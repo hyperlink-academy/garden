@@ -1,0 +1,26 @@
+name = "hyperlink-garden"
+account_id = "81c1ee2e102b2279be9311f73c01ec7f"
+workers_dev = true
+type = "javascript"
+
+route = ''
+zone_id = ''
+usage_model = ''
+compatibility_flags = []
+
+compatibility_date = "2022-01-31"
+
+kv_namespaces = [ 
+]
+
+[build]
+command = "npm run build-backend"
+
+[build.upload]
+format = "modules"
+dir = "out"
+main = "./index.mjs"
+
+[[build.upload.rules]]
+type = "ESModule"
+globs = ["**/*.mjs"]
