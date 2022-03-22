@@ -29,6 +29,9 @@
     "@cloudflare/workers-types": "^3.4.0",
     "@types/node": "^17.0.22",
     "@types/react": "^17.0.41",
-    "esbuild": "^0.14.27"
+    "autoprefixer": "^10.4.4",
+    "esbuild": "^0.14.27",
+    "postcss": "^8.4.12",
+    "tailwindcss": "^3.0.23"
   }
 }
