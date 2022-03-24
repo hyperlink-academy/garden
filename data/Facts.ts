@@ -2,11 +2,18 @@ import { Attribute } from "data/Attributes";
 
 type AttributeName = keyof Attribute;
 
-type FactMetadata = {
+export type FactMetadata = {
   id: string;
   retracted?: boolean;
   lastUpdated: string;
+  schema: Schema;
   positions: { [k: string]: string | undefined };
+};
+
+export type Schema = {
+  type: Fact<"type">["value"];
+  unique: Fact<"unique">["value"];
+  cardinality: Fact<"cardinality">["value"];
 };
 
 export type Fact<A extends AttributeName> = FactMetadata & {

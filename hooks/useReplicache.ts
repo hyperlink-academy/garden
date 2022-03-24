@@ -1,7 +1,7 @@
 import { Attribute } from "data/Attributes";
-import { Fact } from "data/Facts";
+import { Fact, Schema } from "data/Facts";
 import { CardinalityResult, MutationContext, Mutations } from "data/mutations";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext } from "react";
 import {
   Puller,
   Pusher,
@@ -9,6 +9,7 @@ import {
   Replicache,
   WriteTransaction,
 } from "replicache";
+import { useSubscribe } from "replicache-react";
 import { ulid } from "src/utils";
 
 export type ReplicacheMutators = {
@@ -52,13 +53,10 @@ const scanIndex = (tx: ReadTransaction) => {
   };
   return q;
 };
-type Schema = {
-  type: Fact<"type">["value"];
-  unique: Fact<"unique">["value"];
-  cardinality: Fact<"cardinality">["value"];
-};
 const getSchema = async (tx: ReadTransaction, attributeName: string) => {
   let q = scanIndex(tx);
+  let initialFact = Attribute[attributeName as keyof Attribute];
+  if (initialFact) return initialFact;
   let attribute = await q.ave("name", attributeName);
   if (!attribute) return;
 
@@ -70,15 +68,12 @@ const getSchema = async (tx: ReadTransaction, attributeName: string) => {
   return schema;
 };
 
-export function FactWithIndexes<A extends keyof Attribute>(
-  f: Fact<A>,
-  schema: Schema
-) {
+export function FactWithIndexes<A extends keyof Attribute>(f: Fact<A>) {
   let indexes: { eav: string; ave?: string; vae?: string; aev: string } = {
     eav: `${f.entity}-${f.attribute}-${f.id}`,
     aev: `${f.attribute}-${f.entity}-${f.id}`,
-    ave: schema.unique ? `${f.attribute}-${f.value}` : "",
-    vae: schema.type === `reference` ? `${f.value}-${f.attribute}` : "",
+    ave: f.schema.unique ? `${f.attribute}-${f.value}` : "",
+    vae: f.schema.type === `reference` ? `${f.value}-${f.attribute}` : "",
   };
   return { ...f, indexes };
 }
@@ -114,7 +109,7 @@ let mutators: ReplicacheMutators = Object.keys(Mutations).reduce((acc, k) => {
             newID = existingFact.id;
           }
         }
-        let data = FactWithIndexes({ id: newID, ...fact, lastUpdated }, schema);
+        let data = FactWithIndexes({ id: newID, ...fact, lastUpdated, schema });
         return tx.put(newID, data);
       },
     };
@@ -130,6 +125,7 @@ export const makeReplicache = (args: {
 }) => {
   let rep = new Replicache({
     name: args.name,
+    pullInterval: 500,
     pushDelay: 500,
     pusher: args.pusher,
     puller: args.puller,
@@ -145,26 +141,26 @@ export const makeReplicache = (args: {
 export const useIndex = {
   eav<A extends keyof Attribute>(entity: string, attribute: A) {
     let rep = useContext(ReplicacheContext);
-    let [state, setState] = useState<CardinalityResult<A>>();
-    useEffect(() => {
-      if (!rep) return;
-      rep.rep.query(async (tx) => {
+    return useSubscribe(
+      rep?.rep,
+      async (tx) => {
+        console.log("yoooo");
         let result = await scanIndex(tx).eav(entity, attribute);
-        setState(result);
-      });
-    }, [rep, attribute, entity]);
-    return state;
+        return (result as CardinalityResult<A>) || null;
+      },
+      null,
+      [attribute, entity, rep]
+    );
   },
   ave<A extends keyof Attribute>(attribute: A, value: string) {
     let rep = useContext(ReplicacheContext);
-    let [state, setState] = useState<Fact<A>>();
-    useEffect(() => {
-      if (!rep) return;
-      rep.rep.query(async (tx) => {
-        let result = await scanIndex(tx).ave(attribute, value);
-        setState(result);
-      });
-    }, [rep, attribute, value]);
-    return state;
+    return useSubscribe(
+      rep?.rep,
+      async (tx) => {
+        return (await scanIndex(tx).ave(attribute, value)) || null;
+      },
+      null,
+      [attribute, value]
+    );
   },
 };

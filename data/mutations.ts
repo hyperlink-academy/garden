@@ -23,7 +23,7 @@ export type CardinalityResult<A extends keyof Attribute> =
   Attribute[A] extends {
     cardinality: "one";
   }
-    ? Fact<A> | undefined
+    ? Fact<A> | null
     : Fact<A>[];
 
 type Mutation<T> = (args: T, ctx: MutationContext) => Promise<void>;
