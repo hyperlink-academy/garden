@@ -1,21 +1,32 @@
 import { Attribute } from "./Attributes";
-import { Fact } from "./Facts";
+import { Fact, FactMetadata } from "./Facts";
 
-type Context = {
+export type MutationContext = {
   assertFact: <A extends keyof Attribute>(
     d: Pick<Fact<A>, "entity" | "attribute" | "value" | "positions">
   ) => Promise<void>;
-  updateFact: <A extends keyof Attribute>(
-    id: string,
-    data: Partial<Fact<A>>
-  ) => void;
+  updateFact: (id: string, data: Partial<FactMetadata>) => Promise<void>;
+  retractFact: (id: string) => Promise<void>;
   scanIndex: {
-    eav: <A extends keyof Attribute>(entity: string, attribute: A) => Fact<A>[];
-    ave: <A extends keyof Attribute>(attribute: A, value: string) => Fact<A>;
+    eav: <A extends keyof Attribute>(
+      entity: string,
+      attribute: A
+    ) => Promise<CardinalityResult<A>>;
+    ave: <A extends keyof Attribute>(
+      attribute: A,
+      value: string
+    ) => Promise<Fact<A> | undefined>;
   };
 };
 
-type Mutation<T> = (args: T, ctx: Context) => Promise<void>;
+export type CardinalityResult<A extends keyof Attribute> =
+  Attribute[A] extends {
+    cardinality: "one";
+  }
+    ? Fact<A> | undefined
+    : Fact<A>[];
+
+type Mutation<T> = (args: T, ctx: MutationContext) => Promise<void>;
 
 const addDeck: Mutation<{
   name: string;

@@ -1,6 +1,5 @@
 import { Attribute } from "data/Attributes";
 
-type Attribute = typeof Attribute;
 type AttributeName = keyof Attribute;
 
 type FactMetadata = {
