@@ -8,7 +8,7 @@ import {
 } from "hooks/useReplicache";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { PullRequest, PushRequest } from "replicache";
-import { ulid } from "src/utils";
+import { ulid } from "src/ulid";
 
 type Cookie = {
   lastUpdated: string;

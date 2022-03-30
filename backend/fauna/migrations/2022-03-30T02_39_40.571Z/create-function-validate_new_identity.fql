@@ -1,0 +1,13 @@
+CreateFunction({
+  "name": "validate_new_identity",
+  "role": "server",
+  "body": Query(Lambda("data", Let([{
+    "email": Exists(Match(Index("identities_by_email"), [LowerCase(Select("email", Var("data")))]))
+  }, {
+    "username": Exists(Match(Index("identities_by_username"), [LowerCase(Select("username", Var("data")))]))
+  }], {
+    "emailTaken": Var("email"),
+    "usernameTaken": Var("username"),
+    "valid": And(Not(Var("email")), Not(Var("username")))
+  })))
+})

@@ -13,6 +13,16 @@ compatibility_date = "2022-01-31"
 kv_namespaces = [ 
 ]
 
+
+[durable_objects]
+bindings = [
+  { name = "SPACES", class_name = "SpaceDurableObject" }
+]
+
+[[migrations]]
+tag = "v1"
+new_classes = ["SpaceDurableObject"]
+
 [build]
 command = "npm run build-backend"
 

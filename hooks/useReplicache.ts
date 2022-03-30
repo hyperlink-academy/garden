@@ -10,7 +10,7 @@ import {
   WriteTransaction,
 } from "replicache";
 import { useSubscribe } from "replicache-react";
-import { ulid } from "src/utils";
+import { ulid } from "src/ulid";
 
 export type ReplicacheMutators = {
   [k in keyof typeof Mutations]: (

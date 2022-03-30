@@ -1,0 +1,9 @@
+CreateIndex({
+  "name": "sessions_by_id",
+  "source": Collection("sessions"),
+  "unique": true,
+  "terms": [{
+    "field": ["data", "id"]
+  }],
+  "values": []
+})

@@ -1,0 +1,9 @@
+CreateIndex({
+  "name": "identities_by_username",
+  "source": Collection("identities"),
+  "terms": [{
+    "field": ["data", "username"]
+  }],
+  "unique": true,
+  "values": []
+})

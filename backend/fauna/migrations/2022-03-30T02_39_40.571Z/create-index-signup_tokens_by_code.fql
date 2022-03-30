@@ -1,0 +1,9 @@
+CreateIndex({
+  "name": "signup_tokens_by_code",
+  "source": Collection("signup_tokens"),
+  "terms": [{
+    "field": ["data", "code"]
+  }],
+  "unique": true,
+  "values": []
+})

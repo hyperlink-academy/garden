@@ -1,0 +1,31 @@
+CreateFunction({
+  "name": "create_identity",
+  "role": "server",
+  "body": Query(Lambda("data", Let([{
+    "validIdentity": Call("validate_new_identity", Var("data"))
+  }, {
+    "token": Match(Index("signup_tokens_by_code"), [Select("code", Var("data"))])
+  }, {
+    "validToken": And(Exists(Var("token")), Not(Select(["data", "used"], Get(Var("token")))))
+  }], If(Not(Var("validToken")), {
+    "success": false,
+    "error": "invalidToken"
+  }, If(Not(Select("valid", Var("validIdentity"))), {
+    "success": false,
+    "error": "invalidUsernameOrEmail"
+  }, Do(Update(Select("ref", Get(Var("token"))), {
+    "data": {
+      "used": true
+    }
+  }), Create(Collection("identities"), {
+    "data": {
+      "studio": Select("studio", Var("data")),
+      "email": LowerCase(Select("email", Var("data"))),
+      "username": LowerCase(Select("username", Var("data"))),
+      "hashedPassword": Select("hashedPassword", Var("data")),
+      "salt": Select("salt", Var("data"))
+    }
+  }), {
+    "success": true
+  }))))))
+})

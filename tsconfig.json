@@ -3,7 +3,7 @@
     "downlevelIteration": true,
     "target": "es5",
     "lib": ["dom", "dom.iterable", "esnext"],
-    "types": [],
+    "types": ["@cloudflare/workers-types"],
     "allowJs": true,
     "baseUrl": ".",
     "skipLibCheck": true,
