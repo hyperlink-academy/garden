@@ -30,7 +30,6 @@ export const LoginRoute = makePOSTRoute({
     if (!existingUser)
       return { data: { success: false, error: Errors.noUser } } as const;
 
-    console.log(existingUser);
     let hashedPassword = await bcrypt.hash(msg.password, existingUser.salt);
     if (hashedPassword !== existingUser.hashedPassword)
       return {
@@ -51,17 +50,7 @@ export const LoginRoute = makePOSTRoute({
     });
 
     return {
-      data: { success: true },
-      headers: [
-        [
-          "Set-Cookie",
-          cookie.serialize("auth", newToken, {
-            path: "/",
-            httpOnly: true,
-            secure: true,
-          }),
-        ],
-      ],
+      data: { success: true, token: newToken },
     } as const;
   },
 });

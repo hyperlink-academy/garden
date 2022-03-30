@@ -9,8 +9,7 @@ export default {
   fetch: handleRequest,
 };
 
-export const POSTroutes = [SignupRoute, LoginRoute, LogoutRoute];
-export const GETroutes = [SessionRoute];
+export const POSTroutes = [SignupRoute, LoginRoute, LogoutRoute, SessionRoute];
 
 export type Bindings = {
   FAUNA_KEY: string;
@@ -28,28 +27,6 @@ async function handleRequest(request: Request, env: Bindings) {
   switch (request.method) {
     case "OPTIONS":
       return handleOptions(request);
-    case "GET": {
-      let handler = GETroutes.find((f) => f.cmd === path[2]);
-      if (!handler) {
-        status = 404;
-        result = { data: { error: `route /v0/${path[1]} not Found` } };
-        break;
-      }
-      try {
-        result = (await handler.handler(env, request)) as {
-          data: any;
-          headers?: [string, string][];
-        };
-        break;
-      } catch (e) {
-        console.log(e);
-        status = 500;
-        result = {
-          data: { error: "An error occured while handling this request" },
-        };
-        break;
-      }
-    }
     case "POST": {
       let handler = POSTroutes.find((f) => f.cmd === path[2]);
       if (!handler) {

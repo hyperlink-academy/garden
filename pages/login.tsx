@@ -1,6 +1,5 @@
-import { callAPI } from "backend/lib/api";
+import { useAuth } from "hooks/useAuth";
 import { useState } from "react";
-import useSWR from "swr";
 
 export default function LoginPage() {
   let [data, setData] = useState({
@@ -8,22 +7,13 @@ export default function LoginPage() {
     password: "",
   });
 
-  let { data: auth, mutate } = useSWR("session", async () => {
-    return callAPI.query(
-      process.env.NEXT_PUBLIC_WORKER_URL as string,
-      "session"
-    );
-  });
-  console.log(auth);
+  let { session, login, logout } = useAuth();
+  console.log(session.data);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await callAPI.mutation(
-      process.env.NEXT_PUBLIC_WORKER_URL as string,
-      "login",
-      data
-    );
-    mutate();
+    await login(data);
+    session.mutate();
   };
   return (
     <div>
@@ -57,12 +47,8 @@ export default function LoginPage() {
       <button
         className="border-2 p-2"
         onClick={async () => {
-          await callAPI.mutation(
-            process.env.NEXT_PUBLIC_WORKER_URL as string,
-            "logout",
-            {}
-          );
-          mutate();
+          await logout();
+          session.mutate();
         }}
       >
         logout

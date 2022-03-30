@@ -1,23 +1,9 @@
-import { GETroutes, POSTroutes } from "backend";
+import { POSTroutes } from "backend";
 import { ZodObject, ZodRawShape, z, ZodUndefined } from "zod";
 
 type UnwrapPromise<T> = T extends Promise<infer U> ? U : T;
 
 export const callAPI = {
-  query: async <T extends typeof GETroutes[number]["cmd"]>(
-    route: string,
-    cmd: T
-  ) => {
-    let result = await fetch(route + cmd, {
-      method: "GET",
-      credentials: "include",
-    });
-    return result.json() as Promise<
-      UnwrapPromise<
-        ReturnType<Extract<typeof GETroutes[number], { cmd: T }>["handler"]>
-      >["data"]
-    >;
-  },
   mutation: async <T extends typeof POSTroutes[number]["cmd"]>(
     route: string,
     cmd: T,
@@ -26,7 +12,6 @@ export const callAPI = {
     let result = await fetch(route + cmd, {
       body: JSON.stringify(data),
       method: "POST",
-      credentials: "include",
       headers: { "Content-type": "application/json" },
     });
     return result.json() as Promise<
