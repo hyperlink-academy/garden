@@ -26,8 +26,7 @@ export let ReplicacheContext = createContext<{
 const scanIndex = (tx: ReadTransaction) => {
   const q: MutationContext["scanIndex"] = {
     eav: async (entity, attribute) => {
-      let schema = await getSchema(tx, attribute);
-      if (!schema) throw new Error("unknown attribute!");
+      let schema = Attribute[attribute as keyof Attribute];
       let results = await tx
         .scan({
           indexName: "eav",
@@ -35,7 +34,7 @@ const scanIndex = (tx: ReadTransaction) => {
         })
         .values()
         .toArray();
-      if (schema.cardinality === "one")
+      if (schema?.cardinality === "one")
         return results[0] as CardinalityResult<typeof attribute>;
       return results as CardinalityResult<typeof attribute>;
     },
@@ -55,8 +54,6 @@ const scanIndex = (tx: ReadTransaction) => {
 };
 const getSchema = async (tx: ReadTransaction, attributeName: string) => {
   let q = scanIndex(tx);
-  let initialFact = Attribute[attributeName as keyof Attribute];
-  if (initialFact) return initialFact;
   let attribute = await q.ave("name", attributeName);
   if (!attribute) return;
 
@@ -88,17 +85,19 @@ let mutators: ReplicacheMutators = Object.keys(Mutations).reduce((acc, k) => {
       scanIndex: q,
       retractFact: async (id) => {
         await tx.del(id);
+        return;
       },
       updateFact: async (id, data) => {
         let existingFact = (await tx.get(id)) as
           | Fact<keyof Attribute>
           | undefined;
-        if (!existingFact) return;
-        await tx.put(id, { ...existingFact, ...data });
+        if (!existingFact) return { success: false };
+        tx.put(id, { ...existingFact, ...data });
+        return { success: true };
       },
       assertFact: async (fact) => {
         let schema = await getSchema(tx, fact.attribute);
-        if (!schema) return;
+        if (!schema) return { success: false };
         let newID = ulid();
         let lastUpdated = Date.now().toString();
         if (schema.cardinality === "one") {
@@ -110,7 +109,8 @@ let mutators: ReplicacheMutators = Object.keys(Mutations).reduce((acc, k) => {
           }
         }
         let data = FactWithIndexes({ id: newID, ...fact, lastUpdated, schema });
-        return tx.put(newID, data);
+        tx.put(newID, data);
+        return { success: false };
       },
     };
     return Mutations[k as keyof typeof Mutations](mutationArgs, context);
@@ -125,7 +125,6 @@ export const makeReplicache = (args: {
 }) => {
   let rep = new Replicache({
     name: args.name,
-    pullInterval: 500,
     pushDelay: 500,
     pusher: args.pusher,
     puller: args.puller,
@@ -144,7 +143,6 @@ export const useIndex = {
     return useSubscribe(
       rep?.rep,
       async (tx) => {
-        console.log("yoooo");
         let result = await scanIndex(tx).eav(entity, attribute);
         return (result as CardinalityResult<A>) || null;
       },

@@ -40,23 +40,11 @@ export const LocalReplicacheProvider: React.FC<{
         ) as Fact<typeof attribute>;
       },
       eav: async (entity, attribute) => {
-        let cardinality = "many";
         let schema = Attribute[attribute];
-        if (!schema) {
-          let attrEntity = db.current.facts.find(
-            (f) => f.attribute === "name" && f.value === attribute
-          );
-          if (!attrEntity) throw new Error("no attribute found!");
-          cardinality =
-            (db.current.facts.find(
-              (f) =>
-                f.entity === attrEntity?.entity && f.attribute === "cardinality"
-            )?.value as "one" | "many") || "one";
-        }
         let facts = db.current.facts.filter(
           (f) => f.attribute === attribute && f.entity === entity
         );
-        if (cardinality === "one")
+        if (schema?.cardinality === "one")
           return facts[0] as CardinalityResult<typeof attribute>;
         return facts as CardinalityResult<typeof attribute>;
       },
@@ -95,6 +83,7 @@ export const LocalReplicacheProvider: React.FC<{
         let schema: Schema | undefined = Attribute[fact.attribute];
         if (!schema) schema = await getSchema(fact.attribute);
         if (!schema) throw Error("no schema found for attribute");
+
         if (schema.cardinality) {
           let existingFactIndex = db.current.facts.findIndex(
             (f) => f.attribute === fact.attribute && f.entity === fact.entity
@@ -106,19 +95,21 @@ export const LocalReplicacheProvider: React.FC<{
               retracted: false,
               lastUpdated,
             };
-            return;
+            return { success: true };
           }
           db.current.facts.push({ ...fact, id: newID, lastUpdated, schema });
         }
+        return { success: true };
       },
       updateFact: async (id, data) => {
         let existingFactIndex = db.current.facts.findIndex((f) => f.id === id);
-        if (existingFactIndex === -1) return;
+        if (existingFactIndex === -1) return { success: false };
         db.current.facts[existingFactIndex] = {
           ...db.current.facts[existingFactIndex],
           ...data,
           lastUpdated: Date.now().toString(),
         };
+        return { success: true };
       },
     };
   }, []);

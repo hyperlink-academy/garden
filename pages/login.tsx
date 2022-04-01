@@ -7,13 +7,11 @@ export default function LoginPage() {
     password: "",
   });
 
-  let { session, login, logout } = useAuth();
-  console.log(session.data);
+  let { login, logout } = useAuth();
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await login(data);
-    session.mutate();
   };
   return (
     <div>
@@ -48,7 +46,6 @@ export default function LoginPage() {
         className="border-2 p-2"
         onClick={async () => {
           await logout();
-          session.mutate();
         }}
       >
         logout

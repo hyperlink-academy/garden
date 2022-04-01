@@ -1,4 +1,4 @@
-import { callAPI } from "backend/lib/api";
+import { workerAPI } from "backend/lib/api";
 import { useRouter } from "next/router";
 import { useState } from "react";
 
@@ -14,13 +14,16 @@ export default function SignupPage() {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!code) return;
-    let result = await callAPI.mutation(process.env.NEXT_PUBLIC_WORKER_URL as string, "signup", {
-      code: code,
-      email: data.email,
-      password: data.password,
-      username: data.username,
-    });
-    console.log(result);
+    await workerAPI.mutation(
+      process.env.NEXT_PUBLIC_WORKER_URL as string,
+      "signup",
+      {
+        code: code,
+        email: data.email,
+        password: data.password,
+        username: data.username,
+      }
+    );
   };
 
   if (!code)

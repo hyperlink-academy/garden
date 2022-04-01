@@ -1,11 +1,12 @@
 import { Bindings } from "backend";
 import { z } from "zod";
 import { getSessionById } from "backend/fauna/resources/functions/get_session_by_id";
-import { makePOSTRoute } from "backend/lib/api";
+import { ExtractResponse, makePOSTRoute } from "backend/lib/api";
 import { Client } from "faunadb";
 
+export type SessionResponse = ExtractResponse<typeof SessionRoute>;
 export const SessionRoute = makePOSTRoute({
-  cmd: "session",
+  route: "session",
   input: z.object({
     token: z.string(),
   }),
@@ -18,7 +19,7 @@ export const SessionRoute = makePOSTRoute({
     if (!session)
       return {
         data: { loggedIn: false },
-      };
-    return { data: { loggedIn: true, session } };
+      } as const;
+    return { data: { loggedIn: true, session } } as const;
   },
 });

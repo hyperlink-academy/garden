@@ -14,7 +14,7 @@ const Errors = {
 } as const;
 
 export const LoginRoute = makePOSTRoute({
-  cmd: "login",
+  route: "login",
   input: z.object({
     username: z.string(),
     password: z.string(),

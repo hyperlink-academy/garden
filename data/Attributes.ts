@@ -1,4 +1,4 @@
-const BaseAttributes = {
+export const BaseAttributes = {
   name: {
     unique: true,
     cardinality: "one",
@@ -28,7 +28,7 @@ const BaseAttributes = {
   },
 } as const;
 
-const DefaultAttributes = {
+export const DefaultAttributes = {
   arbitrarySectionReferenceType: {
     type: "reference",
     unique: false,

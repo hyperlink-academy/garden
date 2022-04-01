@@ -4,8 +4,11 @@ import { Fact, FactMetadata } from "./Facts";
 export type MutationContext = {
   assertFact: <A extends keyof Attribute>(
     d: Pick<Fact<A>, "entity" | "attribute" | "value" | "positions">
-  ) => Promise<void>;
-  updateFact: (id: string, data: Partial<FactMetadata>) => Promise<void>;
+  ) => Promise<{ success: boolean }>;
+  updateFact: (
+    id: string,
+    data: Partial<FactMetadata>
+  ) => Promise<{ success: boolean }>;
   retractFact: (id: string) => Promise<void>;
   scanIndex: {
     eav: <A extends keyof Attribute>(

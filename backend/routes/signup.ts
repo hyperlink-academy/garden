@@ -3,10 +3,11 @@ import { Bindings } from "backend";
 import { Client } from "faunadb";
 import bcrypt from "bcryptjs";
 import { CreateNewIdentity } from "backend/fauna/resources/functions/create_identity";
-import { makePOSTRoute } from "backend/lib/api";
+import { makeAPIClient, makePOSTRoute } from "backend/lib/api";
+import { SpaceRoutes } from "backend/SpaceDurableObject";
 
 export const SignupRoute = makePOSTRoute({
-  cmd: "signup",
+  route: "signup",
   input: z.object({
     email: z.string().email(),
     username: z.string(),
@@ -22,17 +23,26 @@ export const SignupRoute = makePOSTRoute({
     // Validate their signup token
     let salt = await bcrypt.genSalt();
     let hashedPassword = await bcrypt.hash(msg.password, salt);
-    let newSpace = env.SPACES.newUniqueId().toString();
+    let newSpaceID = env.SPACES.newUniqueId();
     let result = await CreateNewIdentity(fauna, {
       ...msg,
       salt,
-      studio: newSpace,
+      studio: newSpaceID.toString(),
       hashedPassword,
     });
 
     if (!result.success) {
-      return { data: { success: false, error: result.error } };
+      return { data: { success: false, error: result.error } } as const;
     }
-    return { data: { success: true } };
+
+    let stub = env.SPACES.get(newSpaceID);
+    let newSpace = makeAPIClient<SpaceRoutes>(stub.fetch.bind(stub));
+    let res = await newSpace.mutation("http://internal", "claim", {
+      name: msg.username,
+      ownerID: newSpaceID.toString(),
+      ownerName: msg.username,
+    });
+    console.log(res);
+    return { data: { success: true } } as const;
   },
 });

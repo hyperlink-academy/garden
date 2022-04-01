@@ -5,7 +5,7 @@ import { makePOSTRoute } from "backend/lib/api";
 import { deleteSession } from "backend/fauna/resources/functions/delete_session";
 
 export const LogoutRoute = makePOSTRoute({
-  cmd: "logout",
+  route: "logout",
   input: z.object({ token: z.string() }),
   handler: async (msg, env: Bindings) => {
     let fauna = new Client({
