@@ -1,5 +1,6 @@
 /out
 .next
+*.tsbuildinfo
 /node_modules
 .env
 .env.local
