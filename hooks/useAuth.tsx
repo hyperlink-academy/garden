@@ -29,13 +29,10 @@ export const AuthProvider: React.FC = (props) => {
       value={{
         session: data,
         login: async (data: { username: string; password: string }) => {
-          console.log("yo loggin in");
           let token = localStorage.getItem("auth");
-          console.log(token);
           if (token) return true;
           let res = await workerAPI.mutation(WORKER_URL, "login", data);
-          console.log({ res });
-          mutate();
+          await mutate();
           if (res.success) localStorage.setItem("auth", res.token);
           return res.success;
         },

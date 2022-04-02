@@ -7,7 +7,7 @@ export default function IndexPage() {
     <div>
       <div className="text-accent-blue">hello world</div>
       {session.loggedIn ? (
-        <Link href={`/s/${session.session.studio}`}>
+        <Link href={`/s/${session.session.username}`}>
           <a>home studio</a>
         </Link>
       ) : (

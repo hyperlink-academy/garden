@@ -48,6 +48,9 @@ export const SpaceProvider: React.FC<{ id: string }> = (props) => {
       },
     });
     setRep(rep);
+    return () => {
+      rep.close()
+    }
   }, [props.id]);
   return (
     <ReplicacheContext.Provider value={rep ? { rep } : null}>

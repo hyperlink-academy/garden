@@ -16,7 +16,7 @@ export const claimRoute = makePOSTRoute({
     await Promise.all([
       env.factStore.assertFact({
         entity: memberEntity,
-        attribute: "activity/member",
+        attribute: "space/member",
         value: msg.ownerID,
         positions: { aev: "a0" },
       }),

@@ -15,12 +15,14 @@ export default function App({ Component, pageProps }: AppProps) {
 }
 
 const Layout: React.FC = (props) => {
-  let auth = useAuth();
+  let { session } = useAuth();
   return (
     <div>
       <div className="p-2 border-2">
-        {auth.session.loggedIn ? (
-          <button onClick={() => auth.logout()}>logout</button>
+        {session.loggedIn ? (
+          <Link href={`/s/${session.session.username}`}>
+            <a>studio</a>
+          </Link>
         ) : (
           <Link href="/login">
             <a>login</a>

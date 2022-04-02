@@ -6,6 +6,7 @@ type UnwrapPromise<T> = T extends Promise<infer U> ? U : T;
 
 export const workerAPI = makeAPIClient<WorkerRoutes>();
 export const spaceAPI = makeAPIClient<SpaceRoutes>();
+export const internalSpaceAPI = (stub:DurableObjectStub) => makeAPIClient<SpaceRoutes>(stub.fetch.bind(stub))
 
 export type ExtractResponse<
   T extends { handler: (...d: any[]) => Promise<{ data: any }> }

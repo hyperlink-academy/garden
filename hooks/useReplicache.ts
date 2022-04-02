@@ -161,4 +161,22 @@ export const useIndex = {
       [attribute, value]
     );
   },
+  aev<A extends keyof Attribute>(attribute: A, entity?: string) {
+    let rep = useContext(ReplicacheContext)
+    return useSubscribe(
+      rep?.rep,
+      async (tx) => {
+      let results = await tx
+        .scan({
+          indexName: "aev",
+          prefix: `${attribute}-${entity || ''}`,
+        })
+        .values()
+        .toArray();
+        return results as Fact<A>[];
+      },
+      null,
+      [attribute, entity]
+    );
+  }
 };

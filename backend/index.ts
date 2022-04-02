@@ -1,5 +1,6 @@
 import { makeRouter } from "./lib/api";
 import { handleOptions } from "./lib/handleOptions";
+import { getStudioRoute } from "./routes/get_studio";
 import { LoginRoute } from "./routes/login";
 import { LogoutRoute } from "./routes/logout";
 import { SessionRoute } from "./routes/session";
@@ -11,7 +12,7 @@ export default {
 };
 
 const Routes = {
-  POST: [SignupRoute, LoginRoute, LogoutRoute, SessionRoute],
+  POST: [SignupRoute, LoginRoute, LogoutRoute, SessionRoute, getStudioRoute],
   GET: [],
 };
 export type WorkerRoutes = typeof Routes;

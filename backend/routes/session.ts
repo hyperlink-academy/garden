@@ -20,6 +20,6 @@ export const SessionRoute = makePOSTRoute({
       return {
         data: { loggedIn: false },
       } as const;
-    return { data: { loggedIn: true, session } } as const;
+    return { data: { loggedIn: true, session, token: msg.token } } as const;
   },
 });

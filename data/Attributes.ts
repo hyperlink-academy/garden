@@ -84,27 +84,27 @@ export const DefaultAttributes = {
     unique: true,
     cardinality: "one",
   },
-  ["activity/studio"]: {
+  ["space/studio"]: {
     type: "string",
     unique: false,
     cardinality: "one",
   },
-  ["activity/id"]: {
+  ["space/id"]: {
     type: "string",
     unique: true,
     cardinality: "one",
   },
-  ["activity/external"]: {
+  ["space/external"]: {
     type: "boolean",
     unique: false,
     cardinality: "one",
   },
-  "activity/member": {
+  "space/member": {
     type: "string",
     unique: true,
     cardinality: "one",
   },
-  "activity/name": {
+  "space/name": {
     type: "string",
     unique: false,
     cardinality: "one",
