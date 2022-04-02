@@ -15,11 +15,17 @@ export type MutationContext = {
       entity: string,
       attribute: A
     ) => Promise<CardinalityResult<A>>;
-    ave: <A extends keyof Attribute>(
+    ave: <A extends keyof UniqueFacts>(
       attribute: A,
       value: string
     ) => Promise<Fact<A> | undefined>;
   };
+};
+
+type UniqueFacts = {
+  [A in keyof Attribute as Attribute[A]["unique"] extends true
+    ? A
+    : never]: Attribute[A];
 };
 
 export type CardinalityResult<A extends keyof Attribute> =

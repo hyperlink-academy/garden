@@ -4,6 +4,7 @@ import { store } from "./fact_store";
 import { init } from "./initialize";
 import { claimRoute } from "./routes/claim";
 import { create_space_route } from "./routes/create_space";
+import { get_space_route } from "./routes/get_space";
 import { pullRoute } from "./routes/pull";
 
 export type Env = {
@@ -12,7 +13,7 @@ export type Env = {
   env: Bindings;
 };
 
-let routes = [pullRoute, claimRoute, create_space_route]
+let routes = [pullRoute, claimRoute, create_space_route, get_space_route];
 export type SpaceRoutes = typeof routes;
 let router = makeRouter(routes);
 

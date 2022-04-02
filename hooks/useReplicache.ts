@@ -1,4 +1,4 @@
-import { Attribute } from "data/Attributes";
+import { Attribute, UniqueAttributes } from "data/Attributes";
 import { Fact, Schema } from "data/Facts";
 import { CardinalityResult, MutationContext, Mutations } from "data/mutations";
 import { createContext, useContext } from "react";
@@ -150,7 +150,7 @@ export const useIndex = {
       [attribute, entity, rep]
     );
   },
-  ave<A extends keyof Attribute>(attribute: A, value: string) {
+  ave<A extends keyof UniqueAttributes>(attribute: A, value: string) {
     let rep = useContext(ReplicacheContext);
     return useSubscribe(
       rep?.rep,
@@ -162,21 +162,21 @@ export const useIndex = {
     );
   },
   aev<A extends keyof Attribute>(attribute: A, entity?: string) {
-    let rep = useContext(ReplicacheContext)
+    let rep = useContext(ReplicacheContext);
     return useSubscribe(
       rep?.rep,
       async (tx) => {
-      let results = await tx
-        .scan({
-          indexName: "aev",
-          prefix: `${attribute}-${entity || ''}`,
-        })
-        .values()
-        .toArray();
+        let results = await tx
+          .scan({
+            indexName: "aev",
+            prefix: `${attribute}-${entity || ""}`,
+          })
+          .values()
+          .toArray();
         return results as Fact<A>[];
       },
       null,
       [attribute, entity]
     );
-  }
+  },
 };

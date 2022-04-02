@@ -106,7 +106,7 @@ export const DefaultAttributes = {
   },
   "space/name": {
     type: "string",
-    unique: false,
+    unique: true,
     cardinality: "one",
   },
   "member/name": {
@@ -123,3 +123,8 @@ export const DefaultAttributes = {
 
 export const Attribute = { ...DefaultAttributes, ...BaseAttributes };
 export type Attribute = typeof Attribute;
+export type UniqueAttributes = {
+  [A in keyof Attribute as Attribute[A]["unique"] extends true
+    ? A
+    : never]: Attribute[A];
+};
