@@ -19,7 +19,7 @@ export const AuthProvider: React.FC = (props) => {
   let { data, mutate } = useSWR("session", async () => {
     let token = localStorage.getItem("auth");
     if (!token) return { loggedIn: false } as const;
-    let data = await workerAPI.mutation(WORKER_URL, "session", { token });
+    let data = await workerAPI(WORKER_URL, "session", { token });
     if (!data.loggedIn) localStorage.removeItem("auth");
     return data;
   });
@@ -31,15 +31,15 @@ export const AuthProvider: React.FC = (props) => {
         login: async (data: { username: string; password: string }) => {
           let token = localStorage.getItem("auth");
           if (token) return true;
-          let res = await workerAPI.mutation(WORKER_URL, "login", data);
-          await mutate();
+          let res = await workerAPI(WORKER_URL, "login", data);
+          mutate();
           if (res.success) localStorage.setItem("auth", res.token);
           return res.success;
         },
         logout: async () => {
           let token = localStorage.getItem("auth");
           if (!token) return true;
-          await workerAPI.mutation(WORKER_URL, "logout", { token });
+          await workerAPI(WORKER_URL, "logout", { token });
           mutate();
           localStorage.removeItem("auth");
           return true;

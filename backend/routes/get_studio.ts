@@ -1,9 +1,9 @@
 import { Bindings } from "backend";
 import { getIdentityByUsername } from "backend/fauna/resources/functions/get_identity_by_username";
-import { makePOSTRoute } from "backend/lib/api";
+import { makeRoute } from "backend/lib/api";
 import { Client } from "faunadb";
 import { z } from "zod";
-export const getStudioRoute = makePOSTRoute({
+export const getStudioRoute = makeRoute({
   route: "get_studio",
   input: z.object({ name: z.string() }),
   handler: async (msg, env: Bindings) => {

@@ -1,10 +1,10 @@
 import { z } from "zod";
 import { Bindings } from "backend";
 import { Client } from "faunadb";
-import { makePOSTRoute } from "backend/lib/api";
+import { makeRoute } from "backend/lib/api";
 import { deleteSession } from "backend/fauna/resources/functions/delete_session";
 
-export const LogoutRoute = makePOSTRoute({
+export const LogoutRoute = makeRoute({
   route: "logout",
   input: z.object({ token: z.string() }),
   handler: async (msg, env: Bindings) => {

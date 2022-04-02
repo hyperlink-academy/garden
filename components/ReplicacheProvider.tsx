@@ -20,7 +20,7 @@ export const SpaceProvider: React.FC<{ id: string }> = (props) => {
       },
       puller: async (request) => {
         let data: PullRequest = await request.json();
-        let result = await spaceAPI.mutation(
+        let result = await spaceAPI(
           `${WORKER_URL}/space/${props.id}`,
           "pull",
           data as z.infer<typeof pullRoute.input>
@@ -49,8 +49,8 @@ export const SpaceProvider: React.FC<{ id: string }> = (props) => {
     });
     setRep(rep);
     return () => {
-      rep.close()
-    }
+      rep.close();
+    };
   }, [props.id]);
   return (
     <ReplicacheContext.Provider value={rep ? { rep } : null}>

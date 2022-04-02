@@ -1,8 +1,8 @@
-import { makePOSTRoute } from "backend/lib/api";
+import { makeRoute } from "backend/lib/api";
 import { ulid } from "src/ulid";
 import { z } from "zod";
 import { Env } from "..";
-export const claimRoute = makePOSTRoute({
+export const claimRoute = makeRoute({
   route: "claim",
   input: z.object({
     ownerID: z.string(),

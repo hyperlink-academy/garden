@@ -12,7 +12,7 @@ export type Env = {
   env: Bindings;
 };
 
-let routes = { POST: [pullRoute, claimRoute, create_space_route], GET: [] };
+let routes = [pullRoute, claimRoute, create_space_route]
 export type SpaceRoutes = typeof routes;
 let router = makeRouter(routes);
 

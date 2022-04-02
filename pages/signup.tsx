@@ -14,7 +14,7 @@ export default function SignupPage() {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!code) return;
-    await workerAPI.mutation(
+    await workerAPI(
       process.env.NEXT_PUBLIC_WORKER_URL as string,
       "signup",
       {

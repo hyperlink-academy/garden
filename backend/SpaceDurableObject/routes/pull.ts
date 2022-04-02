@@ -1,10 +1,10 @@
-import { makePOSTRoute } from "backend/lib/api";
+import { makeRoute } from "backend/lib/api";
 import { Attribute } from "data/Attributes";
 import { Fact } from "data/Facts";
 import { z } from "zod";
 import { Env } from "..";
 
-export const pullRoute = makePOSTRoute({
+export const pullRoute = makeRoute({
   route: "pull",
   input: z.object({
     clientID: z.string(),

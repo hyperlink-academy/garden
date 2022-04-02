@@ -1,11 +1,11 @@
 import { getSessionById } from "backend/fauna/resources/functions/get_session_by_id";
-import { internalSpaceAPI, makePOSTRoute } from "backend/lib/api";
+import { internalSpaceAPI, makeRoute } from "backend/lib/api";
 import { Client } from "faunadb";
 import { ulid } from "src/ulid";
 import { z } from "zod";
 import { Env } from "..";
 
-export const create_space_route = makePOSTRoute({
+export const create_space_route = makeRoute({
   route: "create_space",
   input: z.object({ name: z.string(), token: z.string() }),
   handler: async (msg, env: Env) => {
@@ -32,7 +32,7 @@ export const create_space_route = makePOSTRoute({
 
     let newSpace = env.env.SPACES.newUniqueId();
     let stub = env.env.SPACES.get(newSpace);
-    await internalSpaceAPI(stub).mutation("http://internal", "claim", {
+    await internalSpaceAPI(stub)("http://internal", "claim", {
       ownerID: session.studio,
       name: msg.name,
       ownerName: session.username,

@@ -14,11 +14,10 @@ export type ExtractResponse<
 export function makeAPIClient<R extends Routes<any>>(f?: Fetcher["fetch"]) {
   let fetcher = fetch;
   if (f) fetcher = f;
-  return {
-    mutation: async <T extends R["POST"][number]["route"]>(
+  return async <T extends R[number]["route"]>(
       path: string,
       route: T,
-      data: z.infer<Extract<R["POST"][number], { route: T }>["input"]>
+      data: z.infer<Extract<R[number], { route: T }>["input"]>
     ) => {
       let result = await fetcher(path + "/api/" + route, {
         body: JSON.stringify(data),
@@ -27,24 +26,20 @@ export function makeAPIClient<R extends Routes<any>>(f?: Fetcher["fetch"]) {
       });
       return result.json() as Promise<
         UnwrapPromise<
-          ReturnType<Extract<R["POST"][number], { route: T }>["handler"]>
+          ReturnType<Extract<R[number], { route: T }>["handler"]>
         >["data"]
       >;
-    },
-  };
+    }
 }
 
-type Routes<Env> = {
-  POST: POSTRoute<string, any, any, Env>[];
-  GET: ReturnType<typeof makeGETRoute>[];
-};
+type Routes<Env> =  POSTRoute<string, any, any, Env>[];
 export const makeRouter = <Env>(routes: Routes<Env>) => {
   return async (route: string, request: Request, env: Env) => {
     let status = 200;
     let result;
     switch (request.method) {
       case "POST": {
-        let handler = routes.POST.find((f) => f.route === route);
+        let handler = routes.find((f) => f.route === route);
         if (!handler) {
           status = 404;
           result = { data: { error: `route ${route} not Found` } };
@@ -114,7 +109,7 @@ type POSTRoute<
   input: Input;
   handler: (msg: z.infer<Input>, env: Env, request: Request) => Promise<Result>;
 };
-export function makePOSTRoute<
+export function makeRoute<
   Cmd extends string,
   Input extends ZodObject<ZodRawShape>,
   Result extends {
@@ -123,25 +118,5 @@ export function makePOSTRoute<
   },
   Env extends {}
 >(d: POSTRoute<Cmd, Input, Result, Env>) {
-  return d;
-}
-
-type GETRoute<
-  Route extends string,
-  Result extends {
-    data: object;
-    headers?: readonly (readonly [string, string])[];
-  },
-  Env extends {}
-> = { route: Route; handler: (env: Env, request: Request) => Promise<Result> };
-
-export function makeGETRoute<
-  Route extends string,
-  Result extends {
-    data: object;
-    headers?: readonly (readonly [string, string])[];
-  },
-  Env extends {}
->(d: GETRoute<Route, Result, Env>) {
   return d;
 }

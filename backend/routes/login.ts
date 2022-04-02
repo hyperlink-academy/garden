@@ -1,9 +1,8 @@
 import { z } from "zod";
-import cookie from "cookie";
 import { Bindings } from "backend";
 import { Client } from "faunadb";
 import bcrypt from "bcryptjs";
-import { makePOSTRoute } from "backend/lib/api";
+import { makeRoute } from "backend/lib/api";
 import { createSession } from "backend/fauna/resources/functions/create_new_session";
 import { getIdentityByUsername } from "backend/fauna/resources/functions/get_identity_by_username";
 
@@ -13,7 +12,7 @@ const Errors = {
   insecureContext: "insecureContext",
 } as const;
 
-export const LoginRoute = makePOSTRoute({
+export const LoginRoute = makeRoute({
   route: "login",
   input: z.object({
     username: z.string(),

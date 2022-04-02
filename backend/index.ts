@@ -11,10 +11,13 @@ export default {
   fetch: handleRequest,
 };
 
-const Routes = {
-  POST: [SignupRoute, LoginRoute, LogoutRoute, SessionRoute, getStudioRoute],
-  GET: [],
-};
+const Routes = [
+  SignupRoute,
+  LoginRoute,
+  LogoutRoute,
+  SessionRoute,
+  getStudioRoute,
+];
 export type WorkerRoutes = typeof Routes;
 
 let router = makeRouter(Routes);

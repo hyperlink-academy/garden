@@ -3,10 +3,10 @@ import { Bindings } from "backend";
 import { Client } from "faunadb";
 import bcrypt from "bcryptjs";
 import { CreateNewIdentity } from "backend/fauna/resources/functions/create_identity";
-import { makeAPIClient, makePOSTRoute } from "backend/lib/api";
+import { makeAPIClient, makeRoute } from "backend/lib/api";
 import { SpaceRoutes } from "backend/SpaceDurableObject";
 
-export const SignupRoute = makePOSTRoute({
+export const SignupRoute = makeRoute({
   route: "signup",
   input: z.object({
     email: z.string().email(),
@@ -37,7 +37,7 @@ export const SignupRoute = makePOSTRoute({
 
     let stub = env.SPACES.get(newSpaceID);
     let newSpace = makeAPIClient<SpaceRoutes>(stub.fetch.bind(stub));
-    let res = await newSpace.mutation("http://internal", "claim", {
+    let res = await newSpace("http://internal", "claim", {
       name: msg.username,
       ownerID: newSpaceID.toString(),
       ownerName: msg.username,

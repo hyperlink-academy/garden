@@ -14,7 +14,7 @@ export default function StudioPage() {
   let { data: id } = useSWR(
     "/space/" + router.query.studio,
     () => {
-      let id = workerAPI.mutation(WORKER_URL, "get_studio", {
+      let id = workerAPI(WORKER_URL, "get_studio", {
         name: router.query.studio as string,
       });
       return id;
@@ -49,7 +49,7 @@ const CreateSpace = (props:{spaceID: string}) => {
   <input value={name} onChange={e=>setName(e.currentTarget.value)}/>
   <button onClick={async ()=> {
     if(!auth.session.loggedIn || !name) return
-    await spaceAPI.mutation(`${WORKER_URL}/space/${props.spaceID}`, 'create_space', {
+    await spaceAPI(`${WORKER_URL}/space/${props.spaceID}`, 'create_space', {
       name,
       token: auth.session.token
         })

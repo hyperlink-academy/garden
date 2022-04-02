@@ -1,11 +1,11 @@
 import { Bindings } from "backend";
 import { z } from "zod";
 import { getSessionById } from "backend/fauna/resources/functions/get_session_by_id";
-import { ExtractResponse, makePOSTRoute } from "backend/lib/api";
+import { ExtractResponse, makeRoute } from "backend/lib/api";
 import { Client } from "faunadb";
 
 export type SessionResponse = ExtractResponse<typeof SessionRoute>;
-export const SessionRoute = makePOSTRoute({
+export const SessionRoute = makeRoute({
   route: "session",
   input: z.object({
     token: z.string(),
