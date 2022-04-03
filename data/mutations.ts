@@ -58,6 +58,41 @@ const addDeck: Mutation<{
   ]);
 };
 
+const addSpace: Mutation<{
+  name: string;
+  studio: string;
+  spaceID: string;
+  entityID: string;
+}> = async (args, ctx) => {
+  await Promise.all([
+    ctx.assertFact({
+      entity: args.entityID,
+      attribute: "space/name",
+      value: args.name,
+      positions: {},
+    }),
+    ctx.assertFact({
+      entity: args.entityID,
+      attribute: "space/studio",
+      value: args.studio,
+      positions: {},
+    }),
+    ctx.assertFact({
+      entity: args.entityID,
+      attribute: "space/id",
+      value: args.spaceID,
+      positions: {},
+    }),
+    ctx.assertFact({
+      entity: args.entityID,
+      attribute: "space/external",
+      value: true,
+      positions: {},
+    }),
+  ]);
+};
+
 export const Mutations = {
+  addSpace,
   addDeck,
 };

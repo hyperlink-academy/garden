@@ -4,9 +4,11 @@ import { store } from "./fact_store";
 import { init } from "./initialize";
 import { claimRoute } from "./routes/claim";
 import { create_space_route } from "./routes/create_space";
+import { get_share_code_route } from "./routes/get_share_code";
 import { get_space_route } from "./routes/get_space";
 import { join_route } from "./routes/join";
 import { pullRoute } from "./routes/pull";
+import { push_route } from "./routes/push";
 
 export type Env = {
   factStore: ReturnType<typeof store>;
@@ -16,9 +18,11 @@ export type Env = {
 
 let routes = [
   pullRoute,
+  push_route,
   claimRoute,
   create_space_route,
   get_space_route,
+  get_share_code_route,
   join_route,
 ];
 export type SpaceRoutes = typeof routes;

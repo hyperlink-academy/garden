@@ -184,7 +184,7 @@ export const LocalReplicacheProvider: React.FC<{
   }, [props.defaultFacts, rep]);
 
   return (
-    <ReplicacheContext.Provider value={rep ? { rep } : null}>
+    <ReplicacheContext.Provider value={rep ? { rep, id: "local" } : null}>
       {props.children}
     </ReplicacheContext.Provider>
   );

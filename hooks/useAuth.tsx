@@ -1,11 +1,15 @@
 import { workerAPI } from "backend/lib/api";
 import { SessionResponse } from "backend/routes/session";
-import { createContext, useContext } from "react";
+import { makeSpaceReplicache } from "components/ReplicacheProvider";
+import { createContext, useContext, useEffect, useState } from "react";
+import { Replicache } from "replicache";
 import useSWR from "swr";
+import { makeReplicache, ReplicacheMutators } from "./useReplicache";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 
 const AuthContext = createContext({
+  rep: null as null | Replicache<ReplicacheMutators>,
   session: { loggedIn: false } as SessionResponse,
   login: async (_data: { username: string; password: string }) => {
     return false as boolean;
@@ -23,10 +27,29 @@ export const AuthProvider: React.FC = (props) => {
     if (!data.loggedIn) localStorage.removeItem("auth");
     return data;
   });
+
+  let [rep, setRep] = useState<ReturnType<typeof makeReplicache>>();
+
+  useEffect(() => {
+    if (!data?.loggedIn) return;
+    let id = data.session.studio;
+    if (!id) return;
+    let rep = makeSpaceReplicache({
+      id: id,
+      session: id,
+      token: data.token,
+    });
+    setRep(rep);
+    return () => {
+      rep.close();
+    };
+  }, [data?.loggedIn]);
+
   if (!data) return <div>loading</div>;
   return (
     <AuthContext.Provider
       value={{
+        rep: rep || null,
         session: data,
         login: async (data: { username: string; password: string }) => {
           let token = localStorage.getItem("auth");

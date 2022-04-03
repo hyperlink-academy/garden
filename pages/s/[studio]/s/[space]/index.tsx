@@ -1,7 +1,7 @@
-import { workerAPI } from "backend/lib/api";
+import { spaceAPI, workerAPI } from "backend/lib/api";
 import { SpaceProvider } from "components/ReplicacheProvider";
 import { useAuth } from "hooks/useAuth";
-import { useIndex } from "hooks/useReplicache";
+import { useIndex, useSpaceID } from "hooks/useReplicache";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import useSWR from "swr";
@@ -40,7 +40,29 @@ const Join = () => {
   let { session } = useAuth();
   let router = useRouter();
   let isMember = useIndex.ave("space/member", session.session?.studio);
-  if (isMember) return <span> You're a member </span>;
+  const spaceID = useSpaceID();
+  const getShareLink = async () => {
+    if (!spaceID || !session.token) return;
+    let code = await spaceAPI(
+      `${WORKER_URL}/space/${spaceID}`,
+      "get_share_code",
+      {
+        token: session.token,
+      }
+    );
+    if (code.success) {
+      await navigator.clipboard.writeText(
+        `${document.location.href}/join?code=${code.code}`
+      );
+    }
+  };
+  if (isMember)
+    return (
+      <span>
+        {" "}
+        You're a member <button onClick={getShareLink}>get share link </button>
+      </span>
+    );
   return (
     <Link href={`${router.asPath}/join`}>
       <a>join</a>

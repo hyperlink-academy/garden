@@ -11,6 +11,7 @@ import {
 } from "replicache";
 import { useSubscribe } from "replicache-react";
 import { ulid } from "src/ulid";
+import { useAuth } from "./useAuth";
 
 export type ReplicacheMutators = {
   [k in keyof typeof Mutations]: (
@@ -21,6 +22,7 @@ export type ReplicacheMutators = {
 
 export let ReplicacheContext = createContext<{
   rep: Replicache<ReplicacheMutators>;
+  id: string;
 } | null>(null);
 
 const scanIndex = (tx: ReadTransaction) => {
@@ -183,4 +185,41 @@ export const useIndex = {
       [attribute, entity]
     );
   },
+};
+
+export const useSpaceID = () => {
+  return useContext(ReplicacheContext)?.id;
+};
+
+export const useMutations = () => {
+  let { session } = useAuth();
+  let rep = useContext(ReplicacheContext);
+  let auth = useSubscribe(
+    rep?.rep,
+    async (tx) => {
+      if (!session || !session.loggedIn) return false;
+      let fact = (await tx
+        .scan({
+          indexName: "ave",
+          prefix: `activity/member-${session.session.studio}`,
+        })
+        .values()
+        .toArray()) as Fact<"space/member">[];
+      if (!fact[0]) return false;
+      return true;
+    },
+    false,
+    [session.session?.studio]
+  );
+
+  return {
+    authorized: auth,
+    mutate<T extends keyof typeof Mutations>(
+      mutation: T,
+      args: Parameters<typeof Mutations[T]>[0]
+    ) {
+      if (!session || !auth) return;
+      return rep?.rep.mutate[mutation](args);
+    },
+  };
 };

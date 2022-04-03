@@ -31,6 +31,6 @@ export const get_share_code_route = makeRoute({
       code = generateShareCode();
       await env.storage.put("meta-shareLink", code);
     }
-    return { data: { code } } as const;
+    return { data: { code, success: true } } as const;
   },
 });
