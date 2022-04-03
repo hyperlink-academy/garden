@@ -150,11 +150,15 @@ export const useIndex = {
       [attribute, entity, rep]
     );
   },
-  ave<A extends keyof UniqueAttributes>(attribute: A, value: string) {
+  ave<A extends keyof UniqueAttributes>(
+    attribute: A,
+    value: string | undefined
+  ) {
     let rep = useContext(ReplicacheContext);
     return useSubscribe(
       rep?.rep,
       async (tx) => {
+        if (!value) return null;
         return (await scanIndex(tx).ave(attribute, value)) || null;
       },
       null,

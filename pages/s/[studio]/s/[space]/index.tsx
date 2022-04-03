@@ -1,6 +1,8 @@
 import { workerAPI } from "backend/lib/api";
 import { SpaceProvider } from "components/ReplicacheProvider";
+import { useAuth } from "hooks/useAuth";
 import { useIndex } from "hooks/useReplicache";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import useSWR from "swr";
 
@@ -23,6 +25,7 @@ export default function SpacePage() {
   return (
     <SpaceProvider id={id.id}>
       <div>Space!</div>
+      <Join />
       <SpaceName />
     </SpaceProvider>
   );
@@ -31,4 +34,16 @@ export default function SpacePage() {
 const SpaceName = () => {
   let name = useIndex.aev("this/name");
   return <h2>{name?.[0]?.value}</h2>;
+};
+
+const Join = () => {
+  let { session } = useAuth();
+  let router = useRouter();
+  let isMember = useIndex.ave("space/member", session.session?.studio);
+  if (isMember) return <span> You're a member </span>;
+  return (
+    <Link href={`${router.asPath}/join`}>
+      <a>join</a>
+    </Link>
+  );
 };
