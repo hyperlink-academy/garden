@@ -1,6 +1,6 @@
 import { Client, query as q } from "faunadb";
 import { FunctionDefinition } from "backend/fauna/types";
-import { CreateSession } from "../session_collection";
+import { CreateSession, Session } from "../session_collection";
 import { IdentitiesByUsernameIndexName } from "../identities_by_username_index";
 export const CreateSessionFunctionName = "create_session";
 
@@ -14,7 +14,7 @@ type Args = {
 
 export const createSession = (c: Client, args: Args) =>
   c.query(q.Call(q.Function(CreateSessionFunctionName), args)) as Promise<
-    { success: false; error: "NoUserFound" } | { success: true }
+    { success: false; error: "NoUserFound" } | { success: true; data: Session }
   >;
 
 const definition: FunctionDefinition = {
@@ -31,17 +31,20 @@ const definition: FunctionDefinition = {
         q.If(
           q.Not(q.Exists(q.Var("identity"))),
           { success: false, error: "NoUserFound" },
-          q.Do(
-            CreateSession({
-              studio: q.Select("studio", args),
-              id: q.Select("id", args),
-              username: q.Select("username", args),
-              createdAt: q.Select("createdAt", args),
-              userAgent: q.Select("userAgent", args),
-              user: q.Select("ref", q.Get(q.Var("identity"))),
-            }),
-            { success: true }
-          )
+          {
+            success: true,
+            data: q.Select(
+              "data",
+              CreateSession({
+                studio: q.Select("studio", args),
+                id: q.Select("id", args),
+                username: q.Select("username", args),
+                createdAt: q.Select("createdAt", args),
+                userAgent: q.Select("userAgent", args),
+                user: q.Select("ref", q.Get(q.Var("identity"))),
+              })
+            ),
+          }
         )
       )
     )

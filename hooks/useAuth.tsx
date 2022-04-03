@@ -32,8 +32,10 @@ export const AuthProvider: React.FC = (props) => {
           let token = localStorage.getItem("auth");
           if (token) return true;
           let res = await workerAPI(WORKER_URL, "login", data);
-          mutate();
-          if (res.success) localStorage.setItem("auth", res.token);
+          if (res.success) {
+            localStorage.setItem("auth", res.token);
+            mutate({ loggedIn: true, session: res.session, token: res.token });
+          }
           return res.success;
         },
         logout: async () => {

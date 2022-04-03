@@ -40,16 +40,18 @@ export const LoginRoute = makeRoute({
         data: { success: false, error: Errors.insecureContext },
       } as const;
 
-    await createSession(fauna, {
+    let session = await createSession(fauna, {
       username: msg.username,
       userAgent: "",
       createdAt: Date.now().toString(),
       studio: existingUser.studio,
       id: newToken,
     });
+    if (!session.success)
+      return { data: { success: false, error: session.error } } as const;
 
     return {
-      data: { success: true, token: newToken },
+      data: { success: true, token: newToken, session: session.data },
     } as const;
   },
 });
