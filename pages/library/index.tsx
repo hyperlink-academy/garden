@@ -53,7 +53,7 @@ export const ComponentViewer: React.FC<{
             <h2 className="text-2xl">Stories</h2>
             {Object.keys(props.stories).map((key) => {
               return (
-                <div>
+                <div key={key}>
                   <button
                     className={`${story === key ? "underline" : ""}`}
                     onClick={() => setStory(key)}
@@ -92,7 +92,7 @@ const AllFacts = () => {
             <ul key={f.id} className="p-2 border-2">
               <li>entity: {f.entity} </li>
               <li>attribute: {f.attribute}</li>
-              <li>value: {f.value}</li>
+              <li>value: {JSON.stringify(f.value)}</li>
             </ul>
           );
         })}
