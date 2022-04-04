@@ -181,7 +181,7 @@ export const useIndex = {
           .toArray();
         return results as Fact<A>[];
       },
-      null,
+      [],
       [attribute, entity]
     );
   },
