@@ -2,36 +2,106 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+	/* IMPORT ALL FONTS */
+	@font-face {
+		src: url(/fonts/iAWriterQuattroS-Regular.woff2);
+		font-family: "Quattro";
+		font-style: normal;
+		font-weight: normal;
+	}
+
+	@font-face {
+		src: url(/fonts/iAWriterQuattroS-Bold.woff2);
+		font-family: "Quattro";
+		font-style: normal;
+		font-weight: bold;
+	}
+
+	@font-face {
+		src: url(/fonts/iAWriterQuattroS-Italic.woff2);
+		font-family: "Quattro";
+		font-style: italic;
+		font-weight: normal;
+	}
+
+	@font-face {
+		src: url(/fonts/iAWriterQuattroS-BoldItalic.woff2);
+		font-family: "Quattro";
+		font-style: italic;
+		font-weight: bold;
+	}
+	/* END IMPORT FONTS */
+}
+
 html,
 body {
-  height: 100%;
-  min-height: -webkit-fill-available;
-  margin: auto;
-  padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+	@apply bg-background;
+	@apply h-full;
+	@apply mx-5;
+	@apply p-0;
+	@apply text-grey-15;
+	min-height: -webkit-fill-available;
+
+	font-family: "Quattro";
 }
 
 #__next {
-  height: 100%;
+	height: 100%;
+}
+
+/* START FONT STYLING */
+h1 {
+	@apply text-2xl;
+	@apply font-bold;
+}
+
+h2 {
+	@apply text-xl;
+	@apply font-bold;
+}
+
+h3 {
+	@apply text-lg;
+	@apply font-bold;
+}
+
+h4 {
+	@apply text-[.95rem];
+	@apply font-bold;
+	@apply text-grey-35;
+	@apply uppercase;
+}
+
+p {
+}
+
+small {
+	@apply text-sm;
+}
+
+.tiny {
+	@apply text-xs;
 }
 
 a {
-  color: inherit;
-  text-decoration: none;
+	color: inherit;
+	text-decoration: none;
 }
 
+/* END FONT STYLING */
+
 * {
-  box-sizing: border-box;
+	box-sizing: border-box;
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
 .no-scrollbar::-webkit-scrollbar {
-  display: none;
+	display: none;
 }
 
 /* Hide scrollbar for IE, Edge and Firefox */
 .no-scrollbar {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+	-ms-overflow-style: none; /* IE and Edge */
+	scrollbar-width: none; /* Firefox */
 }
