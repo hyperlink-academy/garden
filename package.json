@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/hyperlink-academy/garden#readme",
   "dependencies": {
+    "@headlessui/react": "^1.5.0",
     "bcryptjs": "^2.4.3",
     "cookie": "^0.4.2",
     "faunadb": "^4.5.2",
