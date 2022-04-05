@@ -39,17 +39,7 @@ export const DefaultAttributes = {
     unique: false,
     cardinality: "one",
   },
-  section: {
-    type: "string",
-    unique: false,
-    cardinality: "many",
-  },
-  title: {
-    type: "string",
-    unique: true,
-    cardinality: "one",
-  },
-  contains: {
+  "deck/contains": {
     type: "reference",
     unique: false,
     cardinality: "many",
@@ -59,25 +49,15 @@ export const DefaultAttributes = {
     unique: false,
     cardinality: "one",
   },
-  author: {
+  "card/content": {
     type: "string",
     unique: false,
     cardinality: "one",
   },
-  notes: {
+  "card/section": {
     type: "string",
-    unique: false,
-    cardinality: "one",
-  },
-  quotes: {
-    type: "reference",
     unique: false,
     cardinality: "many",
-  },
-  textContent: {
-    type: "string",
-    unique: false,
-    cardinality: "one",
   },
   "card/title": {
     type: "string",
