@@ -11,6 +11,7 @@ import { useContext, useState } from "react";
 import { ReplicacheContext } from "hooks/useReplicache";
 import { Attribute } from "data/Attributes";
 import { Fact } from "data/Facts";
+import { useRouter } from "next/router";
 
 export type Props = InferGetStaticPropsType<typeof getStaticProps>;
 
@@ -30,42 +31,75 @@ export const ComponentViewer: React.FC<{
 }> = (props) => {
   let keys = Object.keys(props.stories);
   let [story, setStory] = useState(keys[0]);
+  let router = useRouter();
   return (
     <LocalReplicacheProvider
       defaultFacts={story ? props.stories[story].entities : []}
     >
-      <h1 className="text-4xl">Component Library</h1>
-      <div style={{ display: "grid", gridTemplateColumns: "200px 1fr 200px" }}>
-        <ul>
+      <h1 className="text-4xl pt-12 pb-8">Component Library</h1>
+      <div className="grid grid-cols-[160px_1fr_300px] gap-4 ">
+        {/* START COMPONENT MENU  */}
+        <ul className="z-10">
           {props.components.map((c) => {
             return (
               <li key={c.path}>
-                <Link href={c.path}>
-                  <a>{c.metadata.name}</a>
-                </Link>
+                <div
+                  className={`px-1 py-0.5 font-bold  
+                  ${
+                    c.path === router.pathname
+                      ? "text-accent-blue border-2 rounded-md bg-white"
+                      : "text-grey-55  hover:text-accent-blue "
+                  }`}
+                >
+                  <Link href={c.path}>
+                    <a>{c.metadata.name}</a>
+                  </Link>
+                </div>
               </li>
             );
           })}
         </ul>
-        <div>{props.children}</div>
+        {/* END COMPONENT MENU  */}
+
+        {/* START COMPONENT VIEW WINDOW  */}
+        <div className="border border-grey-55 rounded-md bg-white p-8">
+          {props.children}
+        </div>
+        {/* END COMPONENT VIEW WINDOW  */}
+
+        {/* START STORIES AND FACTS  */}
         <div className="grid gap-4">
           <div>
-            <h2 className="text-2xl">Stories</h2>
-            {Object.keys(props.stories).map((key) => {
-              return (
-                <div key={key}>
-                  <button
-                    className={`${story === key ? "underline" : ""}`}
-                    onClick={() => setStory(key)}
-                  >
-                    {key}
-                  </button>
-                </div>
-              );
-            })}
+            <h2 className="text-2xl pb-3">Stories</h2>
+            {Object.keys(props.stories).length === 0
+              ? "nothing to see here 🙈"
+              : Object.keys(props.stories).map((key) => {
+                  return (
+                    <div
+                      className="grid grid-cols-[max-content_max-content] gap-2"
+                      key={key}
+                    >
+                      <input
+                        type="radio"
+                        name="story-select"
+                        id={`${key}`}
+                        className={`${story === key ? "underline" : ""}`}
+                        onClick={() => setStory(key)}
+                      ></input>
+
+                      <label
+                        htmlFor={`${key}`}
+                        className="text-grey-35 font-bold"
+                      >
+                        {key}
+                      </label>
+                    </div>
+                  );
+                })}
           </div>
           <AllFacts />
         </div>
+        {/* START STORIES AND FACTS  */}
       </div>
     </LocalReplicacheProvider>
   );
@@ -83,16 +117,30 @@ const AllFacts = () => {
     [],
     []
   );
+
+  if (facts.length === 0) return null;
+
   return (
     <div>
-      <h2 className="text-2xl">All Facts</h2>
-      <ul className="grid gap-2">
+      <h2 className="text-xl">All Facts</h2>
+      <ul className="grid gap-2 text-grey-35">
         {facts.map((f) => {
           return (
-            <ul key={f.id} className="p-2 border-2">
-              <li>entity: {f.entity} </li>
-              <li>attribute: {f.attribute}</li>
-              <li>value: {JSON.stringify(f.value)}</li>
+            <ul
+              key={f.id}
+              className="pt-3 pb-5 border-b border-grey-55 border-dashed last:border-none"
+            >
+              <li>
+                <span className="font-bold">entity: </span>
+                {f.entity}
+              </li>
+              <li>
+                <span className="font-bold">attribute: </span> {f.attribute}
+              </li>
+              <li>
+                <span className="font-bold">value: </span>{" "}
+                {JSON.stringify(f.value)}
+              </li>
             </ul>
           );
         })}
