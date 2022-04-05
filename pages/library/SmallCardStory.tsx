@@ -54,6 +54,7 @@ const SmallCardStory = (props: Props) => {
       <div className="grid gap-2">
         <SmallCard href="" entityID={"1"} />
         <SmallCard href="" entityID={"1"} onDelete={() => {}} />
+        <SmallCard href="" entityID={"1"} onDrag={() => {}} />
       </div>
     </ComponentViewer>
   );

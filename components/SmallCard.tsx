@@ -1,5 +1,6 @@
 import { useIndex } from "hooks/useReplicache";
 import Link from "next/link";
+import { Gripper } from "./Gripper";
 import { Delete } from "./Icons";
 
 export function SmallCard(props: {
@@ -17,7 +18,9 @@ export function SmallCard(props: {
         {!!props.onDelete ? (
           <Delete className="text-accent-blue absolute -right-2.5 z-10" />
         ) : null}
-        <div className="border-[1] border-grey-80 shadow-drop rounded-md p-2 min-w-36 max-w-[151px] h-24 overflow-hidden grid gap-2 bg-white">
+
+        <div className="border-[1] border-grey-80 shadow-drop rounded-md p-2 pl-1 min-w-36 max-w-[151px] h-24 overflow-hidden bg-white flex flex-row gap-2">
+          {!!props.onDrag ? <Gripper /> : <div></div>}
           {!title ? (
             <small>
               <pre className="whitespace-pre-wrap">{content?.value}</pre>
