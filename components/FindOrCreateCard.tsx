@@ -24,11 +24,11 @@ export const FindOrCreateCard = (props: {
     <Dialog
       open={props.open}
       onClose={props.onClose}
-      className="fixed z-10 inset-0 overflow-y-auto"
+      className="fixed z-10 inset-0 overflow-y-hidden"
     >
       <Dialog.Overlay className="fixed inset-0 bg-grey-90 opacity-30" />
       <div className="flex items-center justify-center min-h-screen">
-        <div className="relative w-96 mx-auto">
+        <div className="relative w-[80vw] min-w-[384px] mx-auto">
           <Combobox
             value={props.selectedCard}
             onChange={(c) => {
@@ -46,7 +46,7 @@ export const FindOrCreateCard = (props: {
             />
             <Combobox.Options
               static
-              className="w-full py-4 flex-col flex gap-2 bg-white mt-2 rounded-md h-96 overflow-y-auto shadow-drop"
+              className="w-full py-4 flex-col flex gap-2 bg-white mt-2 mb-8 rounded-md h-[80vh] overflow-y-auto shadow-drop"
             >
               {inputExists ? null : (
                 <Combobox.Option key={"create"} value={input}>

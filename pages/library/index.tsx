@@ -32,74 +32,78 @@ export const ComponentViewer: React.FC<{
   let keys = Object.keys(props.stories);
   let [story, setStory] = useState(keys[0]);
   let router = useRouter();
+  let [open, setOpen] = useState(false);
   return (
     <LocalReplicacheProvider
       defaultFacts={story ? props.stories[story].entities : []}
     >
       <h1 className="text-4xl pt-12 pb-8">Component Library</h1>
-      <div className="grid grid-cols-[160px_1fr_300px] gap-4 ">
+      <button onClick={() => setOpen((o) => !o)}>
+        {open ? "close" : "open"}
+      </button>
+      <div className="grid grid-cols-[auto_1fr] gap-4 ">
         {/* START COMPONENT MENU  */}
-        <ul className="z-10">
-          {props.components.map((c) => {
-            return (
-              <li key={c.path}>
-                <div
-                  className={`px-1 py-0.5 font-bold  
+        <div>
+          {!open ? null : (
+            <ul className="z-10 w-40">
+              {props.components.map((c) => {
+                return (
+                  <li key={c.path}>
+                    <div
+                      className={`px-1 py-0.5 font-bold  
                   ${
                     c.path === router.pathname
                       ? "text-accent-blue border-2 rounded-md bg-white"
                       : "text-grey-55  hover:text-accent-blue "
                   }`}
-                >
-                  <Link href={c.path}>
-                    <a>{c.metadata.name}</a>
-                  </Link>
-                </div>
-              </li>
-            );
-          })}
-        </ul>
+                    >
+                      <Link href={c.path}>
+                        <a>{c.metadata.name}</a>
+                      </Link>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
         {/* END COMPONENT MENU  */}
 
         {/* START COMPONENT VIEW WINDOW  */}
-        <div className="border border-grey-55 rounded-md bg-white p-8">
-          {props.children}
-        </div>
-        {/* END COMPONENT VIEW WINDOW  */}
+        <div className="flex flex-col gap-8">
+          {/* START STORIES AND FACTS  */}
+          <div className="flex flex-row gap-4 items-center flex-wrap w-full">
+            {Object.keys(props.stories).map((key) => {
+              console.log({ story, key });
+              return (
+                <div className="flex flex-row gap-2 items-center" key={key}>
+                  <input
+                    checked={story === key}
+                    type="radio"
+                    name="story-select"
+                    id={`${key}`}
+                    onClick={() => setStory(key)}
+                  ></input>
 
-        {/* START STORIES AND FACTS  */}
-        <div className="grid gap-4">
-          <div>
-            <h2 className="text-2xl pb-3">Stories</h2>
-            {Object.keys(props.stories).length === 0
-              ? "nothing to see here 🙈"
-              : Object.keys(props.stories).map((key) => {
-                  return (
-                    <div
-                      className="grid grid-cols-[max-content_max-content] gap-2"
-                      key={key}
-                    >
-                      <input
-                        type="radio"
-                        name="story-select"
-                        id={`${key}`}
-                        className={`${story === key ? "underline" : ""}`}
-                        onClick={() => setStory(key)}
-                      ></input>
-
-                      <label
-                        htmlFor={`${key}`}
-                        className="text-grey-35 font-bold"
-                      >
-                        {key}
-                      </label>
-                    </div>
-                  );
-                })}
+                  <label
+                    htmlFor={`${key}`}
+                    className={`text-grey-35 font-bold ${
+                      story === key ? "underline" : ""
+                    }`}
+                  >
+                    {key}
+                  </label>
+                </div>
+              );
+            })}
+          </div>
+          {/* END STORIES*/}
+          <div className="border border-grey-55 rounded-md bg-white p-8">
+            {props.children}
           </div>
           <AllFacts />
         </div>
-        {/* START STORIES AND FACTS  */}
+        {/* END COMPONENT VIEW WINDOW  */}
       </div>
     </LocalReplicacheProvider>
   );
