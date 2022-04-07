@@ -1,34 +1,24 @@
 import { DeckList } from "components/DeckList";
+import { flag, ref } from "data/Facts";
+import { title } from "src/lorem";
 import { ComponentViewer, Stories, Props } from "./index";
 export { getStaticProps } from "./index";
 const entities: Stories = {
   Story1: {
     entities: [
       {
-        id: "1",
-        facts: [
-          { attribute: "deck", value: { type: "flag" } },
-          { attribute: "card/title", value: "A Deck" },
-          {
-            attribute: "card/content",
-            value: "This is just a deck containing some cards",
-          },
-          {
-            attribute: "deck/contains",
-            value: { type: "reference", value: "2" },
-          },
-        ],
+        deck: flag(),
+        "card/title": "A Deck",
+        "card/content": "THis is just a deck containing some cards",
+        "deck/contains": [...Array(4).keys()].map((_a, id) =>
+          ref((id + 1).toString())
+        ),
       },
-      {
-        id: "2",
-        facts: [
-          { attribute: "card/title", value: "A Card" },
-          {
-            attribute: "card/content",
-            value: "This is just some content yo",
-          },
-        ],
-      },
+      ...[...Array(8).keys()].map(() => {
+        return {
+          "card/title": title(),
+        };
+      }),
     ],
   },
 };

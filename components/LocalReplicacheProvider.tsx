@@ -15,8 +15,9 @@ type Cookie = {
 };
 
 export type Entity = {
-  id: string;
-  facts: Pick<Fact<keyof Attribute>, "attribute" | "value">[];
+  [k in keyof Attribute]?: Attribute[k] extends { cardinality: "many" }
+    ? Fact<k>["value"][]
+    : Fact<k>["value"];
 };
 
 export const LocalReplicacheProvider: React.FC<{
@@ -163,17 +164,34 @@ export const LocalReplicacheProvider: React.FC<{
     setRep(rep);
   }, []);
   useEffect(() => {
-    let facts = props.defaultFacts.flatMap<Fact<keyof Attribute>>((e) => {
-      return e.facts.map((f) => {
-        let schema = Attribute[f.attribute];
+    let facts = props.defaultFacts.flatMap<Fact<keyof Attribute>>((e, id) => {
+      return Object.keys(e).flatMap((a) => {
+        let attribute: keyof Attribute = a as keyof Attribute;
+        console.log(attribute);
+        let schema = Attribute[attribute];
         if (!schema)
           throw Error("no schema found for attribute in default facts");
+        if (schema.cardinality === "many")
+          //@ts-ignore
+          return e[attribute].map((v) => {
+            console.log(v);
+            return {
+              schema,
+              lastUpdated: Date.now().toString(),
+              entity: id.toString(),
+              id: ulid(),
+              attribute: a as keyof Attribute,
+              value: v,
+              positions: {},
+            };
+          });
         return {
           schema,
           lastUpdated: Date.now().toString(),
-          entity: e.id,
+          entity: id.toString(),
           id: ulid(),
-          ...f,
+          value: e[attribute],
+          attribute: a as keyof Attribute,
           positions: {},
         };
       });

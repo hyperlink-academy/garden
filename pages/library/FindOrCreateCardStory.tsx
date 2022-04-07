@@ -10,18 +10,16 @@ const entities: Stories = {
     entities: [],
   },
   Few: {
-    entities: [...Array(8).keys()].map((_a, index) => {
+    entities: [...Array(8).keys()].map(() => {
       return {
-        id: index.toString(),
-        facts: [{ attribute: "card/title", value: title() }],
+        "card/title": title(),
       };
     }),
   },
   Many: {
-    entities: [...Array(32).keys()].map((_a, index) => {
+    entities: [...Array(32).keys()].map(() => {
       return {
-        id: index.toString(),
-        facts: [{ attribute: "card/title", value: title() }],
+        "card/title": title(),
       };
     }),
   },

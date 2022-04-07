@@ -6,11 +6,8 @@ const stories: Stories = {
   activities: {
     entities: [
       {
-        id: "1",
-        facts: [
-          { attribute: "space/name", value: "Books" },
-          { attribute: "space/studio", value: "jared" },
-        ],
+        "space/name": "Books",
+        "space/studio": "jared",
       },
     ],
   },

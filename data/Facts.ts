@@ -38,3 +38,11 @@ type Value<A extends AttributeName> = Attribute[A] extends {
         type: "flag";
       };
     }[Attribute[A]["type"]];
+
+export const ref = (ref: string) => {
+  return { type: "reference", value: ref } as const;
+};
+
+export const flag = () => {
+  return { type: "flag" as const };
+};

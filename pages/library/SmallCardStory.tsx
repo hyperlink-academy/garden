@@ -5,45 +5,24 @@ const entities: Stories = {
   ShortTitle: {
     entities: [
       {
-        id: "1",
-        facts: [
-          {
-            attribute: "card/content",
-            value: "Short content",
-          },
-          {
-            attribute: "card/title",
-            value: "Hello world",
-          },
-        ],
+        "card/content": "Short content",
+        "card/title": "Hello world",
       },
     ],
   },
   LongContent: {
     entities: [
       {
-        id: "1",
-        facts: [
-          {
-            attribute: "card/content",
-            value:
-              "This is a much longer piece of content. I should write generators for all this stuff!",
-          },
-        ],
+        "card/content":
+          "This is a much longer piece of content. I should write generators for all this stuff!",
       },
     ],
   },
   LongTitle: {
     entities: [
       {
-        id: "1",
-        facts: [
-          {
-            attribute: "card/title",
-            value:
-              "Too Like the Lightning by Ada Palmer, Terra Ignota: Book One",
-          },
-        ],
+        "card/title":
+          "Too Like the Lightning by Ada Palmer, Terra Ignota: Book One",
       },
     ],
   },
