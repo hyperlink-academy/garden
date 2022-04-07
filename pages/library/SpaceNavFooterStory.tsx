@@ -5,7 +5,9 @@ export { getStaticProps } from "./index";
 const SpaceNavFooterStory = (props: Props) => {
   return (
     <ComponentViewer components={props.components} stories={{}}>
-      <SpaceNavFooter currentPage="home" />
+      <div className="h-[2000px] bg-gradient-to-bl from-test-blue to-test-pink ">
+        <SpaceNavFooter currentPage="home" />
+      </div>
     </ComponentViewer>
   );
 };
