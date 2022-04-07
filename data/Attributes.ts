@@ -108,3 +108,9 @@ export type UniqueAttributes = {
     ? A
     : never]: Attribute[A];
 };
+
+export type ReferenceAttributes = {
+  [A in keyof Attribute as Attribute[A]["type"] extends "reference"
+    ? A
+    : never]: Attribute[A];
+};

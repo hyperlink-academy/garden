@@ -1,3 +1,5 @@
+import { sortByPosition } from "components/DeckList";
+import { generateKeyBetween } from "src/fractional-indexing";
 import { Attribute } from "./Attributes";
 import { Fact, FactMetadata } from "./Facts";
 
@@ -92,7 +94,63 @@ const addSpace: Mutation<{
   ]);
 };
 
+const moveCard: Mutation<{
+  factID: string;
+  positionKey: string;
+  parent: string;
+  index: number;
+  attribute: keyof Attribute;
+}> = async (args, context) => {
+  let children = await context.scanIndex.eav(args.parent, args.attribute);
+  let hasUnpositionedChildren = children.reduce(
+    (acc, child) => acc || !child.positions[args.positionKey],
+    false
+  );
+  let positions = children.sort(sortByPosition(args.positionKey)).map((f) => {
+    return {
+      id: f.id,
+      position: f.positions[args.positionKey],
+    };
+  });
+  if (hasUnpositionedChildren) {
+    for (let i = 0; i < positions.length; i++) {
+      if (!positions[i].position) {
+        let newPosition = generateKeyBetween(
+          positions[i - 1]?.position || null,
+          positions[i + 1]?.position || null
+        );
+        positions[i].position = newPosition;
+        await context.updateFact(positions[i].id, {
+          positions: { [args.positionKey]: newPosition },
+        });
+      }
+    }
+  }
+  let newPosition = generateKeyBetween(
+    positions[args.index]?.position || null,
+    positions[args.index + 1]?.position || null
+  );
+  await context.updateFact(args.factID, {
+    positions: { [args.positionKey]: newPosition },
+  });
+};
+
+const assertCardTitle: Mutation<{ cardEntity: string; title: string }> = async (
+  args,
+  ctx
+) => {
+  await ctx.assertFact({
+    entity: args.cardEntity,
+    attribute: "card/title",
+    value: args.title,
+    positions: {},
+  });
+  return;
+};
+
 export const Mutations = {
+  moveCard,
   addSpace,
   addDeck,
+  assertCardTitle,
 };

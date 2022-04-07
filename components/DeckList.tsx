@@ -1,10 +1,14 @@
-import { useIndex } from "hooks/useReplicache";
-import { Disclosure, Transition } from "@headlessui/react";
+import { ReplicacheContext, useIndex } from "hooks/useReplicache";
+import { Disclosure } from "@headlessui/react";
 import useMeasure from "react-use-measure";
 import { SmallCard } from "components/SmallCard";
-import { animated, useSpring, useTransition } from "react-spring";
+import { animated, useSpring } from "react-spring";
 import { usePrevious } from "hooks/utils";
-import { FindOrCreateCard } from "./FindOrCreateCard";
+import { DndContext, useDroppable } from "@dnd-kit/core";
+import { Attribute, ReferenceAttributes } from "data/Attributes";
+import { Fact } from "data/Facts";
+import { SortableContext } from "@dnd-kit/sortable";
+import { useContext, useState } from "react";
 
 export const DeckList = () => {
   let decks = useIndex.aev("deck");
@@ -12,7 +16,7 @@ export const DeckList = () => {
     <div>
       <button>CreateNewDeck</button>
       {decks.map((d) => (
-        <Deck entity={d.entity} />
+        <Deck entity={d.entity} key={d.entity} />
       ))}
     </div>
   );
@@ -34,7 +38,11 @@ const Deck = (props: { entity: string }) => {
                 {description?.value}
               </Disclosure.Button>
               <Drawer open={open}>
-                <SmallCardList cards={cards?.map((c) => c.value.value) || []} />
+                <SmallCardList
+                  positionKey="eav"
+                  deck={props.entity}
+                  cards={cards || []}
+                />
               </Drawer>
             </>
           );
@@ -54,7 +62,6 @@ export const Drawer: React.FC<{ open: boolean }> = (props) => {
       height: props.open ? viewHeight : 0,
     },
   });
-  console.log(arrowHeight);
   return (
     <animated.div
       style={{
@@ -101,12 +108,69 @@ export const Drawer: React.FC<{ open: boolean }> = (props) => {
   );
 };
 
-export const SmallCardList = (props: { cards: string[] }) => {
+export const SmallCardList = (props: {
+  cards: Fact<keyof ReferenceAttributes>[];
+  deck: string;
+  positionKey: string;
+}) => {
+  let rep = useContext(ReplicacheContext);
+  let [dragging, setDraggging] = useState<string | null>(null);
+  let { setNodeRef } = useDroppable({
+    id: props.deck,
+  });
+  let items = props.cards.sort(sortByPosition(props.positionKey));
   return (
-    <div className="flex flex-wrap gap-8 p-8">
-      {props.cards.map((c) => (
-        <SmallCard href="" entityID={c} />
-      ))}
-    </div>
+    <DndContext
+      onDragStart={({ active }) => {
+        setDraggging(active.id);
+      }}
+      onDragEnd={({ over }) => {
+        setDraggging(null);
+        if (over) {
+          if (!dragging) return;
+          let index = items.findIndex((f) => f.id === over.id);
+          let currentIndex = items.findIndex((f) => f.id === dragging);
+          if (index === -1) return;
+          rep?.rep.mutate.moveCard({
+            factID: dragging,
+            positionKey: props.positionKey,
+            parent: props.deck,
+            attribute: "deck/contains",
+            index: currentIndex < index ? index : index - 1,
+          });
+        }
+      }}
+    >
+      <SortableContext items={items.map((item) => item.id)}>
+        <div className="flex flex-wrap gap-8 p-8" ref={setNodeRef}>
+          {items.map((c) => (
+            <SmallCard
+              draggable={true}
+              key={c.id}
+              href=""
+              entityID={c.value.value}
+              id={c.id}
+            />
+          ))}
+        </div>
+      </SortableContext>
+    </DndContext>
   );
 };
+
+export const sortByPosition =
+  (key: string) =>
+  (
+    a: Pick<Fact<keyof Attribute>, "positions" | "id">,
+    b: Pick<Fact<keyof Attribute>, "positions" | "id">
+  ) => {
+    let aPosition = a.positions[key],
+      bPosition = b.positions[key];
+    if (!aPosition) {
+      if (bPosition) return -1;
+      return a.id > b.id ? 1 : -1;
+    }
+    if (!bPosition) return -1;
+    if (aPosition === bPosition) return a.id > b.id ? 1 : -1;
+    return aPosition > bPosition ? 1 : -1;
+  };

@@ -94,7 +94,11 @@ let mutators: ReplicacheMutators = Object.keys(Mutations).reduce((acc, k) => {
           | Fact<keyof Attribute>
           | undefined;
         if (!existingFact) return { success: false };
-        tx.put(id, { ...existingFact, ...data });
+        await tx.put(id, {
+          ...existingFact,
+          ...data,
+          positions: { ...existingFact.positions, ...data.positions },
+        });
         return { success: true };
       },
       assertFact: async (fact) => {

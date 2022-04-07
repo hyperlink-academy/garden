@@ -154,7 +154,7 @@ export const LocalReplicacheProvider: React.FC<{
         return {
           httpRequestInfo: { httpStatusCode: 200, errorMessage: "" },
           response: {
-            lastMutationID: data.lastMutationID,
+            lastMutationID: db.current.lastMutationID,
             cookie: { lastUpdated: latestFact },
             patch: reset ? [{ op: "clear" }, ...ops] : ops,
           },
