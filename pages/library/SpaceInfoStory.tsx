@@ -1,10 +1,11 @@
+import { SpaceInfo } from "components/SpaceInfo";
 import { ComponentViewer, Props } from "./index";
 export { getStaticProps } from "./index";
 
 const SpaceInfoStory = (props: Props) => {
   return (
     <ComponentViewer components={props.components} stories={{}}>
-      <p>hi</p>
+      <SpaceInfo />
     </ComponentViewer>
   );
 };
