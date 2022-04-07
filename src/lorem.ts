@@ -10,3 +10,7 @@ export const title = () => {
     Math.random() * 1000
   ).toString()}`;
 };
+
+export const spaceID = () => {
+  return Math.random().toString().slice(2);
+};

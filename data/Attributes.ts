@@ -99,6 +99,11 @@ export const DefaultAttributes = {
     type: "string",
     cardinality: "one",
   },
+  "this/description": {
+    unique: false,
+    type: "string",
+    cardinality: "one",
+  },
 } as const;
 
 export const Attribute = { ...DefaultAttributes, ...BaseAttributes };
