@@ -39,26 +39,30 @@ export const ComponentViewer: React.FC<{
     <LocalReplicacheProvider
       defaultFacts={story ? props.stories[story].entities : []}
     >
-      <h1 className="text-4xl pt-12 pb-8">Component Library</h1>
-      <div className="flex gap-4 justify-between">
-        <button onClick={() => setOpen((o) => !o)}>
-          {open ? "close" : "open"}
+      {/* MENU AND BG TOGGLE */}
+      <div className="flex gap-4 justify-between pt-6 pb-4 text-accent-blue">
+        <button onClick={() => setOpen(true)}>
+          <MenuIcon />
         </button>
         <BGSwitch enabled={bg} setEnabled={setBg} />
       </div>
-      <div className="grid grid-cols-[auto_1fr] gap-4 ">
-        {/* START COMPONENT MENU  */}
-        <div>
-          {!open ? null : (
-            <ul className="z-10 w-40">
+      {/* START COMPONENT MENU  */}
+      <div>
+        {!open ? null : (
+          <div className="ComponentMenu z-50 w-64 fixed left-0 top-0 h-screen p-4 bg-bg-blue grid auto-rows-max gap-4">
+            <div className="grid grid-cols-[max-content_max-content] place-content-between px-2">
+              <h3>Component Library</h3>
+              <button onClick={() => setOpen(false)}>x</button>
+            </div>
+            <ul>
               {props.components.map((c) => {
                 return (
                   <li key={c.path}>
                     <div
-                      className={`px-1 py-0.5 font-bold  
+                      className={`px-2 py-0.5 font-bold  
                   ${
                     c.path === router.pathname
-                      ? "text-accent-blue border-2 rounded-md bg-white"
+                      ? "text-white rounded-md bg-accent-blue"
                       : "text-grey-55  hover:text-accent-blue "
                   }`}
                     >
@@ -70,14 +74,25 @@ export const ComponentViewer: React.FC<{
                 );
               })}
             </ul>
-          )}
-        </div>
-        {/* END COMPONENT MENU  */}
+          </div>
+        )}
+      </div>
+      {/* END COMPONENT MENU  */}
 
-        {/* START COMPONENT VIEW WINDOW  */}
-        <div className="flex flex-col gap-8">
-          {/* START STORIES AND FACTS  */}
-          <div className="flex flex-row gap-4 items-center flex-wrap w-full">
+      <div className="grid auto-rows-max gap-6">
+        <div
+          className={`
+              ComponentViewPort
+              grid auto-rows-max gap-6
+              ${
+                bg
+                  ? "bg-white border border-grey-80 rounded-lg shadow-drop p-5"
+                  : "bg-background"
+              } 
+            `}
+        >
+          {/* START STORY SELECTOR  */}
+          <div className="grid auto-rows-max gap-1 p-4 border border-grey-80 rounded-md">
             {Object.keys(props.stories).map((key) => {
               console.log({ story, key });
               return (
@@ -92,8 +107,8 @@ export const ComponentViewer: React.FC<{
 
                   <label
                     htmlFor={`${key}`}
-                    className={`text-grey-35 font-bold ${
-                      story === key ? "underline" : ""
+                    className={`text-grey-35  ${
+                      story === key ? "font-bold" : ""
                     }`}
                   >
                     {key}
@@ -102,17 +117,14 @@ export const ComponentViewer: React.FC<{
               );
             })}
           </div>
-          {/* END STORIES*/}
-          <div
-            className={`border border-grey-55 rounded-md ${
-              bg ? "bg-white" : "bg-background"
-            } p-8`}
-          >
-            {props.children}
-          </div>
-          <AllFacts />
+          {/* END STORY SELECTOR  */}
+
+          {/* COMPONENT RENDERS HERE */}
+          {props.children}
         </div>
-        {/* END COMPONENT VIEW WINDOW  */}
+
+        {/* FACT LIST HERE */}
+        <AllFacts />
       </div>
     </LocalReplicacheProvider>
   );
@@ -168,22 +180,42 @@ const BGSwitch = (props: {
 }) => {
   return (
     <div className="flex gap-2">
+      <span className="font-bold">Toggle Background</span>
+
       <Switch
         checked={props.enabled}
         onChange={props.setEnabled}
         className={`${
-          props.enabled ? "bg-bg-blue" : "bg-grey-80"
-        } relative inline-flex items-center h-6 rounded-full w-11`}
+          props.enabled ? "bg-background" : "bg-white "
+        } border-2 border-accent-blue relative inline-flex items-center h-6 rounded-full w-11`}
       >
         <span className="sr-only">Toggle background</span>
         <span
           className={`${
-            props.enabled ? "translate-x-6" : "translate-x-1"
-          } inline-block w-4 h-4 transform bg-white rounded-full`}
+            props.enabled ? "translate-x-5" : "translate-x-1"
+          } inline-block w-4 h-4 transform bg-accent-blue rounded-full`}
         />
       </Switch>
-      <span>Toggle bg</span>
     </div>
+  );
+};
+
+const MenuIcon = () => {
+  return (
+    <svg
+      width="22"
+      height="24"
+      viewBox="0 0 22 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        fill-rule="evenodd"
+        clip-rule="evenodd"
+        d="M3 0C1.34315 0 0 1.28942 0 2.88V21.12C0 22.7106 1.34315 24 3 24H19C20.6569 24 22 22.7106 22 21.12V2.88C22 1.28942 20.6569 0 19 0H3ZM15 1.92V22.08H19C19.5523 22.08 20 21.6502 20 21.12V2.88C20 2.34981 19.5523 1.92 19 1.92H15ZM3 5.845C3 5.36175 3.39175 4.97 3.875 4.97L11.125 4.97C11.6082 4.97 12 5.36175 12 5.845C12 6.32825 11.6082 6.72 11.125 6.72L3.875 6.72C3.39175 6.72 3 6.32825 3 5.845ZM3.875 8.81003C3.39175 8.81003 3 9.20178 3 9.68503C3 10.1683 3.39175 10.56 3.875 10.56L11.125 10.56C11.6082 10.56 12 10.1683 12 9.68503C12 9.20178 11.6082 8.81003 11.125 8.81003L3.875 8.81003ZM3 13.525C3 13.0418 3.39175 12.65 3.875 12.65L11.125 12.65C11.6082 12.65 12 13.0418 12 13.525C12 14.0083 11.6082 14.4 11.125 14.4L3.875 14.4C3.39175 14.4 3 14.0083 3 13.525ZM3.875 16.49C3.39175 16.49 3 16.8818 3 17.365C3 17.8483 3.39175 18.24 3.875 18.24L11.125 18.24C11.6082 18.24 12 17.8483 12 17.365C12 16.8818 11.6082 16.49 11.125 16.49L3.875 16.49Z"
+        fill="currentColor"
+      />
+    </svg>
   );
 };
 

@@ -38,12 +38,15 @@ html,
 body {
   @apply bg-background;
   @apply h-full;
-  @apply mx-5;
   @apply p-0;
   @apply text-grey-15;
   min-height: -webkit-fill-available;
 
   font-family: "Quattro";
+}
+
+body {
+  @apply mx-5;
 }
 
 #__next {
@@ -107,6 +110,7 @@ input {
   @apply bg-white;
   @apply opacity-70;
 }
+
 /* END GLOBAL STYLING */
 
 * {
