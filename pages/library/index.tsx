@@ -12,6 +12,7 @@ import { ReplicacheContext } from "hooks/useReplicache";
 import { Attribute } from "data/Attributes";
 import { Fact } from "data/Facts";
 import { useRouter } from "next/router";
+import { Switch } from "@headlessui/react";
 
 export type Props = InferGetStaticPropsType<typeof getStaticProps>;
 
@@ -33,14 +34,18 @@ export const ComponentViewer: React.FC<{
   let [story, setStory] = useState(keys[0]);
   let router = useRouter();
   let [open, setOpen] = useState(false);
+  let [bg, setBg] = useState(true);
   return (
     <LocalReplicacheProvider
       defaultFacts={story ? props.stories[story].entities : []}
     >
       <h1 className="text-4xl pt-12 pb-8">Component Library</h1>
-      <button onClick={() => setOpen((o) => !o)}>
-        {open ? "close" : "open"}
-      </button>
+      <div className="flex gap-4 justify-between">
+        <button onClick={() => setOpen((o) => !o)}>
+          {open ? "close" : "open"}
+        </button>
+        <BGSwitch enabled={bg} setEnabled={setBg} />
+      </div>
       <div className="grid grid-cols-[auto_1fr] gap-4 ">
         {/* START COMPONENT MENU  */}
         <div>
@@ -98,7 +103,11 @@ export const ComponentViewer: React.FC<{
             })}
           </div>
           {/* END STORIES*/}
-          <div className="border border-grey-55 rounded-md bg-white p-8">
+          <div
+            className={`border border-grey-55 rounded-md ${
+              bg ? "bg-white" : "bg-background"
+            } p-8`}
+          >
             {props.children}
           </div>
           <AllFacts />
@@ -149,6 +158,31 @@ const AllFacts = () => {
           );
         })}
       </ul>
+    </div>
+  );
+};
+
+const BGSwitch = (props: {
+  enabled: boolean;
+  setEnabled: (b: boolean) => void;
+}) => {
+  return (
+    <div className="flex gap-2">
+      <Switch
+        checked={props.enabled}
+        onChange={props.setEnabled}
+        className={`${
+          props.enabled ? "bg-bg-blue" : "bg-grey-80"
+        } relative inline-flex items-center h-6 rounded-full w-11`}
+      >
+        <span className="sr-only">Toggle background</span>
+        <span
+          className={`${
+            props.enabled ? "translate-x-6" : "translate-x-1"
+          } inline-block w-4 h-4 transform bg-white rounded-full`}
+        />
+      </Switch>
+      <span>Toggle bg</span>
     </div>
   );
 };
