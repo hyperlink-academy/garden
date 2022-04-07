@@ -5,6 +5,7 @@ import { ChatBubble, House, Information, SpreadDeck } from "./Icons";
 import { ButtonLink, ButtonPrimary, ButtonTertiary } from "./Buttons";
 import { useState } from "react";
 import { Dialog } from "@headlessui/react";
+import { FloatingContainer } from "./Container";
 
 export function SpaceNavFooter(props: { currentPage: string }) {
   let router = useRouter();
@@ -23,7 +24,7 @@ export function SpaceNavFooter(props: { currentPage: string }) {
   };
 
   function LogInModal() {
-    let [isOpen, setLogInModal] = useState(true);
+    let [isOpen, setLogInModal] = useState(false);
 
     return (
       <div>
@@ -39,20 +40,16 @@ export function SpaceNavFooter(props: { currentPage: string }) {
           className="fixed z-10 inset-0 overflow-y-hidden"
         >
           <Dialog.Overlay className="overlay" />
-
-          <div
+          <FloatingContainer
             className={`
-                logInModal
-                px-3 py-4
-                border border-grey-80 rounded-md 
-                shadow-drop
-                bg-white
                 w-[calc(100%-40px)]
                 fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
                 grid grid-flow-row gap-4
-                ${!isOpen ? "hidden" : ""}
                 `}
           >
+            {/*
+             */}
+
             <form className="grid gap-4 w-full" onSubmit={onSubmit}>
               <label className="grid grid-flow-rows gap-2 font-bold">
                 Username
@@ -98,7 +95,7 @@ export function SpaceNavFooter(props: { currentPage: string }) {
                 />
               </div>
             </form>
-          </div>
+          </FloatingContainer>{" "}
         </Dialog>
       </div>
     );
