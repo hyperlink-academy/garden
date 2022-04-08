@@ -1,10 +1,9 @@
 import { FindOrCreateCard } from "components/FindOrCreateCard";
-import { useIndex } from "hooks/useReplicache";
 import { title } from "src/lorem";
 import { ComponentViewer, Stories, Props } from "./index";
 export { getStaticProps } from "./index";
-import { Card, Deck } from "components/Icons";
 import { useState } from "react";
+import { ButtonLink } from "components/Buttons";
 const entities: Stories = {
   None: {
     entities: [],
@@ -35,31 +34,33 @@ const FindOrCreateCardStory = (props: Props) => {
 
 const Story = () => {
   let [open, setOpen] = useState(false);
-  let [selectedCard, setSelectedCard] = useState("");
-  let decks = useIndex.aev("deck");
-  let titles = useIndex.aev("card/title");
+  let [selectedCards, setSelectedCards] = useState<string[]>([]);
   return (
     <>
       <div onClick={() => setOpen(true)}>FindOrCreateCard</div>
       <FindOrCreateCard
         open={open}
-        selectedCard={selectedCard}
         onClose={() => setOpen(false)}
+        selected={selectedCards}
         onSelect={(e) => {
-          setOpen(false);
-          setSelectedCard(e.value);
+          setSelectedCards((s) => [...s, e.entity]);
         }}
-        items={titles.map((t) => {
-          return {
-            name: t.value,
-            icon: decks.find((d) => d.entity === t.entity) ? (
-              <Deck />
-            ) : (
-              <Card />
-            ),
-          };
-        })}
       />
+      <ul>
+        {selectedCards.map((c) => {
+          return (
+            <li>
+              {c}{" "}
+              <ButtonLink
+                content="delete"
+                onClick={() =>
+                  setSelectedCards((cards) => cards.filter((c1) => c1 !== c))
+                }
+              />
+            </li>
+          );
+        })}
+      </ul>
     </>
   );
 };

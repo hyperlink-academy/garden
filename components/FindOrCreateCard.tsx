@@ -1,22 +1,29 @@
 import { Combobox, Dialog } from "@headlessui/react";
+import { useIndex } from "hooks/useReplicache";
+import { Card, Deck } from "components/Icons";
 import { useState } from "react";
 
-type Item = {
-  name: string;
-  icon: React.ReactElement;
-};
 export const FindOrCreateCard = (props: {
   open: boolean;
   onClose: () => void;
-  onSelect: (id: { value: string }) => void;
-  selectedCard: string;
-  items: Item[];
+  selected: string[];
+  onSelect: (id: { entity: string }) => void;
 }) => {
   let [input, setInput] = useState("");
-  let items = props.items.filter((f) => {
-    if (/[A-Z]/g.test(input)) return f.name.includes(input);
-    return f.name.toLocaleLowerCase().includes(input.toLocaleLowerCase());
-  });
+  let decks = useIndex.aev("deck");
+  let titles = useIndex.aev("card/title");
+  let items = titles
+    .filter((f) => {
+      if (/[A-Z]/g.test(input)) return f.value.includes(input);
+      return f.value.toLocaleLowerCase().includes(input.toLocaleLowerCase());
+    })
+    .map((t) => {
+      return {
+        name: t.value,
+        entity: t.entity,
+        isDeck: !!decks.find((d) => d.entity === t.entity),
+      };
+    });
   let inputExists = !!items.find(
     (i) => i.name.toLocaleLowerCase() === input.toLocaleLowerCase()
   );
@@ -30,10 +37,10 @@ export const FindOrCreateCard = (props: {
       <div className="flex items-center justify-center min-h-screen">
         <div className="relative w-[80vw] min-w-[384px] mx-auto">
           <Combobox
-            value={props.selectedCard}
+            value=""
             onChange={(c) => {
-              setInput(c);
-              props.onSelect({ value: c });
+              console.log(c);
+              props.onSelect({ entity: c });
             }}
             as="div"
             className="relative z-10 w-full"
@@ -63,12 +70,18 @@ export const FindOrCreateCard = (props: {
               )}
               {items.map((item) => {
                 return (
-                  <Combobox.Option key={item.name} value={item.name}>
-                    {(props) => {
+                  <Combobox.Option key={item.entity} value={item.entity}>
+                    {({ active }) => {
                       return (
-                        <SearchItem active={props.active}>
-                          <div className="flex flex-row gap-2 items-center">
-                            {item.icon}
+                        <SearchItem active={active}>
+                          <div
+                            className={`flex flex-row gap-2 items-center ${
+                              props.selected.includes(item.entity)
+                                ? "bg-test-pink"
+                                : ""
+                            }`}
+                          >
+                            {item.isDeck ? <Deck /> : <Card />}
                             {item.name}
                           </div>
                         </SearchItem>
