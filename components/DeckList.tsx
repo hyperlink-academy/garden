@@ -4,7 +4,14 @@ import useMeasure from "react-use-measure";
 import { SmallCard } from "components/SmallCard";
 import { animated, useSpring } from "react-spring";
 import { usePrevious } from "hooks/utils";
-import { DndContext, useDroppable } from "@dnd-kit/core";
+import {
+  DndContext,
+  MouseSensor,
+  TouchSensor,
+  useDroppable,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
 import { Attribute, ReferenceAttributes } from "data/Attributes";
 import { Fact } from "data/Facts";
 import { SortableContext } from "@dnd-kit/sortable";
@@ -113,14 +120,19 @@ export const SmallCardList = (props: {
   deck: string;
   positionKey: string;
 }) => {
+  const mouseSensor = useSensor(MouseSensor, {});
+  const touchSensor = useSensor(TouchSensor, {});
+  const sensors = useSensors(mouseSensor, touchSensor);
   let rep = useContext(ReplicacheContext);
   let [dragging, setDraggging] = useState<string | null>(null);
   let { setNodeRef } = useDroppable({
     id: props.deck,
   });
   let items = props.cards.sort(sortByPosition(props.positionKey));
+
   return (
     <DndContext
+      sensors={sensors}
       onDragStart={({ active }) => {
         setDraggging(active.id);
       }}
@@ -142,7 +154,7 @@ export const SmallCardList = (props: {
       }}
     >
       <SortableContext items={items.map((item) => item.id)}>
-        <div className="flex flex-wrap gap-8 p-8" ref={setNodeRef}>
+        <div className="flex flex-wrap gap-8 py-8 px-2" ref={setNodeRef}>
           {items.map((c) => (
             <SmallCard
               draggable={true}
