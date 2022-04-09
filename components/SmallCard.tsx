@@ -30,7 +30,7 @@ export function SmallCard(props: {
 
   return (
     <div
-      className="relative min-w-36 max-w-[151px]"
+      className="relative min-w-36 max-w-[151px] touch-manipulation"
       style={style}
       ref={setNodeRef}
     >
@@ -40,7 +40,11 @@ export function SmallCard(props: {
 
       <div className="border-[1] border-grey-80 shadow-drop rounded-md p-2 pl-1 min-w-36 max-w-[151px] h-24 overflow-hidden bg-white flex flex-row gap-2">
         {!!props.draggable ? (
-          <Gripper {...attributes} {...listeners} />
+          <Gripper
+            {...attributes}
+            {...listeners}
+            className="touch-manipulation"
+          />
         ) : (
           <div></div>
         )}
