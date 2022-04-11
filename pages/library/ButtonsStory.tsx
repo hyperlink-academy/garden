@@ -5,7 +5,7 @@ import {
   ButtonLink,
 } from "components/Buttons";
 
-import { Deck } from "components/Icons";
+import { DeckSmall } from "components/Icons";
 import { ComponentViewer, Props } from "./index";
 export { getStaticProps } from "./index";
 
@@ -21,7 +21,7 @@ const ButtonsStory = (props: Props) => {
         <ButtonPrimary
           onClick={onClick}
           content="Create Deck"
-          icon={<Deck />}
+          icon={<DeckSmall />}
         />
       </div>
       secondary:
@@ -30,7 +30,7 @@ const ButtonsStory = (props: Props) => {
         <ButtonSecondary
           onClick={onClick}
           content="Create Deck"
-          icon={<Deck />}
+          icon={<DeckSmall />}
         />
       </div>
       tertiary:
@@ -39,13 +39,17 @@ const ButtonsStory = (props: Props) => {
         <ButtonTertiary
           onClick={onClick}
           content="Create Deck"
-          icon={<Deck />}
+          icon={<DeckSmall />}
         />
       </div>
       link button:
       <div className="flex gap-4 mb-8">
         <ButtonLink onClick={onClick} content="Create Deck" />
-        <ButtonLink onClick={onClick} content="Create Deck" icon={<Deck />} />
+        <ButtonLink
+          onClick={onClick}
+          content="Create Deck"
+          icon={<DeckSmall />}
+        />
       </div>
     </ComponentViewer>
   );

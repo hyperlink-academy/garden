@@ -21,7 +21,7 @@ export const Member = (props: SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
-export const Deck = (props: SVGProps<SVGSVGElement>) => (
+export const DeckSmall = (props: SVGProps<SVGSVGElement>) => (
   <svg
     width="24"
     height="24"
@@ -114,7 +114,7 @@ export const ChatBubble = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
-export const House = (props: SVGProps<SVGSVGElement>) => {
+export const Studio = (props: SVGProps<SVGSVGElement>) => {
   return (
     <svg
       {...props}
@@ -166,7 +166,7 @@ export const Information = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
-export const SpreadDeck = (props: SVGProps<SVGSVGElement>) => {
+export const DeckLarge = (props: SVGProps<SVGSVGElement>) => {
   return (
     <svg
       {...props}
