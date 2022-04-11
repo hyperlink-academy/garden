@@ -104,6 +104,11 @@ input {
   @apply box-border !important;
 }
 
+::placeholder {
+  @apply text-grey-80;
+  @apply italic;
+}
+
 .overlay {
   @apply fixed;
   @apply inset-0;
