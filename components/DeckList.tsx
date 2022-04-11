@@ -5,17 +5,23 @@ import { SmallCard } from "components/SmallCard";
 import { animated, useSpring } from "react-spring";
 import { usePrevious } from "hooks/utils";
 import {
+  closestCenter,
   DndContext,
   MouseSensor,
   TouchSensor,
-  useDroppable,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { Attribute, ReferenceAttributes } from "data/Attributes";
+import { ReferenceAttributes } from "data/Attributes";
 import { Fact } from "data/Facts";
 import { SortableContext } from "@dnd-kit/sortable";
 import { useContext, useState } from "react";
+import { FindOrCreateCard } from "./FindOrCreateCard";
+import { ButtonSecondary } from "./Buttons";
+import { Card } from "./Icons";
+import { generateKeyBetween } from "src/fractional-indexing";
+import { sortByPosition } from "src/position_helpers";
+import { ulid } from "src/ulid";
 
 export const DeckList = () => {
   let decks = useIndex.aev("deck");
@@ -31,8 +37,11 @@ export const DeckList = () => {
 
 const Deck = (props: { entity: string }) => {
   let title = useIndex.eav(props.entity, "card/title");
+  let rep = useContext(ReplicacheContext);
   let description = useIndex.eav(props.entity, "card/content");
   let cards = useIndex.eav(props.entity, "deck/contains");
+  let earliestCard = cards?.sort(sortByPosition("eav"))[0];
+  let [findOpen, setFindOpen] = useState(false);
 
   return (
     <div>
@@ -45,6 +54,42 @@ const Deck = (props: { entity: string }) => {
                 {description?.value}
               </Disclosure.Button>
               <Drawer open={open}>
+                <ButtonSecondary
+                  onClick={() => setFindOpen(true)}
+                  icon={<Card />}
+                  content="Add card"
+                />
+                <FindOrCreateCard
+                  onSelect={async (e) => {
+                    let position = generateKeyBetween(
+                      null,
+                      earliestCard?.positions["eav"] || null
+                    );
+                    if (e.type === "create") {
+                      let newEntity = ulid();
+                      await rep?.rep.mutate.createCard({
+                        entityID: newEntity,
+                        title: e.name,
+                      });
+                      await rep?.rep.mutate.addCardToSection({
+                        cardEntity: newEntity,
+                        parent: props.entity,
+                        positions: { eav: position },
+                        section: "deck/contains",
+                      });
+                      return;
+                    }
+                    rep?.rep.mutate.addCardToSection({
+                      cardEntity: e.entity,
+                      parent: props.entity,
+                      positions: { eav: position },
+                      section: "deck/contains",
+                    });
+                  }}
+                  open={findOpen}
+                  onClose={() => setFindOpen(false)}
+                  selected={cards?.map((c) => c.value.value) || []}
+                />
                 <SmallCardList
                   positionKey="eav"
                   deck={props.entity}
@@ -108,7 +153,7 @@ export const Drawer: React.FC<{ open: boolean }> = (props) => {
               }}
             />
           </div>
-          <div className="pb-4">{props.children}</div>
+          <div className="pb-4 pt-8">{props.children}</div>
         </div>
       </Disclosure.Panel>
     </animated.div>
@@ -125,13 +170,11 @@ export const SmallCardList = (props: {
   const sensors = useSensors(mouseSensor, touchSensor);
   let rep = useContext(ReplicacheContext);
   let [dragging, setDraggging] = useState<string | null>(null);
-  let { setNodeRef } = useDroppable({
-    id: props.deck,
-  });
   let items = props.cards.sort(sortByPosition(props.positionKey));
 
   return (
     <DndContext
+      collisionDetection={closestCenter}
       sensors={sensors}
       onDragStart={({ active }) => {
         setDraggging(active.id);
@@ -154,7 +197,7 @@ export const SmallCardList = (props: {
       }}
     >
       <SortableContext items={items.map((item) => item.id)}>
-        <div className="flex flex-wrap gap-8 py-8 px-2" ref={setNodeRef}>
+        <div className="flex flex-wrap gap-8 py-8 px-2">
           {items.map((c) => (
             <SmallCard
               draggable={true}
@@ -169,20 +212,3 @@ export const SmallCardList = (props: {
     </DndContext>
   );
 };
-
-export const sortByPosition =
-  (key: string) =>
-  (
-    a: Pick<Fact<keyof Attribute>, "positions" | "id">,
-    b: Pick<Fact<keyof Attribute>, "positions" | "id">
-  ) => {
-    let aPosition = a.positions[key],
-      bPosition = b.positions[key];
-    if (!aPosition) {
-      if (bPosition) return -1;
-      return a.id > b.id ? 1 : -1;
-    }
-    if (!bPosition) return -1;
-    if (aPosition === bPosition) return a.id > b.id ? 1 : -1;
-    return aPosition > bPosition ? 1 : -1;
-  };
