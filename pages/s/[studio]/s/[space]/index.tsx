@@ -1,4 +1,5 @@
 import { spaceAPI, workerAPI } from "backend/lib/api";
+import { DeckList } from "components/DeckList";
 import { SpaceProvider } from "components/ReplicacheProvider";
 import { useAuth } from "hooks/useAuth";
 import { useIndex, useSpaceID } from "hooks/useReplicache";
@@ -27,6 +28,7 @@ export default function SpacePage() {
       <div>Space!</div>
       <Join />
       <SpaceName />
+      <DeckList />
     </SpaceProvider>
   );
 }

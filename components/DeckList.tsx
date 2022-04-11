@@ -24,10 +24,28 @@ import { sortByPosition } from "src/position_helpers";
 import { ulid } from "src/ulid";
 
 export const DeckList = () => {
-  let decks = useIndex.aev("deck");
+  let decks = useIndex.aev("deck").sort(sortByPosition("aev"));
+  let rep = useContext(ReplicacheContext);
+  let [newDeckName, setNewDeckName] = useState("");
   return (
     <div>
-      <button>CreateNewDeck</button>
+      <input
+        value={newDeckName}
+        placeholder="create a new deck"
+        onChange={(e) => setNewDeckName(e.currentTarget.value)}
+      />
+      <button
+        onClick={() => {
+          let entity = ulid();
+          rep?.rep.mutate.addDeck({
+            newEntity: entity,
+            name: newDeckName,
+            position: generateKeyBetween(null, decks[0].positions.aev || null),
+          });
+        }}
+      >
+        create
+      </button>
       {decks.map((d) => (
         <Deck entity={d.entity} key={d.entity} />
       ))}

@@ -112,6 +112,7 @@ let mutators: ReplicacheMutators = Object.keys(Mutations).reduce((acc, k) => {
         let schema = await getSchema(tx, fact.attribute);
         if (!schema) return { success: false, error: "no schema" };
         let newID = ulid();
+        console.log(newID);
         let lastUpdated = Date.now().toString();
         if (schema.cardinality === "one") {
           let existingFact = (await q.eav(fact.entity, fact.attribute)) as
@@ -139,6 +140,7 @@ export const makeReplicache = (args: {
   let rep = new Replicache({
     name: args.name,
     pushDelay: 500,
+    pullInterval: 5000,
     pusher: args.pusher,
     puller: args.puller,
     mutators: mutators,
