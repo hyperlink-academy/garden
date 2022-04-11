@@ -5,7 +5,7 @@ import { ChatBubble, Studio, Information, DeckLarge } from "./Icons";
 import { ButtonLink, ButtonPrimary, ButtonTertiary } from "./Buttons";
 import { useState } from "react";
 import { Dialog } from "@headlessui/react";
-import { FloatingContainer } from "./Container";
+import { FloatingContainer } from "./Layout";
 
 export function SpaceNavFooter(props: { currentPage: string }) {
   let router = useRouter();
@@ -42,7 +42,6 @@ export function SpaceNavFooter(props: { currentPage: string }) {
           <Dialog.Overlay className="overlay" />
           <FloatingContainer
             className={`
-                w-[calc(100%-40px)]
                 fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
                 grid grid-flow-row gap-4
                 `}
