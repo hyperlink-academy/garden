@@ -6,9 +6,11 @@ import { deleteSessionFunctionName } from "./functions/delete_session";
 import { getIdentityByUsernameFunctionName } from "./functions/get_identity_by_username";
 import { getSessionByIdFunctionName } from "./functions/get_session_by_id";
 import { ValidateNewIdentityFunctionName } from "./functions/validate_new_identity";
+import { getSignupTokenFunctionName } from "./functions/get_signup_token";
 
 const Functions = [
   deleteSessionFunctionName,
+  getSignupTokenFunctionName,
   getSessionByIdFunctionName,
   getIdentityByUsernameFunctionName,
   CreateSessionFunctionName,

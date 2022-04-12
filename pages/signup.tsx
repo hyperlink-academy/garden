@@ -1,7 +1,9 @@
 import { workerAPI } from "backend/lib/api";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import useSWR from "swr";
 
+const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export default function SignupPage() {
   let router = useRouter();
   let [data, setData] = useState({
@@ -11,25 +13,34 @@ export default function SignupPage() {
     confirmPassword: "",
   });
   const code = router.query.signupCode as string | undefined;
+  let { data: signup_token } = useSWR(code, async (c) => {
+    if (!code) return { success: false } as const;
+    let data = await workerAPI(WORKER_URL, "get_signup_token", { code: c });
+    return data;
+  });
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!code) return;
-    await workerAPI(
-      process.env.NEXT_PUBLIC_WORKER_URL as string,
-      "signup",
-      {
-        code: code,
-        email: data.email,
-        password: data.password,
-        username: data.username,
-      }
-    );
+    await workerAPI(WORKER_URL, "signup", {
+      code: code,
+      email: data.email,
+      password: data.password,
+      username: data.username,
+    });
   };
 
-  if (!code)
+  if (!signup_token) return "loading";
+  if (!signup_token.success)
     return <div>We're currently invite only! You need a code to sign up</div>;
   return (
     <div>
+      {signup_token.signup_token.message ? (
+        <div className="max-w-sm m-auto border p-2 my-4">
+          <pre className="whitespace-pre-wrap">
+            {signup_token.signup_token.message}
+          </pre>
+        </div>
+      ) : null}
       <form onSubmit={onSubmit} className="grid gap-2">
         <label className="flex gap-2 align-middle">
           username:
