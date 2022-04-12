@@ -123,7 +123,7 @@ let mutators: ReplicacheMutators = Object.keys(Mutations).reduce((acc, k) => {
           }
         }
         let data = FactWithIndexes({ id: newID, ...fact, lastUpdated, schema });
-        tx.put(newID, data);
+        await tx.put(newID, data);
         return { success: true };
       },
     };
