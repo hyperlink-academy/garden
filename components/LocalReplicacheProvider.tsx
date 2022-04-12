@@ -85,7 +85,7 @@ export const LocalReplicacheProvider: React.FC<{
         if (!schema) schema = await getSchema(fact.attribute);
         if (!schema) throw Error("no schema found for attribute");
 
-        if (schema.cardinality) {
+        if (schema.cardinality === "one") {
           let existingFactIndex = db.current.facts.findIndex(
             (f) => f.attribute === fact.attribute && f.entity === fact.entity
           );
@@ -93,13 +93,17 @@ export const LocalReplicacheProvider: React.FC<{
             db.current.facts[existingFactIndex] = {
               ...db.current.facts[existingFactIndex],
               ...fact,
+              positions: {
+                ...db.current.facts[existingFactIndex].positions,
+                ...fact.positions,
+              },
               retracted: false,
               lastUpdated,
             };
             return { success: true };
           }
-          db.current.facts.push({ ...fact, id: newID, lastUpdated, schema });
         }
+        db.current.facts.push({ ...fact, id: newID, lastUpdated, schema });
         return { success: true };
       },
       updateFact: async (id, data) => {
@@ -108,6 +112,10 @@ export const LocalReplicacheProvider: React.FC<{
         db.current.facts[existingFactIndex] = {
           ...db.current.facts[existingFactIndex],
           ...data,
+          positions: {
+            ...db.current.facts[existingFactIndex].positions,
+            ...data.positions,
+          },
           lastUpdated: Date.now().toString(),
         };
         return { success: true };
@@ -122,20 +130,23 @@ export const LocalReplicacheProvider: React.FC<{
         for (let i = 0; i < data.mutations.length; i++) {
           let m = data.mutations[i];
           let name = m.name as keyof typeof Mutations;
-          if (m.id !== db.current.lastMutationID + 1) continue;
-          await Mutations[name](m.args as any, ctx);
+          console.log(`Executing mutation ${m.name} with id ${m.id}`);
+          if (m.id !== db.current.lastMutationID + 1) {
+            continue;
+          }
           db.current.lastMutationID = m.id;
+          await Mutations[name](m.args as any, ctx);
         }
         return { httpStatusCode: 200, errorMessage: "" };
       },
       puller: async (request) => {
         let data: PullRequest = await request.json();
         let cookie = data.cookie as Cookie | undefined;
-        let lastSeen = cookie?.lastUpdated || "0";
+        let lastSeen = cookie?.lastUpdated || "";
         let newFacts = db.current.facts.filter((f) => f.lastUpdated > lastSeen);
         let latestFact = newFacts.reduce(
           (acc, f) => (f.lastUpdated > acc ? f.lastUpdated : acc),
-          newFacts[0]?.lastUpdated || "0"
+          lastSeen
         );
         let ops = newFacts.map((f) => {
           if (f.retracted)
@@ -154,7 +165,7 @@ export const LocalReplicacheProvider: React.FC<{
         return {
           httpRequestInfo: { httpStatusCode: 200, errorMessage: "" },
           response: {
-            lastMutationID: data.lastMutationID,
+            lastMutationID: db.current.lastMutationID,
             cookie: { lastUpdated: latestFact },
             patch: reset ? [{ op: "clear" }, ...ops] : ops,
           },
@@ -162,19 +173,21 @@ export const LocalReplicacheProvider: React.FC<{
       },
     });
     setRep(rep);
+    return () => {
+      db.current.reset = true;
+      rep?.close();
+    };
   }, []);
   useEffect(() => {
     let facts = props.defaultFacts.flatMap<Fact<keyof Attribute>>((e, id) => {
       return Object.keys(e).flatMap((a) => {
         let attribute: keyof Attribute = a as keyof Attribute;
-        console.log(attribute);
         let schema = Attribute[attribute];
         if (!schema)
           throw Error("no schema found for attribute in default facts");
         if (schema.cardinality === "many")
           //@ts-ignore
           return e[attribute].map((v) => {
-            console.log(v);
             return {
               schema,
               lastUpdated: Date.now().toString(),

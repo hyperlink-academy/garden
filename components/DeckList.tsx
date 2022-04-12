@@ -1,18 +1,53 @@
-import { useIndex } from "hooks/useReplicache";
-import { Disclosure, Transition } from "@headlessui/react";
+import { ReplicacheContext, useIndex } from "hooks/useReplicache";
+import { Disclosure } from "@headlessui/react";
 import useMeasure from "react-use-measure";
 import { SmallCard } from "components/SmallCard";
-import { animated, useSpring, useTransition } from "react-spring";
+import { animated, useSpring } from "react-spring";
 import { usePrevious } from "hooks/utils";
+import {
+  closestCenter,
+  DndContext,
+  MouseSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import { ReferenceAttributes } from "data/Attributes";
+import { Fact } from "data/Facts";
+import { SortableContext } from "@dnd-kit/sortable";
+import { useContext, useState } from "react";
 import { FindOrCreateCard } from "./FindOrCreateCard";
+import { ButtonSecondary } from "./Buttons";
+import { Card } from "./Icons";
+import { generateKeyBetween } from "src/fractional-indexing";
+import { sortByPosition } from "src/position_helpers";
+import { ulid } from "src/ulid";
 
 export const DeckList = () => {
-  let decks = useIndex.aev("deck");
+  let decks = useIndex.aev("deck").sort(sortByPosition("aev"));
+  let rep = useContext(ReplicacheContext);
+  let [newDeckName, setNewDeckName] = useState("");
   return (
     <div>
-      <button>CreateNewDeck</button>
+      <input
+        value={newDeckName}
+        placeholder="create a new deck"
+        onChange={(e) => setNewDeckName(e.currentTarget.value)}
+      />
+      <button
+        onClick={() => {
+          let entity = ulid();
+          rep?.rep.mutate.addDeck({
+            newEntity: entity,
+            name: newDeckName,
+            position: generateKeyBetween(null, decks[0].positions.aev || null),
+          });
+        }}
+      >
+        create
+      </button>
       {decks.map((d) => (
-        <Deck entity={d.entity} />
+        <Deck entity={d.entity} key={d.entity} />
       ))}
     </div>
   );
@@ -20,8 +55,11 @@ export const DeckList = () => {
 
 const Deck = (props: { entity: string }) => {
   let title = useIndex.eav(props.entity, "card/title");
+  let rep = useContext(ReplicacheContext);
   let description = useIndex.eav(props.entity, "card/content");
   let cards = useIndex.eav(props.entity, "deck/contains");
+  let earliestCard = cards?.sort(sortByPosition("eav"))[0];
+  let [findOpen, setFindOpen] = useState(false);
 
   return (
     <div>
@@ -34,7 +72,47 @@ const Deck = (props: { entity: string }) => {
                 {description?.value}
               </Disclosure.Button>
               <Drawer open={open}>
-                <SmallCardList cards={cards?.map((c) => c.value.value) || []} />
+                <ButtonSecondary
+                  onClick={() => setFindOpen(true)}
+                  icon={<Card />}
+                  content="Add card"
+                />
+                <FindOrCreateCard
+                  onSelect={async (e) => {
+                    let position = generateKeyBetween(
+                      null,
+                      earliestCard?.positions["eav"] || null
+                    );
+                    if (e.type === "create") {
+                      let newEntity = ulid();
+                      await rep?.rep.mutate.createCard({
+                        entityID: newEntity,
+                        title: e.name,
+                      });
+                      await rep?.rep.mutate.addCardToSection({
+                        cardEntity: newEntity,
+                        parent: props.entity,
+                        positions: { eav: position },
+                        section: "deck/contains",
+                      });
+                      return;
+                    }
+                    rep?.rep.mutate.addCardToSection({
+                      cardEntity: e.entity,
+                      parent: props.entity,
+                      positions: { eav: position },
+                      section: "deck/contains",
+                    });
+                  }}
+                  open={findOpen}
+                  onClose={() => setFindOpen(false)}
+                  selected={cards?.map((c) => c.value.value) || []}
+                />
+                <SmallCardList
+                  positionKey="eav"
+                  deck={props.entity}
+                  cards={cards || []}
+                />
               </Drawer>
             </>
           );
@@ -54,7 +132,6 @@ export const Drawer: React.FC<{ open: boolean }> = (props) => {
       height: props.open ? viewHeight : 0,
     },
   });
-  console.log(arrowHeight);
   return (
     <animated.div
       style={{
@@ -94,19 +171,62 @@ export const Drawer: React.FC<{ open: boolean }> = (props) => {
               }}
             />
           </div>
-          <div className="pb-4">{props.children}</div>
+          <div className="pb-4 pt-8">{props.children}</div>
         </div>
       </Disclosure.Panel>
     </animated.div>
   );
 };
 
-export const SmallCardList = (props: { cards: string[] }) => {
+export const SmallCardList = (props: {
+  cards: Fact<keyof ReferenceAttributes>[];
+  deck: string;
+  positionKey: string;
+}) => {
+  const mouseSensor = useSensor(MouseSensor, {});
+  const touchSensor = useSensor(TouchSensor, {});
+  const sensors = useSensors(mouseSensor, touchSensor);
+  let rep = useContext(ReplicacheContext);
+  let [dragging, setDraggging] = useState<string | null>(null);
+  let items = props.cards.sort(sortByPosition(props.positionKey));
+
   return (
-    <div className="flex flex-wrap gap-8 p-8">
-      {props.cards.map((c) => (
-        <SmallCard href="" entityID={c} />
-      ))}
-    </div>
+    <DndContext
+      collisionDetection={closestCenter}
+      sensors={sensors}
+      onDragStart={({ active }) => {
+        setDraggging(active.id);
+      }}
+      onDragEnd={({ over }) => {
+        setDraggging(null);
+        if (over) {
+          if (!dragging) return;
+          let index = items.findIndex((f) => f.id === over.id);
+          let currentIndex = items.findIndex((f) => f.id === dragging);
+          if (index === -1) return;
+          rep?.rep.mutate.moveCard({
+            factID: dragging,
+            positionKey: props.positionKey,
+            parent: props.deck,
+            attribute: "deck/contains",
+            index: currentIndex < index ? index : index - 1,
+          });
+        }
+      }}
+    >
+      <SortableContext items={items.map((item) => item.id)}>
+        <div className="flex flex-wrap gap-8 py-8 px-2">
+          {items.map((c) => (
+            <SmallCard
+              draggable={true}
+              key={c.id}
+              href=""
+              entityID={c.value.value}
+              id={c.id}
+            />
+          ))}
+        </div>
+      </SortableContext>
+    </DndContext>
   );
 };

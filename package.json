@@ -20,6 +20,8 @@
   },
   "homepage": "https://github.com/hyperlink-academy/garden#readme",
   "dependencies": {
+    "@dnd-kit/core": "^5.0.3",
+    "@dnd-kit/sortable": "^6.0.1",
     "@headlessui/react": "^1.5.0",
     "bcryptjs": "^2.4.3",
     "cookie": "^0.4.2",

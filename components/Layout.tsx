@@ -1,3 +1,7 @@
+export const Divider = () => {
+  return <div className="border-t border-grey-80 w-full"></div>;
+};
+
 export const FloatingContainer: React.FC<{ className?: string }> = (props) => {
   return (
     <div

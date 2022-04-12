@@ -55,6 +55,8 @@ const scanIndex = (tx: ReadTransaction) => {
   return q;
 };
 const getSchema = async (tx: ReadTransaction, attributeName: string) => {
+  let defaultAttr = Attribute[attributeName as keyof Attribute];
+  if (defaultAttr) return defaultAttr;
   let q = scanIndex(tx);
   let attribute = await q.ave("name", attributeName);
   if (!attribute) return;
@@ -72,7 +74,12 @@ export function FactWithIndexes<A extends keyof Attribute>(f: Fact<A>) {
     eav: `${f.entity}-${f.attribute}-${f.id}`,
     aev: `${f.attribute}-${f.entity}-${f.id}`,
     ave: f.schema.unique ? `${f.attribute}-${f.value}` : "",
-    vae: f.schema.type === `reference` ? `${f.value}-${f.attribute}` : "",
+    vae:
+      f.schema.type === `reference`
+        ? `${(f.value as { type: "reference"; value: string }).value}-${
+            f.attribute
+          }`
+        : "",
   };
   return { ...f, indexes };
 }
@@ -94,13 +101,18 @@ let mutators: ReplicacheMutators = Object.keys(Mutations).reduce((acc, k) => {
           | Fact<keyof Attribute>
           | undefined;
         if (!existingFact) return { success: false };
-        tx.put(id, { ...existingFact, ...data });
+        await tx.put(id, {
+          ...existingFact,
+          ...data,
+          positions: { ...existingFact.positions, ...data.positions },
+        });
         return { success: true };
       },
       assertFact: async (fact) => {
         let schema = await getSchema(tx, fact.attribute);
-        if (!schema) return { success: false };
+        if (!schema) return { success: false, error: "no schema" };
         let newID = ulid();
+        console.log(newID);
         let lastUpdated = Date.now().toString();
         if (schema.cardinality === "one") {
           let existingFact = (await q.eav(fact.entity, fact.attribute)) as
@@ -112,7 +124,7 @@ let mutators: ReplicacheMutators = Object.keys(Mutations).reduce((acc, k) => {
         }
         let data = FactWithIndexes({ id: newID, ...fact, lastUpdated, schema });
         tx.put(newID, data);
-        return { success: false };
+        return { success: true };
       },
     };
     return Mutations[k as keyof typeof Mutations](mutationArgs, context);
@@ -128,6 +140,7 @@ export const makeReplicache = (args: {
   let rep = new Replicache({
     name: args.name,
     pushDelay: 500,
+    pullInterval: 5000,
     pusher: args.pusher,
     puller: args.puller,
     mutators: mutators,

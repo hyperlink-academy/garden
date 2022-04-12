@@ -1,11 +1,11 @@
 import { useAuth } from "hooks/useAuth";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { ChatBubble, House, Information, SpreadDeck } from "./Icons";
+import { ChatBubble, Studio, Information, DeckLarge } from "./Icons";
 import { ButtonLink, ButtonPrimary, ButtonTertiary } from "./Buttons";
 import { useState } from "react";
 import { Dialog } from "@headlessui/react";
-import { FloatingContainer } from "./Container";
+import { FloatingContainer } from "./Layout";
 
 export function SpaceNavFooter(props: { currentPage: string }) {
   let router = useRouter();
@@ -42,7 +42,6 @@ export function SpaceNavFooter(props: { currentPage: string }) {
           <Dialog.Overlay className="overlay" />
           <FloatingContainer
             className={`
-                w-[calc(100%-40px)]
                 fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
                 grid grid-flow-row gap-4
                 `}
@@ -121,14 +120,9 @@ export function SpaceNavFooter(props: { currentPage: string }) {
       {!session?.loggedIn ? (
         <LogInModal />
       ) : (
-        // <Link href="/login">
-        //   <ButtonLink className="justify-self-start" content="Log In">
-        //     Log In!
-        //   </ButtonLink>
-        // </Link>
         <Link href={`/s/${session.session.username}`}>
           <a className="justify-self-start">
-            <House className="text-grey-55" />
+            <Studio className="text-grey-55" />
           </a>
         </Link>
       )}
@@ -137,7 +131,7 @@ export function SpaceNavFooter(props: { currentPage: string }) {
         {/* DECKS */}
         <Link href={`/s/${router.query.studio}/a/${router.query.activity}`}>
           <a className="border-2 border-t-0 rounded-b-lg px-2 relative -top-0.5 bg-background border-grey-15">
-            <SpreadDeck />
+            <DeckLarge />
           </a>
         </Link>
 

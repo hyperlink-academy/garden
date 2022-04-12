@@ -1,6 +1,7 @@
-export const Gripper = () => {
+type DivProps = JSX.IntrinsicElements["div"];
+export const Gripper = (props: DivProps) => {
   return (
-    <div>
+    <div {...props}>
       <svg
         width="6"
         height="100%"
