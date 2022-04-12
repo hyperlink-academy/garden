@@ -291,7 +291,7 @@ export const Settings = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
-export const Trash = (props: SVGProps<SVGSVGElement>) => {
+export const Delete = (props: SVGProps<SVGSVGElement>) => {
   return (
     <svg
       width="24"
