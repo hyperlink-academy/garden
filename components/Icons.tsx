@@ -316,6 +316,44 @@ export const Delete = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
+export const UpArrow = (props: SVGProps<SVGSVGElement>) => {
+  return (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        fill-rule="evenodd"
+        clip-rule="evenodd"
+        d="M11.2929 3.79289C11.6835 3.40237 12.3166 3.40237 12.7072 3.79289L19.0711 10.1569C19.4616 10.5474 19.4616 11.1805 19.0711 11.5711C18.6806 11.9616 18.0474 11.9616 17.6569 11.5711L13.0001 6.91421L13.0001 19.5C13.0001 20.0523 12.5523 20.5 12.0001 20.5C11.4478 20.5 11.0001 20.0523 11.0001 19.5L11.0001 6.91421L6.3432 11.5711C5.95267 11.9616 5.31951 11.9616 4.92898 11.5711C4.53846 11.1805 4.53846 10.5474 4.92898 10.1569L11.2929 3.79289Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+};
+
+export const DownArrow = (props: SVGProps<SVGSVGElement>) => {
+  return (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        fill-rule="evenodd"
+        clip-rule="evenodd"
+        d="M19.0711 13.8431L12.7072 20.2071C12.3166 20.5976 11.6835 20.5976 11.2929 20.2071L4.92899 13.8431C4.53846 13.4526 4.53846 12.8195 4.92899 12.4289C5.31951 12.0384 5.95267 12.0384 6.3432 12.4289L11.0001 17.0858L11.0001 4.5C11.0001 3.94772 11.4478 3.5 12.0001 3.5C12.5523 3.5 13.0001 3.94772 13.0001 4.5L13.0001 17.0858L17.6569 12.4289C18.0474 12.0384 18.6806 12.0384 19.0711 12.4289C19.4616 12.8195 19.4616 13.4526 19.0711 13.8431Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+};
+
 //ADD A NEW ICON WITH THIS
 
 // export const IconName = ( props:SVGProps<SVGSVGElement>) => {
