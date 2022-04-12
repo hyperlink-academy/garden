@@ -1,15 +1,18 @@
-import { useState } from "react";
-import { ButtonLink } from "./Buttons";
+import { Fragment, useState } from "react";
+import { Menu, Transition } from "@headlessui/react";
 
+import { ButtonLink } from "./Buttons";
 import { FindOrCreateCard } from "./FindOrCreateCard";
 import {
   MoreOptions,
   Add,
+  Delete,
+  DeckSmall,
   Settings,
   SectionLinkedCard,
   SectionText,
 } from "./Icons";
-import { Divider } from "./Layout";
+import { Divider, FloatingContainer } from "./Layout";
 import { SmallCard } from "./SmallCard";
 
 export const Card = () => {
@@ -25,10 +28,10 @@ export const Card = () => {
       <div className="grid grid-auto-row gap-6">
         <div className="grid grid-auto-rows gap-3">
           <div className="cardHeader grid grid-cols-[auto_min-content] gap-2 items-start">
-            <h2 className="mt-[2px]">Card Name</h2>
-            <button className="">
-              <Settings />
-            </button>
+            <h2 className="">Card Name</h2>
+            <div className="mt-[4px]">
+              <MoreOptionsMenu />
+            </div>{" "}
           </div>
 
           <div className="cardDefaultContent grid grid-auto-rows gap-2">
@@ -152,5 +155,42 @@ const FindOrCreateWithContext = () => {
         })}
       </ul>
     </>
+  );
+};
+
+const MoreOptionsMenu = () => {
+  return (
+    <div className="text-right">
+      <Menu>
+        <Menu.Button className="mt-[2px] relative">
+          <MoreOptions />
+        </Menu.Button>
+        <Transition
+          as={Fragment}
+          enter="transition ease-out duration-100"
+          enterFrom="transform opacity-0 scale-95"
+          enterTo="transform opacity-100 scale-100"
+          leave="transition ease-in duration-75"
+          leaveFrom="transform opacity-100 scale-100"
+          leaveTo="transform opacity-0 scale-95"
+        >
+          <Menu.Items className="px-3 py-4 border border-grey-80 rounded-md shadow-drop bg-white absolute right-8 justify-items-end grid grid-auto-row gap-3">
+            <Menu.Item>
+              <button className="flex items-center gap-2">
+                <p>Remove from Deck</p>
+                <DeckSmall />
+              </button>
+            </Menu.Item>
+            <Divider />
+            <Menu.Item>
+              <button className="flex items-center gap-2 text-accent-red">
+                <p>Delete Card Everywhere</p>
+                <Delete />
+              </button>
+            </Menu.Item>
+          </Menu.Items>
+        </Transition>
+      </Menu>
+    </div>
   );
 };
