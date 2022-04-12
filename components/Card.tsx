@@ -132,8 +132,8 @@ const FindOrCreateWithContext = () => {
         open={open}
         onClose={() => setOpen(false)}
         selected={selectedCards}
-        onSelect={(e) => {
-          setSelectedCards((s) => [...s, e.entity]);
+        onSelect={() => {
+          //TODO
         }}
       />
       <ul>
