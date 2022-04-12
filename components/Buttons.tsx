@@ -12,7 +12,7 @@ export function ButtonPrimary(
       className="p-2 m-0 text-white font-bold
 bg-accent-blue border rounded-md border-accent-blue flex justify-center
 items-center gap-4 hover:text-accent-blue hover:bg-bg-blue active:text-white
-active:bg-accent-blue"
+active:bg-accent-blue max-w-max"
     >
       {props.icon ? <span className="">{props.icon}</span> : null}
       <span className="">{props.content}</span>
@@ -32,7 +32,7 @@ export function ButtonSecondary(
       {...{ content: undefined, icon: undefined }}
       className="p-2 m-0 text-accent-blue
 font-bold bg-white border rounded-md border-accent-blue flex justify-center
-items-center gap-4 hover:bg-bg-blue active:text-white active:bg-accent-blue"
+items-center gap-4 hover:bg-bg-blue active:text-white active:bg-accent-blue max-w-max"
     >
       {props.icon ? <span className="">{props.icon}</span> : null}
       <span className="">{props.content}</span>
@@ -53,7 +53,7 @@ export function ButtonTertiary(
       className="p-2 m-0 text-grey-35
   bg-white border rounded-md border-grey-55 flex justify-center items-center
   gap-4 hover:text-accent-blue hover:bg-bg-blue active:text-white
-  active:bg-accent-blue"
+  active:bg-accent-blue max-w-max"
     >
       {props.icon ? <span className="">{props.icon}</span> : null}
       <span className="">{props.content}</span>
@@ -72,7 +72,7 @@ export function ButtonLink(
       {...props}
       {...{ content: undefined, icon: undefined }}
       className="m-0 text-accent-blue font-bold flex
-  justify-center items-center gap-4"
+  justify-center items-center gap-4 max-w-max"
     >
       {props.icon ? <span className="">{props.icon}</span> : null}
       <span className="">{props.content}</span>
