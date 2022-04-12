@@ -3,7 +3,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { useIndex } from "hooks/useReplicache";
 import Link from "next/link";
 import { Gripper } from "./Gripper";
-import { Delete } from "./Icons";
+import { Close } from "./Icons";
 
 export function SmallCard(props: {
   href: string;
@@ -35,7 +35,7 @@ export function SmallCard(props: {
       ref={setNodeRef}
     >
       {!!props.onDelete ? (
-        <Delete className="text-accent-blue absolute -right-2.5 z-10" />
+        <Close className="text-accent-blue absolute -right-2.5 z-10" />
       ) : null}
 
       <div className="border-[1] border-grey-80 shadow-drop rounded-md p-2 pl-1 min-w-36 max-w-[151px] h-24 overflow-hidden bg-white flex flex-row gap-2 relative">
