@@ -1,6 +1,6 @@
 import { Combobox, Dialog, Transition } from "@headlessui/react";
 import { useIndex } from "hooks/useReplicache";
-import { Card, Deck } from "components/Icons";
+import { Card, DeckSmall } from "components/Icons";
 import { useState } from "react";
 
 export const FindOrCreateCard = (props: {
@@ -86,7 +86,7 @@ export const FindOrCreateCard = (props: {
                                   : ""
                               }`}
                             >
-                              {item.isDeck ? <Deck /> : <Card />}
+                              {item.isDeck ? <DeckSmall /> : <Card />}
                               {item.name}
                             </div>
                           </SearchItem>

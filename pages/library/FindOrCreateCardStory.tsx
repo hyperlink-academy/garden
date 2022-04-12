@@ -43,7 +43,9 @@ const Story = () => {
         onClose={() => setOpen(false)}
         selected={selectedCards}
         onSelect={(e) => {
-          setSelectedCards((s) => [...s, e.entity]);
+          if (e.type == "existing") {
+            setSelectedCards((s) => [...s, e.entity]);
+          }
         }}
       />
       <ul>

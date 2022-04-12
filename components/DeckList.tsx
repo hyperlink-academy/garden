@@ -40,7 +40,7 @@ export const DeckList = () => {
           rep?.rep.mutate.addDeck({
             newEntity: entity,
             name: newDeckName,
-            position: generateKeyBetween(null, decks[0].positions.aev || null),
+            position: generateKeyBetween(null, decks[0]?.positions.aev || null),
           });
         }}
       >
