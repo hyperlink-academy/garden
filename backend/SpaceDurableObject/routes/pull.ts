@@ -34,7 +34,7 @@ export const pullRoute = makeRoute({
 
     let lastKey = updates[updates.length - 1];
     let newCookie: typeof msg.cookie = {
-      lastUpdated: lastUpdated || lastKey?.lastUpdated || Date.now().toString(),
+      lastUpdated: lastKey?.lastUpdated || lastUpdated || Date.now().toString(),
     };
 
     return {
