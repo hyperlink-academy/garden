@@ -37,7 +37,7 @@ export const FindOrCreateCard = (props: {
       >
         <Dialog.Overlay className="fixed inset-0 bg-grey-90 opacity-30" />
         <div className="flex items-center justify-center min-h-screen">
-          <div className="relative w-[80vw] min-w-[384px] mx-auto">
+          <div className="relative w-[80vw] min-w-[384px] mx-auto max-w-md">
             <Combobox
               value=""
               onChange={(c) => {

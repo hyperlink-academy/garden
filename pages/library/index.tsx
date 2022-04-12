@@ -33,26 +33,27 @@ export const ComponentViewer: React.FC<{
   let keys = Object.keys(props.stories);
   let [story, setStory] = useState(keys[0]);
   let router = useRouter();
-  let [open, setOpen] = useState(false);
+  let [isOpen, toggleOpen] = useState(false);
   let [bg, setBg] = useState(true);
   return (
     <LocalReplicacheProvider
       defaultFacts={story ? props.stories[story].entities : []}
     >
+      <div style={{maxWidth: "48rem", margin: "auto",}}> {/* WRAPPER - OPEN */}
       {/* MENU AND BG TOGGLE */}
       <div className="flex gap-4 justify-between pt-6 pb-4 text-accent-blue">
-        <button onClick={() => setOpen(true)}>
+        <button onClick={() => toggleOpen(!isOpen)}>
           <MenuIcon />
         </button>
         <BGSwitch enabled={bg} setEnabled={setBg} />
       </div>
       {/* START COMPONENT MENU  */}
       <div>
-        {!open ? null : (
+        {!isOpen ? null : (
           <div className="ComponentMenu z-50 w-64 fixed left-0 top-0 h-screen p-4 bg-bg-blue grid auto-rows-max gap-4">
             <div className="grid grid-cols-[max-content_max-content] place-content-between px-2">
               <h3>Component Library</h3>
-              <button onClick={() => setOpen(false)}>x</button>
+              <button onClick={() => toggleOpen(!isOpen)}>x</button>
             </div>
             <ul>
               {props.components.map((c) => {
@@ -126,6 +127,7 @@ export const ComponentViewer: React.FC<{
         {/* FACT LIST HERE */}
         <AllFacts />
       </div>
+      </div> {/* WRAPPER - CLOSE */}
     </LocalReplicacheProvider>
   );
 };

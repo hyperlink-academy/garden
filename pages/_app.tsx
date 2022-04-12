@@ -21,7 +21,7 @@ export default function App({ Component, pageProps }: AppProps) {
 const Layout: React.FC = (props) => {
   let { session } = useAuth();
   return (
-    <div>
+    <div style={{maxWidth: "48rem", margin: "auto",}}>
       <div className="p-2 border-2 mb-8">
         {session.loggedIn ? (
           <Link href={`/s/${session.session.username}`}>
