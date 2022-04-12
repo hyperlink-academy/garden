@@ -25,6 +25,7 @@
     "@headlessui/react": "^1.5.0",
     "bcryptjs": "^2.4.3",
     "cookie": "^0.4.2",
+    "corpora-project": "^0.2.0",
     "faunadb": "^4.5.2",
     "next": "^12.1.0",
     "react": "^17.0.2",
