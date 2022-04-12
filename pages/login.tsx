@@ -1,4 +1,6 @@
+import { ButtonLink, ButtonPrimary } from "components/Buttons";
 import { useAuth } from "hooks/useAuth";
+import Link from "next/link";
 import { useState } from "react";
 
 export default function LoginPage() {
@@ -14,12 +16,13 @@ export default function LoginPage() {
     let session = await login(data);
   };
   return (
-    <div>
-      <form className="grid gap-2" onSubmit={onSubmit}>
-        <label className="flex gap-2 align-middle">
-          username:
+    <div className="grid grid-auto-rows gap-8 mx-auto max-w-md">
+      <h1>Hi, Welcome Back!</h1>
+      <form className="grid gap-4 w-full" onSubmit={onSubmit}>
+        <label className="grid grid-flow-rows gap-2 font-bold">
+          Username
           <input
-            className="border-2 p-2"
+            className="w-[100%]]"
             type="text"
             value={data.username}
             onChange={(e) =>
@@ -27,10 +30,9 @@ export default function LoginPage() {
             }
           />
         </label>
-        <label className="flex gap-2 align-middle">
-          password:
+        <label className="grid grid-flow-rows gap-2 font-bold">
+          Password
           <input
-            className="border-2 p-2"
             type="password"
             value={data.password}
             onChange={(e) =>
@@ -38,18 +40,20 @@ export default function LoginPage() {
             }
           />
         </label>
-        <button className="border-2 p-2" type="submit">
-          submit
-        </button>
+        <div className="grid grid-rows-max gap-2 justify-items-end text-right">
+          <ButtonPrimary content="Log In!" type="submit" />
+          <p className="text-grey-35">
+            {" "}
+            or email us about signing up{" "}
+            <a
+              href="mailto:contact@hyperlink.academy"
+              className="text-accent-blue"
+            >
+              contact@hyperlink.academy
+            </a>
+          </p>
+        </div>
       </form>
-      <button
-        className="border-2 p-2"
-        onClick={async () => {
-          await logout();
-        }}
-      >
-        logout
-      </button>
     </div>
   );
 }

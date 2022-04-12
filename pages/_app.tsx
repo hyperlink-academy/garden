@@ -22,7 +22,7 @@ const Layout: React.FC = (props) => {
   let { session } = useAuth();
   return (
     <div>
-      <div className="p-2 border-2">
+      <div className="p-2 border-2 mb-8">
         {session.loggedIn ? (
           <Link href={`/s/${session.session.username}`}>
             <a>studio</a>
