@@ -128,7 +128,7 @@ export const Drawer: React.FC<{ open: boolean }> = (props) => {
   const { height, arrowHeight } = useSpring({
     from: { height: 0, opacity: 0, arrowHeight: 0 },
     to: {
-      arrowHeight: props.open ? 100 : 0,
+      arrowHeight: props.open ? 100 : 100,
       height: props.open ? viewHeight : 0,
     },
   });
@@ -145,7 +145,7 @@ export const Drawer: React.FC<{ open: boolean }> = (props) => {
           ref={ref}
           style={{
             boxShadow:
-              "inset 0px -4px 3px -3px rgba(0, 0, 0, 0.25), inset 0px 9px 6px -6px rgba(0, 0, 0, 0.25)",
+              "rgb(0 0 0 / 25%) 0px -4px 4px -4px inset, rgb(0 0 0 / 25%) 0px 6px 6px -6px inset",
           }}
         >
           <div
@@ -153,7 +153,7 @@ export const Drawer: React.FC<{ open: boolean }> = (props) => {
               height: "64px",
               marginBottom: "-32px",
               filter:
-                "drop-shadow(0 -1px 3px rgb(0, 0, 0, 0.25)) drop-shadow(0 3px 6px rgb(0, 0, 0, 0.25))",
+                "drop-shadow(rgba(0, 0, 0, 0.25) 0px 1px 2px)",
               clipPath:
                 "polygon(0 0, 0 100% , 20px 100% ,  36px 100%, 52px 100%, 100% 100%, 100% 0)",
               overflow: "hidden",
@@ -171,7 +171,7 @@ export const Drawer: React.FC<{ open: boolean }> = (props) => {
               }}
             />
           </div>
-          <div className="pb-4 pt-8">{props.children}</div>
+          <div className="pb-4 pt-8 px-4">{props.children}</div>
         </div>
       </Disclosure.Panel>
     </animated.div>
@@ -215,7 +215,7 @@ export const SmallCardList = (props: {
       }}
     >
       <SortableContext items={items.map((item) => item.id)}>
-        <div className="flex flex-wrap gap-8 py-8 px-2">
+        <div className="flex flex-wrap gap-8 py-8">
           {items.map((c) => (
             <SmallCard
               draggable={true}
