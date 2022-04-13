@@ -1,6 +1,8 @@
 import { workerAPI } from "backend/lib/api";
+import { ButtonPrimary } from "components/Buttons";
+import { FloatingContainer } from "components/Layout";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { ReactChild, useState } from "react";
 import useSWR from "swr";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
@@ -33,19 +35,28 @@ export default function SignupPage() {
   if (!signup_token.success)
     return <div>We're currently invite only! You need a code to sign up</div>;
   return (
-    <div>
+    <div className="grid grid-rows-max gap-8 mx-auto max-w-md">
+      <div className="grid grid-auto-rows gap-2">
+        <h1>Hello and Welcome!</h1>
+        <p className="text-grey-35">
+          <a className="text-accent-blue" href="/login">
+            Log in
+          </a>{" "}
+          instead
+        </p>
+      </div>
+
       {signup_token.signup_token.message ? (
-        <div className="max-w-sm m-auto border p-2 my-4">
-          <pre className="whitespace-pre-wrap">
+        <FloatingContainer className="max-w-sm m-auto">
+          <pre className="whitespace-pre-wrap font-[Quattro] italic text-grey-35">
             {signup_token.signup_token.message}
           </pre>
-        </div>
+        </FloatingContainer>
       ) : null}
-      <form onSubmit={onSubmit} className="grid gap-2">
-        <label className="flex gap-2 align-middle">
-          username:
+      <form onSubmit={onSubmit} className="grid gap-4 w-full">
+        <label className="grid grid-flow-rows gap-2 font-bold">
+          Username
           <input
-            className="border-2 p-2"
             type="text"
             value={data.username}
             onChange={(e) =>
@@ -53,41 +64,90 @@ export default function SignupPage() {
             }
           />
         </label>
-        <label className="flex gap-2 align-middle">
-          email:
+        <label className="grid grid-flow-rows gap-2 font-bold">
+          Email
           <input
-            className="border-2 p-2"
             type="email"
             value={data.email}
             onChange={(e) => setData({ ...data, email: e.currentTarget.value })}
           />
         </label>
-        <label className="flex gap-2 align-middle">
-          password:
-          <input
-            className="border-2 p-2"
-            type="password"
+        <label className="grid grid-flow-rows gap-2 font-bold">
+          Password
+          <PasswordInput
             value={data.password}
-            onChange={(e) =>
-              setData({ ...data, password: e.currentTarget.value })
-            }
+            onChange={(e) => setData({ ...data, password: e })}
           />
         </label>
-        <label className="flex gap-2 align-middle">
-          confirm password:
-          <input
-            className="border-2 p-2"
-            type="password"
-            value={data.confirmPassword}
-            onChange={(e) =>
-              setData({ ...data, confirmPassword: e.currentTarget.value })
-            }
-          />
-        </label>
-        <button className="border-2 p-2" type="submit">
-          submit
-        </button>
+        <ButtonPrimary type="submit" content="Sign Up!" />
       </form>
     </div>
   );
 }
+
+function PasswordInput(props: {
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  let [visible, setVisible] = useState(false);
+  return (
+    <div>
+      <input
+        className="w-full relative"
+        value={props.value}
+        type={visible ? "text" : "password"}
+        onChange={(e) => props.onChange(e.currentTarget.value)}
+      />
+      <button
+        onClick={(e) => {
+          e.preventDefault();
+          setVisible(!visible);
+        }}
+        className={`
+        relative
+        cursor-pointer
+        hover:cursor-pointer
+        top-[-32px]
+        left-[-16px]
+        float-right`}
+      >
+        {visible ? "hide" : "show"}
+      </button>
+    </div>
+  );
+
+  // position: relative;
+  // &:hover {
+  // cursor: pointer;
+  // }
+  // top: -30px;
+  // left: -16px;
+  // float: right;
+
+  // h("div", { style: { width: "100%", marginBottom: "-16px" } }, [
+  //   h(Input, {
+  //     ...props,
+  //     type: visible ? "text" : "password",
+  //     style: { width: "100%", boxSizing: "border-box" },
+  //   }),
+  //   h(
+  //     ToggleButton,
+  //     {
+  //       onClick: (e) => {
+  //         e.preventDefault();
+  //         setVisible(!visible);
+  //       },
+  //     },
+  //     visible ? "hide" : "show"
+  //   ),
+  // ]);
+}
+
+// let ToggleButton = styled('button')`
+// font-family: 'Roboto Mono', monospace;
+// color: ${colors.textSecondary};
+// outline: none;
+// background-color: inherit;
+// border: none;
+
+// `
