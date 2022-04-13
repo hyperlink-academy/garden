@@ -6,13 +6,26 @@ import {
   makeReplicache,
   ReplicacheContext,
 } from "hooks/useReplicache";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { PullRequest, PushRequest } from "replicache";
 import { useAuth } from "hooks/useAuth";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
+const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL as string;
 export const SpaceProvider: React.FC<{ id: string }> = (props) => {
   let [rep, setRep] = useState<ReturnType<typeof makeReplicache>>();
+  let socket = useRef<WebSocket>();
+  useEffect(() => {
+    if (!props.id || !rep) return;
+    socket.current = new WebSocket(`${SOCKET_URL}/space/${props.id}/socket`);
+    socket.current.addEventListener("message", () => {
+      rep?.pull();
+    });
+    return () => {
+      socket.current?.close();
+    };
+  }, [props.id, rep]);
+
   let { session } = useAuth();
   useEffect(() => {
     let rep = makeSpaceReplicache({

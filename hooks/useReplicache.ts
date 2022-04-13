@@ -140,7 +140,6 @@ export const makeReplicache = (args: {
   let rep = new Replicache({
     name: args.name,
     pushDelay: 500,
-    pullInterval: 5000,
     pusher: args.pusher,
     puller: args.puller,
     mutators: mutators,

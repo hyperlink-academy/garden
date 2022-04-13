@@ -58,6 +58,7 @@ export const create_space_route = makeRoute({
         positions: {},
       }),
     ]);
+    env.poke();
     return { data: { success: true } } as const;
   },
 });

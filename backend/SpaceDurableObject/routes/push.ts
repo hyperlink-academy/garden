@@ -66,7 +66,7 @@ export const push_route = makeRoute({
       }
     }
     env.storage.put<number>(`lastMutationID-${msg.clientID}`, lastMutationID);
-
+    env.poke();
     return { data: { success: true, errors: [] } };
   },
 });
