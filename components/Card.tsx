@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment, useState, useRef, useContext } from "react";
 import { Menu, Transition } from "@headlessui/react";
 
 import { ButtonLink } from "./Buttons";
@@ -17,6 +17,8 @@ import {
 } from "./Icons";
 import { Divider, FloatingContainer } from "./Layout";
 import { SmallCard } from "./SmallCard";
+import Textarea from "./AutosizeTextArea";
+import { ReplicacheContext, useIndex } from "hooks/useReplicache";
 
 export const Card = () => {
   return (
@@ -38,10 +40,11 @@ export const Card = () => {
           </div>
 
           <div className="cardDefaultContent grid grid-auto-rows gap-2">
-            <p>
+            <QuietTextArea entityID="0" />
+            {/* <p>
               This is some default content that I am typing here to make it look
               like something is being said.
-            </p>
+            </p> */}
           </div>
         </div>
 
@@ -237,5 +240,32 @@ const SectionMoreOptionsMenu = () => {
         </Transition>
       </Menu>
     </div>
+  );
+};
+
+const QuietTextArea = (props: { entityID: string }) => {
+  let textarea = useRef<HTMLTextAreaElement | null>(null);
+  let content = useIndex.eav(props.entityID, "card/content");
+  let rep = useContext(ReplicacheContext);
+
+  return (
+    <Textarea
+      ref={textarea}
+      className="placeholder:italic"
+      placeholder="write something..."
+      spellCheck={false}
+      value={content?.value || ""}
+      onChange={async (e) => {
+        let start = e.currentTarget.selectionStart,
+          end = e.currentTarget.selectionEnd;
+        await rep?.rep.mutate.assertFact({
+          entity: props.entityID,
+          attribute: "card/content",
+          value: e.currentTarget.value,
+          positions: content?.positions || {},
+        });
+        textarea.current?.setSelectionRange(start, end);
+      }}
+    />
   );
 };

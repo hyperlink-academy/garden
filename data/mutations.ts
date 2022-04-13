@@ -177,6 +177,12 @@ const createCard: Mutation<{ entityID: string; title: string }> = async (
   });
 };
 
+const assertFact: Mutation<
+  Pick<Fact<keyof Attribute>, "attribute" | "entity" | "value" | "positions">
+> = async (args, ctx) => {
+  await ctx.assertFact({ ...args });
+};
+
 export const Mutations = {
   createCard,
   moveCard,
@@ -184,4 +190,5 @@ export const Mutations = {
   addDeck,
   addCardToSection,
   assertCardTitle,
+  assertFact,
 };
