@@ -1,35 +1,19 @@
-import { spaceAPI, workerAPI } from "backend/lib/api";
+import { spaceAPI } from "backend/lib/api";
 import { DeckList } from "components/DeckList";
-import { SpaceProvider } from "components/ReplicacheProvider";
 import { useAuth } from "hooks/useAuth";
 import { useIndex, useSpaceID } from "hooks/useReplicache";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import useSWR from "swr";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export default function SpacePage() {
-  let router = useRouter();
-  let { data: id } = useSWR(
-    "/studio/" + router.query.studio + "/space/" + router.query.space,
-    () => {
-      let id = workerAPI(WORKER_URL, "get_space", {
-        studio: router.query.studio as string,
-        space: router.query.space as string,
-      });
-      return id;
-    },
-    { revalidateOnFocus: false }
-  );
-  if (!id) return <div>loading</div>;
-  if (!id.success) return <div>404 space</div>;
   return (
-    <SpaceProvider id={id.id}>
+    <>
       <div>Space!</div>
       <Join />
       <SpaceName />
       <DeckList />
-    </SpaceProvider>
+    </>
   );
 }
 

@@ -1,4 +1,4 @@
-import { spaceAPI } from "backend/lib/api";
+import { spaceAPI, workerAPI } from "backend/lib/api";
 import { z } from "zod";
 import { pullRoute } from "backend/SpaceDurableObject/routes/pull";
 import {
@@ -9,6 +9,8 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { PullRequest, PushRequest } from "replicache";
 import { useAuth } from "hooks/useAuth";
+import { useRouter } from "next/router";
+import useSWR from "swr";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL as string;
@@ -43,6 +45,27 @@ export const SpaceProvider: React.FC<{ id: string }> = (props) => {
       {props.children}
     </ReplicacheContext.Provider>
   );
+};
+
+export const SpaceSpaceProvider: React.FC<{
+  loading: React.ReactElement;
+  notFound: React.ReactElement;
+}> = (props) => {
+  let router = useRouter();
+  let { data: id } = useSWR(
+    "/studio/" + router.query.studio + "/space/" + router.query.space,
+    () => {
+      let id = workerAPI(WORKER_URL, "get_space", {
+        studio: router.query.studio as string,
+        space: router.query.space as string,
+      });
+      return id;
+    },
+    { revalidateOnFocus: false }
+  );
+  if (!id) return props.loading;
+  if (!id.success) return props.notFound;
+  return <SpaceProvider id={id.id}>{props.children}</SpaceProvider>;
 };
 
 export const makeSpaceReplicache = ({

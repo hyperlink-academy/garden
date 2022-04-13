@@ -1,0 +1,186 @@
+import { useAuth } from "hooks/useAuth";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { ChatBubble, Studio, Information, DeckLarge } from "./Icons";
+import { ButtonLink, ButtonPrimary, ButtonTertiary } from "./Buttons";
+import { useState } from "react";
+import { Dialog } from "@headlessui/react";
+import { FloatingContainer } from "./Layout";
+
+export const SpaceLayout: React.FC = (props) => {
+  return (
+    <div
+      style={{
+        maxWidth: "48rem",
+        margin: "auto",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        paddingTop: "8px",
+        alignItems: "stretch",
+        position: "relative",
+      }}
+    >
+      <div className="h-full border-grey-15 pt-4 overflow-auto">
+        {props.children}
+      </div>
+      <Footer />
+    </div>
+  );
+};
+
+const selectedClassname =
+  "border-2 border-t-0 rounded-b-lg px-2 relative -top-0.5 bg-background border-grey-15";
+export function Footer() {
+  let router = useRouter();
+  let { session } = useAuth();
+
+  return (
+    <div
+      style={{
+        width: "100%",
+        maxWidth: "100vw",
+      }}
+      className={`
+        grid grid-cols-[1fr,1fr,1fr] gap-1 items-center
+        bg-background border-t-2 border-grey-15 
+        px-4 pb-5
+        `}
+    >
+      {/* BACK TO STUDIO */}
+
+      {!session?.loggedIn ? (
+        <LogInModal />
+      ) : (
+        <Link href={`/s/${session.session.username}`}>
+          <a className="justify-self-start">
+            <Studio className="text-grey-55" />
+          </a>
+        </Link>
+      )}
+
+      <div className="justify-self-center flex flex-row">
+        {/* DECKS */}
+        <Link href={`/s/${router.query.studio}/s/${router.query.space}`}>
+          <a
+            className={
+              router.pathname === "/s/[studio]/s/[space]/chat"
+                ? "w-16"
+                : selectedClassname
+            }
+          >
+            <DeckLarge className="mx-auto" />
+          </a>
+        </Link>
+
+        {/* CHAT */}
+        <Link href={`/s/${router.query.studio}/s/${router.query.space}/chat`}>
+          <a
+            className={
+              router.pathname === "/s/[studio]/s/[space]/chat"
+                ? selectedClassname
+                : "w-16"
+            }
+          >
+            <ChatBubble className="mx-auto" />
+          </a>
+        </Link>
+      </div>
+
+      {/* INFO */}
+      <Link href="/">
+        <a className="justify-self-end">
+          <Information className="text-grey-55" />
+        </a>
+      </Link>
+    </div>
+  );
+}
+
+function LogInModal() {
+  let [isOpen, setLogInModal] = useState(false);
+  let [data, setData] = useState({
+    username: "",
+    password: "",
+  });
+
+  let { login } = useAuth();
+
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await login(data);
+  };
+
+  return (
+    <div>
+      <ButtonLink
+        className="justify-self-start"
+        content="Log In"
+        onClick={() => setLogInModal(true)}
+      />
+
+      <Dialog
+        open={isOpen}
+        onClose={() => setLogInModal(false)}
+        className="fixed z-10 inset-0 overflow-y-auto"
+      >
+        <Dialog.Overlay className="overlay" />
+        <FloatingContainer
+          className={`
+                fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
+                grid grid-flow-row gap-4
+                `}
+        >
+          {/*
+           */}
+
+          <form className="grid gap-4 w-full" onSubmit={onSubmit}>
+            <label className="grid grid-flow-rows gap-2 font-bold">
+              Username
+              <input
+                className="w-[100%]]"
+                type="text"
+                value={data.username}
+                onChange={(e) =>
+                  setData({ ...data, username: e.currentTarget.value })
+                }
+              />
+            </label>
+            <label className="grid grid-flow-rows gap-2 font-bold">
+              Password
+              <input
+                type="password"
+                value={data.password}
+                onChange={(e) =>
+                  setData({ ...data, password: e.currentTarget.value })
+                }
+              />
+            </label>
+
+            <div
+              className={`grid grid-cols-[max-content_auto_max-content] gap-4`}
+            >
+              <ButtonTertiary
+                content="Nevermind"
+                onClick={() => setLogInModal(false)}
+              />
+              <Link href="/signup">
+                <a className="justify-self-end self-center">
+                  <ButtonLink
+                    content="Sign Up"
+                    onClick={() => setLogInModal(false)}
+                  />
+                </a>
+              </Link>
+              <ButtonPrimary
+                type="submit"
+                content="Log In!"
+                onClick={() => setLogInModal(false)}
+              />
+            </div>
+          </form>
+        </FloatingContainer>{" "}
+      </Dialog>
+    </div>
+  );
+}
