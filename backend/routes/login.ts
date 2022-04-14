@@ -2,7 +2,7 @@ import { z } from "zod";
 import { Bindings } from "backend";
 import { Client } from "faunadb";
 import bcrypt from "bcryptjs";
-import { makeRoute } from "backend/lib/api";
+import { ExtractResponse, makeRoute } from "backend/lib/api";
 import { createSession } from "backend/fauna/resources/functions/create_new_session";
 import { getIdentityByUsername } from "backend/fauna/resources/functions/get_identity_by_username";
 
@@ -12,6 +12,7 @@ const Errors = {
   insecureContext: "insecureContext",
 } as const;
 
+export type LoginResponse = ExtractResponse<typeof LoginRoute>;
 export const LoginRoute = makeRoute({
   route: "login",
   input: z.object({

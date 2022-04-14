@@ -3,9 +3,8 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { ChatBubble, Studio, Information, DeckLarge } from "./Icons";
 import { ButtonLink, ButtonPrimary, ButtonTertiary } from "./Buttons";
-import { useState } from "react";
-import { Dialog } from "@headlessui/react";
-import { FloatingContainer } from "./Layout";
+import { useEffect, useState } from "react";
+import { Modal } from "components/Layout";
 
 export const SpaceLayout: React.FC = (props) => {
   return (
@@ -103,12 +102,17 @@ function LogInModal() {
     username: "",
     password: "",
   });
+  let [status, setStatus] = useState<"normal" | "incorrect">("normal");
+  useEffect(() => {
+    setStatus("normal");
+  }, [data.username, data.password]);
 
   let { login } = useAuth();
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await login(data);
+    let result = await login(data);
+    if (!result.success) setStatus("incorrect");
   };
 
   return (
@@ -119,68 +123,46 @@ function LogInModal() {
         onClick={() => setLogInModal(true)}
       />
 
-      <Dialog
-        open={isOpen}
-        onClose={() => setLogInModal(false)}
-        className="fixed z-10 inset-0 overflow-y-auto"
-      >
-        <Dialog.Overlay className="overlay" />
-        <FloatingContainer
-          className={`
-                fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
-                grid grid-flow-row gap-4
-                `}
-        >
-          {/*
-           */}
-
-          <form className="grid gap-4 w-full" onSubmit={onSubmit}>
-            <label className="grid grid-flow-rows gap-2 font-bold">
-              Username
-              <input
-                className="w-[100%]]"
-                type="text"
-                value={data.username}
-                onChange={(e) =>
-                  setData({ ...data, username: e.currentTarget.value })
-                }
-              />
-            </label>
-            <label className="grid grid-flow-rows gap-2 font-bold">
-              Password
-              <input
-                type="password"
-                value={data.password}
-                onChange={(e) =>
-                  setData({ ...data, password: e.currentTarget.value })
-                }
-              />
-            </label>
-
-            <div
-              className={`grid grid-cols-[max-content_auto_max-content] gap-4`}
-            >
-              <ButtonTertiary
-                content="Nevermind"
-                onClick={() => setLogInModal(false)}
-              />
-              <Link href="/signup">
-                <a className="justify-self-end self-center">
-                  <ButtonLink
-                    content="Sign Up"
-                    onClick={() => setLogInModal(false)}
-                  />
-                </a>
-              </Link>
-              <ButtonPrimary
-                type="submit"
-                content="Log In!"
-                onClick={() => setLogInModal(false)}
-              />
+      <Modal open={isOpen} onClose={() => setLogInModal(false)}>
+        <form className="grid gap-4 w-full" onSubmit={onSubmit}>
+          {status === "normal" ? null : (
+            <div className="text-accent-red">
+              Your username or password is incorrect
             </div>
-          </form>
-        </FloatingContainer>{" "}
-      </Dialog>
+          )}
+          <label className="grid grid-flow-rows gap-2 font-bold">
+            Username
+            <input
+              className="w-[100%]]"
+              type="text"
+              value={data.username}
+              onChange={(e) =>
+                setData({ ...data, username: e.currentTarget.value })
+              }
+            />
+          </label>
+          <label className="grid grid-flow-rows gap-2 font-bold">
+            Password
+            <input
+              type="password"
+              value={data.password}
+              onChange={(e) =>
+                setData({ ...data, password: e.currentTarget.value })
+              }
+            />
+          </label>
+
+          <div
+            className={`grid grid-cols-[max-content_auto_max-content] gap-4`}
+          >
+            <ButtonTertiary
+              content="Nevermind"
+              onClick={() => setLogInModal(false)}
+            />
+            <ButtonPrimary type="submit" content="Log In!" />
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 }

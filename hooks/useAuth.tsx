@@ -1,4 +1,5 @@
 import { workerAPI } from "backend/lib/api";
+import { LoginResponse } from "backend/routes/login";
 import { SessionResponse } from "backend/routes/session";
 import { makeSpaceReplicache } from "components/ReplicacheProvider";
 import { createContext, useContext, useEffect, useState } from "react";
@@ -12,7 +13,7 @@ const AuthContext = createContext({
   rep: null as null | Replicache<ReplicacheMutators>,
   session: { loggedIn: false } as SessionResponse,
   login: async (_data: { username: string; password: string }) => {
-    return false as boolean;
+    return {} as unknown as LoginResponse;
   },
   logout: async () => {
     return false as boolean;
@@ -53,13 +54,13 @@ export const AuthProvider: React.FC = (props) => {
         session: data,
         login: async (data: { username: string; password: string }) => {
           let token = localStorage.getItem("auth");
-          if (token) return true;
+          if (token) return { success: true, token: token, session: {} as any };
           let res = await workerAPI(WORKER_URL, "login", data);
           if (res.success) {
             localStorage.setItem("auth", res.token);
             mutate({ loggedIn: true, session: res.session, token: res.token });
           }
-          return res.success;
+          return res;
         },
         logout: async () => {
           let token = localStorage.getItem("auth");
