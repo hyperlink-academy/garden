@@ -28,7 +28,7 @@ export let ReplicacheContext = createContext<{
 const scanIndex = (tx: ReadTransaction) => {
   const q: MutationContext["scanIndex"] = {
     eav: async (entity, attribute) => {
-      let schema = Attribute[attribute as keyof Attribute];
+      let schema = await getSchema(tx, attribute);
       let results = await tx
         .scan({
           indexName: "eav",
@@ -152,11 +152,12 @@ export const makeReplicache = (args: {
 };
 
 export const useIndex = {
-  eav<A extends keyof Attribute>(entity: string, attribute: A) {
+  eav<A extends keyof Attribute>(entity: string | null, attribute: A) {
     let rep = useContext(ReplicacheContext);
     return useSubscribe(
       rep?.rep,
       async (tx) => {
+        if (!entity) return null;
         let result = await scanIndex(tx).eav(entity, attribute);
         return (result as CardinalityResult<A>) || null;
       },

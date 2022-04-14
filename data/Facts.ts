@@ -1,5 +1,4 @@
 import { Attribute } from "data/Attributes";
-
 type AttributeName = keyof Attribute;
 
 export type FactMetadata = {
@@ -45,4 +44,12 @@ export const ref = (ref: string) => {
 
 export const flag = () => {
   return { type: "flag" as const };
+};
+
+export const singleTextSection = (name: string) => {
+  return `section/${name}` as "arbitrarySectionStringType";
+};
+
+export const multipleReferenceSection = (name: string) => {
+  return `section/${name}` as "arbitrarySectionReferenceType";
 };

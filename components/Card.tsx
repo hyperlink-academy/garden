@@ -1,26 +1,30 @@
 import { Fragment, useState, useRef, useContext } from "react";
 import { Menu, Transition } from "@headlessui/react";
 
-import { ButtonLink } from "./Buttons";
+import { ButtonLink, ButtonPrimary } from "./Buttons";
 import { FindOrCreateCard } from "./FindOrCreateCard";
 import {
   MoreOptions,
   Add,
   Delete,
   DeckSmall,
-  Settings,
   SectionLinkedCard,
   SectionText,
   Close,
   DownArrow,
   UpArrow,
 } from "./Icons";
-import { Divider, FloatingContainer } from "./Layout";
+import { Divider } from "./Layout";
 import { SmallCard } from "./SmallCard";
 import Textarea from "./AutosizeTextArea";
 import { ReplicacheContext, useIndex } from "hooks/useReplicache";
+import { multipleReferenceSection, singleTextSection } from "data/Facts";
+import { generateKeyBetween } from "src/fractional-indexing";
+import { sortByPosition } from "src/position_helpers";
+import { ulid } from "src/ulid";
+import { SmallCardList } from "./DeckList";
 
-export const Card = () => {
+export const Card = (props: { entityID: string }) => {
   return (
     <div
       className={`
@@ -32,88 +36,10 @@ export const Card = () => {
     >
       <div className="grid grid-auto-row gap-6">
         <div className="grid grid-auto-rows gap-3">
-          <div className="cardHeader grid grid-cols-[auto_min-content] gap-2 items-start z-40">
-            <h2 className="">Card Name</h2>
-            <div className="mt-[4px]">
-              <CardMoreOptionsMenu />
-            </div>{" "}
-          </div>
-
-          <div className="cardDefaultContent grid grid-auto-rows gap-2">
-            <QuietTextArea entityID="0" />
-            {/* <p>
-              This is some default content that I am typing here to make it look
-              like something is being said.
-            </p> */}
-          </div>
+          <Header entityID={props.entityID} />
+          <QuietTextArea entityID={props.entityID} />
         </div>
-
-        <div className="textSection grid grid-auto-rows gap-2">
-          <div className="grid grid-cols-[auto_min-content_min-content] gap-2 items-start z-40">
-            <h4 className="mt-[1px]">Text Section Title Here</h4>
-            <div className="text-grey-55">
-              <SectionText />
-            </div>
-            <button className="mt-1">
-              <SectionMoreOptionsMenu />
-            </button>
-          </div>
-          <p>
-            Hello, I am here again with more text and I just keep on coming with
-            those bangers. Is there an award I can get for best copy text? The
-            Blabies?
-          </p>
-        </div>
-
-        <div className="linkedCardSection textSection grid grid-auto-rows gap-2">
-          <div className="grid grid-cols-[auto_min-content_min-content] gap-2 items-start z-40">
-            <h4 className="mt-[1px]">Linked Card Section Title Here</h4>
-            <div className="text-grey-55">
-              <SectionLinkedCard />
-            </div>
-            <button className="mt-1">
-              <SectionMoreOptionsMenu />
-            </button>
-          </div>
-          <FindOrCreateWithContext />
-          <div className="grid grid-cols-2 gap-4">
-            <SmallCard
-              href=""
-              entityID={"0"}
-              id={"1"}
-              draggable={true}
-              onDelete={() => {}}
-            />
-            <SmallCard
-              href=""
-              entityID={"0"}
-              id={"2"}
-              draggable={true}
-              onDelete={() => {}}
-            />
-            <SmallCard
-              href=""
-              entityID={"0"}
-              id={"3"}
-              draggable={true}
-              onDelete={() => {}}
-            />
-            <SmallCard
-              href=""
-              entityID={"0"}
-              id={"4"}
-              draggable={true}
-              onDelete={() => {}}
-            />
-            <SmallCard
-              href=""
-              entityID={"0"}
-              id={"5"}
-              draggable={true}
-              onDelete={() => {}}
-            />
-          </div>
-        </div>
+        <Sections entityID={props.entityID} />
 
         <div className="addSectionButton grid grid-auto-row gap-2 pb-6">
           <Divider />
@@ -127,40 +53,157 @@ export const Card = () => {
   );
 };
 
-const FindOrCreateWithContext = () => {
-  let [open, setOpen] = useState(false);
-  let [selectedCards, setSelectedCards] = useState<string[]>([]);
+const Sections = (props: { entityID: string }) => {
+  let sections = useIndex.eav(props.entityID, "card/section");
   return (
-    <>
-      <input
-        type="text"
-        placeholder="search to add cards..."
+    <div className="grid grid-auto-row gap-6">
+      {sections?.map((s) => (
+        <Section name={s.value} entityID={props.entityID} key={s.value} />
+      ))}
+    </div>
+  );
+};
+
+const Section = (props: { name: string; entityID: string }) => {
+  let entity = useIndex.ave("name", `section/${props.name}`);
+  let cardinality = useIndex.eav(entity?.entity || null, "cardinality");
+  let type = useIndex.eav(entity?.entity || null, "type");
+  return (
+    <div className="textSection grid grid-auto-rows gap-2">
+      <div className="grid grid-cols-[auto_min-content_min-content] gap-2 items-start z-40">
+        <h4 className="mt-[1px]">{props.name}</h4>
+        <div className="text-grey-55">
+          <SectionText />
+        </div>
+        <button className="mt-1">
+          <SectionMoreOptionsMenu />
+        </button>
+      </div>
+      {type?.value === "string" ? (
+        <SingleTextSection entityID={props.entityID} section={props.name} />
+      ) : type?.value === "reference" && cardinality?.value === "many" ? (
+        <MultipleReferenceSection
+          section={props.name}
+          entityID={props.entityID}
+        />
+      ) : null}
+    </div>
+  );
+};
+
+const SingleTextSection = (props: {
+  entityID: string;
+  section: string;
+  new?: boolean;
+}) => {
+  let fact = useIndex.eav(props.entityID, singleTextSection(props.section));
+  let inputEl = useRef<HTMLTextAreaElement | null>(null);
+  let rep = useContext(ReplicacheContext);
+  return (
+    <Textarea
+      autoFocus={props.new}
+      ref={inputEl}
+      className="w-full"
+      value={(fact?.value as string) || ""}
+      onChange={async (e) => {
+        let start = e.currentTarget.selectionStart,
+          end = e.currentTarget.selectionEnd;
+        await rep?.rep.mutate.assertFact({
+          entity: props.entityID,
+          attribute: singleTextSection(props.section),
+          value: e.currentTarget.value,
+          positions: fact?.positions || {},
+        });
+        inputEl.current?.setSelectionRange(start, end);
+      }}
+    />
+  );
+};
+
+const MultipleReferenceSection = (props: {
+  entityID: string;
+  section: string;
+}) => {
+  let attribute = multipleReferenceSection(props.section);
+  let references = useIndex.eav(props.entityID, attribute);
+  let rep = useContext(ReplicacheContext);
+  let earliestCard = references?.sort(sortByPosition("eav"))[0];
+  let [open, setOpen] = useState(false);
+  return (
+    <div className="flex flex-col gap-4">
+      <ButtonPrimary
         onClick={() => setOpen(true)}
-      ></input>
+        content="search to add cards"
+      />
       <FindOrCreateCard
         open={open}
         onClose={() => setOpen(false)}
-        selected={selectedCards}
-        onSelect={() => {
+        selected={references?.map((c) => c.value.value) || []}
+        onSelect={async (e) => {
+          let position = generateKeyBetween(
+            null,
+            earliestCard?.positions["eav"] || null
+          );
+          if (e.type === "create") {
+            let newEntity = ulid();
+            await rep?.rep.mutate.createCard({
+              entityID: newEntity,
+              title: e.name,
+            });
+            await rep?.rep.mutate.addCardToSection({
+              cardEntity: newEntity,
+              parent: props.entityID,
+              positions: { eav: position },
+              section: attribute,
+            });
+            return;
+          }
+          rep?.rep.mutate.addCardToSection({
+            cardEntity: e.entity,
+            parent: props.entityID,
+            positions: { eav: position },
+            section: attribute,
+          });
           //TODO
         }}
       />
-      <ul>
-        {selectedCards.map((c) => {
-          return (
-            <li>
-              {c}{" "}
-              <ButtonLink
-                content="delete"
-                onClick={() =>
-                  setSelectedCards((cards) => cards.filter((c1) => c1 !== c))
-                }
-              />
-            </li>
-          );
-        })}
-      </ul>
-    </>
+      <SmallCardList
+        attribute={attribute}
+        cards={references || []}
+        deck={props.entityID}
+        positionKey="eav"
+      />
+    </div>
+  );
+};
+
+const Header = (props: { entityID: string }) => {
+  let title = useIndex.eav(props.entityID, "card/title");
+  let rep = useContext(ReplicacheContext);
+
+  let textarea = useRef<HTMLTextAreaElement | null>(null);
+  return (
+    <div className="cardHeader grid grid-cols-[auto_min-content] gap-2 items-start z-40">
+      <Textarea
+        ref={textarea}
+        className="text-xl font-bold"
+        value={title?.value}
+        onChange={async (e) => {
+          let start = e.currentTarget.selectionStart,
+            end = e.currentTarget.selectionEnd;
+          await rep?.rep.mutate.assertFact({
+            entity: props.entityID,
+            attribute: "card/title",
+            value: e.currentTarget.value,
+            positions: title?.positions || {},
+          });
+          textarea.current?.setSelectionRange(start, end);
+        }}
+      />
+      <div className="mt-[4px]">
+        <CardMoreOptionsMenu />
+      </div>{" "}
+    </div>
   );
 };
 

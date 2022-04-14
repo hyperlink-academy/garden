@@ -21,6 +21,7 @@ export type Entity = {
 };
 
 export const LocalReplicacheProvider: React.FC<{
+  defaultAttributes: { [k: string]: Schema };
   defaultFacts: Entity[];
 }> = (props) => {
   let db = useRef<{
@@ -182,10 +183,9 @@ export const LocalReplicacheProvider: React.FC<{
     let facts = props.defaultFacts.flatMap<Fact<keyof Attribute>>((e, id) => {
       return Object.keys(e).flatMap((a) => {
         let attribute: keyof Attribute = a as keyof Attribute;
-        let schema = Attribute[attribute];
-        if (!schema)
-          throw Error("no schema found for attribute in default facts");
-        if (schema.cardinality === "many")
+        let schema: Schema = Attribute[attribute];
+        if (!schema) schema = props.defaultAttributes[attribute];
+        if (schema?.cardinality === "many")
           //@ts-ignore
           return e[attribute].map((v) => {
             return {
@@ -198,6 +198,7 @@ export const LocalReplicacheProvider: React.FC<{
               positions: {},
             };
           });
+        console.log(attribute);
         return {
           schema,
           lastUpdated: Date.now().toString(),

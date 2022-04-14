@@ -109,6 +109,7 @@ const Deck = (props: { entity: string }) => {
                   selected={cards?.map((c) => c.value.value) || []}
                 />
                 <SmallCardList
+                  attribute="deck/contains"
                   positionKey="eav"
                   deck={props.entity}
                   cards={cards || []}
@@ -152,8 +153,7 @@ export const Drawer: React.FC<{ open: boolean }> = (props) => {
             style={{
               height: "64px",
               marginBottom: "-32px",
-              filter:
-                "drop-shadow(rgba(0, 0, 0, 0.25) 0px 1px 2px)",
+              filter: "drop-shadow(rgba(0, 0, 0, 0.25) 0px 1px 2px)",
               clipPath:
                 "polygon(0 0, 0 100% , 20px 100% ,  36px 100%, 52px 100%, 100% 100%, 100% 0)",
               overflow: "hidden",
@@ -181,6 +181,7 @@ export const Drawer: React.FC<{ open: boolean }> = (props) => {
 export const SmallCardList = (props: {
   cards: Fact<keyof ReferenceAttributes>[];
   deck: string;
+  attribute: keyof ReferenceAttributes;
   positionKey: string;
 }) => {
   const mouseSensor = useSensor(MouseSensor, {});
@@ -208,7 +209,7 @@ export const SmallCardList = (props: {
             factID: dragging,
             positionKey: props.positionKey,
             parent: props.deck,
-            attribute: "deck/contains",
+            attribute: props.attribute,
             index: currentIndex < index ? index : index - 1,
           });
         }

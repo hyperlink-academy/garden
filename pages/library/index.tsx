@@ -10,7 +10,7 @@ import { useSubscribe } from "replicache-react";
 import { useContext, useState } from "react";
 import { ReplicacheContext } from "hooks/useReplicache";
 import { Attribute } from "data/Attributes";
-import { Fact } from "data/Facts";
+import { Fact, Schema } from "data/Facts";
 import { useRouter } from "next/router";
 import { Switch } from "@headlessui/react";
 
@@ -22,6 +22,7 @@ type Metadata = {
 
 export type Stories = {
   [k: string]: {
+    attributes?: { [k: string]: Schema };
     entities: Entity[];
   };
 };
@@ -37,52 +38,54 @@ export const ComponentViewer: React.FC<{
   let [bg, setBg] = useState(true);
   return (
     <LocalReplicacheProvider
+      defaultAttributes={story ? props.stories[story].attributes || {} : {}}
       defaultFacts={story ? props.stories[story].entities : []}
     >
-      <div style={{maxWidth: "48rem", margin: "auto",}}> {/* WRAPPER - OPEN */}
-      {/* MENU AND BG TOGGLE */}
-      <div className="flex gap-4 justify-between pt-6 pb-4 text-accent-blue">
-        <button onClick={() => toggleOpen(!isOpen)}>
-          <MenuIcon />
-        </button>
-        <BGSwitch enabled={bg} setEnabled={setBg} />
-      </div>
-      {/* START COMPONENT MENU  */}
-      <div>
-        {!isOpen ? null : (
-          <div className="ComponentMenu z-50 w-64 fixed left-0 top-0 h-screen p-4 bg-bg-blue grid auto-rows-max gap-4">
-            <div className="grid grid-cols-[max-content_max-content] place-content-between px-2">
-              <h3>Component Library</h3>
-              <button onClick={() => toggleOpen(!isOpen)}>x</button>
-            </div>
-            <ul>
-              {props.components.map((c) => {
-                return (
-                  <li key={c.path}>
-                    <div
-                      className={`px-2 py-0.5 font-bold  
+      <div style={{ maxWidth: "48rem", margin: "auto" }}>
+        {" "}
+        {/* WRAPPER - OPEN */}
+        {/* MENU AND BG TOGGLE */}
+        <div className="flex gap-4 justify-between pt-6 pb-4 text-accent-blue">
+          <button onClick={() => toggleOpen(!isOpen)}>
+            <MenuIcon />
+          </button>
+          <BGSwitch enabled={bg} setEnabled={setBg} />
+        </div>
+        {/* START COMPONENT MENU  */}
+        <div>
+          {!isOpen ? null : (
+            <div className="ComponentMenu z-50 w-64 fixed left-0 top-0 h-screen p-4 bg-bg-blue grid auto-rows-max gap-4">
+              <div className="grid grid-cols-[max-content_max-content] place-content-between px-2">
+                <h3>Component Library</h3>
+                <button onClick={() => toggleOpen(!isOpen)}>x</button>
+              </div>
+              <ul>
+                {props.components.map((c) => {
+                  return (
+                    <li key={c.path}>
+                      <div
+                        className={`px-2 py-0.5 font-bold  
                   ${
                     c.path === router.pathname
                       ? "text-white rounded-md bg-accent-blue"
                       : "text-grey-55  hover:text-accent-blue "
                   }`}
-                    >
-                      <Link href={c.path}>
-                        <a>{c.metadata.name}</a>
-                      </Link>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        )}
-      </div>
-      {/* END COMPONENT MENU  */}
-
-      <div className="grid auto-rows-max gap-6">
-        <div
-          className={`
+                      >
+                        <Link href={c.path}>
+                          <a>{c.metadata.name}</a>
+                        </Link>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
+        </div>
+        {/* END COMPONENT MENU  */}
+        <div className="grid auto-rows-max gap-6">
+          <div
+            className={`
               ComponentViewPort
               grid auto-rows-max gap-6
               ${
@@ -91,43 +94,44 @@ export const ComponentViewer: React.FC<{
                   : "bg-background"
               } 
             `}
-        >
-          {/* START STORY SELECTOR  */}
-          <div className="grid auto-rows-max gap-1 p-4 border border-grey-80 rounded-md">
-            {Object.keys(props.stories).map((key) => {
-              console.log({ story, key });
-              return (
-                <div className="flex flex-row gap-2 items-center" key={key}>
-                  <input
-                    checked={story === key}
-                    type="radio"
-                    name="story-select"
-                    id={`${key}`}
-                    onChange={() => setStory(key)}
-                  ></input>
+          >
+            {/* START STORY SELECTOR  */}
+            <div className="grid auto-rows-max gap-1 p-4 border border-grey-80 rounded-md">
+              {Object.keys(props.stories).map((key) => {
+                console.log({ story, key });
+                return (
+                  <div className="flex flex-row gap-2 items-center" key={key}>
+                    <input
+                      checked={story === key}
+                      type="radio"
+                      name="story-select"
+                      id={`${key}`}
+                      onChange={() => setStory(key)}
+                    ></input>
 
-                  <label
-                    htmlFor={`${key}`}
-                    className={`text-grey-35  ${
-                      story === key ? "font-bold" : ""
-                    }`}
-                  >
-                    {key}
-                  </label>
-                </div>
-              );
-            })}
+                    <label
+                      htmlFor={`${key}`}
+                      className={`text-grey-35  ${
+                        story === key ? "font-bold" : ""
+                      }`}
+                    >
+                      {key}
+                    </label>
+                  </div>
+                );
+              })}
+            </div>
+            {/* END STORY SELECTOR  */}
+
+            {/* COMPONENT RENDERS HERE */}
+            {props.children}
           </div>
-          {/* END STORY SELECTOR  */}
 
-          {/* COMPONENT RENDERS HERE */}
-          {props.children}
+          {/* FACT LIST HERE */}
+          <AllFacts />
         </div>
-
-        {/* FACT LIST HERE */}
-        <AllFacts />
-      </div>
-      </div> {/* WRAPPER - CLOSE */}
+      </div>{" "}
+      {/* WRAPPER - CLOSE */}
     </LocalReplicacheProvider>
   );
 };
@@ -167,6 +171,10 @@ const AllFacts = () => {
               <li>
                 <span className="font-bold">value: </span>{" "}
                 {JSON.stringify(f.value)}
+              </li>
+              <li>
+                <span className="font-bold">positions: </span>{" "}
+                {JSON.stringify(f.positions)}
               </li>
             </ul>
           );
