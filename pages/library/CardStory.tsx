@@ -5,6 +5,7 @@ import { ComponentViewer, Props, Stories } from "./index";
 export { getStaticProps } from "./index";
 
 const Stories: Stories = {
+  empty: { entities: [] },
   default: {
     attributes: {
       [singleTextSection("Text Section")]: {
@@ -37,6 +38,16 @@ const Stories: Stories = {
         name: multipleReferenceSection("Quotes"),
         cardinality: "many",
         type: "reference",
+      },
+      {
+        name: multipleReferenceSection("Ideas"),
+        cardinality: "many",
+        type: "reference",
+      },
+      {
+        name: singleTextSection("Notes"),
+        cardinality: "one",
+        type: "string",
       },
       {
         name: singleTextSection("Text Section"),

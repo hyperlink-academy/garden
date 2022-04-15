@@ -4,7 +4,13 @@ import {
   generateNKeysBetween,
 } from "src/fractional-indexing";
 import { Attribute } from "./Attributes";
-import { Fact, FactMetadata, ref } from "./Facts";
+import {
+  Fact,
+  FactMetadata,
+  multipleReferenceSection,
+  ref,
+  singleTextSection,
+} from "./Facts";
 
 export type MutationContext = {
   assertFact: <A extends keyof Attribute>(
@@ -183,6 +189,52 @@ const assertFact: Mutation<
   await ctx.assertFact({ ...args });
 };
 
+const addSection: Mutation<{
+  newSectionEntity: string;
+  sectionName: string;
+  type: "string" | "reference";
+  positions: string;
+  cardEntity: string;
+}> = async (args, ctx) => {
+  let sectionEntity = (
+    await ctx.scanIndex.ave("name", `section/${args.sectionName}`)
+  )?.entity;
+  if (!sectionEntity) {
+    sectionEntity = args.newSectionEntity;
+    await ctx.assertFact({
+      entity: args.newSectionEntity,
+      attribute: "name",
+      value: `section/${args.sectionName}`,
+      positions: {},
+    });
+    await ctx.assertFact({
+      entity: args.newSectionEntity,
+      attribute: "type",
+      value: args.type,
+      positions: {},
+    });
+
+    await ctx.assertFact({
+      entity: args.newSectionEntity,
+      attribute: "cardinality",
+      value: args.type === "reference" ? "many" : "one",
+      positions: {},
+    });
+  }
+
+  let type = await ctx.scanIndex.eav(sectionEntity, "type");
+  let cardinality = await ctx.scanIndex.eav(sectionEntity, "cardinality");
+  if (!type || !cardinality) return;
+  if (type.value !== args.type) return;
+
+  await ctx.assertFact({
+    entity: args.cardEntity,
+    attribute: "card/section",
+    value: args.sectionName,
+    positions: { eav: args.positions },
+  });
+};
+
 export const Mutations = {
   createCard,
   moveCard,
@@ -191,4 +243,5 @@ export const Mutations = {
   addCardToSection,
   assertCardTitle,
   assertFact,
+  addSection,
 };

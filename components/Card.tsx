@@ -1,21 +1,20 @@
 import { Fragment, useState, useRef, useContext } from "react";
 import { Menu, Transition } from "@headlessui/react";
 
-import { ButtonLink, ButtonPrimary } from "./Buttons";
-import { FindOrCreateCard } from "./FindOrCreateEntity";
+import { ButtonPrimary, ButtonSecondary } from "./Buttons";
+import { FindOrCreate, FindOrCreateCard } from "./FindOrCreateEntity";
 import {
   MoreOptions,
   Add,
   Delete,
   DeckSmall,
-  SectionLinkedCard,
   SectionText,
   Close,
   DownArrow,
   UpArrow,
+  SectionLinkedCard,
 } from "./Icons";
 import { Divider } from "./Layout";
-import { SmallCard } from "./SmallCard";
 import Textarea from "./AutosizeTextArea";
 import { ReplicacheContext, useIndex } from "hooks/useReplicache";
 import { multipleReferenceSection, singleTextSection } from "data/Facts";
@@ -40,15 +39,140 @@ export const Card = (props: { entityID: string }) => {
           <QuietTextArea entityID={props.entityID} />
         </div>
         <Sections entityID={props.entityID} />
-
-        <div className="addSectionButton grid grid-auto-row gap-2 pb-6">
-          <Divider />
-          <button className="flex gap-2 text-grey-80">
-            <Add />
-            <h4 className="text-grey-80 ">Add Section</h4>
-          </button>
-        </div>
+        <AddSection cardEntity={props.entityID} />
       </div>
+    </div>
+  );
+};
+
+const AddSection = (props: { cardEntity: string }) => {
+  let [open, setOpen] = useState(false);
+  let rep = useContext(ReplicacheContext);
+  let [section, setSection] = useState({
+    name: "",
+    type: "string" as "reference" | "string",
+  });
+  let cardSections = useIndex.eav(props.cardEntity, "card/section");
+  let sections = useIndex
+    .aev("name")
+    .filter(
+      (f) =>
+        f.value.startsWith("section") &&
+        !cardSections?.find((c) => f.value === `section/${c.value}`)
+    );
+  let types = useIndex.aev("type");
+
+  let existingSection = sections.find(
+    (f) => f.value === `section/${section.name}`
+  );
+  let existingSectionType = types.find(
+    (f) => f.entity === existingSection?.entity
+  );
+
+  let type = existingSectionType?.value || section.type;
+
+  return (
+    <div className="addSectionButton grid grid-auto-row gap-2 pb-6">
+      <Divider />
+      {!open ? (
+        <button
+          className="flex gap-2 text-grey-80"
+          onClick={() => setOpen(true)}
+        >
+          <Add />
+          <h4 className="text-grey-80 ">Add Section</h4>
+        </button>
+      ) : (
+        <div>
+          <div className="grid grid-flow-col gap-4 grid-cols-[auto,min-content]">
+            <SectionNamePicker
+              items={sections.map((s) => {
+                let type = types.find((f) => f.entity === s.entity);
+                return {
+                  entity: s.entity,
+                  display: s.value.slice(8),
+                  icon:
+                    type?.value === "string" ? (
+                      <SectionText />
+                    ) : (
+                      <SectionLinkedCard />
+                    ),
+                };
+              })}
+              name={section.name}
+              setName={(e) => setSection({ ...section, name: e })}
+            />
+            <div className="flex flex-row items-center w-min gap-2">
+              <button
+                onClick={() => setSection({ ...section, type: "string" })}
+              >
+                <SectionText
+                  className={
+                    type === "string" ? "text-grey-15" : "text-grey-55"
+                  }
+                />
+              </button>
+              <button
+                onClick={() => setSection({ ...section, type: "reference" })}
+              >
+                <SectionLinkedCard
+                  className={
+                    type === "reference" ? "text-grey-15" : "text-grey-55"
+                  }
+                />
+              </button>
+            </div>
+          </div>
+          <ButtonSecondary
+            content="Add Section"
+            onClick={async () => {
+              await rep?.rep.mutate.addSection({
+                newSectionEntity: ulid(),
+                sectionName: section.name,
+                type: type as "reference" | "string",
+                cardEntity: props.cardEntity,
+                positions: "",
+              });
+              setOpen(false);
+              setSection({ ...section, name: "" });
+            }}
+          />
+        </div>
+      )}
+    </div>
+  );
+};
+
+const SectionNamePicker = (props: {
+  name: string;
+  items: { entity: string; display: string; icon: React.ReactElement }[];
+  setName: (s: string) => void;
+}) => {
+  let [open, setOpen] = useState(false);
+  return (
+    <div>
+      <button
+        className="w-full p-2 rounded-md bg-white border-grey-55 border text-left"
+        onClick={() => setOpen(true)}
+      >
+        {props.name || ""}
+      </button>
+      <FindOrCreate
+        open={open}
+        onSelect={(e) => {
+          if (e.type === "create") props.setName(e.name);
+          else {
+            let name = props.items.find((s) => s.entity === e.entity)?.display;
+            if (name) props.setName(name);
+          }
+          setOpen(false);
+        }}
+        onClose={() => setOpen(false)}
+        items={props.items}
+        selected={[
+          props.items.find((f) => f.display === props.name)?.entity || "",
+        ]}
+      />
     </div>
   );
 };
@@ -70,10 +194,10 @@ const Section = (props: { name: string; entityID: string }) => {
   let type = useIndex.eav(entity?.entity || null, "type");
   return (
     <div className="textSection grid grid-auto-rows gap-2">
-      <div className="grid grid-cols-[auto_min-content_min-content] gap-2 items-start z-40">
+      <div className="grid grid-cols-[auto_min-content_min-content] gap-2 items-start">
         <h4 className="mt-[1px]">{props.name}</h4>
         <div className="text-grey-55">
-          <SectionText />
+          {type?.value === "string" ? <SectionText /> : <SectionLinkedCard />}
         </div>
         <button className="mt-1">
           <SectionMoreOptionsMenu />
