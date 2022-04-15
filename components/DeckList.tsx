@@ -16,7 +16,7 @@ import { ReferenceAttributes } from "data/Attributes";
 import { Fact } from "data/Facts";
 import { SortableContext } from "@dnd-kit/sortable";
 import { useContext, useState } from "react";
-import { FindOrCreateCard } from "./FindOrCreateCard";
+import { FindOrCreateCard } from "./FindOrCreateEntity";
 import { ButtonSecondary } from "./Buttons";
 import { Card } from "./Icons";
 import { generateKeyBetween } from "src/fractional-indexing";

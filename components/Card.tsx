@@ -2,7 +2,7 @@ import { Fragment, useState, useRef, useContext } from "react";
 import { Menu, Transition } from "@headlessui/react";
 
 import { ButtonLink, ButtonPrimary } from "./Buttons";
-import { FindOrCreateCard } from "./FindOrCreateCard";
+import { FindOrCreateCard } from "./FindOrCreateEntity";
 import {
   MoreOptions,
   Add,

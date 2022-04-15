@@ -1,9 +1,11 @@
-import { FindOrCreateCard } from "components/FindOrCreateCard";
+import { FindOrCreate } from "components/FindOrCreateEntity";
 import { title } from "src/lorem";
 import { ComponentViewer, Stories, Props } from "./index";
 export { getStaticProps } from "./index";
 import { useState } from "react";
 import { ButtonLink } from "components/Buttons";
+import { useIndex } from "hooks/useReplicache";
+import { Card, DeckSmall } from "components/Icons";
 const entities: Stories = {
   None: {
     entities: [],
@@ -35,11 +37,25 @@ const FindOrCreateCardStory = (props: Props) => {
 const Story = () => {
   let [open, setOpen] = useState(false);
   let [selectedCards, setSelectedCards] = useState<string[]>([]);
+  let decks = useIndex.aev("deck");
+  let titles = useIndex.aev("card/title");
+  let items = titles.map((t) => {
+    return {
+      entity: t.entity,
+      display: t.value,
+      icon: !!decks.find((d) => t.entity === d.entity) ? (
+        <DeckSmall />
+      ) : (
+        <Card />
+      ),
+    };
+  });
   return (
     <>
       <div onClick={() => setOpen(true)}>FindOrCreateCard</div>
-      <FindOrCreateCard
+      <FindOrCreate
         open={open}
+        items={items}
         onClose={() => setOpen(false)}
         selected={selectedCards}
         onSelect={(e) => {

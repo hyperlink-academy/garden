@@ -1,33 +1,27 @@
 import { Combobox, Dialog, Transition } from "@headlessui/react";
 import { useIndex } from "hooks/useReplicache";
-import { Card, DeckSmall } from "components/Icons";
 import { useState } from "react";
+import { Card, DeckSmall } from "./Icons";
 
-export const FindOrCreateCard = (props: {
+// Can I adapt this to work for section names as well?
+// They are a single select
+// use react state not replicache state
+export const FindOrCreate = (props: {
   open: boolean;
   onClose: () => void;
+  items: { display: string; entity: string; icon?: React.ReactElement }[];
   selected: string[];
   onSelect: (
     id: { entity: string; type: "existing" } | { name: string; type: "create" }
   ) => void;
 }) => {
   let [input, setInput] = useState("");
-  let decks = useIndex.aev("deck");
-  let titles = useIndex.aev("card/title");
-  let items = titles
-    .filter((f) => {
-      if (/[A-Z]/g.test(input)) return f.value.includes(input);
-      return f.value.toLocaleLowerCase().includes(input.toLocaleLowerCase());
-    })
-    .map((t) => {
-      return {
-        name: t.value,
-        entity: t.entity,
-        isDeck: !!decks.find((d) => d.entity === t.entity),
-      };
-    });
+  let items = props.items.filter((f) => {
+    if (/[A-Z]/g.test(input)) return f.display.includes(input);
+    return f.display.toLocaleLowerCase().includes(input.toLocaleLowerCase());
+  });
   let inputExists = !!items.find(
-    (i) => i.name.toLocaleLowerCase() === input.toLocaleLowerCase()
+    (i) => i.display.toLocaleLowerCase() === input.toLocaleLowerCase()
   );
   return (
     <Transition show={props.open}>
@@ -86,8 +80,8 @@ export const FindOrCreateCard = (props: {
                                   : ""
                               }`}
                             >
-                              {item.isDeck ? <DeckSmall /> : <Card />}
-                              {item.name}
+                              {item.icon}
+                              {item.display}
                             </div>
                           </SearchItem>
                         );
@@ -101,6 +95,39 @@ export const FindOrCreateCard = (props: {
         </div>
       </Dialog>
     </Transition>
+  );
+};
+
+export const FindOrCreateCard = (props: {
+  open: boolean;
+  onClose: () => void;
+  selected: string[];
+  onSelect: (
+    id: { entity: string; type: "existing" } | { name: string; type: "create" }
+  ) => void;
+}) => {
+  let decks = useIndex.aev("deck");
+  let titles = useIndex.aev("card/title");
+  let items = titles.map((t) => {
+    return {
+      entity: t.entity,
+      display: t.value,
+      icon: !!decks.find((d) => t.entity === d.entity) ? (
+        <DeckSmall />
+      ) : (
+        <Card />
+      ),
+    };
+  });
+
+  return (
+    <FindOrCreate
+      onClose={props.onClose}
+      open={props.open}
+      items={items}
+      selected={props.selected}
+      onSelect={props.onSelect}
+    />
   );
 };
 
