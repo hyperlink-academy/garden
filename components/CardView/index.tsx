@@ -2,7 +2,7 @@ import { Fragment, useRef, useContext } from "react";
 import { Menu, Transition } from "@headlessui/react";
 
 import { MoreOptions, Delete, DeckSmall } from "components/Icons";
-import { Divider } from "components/Layout";
+import { Divider, MenuContainer, MenuItem } from "components/Layout";
 import Textarea from "components/AutosizeTextArea";
 import { ReplicacheContext, useIndex } from "hooks/useReplicache";
 import { Sections } from "./Sections";
@@ -91,31 +91,21 @@ const CardMoreOptionsMenu = () => {
       <Menu.Button>
         <MoreOptions />
       </Menu.Button>
-      <Transition
-        as={Fragment}
-        enter="transition ease-out duration-100"
-        enterFrom="transform opacity-0 scale-95"
-        enterTo="transform opacity-100 scale-100"
-        leave="transition ease-in duration-75"
-        leaveFrom="transform opacity-100 scale-100"
-        leaveTo="transform opacity-0 scale-95"
-      >
-        <Menu.Items className="px-3 py-4 border border-grey-80 rounded-md shadow-drop bg-white absolute justify-items-end flex flex-col gap-3 text-right origin-top-right right-0 z-40 w-max">
-          <Menu.Item>
-            <button className="flex items-center gap-2">
-              <p>Remove from Deck</p>
-              <DeckSmall />
-            </button>
-          </Menu.Item>
-          <Divider />
-          <Menu.Item>
-            <button className="flex items-center gap-2 text-accent-red">
-              <p className="font-bold">Delete Card FOREVER</p>
-              <Delete />
-            </button>
-          </Menu.Item>
-        </Menu.Items>
-      </Transition>
+      <MenuContainer>
+        <MenuItem>
+          <button className="flex items-center gap-2">
+            <p>Remove from Deck</p>
+            <DeckSmall />
+          </button>
+        </MenuItem>
+        <Divider />
+        <MenuItem>
+          <button className="flex items-center gap-2 text-accent-red">
+            <p className="font-bold">Delete Card FOREVER</p>
+            <Delete />
+          </button>
+        </MenuItem>
+      </MenuContainer>
     </Menu>
   );
 };
