@@ -1,4 +1,4 @@
-import { Card } from "components/Card";
+import { CardView } from "components/CardView";
 import { multipleReferenceSection, ref, singleTextSection } from "data/Facts";
 import { title } from "src/lorem";
 import { ComponentViewer, Props, Stories } from "./index";
@@ -58,16 +58,16 @@ const Stories: Stories = {
   },
 };
 
-const CardStory = (props: Props) => {
+const CardViewStory = (props: Props) => {
   return (
     <ComponentViewer components={props.components} stories={Stories}>
-      <Card entityID={"0"} />
+      <CardView entityID={"0"} />
     </ComponentViewer>
   );
 };
 
-CardStory.metadata = {
-  name: "Card",
+CardViewStory.metadata = {
+  name: "Card View",
 };
 
-export default CardStory;
+export default CardViewStory;

@@ -1,8 +1,8 @@
 import { Fragment, useState, useRef, useContext } from "react";
 import { Menu, Transition } from "@headlessui/react";
 
-import { ButtonPrimary, ButtonSecondary } from "./Buttons";
-import { FindOrCreate, FindOrCreateCard } from "./FindOrCreateEntity";
+import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
+import { FindOrCreate, FindOrCreateCard } from "components/FindOrCreateEntity";
 import {
   MoreOptions,
   Add,
@@ -13,17 +13,17 @@ import {
   DownArrow,
   UpArrow,
   SectionLinkedCard,
-} from "./Icons";
-import { Divider } from "./Layout";
-import Textarea from "./AutosizeTextArea";
+} from "components/Icons";
+import { Divider } from "components/Layout";
+import Textarea from "components/AutosizeTextArea";
 import { ReplicacheContext, useIndex } from "hooks/useReplicache";
 import { multipleReferenceSection, singleTextSection } from "data/Facts";
 import { generateKeyBetween } from "src/fractional-indexing";
 import { sortByPosition } from "src/position_helpers";
 import { ulid } from "src/ulid";
-import { SmallCardList } from "./DeckList";
+import { SmallCardList } from "components/DeckList";
 
-export const Card = (props: { entityID: string }) => {
+export const CardView = (props: { entityID: string }) => {
   return (
     <div
       className={`
