@@ -189,6 +189,10 @@ const assertFact: Mutation<
   await ctx.assertFact({ ...args });
 };
 
+const retractFact: Mutation<{ id: string }> = async (args, ctx) => {
+  await ctx.retractFact(args.id);
+};
+
 const addSection: Mutation<{
   newSectionEntity: string;
   sectionName: string;
@@ -249,5 +253,6 @@ export const Mutations = {
   addCardToSection,
   assertCardTitle,
   assertFact,
+  retractFact,
   addSection,
 };
