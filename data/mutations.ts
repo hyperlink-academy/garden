@@ -196,6 +196,7 @@ const addSection: Mutation<{
   positions: string;
   cardEntity: string;
 }> = async (args, ctx) => {
+  if (!args.sectionName) return;
   let sectionEntity = (
     await ctx.scanIndex.ave("name", `section/${args.sectionName}`)
   )?.entity;

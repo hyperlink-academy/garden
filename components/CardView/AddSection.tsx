@@ -86,7 +86,9 @@ export const AddSection = (props: { cardEntity: string }) => {
           </div>
           <ButtonSecondary
             content="Add Section"
+            disabled={!section.name}
             onClick={async () => {
+              if (!section.name) return;
               await rep?.rep.mutate.addSection({
                 newSectionEntity: ulid(),
                 sectionName: section.name,
