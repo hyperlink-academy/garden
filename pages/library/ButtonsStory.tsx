@@ -23,11 +23,23 @@ const ButtonsStory = (props: Props) => {
           content="Create Deck"
           icon={<DeckSmall />}
         />
+        <ButtonPrimary
+          disabled
+          onClick={onClick}
+          content="Create Deck"
+          icon={<DeckSmall />}
+        />
       </div>
       secondary:
       <div className="flex gap-4 mb-8">
         <ButtonSecondary onClick={onClick} content="Create Deck" />
         <ButtonSecondary
+          onClick={onClick}
+          content="Create Deck"
+          icon={<DeckSmall />}
+        />
+        <ButtonSecondary
+          disabled
           onClick={onClick}
           content="Create Deck"
           icon={<DeckSmall />}
@@ -41,11 +53,23 @@ const ButtonsStory = (props: Props) => {
           content="Create Deck"
           icon={<DeckSmall />}
         />
+        <ButtonTertiary
+          disabled
+          onClick={onClick}
+          content="Create Deck"
+          icon={<DeckSmall />}
+        />
       </div>
       link button:
       <div className="flex gap-4 mb-8">
         <ButtonLink onClick={onClick} content="Create Deck" />
         <ButtonLink
+          onClick={onClick}
+          content="Create Deck"
+          icon={<DeckSmall />}
+        />
+        <ButtonLink
+          disabled
           onClick={onClick}
           content="Create Deck"
           icon={<DeckSmall />}
