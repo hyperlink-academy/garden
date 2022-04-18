@@ -12,6 +12,7 @@ export const CardView = (props: { entityID: string }) => {
   return (
     <div
       className={`
+      h-full
       px-5 py-6
       border border-grey-80 rounded-lg 
       shadow-drop
@@ -41,6 +42,7 @@ const Title = (props: { entityID: string }) => {
   return (
     <Textarea
       ref={textarea}
+      placeholder="Untitled"
       className="text-xl font-bold"
       value={title?.value}
       onChange={async (e) => {

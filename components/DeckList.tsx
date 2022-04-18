@@ -22,6 +22,7 @@ import { Card } from "./Icons";
 import { generateKeyBetween } from "src/fractional-indexing";
 import { sortByPosition } from "src/position_helpers";
 import { ulid } from "src/ulid";
+import { useRouter } from "next/router";
 
 export const DeckList = () => {
   let decks = useIndex.aev("deck").sort(sortByPosition("aev"));
@@ -78,6 +79,7 @@ const Deck = (props: { entity: string }) => {
                   content="Add card"
                 />
                 <FindOrCreateCard
+                  allowBlank={true}
                   onSelect={async (e) => {
                     let position = generateKeyBetween(
                       null,
@@ -184,6 +186,7 @@ export const SmallCardList = (props: {
   attribute: keyof ReferenceAttributes;
   positionKey: string;
 }) => {
+  let { studio, space } = useRouter().query;
   const mouseSensor = useSensor(MouseSensor, {});
   const touchSensor = useSensor(TouchSensor, {});
   const sensors = useSensors(mouseSensor, touchSensor);
@@ -221,7 +224,7 @@ export const SmallCardList = (props: {
             <SmallCard
               draggable={true}
               key={c.id}
-              href=""
+              href={`/s/${studio}/s/${space}/c/${c.value.value}`}
               entityID={c.value.value}
               id={c.id}
             />

@@ -7,6 +7,7 @@ import { Card, DeckSmall } from "./Icons";
 // They are a single select
 // use react state not replicache state
 export const FindOrCreate = (props: {
+  allowBlank: boolean;
   open: boolean;
   onClose: () => void;
   items: { display: string; entity: string; icon?: React.ReactElement }[];
@@ -54,17 +55,19 @@ export const FindOrCreate = (props: {
               >
                 {inputExists ? null : (
                   <Combobox.Option key={"create"} value={"create"}>
-                    {({ active }) => {
-                      return (
-                        <SearchItem active={active}>
-                          <div className="px-2 p-1.5 border-2 border-b-accent-blue rounded-md text-accent-blue font-bold w-full bg-white">
-                            {!input
-                              ? "Create a blank card"
-                              : `Create "${input}"`}
-                          </div>
-                        </SearchItem>
-                      );
-                    }}
+                    {input || props.allowBlank
+                      ? ({ active }) => {
+                          return (
+                            <SearchItem active={active}>
+                              <div className="px-2 p-1.5 border-2 border-b-accent-blue rounded-md text-accent-blue font-bold w-full bg-white">
+                                {!input
+                                  ? "Create a blank card"
+                                  : `Create "${input}"`}
+                              </div>
+                            </SearchItem>
+                          );
+                        }
+                      : null}
                   </Combobox.Option>
                 )}
                 {items.map((item) => {
@@ -100,6 +103,7 @@ export const FindOrCreate = (props: {
 
 export const FindOrCreateCard = (props: {
   open: boolean;
+  allowBlank: boolean;
   onClose: () => void;
   selected: string[];
   onSelect: (
@@ -122,6 +126,7 @@ export const FindOrCreateCard = (props: {
 
   return (
     <FindOrCreate
+      allowBlank={props.allowBlank}
       onClose={props.onClose}
       open={props.open}
       items={items}
