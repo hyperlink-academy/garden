@@ -87,11 +87,6 @@ export function Footer() {
       </div>
 
       {/* INFO */}
-      {/* <Link href="/">
-        <a className="justify-self-end">
-          <Information className="text-grey-55" />
-        </a>
-      </Link> */}
       <InfoModal />
     </div>
   );
@@ -173,10 +168,9 @@ function InfoModal() {
 
   return (
     <div className="justify-self-end">
-      <Information
-        className="text-grey-55"
-        onClick={() => setInfoModal(true)}
-      />
+      <button onClick={() => setInfoModal(true)}>
+        <Information className="text-grey-55" />
+      </button>
 
       <Modal open={isOpen} onClose={() => setInfoModal(false)}>
         <h2>Hyperlink Info</h2>
