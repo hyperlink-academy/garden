@@ -54,6 +54,7 @@ const Story = () => {
     <>
       <div onClick={() => setOpen(true)}>FindOrCreateCard</div>
       <FindOrCreate
+        allowBlank={true}
         open={open}
         items={items}
         onClose={() => setOpen(false)}

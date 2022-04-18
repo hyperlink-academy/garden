@@ -78,6 +78,7 @@ const Deck = (props: { entity: string }) => {
                   content="Add card"
                 />
                 <FindOrCreateCard
+                  allowBlank={true}
                   onSelect={async (e) => {
                     let position = generateKeyBetween(
                       null,

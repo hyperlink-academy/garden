@@ -101,6 +101,7 @@ const MultipleReferenceSection = (props: {
       />
       <FindOrCreateCard
         open={open}
+        allowBlank={true}
         onClose={() => setOpen(false)}
         selected={references?.map((c) => c.value.value) || []}
         onSelect={async (e) => {

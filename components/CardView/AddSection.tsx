@@ -120,6 +120,7 @@ const SectionNamePicker = (props: {
       </button>
       <FindOrCreate
         open={open}
+        allowBlank={false}
         onSelect={(e) => {
           if (e.type === "create") props.setName(e.name);
           else {
