@@ -87,11 +87,12 @@ export function Footer() {
       </div>
 
       {/* INFO */}
-      <Link href="/">
+      {/* <Link href="/">
         <a className="justify-self-end">
           <Information className="text-grey-55" />
         </a>
-      </Link>
+      </Link> */}
+      <InfoModal />
     </div>
   );
 }
@@ -162,6 +163,67 @@ function LogInModal() {
             <ButtonPrimary type="submit" content="Log In!" />
           </div>
         </form>
+      </Modal>
+    </div>
+  );
+}
+
+function InfoModal() {
+  let [isOpen, setInfoModal] = useState(false);
+
+  return (
+    <div className="justify-self-end">
+      <Information
+        className="text-grey-55"
+        onClick={() => setInfoModal(true)}
+      />
+
+      <Modal open={isOpen} onClose={() => setInfoModal(false)}>
+        <h2>Hyperlink Info</h2>
+        <p>Looking for help? A few pointers 🌱👇</p>
+        <ul className="list-disc list-inside">
+          <li className="pb-4">
+            <a
+              href="https://hyperlink.garden/s/Hyperlink%20Team/s/Hyperlink%20Handbook"
+              target="_blank"
+              className="text-accent-blue hover:underline decoration-accent-blue"
+            >
+              Hyperlink Handbook
+            </a>
+            : read our in-depth guide to the Hyperlink app
+          </li>
+          <li className="pb-4">
+            <a
+              href="https://hyperlink.garden/s/Hyperlink%20Team/s/Hypernaut%20Hub"
+              target="_blank"
+              className="text-accent-blue hover:underline decoration-accent-blue"
+            >
+              Hypernaut Hub
+            </a>
+            : share bugs, questions, suggestions, or just hang and chat!
+          </li>
+          <li>
+            <a
+              href="https://hyperlink.garden/s/Hyperlink%20Team/s/Activity%20Library"
+              target="_blank"
+              className="text-accent-blue hover:underline decoration-accent-blue"
+            >
+              Activity Library
+            </a>
+            : explore other interesting Spaces for inspiration
+          </li>
+        </ul>
+        <p>
+          You can also{" "}
+          <a
+            href="mailto:contact@hyperlink.academy"
+            target="_blank"
+            className="text-accent-blue hover:underline decoration-accent-blue"
+          >
+            email us
+          </a>{" "}
+          with any private questions or feedback — thanks!
+        </p>
       </Modal>
     </div>
   );
