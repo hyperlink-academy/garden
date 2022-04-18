@@ -12,6 +12,7 @@ export const CardView = (props: { entityID: string }) => {
   return (
     <div
       className={`
+      overflow-y-auto
       h-full
       px-5 py-6
       border border-grey-80 rounded-lg 

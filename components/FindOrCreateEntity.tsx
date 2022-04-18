@@ -25,7 +25,7 @@ export const FindOrCreate = (props: {
     (i) => i.display.toLocaleLowerCase() === input.toLocaleLowerCase()
   );
   return (
-    <Transition show={props.open}>
+    <Transition show={props.open} className="fixed">
       <Dialog
         onClose={props.onClose}
         className="fixed z-10 inset-0 overflow-y-hidden"

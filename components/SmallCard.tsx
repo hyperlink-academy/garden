@@ -38,7 +38,7 @@ export function SmallCard(props: {
         <Close className="text-accent-blue absolute -right-2.5 z-10" />
       ) : null}
 
-      <div className="border-[1] border-grey-80 shadow-drop rounded-md p-2 pl-1 min-w-36 max-w-[151px] h-24 overflow-hidden bg-white flex flex-row gap-2 relative">
+      <div className="border-[1] border-grey-80 shadow-drop rounded-md p-2 pl-1 w-[151px] h-24 overflow-hidden bg-white flex flex-row gap-2 relative">
         {!!props.draggable ? (
           <Gripper
             {...attributes}
@@ -50,7 +50,7 @@ export function SmallCard(props: {
         )}
 
         <Link href={props.href}>
-          <a>
+          <a className="h-full w-full">
             {!title ? (
               <small>
                 <pre className="whitespace-pre-wrap">{content?.value}</pre>
