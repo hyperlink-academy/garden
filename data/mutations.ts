@@ -221,6 +221,11 @@ const addSection: Mutation<{
       positions: {},
     });
   }
+  let existingSections = await ctx.scanIndex.eav(
+    args.cardEntity,
+    "card/section"
+  );
+  if (existingSections.find((s) => s.value === args.sectionName)) return;
 
   let type = await ctx.scanIndex.eav(sectionEntity, "type");
   let cardinality = await ctx.scanIndex.eav(sectionEntity, "cardinality");
