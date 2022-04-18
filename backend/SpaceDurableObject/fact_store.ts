@@ -13,6 +13,8 @@ export const indexes = {
 
 export const store = (storage: DurableObjectStorage) => {
   async function getSchema(attribute: string): Promise<Schema | undefined> {
+    let defaultAttribute = Attribute[attribute as keyof Attribute];
+    if (defaultAttribute) return defaultAttribute;
     let attributeFact = await scanIndex.ave("name", attribute);
     if (!attributeFact) return;
 
@@ -46,7 +48,7 @@ export const store = (storage: DurableObjectStorage) => {
 
     storage.put(indexes.factID(f.id), f);
     storage.put(indexes.ea(f.entity, f.attribute, f.id), f);
-    storage.put(indexes.ti(f.lastUpdated, f.id), { ...f, meta: { schema } });
+    storage.put(indexes.ti(f.lastUpdated, f.id), f);
     if (schema.unique) {
       storage.put(indexes.av(f.attribute, f.value as string), f);
     }
@@ -54,7 +56,7 @@ export const store = (storage: DurableObjectStorage) => {
 
   const scanIndex: MutationContext["scanIndex"] = {
     eav: async (entity, attribute) => {
-      let schema = Attribute[attribute];
+      let schema = await getSchema(attribute);
       let results = [
         ...(
           await storage.list<Fact<keyof Attribute>>({
@@ -114,15 +116,15 @@ export const store = (storage: DurableObjectStorage) => {
       let schema = await getSchema(f.attribute);
       if (!schema)
         return { success: false, error: "Invalid attribute" } as const;
-      let newID = ulid();
+      let factID = ulid();
       let lastUpdated = Date.now().toString();
       if (schema.cardinality === "one") {
         let existingFact = (await scanIndex.eav(f.entity, f.attribute)) as
           | Fact<keyof Attribute>
           | undefined;
-        if (existingFact) newID = existingFact.id;
+        if (existingFact) factID = existingFact.id;
       }
-      writeFactToStore({ ...f, id: newID, lastUpdated, schema }, schema);
+      writeFactToStore({ ...f, id: factID, lastUpdated, schema }, schema);
       return { success: true };
     },
   };
