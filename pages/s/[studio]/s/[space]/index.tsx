@@ -1,4 +1,5 @@
 import { spaceAPI } from "backend/lib/api";
+import { ButtonLink } from "components/Buttons";
 import { DeckList } from "components/DeckList";
 import { useAuth } from "hooks/useAuth";
 import { useIndex, useSpaceID } from "hooks/useReplicache";
@@ -9,9 +10,10 @@ const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export default function SpacePage() {
   return (
     <>
-      <div>Space!</div>
-      <Join />
-      <SpaceName />
+      <div className="flex justify-between pb-4">
+        <SpaceName />
+        <Join />
+      </div>
       <DeckList />
     </>
   );
@@ -44,10 +46,9 @@ const Join = () => {
   };
   if (isMember)
     return (
-      <span>
-        {" "}
-        You're a member <button onClick={getShareLink}>get share link </button>
-      </span>
+      <div className="self-center">
+        <ButtonLink onClick={getShareLink} content="get share link" />
+      </div>
     );
   return (
     <Link href={`${router.asPath}/join`}>
