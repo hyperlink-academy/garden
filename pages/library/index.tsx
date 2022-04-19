@@ -83,7 +83,7 @@ export const ComponentViewer: React.FC<{
           )}
         </div>
         {/* END COMPONENT MENU  */}
-        <div className="grid auto-rows-max gap-6">
+        <div className="grid auto-rows-max gap-6 m-5">
           <div
             className={`
               ComponentViewPort

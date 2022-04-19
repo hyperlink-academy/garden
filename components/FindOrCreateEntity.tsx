@@ -1,7 +1,9 @@
 import { Combobox, Dialog, Transition } from "@headlessui/react";
 import { useIndex } from "hooks/useReplicache";
 import { useState } from "react";
-import { Card, DeckSmall } from "./Icons";
+import { parentPort } from "worker_threads";
+import { ButtonLink } from "./Buttons";
+import { Card, Checkmark, DeckSmall } from "./Icons";
 
 // Can I adapt this to work for section names as well?
 // They are a single select
@@ -31,70 +33,86 @@ export const FindOrCreate = (props: {
         className="fixed z-10 inset-0 overflow-y-hidden"
       >
         <Dialog.Overlay className="fixed inset-0 bg-grey-90 opacity-30" />
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="relative w-[80vw] min-w-[384px] mx-auto max-w-md">
-            <Combobox
-              value=""
-              onChange={(c) => {
-                if (c === "create")
-                  props.onSelect({ name: input, type: "create" });
-                else props.onSelect({ entity: c, type: "existing" });
-              }}
-              as="div"
-              className="relative z-10 w-full"
+
+        <div className="h-[calc(100vh-32px)]">
+          <Combobox
+            value=""
+            onChange={(c) => {
+              if (c === "create")
+                props.onSelect({ name: input, type: "create" });
+              else props.onSelect({ entity: c, type: "existing" });
+            }}
+            as="div"
+            className={`
+              relative 
+              max-w-md h-fit max-h-full
+              z-10 
+              mx-5 my-5 
+              grid grid-rows-[min-content_auto_min-content] gap-2 
+              bg-white shadow-drop rounded-md
+              `}
+          >
+            <Combobox.Input
+              value={input}
+              className=""
+              placeholder="search or create cards..."
+              onChange={(e) => setInput(e.currentTarget.value)}
+            />
+
+            {/* I am aware the max height in the Combobox.Options is gross, but max-h-full does work and this is the best i could do D:*/}
+            <Combobox.Options
+              static
+              className="w-full py-4 flex-col flex gap-2 bg-white rounded-md h-min max-h-[calc(100vh-154px)] overflow-y-auto shadow-drop"
             >
-              <Combobox.Input
-                value={input}
-                className="w-full p-2 rounded-md border-grey-55 border"
-                placeholder="search or create"
-                onChange={(e) => setInput(e.currentTarget.value)}
-              />
-              <Combobox.Options
-                static
-                className="w-full py-4 flex-col flex gap-2 bg-white mt-2 mb-8 rounded-md h-[80vh] overflow-y-auto shadow-drop"
-              >
-                {inputExists ? null : (
-                  <Combobox.Option key={"create"} value={"create"}>
-                    {input || props.allowBlank
-                      ? ({ active }) => {
-                          return (
-                            <SearchItem active={active}>
-                              <div className="px-2 p-1.5 border-2 border-b-accent-blue rounded-md text-accent-blue font-bold w-full bg-white">
-                                {!input
-                                  ? "Create a blank card"
-                                  : `Create "${input}"`}
-                              </div>
-                            </SearchItem>
-                          );
-                        }
-                      : null}
-                  </Combobox.Option>
-                )}
-                {items.map((item) => {
-                  return (
-                    <Combobox.Option key={item.entity} value={item.entity}>
-                      {({ active }) => {
+              {inputExists ? null : (
+                <Combobox.Option key={"create"} value={"create"}>
+                  {input || props.allowBlank
+                    ? ({ active }) => {
                         return (
                           <SearchItem active={active}>
-                            <div
-                              className={`flex flex-row gap-2 items-center ${
-                                props.selected.includes(item.entity)
-                                  ? "bg-test-pink"
-                                  : ""
-                              }`}
-                            >
-                              {item.icon}
-                              {item.display}
+                            <div className="px-2 p-1.5 border-2 border-b-accent-blue rounded-md text-accent-blue font-bold w-full bg-white">
+                              {!input
+                                ? "Create a blank card"
+                                : `Create "${input}"`}
                             </div>
                           </SearchItem>
                         );
-                      }}
-                    </Combobox.Option>
-                  );
-                })}
-              </Combobox.Options>
-            </Combobox>
-          </div>
+                      }
+                    : null}
+                </Combobox.Option>
+              )}
+              {items.map((item) => {
+                return (
+                  //how to get selected items to the top of the list??? collapsable....? maybe not.
+                  <Combobox.Option key={item.entity} value={item.entity}>
+                    {({ active }) => {
+                      return (
+                        <SearchItem active={active}>
+                          <div
+                            className={`gap-2 items-center ${
+                              props.selected.includes(item.entity)
+                                ? "grid grid-cols-[min-content_auto_min-content] text-grey-80 "
+                                : "grid grid-cols-[min-content_auto]"
+                            }`}
+                          >
+                            {item.icon}
+                            {item.display}
+                            {props.selected.includes(item.entity) ? (
+                              <Checkmark className="justify-self-end" />
+                            ) : null}
+                          </div>
+                        </SearchItem>
+                      );
+                    }}
+                  </Combobox.Option>
+                );
+              })}
+            </Combobox.Options>
+            <div className="h-max grid grid-cols-[auto_min-content]">
+              <h4>{props.selected.length} cards added</h4>
+              <ButtonLink content="DONE!" onClick={props.onClose} />
+            </div>
+          </Combobox>
         </div>
       </Dialog>
     </Transition>
