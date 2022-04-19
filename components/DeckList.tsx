@@ -17,7 +17,7 @@ import { Fact } from "data/Facts";
 import { SortableContext } from "@dnd-kit/sortable";
 import { useContext, useEffect, useState } from "react";
 import { FindOrCreateCard } from "./FindOrCreateEntity";
-import { ButtonSecondary } from "./Buttons";
+import { ButtonLink, ButtonSecondary } from "./Buttons";
 import { Card } from "./Icons";
 import { generateKeyBetween } from "src/fractional-indexing";
 import { sortByPosition } from "src/position_helpers";
@@ -31,26 +31,38 @@ export const DeckList = () => {
   let [toggleAll, setToggleAll] = useState<boolean | undefined>(undefined);
   return (
     <div>
-      <input
-        value={newDeckName}
-        placeholder="create a new deck"
-        onChange={(e) => setNewDeckName(e.currentTarget.value)}
-      />
-      <button
-        onClick={() => {
-          let entity = ulid();
-          rep?.rep.mutate.addDeck({
-            newEntity: entity,
-            name: newDeckName,
-            position: generateKeyBetween(null, decks[0]?.positions.aev || null),
-          });
-        }}
-      >
-        create
-      </button>
-      <button className="float-right" onClick={() => setToggleAll(!toggleAll)}>
-        toggle all
-      </button>
+      <div className="pb-4">
+        <div className="flex flex-col sm:flex-row justify-between">
+          <div className="flex">
+            <input
+              className="mr-2"
+              value={newDeckName}
+              placeholder="new deck"
+              onChange={(e) => setNewDeckName(e.currentTarget.value)}
+            />
+            <ButtonSecondary
+              content="create"
+              onClick={() => {
+                let entity = ulid();
+                rep?.rep.mutate.addDeck({
+                  newEntity: entity,
+                  name: newDeckName,
+                  position: generateKeyBetween(
+                    null,
+                    decks[0]?.positions.aev || null
+                  ),
+                });
+              }}
+            />
+          </div>
+          <div className="self-left sm:self-center py-2">
+            <ButtonLink
+              onClick={() => setToggleAll(!toggleAll)}
+              content="toggle all"
+            />
+          </div>
+        </div>
+      </div>
       {decks.map((d) => (
         <Deck entity={d.entity} toggleAll={toggleAll} key={d.entity} />
       ))}
@@ -76,9 +88,9 @@ const Deck = (props: { entity: string; toggleAll: boolean | undefined }) => {
   }, [props.toggleAll]);
 
   return (
-    <div>
+    <div className="pb-4">
       <Disclosure>
-        <div onClick={() => setDrawerOpen(!drawerOpen)}>
+        <div className="pb-2" onClick={() => setDrawerOpen(!drawerOpen)}>
           <h3 className="text-grey-35 text-xl">{title?.value}</h3>
           {description?.value}
         </div>
@@ -86,7 +98,7 @@ const Deck = (props: { entity: string; toggleAll: boolean | undefined }) => {
           <ButtonSecondary
             onClick={() => setFindOpen(true)}
             icon={<Card />}
-            content="Add card"
+            content="Add cards"
           />
           <FindOrCreateCard
             allowBlank={true}
@@ -148,6 +160,7 @@ export const Drawer: React.FC<{ open: boolean }> = (props) => {
         height: props.open && previousState === props.open ? "auto" : height,
         overflow: "hidden",
       }}
+      className="-mx-4"
     >
       <Disclosure.Panel static>
         <div
@@ -160,7 +173,7 @@ export const Drawer: React.FC<{ open: boolean }> = (props) => {
         >
           <div
             style={{
-              height: "64px",
+              height: "48px",
               marginBottom: "-32px",
               filter: "drop-shadow(rgba(0, 0, 0, 0.25) 0px 1px 2px)",
               clipPath:
@@ -226,7 +239,7 @@ export const SmallCardList = (props: {
       }}
     >
       <SortableContext items={items.map((item) => item.id)}>
-        <div className="flex flex-wrap gap-8 py-8">
+        <div className="flex flex-wrap gap-8 pt-8 pb-6">
           {items.map((c) => (
             <SmallCard
               draggable={true}

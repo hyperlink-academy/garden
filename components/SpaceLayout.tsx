@@ -20,7 +20,7 @@ export const SpaceLayout: React.FC = (props) => {
         position: "relative",
       }}
     >
-      <div className="h-full border-grey-15 pt-4 overflow-auto">
+      <div className="h-full border-grey-15 pt-4 px-4 overflow-auto">
         {props.children}
       </div>
       <Footer />

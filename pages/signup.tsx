@@ -35,7 +35,7 @@ export default function SignupPage() {
   if (!signup_token.success)
     return <div>We're currently invite only! You need a code to sign up</div>;
   return (
-    <div className="grid grid-rows-max gap-8 mx-auto max-w-md">
+    <div className="grid grid-rows-max gap-8 mx-auto max-w-md px-4">
       <div className="grid grid-auto-rows gap-2">
         <h1>Hello and Welcome!</h1>
         <p className="text-grey-35">

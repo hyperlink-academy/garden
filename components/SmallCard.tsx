@@ -56,7 +56,7 @@ export function SmallCard(props: {
                 <pre className="whitespace-pre-wrap">{content?.value}</pre>
               </small>
             ) : (
-              <h4 className={"uppercase text-grey-35"}>{title.value}</h4>
+              <h4 className="normal-case leading-tight">{title.value}</h4>
             )}
           </a>
         </Link>
