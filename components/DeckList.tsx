@@ -28,6 +28,7 @@ export const DeckList = () => {
   let decks = useIndex.aev("deck").sort(sortByPosition("aev"));
   let rep = useContext(ReplicacheContext);
   let [newDeckName, setNewDeckName] = useState("");
+  let [toggleAll, setToggleAll] = useState<boolean | undefined>(undefined);
   return (
     <div>
       <input
@@ -47,8 +48,11 @@ export const DeckList = () => {
       >
         create
       </button>
+      <button className="float-right" onClick={() => setToggleAll(!toggleAll)}>
+        toggle all
+      </button>
       {decks.map((d) => (
-        <Deck entity={d.entity} key={d.entity} />
+        <Deck entity={d.entity} toggleAll={toggleAll} key={d.entity} />
       ))}
     </div>
   );
@@ -56,7 +60,7 @@ export const DeckList = () => {
 
 let openStates: { [key: string]: boolean | undefined } = {};
 
-const Deck = (props: { entity: string }) => {
+const Deck = (props: { entity: string; toggleAll: boolean | undefined }) => {
   let title = useIndex.eav(props.entity, "card/title");
   let rep = useContext(ReplicacheContext);
   let description = useIndex.eav(props.entity, "card/content");
@@ -67,6 +71,9 @@ const Deck = (props: { entity: string }) => {
   useEffect(() => {
     openStates[props.entity] = drawerOpen;
   }, [drawerOpen]);
+  useEffect(() => {
+    if (props.toggleAll !== undefined) setDrawerOpen(props.toggleAll);
+  }, [props.toggleAll]);
 
   return (
     <div>
