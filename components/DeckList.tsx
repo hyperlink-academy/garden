@@ -15,7 +15,7 @@ import {
 import { ReferenceAttributes } from "data/Attributes";
 import { Fact } from "data/Facts";
 import { SortableContext } from "@dnd-kit/sortable";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { FindOrCreateCard } from "./FindOrCreateEntity";
 import { ButtonSecondary } from "./Buttons";
 import { Card } from "./Icons";
@@ -54,6 +54,8 @@ export const DeckList = () => {
   );
 };
 
+let openStates: { [key: string]: boolean | undefined } = {};
+
 const Deck = (props: { entity: string }) => {
   let title = useIndex.eav(props.entity, "card/title");
   let rep = useContext(ReplicacheContext);
@@ -61,65 +63,63 @@ const Deck = (props: { entity: string }) => {
   let cards = useIndex.eav(props.entity, "deck/contains");
   let earliestCard = cards?.sort(sortByPosition("eav"))[0];
   let [findOpen, setFindOpen] = useState(false);
+  let [drawerOpen, setDrawerOpen] = useState(openStates[props.entity]);
+  useEffect(() => {
+    openStates[props.entity] = drawerOpen;
+  }, [drawerOpen]);
 
   return (
     <div>
       <Disclosure>
-        {({ open }) => {
-          return (
-            <>
-              <Disclosure.Button as="div">
-                <h3 className="text-grey-35 text-xl">{title?.value}</h3>
-                {description?.value}
-              </Disclosure.Button>
-              <Drawer open={open}>
-                <ButtonSecondary
-                  onClick={() => setFindOpen(true)}
-                  icon={<Card />}
-                  content="Add card"
-                />
-                <FindOrCreateCard
-                  allowBlank={true}
-                  onSelect={async (e) => {
-                    let position = generateKeyBetween(
-                      null,
-                      earliestCard?.positions["eav"] || null
-                    );
-                    if (e.type === "create") {
-                      let newEntity = ulid();
-                      await rep?.rep.mutate.createCard({
-                        entityID: newEntity,
-                        title: e.name,
-                      });
-                      await rep?.rep.mutate.addCardToSection({
-                        cardEntity: newEntity,
-                        parent: props.entity,
-                        positions: { eav: position },
-                        section: "deck/contains",
-                      });
-                      return;
-                    }
-                    rep?.rep.mutate.addCardToSection({
-                      cardEntity: e.entity,
-                      parent: props.entity,
-                      positions: { eav: position },
-                      section: "deck/contains",
-                    });
-                  }}
-                  open={findOpen}
-                  onClose={() => setFindOpen(false)}
-                  selected={cards?.map((c) => c.value.value) || []}
-                />
-                <SmallCardList
-                  attribute="deck/contains"
-                  positionKey="eav"
-                  deck={props.entity}
-                  cards={cards || []}
-                />
-              </Drawer>
-            </>
-          );
-        }}
+        <div onClick={() => setDrawerOpen(!drawerOpen)}>
+          <h3 className="text-grey-35 text-xl">{title?.value}</h3>
+          {description?.value}
+        </div>
+        <Drawer open={!!drawerOpen}>
+          <ButtonSecondary
+            onClick={() => setFindOpen(true)}
+            icon={<Card />}
+            content="Add card"
+          />
+          <FindOrCreateCard
+            allowBlank={true}
+            onSelect={async (e) => {
+              let position = generateKeyBetween(
+                null,
+                earliestCard?.positions["eav"] || null
+              );
+              if (e.type === "create") {
+                let newEntity = ulid();
+                await rep?.rep.mutate.createCard({
+                  entityID: newEntity,
+                  title: e.name,
+                });
+                await rep?.rep.mutate.addCardToSection({
+                  cardEntity: newEntity,
+                  parent: props.entity,
+                  positions: { eav: position },
+                  section: "deck/contains",
+                });
+                return;
+              }
+              rep?.rep.mutate.addCardToSection({
+                cardEntity: e.entity,
+                parent: props.entity,
+                positions: { eav: position },
+                section: "deck/contains",
+              });
+            }}
+            open={findOpen}
+            onClose={() => setFindOpen(false)}
+            selected={cards?.map((c) => c.value.value) || []}
+          />
+          <SmallCardList
+            attribute="deck/contains"
+            positionKey="eav"
+            deck={props.entity}
+            cards={cards || []}
+          />
+        </Drawer>
       </Disclosure>
     </div>
   );
