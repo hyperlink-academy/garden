@@ -1,14 +1,18 @@
-import {
-  ButtonPrimary,
-  ButtonSecondary,
-  ButtonTertiary,
-} from "components/Buttons";
+import { ButtonPrimary, ButtonTertiary, ButtonLink } from "components/Buttons";
 import { FindOrCreate } from "components/FindOrCreateEntity";
-import { Add, SectionLinkedCard, SectionText } from "components/Icons";
+import {
+  Add,
+  Card,
+  Checkmark,
+  DeckSmall,
+  SectionLinkedCard,
+  SectionText,
+} from "components/Icons";
 import { Divider, Modal } from "components/Layout";
 import { ReplicacheContext, useIndex } from "hooks/useReplicache";
 import { useContext, useState } from "react";
 import { ulid } from "src/ulid";
+import { Combobox, Dialog, Transition } from "@headlessui/react";
 
 export const AddSection = (props: { cardEntity: string }) => {
   let [open, setOpen] = useState(false);
@@ -70,7 +74,9 @@ export const AddSection = (props: { cardEntity: string }) => {
             <input
               type="text"
               aria-label="section name"
-              onChange={(e) => setSection({ ...section, name: e.target.value })}
+              onChange={(e) =>
+                setSection({ ...section, name: e.currentTarget.value })
+              }
             />
           </div>
           <div className="sectionTypePicker grid grid-flow-row items-center w-full gap-2">
@@ -146,7 +152,6 @@ export const AddSection = (props: { cardEntity: string }) => {
               }}
             />
           </div>
-          {console.log(section)}
         </Modal>
       ) : null}
     </div>
@@ -167,15 +172,12 @@ const SectionNamePicker = (props: {
         <h4 className="text-grey-80 ">Add Section</h4>
       </button>
       {/* END ADD SECTION BUTTON */}
-      <FindOrCreate
+      <SelectSection
         open={open}
-        allowBlank={false}
         onSelect={(e) => {
-          if (e.type === "create") props.setName(e.name);
-          else {
-            let name = props.items.find((s) => s.entity === e.entity)?.display;
-            if (name) props.setName(name);
-          }
+          let name = props.items.find((s) => s.entity === e.entity)?.display;
+          if (name) props.setName(name);
+
           setOpen(false);
         }}
         onClose={() => setOpen(false)}
@@ -184,6 +186,115 @@ const SectionNamePicker = (props: {
           props.items.find((f) => f.display === props.name)?.entity || "",
         ]}
       />
+    </div>
+  );
+};
+
+// Can I adapt this to work for section names as well?
+// They are a single select
+// use react state not replicache state
+export const SelectSection = (props: {
+  open: boolean;
+  onClose: () => void;
+  items: { display: string; entity: string; icon?: React.ReactElement }[];
+  selected: string[];
+  onSelect: (id: { entity: string }) => void;
+}) => {
+  let [input, setInput] = useState("");
+  let items = props.items.filter((f) => {
+    if (/[A-Z]/g.test(input)) return f.display.includes(input);
+    return f.display.toLocaleLowerCase().includes(input.toLocaleLowerCase());
+  });
+  let inputExists = !!items.find(
+    (i) => i.display.toLocaleLowerCase() === input.toLocaleLowerCase()
+  );
+  return (
+    <Transition show={props.open} className="fixed">
+      <Dialog
+        onClose={props.onClose}
+        className="fixed z-10 inset-0 overflow-y-hidden"
+      >
+        <Dialog.Overlay className="overlay" />
+
+        <div className="">
+          <Combobox
+            value=""
+            onChange={(c) => {
+              props.onSelect({ entity: c });
+            }}
+            as="div"
+            className={`
+              relative
+              max-w-md h-fit max-h-full
+              w-[calc(100vw-2.5rem)]
+              z-10 
+              mx-auto mb-20 mt-10
+              grid grid-rows-[min-content_auto_min-content] 
+              bg-white shadow-drop border border-grey-80 rounded-md
+              `}
+          >
+            <h3 className="mx-6 pt-6 pb-2">Add a Section</h3>
+
+            <Combobox.Input
+              value={input}
+              className="mx-6"
+              placeholder="search for a section..."
+              onChange={(e) => setInput(e.currentTarget.value)}
+            />
+
+            {/* I am aware the max height in the Combobox.Options is gross, but max-h-full does work and this is the best i could do D:*/}
+            <Combobox.Options
+              static
+              className="w-full py-4 flex-col flex gap-2 h-min max-h-[calc(100vh-12rem)] overflow-y-auto "
+            >
+              {items.map((item) => {
+                return (
+                  <Combobox.Option
+                    key={item.entity}
+                    value={item.entity}
+                    className="cursor-pointer"
+                  >
+                    {({ active }) => {
+                      return (
+                        <SearchItem active={active}>
+                          <div
+                            className={`gap-2 items-center grid grid-cols-[min-content_auto]`}
+                          >
+                            {item.icon}
+                            {item.display}
+                          </div>
+                        </SearchItem>
+                      );
+                    }}
+                  </Combobox.Option>
+                );
+              })}
+            </Combobox.Options>
+            <div className="m-3">
+              <Divider />
+            </div>
+            {/* Jared is gonna make this button work  */}
+            <div className="mx-6 pb-6 justify-self-center">
+              <ButtonLink icon={<Add />} content="Or Create a New Section" />
+            </div>
+          </Combobox>
+        </div>
+      </Dialog>
+    </Transition>
+  );
+};
+
+const SearchItem: React.FC<{
+  active: boolean;
+  className?: string;
+}> = (props) => {
+  return (
+    <div
+      className={`w-full px-6 py-0.5 ${props.className || ""} ${
+        props.active ? "bg-bg-blue" : ""
+      }`}
+    >
+      {props.children}
     </div>
   );
 };
