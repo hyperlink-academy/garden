@@ -34,7 +34,7 @@ export const FindOrCreate = (props: {
       >
         <Dialog.Overlay className="overlay" />
 
-        <div className="h-[calc(100vh-32px)]">
+        <div className="">
           <Combobox
             value=""
             onChange={(c) => {
@@ -44,10 +44,11 @@ export const FindOrCreate = (props: {
             }}
             as="div"
             className={`
-              relative 
+              relative
               max-w-md h-fit max-h-full
+              w-[calc(100vw-2.5rem)]
               z-10 
-              mx-5 my-5 
+              mx-auto mb-20 mt-10
               grid grid-rows-[min-content_auto_min-content] 
               bg-white shadow-drop border border-grey-80 rounded-md
               `}
@@ -62,7 +63,7 @@ export const FindOrCreate = (props: {
             {/* I am aware the max height in the Combobox.Options is gross, but max-h-full does work and this is the best i could do D:*/}
             <Combobox.Options
               static
-              className="w-full pt-2 flex-col flex gap-2 h-min max-h-[calc(100vh-154px)] overflow-y-auto"
+              className="w-full pt-2 flex-col flex gap-2 h-min max-h-[calc(100vh-12rem)] overflow-y-auto"
             >
               {inputExists ? null : (
                 <Combobox.Option key={"create"} value={"create"}>
@@ -117,7 +118,7 @@ export const FindOrCreate = (props: {
                 );
               })}
             </Combobox.Options>
-            <div className="h-max grid grid-cols-[auto_min-content] p-4">
+            <div className="h-max grid grid-cols-[auto_min-content] p-4 bg-bg-blue">
               <h4>{props.selected.length} cards added</h4>
               <ButtonLink content="DONE!" onClick={props.onClose} />
             </div>
