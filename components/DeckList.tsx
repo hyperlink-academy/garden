@@ -151,7 +151,7 @@ export const Drawer: React.FC<{ open: boolean }> = (props) => {
     config: { mass: 0.1, tension: 500, friction: 25 },
     from: { height: 0, opacity: 0, arrowHeight: 0 },
     to: {
-      arrowHeight: props.open ? 100 : 100,
+      arrowHeight: props.open ? 100 : 0,
       height: props.open ? viewHeight : 0,
     },
   });
@@ -187,10 +187,13 @@ export const Drawer: React.FC<{ open: boolean }> = (props) => {
               style={{
                 width: "100%",
                 height: "16px",
-                clipPath: arrowHeight.to(
-                  (h) =>
-                    `polygon(0 0, 0 ${h}% , 20px ${h}% ,  36px 0, 52px ${h}%, 100% ${h}%, 100% 0)`
-                ),
+                clipPath:
+                  props.open && previousState === props.open
+                    ? `polygon(0 0, 0 100% , 20px 100% ,  36px 0, 52px 100%, 100% 100%, 100% 0)`
+                    : arrowHeight.to(
+                        (h) =>
+                          `polygon(0 0, 0 ${h}% , 20px ${h}% ,  36px 0, 52px ${h}%, 100% ${h}%, 100% 0)`
+                      ),
               }}
             />
           </div>
