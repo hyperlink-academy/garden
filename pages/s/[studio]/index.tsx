@@ -39,7 +39,11 @@ export default function StudioPage() {
 
 const StudioName = () => {
   let name = useIndex.ave("this/name", "");
-  return <div>{name ? name?.value : "Generic Studio Name!"}</div>;
+  return (
+    <div>
+      <h2>{name ? name?.value : "Generic Studio Name!"}</h2>
+    </div>
+  );
 };
 
 const CreateSpace = (props: { spaceID: string }) => {
