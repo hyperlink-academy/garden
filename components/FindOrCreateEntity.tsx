@@ -3,7 +3,7 @@ import { useIndex } from "hooks/useReplicache";
 import { useState } from "react";
 import { parentPort } from "worker_threads";
 import { ButtonLink } from "./Buttons";
-import { Card, Checkmark, DeckSmall } from "./Icons";
+import { Add, Card, Checkmark, DeckSmall } from "./Icons";
 
 // Can I adapt this to work for section names as well?
 // They are a single select
@@ -32,7 +32,7 @@ export const FindOrCreate = (props: {
         onClose={props.onClose}
         className="fixed z-10 inset-0 overflow-y-hidden"
       >
-        <Dialog.Overlay className="fixed inset-0 bg-grey-90 opacity-30" />
+        <Dialog.Overlay className="overlay" />
 
         <div className="h-[calc(100vh-32px)]">
           <Combobox
@@ -48,21 +48,21 @@ export const FindOrCreate = (props: {
               max-w-md h-fit max-h-full
               z-10 
               mx-5 my-5 
-              grid grid-rows-[min-content_auto_min-content] gap-2 
-              bg-white shadow-drop rounded-md
+              grid grid-rows-[min-content_auto_min-content] 
+              bg-white shadow-drop border border-grey-80 rounded-md
               `}
           >
             <Combobox.Input
               value={input}
-              className=""
-              placeholder="search or create cards..."
+              className="mx-3 mt-4"
+              placeholder="find or create cards..."
               onChange={(e) => setInput(e.currentTarget.value)}
             />
 
             {/* I am aware the max height in the Combobox.Options is gross, but max-h-full does work and this is the best i could do D:*/}
             <Combobox.Options
               static
-              className="w-full py-4 flex-col flex gap-2 bg-white rounded-md h-min max-h-[calc(100vh-154px)] overflow-y-auto shadow-drop"
+              className="w-full pt-2 flex-col flex gap-2 h-min max-h-[calc(100vh-154px)] overflow-y-auto"
             >
               {inputExists ? null : (
                 <Combobox.Option key={"create"} value={"create"}>
@@ -70,10 +70,19 @@ export const FindOrCreate = (props: {
                     ? ({ active }) => {
                         return (
                           <SearchItem active={active}>
-                            <div className="px-2 p-1.5 border-2 border-b-accent-blue rounded-md text-accent-blue font-bold w-full bg-white">
-                              {!input
-                                ? "Create a blank card"
-                                : `Create "${input}"`}
+                            <div
+                              className={`
+                              py-2 w-full
+                              text-accent-blue font-bold 
+                              grid grid-cols-[min-content_auto] gap-2
+                            `}
+                            >
+                              <Add />
+                              <div>
+                                {!input
+                                  ? "Create a blank card"
+                                  : `Create "${input}"`}
+                              </div>
                             </div>
                           </SearchItem>
                         );
@@ -108,7 +117,7 @@ export const FindOrCreate = (props: {
                 );
               })}
             </Combobox.Options>
-            <div className="h-max grid grid-cols-[auto_min-content]">
+            <div className="h-max grid grid-cols-[auto_min-content] p-4">
               <h4>{props.selected.length} cards added</h4>
               <ButtonLink content="DONE!" onClick={props.onClose} />
             </div>

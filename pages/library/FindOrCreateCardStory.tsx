@@ -6,6 +6,7 @@ import { useState } from "react";
 import { ButtonLink } from "components/Buttons";
 import { useIndex } from "hooks/useReplicache";
 import { Card, DeckSmall } from "components/Icons";
+import { SmallCard } from "components/SmallCard";
 const entities: Stories = {
   None: {
     entities: [],
@@ -52,7 +53,12 @@ const Story = () => {
   });
   return (
     <>
-      <div onClick={() => setOpen(true)}>FindOrCreateCard</div>
+      <div
+        className={`w-full bg-white border border-grey-55 italic text-grey-55 p-2 rounded-md`}
+        onClick={() => setOpen(true)}
+      >
+        find or create cards...
+      </div>
       <FindOrCreate
         allowBlank={true}
         open={open}
@@ -65,14 +71,16 @@ const Story = () => {
           }
         }}
       />
-      <ul>
+      <ul className="grid grid-cols-2 grid-flow-row gap-4">
         {selectedCards.map((c) => {
           return (
             <li>
-              {c}{" "}
-              <ButtonLink
-                content="delete"
-                onClick={() =>
+              <SmallCard
+                href=""
+                draggable
+                entityID={c}
+                id={c}
+                onDelete={() =>
                   setSelectedCards((cards) => cards.filter((c1) => c1 !== c))
                 }
               />
