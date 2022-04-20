@@ -9,6 +9,14 @@ const stories: Stories = {
         "space/name": "Books",
         "space/studio": "jared",
       },
+      {
+        "space/name": "Infinite Musings",
+        "space/studio": "brendan",
+      },
+      {
+        "space/name": "Antilibraries Atelier",
+        "space/studio": "brendan",
+      },
     ],
   },
 };

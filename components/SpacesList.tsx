@@ -17,7 +17,7 @@ const Activity = (props: { entity: string; name: string }) => {
   let studio = useIndex.eav(props.entity, "space/studio");
   return (
     <Link href={`/s/${studio?.value}/s/${props.name}`}>
-      <a className="flex flex-row gap-4 font-bold">
+      <a className="flex flex-row gap-4 pb-8">
         <Door />
         <h3 className="text-xl">{props.name}</h3>
       </a>
