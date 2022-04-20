@@ -118,7 +118,7 @@ export const FindOrCreate = (props: {
                 );
               })}
             </Combobox.Options>
-            <div className="h-max grid grid-cols-[auto_min-content] p-4 bg-bg-blue">
+            <div className="h-max grid grid-cols-[auto_min-content] p-4 ">
               <h4>{props.selected.length} cards added</h4>
               <ButtonLink content="DONE!" onClick={props.onClose} />
             </div>
