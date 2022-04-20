@@ -35,7 +35,9 @@ export function SmallCard(props: {
       ref={setNodeRef}
     >
       {!!props.onDelete ? (
-        <Close className="text-accent-blue absolute -right-2.5 z-10" />
+        <button onClick={props.onDelete}>
+          <Close className="text-accent-blue absolute -right-2.5 z-10" />
+        </button>
       ) : null}
 
       <div className="border-[1] border-grey-80 shadow-drop rounded-md p-2 pl-1 w-[151px] h-24 overflow-hidden bg-white flex flex-row gap-2 relative">

@@ -171,6 +171,10 @@ const addCardToSection: Mutation<{
   });
 };
 
+const removeCardFromSection: Mutation<{ id: string }> = async (args, ctx) => {
+  await ctx.retractFact(args.id);
+};
+
 const createCard: Mutation<{ entityID: string; title: string }> = async (
   args,
   ctx
@@ -249,6 +253,7 @@ export const Mutations = {
   createCard,
   moveCard,
   addSpace,
+  removeCardFromSection,
   addDeck,
   addCardToSection,
   assertCardTitle,

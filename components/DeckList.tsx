@@ -49,7 +49,7 @@ export const DeckList = () => {
                   name: newDeckName,
                   position: generateKeyBetween(
                     decks[decks.length]?.positions.aev || null,
-                    null,
+                    null
                   ),
                 });
               }}
@@ -242,6 +242,11 @@ export const SmallCardList = (props: {
         <div className="flex flex-wrap gap-8 pt-8 pb-6">
           {items.map((c) => (
             <SmallCard
+              onDelete={() => {
+                rep?.rep.mutate.removeCardFromSection({
+                  id: c.id,
+                });
+              }}
               draggable={true}
               key={c.id}
               href={`/s/${studio}/s/${space}/c/${c.value.value}`}
