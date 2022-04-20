@@ -9,7 +9,7 @@ import { makeReplicache, ReplicacheMutators } from "./useReplicache";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 
-const AuthContext = createContext({
+export const AuthContext = createContext({
   rep: null as null | Replicache<ReplicacheMutators>,
   session: { loggedIn: false } as SessionResponse,
   login: async (_data: { username: string; password: string }) => {
