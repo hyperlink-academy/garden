@@ -1,5 +1,5 @@
-import { Fragment, useRef, useContext } from "react";
-import { Menu, Transition } from "@headlessui/react";
+import { useRef, useContext } from "react";
+import { Menu } from "@headlessui/react";
 
 import { MoreOptions, Delete, DeckSmall } from "components/Icons";
 import { Divider, MenuContainer, MenuItem } from "components/Layout";
@@ -7,8 +7,10 @@ import Textarea from "components/AutosizeTextArea";
 import { ReplicacheContext, useIndex } from "hooks/useReplicache";
 import { Sections } from "./Sections";
 import { AddSection } from "./AddSection";
+import { Backlinks } from "./Backlinks";
 
 export const CardView = (props: { entityID: string }) => {
+  let isDeck = useIndex.eav(props.entityID, "deck");
   return (
     <div
       className={`
@@ -30,6 +32,7 @@ export const CardView = (props: { entityID: string }) => {
         </div>
         <Sections entityID={props.entityID} />
         <AddSection cardEntity={props.entityID} />
+        <Backlinks entityID={props.entityID} />
       </div>
     </div>
   );

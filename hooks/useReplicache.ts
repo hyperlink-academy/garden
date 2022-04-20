@@ -198,6 +198,24 @@ export const useIndex = {
       [attribute, entity]
     );
   },
+  vae<A extends keyof Attribute>(entity: string, attribute?: A) {
+    let rep = useContext(ReplicacheContext);
+    return useSubscribe(
+      rep?.rep,
+      async (tx) => {
+        let results = await tx
+          .scan({
+            indexName: "vae",
+            prefix: `${entity}-${attribute || ""}`,
+          })
+          .values()
+          .toArray();
+        return results as Fact<A>[];
+      },
+      [],
+      [entity, attribute]
+    );
+  },
 };
 
 export const useSpaceID = () => {

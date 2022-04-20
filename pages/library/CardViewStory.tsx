@@ -1,5 +1,10 @@
 import { CardView } from "components/CardView";
-import { multipleReferenceSection, ref, singleTextSection } from "data/Facts";
+import {
+  flag,
+  multipleReferenceSection,
+  ref,
+  singleTextSection,
+} from "data/Facts";
 import { title } from "src/lorem";
 import { ComponentViewer, Props, Stories } from "./index";
 export { getStaticProps } from "./index";
@@ -18,6 +23,11 @@ const Stories: Stories = {
         cardinality: "many",
         unique: false,
       },
+      [multipleReferenceSection("Related")]: {
+        unique: false,
+        cardinality: "many",
+        type: "reference",
+      },
     },
     entities: [
       {
@@ -35,12 +45,26 @@ const Stories: Stories = {
         };
       }),
       {
+        "card/title": "A deck!",
+        deck: flag(),
+        "deck/contains": [ref("0")],
+      },
+      {
+        "card/title": "A another card",
+        [multipleReferenceSection("Related")]: [ref("0")],
+      },
+      {
         name: multipleReferenceSection("Quotes"),
         cardinality: "many",
         type: "reference",
       },
       {
         name: multipleReferenceSection("Ideas"),
+        cardinality: "many",
+        type: "reference",
+      },
+      {
+        name: multipleReferenceSection("Related"),
         cardinality: "many",
         type: "reference",
       },
