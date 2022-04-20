@@ -48,8 +48,8 @@ export const DeckList = () => {
                   newEntity: entity,
                   name: newDeckName,
                   position: generateKeyBetween(
+                    decks[decks.length]?.positions.aev || null,
                     null,
-                    decks[0]?.positions.aev || null
                   ),
                 });
               }}
@@ -77,7 +77,7 @@ const Deck = (props: { entity: string; toggleAll: boolean | undefined }) => {
   let rep = useContext(ReplicacheContext);
   let description = useIndex.eav(props.entity, "card/content");
   let cards = useIndex.eav(props.entity, "deck/contains");
-  let earliestCard = cards?.sort(sortByPosition("eav"))[0];
+  let lastCard = cards?.sort(sortByPosition("eav"))[cards.length - 1];
   let [findOpen, setFindOpen] = useState(false);
   let [drawerOpen, setDrawerOpen] = useState(openStates[props.entity]);
   useEffect(() => {
@@ -104,8 +104,8 @@ const Deck = (props: { entity: string; toggleAll: boolean | undefined }) => {
             allowBlank={true}
             onSelect={async (e) => {
               let position = generateKeyBetween(
-                null,
-                earliestCard?.positions["eav"] || null
+                lastCard?.positions["eav"] || null,
+                null
               );
               if (e.type === "create") {
                 let newEntity = ulid();
