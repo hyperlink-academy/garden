@@ -15,7 +15,6 @@ export const SpaceLayout: React.FC = (props) => {
         height: "100%",
         display: "flex",
         flexDirection: "column",
-        paddingTop: "8px",
         alignItems: "stretch",
         position: "relative",
       }}

@@ -25,12 +25,14 @@ export default function StudioPage() {
   if (!id.success) return <div>404 studio</div>;
   return (
     <SpaceProvider id={id.id}>
-      <div className="flex justify-between">
-        <StudioName />
-        <Logout />
+      <div className="pt-4 px-4">
+        <div className="flex justify-between pb-4">
+          <StudioName />
+          <Logout />
+        </div>
+        <CreateSpace spaceID={id.id} />
+        <SpaceList />
       </div>
-      <CreateSpace spaceID={id.id} />
-      <SpaceList />
     </SpaceProvider>
   );
 }
