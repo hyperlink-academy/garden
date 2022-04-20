@@ -38,10 +38,10 @@ export default function StudioPage() {
 }
 
 const StudioName = () => {
-  let name = useIndex.ave("this/name", "");
+  let name = useIndex.aev("this/name", "")[0];
   return (
     <div>
-      <h2>{name ? name?.value : "Generic Studio Name!"}</h2>
+      <h2>{name?.value}</h2>
     </div>
   );
 };
