@@ -55,10 +55,14 @@ export function SmallCard(props: {
           <a className="h-full w-full">
             {!title ? (
               <small>
-                <pre className="whitespace-pre-wrap">{content?.value}</pre>
+                <pre className="whitespace-pre-wrap truncate">
+                  {content?.value}
+                </pre>
               </small>
             ) : (
-              <h4 className="normal-case leading-tight">{title.value}</h4>
+              <h4 className="normal-case leading-tight h-full overflow-hidden text-ellipsis">
+                {title.value}
+              </h4>
             )}
           </a>
         </Link>

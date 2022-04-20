@@ -71,16 +71,14 @@ const Story = () => {
           }
         }}
       />
-      <ul className="grid grid-cols-2 grid-flow-row gap-4">
+      <ul>
         {selectedCards.map((c) => {
           return (
             <li>
-              <SmallCard
-                href=""
-                draggable
-                entityID={c}
-                id={c}
-                onDelete={() =>
+              {c}{" "}
+              <ButtonLink
+                content="delete"
+                onClick={() =>
                   setSelectedCards((cards) => cards.filter((c1) => c1 !== c))
                 }
               />

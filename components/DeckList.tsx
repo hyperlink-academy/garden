@@ -243,7 +243,7 @@ export const SmallCardList = (props: {
       }}
     >
       <SortableContext items={items.map((item) => item.id)}>
-        <div className="flex flex-wrap gap-8 pt-8 pb-6">
+        <div className="flex flex-wrap gap-4 pt-8 pb-6">
           {items.map((c) => (
             <SmallCard
               onDelete={() => {
