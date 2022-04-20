@@ -148,6 +148,7 @@ export const Drawer: React.FC<{ open: boolean }> = (props) => {
   const [ref, { height: viewHeight }] = useMeasure();
   const previousState = usePrevious(props.open);
   const { height, arrowHeight } = useSpring({
+    config: { mass: 0.1, tension: 500, friction: 25 },
     from: { height: 0, opacity: 0, arrowHeight: 0 },
     to: {
       arrowHeight: props.open ? 100 : 100,
