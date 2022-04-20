@@ -1,5 +1,5 @@
 import { spaceAPI, workerAPI } from "backend/lib/api";
-import { ButtonSecondary } from "components/Buttons";
+import { ButtonSecondary, ButtonLink } from "components/Buttons";
 import { SpaceProvider } from "components/ReplicacheProvider";
 import { SpaceList } from "components/SpacesList";
 import { useAuth } from "hooks/useAuth";
@@ -25,17 +25,19 @@ export default function StudioPage() {
   if (!id.success) return <div>404 studio</div>;
   return (
     <SpaceProvider id={id.id}>
-      <StudioName />
+      <div className="flex justify-between">
+        <StudioName />
+        <Logout />
+      </div>
       <CreateSpace spaceID={id.id} />
       <SpaceList />
-      <Logout />
     </SpaceProvider>
   );
 }
 
 const StudioName = () => {
   let name = useIndex.ave("this/name", "");
-  return <div>{name?.value}</div>;
+  return <div>{name ? name?.value : "Generic Studio Name!"}</div>;
 };
 
 const CreateSpace = (props: { spaceID: string }) => {
@@ -44,7 +46,7 @@ const CreateSpace = (props: { spaceID: string }) => {
   let rep = useContext(ReplicacheContext);
   if (!auth.session.loggedIn) return null;
   return (
-    <div className="pb-4">
+    <div className="pb-4 flex">
       <input
         className="mr-2"
         value={name}
@@ -75,6 +77,8 @@ const Logout = () => {
   let { session, logout } = useAuth();
   let router = useRouter();
   return session.session?.username === router.query.studio ? (
-    <button onClick={() => logout()}>logout</button>
+    <div className="self-center">
+      <ButtonLink content="logout" onClick={() => logout()} />
+    </div>
   ) : null;
 };
