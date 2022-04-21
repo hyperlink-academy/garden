@@ -12,9 +12,10 @@ import { ReplicacheContext } from "hooks/useReplicache";
 import { Attribute } from "data/Attributes";
 import { Fact, Schema } from "data/Facts";
 import { useRouter } from "next/router";
-import { Switch } from "@headlessui/react";
+import { Menu, Switch } from "@headlessui/react";
 import { AuthContext } from "hooks/useAuth";
 import { MenuIcon } from "components/Icons";
+import { MenuContainer, MenuItem } from "components/Layout";
 
 export type Props = InferGetStaticPropsType<typeof getStaticProps>;
 
@@ -29,6 +30,35 @@ export type Stories = {
   };
 };
 
+type AuthState = "loggedOut" | "loggedIn" | "authorized";
+
+const AuthStates = {
+  loggedOut: { loggedIn: false },
+  loggedIn: {
+    loggedIn: true,
+    token: "a token",
+    session: {
+      studio: "loggedin-studio",
+      id: "session-id",
+      createdAt: "0",
+      userAgent: "unknown",
+      username: "Newton",
+      user: "" as any,
+    },
+  },
+  authorized: {
+    loggedIn: true,
+    token: "a token",
+    session: {
+      studio: "authorized-studio",
+      id: "session-id",
+      createdAt: "0",
+      userAgent: "unknown",
+      username: "Newton",
+      user: "" as any,
+    },
+  },
+} as const;
 export const ComponentViewer: React.FC<{
   components: Props["components"];
   stories: Stories;
@@ -36,11 +66,13 @@ export const ComponentViewer: React.FC<{
   let keys = Object.keys(props.stories);
   let [story, setStory] = useState(keys[0]);
   let [bg, setBg] = useState(true);
+  let [authState, setAuthState] = useState<AuthState>("loggedOut");
+
   return (
     <AuthContext.Provider
       value={{
         rep: null,
-        session: { loggedIn: false },
+        session: AuthStates[authState],
         logout: async () => false,
         login: async () => {
           return { success: false, error: "noUser" } as const;
@@ -52,10 +84,15 @@ export const ComponentViewer: React.FC<{
         defaultFacts={story ? props.stories[story].entities : []}
       >
         <div style={{ maxWidth: "48rem", margin: "auto" }}>
-          {/* WRAPPER - OPEN */}
-          <div className="flex gap-4 justify-between pt-6 pb-4 text-accent-blue">
-            <Menu pages={props.components} />
-            <BGSwitch enabled={bg} setEnabled={setBg} />
+          <div className="flex gap-4 justify-between pt-6 pb-4 text-accent-blue px-5">
+            <PageSidebar pages={props.components} />
+            <div className="flex gap-2">
+              <BGSwitch enabled={bg} setEnabled={setBg} />
+              <AuthStatePicker
+                authState={authState}
+                setAuthState={setAuthState}
+              />
+            </div>
           </div>
           <div className="grid auto-rows-max gap-6 m-5">
             <div
@@ -133,13 +170,50 @@ const AllFacts = () => {
   );
 };
 
+const AuthStatePicker = (props: {
+  authState: AuthState;
+  setAuthState: (s: AuthState) => void;
+}) => {
+  return (
+    <Menu as="div" className="relative">
+      <Menu.Button className="font-bold">auth: {props.authState}</Menu.Button>
+      <MenuContainer>
+        <MenuItem>
+          <button
+            className={props.authState === "loggedOut" ? "font-bold" : ""}
+            onClick={() => props.setAuthState("loggedOut")}
+          >
+            Logged Out
+          </button>
+        </MenuItem>
+        <MenuItem>
+          <button
+            className={props.authState === "loggedIn" ? "font-bold" : ""}
+            onClick={() => props.setAuthState("loggedIn")}
+          >
+            Logged In
+          </button>
+        </MenuItem>
+        <MenuItem>
+          <button
+            className={props.authState === "authorized" ? "font-bold" : ""}
+            onClick={() => props.setAuthState("authorized")}
+          >
+            Authorized
+          </button>
+        </MenuItem>
+      </MenuContainer>
+    </Menu>
+  );
+};
+
 const BGSwitch = (props: {
   enabled: boolean;
   setEnabled: (b: boolean) => void;
 }) => {
   return (
     <div className="flex gap-2">
-      <span className="font-bold">Toggle Background</span>
+      <span className="font-bold">BG</span>
 
       <Switch
         checked={props.enabled}
@@ -159,7 +233,7 @@ const BGSwitch = (props: {
   );
 };
 
-const Menu = (props: { pages: Props["components"] }) => {
+const PageSidebar = (props: { pages: Props["components"] }) => {
   let router = useRouter();
   let [isOpen, toggleOpen] = useState(false);
   return (

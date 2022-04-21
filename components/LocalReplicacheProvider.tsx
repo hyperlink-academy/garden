@@ -180,36 +180,48 @@ export const LocalReplicacheProvider: React.FC<{
     };
   }, []);
   useEffect(() => {
-    let facts = props.defaultFacts.flatMap<Fact<keyof Attribute>>((e, id) => {
-      return Object.keys(e).flatMap((a) => {
-        let attribute: keyof Attribute = a as keyof Attribute;
-        let schema: Schema = Attribute[attribute];
-        if (!schema) schema = props.defaultAttributes[attribute];
-        if (schema?.cardinality === "many")
-          //@ts-ignore
-          return e[attribute].map((v) => {
-            return {
-              schema,
-              lastUpdated: Date.now().toString(),
-              entity: id.toString(),
-              id: ulid(),
-              attribute: a as keyof Attribute,
-              value: v,
-              positions: {},
-            };
-          });
-        console.log(attribute);
-        return {
-          schema,
+    let facts = props.defaultFacts
+      .flatMap<Fact<keyof Attribute>>((e, id) => {
+        return Object.keys(e).flatMap((a) => {
+          let attribute: keyof Attribute = a as keyof Attribute;
+          let schema: Schema = Attribute[attribute];
+          if (!schema) schema = props.defaultAttributes[attribute];
+          if (schema?.cardinality === "many")
+            //@ts-ignore
+            return e[attribute].map((v) => {
+              return {
+                schema,
+                lastUpdated: Date.now().toString(),
+                entity: id.toString(),
+                id: ulid(),
+                attribute: a as keyof Attribute,
+                value: v,
+                positions: {},
+              };
+            });
+          console.log(attribute);
+          return {
+            schema,
+            lastUpdated: Date.now().toString(),
+            entity: id.toString(),
+            id: ulid(),
+            value: e[attribute],
+            attribute: a as keyof Attribute,
+            positions: {},
+          };
+        });
+      })
+      .concat([
+        {
+          schema: Attribute["space/member"],
           lastUpdated: Date.now().toString(),
-          entity: id.toString(),
-          id: ulid(),
-          value: e[attribute],
-          attribute: a as keyof Attribute,
+          attribute: "space/member",
+          value: "authorized-studio",
           positions: {},
-        };
-      });
-    });
+          id: ulid(),
+          entity: ulid(),
+        },
+      ]);
     db.current.facts = facts;
     db.current.reset = true;
     if (rep) rep.pull();
