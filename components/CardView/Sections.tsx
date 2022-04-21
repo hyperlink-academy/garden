@@ -13,7 +13,7 @@ import {
 } from "components/Icons";
 import { MenuContainer, MenuItem } from "components/Layout";
 import { multipleReferenceSection, singleTextSection } from "data/Facts";
-import { ReplicacheContext, useIndex } from "hooks/useReplicache";
+import { ReplicacheContext, useIndex, useMutations } from "hooks/useReplicache";
 import { Fragment, useContext, useRef, useState } from "react";
 import { generateKeyBetween } from "src/fractional-indexing";
 import { sortByPosition } from "src/position_helpers";
@@ -90,46 +90,50 @@ const MultipleReferenceSection = (props: {
 }) => {
   let attribute = multipleReferenceSection(props.section);
   let references = useIndex.eav(props.entityID, attribute);
-  let rep = useContext(ReplicacheContext);
+  let { mutate, authorized } = useMutations();
   let earliestCard = references?.sort(sortByPosition("eav"))[0];
   let [open, setOpen] = useState(false);
   return (
     <div className="flex flex-col gap-4">
-      <ButtonPrimary
-        onClick={() => setOpen(true)}
-        content="search to add cards"
-      />
-      <FindOrCreateCard
-        open={open}
-        allowBlank={true}
-        onClose={() => setOpen(false)}
-        selected={references?.map((c) => c.value.value) || []}
-        onSelect={async (e) => {
-          let position = generateKeyBetween(
-            null,
-            earliestCard?.positions["eav"] || null
-          );
-          let entity;
+      {authorized ? (
+        <>
+          <ButtonPrimary
+            onClick={() => setOpen(true)}
+            content="search to add cards"
+          />
+          <FindOrCreateCard
+            open={open}
+            allowBlank={true}
+            onClose={() => setOpen(false)}
+            selected={references?.map((c) => c.value.value) || []}
+            onSelect={async (e) => {
+              let position = generateKeyBetween(
+                null,
+                earliestCard?.positions["eav"] || null
+              );
+              let entity;
 
-          if (e.type === "create") {
-            entity = ulid();
-            await rep?.rep.mutate.createCard({
-              entityID: entity,
-              title: e.name,
-            });
-          } else {
-            entity = e.entity;
-          }
+              if (e.type === "create") {
+                entity = ulid();
+                await mutate("createCard", {
+                  entityID: entity,
+                  title: e.name,
+                });
+              } else {
+                entity = e.entity;
+              }
 
-          rep?.rep.mutate.addCardToSection({
-            cardEntity: entity,
-            parent: props.entityID,
-            positions: { eav: position },
-            section: attribute,
-          });
-          //TODO
-        }}
-      />
+              mutate("addCardToSection", {
+                cardEntity: entity,
+                parent: props.entityID,
+                positions: { eav: position },
+                section: attribute,
+              });
+              //TODO
+            }}
+          />
+        </>
+      ) : null}
       <SmallCardList
         attribute={attribute}
         cards={references || []}

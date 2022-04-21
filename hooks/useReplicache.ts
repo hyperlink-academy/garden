@@ -232,7 +232,7 @@ export const useMutations = () => {
       let fact = (await tx
         .scan({
           indexName: "ave",
-          prefix: `activity/member-${session.session.studio}`,
+          prefix: `space/member-${session.session.studio}`,
         })
         .values()
         .toArray()) as Fact<"space/member">[];

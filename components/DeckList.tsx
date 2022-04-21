@@ -1,4 +1,4 @@
-import { ReplicacheContext, useIndex } from "hooks/useReplicache";
+import { ReplicacheContext, useIndex, useMutations } from "hooks/useReplicache";
 import { Disclosure } from "@headlessui/react";
 import useMeasure from "react-use-measure";
 import { SmallCard } from "components/SmallCard";
@@ -214,8 +214,8 @@ export const SmallCardList = (props: {
   const mouseSensor = useSensor(MouseSensor, {});
   const touchSensor = useSensor(TouchSensor, {});
   const sensors = useSensors(mouseSensor, touchSensor);
-  let rep = useContext(ReplicacheContext);
-  let [dragging, setDraggging] = useState<string | null>(null);
+  let { authorized, mutate } = useMutations();
+  let [dragging, setDragging] = useState<string | null>(null);
   let items = props.cards.sort(sortByPosition(props.positionKey));
 
   return (
@@ -223,16 +223,16 @@ export const SmallCardList = (props: {
       collisionDetection={closestCenter}
       sensors={sensors}
       onDragStart={({ active }) => {
-        setDraggging(active.id);
+        setDragging(active.id);
       }}
       onDragEnd={({ over }) => {
-        setDraggging(null);
+        setDragging(null);
         if (over) {
           if (!dragging) return;
           let index = items.findIndex((f) => f.id === over.id);
           let currentIndex = items.findIndex((f) => f.id === dragging);
           if (index === -1) return;
-          rep?.rep.mutate.moveCard({
+          mutate("moveCard", {
             factID: dragging,
             positionKey: props.positionKey,
             parent: props.deck,
@@ -246,12 +246,16 @@ export const SmallCardList = (props: {
         <div className="flex flex-wrap gap-4 pt-8 pb-6">
           {items.map((c) => (
             <SmallCard
-              onDelete={() => {
-                rep?.rep.mutate.removeCardFromSection({
-                  id: c.id,
-                });
-              }}
-              draggable={true}
+              onDelete={
+                !authorized
+                  ? undefined
+                  : () => {
+                      mutate("removeCardFromSection", {
+                        id: c.id,
+                      });
+                    }
+              }
+              draggable={authorized}
               key={c.id}
               href={`/s/${studio}/s/${space}/c/${c.value.value}`}
               entityID={c.value.value}
