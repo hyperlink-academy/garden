@@ -122,6 +122,7 @@ export const store = (storage: DurableObjectStorage) => {
         let existingFact = (await scanIndex.eav(f.entity, f.attribute)) as
           | Fact<keyof Attribute>
           | undefined;
+        // We might want to preserve positions of the existing fact as well
         if (existingFact) factID = existingFact.id;
       }
       writeFactToStore({ ...f, id: factID, lastUpdated, schema }, schema);

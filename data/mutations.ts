@@ -162,7 +162,8 @@ const addCardToSection: Mutation<{
     args.parent,
     args.section as "arbitrarySectionReferenceType"
   );
-  if (!!existingCards.find((f) => f.value.value === args.cardEntity)) return;
+  let existing = existingCards.find((f) => f.value.value === args.cardEntity);
+  if (existing && !existing.retracted) return;
   await ctx.assertFact({
     entity: args.parent,
     attribute: args.section as "arbitrarySectionReferenceType",
