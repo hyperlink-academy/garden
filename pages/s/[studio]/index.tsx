@@ -21,18 +21,16 @@ export default function StudioPage() {
     },
     { revalidateOnFocus: false }
   );
-  if (!id) return <div> loading</div>;
-  if (!id.success) return <div>404 studio</div>;
+  if (!id) return <div>loading…</div>;
+  if (!id.success) return <div>404 - studio not found!</div>;
   return (
     <SpaceProvider id={id.id}>
-      <div className="pt-4 px-4">
-        <div className="flex justify-between pb-4">
-          <StudioName />
-          <Logout />
-        </div>
-        <CreateSpace spaceID={id.id} />
-        <SpaceList />
+      <div className="flex justify-between pb-4">
+        <StudioName />
+        <Logout />
       </div>
+      <CreateSpace spaceID={id.id} />
+      <SpaceList />
     </SpaceProvider>
   );
 }

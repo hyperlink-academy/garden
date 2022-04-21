@@ -23,7 +23,7 @@ export default function LoginPage() {
     if (result.success) router.push(`/s/${result.session.username}`);
   };
   return (
-    <div className="grid grid-auto-rows gap-8 mx-auto max-w-md px-4">
+    <div className="grid grid-auto-rows gap-8 mx-auto max-w-md">
       <h1>Hi, Welcome Back!</h1>
       <form className="grid gap-4 w-full" onSubmit={onSubmit}>
         {status === "normal" ? null : (

@@ -20,8 +20,8 @@ export default function JoinSpacePage() {
     },
     { revalidateOnFocus: false }
   );
-  if (!id) return <div>loading</div>;
-  if (!id.success) return <div>404 space</div>;
+  if (!id) return <div>loading…</div>;
+  if (!id.success) return <div>404 - space not found!</div>;
   return (
     <SpaceProvider id={id.id}>
       <JoinSpace id={id.id} />

@@ -31,11 +31,27 @@ export default function SignupPage() {
     });
   };
 
-  if (!signup_token) return "loading";
-  if (!signup_token.success)
-    return <div>We're currently invite only! You need a code to sign up</div>;
+  if (!signup_token)
+    return (
+      <div>
+        <h2 className="pb-2">
+          The Garden is currently open by invitation only!
+        </h2>
+        <p>
+          You need an invite code to sign up — please{" "}
+          <a
+            className="text-accent-blue"
+            href="mailto:contact@hyperlink.academy"
+          >
+            email us
+          </a>{" "}
+          any ideas for experiments :)
+        </p>
+      </div>
+    );
+  if (!signup_token.success) return "loading…";
   return (
-    <div className="grid grid-rows-max gap-8 mx-auto max-w-md px-4">
+    <div className="grid grid-rows-max gap-8 mx-auto max-w-md">
       <div className="grid grid-auto-rows gap-2">
         <h1>Hello and Welcome!</h1>
         <p className="text-grey-35">
