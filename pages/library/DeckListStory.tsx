@@ -26,16 +26,23 @@ const entities: Stories = {
         "card/title": "Worship Strange Winds",
         "card/content":
           "In this deck, an intersection of fictional beliefs and winds playing instruments, a most interesting combination.",
-        "deck/contains": [...Array(8).keys()].map((_a, id) =>
+        "deck/contains": [...Array(3).keys()].map((_a, id) =>
           ref((id + 11).toString())
         ),
       },
       {
         deck: flag(),
+        "card/title": "This deck is empty",
+        "card/content":
+          "Unfortunately it contains zero  cards. Maybe with your help…someday…",
+        "deck/contains": [],
+      },
+      {
+        deck: flag(),
         "card/title": "What Can Ya Do",
         "card/content": "Moody occupations, the full breadth of humanity…",
-        "deck/contains": [...Array(8).keys()].map((_a, id) =>
-          ref((id + 19).toString())
+        "deck/contains": [...Array(7).keys()].map((_a, id) =>
+          ref((id + 15).toString())
         ),
       },
       ...[...Array(8).keys()].map(() => {
@@ -43,12 +50,12 @@ const entities: Stories = {
           "card/title": getRandomTitleBook(),
         };
       }),
-      ...[...Array(8).keys()].map(() => {
+      ...[...Array(3).keys()].map(() => {
         return {
           "card/title": getRandomTitleWeird(),
         };
       }),
-      ...[...Array(8).keys()].map(() => {
+      ...[...Array(7).keys()].map(() => {
         return {
           "card/title": getRandomTitleOccupation(),
         };

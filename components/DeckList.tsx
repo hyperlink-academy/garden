@@ -18,6 +18,7 @@ import { SortableContext } from "@dnd-kit/sortable";
 import { useContext, useEffect, useState } from "react";
 import { FindOrCreateCard } from "./FindOrCreateEntity";
 import { ButtonLink, ButtonSecondary } from "./Buttons";
+import Link from "next/link";
 import { Card } from "./Icons";
 import { generateKeyBetween } from "src/fractional-indexing";
 import { sortByPosition } from "src/position_helpers";
@@ -31,7 +32,7 @@ export const DeckList = () => {
   let [toggleAll, setToggleAll] = useState<boolean | undefined>(undefined);
   return (
     <div>
-      <div className="pb-4">
+      <div className="pb-8">
         <div className="flex flex-col sm:flex-row justify-between">
           <div className="flex">
             <input
@@ -77,9 +78,11 @@ const Deck = (props: { entity: string; toggleAll: boolean | undefined }) => {
   let rep = useContext(ReplicacheContext);
   let description = useIndex.eav(props.entity, "card/content");
   let cards = useIndex.eav(props.entity, "deck/contains");
+  let cardsCount = cards ? cards.length : 0;
   let lastCard = cards?.sort(sortByPosition("eav"))[cards.length - 1];
   let [findOpen, setFindOpen] = useState(false);
   let [drawerOpen, setDrawerOpen] = useState(openStates[props.entity]);
+  let router = useRouter();
   useEffect(() => {
     openStates[props.entity] = drawerOpen;
   }, [drawerOpen]);
@@ -88,11 +91,39 @@ const Deck = (props: { entity: string; toggleAll: boolean | undefined }) => {
   }, [props.toggleAll]);
 
   return (
-    <div className="pb-4">
+    <div className="pb-8">
       <Disclosure>
-        <div className="pb-2" onClick={() => setDrawerOpen(!drawerOpen)}>
-          <h3 className="text-grey-35 text-xl">{title?.value}</h3>
-          {description?.value}
+        <div className="flex pb-2">
+          <div className="pr-8 z-[99]">
+            <div className="rounded-lg w-20 h-32 relative bg-white">
+              <span className="text-grey-35 text-lg font-bold italic absolute top-2 right-3 z-[1]">
+                {cardsCount}
+              </span>
+              <span className="text-accent-blue text-sm font-bold absolute bottom-2 right-2 z-[1]">
+                <Link
+                  href={`/s/${router.query.studio}/s/${router.query.space}/c/${props.entity}`}
+                >
+                  edit deck
+                </Link>
+              </span>
+              <div className="border rounded-lg w-20 h-32 absolute bg-white"></div>
+              {cardsCount > 0 ? (
+                <>
+                  <div className="border rounded-lg w-20 h-32 absolute bg-white bottom-1 left-1 -z-[2] rotate-1"></div>
+                  <div className="border rounded-lg w-20 h-32 absolute bg-white bottom-2 left-2 -z-[3] rotate-2"></div>
+                </>
+              ) : (
+                <>
+                  <div className="border border-dotted rounded-lg w-20 h-32 absolute bg-background bottom-1 left-1 -z-[2]"></div>
+                  <div className="border border-dotted rounded-lg w-20 h-32 absolute bg-background bottom-2 left-2 -z-[3]"></div>
+                </>
+              )}
+            </div>
+          </div>
+          <div className="pb-2" onClick={() => setDrawerOpen(!drawerOpen)}>
+            <h3 className="text-grey-35 text-xl">{title?.value}</h3>
+            {description?.value}
+          </div>
         </div>
         <Drawer open={!!drawerOpen}>
           <ButtonSecondary
@@ -178,7 +209,8 @@ export const Drawer: React.FC<{ open: boolean }> = (props) => {
               marginBottom: "-32px",
               filter: "drop-shadow(rgba(0, 0, 0, 0.25) 0px 1px 2px)",
               clipPath:
-                "polygon(0 0, 0 100% , 20px 100% ,  36px 100%, 52px 100%, 100% 100%, 100% 0)",
+                // "polygon(0 0, 0 100% , 20px 100% ,  36px 100%, 52px 100%, 100% 100%, 100% 0)",
+                "polygon(0 0, 0 100% , 42px 100% ,  58px 100%, 74px 100%, 100% 100%, 100% 0)",
               overflow: "hidden",
             }}
           >
@@ -189,10 +221,12 @@ export const Drawer: React.FC<{ open: boolean }> = (props) => {
                 height: "16px",
                 clipPath:
                   props.open && previousState === props.open
-                    ? `polygon(0 0, 0 100% , 20px 100% ,  36px 0, 52px 100%, 100% 100%, 100% 0)`
+                    ? // ? `polygon(0 0, 0 100% , 20px 100% ,  36px 0, 52px 100%, 100% 100%, 100% 0)`
+                      `polygon(0 0, 0 100% , 42px 100% ,  58px 0, 74px 100%, 100% 100%, 100% 0)`
                     : arrowHeight.to(
                         (h) =>
-                          `polygon(0 0, 0 ${h}% , 20px ${h}% ,  36px 0, 52px ${h}%, 100% ${h}%, 100% 0)`
+                          // `polygon(0 0, 0 ${h}% , 20px ${h}% ,  36px 0, 52px ${h}%, 100% ${h}%, 100% 0)`
+                          `polygon(0 0, 0 ${h}% , 42px ${h}% ,  58px 0, 74px ${h}%, 100% ${h}%, 100% 0)`
                       ),
               }}
             />
