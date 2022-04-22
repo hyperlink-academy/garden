@@ -27,7 +27,6 @@ import { useRouter } from "next/router";
 
 export const DeckList = () => {
   let decks = useIndex.aev("deck").sort(sortByPosition("aev"));
-  // let rep = useContext(ReplicacheContext);
   let { authorized, mutate } = useMutations();
   let [newDeckName, setNewDeckName] = useState("");
   let [toggleAll, setToggleAll] = useState<boolean | undefined>(undefined);
@@ -36,7 +35,7 @@ export const DeckList = () => {
       <div className="pb-8">
         <div className="flex flex-col sm:flex-row justify-between">
           <div className="flex">
-            {authorized ? (
+            {!authorized ? null : (
               <>
                 <input
                   className="mr-2"
@@ -59,8 +58,6 @@ export const DeckList = () => {
                   }}
                 />
               </>
-            ) : (
-              ""
             )}
           </div>
 
@@ -83,7 +80,6 @@ let openStates: { [key: string]: boolean | undefined } = {};
 
 const Deck = (props: { entity: string; toggleAll: boolean | undefined }) => {
   let title = useIndex.eav(props.entity, "card/title");
-  // let rep = useContext(ReplicacheContext);
   let { authorized, mutate } = useMutations();
   let description = useIndex.eav(props.entity, "card/content");
   let cards = useIndex.eav(props.entity, "deck/contains");
@@ -100,7 +96,6 @@ const Deck = (props: { entity: string; toggleAll: boolean | undefined }) => {
   }, [props.toggleAll]);
   const { rot1, rot2, xyz1, xyz2, xyzempty1, xyzempty2 } = useSpring({
     config: { mass: 0.1, tension: 500, friction: 25 },
-    // from: { rot1: 3, rot2: 6 },
     to: {
       rot1: drawerOpen ? -6 : 3,
       rot2: drawerOpen ? 12 : 6,
@@ -116,7 +111,7 @@ const Deck = (props: { entity: string; toggleAll: boolean | undefined }) => {
       <Disclosure>
         <div className="flex pb-2 justify-between">
           <div className="flex">
-            <div className="pr-8 z-[99]">
+            <div className="pr-8 z-[9]">
               <div className="rounded-lg w-[64px] h-[110px] relative bg-white">
                 <span className="text-grey-35 text-2xl font-bold italic absolute top-9 right-6 z-[1]">
                   {cardsCount}
@@ -174,7 +169,7 @@ const Deck = (props: { entity: string; toggleAll: boolean | undefined }) => {
               {description?.value}
             </div>
           </div>
-          {authorized ? (
+          {!authorized ? null : (
             <div className="pl-2">
               <span className="text-accent-blue text-sm font-bold">
                 <Link
@@ -186,12 +181,16 @@ const Deck = (props: { entity: string; toggleAll: boolean | undefined }) => {
                 </Link>
               </span>
             </div>
-          ) : (
-            ""
           )}
         </div>
         <Drawer open={!!drawerOpen}>
-          {authorized ? (
+          {!authorized ? (
+            cardsCount > 0 ? (
+              <div className="-mb-6"></div>
+            ) : (
+              <div className="italic">no cards!</div>
+            )
+          ) : (
             <>
               <ButtonSecondary
                 onClick={() => setFindOpen(true)}
@@ -231,10 +230,6 @@ const Deck = (props: { entity: string; toggleAll: boolean | undefined }) => {
                 selected={cards?.map((c) => c.value.value) || []}
               />
             </>
-          ) : cardsCount > 0 ? (
-            <div className="-mb-6"></div>
-          ) : (
-            <div className="italic">no cards!</div>
           )}
           <SmallCardList
             attribute="deck/contains"
