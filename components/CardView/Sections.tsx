@@ -1,7 +1,7 @@
 import { Menu, Transition } from "@headlessui/react";
 import Textarea from "components/AutosizeTextArea";
 import { ButtonPrimary } from "components/Buttons";
-import { SmallCardList } from "components/DeckList";
+import { SmallCardList } from "components/SmallCardList";
 import { FindOrCreateCard } from "components/FindOrCreateEntity";
 import {
   Close,
