@@ -1,7 +1,6 @@
 import { Combobox, Dialog, Transition } from "@headlessui/react";
 import { useIndex } from "hooks/useReplicache";
 import { useState } from "react";
-import { parentPort } from "worker_threads";
 import { ButtonLink } from "./Buttons";
 import { Add, Card, Checkmark, DeckSmall } from "./Icons";
 
@@ -57,6 +56,9 @@ export const FindOrCreate = (props: {
               value={input}
               className="mx-3 mt-4"
               placeholder="find or create cards..."
+              onKeyDown={(e: React.KeyboardEvent) => {
+                if (e.key === "Escape") props.onClose();
+              }}
               onChange={(e) => setInput(e.currentTarget.value)}
             />
 
