@@ -174,17 +174,21 @@ const Deck = (props: { entity: string; toggleAll: boolean | undefined }) => {
               {description?.value}
             </div>
           </div>
-          <div className="pl-2">
-            <span className="text-accent-blue text-sm font-bold">
-              <Link
-                href={`/s/${router.query.studio}/s/${router.query.space}/c/${props.entity}`}
-              >
-                <a>
-                  <ButtonLink icon={<Settings />} content="" />
-                </a>
-              </Link>
-            </span>
-          </div>
+          {authorized ? (
+            <div className="pl-2">
+              <span className="text-accent-blue text-sm font-bold">
+                <Link
+                  href={`/s/${router.query.studio}/s/${router.query.space}/c/${props.entity}`}
+                >
+                  <a>
+                    <ButtonLink icon={<Settings />} content="" />
+                  </a>
+                </Link>
+              </span>
+            </div>
+          ) : (
+            ""
+          )}
         </div>
         <Drawer open={!!drawerOpen}>
           {authorized ? (
