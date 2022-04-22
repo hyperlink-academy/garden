@@ -89,6 +89,18 @@ const Deck = (props: { entity: string; toggleAll: boolean | undefined }) => {
   useEffect(() => {
     if (props.toggleAll !== undefined) setDrawerOpen(props.toggleAll);
   }, [props.toggleAll]);
+  const { rot1, rot2, xyz1, xyz2, xyzempty1, xyzempty2 } = useSpring({
+    config: { mass: 0.1, tension: 500, friction: 25 },
+    // from: { rot1: 3, rot2: 6 },
+    to: {
+      rot1: drawerOpen ? -6 : 3,
+      rot2: drawerOpen ? 12 : 6,
+      xyz1: drawerOpen ? [-16, -4, 0] : [0, 0, 0],
+      xyz2: drawerOpen ? [2, 8, 0] : [0, 0, 0],
+      xyzempty1: drawerOpen ? [4, -2, 0] : [0, 0, 0],
+      xyzempty2: drawerOpen ? [8, -4, 0] : [0, 0, 0],
+    },
+  });
 
   return (
     <div className="pb-8">
@@ -103,13 +115,47 @@ const Deck = (props: { entity: string; toggleAll: boolean | undefined }) => {
                 <div className="border rounded-lg w-[64px] h-[110px] absolute bg-white"></div>
                 {cardsCount > 0 ? (
                   <>
-                    <div className="border rounded-lg w-[64px] h-[110px] absolute bg-white bottom-1 left-1 -z-[2] rotate-1"></div>
-                    <div className="border rounded-lg w-[64px] h-[110px] absolute bg-white bottom-2 left-2 -z-[3] rotate-2"></div>
+                    <animated.div
+                      style={{
+                        rotate: rot1,
+                        transform: xyz1.to(
+                          (x: any, y: any, z: any) =>
+                            `translate3d(${x}px, ${y}px, ${z}px)`
+                        ),
+                      }}
+                      className="border rounded-lg w-[64px] h-[110px] absolute bg-white bottom-1 left-1 -z-[2]"
+                    ></animated.div>
+                    <animated.div
+                      style={{
+                        rotate: rot2,
+                        transform: xyz2.to(
+                          (x: any, y: any, z: any) =>
+                            `translate3d(${x}px, ${y}px, ${z}px)`
+                        ),
+                      }}
+                      className="border rounded-lg w-[64px] h-[110px] absolute bg-white bottom-2 left-2 -z-[3]"
+                    ></animated.div>
                   </>
                 ) : (
                   <>
-                    <div className="border border-dotted rounded-lg w-[64px] h-[110px] absolute bg-background bottom-1 left-1 -z-[2]"></div>
-                    <div className="border border-dotted rounded-lg w-[64px] h-[110px] absolute bg-background bottom-2 left-2 -z-[3]"></div>
+                    <animated.div
+                      style={{
+                        transform: xyzempty1.to(
+                          (x: any, y: any, z: any) =>
+                            `translate3d(${x}px, ${y}px, ${z}px)`
+                        ),
+                      }}
+                      className="border border-dotted rounded-lg w-[64px] h-[110px] absolute bg-background bottom-1 left-1 -z-[2]"
+                    ></animated.div>
+                    <animated.div
+                      style={{
+                        transform: xyzempty2.to(
+                          (x: any, y: any, z: any) =>
+                            `translate3d(${x}px, ${y}px, ${z}px)`
+                        ),
+                      }}
+                      className="border border-dotted rounded-lg w-[64px] h-[110px] absolute bg-background bottom-2 left-2 -z-[3]"
+                    ></animated.div>
                   </>
                 )}
               </div>
