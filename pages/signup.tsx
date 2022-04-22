@@ -2,20 +2,25 @@ import { workerAPI } from "backend/lib/api";
 import { ButtonPrimary } from "components/Buttons";
 import { FloatingContainer } from "components/Layout";
 import { useRouter } from "next/router";
-import { ReactChild, useState } from "react";
+import { ReactChild, useEffect, useState } from "react";
 import useSWR from "swr";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export default function SignupPage() {
   let router = useRouter();
+  let [status, setStatus] = useState<
+    "normal" | "invalidUsernameOrEmail" | "invalidToken"
+  >("normal");
   let [data, setData] = useState({
     username: "",
     password: "",
     email: "",
-    confirmPassword: "",
   });
+  useEffect(() => {
+    setStatus("normal");
+  }, [data]);
   const code = router.query.signupCode as string | undefined;
-  let { data: signup_token } = useSWR(code, async (c) => {
+  let { data: signup_token } = useSWR(code || "", async (c) => {
     if (!code) return { success: false } as const;
     let data = await workerAPI(WORKER_URL, "get_signup_token", { code: c });
     return data;
@@ -23,15 +28,17 @@ export default function SignupPage() {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!code) return;
-    await workerAPI(WORKER_URL, "signup", {
+    let res = await workerAPI(WORKER_URL, "signup", {
       code: code,
       email: data.email,
       password: data.password,
       username: data.username,
     });
+    if (res.success) return router.push("/login");
+    setStatus(res.error);
   };
 
-  if (!signup_token)
+  if (!signup_token?.success)
     return (
       <div>
         <h2 className="pb-2">
@@ -49,7 +56,6 @@ export default function SignupPage() {
         </p>
       </div>
     );
-  if (!signup_token.success) return "loading…";
   return (
     <div className="grid grid-rows-max gap-8 mx-auto max-w-md">
       <div className="grid grid-auto-rows gap-2">
@@ -70,6 +76,15 @@ export default function SignupPage() {
         </FloatingContainer>
       ) : null}
       <form onSubmit={onSubmit} className="grid gap-4 w-full">
+        {status === "normal" ? null : (
+          <div className="text-accent-red">
+            {status === "invalidToken" ? (
+              <span> Your invite code is invalid</span>
+            ) : (
+              <span> That username or email is taken</span>
+            )}
+          </div>
+        )}
         <label className="grid grid-flow-rows gap-2 font-bold">
           Username
           <input
