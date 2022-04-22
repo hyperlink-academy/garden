@@ -46,6 +46,7 @@ const MessageInput = () => {
             if (e.shiftKey) {
               return;
             }
+            e.preventDefault();
             if (!authorized || !session.session || !message) return;
             mutate("postMessage", {
               id: ulid(),
