@@ -49,7 +49,7 @@ const CreateSpace = (props: { spaceID: string }) => {
   let auth = useAuth();
   let rep = useContext(ReplicacheContext);
   let { authorized, mutate } = useMutations();
-  return authorized ? null : (
+  return !authorized ? null : (
     <div className="pb-4 flex">
       <input
         className="mr-2"
