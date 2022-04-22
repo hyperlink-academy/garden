@@ -27,7 +27,8 @@ import { useRouter } from "next/router";
 
 export const DeckList = () => {
   let decks = useIndex.aev("deck").sort(sortByPosition("aev"));
-  let rep = useContext(ReplicacheContext);
+  // let rep = useContext(ReplicacheContext);
+  let { authorized, mutate } = useMutations();
   let [newDeckName, setNewDeckName] = useState("");
   let [toggleAll, setToggleAll] = useState<boolean | undefined>(undefined);
   return (
@@ -35,27 +36,34 @@ export const DeckList = () => {
       <div className="pb-8">
         <div className="flex flex-col sm:flex-row justify-between">
           <div className="flex">
-            <input
-              className="mr-2"
-              value={newDeckName}
-              placeholder="new deck"
-              onChange={(e) => setNewDeckName(e.currentTarget.value)}
-            />
-            <ButtonSecondary
-              content="create"
-              onClick={() => {
-                let entity = ulid();
-                rep?.rep.mutate.addDeck({
-                  newEntity: entity,
-                  name: newDeckName,
-                  position: generateKeyBetween(
-                    decks[decks.length]?.positions.aev || null,
-                    null
-                  ),
-                });
-              }}
-            />
+            {authorized ? (
+              <>
+                <input
+                  className="mr-2"
+                  value={newDeckName}
+                  placeholder="new deck"
+                  onChange={(e) => setNewDeckName(e.currentTarget.value)}
+                />
+                <ButtonSecondary
+                  content="create"
+                  onClick={() => {
+                    let entity = ulid();
+                    mutate("addDeck", {
+                      newEntity: entity,
+                      name: newDeckName,
+                      position: generateKeyBetween(
+                        decks[decks.length]?.positions.aev || null,
+                        null
+                      ),
+                    });
+                  }}
+                />
+              </>
+            ) : (
+              ""
+            )}
           </div>
+
           <div className="self-left sm:self-center py-2">
             <ButtonLink
               onClick={() => setToggleAll(!toggleAll)}
@@ -75,7 +83,8 @@ let openStates: { [key: string]: boolean | undefined } = {};
 
 const Deck = (props: { entity: string; toggleAll: boolean | undefined }) => {
   let title = useIndex.eav(props.entity, "card/title");
-  let rep = useContext(ReplicacheContext);
+  // let rep = useContext(ReplicacheContext);
+  let { authorized, mutate } = useMutations();
   let description = useIndex.eav(props.entity, "card/content");
   let cards = useIndex.eav(props.entity, "deck/contains");
   let cardsCount = cards ? cards.length : 0;
@@ -95,8 +104,8 @@ const Deck = (props: { entity: string; toggleAll: boolean | undefined }) => {
     to: {
       rot1: drawerOpen ? -6 : 3,
       rot2: drawerOpen ? 12 : 6,
-      xyz1: drawerOpen ? [-16, -4, 0] : [0, 0, 0],
-      xyz2: drawerOpen ? [2, 8, 0] : [0, 0, 0],
+      xyz1: drawerOpen ? [-8, -8, 0] : [0, 0, 0],
+      xyz2: drawerOpen ? [-2, 10, 0] : [0, 0, 0],
       xyzempty1: drawerOpen ? [4, -2, 0] : [0, 0, 0],
       xyzempty2: drawerOpen ? [8, -4, 0] : [0, 0, 0],
     },
@@ -178,43 +187,51 @@ const Deck = (props: { entity: string; toggleAll: boolean | undefined }) => {
           </div>
         </div>
         <Drawer open={!!drawerOpen}>
-          <ButtonSecondary
-            onClick={() => setFindOpen(true)}
-            icon={<Card />}
-            content="Add cards"
-          />
-          <FindOrCreateCard
-            allowBlank={true}
-            onSelect={async (e) => {
-              let position = generateKeyBetween(
-                lastCard?.positions["eav"] || null,
-                null
-              );
-              if (e.type === "create") {
-                let newEntity = ulid();
-                await rep?.rep.mutate.createCard({
-                  entityID: newEntity,
-                  title: e.name,
-                });
-                await rep?.rep.mutate.addCardToSection({
-                  cardEntity: newEntity,
-                  parent: props.entity,
-                  positions: { eav: position },
-                  section: "deck/contains",
-                });
-                return;
-              }
-              rep?.rep.mutate.addCardToSection({
-                cardEntity: e.entity,
-                parent: props.entity,
-                positions: { eav: position },
-                section: "deck/contains",
-              });
-            }}
-            open={findOpen}
-            onClose={() => setFindOpen(false)}
-            selected={cards?.map((c) => c.value.value) || []}
-          />
+          {authorized ? (
+            <>
+              <ButtonSecondary
+                onClick={() => setFindOpen(true)}
+                icon={<Card />}
+                content="Add cards"
+              />
+              <FindOrCreateCard
+                allowBlank={true}
+                onSelect={async (e) => {
+                  let position = generateKeyBetween(
+                    lastCard?.positions["eav"] || null,
+                    null
+                  );
+                  if (e.type === "create") {
+                    let newEntity = ulid();
+                    await mutate("createCard", {
+                      entityID: newEntity,
+                      title: e.name,
+                    });
+                    await mutate("addCardToSection", {
+                      cardEntity: newEntity,
+                      parent: props.entity,
+                      positions: { eav: position },
+                      section: "deck/contains",
+                    });
+                    return;
+                  }
+                  mutate("addCardToSection", {
+                    cardEntity: e.entity,
+                    parent: props.entity,
+                    positions: { eav: position },
+                    section: "deck/contains",
+                  });
+                }}
+                open={findOpen}
+                onClose={() => setFindOpen(false)}
+                selected={cards?.map((c) => c.value.value) || []}
+              />
+            </>
+          ) : cardsCount > 0 ? (
+            <div className="-mb-6"></div>
+          ) : (
+            <div className="italic">no cards!</div>
+          )}
           <SmallCardList
             attribute="deck/contains"
             positionKey="eav"
