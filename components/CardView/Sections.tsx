@@ -21,7 +21,7 @@ import { ulid } from "src/ulid";
 
 export const Sections = (props: { entityID: string }) => {
   let sections = useIndex.eav(props.entityID, "card/section");
-  return (
+  return !(sections && sections.length > 0) ? null : (
     <div className="grid grid-auto-row gap-6">
       {sections?.map((s) => (
         <Section name={s.value} entityID={props.entityID} key={s.value} />
@@ -62,8 +62,11 @@ const SingleTextSection = (props: {
 }) => {
   let fact = useIndex.eav(props.entityID, singleTextSection(props.section));
   let inputEl = useRef<HTMLTextAreaElement | null>(null);
-  let rep = useContext(ReplicacheContext);
-  return (
+  let { authorized, mutate } = useMutations();
+
+  return !authorized ? (
+    <div className="whitespace-pre-wrap">{(fact?.value as string) || ""}</div>
+  ) : (
     <Textarea
       autoFocus={props.new}
       ref={inputEl}
@@ -72,7 +75,7 @@ const SingleTextSection = (props: {
       onChange={async (e) => {
         let start = e.currentTarget.selectionStart,
           end = e.currentTarget.selectionEnd;
-        await rep?.rep.mutate.assertFact({
+        await mutate("assertFact", {
           entity: props.entityID,
           attribute: singleTextSection(props.section),
           value: e.currentTarget.value,
@@ -94,8 +97,8 @@ const MultipleReferenceSection = (props: {
   let earliestCard = references?.sort(sortByPosition("eav"))[0];
   let [open, setOpen] = useState(false);
   return (
-    <div className="flex flex-col gap-4">
-      {authorized ? (
+    <div className="flex flex-col">
+      {!authorized ? null : (
         <>
           <ButtonPrimary
             onClick={() => setOpen(true)}
@@ -133,19 +136,23 @@ const MultipleReferenceSection = (props: {
             }}
           />
         </>
-      ) : null}
-      <SmallCardList
-        attribute={attribute}
-        cards={references || []}
-        deck={props.entityID}
-        positionKey="eav"
-      />
+      )}
+      <div className="-mt-4">
+        {/* hack to remove extra space*/}
+        <SmallCardList
+          attribute={attribute}
+          cards={references || []}
+          deck={props.entityID}
+          positionKey="eav"
+        />
+      </div>
     </div>
   );
 };
 
 const SectionMoreOptionsMenu = () => {
-  return (
+  let { mutate, authorized } = useMutations();
+  return !authorized ? null : (
     <Menu as="div" className="relative">
       <Menu.Button>
         <MoreOptions />

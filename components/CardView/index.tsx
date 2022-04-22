@@ -4,7 +4,7 @@ import { Menu } from "@headlessui/react";
 import { MoreOptions, Delete, DeckSmall } from "components/Icons";
 import { Divider, MenuContainer, MenuItem } from "components/Layout";
 import Textarea from "components/AutosizeTextArea";
-import { ReplicacheContext, useIndex } from "hooks/useReplicache";
+import { ReplicacheContext, useIndex, useMutations } from "hooks/useReplicache";
 import { Sections } from "./Sections";
 import { AddSection } from "./AddSection";
 import { Backlinks } from "./Backlinks";
@@ -40,10 +40,12 @@ export const CardView = (props: { entityID: string }) => {
 
 const Title = (props: { entityID: string }) => {
   let title = useIndex.eav(props.entityID, "card/title");
-  let rep = useContext(ReplicacheContext);
+  let { authorized, mutate } = useMutations();
 
   let textarea = useRef<HTMLTextAreaElement | null>(null);
-  return (
+  return !authorized ? (
+    <h2>{title ? title?.value : "Untitled"}</h2>
+  ) : (
     <Textarea
       ref={textarea}
       placeholder="Untitled"
@@ -52,7 +54,7 @@ const Title = (props: { entityID: string }) => {
       onChange={async (e) => {
         let start = e.currentTarget.selectionStart,
           end = e.currentTarget.selectionEnd;
-        await rep?.rep.mutate.assertFact({
+        await mutate("assertFact", {
           entity: props.entityID,
           attribute: "card/title",
           value: e.currentTarget.value,
@@ -67,9 +69,11 @@ const Title = (props: { entityID: string }) => {
 const Content = (props: { entityID: string }) => {
   let textarea = useRef<HTMLTextAreaElement | null>(null);
   let content = useIndex.eav(props.entityID, "card/content");
-  let rep = useContext(ReplicacheContext);
+  let { authorized, mutate } = useMutations();
 
-  return (
+  return !authorized ? (
+    <div className="whitespace-pre-wrap">{content?.value || ""}</div>
+  ) : (
     <Textarea
       ref={textarea}
       className="placeholder:italic"
@@ -79,7 +83,7 @@ const Content = (props: { entityID: string }) => {
       onChange={async (e) => {
         let start = e.currentTarget.selectionStart,
           end = e.currentTarget.selectionEnd;
-        await rep?.rep.mutate.assertFact({
+        await mutate("assertFact", {
           entity: props.entityID,
           attribute: "card/content",
           value: e.currentTarget.value,
@@ -92,7 +96,9 @@ const Content = (props: { entityID: string }) => {
 };
 
 const CardMoreOptionsMenu = () => {
-  return (
+  let { authorized, mutate } = useMutations();
+
+  return !authorized ? null : (
     <Menu as="div" className="relative">
       <Menu.Button>
         <MoreOptions />

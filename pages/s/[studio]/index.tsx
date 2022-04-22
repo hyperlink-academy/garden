@@ -3,7 +3,7 @@ import { ButtonSecondary, ButtonLink } from "components/Buttons";
 import { SpaceProvider } from "components/ReplicacheProvider";
 import { SpaceList } from "components/SpacesList";
 import { useAuth } from "hooks/useAuth";
-import { ReplicacheContext, useIndex } from "hooks/useReplicache";
+import { ReplicacheContext, useIndex, useMutations } from "hooks/useReplicache";
 import { useRouter } from "next/router";
 import { useContext, useState } from "react";
 import useSWR from "swr";
@@ -48,8 +48,8 @@ const CreateSpace = (props: { spaceID: string }) => {
   let [name, setName] = useState("");
   let auth = useAuth();
   let rep = useContext(ReplicacheContext);
-  if (!auth.session.loggedIn) return null;
-  return (
+  let { authorized, mutate } = useMutations();
+  return authorized ? null : (
     <div className="pb-4 flex">
       <input
         className="mr-2"

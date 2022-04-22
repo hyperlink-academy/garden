@@ -1,7 +1,7 @@
 import { ButtonPrimary, ButtonTertiary, ButtonLink } from "components/Buttons";
 import { Add, SectionLinkedCard, SectionText } from "components/Icons";
 import { Divider, Modal } from "components/Layout";
-import { ReplicacheContext, useIndex } from "hooks/useReplicache";
+import { ReplicacheContext, useIndex, useMutations } from "hooks/useReplicache";
 import { useContext, useState } from "react";
 import { ulid } from "src/ulid";
 import { Combobox } from "@headlessui/react";
@@ -12,7 +12,7 @@ import { Combobox } from "@headlessui/react";
 
 export const AddSection = (props: { cardEntity: string }) => {
   let [state, setState] = useState<"closed" | "add" | "create">("closed");
-  let rep = useContext(ReplicacheContext);
+  let { authorized, mutate } = useMutations();
   let cardSections = useIndex.eav(props.cardEntity, "card/section");
   let sections = useIndex
     .aev("name")
@@ -21,10 +21,9 @@ export const AddSection = (props: { cardEntity: string }) => {
         f.value.startsWith("section") &&
         !cardSections?.find((c) => f.value === `section/${c.value}`)
     );
-  console.log(sections);
   let types = useIndex.aev("type");
 
-  return (
+  return !authorized ? null : (
     <div className="addSectionButton grid grid-auto-row gap-2 pb-6">
       <Divider />
 
@@ -43,7 +42,7 @@ export const AddSection = (props: { cardEntity: string }) => {
               let name = sections.find((f) => f.entity === s.entity);
               let type = types.find((f) => f.entity === s.entity);
               if (!name || !type) return;
-              await rep?.rep.mutate.addSection({
+              await mutate("addSection", {
                 newSectionEntity: ulid(),
                 sectionName: name.value.slice(8),
                 type: type.value as "reference" | "string",
@@ -71,7 +70,7 @@ export const AddSection = (props: { cardEntity: string }) => {
           <CreateSectionDialog
             onClose={() => setState("closed")}
             onCreate={async (s) => {
-              await rep?.rep.mutate.addSection({
+              await mutate("addSection", {
                 newSectionEntity: ulid(),
                 sectionName: s.name,
                 type: s.type,
