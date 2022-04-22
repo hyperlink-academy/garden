@@ -1,6 +1,7 @@
 import { makeRoute } from "backend/lib/api";
 import { Attribute } from "data/Attributes";
 import { Fact } from "data/Facts";
+import { Message } from "data/Messages";
 import { z } from "zod";
 import { Env } from "..";
 
@@ -24,17 +25,30 @@ export const pullRoute = makeRoute({
       (await env.storage.get<number>(`lastMutationID-${msg.clientID}`)) || 0;
 
     let lastUpdated = msg.cookie?.lastUpdated || "";
-    let map = await env.storage.list<Fact<keyof Attribute>>({
+    let facts = await env.storage.list<Fact<keyof Attribute>>({
       prefix: `ti`,
       start: `ti-${lastUpdated}`,
     });
-    let updates = [...map.values()].filter(
+    let messages = [
+      ...(
+        await env.storage.list<Message>({
+          prefix: `messages`,
+          start: `messages-${lastUpdated}`,
+        })
+      ).values(),
+    ];
+    let updates = [...facts.values()].filter(
       (f) => !lastUpdated || f.lastUpdated > lastUpdated
     );
 
-    let lastKey = updates[updates.length - 1];
+    let newLastUpdated = lastUpdated || Date.now().toString();
+    let lastKey = updates[updates.length - 1]?.lastUpdated;
+    let lastMessage = messages[messages.length - 1]?.ts;
+    if (lastKey && lastKey > newLastUpdated) newLastUpdated = lastKey;
+    if (lastMessage && lastMessage > newLastUpdated)
+      newLastUpdated = lastMessage;
     let newCookie: typeof msg.cookie = {
-      lastUpdated: lastKey?.lastUpdated || lastUpdated || Date.now().toString(),
+      lastUpdated: newLastUpdated,
     };
 
     return {
@@ -42,6 +56,7 @@ export const pullRoute = makeRoute({
         cookie: newCookie,
         lastMutationID,
         data: updates,
+        messages,
       },
     };
   },

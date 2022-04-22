@@ -4,6 +4,7 @@ import { pullRoute } from "backend/SpaceDurableObject/routes/pull";
 import {
   FactWithIndexes,
   makeReplicache,
+  MessageWithIndexes,
   ReplicacheContext,
 } from "hooks/useReplicache";
 import { useEffect, useRef, useState } from "react";
@@ -108,12 +109,19 @@ export const makeSpaceReplicache = ({
           value: FactWithIndexes(fact),
         } as const;
       });
+      let messageOps = result.messages.map((m) => {
+        return {
+          op: "put",
+          key: m.id,
+          value: MessageWithIndexes(m),
+        } as const;
+      });
       return {
         httpRequestInfo: { httpStatusCode: 200, errorMessage: "" },
         response: {
           lastMutationID: result.lastMutationID,
           cookie: result.cookie,
-          patch: ops,
+          patch: [...ops, ...messageOps],
         },
       };
     },

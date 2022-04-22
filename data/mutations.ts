@@ -4,15 +4,11 @@ import {
   generateNKeysBetween,
 } from "src/fractional-indexing";
 import { Attribute } from "./Attributes";
-import {
-  Fact,
-  FactMetadata,
-  multipleReferenceSection,
-  ref,
-  singleTextSection,
-} from "./Facts";
+import { Fact, FactMetadata, ref } from "./Facts";
+import { Message } from "./Messages";
 
 export type MutationContext = {
+  postMessage: (msg: Message) => Promise<{ success: boolean }>;
   assertFact: <A extends keyof Attribute>(
     d: Pick<Fact<A>, "entity" | "attribute" | "value" | "positions">
   ) => Promise<{ success: boolean }>;
@@ -198,6 +194,10 @@ const retractFact: Mutation<{ id: string }> = async (args, ctx) => {
   await ctx.retractFact(args.id);
 };
 
+const postMessage: Mutation<Message> = async (args, ctx) => {
+  await ctx.postMessage(args);
+};
+
 const addSection: Mutation<{
   newSectionEntity: string;
   sectionName: string;
@@ -251,6 +251,7 @@ const addSection: Mutation<{
 };
 
 export const Mutations = {
+  postMessage,
   createCard,
   moveCard,
   addSpace,

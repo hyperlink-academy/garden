@@ -1,5 +1,6 @@
 import { Attribute } from "data/Attributes";
 import { Fact, Schema } from "data/Facts";
+import { Message } from "data/Messages";
 import { CardinalityResult, MutationContext, Mutations } from "data/mutations";
 import {
   FactWithIndexes,
@@ -25,10 +26,12 @@ export const LocalReplicacheProvider: React.FC<{
   defaultFacts: Entity[];
 }> = (props) => {
   let db = useRef<{
+    messages: Message[];
     facts: Fact<keyof Attribute>[];
     lastMutationID: number;
     reset: boolean;
   }>({
+    messages: [],
     facts: [],
     lastMutationID: 0,
     reset: false,
@@ -78,6 +81,9 @@ export const LocalReplicacheProvider: React.FC<{
             lastUpdated: Date.now().toString(),
           };
         }
+      },
+      postMessage: async (d) => {
+        return { success: true };
       },
       assertFact: async (fact) => {
         let newID = ulid();

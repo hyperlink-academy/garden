@@ -1,7 +1,8 @@
 import { Attribute, UniqueAttributes } from "data/Attributes";
 import { Fact, Schema } from "data/Facts";
+import { Message } from "data/Messages";
 import { CardinalityResult, MutationContext, Mutations } from "data/mutations";
-import { createContext, useContext } from "react";
+import { createContext, useContext, useState } from "react";
 import {
   Puller,
   Pusher,
@@ -69,8 +70,22 @@ const getSchema = async (tx: ReadTransaction, attributeName: string) => {
   return schema;
 };
 
+export function MessageWithIndexes(m: Message) {
+  return {
+    ...m,
+    indexes: {
+      messages: `${m.ts}-${m.id}`,
+      eav: "",
+      aev: "",
+      ave: "",
+      vae: "",
+    },
+  };
+}
+
 export function FactWithIndexes<A extends keyof Attribute>(f: Fact<A>) {
-  let indexes: { eav: string; ave?: string; vae?: string; aev: string } = {
+  let indexes = {
+    messages: "",
     eav: `${f.entity}-${f.attribute}-${f.id}`,
     aev: `${f.attribute}-${f.entity}-${f.id}`,
     ave: f.schema.unique ? `${f.attribute}-${f.value}` : "",
@@ -95,6 +110,10 @@ let mutators: ReplicacheMutators = Object.keys(Mutations).reduce((acc, k) => {
       retractFact: async (id) => {
         await tx.del(id);
         return;
+      },
+      postMessage: async (m) => {
+        await tx.put(m.id, MessageWithIndexes(m));
+        return { success: true };
       },
       updateFact: async (id, data) => {
         let existingFact = (await tx.get(id)) as
@@ -148,6 +167,7 @@ export const makeReplicache = (args: {
   rep.createIndex({ name: "aev", jsonPointer: "/indexes/aev" });
   rep.createIndex({ name: "ave", jsonPointer: "/indexes/ave" });
   rep.createIndex({ name: "vae", jsonPointer: "/indexes/vae" });
+  rep.createIndex({ name: "messages", jsonPointer: "/indexes/messages" });
   return rep;
 };
 
@@ -214,6 +234,21 @@ export const useIndex = {
       },
       [],
       [entity, attribute]
+    );
+  },
+  messages() {
+    let rep = useContext(ReplicacheContext);
+    return useSubscribe(
+      rep?.rep,
+      async (tx) => {
+        let messages = await tx
+          .scan({ indexName: "messages" })
+          .values()
+          .toArray();
+        return messages as Message[];
+      },
+      [],
+      []
     );
   },
 };

@@ -63,7 +63,7 @@ export const store = (storage: DurableObjectStorage) => {
             prefix: `ea-${entity}-${attribute}`,
           })
         ).values(),
-      ];
+      ].filter((f) => !f.retracted);
       if (schema?.cardinality === "one")
         return results[0] as CardinalityResult<typeof attribute>;
       return results as CardinalityResult<typeof attribute>;
@@ -71,16 +71,20 @@ export const store = (storage: DurableObjectStorage) => {
     ave: async (attribute, value) => {
       let results = [
         ...(
-          await storage.list({
+          await storage.list<Fact<keyof Attribute>>({
             prefix: `av-${attribute}-${value}`,
           })
         ).values(),
-      ];
+      ].filter((f) => !f.retracted);
       return results[0] as Fact<typeof attribute>;
     },
   };
   let context: MutationContext = {
     scanIndex,
+    postMessage: async (m) => {
+      storage.put(`messages-${m.ts}-${m.id}`, m);
+      return { success: true };
+    },
     updateFact: async (id, data) => {
       let existingFact = await storage.get<Fact<keyof Attribute>>(
         indexes.factID(id)
