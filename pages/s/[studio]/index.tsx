@@ -22,14 +22,11 @@ export default function StudioPage() {
     },
     { revalidateOnFocus: false }
   );
-  let name = useIndex.aev("this/name", "")[0];
+
   if (!id) return <div>loading…</div>;
   if (!id.success) return <div>404 - studio not found!</div>;
   return (
     <SpaceProvider id={id.id}>
-      <Head>
-        <title key="title">{name?.value}</title>
-      </Head>
       <div className="flex justify-between pb-4">
         <StudioName />
         <Logout />
@@ -43,9 +40,14 @@ export default function StudioPage() {
 const StudioName = () => {
   let name = useIndex.aev("this/name", "")[0];
   return (
-    <div>
-      <h2>{name?.value}</h2>
-    </div>
+    <>
+      <Head>
+        <title key="title">Studio: {name?.value}</title>
+      </Head>
+      <div>
+        <h2>Studio: {name?.value}</h2>
+      </div>
+    </>
   );
 };
 
