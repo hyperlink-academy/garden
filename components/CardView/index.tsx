@@ -8,12 +8,18 @@ import { ReplicacheContext, useIndex, useMutations } from "hooks/useReplicache";
 import { Sections } from "./Sections";
 import { AddSection } from "./AddSection";
 import { Backlinks } from "./Backlinks";
+import Head from "next/head";
 
 export const CardView = (props: { entityID: string }) => {
   let isDeck = useIndex.eav(props.entityID, "deck");
+  let title = useIndex.eav(props.entityID, "card/title");
   return (
-    <div
-      className={`
+    <>
+      <Head>
+        <title key="title">{title ? title?.value : "Untitled"}</title>
+      </Head>
+      <div
+        className={`
       overflow-y-auto
       h-full
       px-5 py-6
@@ -21,20 +27,21 @@ export const CardView = (props: { entityID: string }) => {
       shadow-drop
       bg-white
       `}
-    >
-      <div className="grid grid-auto-row gap-6">
-        <div className="grid grid-auto-rows gap-3">
-          <div className="cardHeader grid grid-cols-[auto_min-content] gap-2">
-            <Title entityID={props.entityID} />
-            <CardMoreOptionsMenu />
+      >
+        <div className="grid grid-auto-row gap-6">
+          <div className="grid grid-auto-rows gap-3">
+            <div className="cardHeader grid grid-cols-[auto_min-content] gap-2">
+              <Title entityID={props.entityID} />
+              <CardMoreOptionsMenu />
+            </div>
+            <Content entityID={props.entityID} />
           </div>
-          <Content entityID={props.entityID} />
+          <Sections entityID={props.entityID} />
+          <AddSection cardEntity={props.entityID} />
+          <Backlinks entityID={props.entityID} />
         </div>
-        <Sections entityID={props.entityID} />
-        <AddSection cardEntity={props.entityID} />
-        <Backlinks entityID={props.entityID} />
       </div>
-    </div>
+    </>
   );
 };
 

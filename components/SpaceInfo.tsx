@@ -1,6 +1,7 @@
 import { spaceAPI } from "backend/lib/api";
 import { useAuth } from "hooks/useAuth";
 import { useIndex, useSpaceID } from "hooks/useReplicache";
+import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { ButtonLink } from "./Buttons";
@@ -10,16 +11,21 @@ export const SpaceInfo = () => {
   let spaceName = useIndex.aev("this/name")[0];
 
   return (
-    <div className="spaceInfo grid auto-rows-max gap-3">
-      <div className="spaceNameDescription grid auto-rows-max gap-2">
-        <div className="flex justify-between pb-4">
-          <h1>{spaceName?.value}</h1>
-          <Join />
+    <>
+      <Head>
+        <title key="title">{spaceName?.value}</title>
+      </Head>
+      <div className="spaceInfo grid auto-rows-max gap-3">
+        <div className="spaceNameDescription grid auto-rows-max gap-2">
+          <div className="flex justify-between pb-4">
+            <h1>{spaceName?.value}</h1>
+            <Join />
+          </div>
+          <Description entity={spaceName?.entity} />
         </div>
-        <Description entity={spaceName?.entity} />
+        <Members />
       </div>
-      <Members />
-    </div>
+    </>
   );
 };
 

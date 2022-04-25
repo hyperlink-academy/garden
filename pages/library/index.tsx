@@ -16,6 +16,7 @@ import { Menu, Switch } from "@headlessui/react";
 import { AuthContext } from "hooks/useAuth";
 import { MenuIcon } from "components/Icons";
 import { MenuContainer, MenuItem } from "components/Layout";
+import Head from "next/head";
 
 export type Props = InferGetStaticPropsType<typeof getStaticProps>;
 
@@ -83,6 +84,9 @@ export const ComponentViewer: React.FC<{
         defaultAttributes={story ? props.stories[story].attributes || {} : {}}
         defaultFacts={story ? props.stories[story].entities : []}
       >
+        <Head>
+          <title key="title">Hyperlink Component Library</title>
+        </Head>
         <div style={{ maxWidth: "48rem", margin: "auto" }}>
           <div className="flex gap-4 justify-between pt-6 pb-4 text-accent-blue px-5">
             <PageSidebar pages={props.components} />

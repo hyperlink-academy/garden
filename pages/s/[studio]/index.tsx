@@ -4,6 +4,7 @@ import { SpaceProvider } from "components/ReplicacheProvider";
 import { SpaceList } from "components/SpacesList";
 import { useAuth } from "hooks/useAuth";
 import { ReplicacheContext, useIndex, useMutations } from "hooks/useReplicache";
+import Head from "next/head";
 import { useRouter } from "next/router";
 import { useContext, useState } from "react";
 import useSWR from "swr";
@@ -21,10 +22,14 @@ export default function StudioPage() {
     },
     { revalidateOnFocus: false }
   );
+  let name = useIndex.aev("this/name", "")[0];
   if (!id) return <div>loading…</div>;
   if (!id.success) return <div>404 - studio not found!</div>;
   return (
     <SpaceProvider id={id.id}>
+      <Head>
+        <title key="title">{name?.value}</title>
+      </Head>
       <div className="flex justify-between pb-4">
         <StudioName />
         <Logout />

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { SpaceSpaceProvider } from "components/ReplicacheProvider";
 import { SpaceLayout } from "components/SpaceLayout";
+import Head from "next/head";
 
 export default function App({ Component, pageProps }: AppProps) {
   let router = useRouter();
@@ -37,8 +38,13 @@ export default function App({ Component, pageProps }: AppProps) {
 const Layout: React.FC = (props) => {
   let { session } = useAuth();
   return (
-    <div style={{ maxWidth: "48rem", margin: "auto", padding: "1rem" }}>
-      {props.children}
-    </div>
+    <>
+      <Head>
+        <title key="title">Hyperlink Garden</title>
+      </Head>
+      <div style={{ maxWidth: "48rem", margin: "auto", padding: "1rem" }}>
+        {props.children}
+      </div>
+    </>
   );
 };
