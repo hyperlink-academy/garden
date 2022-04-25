@@ -91,7 +91,9 @@ const Deck = (props: { entity: string; toggleAll: boolean | undefined }) => {
           <DeckImage count={cardsCount} open={!!drawerOpen} />
           <div
             className="pb-2 w-full"
-            onClick={() => setDrawerOpen(!drawerOpen)}
+            onClick={(e) => {
+              setDrawerOpen(!drawerOpen);
+            }}
           >
             <h3 className="text-grey-35 text-xl">{title?.value}</h3>
             {description?.value}
@@ -123,32 +125,10 @@ const Deck = (props: { entity: string; toggleAll: boolean | undefined }) => {
             />
             <FindOrCreateCard
               allowBlank={true}
-              onSelect={async (e) => {
-                let position = generateKeyBetween(
-                  lastCard?.positions["eav"] || null,
-                  null
-                );
-                if (e.type === "create") {
-                  let newEntity = ulid();
-                  await mutate("createCard", {
-                    entityID: newEntity,
-                    title: e.name,
-                  });
-                  await mutate("addCardToSection", {
-                    cardEntity: newEntity,
-                    parent: props.entity,
-                    positions: { eav: position },
-                    section: "deck/contains",
-                  });
-                  return;
-                }
-                mutate("addCardToSection", {
-                  cardEntity: e.entity,
-                  parent: props.entity,
-                  positions: { eav: position },
-                  section: "deck/contains",
-                });
-              }}
+              entity={props.entity}
+              positionKey="eav"
+              lastPosition={lastCard?.positions["eav"]}
+              section="deck/contains"
               open={findOpen}
               onClose={() => setFindOpen(false)}
               selected={cards?.map((c) => c.value.value) || []}

@@ -1,6 +1,8 @@
 import { Combobox, Dialog, Transition } from "@headlessui/react";
-import { useIndex } from "hooks/useReplicache";
+import { useIndex, useMutations } from "hooks/useReplicache";
 import { useState } from "react";
+import { generateKeyBetween } from "src/fractional-indexing";
+import { ulid } from "src/ulid";
 import { ButtonLink } from "./Buttons";
 import { Add, Card, Checkmark, DeckSmall } from "./Icons";
 
@@ -132,14 +134,16 @@ export const FindOrCreate = (props: {
 };
 
 export const FindOrCreateCard = (props: {
+  entity: string;
+  section: string;
+  positionKey: string;
   open: boolean;
   allowBlank: boolean;
   onClose: () => void;
   selected: string[];
-  onSelect: (
-    id: { entity: string; type: "existing" } | { name: string; type: "create" }
-  ) => void;
+  lastPosition?: string;
 }) => {
+  let { mutate } = useMutations();
   let decks = useIndex.aev("deck");
   let titles = useIndex.aev("card/title");
   let items = titles.map((t) => {
@@ -161,7 +165,27 @@ export const FindOrCreateCard = (props: {
       open={props.open}
       items={items}
       selected={props.selected}
-      onSelect={props.onSelect}
+      onSelect={async (e) => {
+        let position = generateKeyBetween(props.lastPosition || null, null);
+        let entity;
+
+        if (e.type === "create") {
+          entity = ulid();
+          await mutate("createCard", {
+            entityID: entity,
+            title: e.name,
+          });
+        } else {
+          entity = e.entity;
+        }
+
+        mutate("addCardToSection", {
+          cardEntity: entity,
+          parent: props.entity,
+          positions: { [props.positionKey]: position },
+          section: props.section,
+        });
+      }}
     />
   );
 };

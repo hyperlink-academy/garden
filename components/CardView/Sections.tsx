@@ -13,8 +13,8 @@ import {
 } from "components/Icons";
 import { MenuContainer, MenuItem } from "components/Layout";
 import { multipleReferenceSection, singleTextSection } from "data/Facts";
-import { ReplicacheContext, useIndex, useMutations } from "hooks/useReplicache";
-import { Fragment, useContext, useRef, useState } from "react";
+import { useIndex, useMutations } from "hooks/useReplicache";
+import { useRef, useState } from "react";
 import { generateKeyBetween } from "src/fractional-indexing";
 import { sortByPosition } from "src/position_helpers";
 import { ulid } from "src/ulid";
@@ -93,8 +93,10 @@ const MultipleReferenceSection = (props: {
 }) => {
   let attribute = multipleReferenceSection(props.section);
   let references = useIndex.eav(props.entityID, attribute);
-  let { mutate, authorized } = useMutations();
-  let earliestCard = references?.sort(sortByPosition("eav"))[0];
+  let { authorized } = useMutations();
+  let earliestCard = references?.sort(sortByPosition("eav"))[
+    references.length - 1
+  ];
   let [open, setOpen] = useState(false);
   return (
     <div className="flex flex-col">
@@ -105,35 +107,14 @@ const MultipleReferenceSection = (props: {
             content="search to add cards"
           />
           <FindOrCreateCard
+            entity={props.entityID}
+            positionKey="eav"
+            section={attribute}
+            lastPosition={earliestCard?.positions["eav"]}
             open={open}
             allowBlank={true}
             onClose={() => setOpen(false)}
             selected={references?.map((c) => c.value.value) || []}
-            onSelect={async (e) => {
-              let position = generateKeyBetween(
-                null,
-                earliestCard?.positions["eav"] || null
-              );
-              let entity;
-
-              if (e.type === "create") {
-                entity = ulid();
-                await mutate("createCard", {
-                  entityID: entity,
-                  title: e.name,
-                });
-              } else {
-                entity = e.entity;
-              }
-
-              mutate("addCardToSection", {
-                cardEntity: entity,
-                parent: props.entityID,
-                positions: { eav: position },
-                section: attribute,
-              });
-              //TODO
-            }}
           />
         </>
       )}
