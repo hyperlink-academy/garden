@@ -1,10 +1,13 @@
+import { Disclosure } from "@headlessui/react";
 import { spaceAPI } from "backend/lib/api";
 import { useAuth } from "hooks/useAuth";
 import { useIndex, useSpaceID } from "hooks/useReplicache";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useState } from "react";
 import { ButtonLink } from "./Buttons";
+import { Drawer } from "./DeckList";
 import { Member } from "./Icons";
 
 export const SpaceInfo = () => {
@@ -37,11 +40,31 @@ const Description = (props: { entity: string }) => {
 const Members = () => {
   let members = useIndex.aev("space/member");
 
+  let [toggle, setToggle] = useState<boolean | undefined>(undefined);
+
   return (
-    <button className="membersList grid grid-cols-[max-content_max-content] gap-2 items-center font-bold">
-      <Member />
-      <p>Members ({members.length})</p>
-    </button>
+    <div className="pb-4">
+      <Disclosure>
+        <button
+          className="membersList grid grid-cols-[max-content_max-content] gap-2 items-center font-bold"
+          onClick={() => setToggle(!toggle)}
+        >
+          <Member />
+          <p>Members ({members.length})</p>
+        </button>
+
+        <Drawer open={!!toggle}>
+          <div>member list</div>
+          <ul>
+            {members.map((m) => (
+              <li className="" key={m.entity}>
+                {m.entity}
+              </li>
+            ))}
+          </ul>
+        </Drawer>
+      </Disclosure>
+    </div>
   );
 };
 

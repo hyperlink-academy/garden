@@ -97,8 +97,8 @@ const Deck = (props: { entity: string; toggleAll: boolean | undefined }) => {
         <div className="flex gap-10 w-full">
           <DeckImage count={cardsCount} open={!!drawerOpen} />
           <div
-            className="pb-2 w-full"
-            onClick={() => {
+            className="pb-2 w-full cursor-pointer"
+            onClick={(e) => {
               setDrawerOpen(!drawerOpen);
             }}
           >
@@ -166,7 +166,7 @@ const DeckImage = (props: { count: number; open: boolean }) => {
 
   return (
     <div className="pr-8 z-0 w-[64px] h-[110px] relative">
-      <span className="text-grey-35 text-2xl font-bold italic absolute top-9 right-6 z-[1]">
+      <span className="text-accent-red text-lg font-bold italic absolute bottom-2 right-2 z-[1]">
         {props.count}
       </span>
       <div className="border rounded-lg w-[64px] h-[110px] absolute bg-white">

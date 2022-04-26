@@ -30,8 +30,9 @@ module.exports = {
       white: "#FFFFFF",
 
       //ACCENT COLORS
-      "accent-blue": "#0000FF",
-      "accent-red": "#DC143C",
+      "accent-blue": "#0000FF", //blue
+      "accent-red": "#DC143C", //crimson
+      "accent-gold": "#FFD700", //gold
 
       //BG COLORS
       "bg-blue": "#F0F7FA",
