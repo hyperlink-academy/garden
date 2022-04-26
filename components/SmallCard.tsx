@@ -1,38 +1,71 @@
-import { useDraggable } from "@dnd-kit/core";
+import { DraggableAttributes, useDraggable } from "@dnd-kit/core";
+import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
 import { useSortable } from "@dnd-kit/sortable";
 import { useIndex } from "hooks/useReplicache";
 import Link from "next/link";
 import { Gripper } from "./Gripper";
 import { Close } from "./Icons";
 
-export function SmallCard(props: {
+type Props = {
   href: string;
   entityID: string;
-  id: string;
   draggable?: boolean;
   onDelete?: () => void;
-}) {
-  let { setNodeRef, attributes, listeners, transform, transition } =
+};
+
+export function SmallCard(
+  props: {
+    id: string;
+    index: number;
+    parent: string;
+    section: string;
+  } & Props
+) {
+  let { setNodeRef, attributes, listeners, transform, transition, isDragging } =
     useSortable({
       disabled: !props.draggable,
       id: props.id,
+      data: {
+        entityID: props.entityID,
+        index: props.index,
+        parent: props.parent,
+        section: props.section,
+      },
     });
-  let title = useIndex.eav(props.entityID, "card/title");
-  let content = useIndex.eav(props.entityID, "card/content");
-
   const style = transform
     ? {
-        zIndex: 100,
         transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
         transition,
       }
     : undefined;
 
   return (
+    <div style={style} ref={setNodeRef}>
+      {isDragging ? (
+        <div className="border-[1] border-grey-80 shadow-drop rounded-md p-2 pl-1 w-[151px] h-24 overflow-hidden bg-white flex flex-row gap-2 relative" />
+      ) : (
+        <BaseSmallCard
+          listeners={listeners}
+          attributes={attributes}
+          {...props}
+        />
+      )}
+    </div>
+  );
+}
+
+export const BaseSmallCard = (
+  props: {
+    entityID: string;
+    attributes?: DraggableAttributes;
+    listeners?: SyntheticListenerMap;
+  } & Props
+) => {
+  let title = useIndex.eav(props.entityID, "card/title");
+  let content = useIndex.eav(props.entityID, "card/content");
+  return (
     <div
       className={`min-w-36 max-w-[151px] touch-manipulation relative origin-center`}
-      style={style}
-      ref={setNodeRef}
     >
       {!!props.onDelete ? (
         <button onClick={props.onDelete}>
@@ -43,8 +76,8 @@ export function SmallCard(props: {
       <div className="border-[1] border-grey-80 shadow-drop rounded-md p-2 pl-1 w-[151px] h-24 overflow-hidden bg-white flex flex-row gap-2 relative">
         {!!props.draggable ? (
           <Gripper
-            {...attributes}
-            {...listeners}
+            {...props.attributes}
+            {...props.listeners}
             className="touch-manipulation"
           />
         ) : (
@@ -69,4 +102,4 @@ export function SmallCard(props: {
       </div>
     </div>
   );
-}
+};

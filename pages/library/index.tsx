@@ -17,6 +17,7 @@ import { AuthContext } from "hooks/useAuth";
 import { MenuIcon } from "components/Icons";
 import { MenuContainer, MenuItem } from "components/Layout";
 import Head from "next/head";
+import { SmallCardDragContext } from "components/DragContext";
 
 export type Props = InferGetStaticPropsType<typeof getStaticProps>;
 
@@ -87,6 +88,7 @@ export const ComponentViewer: React.FC<{
         <Head>
           <title key="title">Hyperlink Component Library</title>
         </Head>
+        <SmallCardDragContext>
         <div style={{ maxWidth: "48rem", margin: "auto" }}>
           <div className="flex gap-4 justify-between pt-6 pb-4 text-accent-blue px-5">
             <PageSidebar pages={props.components} />
@@ -96,11 +98,11 @@ export const ComponentViewer: React.FC<{
                 authState={authState}
                 setAuthState={setAuthState}
               />
+              </div>
             </div>
-          </div>
-          <div className="grid auto-rows-max gap-6 m-5">
-            <div
-              className={`
+            <div className="grid auto-rows-max gap-6 m-5">
+              <div
+                className={`
               ComponentViewPort
               grid auto-rows-max gap-6
               ${
@@ -109,18 +111,19 @@ export const ComponentViewer: React.FC<{
                   : "bg-background"
               } 
             `}
-            >
-              <StoryPicker
-                story={story}
-                stories={Object.keys(props.stories)}
-                setStory={setStory}
-              />
-              {props.children}
+              >
+                <StoryPicker
+                  story={story}
+                  stories={Object.keys(props.stories)}
+                  setStory={setStory}
+                />
+                {props.children}
+              </div>
+              <AllFacts />
             </div>
-            <AllFacts />
           </div>
-        </div>
-        {/* WRAPPER - CLOSE */}
+          {/* WRAPPER - CLOSE */}
+        </SmallCardDragContext>
       </LocalReplicacheProvider>
     </AuthContext.Provider>
   );

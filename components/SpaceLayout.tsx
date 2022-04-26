@@ -5,6 +5,7 @@ import { ChatBubble, Studio, Information, DeckLarge } from "./Icons";
 import { ButtonLink, ButtonPrimary, ButtonTertiary } from "./Buttons";
 import { useEffect, useState } from "react";
 import { Modal } from "components/Layout";
+import { SmallCardDragContext } from "./DragContext";
 
 export const SpaceLayout: React.FC = (props) => {
   return (
@@ -20,7 +21,7 @@ export const SpaceLayout: React.FC = (props) => {
       }}
     >
       <div className="h-full border-grey-15 pt-4 px-4 overflow-auto">
-        {props.children}
+        <SmallCardDragContext>{props.children}</SmallCardDragContext>
       </div>
       <Footer />
     </div>
