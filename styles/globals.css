@@ -115,6 +115,11 @@ input {
   @apply opacity-70;
 }
 
+.lightBorder {
+  @apply border;
+  @apply border-grey-80;
+  @apply rounded-md;
+}
 /* END GLOBAL STYLING */
 
 * {
