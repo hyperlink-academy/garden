@@ -11,8 +11,6 @@ export const SpaceLayout: React.FC = (props) => {
   return (
     <div
       style={{
-        maxWidth: "48rem",
-        margin: "auto",
         height: "100%",
         display: "flex",
         flexDirection: "column",
@@ -20,8 +18,16 @@ export const SpaceLayout: React.FC = (props) => {
         position: "relative",
       }}
     >
-      <div className="h-full border-grey-15 pt-4 px-4 overflow-auto">
-        <SmallCardDragContext>{props.children}</SmallCardDragContext>
+      <div className="h-full pt-4 px-4 overflow-auto">
+        <div
+          style={{
+            height: "100%",
+            margin: "auto",
+            maxWidth: "48rem",
+          }}
+        >
+          <SmallCardDragContext>{props.children}</SmallCardDragContext>
+        </div>
       </div>
       <Footer />
     </div>
@@ -38,7 +44,8 @@ export function Footer() {
     <div
       style={{
         width: "100%",
-        maxWidth: "100vw",
+        margin: "auto",
+        maxWidth: "48rem",
       }}
       className={`
         grid grid-cols-[1fr,1fr,1fr] gap-1 items-center
