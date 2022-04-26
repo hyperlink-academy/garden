@@ -16,39 +16,12 @@ import { SmallCardList } from "./SmallCardList";
 
 export const DeckList = () => {
   let decks = useIndex.aev("deck").sort(sortByPosition("aev"));
-  let { authorized, mutate } = useMutations();
-  let [newDeckName, setNewDeckName] = useState("");
   let [toggleAll, setToggleAll] = useState<boolean | undefined>(undefined);
+
   return (
     <div>
       <div className="pb-8 flex flex-col sm:flex-row justify-between">
-        <div className="flex">
-          {!authorized ? null : (
-            <>
-              <input
-                className="mr-2"
-                value={newDeckName}
-                placeholder="new deck"
-                onChange={(e) => setNewDeckName(e.currentTarget.value)}
-              />
-              <ButtonSecondary
-                content="create"
-                onClick={() => {
-                  let entity = ulid();
-                  mutate("addDeck", {
-                    newEntity: entity,
-                    name: newDeckName,
-                    position: generateKeyBetween(
-                      decks[decks.length]?.positions.aev || null,
-                      null
-                    ),
-                  });
-                }}
-              />
-            </>
-          )}
-        </div>
-
+        <CreateDeck lastDeckPosition={decks[decks.length - 1]?.positions.aev} />
         <div className="self-left sm:self-center py-2">
           <ButtonLink
             onClick={() => setToggleAll(!toggleAll)}
@@ -56,9 +29,43 @@ export const DeckList = () => {
           />
         </div>
       </div>
+
       {decks.map((d) => (
         <Deck entity={d.entity} toggleAll={toggleAll} key={d.entity} />
       ))}
+    </div>
+  );
+};
+
+const CreateDeck = (props: { lastDeckPosition?: string }) => {
+  let { authorized, mutate } = useMutations();
+  let [newDeckName, setNewDeckName] = useState("");
+  return (
+    <div className="flex">
+      {!authorized ? null : (
+        <>
+          <input
+            className="mr-2"
+            value={newDeckName}
+            placeholder="new deck"
+            onChange={(e) => setNewDeckName(e.currentTarget.value)}
+          />
+          <ButtonSecondary
+            content="create"
+            onClick={() => {
+              let entity = ulid();
+              mutate("addDeck", {
+                newEntity: entity,
+                name: newDeckName,
+                position: generateKeyBetween(
+                  props.lastDeckPosition || null,
+                  null
+                ),
+              });
+            }}
+          />
+        </>
+      )}
     </div>
   );
 };
@@ -91,7 +98,7 @@ const Deck = (props: { entity: string; toggleAll: boolean | undefined }) => {
           <DeckImage count={cardsCount} open={!!drawerOpen} />
           <div
             className="pb-2 w-full"
-            onClick={(e) => {
+            onClick={() => {
               setDrawerOpen(!drawerOpen);
             }}
           >
