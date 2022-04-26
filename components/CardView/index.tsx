@@ -9,16 +9,19 @@ import { MultipleReferenceSection, Sections } from "./Sections";
 import { AddSection } from "./AddSection";
 import { Backlinks } from "./Backlinks";
 import Head from "next/head";
+import { usePreserveScroll } from "hooks/utils";
 
 export const CardView = (props: { entityID: string }) => {
   let isDeck = useIndex.eav(props.entityID, "deck");
   let title = useIndex.eav(props.entityID, "card/title");
+  let { ref } = usePreserveScroll<HTMLDivElement>();
   return (
     <>
       <Head>
         <title key="title">{title ? title?.value : "Untitled"}</title>
       </Head>
       <div
+        ref={ref}
         className={`
       overflow-y-auto
       h-full

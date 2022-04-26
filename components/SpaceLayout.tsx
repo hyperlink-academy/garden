@@ -6,8 +6,11 @@ import { ButtonLink, ButtonPrimary, ButtonTertiary } from "./Buttons";
 import { useEffect, useState } from "react";
 import { Modal } from "components/Layout";
 import { SmallCardDragContext } from "./DragContext";
+import { usePreserveScroll } from "hooks/utils";
 
 export const SpaceLayout: React.FC = (props) => {
+  let { ref } = usePreserveScroll<HTMLDivElement>();
+
   return (
     <div
       style={{
@@ -18,7 +21,7 @@ export const SpaceLayout: React.FC = (props) => {
         position: "relative",
       }}
     >
-      <div className="h-full pt-4 px-4 overflow-auto">
+      <div className="h-full pt-4 px-4 overflow-auto" ref={ref}>
         <div
           style={{
             height: "100%",
