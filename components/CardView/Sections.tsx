@@ -1,4 +1,4 @@
-import { Menu, Transition } from "@headlessui/react";
+import { Menu } from "@headlessui/react";
 import Textarea from "components/AutosizeTextArea";
 import { ButtonPrimary } from "components/Buttons";
 import { SmallCardList } from "components/SmallCardList";
@@ -15,9 +15,8 @@ import { MenuContainer, MenuItem } from "components/Layout";
 import { multipleReferenceSection, singleTextSection } from "data/Facts";
 import { useIndex, useMutations } from "hooks/useReplicache";
 import { useRef, useState } from "react";
-import { generateKeyBetween } from "src/fractional-indexing";
 import { sortByPosition } from "src/position_helpers";
-import { ulid } from "src/ulid";
+import { ReferenceAttributes } from "data/Attributes";
 
 export const Sections = (props: { entityID: string }) => {
   let sections = useIndex.eav(props.entityID, "card/section");
@@ -47,7 +46,7 @@ const Section = (props: { name: string; entityID: string }) => {
         <SingleTextSection entityID={props.entityID} section={props.name} />
       ) : type?.value === "reference" && cardinality?.value === "many" ? (
         <MultipleReferenceSection
-          section={props.name}
+          section={multipleReferenceSection(props.name)}
           entityID={props.entityID}
         />
       ) : null}
@@ -87,12 +86,11 @@ const SingleTextSection = (props: {
   );
 };
 
-const MultipleReferenceSection = (props: {
+export const MultipleReferenceSection = (props: {
   entityID: string;
-  section: string;
+  section: keyof ReferenceAttributes;
 }) => {
-  let attribute = multipleReferenceSection(props.section);
-  let references = useIndex.eav(props.entityID, attribute);
+  let references = useIndex.eav(props.entityID, props.section);
   let { authorized } = useMutations();
   let earliestCard = references?.sort(sortByPosition("eav"))[
     references.length - 1
@@ -109,7 +107,7 @@ const MultipleReferenceSection = (props: {
           <FindOrCreateCard
             entity={props.entityID}
             positionKey="eav"
-            section={attribute}
+            section={props.section}
             lastPosition={earliestCard?.positions["eav"]}
             open={open}
             allowBlank={true}
@@ -121,7 +119,7 @@ const MultipleReferenceSection = (props: {
       <div className="-mt-4">
         {/* hack to remove extra space*/}
         <SmallCardList
-          attribute={attribute}
+          attribute={props.section}
           cards={references || []}
           deck={props.entityID}
           positionKey="eav"

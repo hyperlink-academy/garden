@@ -67,7 +67,7 @@ let openStates: { [key: string]: boolean | undefined } = {};
 
 const Deck = (props: { entity: string; toggleAll: boolean | undefined }) => {
   let title = useIndex.eav(props.entity, "card/title");
-  let { authorized, mutate } = useMutations();
+  let { authorized } = useMutations();
   let description = useIndex.eav(props.entity, "card/content");
   let cards = useIndex.eav(props.entity, "deck/contains");
   let cardsCount = cards ? cards.length : 0;

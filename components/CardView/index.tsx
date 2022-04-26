@@ -1,11 +1,11 @@
-import { useRef, useContext } from "react";
+import { useRef } from "react";
 import { Menu } from "@headlessui/react";
 
 import { MoreOptions, Delete, DeckSmall } from "components/Icons";
 import { Divider, MenuContainer, MenuItem } from "components/Layout";
 import Textarea from "components/AutosizeTextArea";
-import { ReplicacheContext, useIndex, useMutations } from "hooks/useReplicache";
-import { Sections } from "./Sections";
+import { useIndex, useMutations } from "hooks/useReplicache";
+import { MultipleReferenceSection, Sections } from "./Sections";
 import { AddSection } from "./AddSection";
 import { Backlinks } from "./Backlinks";
 import Head from "next/head";
@@ -40,8 +40,25 @@ export const CardView = (props: { entityID: string }) => {
           <AddSection cardEntity={props.entityID} />
           <Backlinks entityID={props.entityID} />
         </div>
+        {!isDeck ? null : <DeckCardList entityID={props.entityID} />}
+        <Sections entityID={props.entityID} />
+        <AddSection cardEntity={props.entityID} />
+        <Backlinks entityID={props.entityID} />
       </div>
     </>
+  );
+};
+
+const DeckCardList = (props: { entityID: string }) => {
+  let cards = useIndex.eav(props.entityID, "deck/contains");
+  return (
+    <div>
+      <h3>Cards ({cards?.length})</h3>
+      <MultipleReferenceSection
+        entityID={props.entityID}
+        section="deck/contains"
+      />
+    </div>
   );
 };
 
