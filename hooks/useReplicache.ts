@@ -152,6 +152,7 @@ export const makeReplicache = (args: {
   name: string;
 }) => {
   let rep = new Replicache({
+    schemaVersion: "0.0.1",
     name: args.name,
     pushDelay: 500,
     pusher: args.pusher,
