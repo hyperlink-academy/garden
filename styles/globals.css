@@ -122,13 +122,21 @@ input {
 }
 
 .deckCardBorder {
-  border-image-source: url(/cardBorders/deckCardBorder.svg);
-  border-image-slice: 12% 12% 12% 12% fill;
-  border-width: 12px 12px 12px 12px;
+  z-index: 0;
+  position: relative;
 }
 
 .deckCardBorder::before {
+  content: "";
   z-index: -1;
+  border-image-source: url(/cardBorders/deckCardBorder.svg);
+  border-image-slice: 12% fill;
+  border-width: 12px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 .memberCardBorder {

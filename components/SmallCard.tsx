@@ -68,13 +68,17 @@ const borderStyles = (args: { deck: boolean; member: boolean }) => {
 };
 
 const contentStyles = (args: { deck: boolean; member: boolean }) => {
+  // the negative margin here takes care of spacing weirdness when there isn't a gripper on the card.
+  // Basically, when the gripper is not there, there is an empty div with left padding that inherits its value from here
+  // We want that that left padding to be equal to the right padding here
+  // so we set left and right padding here to be the same and then adjust left padding here with the negative margin.
   switch (true) {
     case args.member:
       return "pb-3 px-2 pt-2 -ml-1 ";
     case args.deck:
-      return "-mt-1 -mr-1 ml-.5";
+      return "pb-4 px-3 pt-2 -ml-1";
     default:
-      return " -ml-3 px-3 py-2";
+      return "-ml-3 px-3 py-2";
   }
 };
 
