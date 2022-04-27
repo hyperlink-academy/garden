@@ -62,6 +62,7 @@ const CreateDeck = (props: { lastDeckPosition?: string }) => {
                   null
                 ),
               });
+              setNewDeckName("");
             }}
           />
         </>
