@@ -16,7 +16,7 @@ const styles = (args: { deck: boolean; member: boolean }) => {
     case args.member:
       return `border border-grey-80 rounded-lg shadow-drop bg-white px-5 py-6`;
     case args.deck:
-      return `deckBorder pt-3 pr-2 pb-6 pl-5`;
+      return `deckCardBorder pt-3 pr-2 pb-6 pl-5`;
     default:
       return `border border-grey-80 rounded-lg shadow-drop bg-white px-5 py-6`;
   }

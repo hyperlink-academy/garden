@@ -56,14 +56,25 @@ export function SmallCard(
   );
 }
 
-const styles = (args: { deck: boolean; member: boolean }) => {
+const borderStyles = (args: { deck: boolean; member: boolean }) => {
   switch (true) {
     case args.member:
-      return "bg-accent-red rounded-md pl-1 p-2";
+      return "memberCardBorder";
     case args.deck:
-      return "deckBorder";
+      return "deckCardBorder";
     default:
-      return "border border-grey-80 rounded-md bg-white pl-1 p-2";
+      return "border border-grey-80 rounded-md bg-white ";
+  }
+};
+
+const contentStyles = (args: { deck: boolean; member: boolean }) => {
+  switch (true) {
+    case args.member:
+      return "pb-3 px-2 pt-2 -ml-1 ";
+    case args.deck:
+      return "-mt-1 -mr-1 ml-.5";
+    default:
+      return " -ml-3 px-3 py-2";
   }
 };
 
@@ -96,25 +107,24 @@ export const BaseSmallCard = (
          w-[151px] h-24 
         overflow-hidden 
         relative
-        ${styles({ deck: !!isDeck, member: !!memberName })}
-        }
+        ${borderStyles({ deck: !!isDeck, member: !!memberName })}
         `}
       >
         <div
-          className={`flex flex-row gap-0 h-full ${
-            !!isDeck ? "-mt-1 -mr-1" : ""
-          }`}
+          className={`flex flex-row gap-0 h-full 
+          ${contentStyles({ deck: !!isDeck, member: !!memberName })}
+          `}
         >
           {!!props.draggable ? (
             <Gripper
               {...props.attributes}
               {...props.listeners}
-              className={`touch-manipulation pr-2 pl-1 ${
-                !!memberName ? "text-white" : "text-grey-35"
+              className={`touch-manipulation pl-1 pr-2 ${
+                !!memberName ? "text-white" : "text-grey-55"
               }`}
             />
           ) : (
-            <div className="px-2" />
+            <div className="pl-[inherit]" />
           )}
           <CardBody
             member={!!memberName}
@@ -138,12 +148,13 @@ const CardBody = (props: {
     return (
       <Link href={props.href}>
         <a className="w-full h-full">
-          <div className="h-full pr-2 grid gap-2 grid-rows-[min-content,auto] pb-1">
-            <div className="flex flex-row">
+          <div className="h-full grid gap-1 grid-rows-[min-content,auto]">
+            <div className="grid grid-cols-[auto_max-content] items-end text-white">
               <Member />
-              member
+              <small>member</small>
             </div>
-            <div className="w-full bg-white rounded-md text-accent-red font-bold grid p-1">
+
+            <div className="w-full bg-white rounded-md text-accent-red font-bold grid py-1 px-2 leading-tight text-ellipsis overflow-hidden">
               <span className="self-end">{props.title}</span>
             </div>
           </div>

@@ -101,6 +101,23 @@ const Stories: Stories = {
       ...BaseEntities,
     ],
   },
+  MemberCard: {
+    attributes,
+    entities: [
+      {
+        "card/content":
+          "Hi my name is Celine and I'm a Gemini, Year of Dog, Blood Type A, ENFP, Type 9 <3",
+        "member/name": "celine",
+        deck: flag(),
+        "card/section": ["Text Section"],
+        [singleTextSection(
+          "Text Section"
+        )]: `Hello, I am here again with more text and I just keep on coming with those bangers. Is there an award I can get for best copy text? The Blabies?`,
+        ["deck/contains"]: [ref("1"), ref("2"), ref("3")],
+      },
+      ...BaseEntities,
+    ],
+  },
 };
 
 const CardViewStory = (props: Props) => {

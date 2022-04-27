@@ -121,11 +121,34 @@ input {
   @apply rounded-md;
 }
 
-.deckBorder {
-  border-image-source: url(/deckCardBorder.svg);
+.deckCardBorder {
+  border-image-source: url(/cardBorders/deckCardBorder.svg);
   border-image-slice: 12% 12% 12% 12% fill;
   border-width: 12px 12px 12px 12px;
 }
+
+.deckCardBorder::before {
+  z-index: -1;
+}
+
+.memberCardBorder {
+  z-index: 0;
+  position: relative;
+}
+
+.memberCardBorder::before {
+  content: "";
+  z-index: -1;
+  border-image-source: url(/cardBorders/memberCardBorder.svg);
+  border-image-slice: 12% fill;
+  border-width: 12px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
 /* 
 .deckBorderContent {
   margin: -19px;
