@@ -42,10 +42,10 @@ const StudioName = () => {
   return (
     <>
       <Head>
-        <title key="title">Studio: {name?.value}</title>
+        <title key="title">{name?.value}'s studio</title>
       </Head>
       <div>
-        <h2>Studio: {name?.value}</h2>
+        <h1>{name?.value}'s studio</h1>
       </div>
     </>
   );
