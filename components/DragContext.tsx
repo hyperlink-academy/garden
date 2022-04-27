@@ -8,8 +8,11 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
+import { ReferenceAttributes } from "data/Attributes";
+import { Fact } from "data/Facts";
 import { useMutations } from "hooks/useReplicache";
 import { useState } from "react";
+import { updatePositions } from "src/position_helpers";
 import { BaseSmallCard } from "./SmallCard";
 
 export const SmallCardDragContext: React.FC = (props) => {
@@ -31,24 +34,29 @@ export const SmallCardDragContext: React.FC = (props) => {
         if (over) {
           if (!active) return;
           let index = over.data.current?.index;
-          let currentIndex = active.data.current?.index;
-          let parent = over.data.current?.parent;
-          let section = over.data.current?.section;
+          let currentIndex: number | undefined = active.data.current?.index;
+          let parent: string | undefined = over.data.current?.parent;
+          let section: keyof ReferenceAttributes | undefined =
+            over.data.current?.section;
+          let positionKey: string | undefined = over.data.current?.positionKey;
+          let siblings: Fact<keyof ReferenceAttributes>[] | undefined =
+            over.data.current?.siblings;
 
           if (
             index === undefined ||
             currentIndex === undefined ||
+            !siblings ||
+            !positionKey ||
             !parent ||
             !section
           )
             return;
-
-          await mutate("moveCard", {
-            factID: active.id,
-            positionKey: "eav",
-            parent,
-            attribute: section,
-            index: currentIndex < index ? index : index - 1,
+          let newPositions = updatePositions(positionKey, siblings, [
+            [active.id, currentIndex < index ? index : index - 1],
+          ]);
+          await mutate("updatePositions", {
+            positionKey: positionKey,
+            newPositions,
           });
         }
       }}

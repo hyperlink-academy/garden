@@ -99,40 +99,15 @@ const addSpace: Mutation<{
   ]);
 };
 
-const moveCard: Mutation<{
-  factID: string;
+const updatePositions: Mutation<{
+  newPositions: [string, string][];
   positionKey: string;
-  parent: string;
-  index: number;
-  attribute: keyof Attribute;
-}> = async (args, context) => {
-  let children = await context.scanIndex.eav(args.parent, args.attribute);
-  let hasUnpositionedChildren = children.reduce(
-    (acc, child) => acc || !child.positions[args.positionKey],
-    false
-  );
-  let positions = children.sort(sortByPosition(args.positionKey)).map((f) => {
-    return {
-      id: f.id,
-      position: f.positions[args.positionKey],
-    };
-  });
-  if (hasUnpositionedChildren) {
-    let newPositions = generateNKeysBetween(null, null, positions.length);
-    for (let i = 0; i < positions.length; i++) {
-      positions[i].position = newPositions[i];
-      await context.updateFact(positions[i].id, {
-        positions: { [args.positionKey]: newPositions[i] },
-      });
-    }
+}> = async (args, ctx) => {
+  for (let [factID, position] of args.newPositions) {
+    await ctx.updateFact(factID, {
+      positions: { [args.positionKey]: position },
+    });
   }
-  let newPosition = generateKeyBetween(
-    positions[args.index]?.position || null,
-    positions[args.index + 1]?.position || null
-  );
-  await context.updateFact(args.factID, {
-    positions: { [args.positionKey]: newPosition },
-  });
 };
 
 const assertCardTitle: Mutation<{ cardEntity: string; title: string }> = async (
@@ -273,8 +248,8 @@ export const Mutations = {
   updateLastSeenMessage,
   postMessage,
   createCard,
-  moveCard,
   addSpace,
+  updatePositions,
   removeCardFromSection,
   addDeck,
   addCardToSection,

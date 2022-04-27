@@ -20,12 +20,14 @@ export const SmallCardList = (props: {
   let itemsCount = items ? items.length : 0;
 
   return (
-    <SortableContext items={items.map((item) => item.id)}>
+    <SortableContext items={items}>
       {itemsCount > 0 ? (
-        <div className="flex flex-wrap gap-4 pt-8 pb-6">
+        <div className="flex flex-wrap gap-4">
           {items.map((c, index) => (
             <SmallCard
               parent={props.deck}
+              siblings={props.cards}
+              positionKey={props.positionKey}
               section={props.attribute}
               index={index}
               onDelete={
