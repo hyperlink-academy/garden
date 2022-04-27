@@ -11,9 +11,22 @@ import { Backlinks } from "./Backlinks";
 import Head from "next/head";
 import { usePreserveScroll } from "hooks/utils";
 
+const styles = (args: { deck: boolean; member: boolean }) => {
+  switch (true) {
+    case args.member:
+      return `border border-grey-80 rounded-lg shadow-drop bg-white px-5 py-6`;
+    case args.deck:
+      return `deckBorder pt-3 pr-2 pb-6 pl-5`;
+    default:
+      return `border border-grey-80 rounded-lg shadow-drop bg-white px-5 py-6`;
+  }
+};
+
 export const CardView = (props: { entityID: string }) => {
   let isDeck = useIndex.eav(props.entityID, "deck");
-  let title = useIndex.eav(props.entityID, "card/title");
+  let cardTitle = useIndex.eav(props.entityID, "card/title");
+  let memberName = useIndex.eav(props.entityID, "member/name");
+  let title = memberName || cardTitle;
   let { ref } = usePreserveScroll<HTMLDivElement>();
   return (
     <>
@@ -27,16 +40,7 @@ export const CardView = (props: { entityID: string }) => {
           overflow-y-auto
           w-full
           h-full
-        ${
-          isDeck
-            ? `
-              deckBorder
-              pt-3 pr-2 pb-6 pl-5`
-            : `border border-grey-80 rounded-lg 
-            shadow-drop
-            bg-white
-            px-5 py-6`
-        }
+        ${styles({ deck: !!isDeck, member: !!memberName })}
         
 `}
       >
@@ -75,11 +79,13 @@ const DeckCardList = (props: { entityID: string }) => {
 };
 
 const Title = (props: { entityID: string }) => {
-  let title = useIndex.eav(props.entityID, "card/title");
+  let cardTitle = useIndex.eav(props.entityID, "card/title");
+  let memberName = useIndex.eav(props.entityID, "member/name");
+  let title = memberName || cardTitle;
   let { authorized, mutate } = useMutations();
 
   let textarea = useRef<HTMLTextAreaElement | null>(null);
-  return !authorized ? (
+  return !authorized || memberName ? (
     <h2>{title ? title?.value : "Untitled"}</h2>
   ) : (
     <Textarea

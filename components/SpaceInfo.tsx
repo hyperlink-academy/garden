@@ -9,6 +9,7 @@ import { useState } from "react";
 import { ButtonLink } from "./Buttons";
 import { Drawer } from "./DeckList";
 import { Member } from "./Icons";
+import { SmallCard } from "./SmallCard";
 
 export const SpaceInfo = () => {
   let spaceName = useIndex.aev("this/name")[0];
@@ -39,6 +40,7 @@ const Description = (props: { entity: string }) => {
 
 const Members = () => {
   let members = useIndex.aev("space/member");
+  let { studio, space } = useRouter().query;
 
   let [toggle, setToggle] = useState<boolean | undefined>(undefined);
 
@@ -54,14 +56,18 @@ const Members = () => {
         </button>
 
         <Drawer open={!!toggle}>
-          <div>member list</div>
-          <ul>
+          <div className="flex flex-wrap gap-4">
             {members.map((m) => (
-              <li className="" key={m.entity}>
-                {m.entity}
-              </li>
+              <SmallCard
+                entityID={m.entity}
+                id={m.id}
+                index={0}
+                parent=""
+                section={""}
+                href={`/s/${studio}/s/${space}/c/${m.entity}`}
+              />
             ))}
-          </ul>
+          </div>
         </Drawer>
       </Disclosure>
     </div>

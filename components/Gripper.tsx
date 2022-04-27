@@ -17,10 +17,10 @@ export const Gripper = (props: DivProps) => {
             height="8"
             patternUnits="userSpaceOnUse"
           >
-            <rect width="2" height="2" rx="1" fill="#8C8C8C" />
-            <rect y="4" width="2" height="2" rx="1" fill="#8C8C8C" />
-            <rect x="4" width="2" height="2" rx="1" fill="#8C8C8C" />
-            <rect x="4" y="4" width="2" height="2" rx="1" fill="#8C8C8C" />
+            <rect width="2" height="2" rx="1" fill="currentColor" />
+            <rect y="4" width="2" height="2" rx="1" fill="currentColor" />
+            <rect x="4" width="2" height="2" rx="1" fill="currentColor" />
+            <rect x="4" y="4" width="2" height="2" rx="1" fill="currentColor" />
           </pattern>
         </defs>
         <rect fill="url(#Pattern)" width="6" height="100%" />

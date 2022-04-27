@@ -35,6 +35,14 @@ const entities: Stories = {
       },
     ],
   },
+  Member: {
+    entities: [
+      {
+        "member/name": "celine",
+        "space/member": "lksjdflkajsd",
+      },
+    ],
+  },
 };
 
 const SmallCardStory = (props: Props) => {
