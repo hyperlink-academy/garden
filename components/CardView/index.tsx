@@ -52,13 +52,10 @@ export const CardView = (props: { entityID: string }) => {
             </div>
             <Content entityID={props.entityID} />
           </div>
+          {!isDeck ? null : <DeckCardList entityID={props.entityID} />}
           <Sections entityID={props.entityID} />
           <AddSection cardEntity={props.entityID} />
-          <Backlinks entityID={props.entityID} />
         </div>
-        {!isDeck ? null : <DeckCardList entityID={props.entityID} />}
-        <Sections entityID={props.entityID} />
-        <AddSection cardEntity={props.entityID} />
         <Backlinks entityID={props.entityID} />
       </div>
     </>

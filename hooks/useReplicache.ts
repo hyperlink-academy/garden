@@ -1,4 +1,8 @@
-import { Attribute, UniqueAttributes } from "data/Attributes";
+import {
+  Attribute,
+  ReferenceAttributes,
+  UniqueAttributes,
+} from "data/Attributes";
 import { Fact, Schema } from "data/Facts";
 import { Message } from "data/Messages";
 import { CardinalityResult, MutationContext, Mutations } from "data/mutations";
@@ -215,7 +219,7 @@ export const useIndex = {
       [attribute, entity]
     );
   },
-  vae<A extends keyof Attribute>(entity: string, attribute?: A) {
+  vae<A extends keyof ReferenceAttributes>(entity: string, attribute?: A) {
     let rep = useContext(ReplicacheContext);
     return useSubscribe(
       rep?.rep,

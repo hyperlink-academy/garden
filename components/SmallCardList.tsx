@@ -13,6 +13,7 @@ export const SmallCardList = (props: {
   deck: string;
   attribute: keyof ReferenceAttributes;
   positionKey: string;
+  backlink?: boolean;
 }) => {
   let { studio, space } = useRouter().query;
   let { authorized, mutate } = useMutations();
@@ -23,29 +24,33 @@ export const SmallCardList = (props: {
     <SortableContext items={items}>
       {itemsCount > 0 ? (
         <div className="flex flex-wrap gap-4">
-          {items.map((c, index) => (
-            <SmallCard
-              parent={props.deck}
-              siblings={props.cards}
-              positionKey={props.positionKey}
-              section={props.attribute}
-              index={index}
-              onDelete={
-                !authorized
-                  ? undefined
-                  : () => {
-                      mutate("removeCardFromSection", {
-                        id: c.id,
-                      });
-                    }
-              }
-              draggable={authorized}
-              key={c.id}
-              href={`/s/${studio}/s/${space}/c/${c.value.value}`}
-              entityID={c.value.value}
-              id={c.id}
-            />
-          ))}
+          {items.map((c, index) => {
+            let entity = props.backlink ? c.entity : c.value.value;
+
+            return (
+              <SmallCard
+                parent={props.deck}
+                siblings={props.cards}
+                positionKey={props.positionKey}
+                section={props.attribute}
+                index={index}
+                onDelete={
+                  !authorized
+                    ? undefined
+                    : () => {
+                        mutate("removeCardFromSection", {
+                          id: c.id,
+                        });
+                      }
+                }
+                draggable={authorized}
+                key={c.id}
+                href={`/s/${studio}/s/${space}/c/${entity}`}
+                entityID={entity}
+                id={c.id}
+              />
+            );
+          })}
         </div>
       ) : (
         <div className="pb-4"></div>

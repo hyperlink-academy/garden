@@ -1,6 +1,8 @@
-import { DraggableAttributes, useDraggable } from "@dnd-kit/core";
+import { DraggableAttributes } from "@dnd-kit/core";
 import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
 import { useSortable } from "@dnd-kit/sortable";
+import { ReferenceAttributes } from "data/Attributes";
+import { Fact } from "data/Facts";
 import { useIndex } from "hooks/useReplicache";
 import Link from "next/link";
 import { Gripper } from "./Gripper";
@@ -19,6 +21,8 @@ export function SmallCard(
     index: number;
     parent: string;
     section: string;
+    siblings: Fact<keyof ReferenceAttributes>[];
+    positionKey: string;
   } & Props
 ) {
   let { setNodeRef, attributes, listeners, transform, transition, isDragging } =
@@ -26,8 +30,10 @@ export function SmallCard(
       disabled: !props.draggable,
       id: props.id,
       data: {
+        siblings: props.siblings,
         entityID: props.entityID,
         index: props.index,
+        positionKey: props.positionKey,
         parent: props.parent,
         section: props.section,
       },
@@ -43,7 +49,7 @@ export function SmallCard(
     <div style={style} ref={setNodeRef}>
       {isDragging ? (
         <div
-          className={`border-[1] border-grey-80 shadow-drop rounded-md p-2 pl-1 w-[151px] h-24 overflow-hidden bg-white flex flex-row gap-2 relative`}
+          className={`border-grey-80 border rounded-md w-[151px] h-24 bg-grey-90 relative top-6`}
         />
       ) : (
         <BaseSmallCard
