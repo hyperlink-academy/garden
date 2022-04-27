@@ -60,10 +60,6 @@ const Members = () => {
             {members.map((m) => (
               <SmallCard
                 entityID={m.entity}
-                id={m.id}
-                index={0}
-                parent=""
-                section={""}
                 href={`/s/${studio}/s/${space}/c/${m.entity}`}
               />
             ))}

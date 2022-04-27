@@ -6,7 +6,6 @@ import { useState } from "react";
 import { ButtonLink } from "components/Buttons";
 import { useIndex } from "hooks/useReplicache";
 import { Card, DeckSmall } from "components/Icons";
-import { SmallCard } from "components/SmallCard";
 const entities: Stories = {
   None: {
     entities: [],

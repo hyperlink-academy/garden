@@ -15,7 +15,7 @@ type Props = {
   onDelete?: () => void;
 };
 
-export function SmallCard(
+export function SortableSmallCard(
   props: {
     id: string;
     index: number;
@@ -52,11 +52,7 @@ export function SmallCard(
           className={`border-grey-80 border rounded-md w-[151px] h-24 bg-grey-90 relative top-6`}
         />
       ) : (
-        <BaseSmallCard
-          listeners={listeners}
-          attributes={attributes}
-          {...props}
-        />
+        <SmallCard listeners={listeners} attributes={attributes} {...props} />
       )}
     </div>
   );
@@ -85,7 +81,7 @@ const contentStyles = (args: { deck: boolean; member: boolean }) => {
   }
 };
 
-export const BaseSmallCard = (
+export const SmallCard = (
   props: {
     entityID: string;
     attributes?: DraggableAttributes;

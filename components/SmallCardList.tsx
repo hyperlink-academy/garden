@@ -4,7 +4,7 @@ import { Fact } from "data/Facts";
 import { useMutations } from "hooks/useReplicache";
 import { useRouter } from "next/router";
 import { sortByPosition } from "src/position_helpers";
-import { SmallCard } from "./SmallCard";
+import { SortableSmallCard } from "./SmallCard";
 
 // Currently this is rendered inside a DnD Context and used in a couple
 // different places.
@@ -28,7 +28,7 @@ export const SmallCardList = (props: {
             let entity = props.backlink ? c.entity : c.value.value;
 
             return (
-              <SmallCard
+              <SortableSmallCard
                 parent={props.deck}
                 siblings={props.cards}
                 positionKey={props.positionKey}

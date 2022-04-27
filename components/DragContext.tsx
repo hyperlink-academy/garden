@@ -13,7 +13,7 @@ import { Fact } from "data/Facts";
 import { useMutations } from "hooks/useReplicache";
 import { useState } from "react";
 import { updatePositions } from "src/position_helpers";
-import { BaseSmallCard } from "./SmallCard";
+import { SmallCard } from "./SmallCard";
 
 export const SmallCardDragContext: React.FC = (props) => {
   let [activeCard, setActiveCard] = useState<Active | null>(null);
@@ -64,7 +64,7 @@ export const SmallCardDragContext: React.FC = (props) => {
       {props.children}
       <DragOverlay dropAnimation={null}>
         {activeCard ? (
-          <BaseSmallCard
+          <SmallCard
             entityID={activeCard.data.current?.entityID}
             href=""
             draggable={true}

@@ -49,32 +49,9 @@ const SmallCardStory = (props: Props) => {
   return (
     <ComponentViewer components={props.components} stories={entities}>
       <div className="grid gap-2">
-        <SmallCard
-          href=""
-          entityID={"0"}
-          id={"1"}
-          index={0}
-          parent=""
-          section=""
-        />
-        <SmallCard
-          href=""
-          entityID={"0"}
-          id={"2"}
-          index={1}
-          parent=""
-          section=""
-          onDelete={() => {}}
-        />
-        <SmallCard
-          href=""
-          entityID={"0"}
-          id={"3"}
-          index={1}
-          parent=""
-          section=""
-          draggable={true}
-        />
+        <SmallCard href="" entityID={"0"} />
+        <SmallCard href="" entityID={"0"} onDelete={() => {}} />
+        <SmallCard href="" entityID={"0"} draggable={true} />
       </div>
     </ComponentViewer>
   );
