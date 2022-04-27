@@ -104,7 +104,7 @@ input {
 }
 
 ::placeholder {
-  @apply text-grey-80;
+  @apply !text-grey-80;
   @apply italic;
 }
 
