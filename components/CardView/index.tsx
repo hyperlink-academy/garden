@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { Menu } from "@headlessui/react";
 
-import { MoreOptions, Delete, DeckSmall } from "components/Icons";
+import { MoreOptions, Delete, DeckSmall, Member } from "components/Icons";
 import { Divider, MenuContainer, MenuItem } from "components/Layout";
 import Textarea from "components/AutosizeTextArea";
 import { useIndex, useMutations } from "hooks/useReplicache";
@@ -11,10 +11,10 @@ import { Backlinks } from "./Backlinks";
 import Head from "next/head";
 import { usePreserveScroll } from "hooks/utils";
 
-const styles = (args: { deck: boolean; member: boolean }) => {
+const borderStyles = (args: { deck: boolean; member: boolean }) => {
   switch (true) {
     case args.member:
-      return `border border-grey-80 rounded-lg shadow-drop bg-white px-5 py-6`;
+      return `memberCardBorder  p-2 pb-3 pl-3`;
     case args.deck:
       return `deckCardBorder pt-3 pr-2 pb-6 pl-5`;
     default:
@@ -22,6 +22,16 @@ const styles = (args: { deck: boolean; member: boolean }) => {
   }
 };
 
+const contentStyles = (args: { deck: boolean; member: boolean }) => {
+  switch (true) {
+    case args.member:
+      return `bg-white rounded-md px-3 pt-3 pb-6`;
+    case args.deck:
+      return ``;
+    default:
+      return ``;
+  }
+};
 export const CardView = (props: { entityID: string }) => {
   let isDeck = useIndex.eav(props.entityID, "deck");
   let cardTitle = useIndex.eav(props.entityID, "card/title");
@@ -40,11 +50,22 @@ export const CardView = (props: { entityID: string }) => {
           overflow-y-auto
           w-full
           h-full
-        ${styles({ deck: !!isDeck, member: !!memberName })}
-        
-`}
+          ${borderStyles({ deck: !!isDeck, member: !!memberName })}
+        `}
       >
-        <div className="grid grid-auto-row gap-6">
+        {!memberName ? null : (
+          <div className="grid grid-cols-[auto_max-content] items-end text-white pb-1">
+            <Member />
+            <small>member</small>
+          </div>
+        )}
+
+        <div
+          className={`
+          grid grid-auto-row gap-6
+          ${contentStyles({ deck: !!isDeck, member: !!memberName })}
+          `}
+        >
           <div className="grid grid-auto-rows gap-3">
             <div className="cardHeader grid grid-cols-[auto_min-content] gap-2">
               <Title entityID={props.entityID} />
@@ -52,11 +73,15 @@ export const CardView = (props: { entityID: string }) => {
             </div>
             <Content entityID={props.entityID} />
           </div>
+
           {!isDeck ? null : <DeckCardList entityID={props.entityID} />}
+
           <Sections entityID={props.entityID} />
+
           <AddSection cardEntity={props.entityID} />
+
+          <Backlinks entityID={props.entityID} />
         </div>
-        <Backlinks entityID={props.entityID} />
       </div>
     </>
   );
