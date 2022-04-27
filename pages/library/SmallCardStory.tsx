@@ -26,7 +26,17 @@ const entities: Stories = {
       },
     ],
   },
+
+  Deck: {
+    entities: [
+      {
+        deck: { type: "flag" },
+        "card/title": "Books I Like",
+      },
+    ],
+  },
 };
+
 const SmallCardStory = (props: Props) => {
   return (
     <ComponentViewer components={props.components} stories={entities}>

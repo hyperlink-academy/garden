@@ -120,6 +120,17 @@ input {
   @apply border-grey-80;
   @apply rounded-md;
 }
+
+.deckBorder {
+  border-image-source: url(/deckCardBorder.svg);
+  border-image-slice: 12% 12% 12% 12% fill;
+  border-width: 12px 12px 12px 12px;
+}
+/* 
+.deckBorderContent {
+  margin: -19px;
+  @apply rounded-lg;
+} */
 /* END GLOBAL STYLING */
 
 * {

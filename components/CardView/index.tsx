@@ -20,16 +20,25 @@ export const CardView = (props: { entityID: string }) => {
       <Head>
         <title key="title">{title ? title?.value : "Untitled"}</title>
       </Head>
+
       <div
         ref={ref}
         className={`
-      overflow-y-auto
-      h-full
-      px-5 py-6
-      border border-grey-80 rounded-lg 
-      shadow-drop
-      bg-white
-      `}
+          overflow-y-auto
+          w-full
+          h-full
+        ${
+          isDeck
+            ? `
+              deckBorder
+              pt-3 pr-2 pb-6 pl-5`
+            : `border border-grey-80 rounded-lg 
+            shadow-drop
+            bg-white
+            px-5 py-6`
+        }
+        
+`}
       >
         <div className="grid grid-auto-row gap-6">
           <div className="grid grid-auto-rows gap-3">
