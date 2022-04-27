@@ -58,6 +58,7 @@ export function SmallCard(
 
 const borderStyles = (args: { deck: boolean; member: boolean }) => {
   switch (true) {
+    //border styles found in global.css
     case args.member:
       return "memberCardBorder";
     case args.deck:
@@ -68,15 +69,11 @@ const borderStyles = (args: { deck: boolean; member: boolean }) => {
 };
 
 const contentStyles = (args: { deck: boolean; member: boolean }) => {
-  // the negative margin here takes care of spacing weirdness when there isn't a gripper on the card.
-  // Basically, when the gripper is not there, there is an empty div with left padding that inherits its value from here
-  // We want that that left padding to be equal to the right padding here
-  // so we set left and right padding here to be the same and then adjust left padding here with the negative margin.
   switch (true) {
     case args.member:
-      return "pb-3 px-2 pt-2 -ml-1 ";
+      return "pb-3 pr-2 pl-1 pt-2 ";
     case args.deck:
-      return "pb-4 px-3 pt-2 -ml-1";
+      return "pb-4 pr-3 pl-2 pt-2";
     default:
       return "-ml-3 px-3 py-2";
   }
@@ -128,7 +125,7 @@ export const BaseSmallCard = (
               }`}
             />
           ) : (
-            <div className="pl-[inherit]" />
+            <div className="pr-[inherit]" />
           )}
           <CardBody
             member={!!memberName}
