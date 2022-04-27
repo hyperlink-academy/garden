@@ -23,7 +23,7 @@ export const SmallCardList = (props: {
   return (
     <SortableContext items={items}>
       {itemsCount > 0 ? (
-        <div className="flex flex-wrap gap-4">
+        <div className="flex flex-wrap gap-x-4 gap-y-2">
           {items.map((c, index) => {
             let entity = props.backlink ? c.entity : c.value.value;
 

@@ -84,6 +84,7 @@ const Deck = (props: { entity: string; toggleAll: boolean | undefined }) => {
   let [drawerOpen, setDrawerOpen] = useState(openStates[props.entity]);
 
   let router = useRouter();
+
   useEffect(() => {
     openStates[props.entity] = drawerOpen;
   }, [drawerOpen]);
@@ -95,26 +96,22 @@ const Deck = (props: { entity: string; toggleAll: boolean | undefined }) => {
     <Disclosure as="div" className="pb-8">
       <div className="flex pb-2 gap-2 justify-between">
         <div className="flex gap-10 w-full">
-          <DeckImage count={cardsCount} open={!!drawerOpen} />
-          <div
-            className="pb-2 w-full cursor-pointer"
+          <button
             onClick={(e) => {
               setDrawerOpen(!drawerOpen);
             }}
           >
-            <h3 className="text-grey-35 text-xl">{title?.value}</h3>
-            {description?.value}
-          </div>
-        </div>
-        {!authorized ? null : (
+            <DeckImage count={cardsCount} open={!!drawerOpen} />
+          </button>
           <Link
             href={`/s/${router.query.studio}/s/${router.query.space}/c/${props.entity}`}
           >
-            <a className="text-accent-blue text-sm font-bold">
-              <ButtonLink icon={<Settings />} content="" />
+            <a className="pb-2 w-full">
+              <h3 className="text-grey-35 text-xl">{title?.value}</h3>
+              <p>{description?.value}</p>
             </a>
           </Link>
-        )}
+        </div>
       </div>
       <Drawer open={!!drawerOpen}>
         {!authorized ? (
@@ -165,7 +162,7 @@ const DeckImage = (props: { count: number; open: boolean }) => {
   });
 
   return (
-    <div className="pr-8 z-0 w-[64px] h-[110px] relative">
+    <div className="pr-8 z-0 w-[64px] h-[110px] relative hover:scale-105 transition-transform cursor-pointer">
       <span className="text-accent-red text-lg font-bold italic absolute bottom-2 right-2 z-[1]">
         {props.count}
       </span>
@@ -293,7 +290,7 @@ export const Drawer: React.FC<{ open: boolean }> = (props) => {
               }}
             />
           </div>
-          <div className="pb-4 pt-8 px-4">{props.children}</div>
+          <div className="pb-8 pt-8 px-4">{props.children}</div>
         </div>
       </Disclosure.Panel>
     </animated.div>
