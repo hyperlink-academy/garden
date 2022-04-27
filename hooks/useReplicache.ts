@@ -2,7 +2,7 @@ import { Attribute, UniqueAttributes } from "data/Attributes";
 import { Fact, Schema } from "data/Facts";
 import { Message } from "data/Messages";
 import { CardinalityResult, MutationContext, Mutations } from "data/mutations";
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext } from "react";
 import {
   Puller,
   Pusher,
@@ -26,7 +26,7 @@ export let ReplicacheContext = createContext<{
   id: string;
 } | null>(null);
 
-const scanIndex = (tx: ReadTransaction) => {
+export const scanIndex = (tx: ReadTransaction) => {
   const q: MutationContext["scanIndex"] = {
     eav: async (entity, attribute) => {
       let schema = await getSchema(tx, attribute);
@@ -75,17 +75,12 @@ export function MessageWithIndexes(m: Message) {
     ...m,
     indexes: {
       messages: `${m.ts}-${m.id}`,
-      eav: "",
-      aev: "",
-      ave: "",
-      vae: "",
     },
   };
 }
 
 export function FactWithIndexes<A extends keyof Attribute>(f: Fact<A>) {
   let indexes = {
-    messages: "",
     eav: `${f.entity}-${f.attribute}-${f.id}`,
     aev: `${f.attribute}-${f.entity}-${f.id}`,
     ave: f.schema.unique ? `${f.attribute}-${f.value}` : "",
@@ -162,6 +157,7 @@ export const makeReplicache = (args: {
     pusher: args.pusher,
     puller: args.puller,
     mutators: mutators,
+    logLevel: "error",
   });
   rep.createIndex({ name: "eav", jsonPointer: "/indexes/eav" });
   rep.createIndex({ name: "aev", jsonPointer: "/indexes/aev" });

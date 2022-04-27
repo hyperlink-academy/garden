@@ -4,6 +4,7 @@ import { store } from "./fact_store";
 import { init } from "./initialize";
 import { claimRoute } from "./routes/claim";
 import { create_space_route } from "./routes/create_space";
+import { get_latest_message } from "./routes/get_latest_message";
 import { get_share_code_route } from "./routes/get_share_code";
 import { get_space_route } from "./routes/get_space";
 import { join_route } from "./routes/join";
@@ -25,6 +26,7 @@ let routes = [
   create_space_route,
   get_space_route,
   get_share_code_route,
+  get_latest_message,
   join_route,
 ];
 export type SpaceRoutes = typeof routes;

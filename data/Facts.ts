@@ -28,6 +28,7 @@ type Value<A extends AttributeName> = Attribute[A] extends {
   : {
       union: never;
       string: string;
+      number: number;
       boolean: boolean;
       reference: {
         type: "reference";

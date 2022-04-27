@@ -82,7 +82,13 @@ export const store = (storage: DurableObjectStorage) => {
   let context: MutationContext = {
     scanIndex,
     postMessage: async (m) => {
-      storage.put(`messages-${m.ts}-${m.id}`, m);
+      let latestMessage = await storage.get<number>("meta-latest-message");
+      let index = latestMessage !== undefined ? latestMessage + 1 : 0;
+      storage.put(`messages-${m.ts}-${m.id}`, {
+        ...m,
+        index,
+      });
+      await storage.put("meta-latest-message", index);
       return { success: true };
     },
     updateFact: async (id, data) => {

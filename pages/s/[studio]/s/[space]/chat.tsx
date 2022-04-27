@@ -1,5 +1,10 @@
-import { useState } from "react";
-import { useIndex, useMutations } from "hooks/useReplicache";
+import { useEffect, useState } from "react";
+import {
+  scanIndex,
+  useIndex,
+  useMutations,
+  useSpaceID,
+} from "hooks/useReplicache";
 import { ulid } from "src/ulid";
 import { useAuth } from "hooks/useAuth";
 import Textarea from "components/AutosizeTextArea";
@@ -15,12 +20,34 @@ export default function ChatPage() {
 
 const Messages = () => {
   let messages = useIndex.messages();
+  let { rep } = useAuth();
+  let id = useSpaceID();
+  useEffect(() => {
+    let lastMessage = messages[messages.length - 1];
+    console.log(messages);
+    rep?.query(async (tx) => {
+      if (!id || !lastMessage?.index) return;
+      let q = scanIndex(tx);
+
+      let space = await q.ave("space/id", id);
+      if (!space) return;
+
+      let latest = await q.eav(space.entity, "space/lastSeenMessage");
+      if (latest && latest.value > lastMessage.index) return;
+
+      rep?.mutate.updateLastSeenMessage({
+        space: id,
+        lastSeenMessage: lastMessage.index,
+      });
+    });
+  }, [messages]);
+
   return (
     <div className="h-full overflow-auto flex flex-col-reverse">
       <div>
         {messages.map((m) => {
           return (
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2" key={m.id}>
               <div className="font-bold">{m.sender}</div>
               <pre className="whitespace-pre-wrap">{m.content}</pre>
             </div>

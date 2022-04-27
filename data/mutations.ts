@@ -250,7 +250,27 @@ const addSection: Mutation<{
   });
 };
 
+const updateLastSeenMessage: Mutation<{
+  space: string;
+  lastSeenMessage: number;
+}> = async (args, ctx) => {
+  let space = await ctx.scanIndex.ave("space/id", args.space);
+  if (!space) return;
+  let lastSeenMessage = await ctx.scanIndex.eav(
+    space.entity,
+    "space/lastSeenMessage"
+  );
+  if ((lastSeenMessage?.value || 0) > args.lastSeenMessage) return;
+  await ctx.assertFact({
+    entity: space.entity,
+    value: args.lastSeenMessage,
+    attribute: "space/lastSeenMessage",
+    positions: {},
+  });
+};
+
 export const Mutations = {
+  updateLastSeenMessage,
   postMessage,
   createCard,
   moveCard,

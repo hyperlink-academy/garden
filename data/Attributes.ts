@@ -13,7 +13,14 @@ export const BaseAttributes = {
     type: "union",
     unique: false,
     cardinality: "one",
-    "union/value": ["string", "union", "reference", "boolean", "flag"],
+    "union/value": [
+      "string",
+      "union",
+      "reference",
+      "boolean",
+      "flag",
+      "number",
+    ],
   },
   "union/value": {
     unique: false,
@@ -87,6 +94,11 @@ export const DefaultAttributes = {
   "space/name": {
     type: "string",
     unique: true,
+    cardinality: "one",
+  },
+  "space/lastSeenMessage": {
+    type: "number",
+    unique: false,
     cardinality: "one",
   },
   "member/name": {
