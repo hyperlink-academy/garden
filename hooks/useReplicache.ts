@@ -129,9 +129,8 @@ let mutators: ReplicacheMutators = Object.keys(Mutations).reduce((acc, k) => {
       assertFact: async (fact) => {
         let schema = await getSchema(tx, fact.attribute);
         if (!schema) return { success: false, error: "no schema" };
-        let newID = ulid();
-        console.log(newID);
         let lastUpdated = Date.now().toString();
+        let newID;
         if (schema.cardinality === "one") {
           let existingFact = (await q.eav(fact.entity, fact.attribute)) as
             | Fact<keyof Attribute>
@@ -140,6 +139,7 @@ let mutators: ReplicacheMutators = Object.keys(Mutations).reduce((acc, k) => {
             newID = existingFact.id;
           }
         }
+        if (!newID) newID = ulid();
         let data = FactWithIndexes({ id: newID, ...fact, lastUpdated, schema });
         await tx.put(newID, data);
         return { success: true };
