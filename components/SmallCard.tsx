@@ -77,7 +77,7 @@ const contentStyles = (args: { deck: boolean; member: boolean }) => {
     case args.deck:
       return "pb-4 pr-3 pl-2 pt-2";
     default:
-      return "-ml-3 px-3 py-2";
+      return "pr-3 pl-0 py-2";
   }
 };
 
@@ -95,19 +95,11 @@ export const SmallCard = (
 
   let title = !!memberName ? memberName : cardTitle;
   return (
-    <div
-      className={`min-w-36 max-w-[151px] touch-manipulation relative origin-center`}
-    >
-      {!!props.onDelete ? (
-        <button onClick={props.onDelete}>
-          <Close className="text-accent-blue absolute -right-2.5 z-10" />
-        </button>
-      ) : null}
-
+    <div className={`w-[151px] h-24 touch-manipulation relative origin-center`}>
       <div
         className={`
         drop-shadow-md
-         w-[151px] h-24 
+        w-full h-24 
         overflow-hidden 
         relative
         ${borderStyles({ deck: !!isDeck, member: !!memberName })}
@@ -137,6 +129,11 @@ export const SmallCard = (
           />
         </div>
       </div>
+      {!!props.onDelete ? (
+        <button onClick={props.onDelete}>
+          <Close className="text-accent-blue absolute -right-2.5 -top-2 z-10" />
+        </button>
+      ) : null}
     </div>
   );
 };

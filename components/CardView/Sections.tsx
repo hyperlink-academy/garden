@@ -1,6 +1,6 @@
 import { Menu } from "@headlessui/react";
 import Textarea from "components/AutosizeTextArea";
-import { ButtonPrimary } from "components/Buttons";
+import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
 import { SmallCardList } from "components/SmallCardList";
 import { FindOrCreateCard } from "components/FindOrCreateEntity";
 import {
@@ -69,7 +69,7 @@ const SingleTextSection = (props: {
     <Textarea
       autoFocus={props.new}
       ref={inputEl}
-      className="w-full"
+      className="w-full bg-inherit"
       value={(fact?.value as string) || ""}
       onChange={async (e) => {
         let start = e.currentTarget.selectionStart,
@@ -97,13 +97,10 @@ export const MultipleReferenceSection = (props: {
   ];
   let [open, setOpen] = useState(false);
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col gap-4">
       {!authorized ? null : (
         <>
-          <ButtonPrimary
-            onClick={() => setOpen(true)}
-            content="search to add cards"
-          />
+          <ButtonSecondary onClick={() => setOpen(true)} content="Add Cards!" />
           <FindOrCreateCard
             entity={props.entityID}
             positionKey="eav"
@@ -116,7 +113,7 @@ export const MultipleReferenceSection = (props: {
           />
         </>
       )}
-      <div className="-mt-4">
+      <div className="">
         {/* hack to remove extra space*/}
         <SmallCardList
           attribute={props.section}

@@ -14,11 +14,11 @@ import { usePreserveScroll } from "hooks/utils";
 const borderStyles = (args: { deck: boolean; member: boolean }) => {
   switch (true) {
     case args.member:
-      return `memberCardBorder  p-2 pb-3 pl-3`;
+      return `memberCardBorder p-2 pb-3 pl-3`;
     case args.deck:
-      return `deckCardBorder pt-6 pr-4 pb-8 pl-6`;
+      return `deckCardBorder pl-2 pb-2`;
     default:
-      return `border border-grey-80 rounded-lg shadow-drop bg-white px-5 py-6`;
+      return `border border-grey-80 rounded-lg shadow-drop bg-white `;
   }
 };
 
@@ -27,9 +27,9 @@ const contentStyles = (args: { deck: boolean; member: boolean }) => {
     case args.member:
       return `bg-white rounded-md px-3 pt-3 pb-6`;
     case args.deck:
-      return ``;
+      return `py-6 px-5 `;
     default:
-      return ``;
+      return `px-5 py-6`;
   }
 };
 export const CardView = (props: { entityID: string }) => {
@@ -45,13 +45,10 @@ export const CardView = (props: { entityID: string }) => {
       </Head>
 
       <div
-        ref={ref}
-        className={`
-          overflow-y-auto
-          w-full
-          h-full
-          ${borderStyles({ deck: !!isDeck, member: !!memberName })}
-        `}
+        className={`${borderStyles({
+          deck: !!isDeck,
+          member: !!memberName,
+        })}`}
       >
         {!memberName ? null : (
           <div className="grid grid-cols-[auto_max-content] items-end text-white pb-1">
@@ -61,10 +58,14 @@ export const CardView = (props: { entityID: string }) => {
         )}
 
         <div
+          ref={ref}
           className={`
-          grid grid-auto-row gap-6
-          ${contentStyles({ deck: !!isDeck, member: !!memberName })}
-          `}
+            grid grid-auto-row gap-6          
+            overflow-y-auto
+            w-full
+            h-full
+            ${contentStyles({ deck: !!isDeck, member: !!memberName })}
+            `}
         >
           <div className="grid grid-auto-rows gap-3">
             <div className="cardHeader grid grid-cols-[auto_min-content] gap-2">
@@ -113,7 +114,7 @@ const Title = (props: { entityID: string }) => {
     <Textarea
       ref={textarea}
       placeholder="Untitled"
-      className="text-xl font-bold"
+      className="text-xl font-bold bg-inherit"
       value={title?.value}
       onChange={async (e) => {
         let start = e.currentTarget.selectionStart,
@@ -140,7 +141,7 @@ const Content = (props: { entityID: string }) => {
   ) : (
     <Textarea
       ref={textarea}
-      className="placeholder:italic"
+      className="placeholder:italic bg-inherit"
       placeholder="write something..."
       spellCheck={false}
       value={content?.value || ""}

@@ -16,10 +16,10 @@ module.exports = {
 
     colors: {
       "bg-drawer": "#FDFCFA",
+      inherit: "inherit",
       transparent: "transparent",
       current: "currentColor",
       background: "floralwhite",
-
       //JUST A BUNCH OF GRAYS. # refers to lightness value. 95 = lightest, 15 = darkest
 
       "grey-15": "#272727",
