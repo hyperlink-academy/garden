@@ -64,7 +64,7 @@ export const CardView = (props: { entityID: string }) => {
         <div
           ref={ref}
           className={`
-            grid grid-auto-row gap-6          
+            flex flex-col gap-6          
             overflow-y-auto
             w-full
             h-full
