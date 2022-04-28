@@ -15,32 +15,48 @@ import { MenuContainer, MenuItem } from "components/Layout";
 import { multipleReferenceSection, singleTextSection } from "data/Facts";
 import { useIndex, useMutations } from "hooks/useReplicache";
 import { useRef, useState } from "react";
-import { sortByPosition } from "src/position_helpers";
+import { sortByPosition, updatePositions } from "src/position_helpers";
 import { ReferenceAttributes } from "data/Attributes";
 
 export const Sections = (props: { entityID: string }) => {
   let sections = useIndex.eav(props.entityID, "card/section");
   return !(sections && sections.length > 0) ? null : (
     <div className="grid grid-auto-row gap-6">
-      {sections?.map((s) => (
-        <Section name={s.value} entityID={props.entityID} key={s.value} />
+      {sections.sort(sortByPosition("eav")).map((s) => (
+        <Section
+          position={s.positions.eav}
+          name={s.value}
+          entityID={props.entityID}
+          key={s.value}
+          factID={s.id}
+        />
       ))}
     </div>
   );
 };
 
-const Section = (props: { name: string; entityID: string }) => {
+const Section = (props: {
+  name: string;
+  entityID: string;
+  factID: string;
+  position: string | undefined;
+}) => {
   let entity = useIndex.ave("name", `section/${props.name}`);
   let cardinality = useIndex.eav(entity?.entity || null, "cardinality");
   let type = useIndex.eav(entity?.entity || null, "type");
   return (
     <div className="textSection grid grid-auto-rows gap-2">
       <div className="grid grid-cols-[auto_min-content_min-content] gap-2 items-center">
-        <h4>{props.name}</h4>
+        <h4>
+          {props.name} {props.position}
+        </h4>
         <div className="text-grey-55">
           {type?.value === "string" ? <SectionText /> : <SectionLinkedCard />}
         </div>
-        <SectionMoreOptionsMenu />
+        <SectionMoreOptionsMenu
+          entityID={props.entityID}
+          factID={props.factID}
+        />
       </div>
       {type?.value === "string" ? (
         <SingleTextSection entityID={props.entityID} section={props.name} />
@@ -126,8 +142,34 @@ export const MultipleReferenceSection = (props: {
   );
 };
 
-const SectionMoreOptionsMenu = () => {
+const SectionMoreOptionsMenu = (props: {
+  factID: string;
+  entityID: string;
+}) => {
   let { mutate, authorized } = useMutations();
+  let sections = useIndex
+    .eav(props.entityID, "card/section")
+    ?.sort(sortByPosition("eav"));
+  let index = sections?.findIndex((s) => s.id === props.factID);
+
+  const moveUp = async () => {
+    if (index === undefined || index === -1 || !sections) return;
+    if (index === 0) return;
+    let newPositions = updatePositions("eav", sections, [
+      [props.factID, index - 2],
+    ]);
+    await mutate("updatePositions", { positionKey: "eav", newPositions });
+  };
+
+  const moveDown = async () => {
+    if (index === undefined || index === -1 || !sections) return;
+    if (index === sections.length - 1) return;
+    let newPositions = updatePositions("eav", sections, [
+      [props.factID, index + 1],
+    ]);
+    await mutate("updatePositions", { positionKey: "eav", newPositions });
+  };
+
   return !authorized ? null : (
     <Menu as="div" className="relative">
       <Menu.Button>
@@ -135,13 +177,19 @@ const SectionMoreOptionsMenu = () => {
       </Menu.Button>
       <MenuContainer>
         <MenuItem>
-          <button className="flex items-center gap-2 justify-end">
+          <button
+            className="flex items-center gap-2 justify-end"
+            onClick={() => moveUp()}
+          >
             <p>Move Up</p>
             <UpArrow />
           </button>
         </MenuItem>
         <MenuItem>
-          <button className="flex items-center gap-2 justify--end">
+          <button
+            className="flex items-center gap-2 justify--end"
+            onClick={() => moveDown()}
+          >
             <p>Move Down</p>
             <DownArrow />
           </button>
