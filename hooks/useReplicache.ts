@@ -156,6 +156,7 @@ export const makeReplicache = (args: {
   name: string;
 }) => {
   let rep = new Replicache({
+    licenseKey: "l381074b8d5224dabaef869802421225a",
     schemaVersion: "0.0.1",
     name: args.name,
     pushDelay: 500,
