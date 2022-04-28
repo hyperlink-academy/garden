@@ -66,7 +66,7 @@ const borderStyles = (args: { deck: boolean; member: boolean }) => {
     case args.deck:
       return "deckCardBorder";
     default:
-      return "border border-grey-80 rounded-md bg-white ";
+      return "defaultCardBorder";
   }
 };
 
@@ -163,13 +163,13 @@ const CardBody = (props: {
     );
   return (
     <Link href={props.href}>
-      <a className={`w-full`}>
+      <a className={`w-full overflow-hidden`}>
         {!props.title ? (
           <small>
             <pre className="whitespace-pre-wrap truncate">{props.content}</pre>
           </small>
         ) : (
-          <h4 className="normal-case leading-tight h-full overflow-hidden text-ellipsis">
+          <h4 className="normal-case leading-tight h-full text-ellipsis">
             {props.title}
           </h4>
         )}

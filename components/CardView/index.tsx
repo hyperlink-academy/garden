@@ -13,12 +13,13 @@ import { usePreserveScroll } from "hooks/utils";
 
 const borderStyles = (args: { deck: boolean; member: boolean }) => {
   switch (true) {
+    //styles can be found is global.css
     case args.member:
-      return `memberCardBorder p-2 pb-3 pl-3`;
+      return `memberCardBorder `;
     case args.deck:
-      return `deckCardBorder pl-2 pb-2`;
+      return `deckCardBorder`;
     default:
-      return `border border-grey-80 rounded-lg shadow-drop bg-white `;
+      return `defaultCardBorder`;
   }
 };
 
@@ -27,7 +28,7 @@ const contentStyles = (args: { deck: boolean; member: boolean }) => {
     case args.member:
       return `bg-white rounded-md px-3 pt-3 pb-6`;
     case args.deck:
-      return `py-6 px-5 `;
+      return `px-5 py-6`;
     default:
       return `px-5 py-6`;
   }
@@ -45,10 +46,13 @@ export const CardView = (props: { entityID: string }) => {
       </Head>
 
       <div
-        className={`${borderStyles({
-          deck: !!isDeck,
-          member: !!memberName,
-        })}`}
+        className={`
+          h-full 
+          drop-shadow-md
+          ${borderStyles({
+            deck: !!isDeck,
+            member: !!memberName,
+          })}`}
       >
         {!memberName ? null : (
           <div className="grid grid-cols-[auto_max-content] items-end text-white pb-1">
