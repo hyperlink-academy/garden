@@ -24,7 +24,6 @@ function getSequentialDoorImage(doorImages: string[]) {
 }
 
 let frameColors = {
-  "testing testing": ["#db90a7", "#d3b4bd"],
   skyblue: ["#87ceeb", "#e0ffff"], //skyblue, lightcyan
   salmon: ["#fa8072", "#ffa07a"], //salmon, lightsalmon
   plum: ["#9932cc", "#dda0dd"], //darkorchid, plum
@@ -41,7 +40,9 @@ let frameColors = {
 
 function getRandomFrame(frameColors: object) {
   var length = Object.keys(frameColors).length;
-  return Object.keys(frameColors)[Math.floor(Math.random() * length)];
+  return Object.keys(frameColors)[
+    Math.floor(Math.random() * length)
+  ] as keyof typeof frameColors;
 }
 
 export const Door = (props: SVGProps<SVGSVGElement>) => {
