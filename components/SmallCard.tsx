@@ -5,6 +5,7 @@ import { ReferenceAttributes } from "data/Attributes";
 import { Fact } from "data/Facts";
 import { useIndex } from "hooks/useReplicache";
 import Link from "next/link";
+import { isUrl } from "src/isUrl";
 import { Gripper } from "./Gripper";
 import { Close, Member } from "./Icons";
 
@@ -94,6 +95,8 @@ export const SmallCard = (
   let memberName = useIndex.eav(props.entityID, "member/name");
 
   let title = !!memberName ? memberName : cardTitle;
+
+  let url = content ? isUrl(content.value) : false;
   return (
     <div className={`w-[151px] h-24 touch-manipulation relative origin-center`}>
       <div
@@ -121,12 +124,23 @@ export const SmallCard = (
           ) : (
             <div className="pr-[inherit]" />
           )}
-          <CardBody
-            member={!!memberName}
-            content={content?.value}
-            title={title?.value}
-            href={props.href}
-          />
+          <div className="flex flex-col">
+            <CardBody
+              member={!!memberName}
+              content={content?.value}
+              title={title?.value}
+              href={props.href}
+            />
+            {url ? (
+              <a
+                href={content?.value}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <small className="text-accent-blue">ext</small>
+              </a>
+            ) : null}
+          </div>
         </div>
       </div>
       {!!props.onDelete ? (
@@ -163,7 +177,7 @@ const CardBody = (props: {
     );
   return (
     <Link href={props.href}>
-      <a className={`w-full overflow-hidden`}>
+      <a className={`w-full overflow-hidden h-full`}>
         {!props.title ? (
           <small>
             <pre className="whitespace-pre-wrap truncate">{props.content}</pre>
