@@ -4,7 +4,7 @@ import { useState } from "react";
 import { generateKeyBetween } from "src/fractional-indexing";
 import { ulid } from "src/ulid";
 import { ButtonLink } from "./Buttons";
-import { Add, Card, Checkmark, DeckSmall } from "./Icons";
+import { Add, Card, Checkmark, DeckSmall, Member } from "./Icons";
 
 // Can I adapt this to work for section names as well?
 // They are a single select
@@ -146,17 +146,28 @@ export const FindOrCreateCard = (props: {
   let { mutate } = useMutations();
   let decks = useIndex.aev("deck");
   let titles = useIndex.aev("card/title");
-  let items = titles.map((t) => {
-    return {
-      entity: t.entity,
-      display: t.value,
-      icon: !!decks.find((d) => t.entity === d.entity) ? (
-        <DeckSmall />
-      ) : (
-        <Card />
-      ),
-    };
-  });
+  let members = useIndex.aev("member/name");
+  let items = titles
+    .map((t) => {
+      return {
+        entity: t.entity,
+        display: t.value,
+        icon: !!decks.find((d) => t.entity === d.entity) ? (
+          <DeckSmall />
+        ) : (
+          <Card />
+        ),
+      };
+    })
+    .concat(
+      members.map((m) => {
+        return {
+          entity: m.entity,
+          display: m.value,
+          icon: <Member />,
+        };
+      })
+    );
 
   return (
     <FindOrCreate
