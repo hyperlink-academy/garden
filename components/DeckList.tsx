@@ -123,7 +123,7 @@ const Deck = (props: { entity: string; toggleAll: boolean | undefined }) => {
           )
         ) : (
           <>
-            <div className="pb-4">
+            <div className={cardsCount > 0 ? "pb-4" : ""}>
               <ButtonSecondary
                 onClick={() => setFindOpen(true)}
                 icon={<Card />}
