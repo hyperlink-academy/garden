@@ -117,17 +117,19 @@ const Deck = (props: { entity: string; toggleAll: boolean | undefined }) => {
       <Drawer open={!!drawerOpen}>
         {!authorized ? (
           cardsCount > 0 ? (
-            <div className="-mb-6"></div>
+            ""
           ) : (
             <div className="italic">no cards!</div>
           )
         ) : (
           <>
-            <ButtonSecondary
-              onClick={() => setFindOpen(true)}
-              icon={<Card />}
-              content="Add cards"
-            />
+            <div className="pb-4">
+              <ButtonSecondary
+                onClick={() => setFindOpen(true)}
+                icon={<Card />}
+                content="Add cards"
+              />
+            </div>
             <FindOrCreateCard
               allowBlank={true}
               entity={props.entity}

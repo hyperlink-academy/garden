@@ -28,9 +28,9 @@ const contentStyles = (args: { deck: boolean; member: boolean }) => {
     case args.member:
       return `bg-white rounded-md px-3 pt-3 pb-6`;
     case args.deck:
-      return `px-5 py-6`;
+      return `px-4 py-6`;
     default:
-      return `px-5 py-6`;
+      return `px-4 py-6`;
   }
 };
 export const CardView = (props: { entityID: string }) => {
@@ -97,7 +97,7 @@ const DeckCardList = (props: { entityID: string }) => {
   let cards = useIndex.eav(props.entityID, "deck/contains");
   return (
     <div>
-      <h3>Cards ({cards?.length})</h3>
+      <h3 className="pb-2">Cards ({cards?.length})</h3>
       <MultipleReferenceSection
         entityID={props.entityID}
         section="deck/contains"

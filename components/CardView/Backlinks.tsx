@@ -36,7 +36,7 @@ const BacklinkSection = (props: {
       : `${props.attribute.slice(8)} Section of`;
   return (
     <div>
-      <h3>{title}</h3>
+      <h3 className="pb-2">{title}</h3>
       <SmallCardList
         backlink={true}
         attribute={props.attribute}
