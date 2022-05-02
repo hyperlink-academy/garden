@@ -91,6 +91,11 @@ a {
   text-decoration: none;
 }
 
+pre-wrap {
+  font-family: "Quattro";
+  color: aqua;
+}
+
 /* END FONT STYLING */
 
 /* START GLOBAL STYLING */

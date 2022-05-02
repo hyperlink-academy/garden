@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   scanIndex,
   useIndex,
@@ -8,6 +8,7 @@ import {
 import { ulid } from "src/ulid";
 import { useAuth } from "hooks/useAuth";
 import Textarea from "components/AutosizeTextArea";
+import { cornersOfRectangle } from "@dnd-kit/core/dist/utilities/algorithms/helpers";
 
 export default function ChatPage() {
   return (
@@ -22,8 +23,9 @@ const Messages = () => {
   let messages = useIndex.messages();
   let { rep } = useAuth();
   let id = useSpaceID();
+  let lastMessage = messages[messages.length - 1];
+
   useEffect(() => {
-    let lastMessage = messages[messages.length - 1];
     console.log(messages);
     rep?.query(async (tx) => {
       if (!id || !lastMessage?.index) return;
@@ -43,29 +45,46 @@ const Messages = () => {
   }, [messages]);
 
   return (
-    <div className="h-full overflow-auto flex flex-col-reverse">
-      <div>
-        {messages.map((m) => {
-          return (
-            <div className="flex flex-col gap-2" key={m.id}>
-              <div className="font-bold">{m.sender}</div>
-              <pre className="whitespace-pre-wrap">{m.content}</pre>
-            </div>
-          );
-        })}
+    <React.Fragment>
+      <style jsx>
+        {`
+          .Message:hover .MessageInfo {
+            display: block;
+          }
+        `}
+      </style>
+      <div className=" h-full overflow-auto pb-6 flex flex-col-reverse ">
+        <div className=" flex flex-col gap-4">
+          {messages.map((m) => {
+            return (
+              <div className="Message flex flex-col" key={m.id}>
+                <div className="grid grid-cols-[auto_max-content]">
+                  <div className={`MessageSender font-bold`}>{m.sender}</div>
+                  <div className="MessageInfo hidden italic text-grey-80">
+                    4/12/22
+                  </div>
+                </div>
+                <pre className="MessageContent whitespace-pre-wrap font-[Quattro] text-grey-35">
+                  {m.content}
+                </pre>
+              </div>
+            );
+          })}
+        </div>
       </div>
-    </div>
+    </React.Fragment>
   );
 };
+
 const MessageInput = () => {
   let [message, setMessage] = useState("");
   let { session } = useAuth();
   let { authorized, mutate } = useMutations();
 
   return (
-    <div className="-mx-4 border-t">
+    <div className="-mx-5 border-t border-grey-80">
       <Textarea
-        className="bg-background p-1"
+        className="bg-background px-5 pt-3 pb-4"
         placeholder="write a message"
         value={message}
         onKeyDown={(e) => {
