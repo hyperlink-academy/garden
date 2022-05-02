@@ -47,8 +47,9 @@ export const CardView = (props: { entityID: string }) => {
 
       <div
         className={`
-          h-full 
+          h-full
           drop-shadow-md
+          flex flex-col
           ${borderStyles({
             deck: !!isDeck,
             member: !!memberName,
