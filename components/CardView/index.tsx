@@ -15,7 +15,7 @@ const borderStyles = (args: { deck: boolean; member: boolean }) => {
   switch (true) {
     //styles can be found is global.css
     case args.member:
-      return `memberCardBorder `;
+      return `memberCardBorder !pl-3 pr-2 !pb-3 pt-2`;
     case args.deck:
       return `deckCardBorder`;
     default:

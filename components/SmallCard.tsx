@@ -74,9 +74,9 @@ const borderStyles = (args: { deck: boolean; member: boolean }) => {
 const contentStyles = (args: { deck: boolean; member: boolean }) => {
   switch (true) {
     case args.member:
-      return "pb-3 pr-2 pl-1 pt-2 ";
+      return "pr-1 pl-0 pb-1 pt-2";
     case args.deck:
-      return "pb-4 pr-3 pl-2 pt-2";
+      return "pr-3 pl-0 py-2";
     default:
       return "pr-3 pl-0 py-2";
   }
@@ -109,7 +109,7 @@ export const SmallCard = (
         `}
       >
         <div
-          className={`flex flex-row gap-0 h-full 
+          className={`flex flex-row gap-0 h-full
           ${contentStyles({ deck: !!isDeck, member: !!memberName })}
           `}
         >
@@ -124,7 +124,7 @@ export const SmallCard = (
           ) : (
             <div className="pr-[inherit]" />
           )}
-          <div className="flex flex-col">
+          <div className="flex flex-col w-full">
             <CardBody
               member={!!memberName}
               content={content?.value}
