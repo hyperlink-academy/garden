@@ -90,18 +90,19 @@ const CardContainer: React.FC<{ selected: boolean; entity: string }> = (
         }
         if (e[0]?.isIntersecting && router.query.child !== props.entity) {
           timeout = window.setTimeout(() => {
+            if (window.location.href.endsWith(props.entity)) return;
             let q = router.query;
             router.replace(
               `/s/${q.studio}/s/${q.space}/c/${q.card}/a/${q.attribute}/${props.entity}`
             );
-          }, 750);
+          }, 100);
         }
       },
       { root: null, rootMargin: "0px", threshold: 1.0 }
     );
     setTimeout(() => {
       if (node) observer.observe(node);
-    }, 500);
+    }, 100);
     return () => {
       if (node) observer.unobserve(node);
     };
