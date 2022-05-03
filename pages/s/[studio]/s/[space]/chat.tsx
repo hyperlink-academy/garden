@@ -8,7 +8,7 @@ import {
 import { ulid } from "src/ulid";
 import { useAuth } from "hooks/useAuth";
 import Textarea from "components/AutosizeTextArea";
-import { cornersOfRectangle } from "@dnd-kit/core/dist/utilities/algorithms/helpers";
+import { SectionLinkedCard, Send } from "components/Icons";
 
 export default function ChatPage() {
   return (
@@ -44,6 +44,10 @@ const Messages = () => {
     });
   }, [messages]);
 
+  if (messages.length > 1) {
+    console.log(lastMessage.ts);
+  }
+
   return (
     <React.Fragment>
       <style jsx>
@@ -53,7 +57,7 @@ const Messages = () => {
           }
         `}
       </style>
-      <div className=" h-full overflow-auto pb-6 flex flex-col-reverse ">
+      <div className=" h-full overflow-y-auto overflow-x-hidden pb-6 flex flex-col-reverse ">
         <div className=" flex flex-col gap-4">
           {messages.map((m) => {
             return (
@@ -61,7 +65,7 @@ const Messages = () => {
                 <div className="grid grid-cols-[auto_max-content]">
                   <div className={`MessageSender font-bold`}>{m.sender}</div>
                   <div className="MessageInfo hidden italic text-grey-80">
-                    4/12/22
+                    {new Date(parseInt(m.ts)).toLocaleDateString()}
                   </div>
                 </div>
                 <pre className="MessageContent whitespace-pre-wrap font-[Quattro] text-grey-35">
@@ -80,31 +84,71 @@ const MessageInput = () => {
   let [message, setMessage] = useState("");
   let { session } = useAuth();
   let { authorized, mutate } = useMutations();
+  let [inputFocused, setInputFocused] = useState(false);
 
-  return (
-    <div className="-mx-5 border-t border-grey-80">
-      <Textarea
-        className="bg-background px-5 pt-3 pb-4"
-        placeholder="write a message"
-        value={message}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            if (e.shiftKey) {
-              return;
+  if (!authorized) {
+    return (
+      <div className="bg-grey-90 text-grey-55 italic border-t border-grey-80 -mx-5 px-5 pt-3 pb-4">
+        Log In to send a message!
+      </div>
+    );
+  } else {
+    return (
+      <div className="-mx-5 px-5 pt-3 pb-4 border-t border-grey-80 flex flex-col gap-2">
+        <div
+          onMouseDown={(e) => e.preventDefault()}
+          className={`w-full bg-bg-blue lightBorder ${
+            inputFocused
+              ? "flex flex-row justify-end rounded-md p-2 gap-4"
+              : "hidden"
+          } `}
+        >
+          <SectionLinkedCard className="hover:text-accent-blue text-grey-35" />
+          <div className="border-l text-grey-80"></div>
+          <button
+            className="text-accent-blue"
+            onClick={(e) => {
+              e.preventDefault;
+              if (!authorized || !session.session || !message) return;
+              mutate("postMessage", {
+                id: ulid(),
+                content: message,
+                sender: session.session.username,
+                ts: Date.now().toString(),
+              });
+              setMessage("");
+            }}
+          >
+            <div className="flex gap-2 font-bold">
+              <Send />
+            </div>
+          </button>
+        </div>
+        <Textarea
+          onFocus={() => setInputFocused(true)}
+          onBlur={() => setInputFocused(false)}
+          className="bg-background"
+          placeholder="write a message"
+          value={message}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              if (e.shiftKey) {
+                return;
+              }
+              e.preventDefault();
+              if (!authorized || !session.session || !message) return;
+              mutate("postMessage", {
+                id: ulid(),
+                content: message,
+                sender: session.session.username,
+                ts: Date.now().toString(),
+              });
+              setMessage("");
             }
-            e.preventDefault();
-            if (!authorized || !session.session || !message) return;
-            mutate("postMessage", {
-              id: ulid(),
-              content: message,
-              sender: session.session.username,
-              ts: Date.now().toString(),
-            });
-            setMessage("");
-          }
-        }}
-        onChange={(e) => setMessage(e.currentTarget.value)}
-      />
-    </div>
-  );
+          }}
+          onChange={(e) => setMessage(e.currentTarget.value)}
+        />
+      </div>
+    );
+  }
 };
