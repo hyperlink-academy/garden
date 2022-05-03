@@ -67,6 +67,7 @@ export const CardView = (props: { entityID: string }) => {
           className={`
             flex flex-col gap-6          
             overflow-y-auto
+            no-scrollbar
             w-full
             h-full
             ${contentStyles({ deck: !!isDeck, member: !!memberName })}

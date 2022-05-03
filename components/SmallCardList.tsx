@@ -26,6 +26,10 @@ export const SmallCardList = (props: {
         <div className="flex flex-wrap w-full gap-4">
           {items.map((c, index) => {
             let entity = props.backlink ? c.entity : c.value.value;
+            let attribute =
+              props.attribute === "deck/contains"
+                ? "cards"
+                : props.attribute.slice(8);
 
             return (
               <SortableSmallCard
@@ -45,7 +49,9 @@ export const SmallCardList = (props: {
                 }
                 draggable={authorized}
                 key={c.id}
-                href={`/s/${studio}/s/${space}/c/${entity}`}
+                href={`/s/${studio}/s/${space}/c/${props.deck}/${
+                  props.backlink ? "b" : "a"
+                }/${attribute}/${entity}`}
                 entityID={entity}
                 id={c.id}
               />
