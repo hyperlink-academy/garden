@@ -3,9 +3,11 @@ import { CardView } from "components/CardView";
 import { Card, LeftArrow, RightArrow, Shuffle } from "components/Icons";
 import { ReferenceAttributes } from "data/Attributes";
 import { Fact } from "data/Facts";
-import { useIndex } from "hooks/useReplicache";
+import { useIndex, useMutations } from "hooks/useReplicache";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
+import { generateKeyBetween } from "src/fractional-indexing";
+import { ulid } from "src/ulid";
 
 let smooth = false;
 export const CardCarousel = (props: {
@@ -16,6 +18,7 @@ export const CardCarousel = (props: {
 }) => {
   let [position, setPosition] = useState(0);
   let router = useRouter();
+  let { mutate, authorized } = useMutations();
   let selectedChild = router.query.child as string;
   let Name = useIndex.eav(props.entityID, "card/title");
 
@@ -28,7 +31,10 @@ export const CardCarousel = (props: {
   }, [props.cards, selectedChild]);
 
   return (
-    <div className="h-full flex flex-col items-stretch relative pt-8">
+    <div
+      className="h-full flex flex-col items-stretch relative pt-8"
+      onKeyDown={console.log}
+    >
       <div className="px-4 grid grid-flow-col items-center w-full pr-10 pb-2">
         <h4 className="uppercase text-accent-blue font-bold">{`${Name?.value} ${
           props.section === "deck/contains" ? "" : props.section.slice(8)
@@ -66,9 +72,39 @@ export const CardCarousel = (props: {
             );
           }}
         />
-        <div className="justify-items-end grid pt-2">
-          <ButtonLink icon={<Card />} content="Add Card!" />
-        </div>
+        {!authorized || props.backlink ? null : (
+          <div className="justify-items-end grid pt-2">
+            <ButtonLink
+              icon={<Card />}
+              content="Add Card!"
+              onClick={async () => {
+                let newCard = ulid();
+                await mutate("createCard", {
+                  entityID: newCard,
+                  title: "",
+                });
+                await mutate("addCardToSection", {
+                  cardEntity: newCard,
+                  parent: props.entityID,
+                  positions: {
+                    eav: generateKeyBetween(
+                      props.cards[props.cards.length - 1]?.positions.eav ||
+                        null,
+                      null
+                    ),
+                  },
+                  section: props.section,
+                });
+                let q = router.query;
+                router.replace(
+                  `/s/${q.studio}/s/${q.space}/c/${q.card}/${
+                    props.backlink ? "b" : "a"
+                  }/${q.attribute}/${newCard}`
+                );
+              }}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
@@ -120,6 +156,7 @@ const CardContainer: React.FC<{ selected: boolean; entity: string }> = (
       console.log("scrolling into view!", props.entity);
       ref.current?.scrollIntoView({ behavior: smooth ? "smooth" : "auto" });
     }
+    ref.current.focus();
     smooth = false;
   }, [props.selected, props.entity]);
   return (
