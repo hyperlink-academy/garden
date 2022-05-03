@@ -4,6 +4,7 @@ import { Card, LeftArrow, RightArrow, Shuffle } from "components/Icons";
 import { ReferenceAttributes } from "data/Attributes";
 import { Fact } from "data/Facts";
 import { useIndex, useMutations } from "hooks/useReplicache";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { generateKeyBetween } from "src/fractional-indexing";
@@ -36,9 +37,16 @@ export const CardCarousel = (props: {
       onKeyDown={console.log}
     >
       <div className="px-4 grid grid-flow-col items-center w-full pr-10 pb-2">
-        <h4 className="uppercase text-accent-blue font-bold">{`${Name?.value} ${
-          props.section === "deck/contains" ? "" : props.section.slice(8)
-        }`}</h4>
+        <h4 className="uppercase text-accent-blue font-bold">
+          <Link
+            href={`/s/${router.query.studio}/s/${router.query.space}/c/${props.entityID}`}
+          >
+            <a>{Name?.value}</a>
+          </Link>
+          {props.section === "deck/contains"
+            ? ""
+            : ` / ${props.section.slice(8)}`}
+        </h4>
       </div>
       <div
         className={`overflow-x-scroll flex snap-x snap-mandatory gap-4 -mx-4 px-4 no-scrollbar h-full`}
