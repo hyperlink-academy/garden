@@ -33,7 +33,7 @@ export const CardCarousel = (props: {
 
   return (
     <div
-      className="h-full flex flex-col items-stretch relative pt-8"
+      className="h-full flex flex-col items-stretch relative"
       onKeyDown={console.log}
     >
       <div className="px-4 grid grid-flow-col items-center w-full pr-10 pb-2">
