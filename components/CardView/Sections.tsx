@@ -47,9 +47,7 @@ const Section = (props: {
   return (
     <div className="textSection grid grid-auto-rows gap-2">
       <div className="grid grid-cols-[auto_min-content_min-content] gap-2 items-center">
-        <h4>
-          {props.name} {props.position}
-        </h4>
+        <h4>{props.name}</h4>
         <div className="text-grey-55">
           {type?.value === "string" ? <SectionText /> : <SectionLinkedCard />}
         </div>
@@ -85,6 +83,7 @@ const SingleTextSection = (props: {
     <Textarea
       autoFocus={props.new}
       ref={inputEl}
+      spellCheck={false}
       className="w-full bg-inherit"
       value={(fact?.value as string) || ""}
       onChange={async (e) => {
