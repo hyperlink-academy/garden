@@ -59,6 +59,7 @@ const Members = () => {
           <div className="flex flex-wrap gap-4">
             {members.map((m) => (
               <SmallCard
+                key={m.entity}
                 entityID={m.entity}
                 href={`/s/${studio}/s/${space}/c/${m.entity}`}
               />
