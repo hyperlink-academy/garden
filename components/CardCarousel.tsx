@@ -125,6 +125,11 @@ const CardContainer: React.FC<{ selected: boolean; entity: string }> = (
   return (
     <div
       ref={ref}
+      onClick={() => {
+        let q = router.query;
+        if (q.entity === props.entity) return;
+        ref.current?.scrollIntoView({ behavior: "smooth" });
+      }}
       style={{ maxWidth: "calc(100% - 16px)" }}
       className={`h-full snap-center flex-shrink-0 pb-1.5 w-full`}
     >
