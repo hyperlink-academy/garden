@@ -58,25 +58,51 @@ const Messages = () => {
         `}
       </style>
       <div className=" h-full overflow-y-auto overflow-x-hidden pb-6 flex flex-col-reverse ">
-        <div className=" flex flex-col gap-4">
-          {messages.map((m) => {
+        <div className=" flex flex-col">
+          {messages.map((m, index) => {
             return (
-              <div className="Message flex flex-col" key={m.id}>
-                <div className="grid grid-cols-[auto_max-content]">
-                  <div className={`MessageSender font-bold`}>{m.sender}</div>
-                  <div className="MessageInfo hidden italic text-grey-80">
-                    {new Date(parseInt(m.ts)).toLocaleDateString()}
-                  </div>
-                </div>
-                <pre className="MessageContent whitespace-pre-wrap font-[Quattro] text-grey-35">
-                  {m.content}
-                </pre>
-              </div>
+              <Message
+                key={m.id}
+                sender={m.sender}
+                ts={m.ts}
+                content={m.content}
+                doubleSend={
+                  messages[index - 1]?.sender === m.sender &&
+                  parseInt(m.ts) - parseInt(messages[index - 1].ts) < 300000
+                }
+              />
             );
           })}
         </div>
       </div>
     </React.Fragment>
+  );
+};
+
+const Message = (props: {
+  sender: string;
+  ts: string;
+  content: string;
+  doubleSend: boolean;
+}) => {
+  let messages = useIndex.messages();
+  let lastMessage = messages[messages.length - 1];
+  return (
+    <div
+      className={`Message flex flex-col ${props.doubleSend ? "pt-1" : "pt-4"}`}
+    >
+      <div className="grid grid-cols-[auto_max-content]">
+        {props.doubleSend ? null : (
+          <div className={`MessageSender font-bold `}>{props.sender}</div>
+        )}
+        <div className="MessageInfo hidden italic text-grey-80">
+          {new Date(parseInt(props.ts)).toLocaleDateString()}
+        </div>
+      </div>
+      <pre className="MessageContent whitespace-pre-wrap font-[Quattro] text-grey-35">
+        {props.content}
+      </pre>
+    </div>
   );
 };
 
