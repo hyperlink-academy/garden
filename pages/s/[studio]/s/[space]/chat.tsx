@@ -9,6 +9,8 @@ import { ulid } from "src/ulid";
 import { useAuth } from "hooks/useAuth";
 import Textarea from "components/AutosizeTextArea";
 import { SectionLinkedCard, Send } from "components/Icons";
+import { useRouter } from "next/router";
+import Link from "next/link";
 
 export default function ChatPage() {
   return (
@@ -26,7 +28,6 @@ const Messages = () => {
   let lastMessage = messages[messages.length - 1];
 
   useEffect(() => {
-    console.log(messages);
     rep?.query(async (tx) => {
       if (!id || !lastMessage?.index) return;
       let q = scanIndex(tx);
@@ -43,10 +44,6 @@ const Messages = () => {
       });
     });
   }, [messages]);
-
-  if (messages.length > 1) {
-    console.log(lastMessage.ts);
-  }
 
   return (
     <React.Fragment>
@@ -87,13 +84,19 @@ const Message = (props: {
 }) => {
   let messages = useIndex.messages();
   let lastMessage = messages[messages.length - 1];
+  let member = useIndex.ave("member/name", props.sender);
+  let q = useRouter().query;
   return (
     <div
       className={`Message flex flex-col ${props.doubleSend ? "pt-1" : "pt-4"}`}
     >
       <div className="grid grid-cols-[auto_max-content]">
         {props.doubleSend ? null : (
-          <div className={`MessageSender font-bold `}>{props.sender}</div>
+          <Link href={`/s/${q.studio}/s/${q.space}/c/${member?.entity}`}>
+            <a>
+              <div className={`MessageSender font-bold `}>{props.sender}</div>
+            </a>
+          </Link>
         )}
         <div className="MessageInfo hidden italic text-grey-80">
           {new Date(parseInt(props.ts)).toLocaleDateString()}
