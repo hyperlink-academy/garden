@@ -13,10 +13,11 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 
 export default function ChatPage() {
+  let id = useSpaceID();
   return (
     <div className="h-full flex flex-col relative items-stretch">
       <Messages />
-      <MessageInput />
+      <MessageInput id={id || ""} />
     </div>
   );
 }
@@ -109,9 +110,21 @@ const Message = (props: {
   );
 };
 
-const MessageInput = () => {
+const MessageInput = (props: { id: string }) => {
   let [message, setMessage] = useState("");
   let { session } = useAuth();
+  useEffect(() => {
+    let storedMsg = localStorage.getItem(
+      `chatinput-${props.id}-${session?.session?.studio}`
+    );
+    if (storedMsg) setMessage((m) => (m ? m : (storedMsg as string)));
+  }, [props.id, session]);
+  useEffect(() => {
+    localStorage.setItem(
+      `chatinput-${props.id}-${session?.session?.studio}`,
+      message
+    );
+  }, [message]);
   let { authorized, mutate } = useMutations();
   let [inputFocused, setInputFocused] = useState(false);
 
