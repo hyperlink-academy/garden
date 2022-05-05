@@ -3,10 +3,13 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { ChatBubble, Studio, Information, DeckLarge } from "./Icons";
 import { ButtonLink, ButtonPrimary, ButtonTertiary } from "./Buttons";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Modal } from "components/Layout";
 import { SmallCardDragContext } from "./DragContext";
 import { usePreserveScroll } from "hooks/utils";
+import { ReplicacheContext, scanIndex, useSpaceID } from "hooks/useReplicache";
+import { useSubscribe } from "replicache-react";
+import { Message } from "data/Messages";
 
 export const SpaceLayout: React.FC = (props) => {
   let { ref } = usePreserveScroll<HTMLDivElement>();
@@ -81,19 +84,8 @@ export function Footer() {
             <DeckLarge className="mx-auto" />
           </a>
         </Link>
-
         {/* CHAT */}
-        <Link href={`/s/${router.query.studio}/s/${router.query.space}/chat`}>
-          <a
-            className={
-              router.pathname === "/s/[studio]/s/[space]/chat"
-                ? selectedClassname
-                : "w-16"
-            }
-          >
-            <ChatBubble className="mx-auto" />
-          </a>
-        </Link>
+        <ChatIcon />
       </div>
 
       {/* INFO */}
@@ -101,6 +93,56 @@ export function Footer() {
     </div>
   );
 }
+
+const ChatIcon = () => {
+  let router = useRouter();
+  let ctx = useContext(ReplicacheContext);
+  let spaceID = useSpaceID();
+  let { rep: studio } = useAuth();
+  let lastSeen = useSubscribe(
+    studio,
+    async (tx) => {
+      if (!spaceID) return 0;
+      let q = scanIndex(tx);
+      let space = await q.ave("space/id", spaceID);
+      if (!space) return 0;
+      let latest = await q.eav(space.entity, "space/lastSeenMessage");
+      return latest?.value || 0;
+    },
+    0,
+    [spaceID]
+  );
+  let latestMsg = useSubscribe(
+    ctx?.rep,
+    async (tx) => {
+      let messages = await tx
+        .scan({ indexName: "messages" })
+        .values()
+        .toArray();
+      let lastMessage = messages[messages.length - 1] as Message;
+      return lastMessage?.index || 0;
+    },
+    0,
+    []
+  );
+
+  return (
+    <Link href={`/s/${router.query.studio}/s/${router.query.space}/chat`}>
+      <a
+        className={`relative ${
+          router.pathname === "/s/[studio]/s/[space]/chat"
+            ? selectedClassname
+            : "w-16"
+        }`}
+      >
+        <ChatBubble className="mx-auto" />
+        {latestMsg > lastSeen ? (
+          <div className="bg-accent-red absolute rounded-full top-1.5 left-10 w-3 h-3"></div>
+        ) : null}
+      </a>
+    </Link>
+  );
+};
 
 function LogInModal() {
   let [isOpen, setLogInModal] = useState(false);
