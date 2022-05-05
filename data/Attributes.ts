@@ -91,6 +91,11 @@ export const DefaultAttributes = {
     unique: true,
     cardinality: "one",
   },
+  "space/door/image": {
+    type: "string",
+    unique: false,
+    cardinality: "one",
+  },
   "space/name": {
     type: "string",
     unique: true,

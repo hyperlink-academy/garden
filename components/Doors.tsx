@@ -1,3 +1,4 @@
+import { useIndex } from "hooks/useReplicache";
 import { SVGProps } from "react";
 
 let doorImages: string[] = [
@@ -6,10 +7,6 @@ let doorImages: string[] = [
   "/doors/door-field-256.jpg",
   "/doors/door-windowseat-256.jpg",
 ];
-function getRandomDoorImage(doorImages: string[]) {
-  var length = doorImages.length;
-  return doorImages[Math.floor(Math.random() * length)];
-}
 
 var doorIndex = 0;
 function getSequentialDoorImage(doorImages: string[]) {
@@ -45,20 +42,16 @@ function getRandomFrame(frameColors: object) {
   ] as keyof typeof frameColors;
 }
 
-export const Door = (props: SVGProps<SVGSVGElement>) => {
+export const Door = (props: { entityID: string; width?: string }) => {
   let colorKey = getRandomFrame(frameColors);
+  let image = useIndex.eav(props.entityID, "space/door/image");
   let color1 = frameColors[colorKey][0];
   let color2 = frameColors[colorKey][1];
   return (
     <svg
-      {...props}
       xmlns="http://www.w3.org/2000/svg"
-      // width="64"
-      // height="144"
-      // width="96"
-      // height="216"
-      width="128"
-      height="288"
+      width={props.width || "128"}
+      height="auto"
       viewBox="0 0 256 575.64"
       // className="flex-none"
       className="flex-none -scale-x-100"
@@ -80,8 +73,7 @@ export const Door = (props: SVGProps<SVGSVGElement>) => {
         width="100%"
         height="100%"
         preserveAspectRatio="xMinYMin slice"
-        // xlinkHref={getRandomDoorImage(doorImages)}
-        xlinkHref={getSequentialDoorImage(doorImages)}
+        xlinkHref={image?.value || getSequentialDoorImage(doorImages)}
         clipPath="url(#outer-frame)"
       />
 
