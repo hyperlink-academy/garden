@@ -5,7 +5,7 @@ import { ReferenceAttributes } from "data/Attributes";
 import { Fact } from "data/Facts";
 import { useIndex, useMutations } from "hooks/useReplicache";
 import Link from "next/link";
-import { useRouter } from "next/router";
+import Router, { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { generateKeyBetween } from "src/fractional-indexing";
 import { ulid } from "src/ulid";
@@ -17,19 +17,14 @@ export const CardCarousel = (props: {
   section: string;
   cards: Fact<keyof ReferenceAttributes>[];
 }) => {
-  let [position, setPosition] = useState(0);
   let router = useRouter();
+  let [selectedChild, setSelectedChild] = useState(router.query.child);
   let { mutate, authorized } = useMutations();
-  let selectedChild = router.query.child as string;
   let Name = useIndex.eav(props.entityID, "card/title");
-
-  useEffect(() => {
-    let index = props.cards.findIndex((c) => {
-      let entity = props.backlink ? c.entity : c.value.value;
-      return entity === selectedChild;
-    });
-    if (index !== -1) setPosition(index);
-  }, [props.cards, selectedChild]);
+  const position = props.cards.findIndex((c) => {
+    let entity = props.backlink ? c.entity : c.value.value;
+    return entity === selectedChild;
+  });
 
   return (
     <div
@@ -55,7 +50,8 @@ export const CardCarousel = (props: {
           let entity = props.backlink ? c.entity : c.value.value;
           return (
             <CardContainer
-              selected={selectedChild === c.value.value}
+              onFocus={() => setSelectedChild(entity)}
+              selected={selectedChild === entity}
               key={entity}
               entity={entity}
             >
@@ -72,12 +68,7 @@ export const CardCarousel = (props: {
             let card = props.cards[pos];
             let entity = props.backlink ? card.entity : card.value.value;
             smooth = true;
-            let q = router.query;
-            router.replace(
-              `/s/${q.studio}/s/${q.space}/c/${q.card}/${
-                props.backlink ? "b" : "a"
-              }/${q.attribute}/${entity}`
-            );
+            setSelectedChild(entity);
           }}
         />
         {!authorized || props.backlink ? null : (
@@ -103,12 +94,7 @@ export const CardCarousel = (props: {
                   },
                   section: props.section,
                 });
-                let q = router.query;
-                router.replace(
-                  `/s/${q.studio}/s/${q.space}/c/${q.card}/${
-                    props.backlink ? "b" : "a"
-                  }/${q.attribute}/${newCard}`
-                );
+                setSelectedChild(newCard);
               }}
             />
           </div>
@@ -118,11 +104,12 @@ export const CardCarousel = (props: {
   );
 };
 
-const CardContainer: React.FC<{ selected: boolean; entity: string }> = (
-  props
-) => {
+const CardContainer: React.FC<{
+  selected: boolean;
+  entity: string;
+  onFocus: () => void;
+}> = (props) => {
   let ref = useRef<HTMLDivElement>(null);
-  let router = useRouter();
   useEffect(() => {
     let timeout: number | undefined = undefined;
     let node = ref.current;
@@ -132,13 +119,17 @@ const CardContainer: React.FC<{ selected: boolean; entity: string }> = (
           clearTimeout(timeout);
           timeout = undefined;
         }
-        if (e[0]?.isIntersecting && router.query.child !== props.entity) {
+        if (e[0]?.isIntersecting) {
           timeout = window.setTimeout(() => {
             if (window.location.href.endsWith(props.entity)) return;
-            let q = router.query;
-            router.replace(
-              `/s/${q.studio}/s/${q.space}/c/${q.card}/a/${q.attribute}/${props.entity}`
+            let q = Router.query;
+            let newUrl = `/s/${q.studio}/s/${q.space}/c/${q.card}/a/${q.attribute}/${props.entity}`;
+            window.history.replaceState(
+              { ...window.history.state, as: newUrl, url: newUrl },
+              "",
+              newUrl
             );
+            props.onFocus();
           }, 100);
         }
       },
@@ -150,28 +141,25 @@ const CardContainer: React.FC<{ selected: boolean; entity: string }> = (
     return () => {
       if (node) observer.unobserve(node);
     };
-  }, [ref, props.entity, router]);
+  }, [ref, props.entity, props.selected]);
 
   useEffect(() => {
     if (!ref.current) return;
     if (!props.selected) return;
-    console.log(props.entity, "should be scrolled!");
     //@ts-ignore
     if (ref.current.scrollIntoViewIfNeeded) {
       //@ts-ignore
       ref.current.scrollIntoViewIfNeeded();
     } else {
-      console.log("scrolling into view!", props.entity);
       ref.current?.scrollIntoView({ behavior: smooth ? "smooth" : "auto" });
     }
-    ref.current.focus();
     smooth = false;
   }, [props.selected, props.entity]);
   return (
     <div
       ref={ref}
       onClick={() => {
-        let q = router.query;
+        let q = Router.query;
         if (q.entity === props.entity) return;
         ref.current?.scrollIntoView({ behavior: "smooth" });
       }}
