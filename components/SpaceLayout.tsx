@@ -47,50 +47,59 @@ export function Footer() {
   let { session } = useAuth();
 
   return (
-    <div
-      style={{
-        width: "100%",
-        margin: "auto",
-        maxWidth: "48rem",
-      }}
-      className={`
+    <>
+      <style jsx>{`
+        @media (max-height: 500px) {
+          .menu {
+            display: none;
+          }
+        }
+      `}</style>
+      <div
+        style={{
+          width: "100%",
+          margin: "auto",
+          maxWidth: "48rem",
+        }}
+        className={`menu
         grid grid-cols-[1fr,1fr,1fr] gap-1 items-center
         bg-background border-t-2 border-grey-15 
         px-4 pb-5
         `}
-    >
-      {/* BACK TO STUDIO */}
+      >
+        {/* BACK TO STUDIO */}
 
-      {!session?.loggedIn ? (
-        <LogInModal />
-      ) : (
-        <Link href={`/s/${session.session.username}`}>
-          <a className="justify-self-start">
-            <Studio className="text-grey-55" />
-          </a>
-        </Link>
-      )}
+        {!session?.loggedIn ? (
+          <LogInModal />
+        ) : (
+          <Link href={`/s/${session.session.username}`}>
+            <a className="justify-self-start">
+              <Studio className="text-grey-55" />
+            </a>
+          </Link>
+        )}
 
-      <div className="justify-self-center flex flex-row">
-        {/* DECKS */}
-        <Link href={`/s/${router.query.studio}/s/${router.query.space}`}>
-          <a
-            className={
-              router.pathname === "/s/[studio]/s/[space]/chat"
-                ? "w-16"
-                : selectedClassname
-            }
-          >
-            <DeckLarge className="mx-auto" />
-          </a>
-        </Link>
-        {/* CHAT */}
-        <ChatIcon />
+        <div className="justify-self-center flex flex-row">
+          {/* DECKS */}
+          <Link href={`/s/${router.query.studio}/s/${router.query.space}`}>
+            <a
+              className={
+                router.pathname === "/s/[studio]/s/[space]/chat"
+                  ? "w-16"
+                  : selectedClassname
+              }
+            >
+              <DeckLarge className="mx-auto" />
+            </a>
+          </Link>
+          {/* CHAT */}
+          <ChatIcon />
+        </div>
+
+        {/* INFO */}
+        <InfoModal />
       </div>
-
-      {/* INFO */}
-      <InfoModal />
-    </div>
+    </>
   );
 }
 
