@@ -23,16 +23,20 @@ export const AddSection = (props: { cardEntity: string }) => {
     );
   let types = useIndex.aev("type");
 
-  return !authorized ? null : (
+  return !authorized ? (
+    <Divider />
+  ) : (
     <div className="addSectionButton grid grid-auto-row gap-2 pb-6">
-      <Divider />
-
       <button
-        className="flex gap-2 text-grey-80"
+        className="grid grid-cols-[1fr_max-content_1fr] gap-4 items-center text-grey-80"
         onClick={() => setState("add")}
       >
-        <Add />
-        <h4 className="text-grey-80 ">Add Section</h4>
+        <Divider />
+        <div className="flex gap-2">
+          <Add />
+          <h4 className="text-grey-80 ">Add Section</h4>
+        </div>
+        <Divider />
       </button>
       <Modal open={state !== "closed"} onClose={() => setState("closed")}>
         {state === "add" ? (

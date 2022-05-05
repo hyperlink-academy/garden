@@ -13,9 +13,11 @@ export const Backlinks = (props: { entityID: string }) => {
     }, {} as { [k in string]: boolean })
   ) as (keyof ReferenceAttributes)[];
   return (
-    <div className=" grid grid-flow-row gap-2">
-      <h3>This card appears in ({sections.length})</h3>
-      <ul className=" grid grid-flow-row gap-2">
+    <div className=" grid grid-flow-row gap-6 ">
+      <small className="bg-background rounded-md p-2 font-bold lightBorder">
+        This card is part of {sections.length} collections
+      </small>
+      <ul className=" grid grid-flow-row gap-4">
         {sections.map((s) => {
           return (
             <BacklinkSection entityID={props.entityID} attribute={s} key={s} />
@@ -33,12 +35,20 @@ const BacklinkSection = (props: {
   let backlinkedCards = useIndex.vae(props.entityID, props.attribute);
 
   let title =
-    props.attribute === "deck/contains"
-      ? "Decks"
-      : `${props.attribute.slice(8)} Section of`;
+    props.attribute === "deck/contains" ? (
+      "Decks"
+    ) : (
+      <p>
+        <span className="">{props.attribute.slice(8)}</span>
+        <span className="font-normal normal-case text-grey-55">
+          {" "}
+          section in
+        </span>
+      </p>
+    );
   return (
     <div>
-      <h3 className="pb-2">{title}</h3>
+      <h4 className="pb-2">{title}</h4>
       <SmallCardList
         backlink={true}
         attribute={props.attribute}
