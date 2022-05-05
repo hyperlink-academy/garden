@@ -17,7 +17,9 @@ export const Backlinks = (props: { entityID: string }) => {
       <h3>This card appears in ({sections.length})</h3>
       <ul className=" grid grid-flow-row gap-2">
         {sections.map((s) => {
-          return <BacklinkSection entityID={props.entityID} attribute={s} />;
+          return (
+            <BacklinkSection entityID={props.entityID} attribute={s} key={s} />
+          );
         })}
       </ul>
     </div>
