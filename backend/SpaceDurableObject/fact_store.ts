@@ -139,5 +139,5 @@ export const store = (storage: DurableObjectStorage) => {
       return { success: true };
     },
   };
-  return { ...context, writeFactToStore };
+  return { ...context, writeFactToStore, getSchema };
 };

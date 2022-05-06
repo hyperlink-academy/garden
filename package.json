@@ -22,11 +22,13 @@
   "dependencies": {
     "@dnd-kit/core": "^5.0.3",
     "@dnd-kit/sortable": "^6.0.1",
+    "@graphql-yoga/common": "^2.5.0",
     "@headlessui/react": "^1.5.0",
     "bcryptjs": "^2.4.3",
     "cookie": "^0.4.2",
     "corpora-project": "^0.2.0",
     "faunadb": "^4.5.2",
+    "graphql": "^16.4.0",
     "next": "^12.1.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",

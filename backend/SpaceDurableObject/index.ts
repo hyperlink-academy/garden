@@ -1,6 +1,7 @@
 import { Bindings } from "backend";
 import { makeRouter } from "backend/lib/api";
 import { store } from "./fact_store";
+import { graphqlServer } from "./graphql";
 import { init } from "./initialize";
 import { claimRoute } from "./routes/claim";
 import { create_space_route } from "./routes/create_space";
@@ -56,29 +57,33 @@ export class SpaceDurableObject implements DurableObject {
   async fetch(request: Request) {
     let url = new URL(request.url);
     let path = url.pathname.split("/");
+    let ctx = {
+      storage: this.state.storage,
+      env: this.env,
+      poke: () => {
+        if (this.throttled) {
+          return;
+        }
+
+        this.throttled = true;
+        setTimeout(() => {
+          this.sockets.forEach((socket) => {
+            socket.socket.send(JSON.stringify({ type: "poke" }));
+          });
+          this.throttled = false;
+        }, 100);
+      },
+      factStore: store(this.state.storage),
+    };
     switch (path[1]) {
       case "socket": {
         return connect.bind(this)(request);
       }
       case "api": {
-        return router(path[2], request, {
-          storage: this.state.storage,
-          env: this.env,
-          poke: () => {
-            if (this.throttled) {
-              return;
-            }
-
-            this.throttled = true;
-            setTimeout(() => {
-              this.sockets.forEach((socket) => {
-                socket.socket.send(JSON.stringify({ type: "poke" }));
-              });
-              this.throttled = false;
-            }, 100);
-          },
-          factStore: store(this.state.storage),
-        });
+        return router(path[2], request, ctx);
+      }
+      case "graphql": {
+        return graphqlServer(request, ctx);
       }
       default:
         return new Response("", { status: 404 });
