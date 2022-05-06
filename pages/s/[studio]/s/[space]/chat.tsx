@@ -8,9 +8,19 @@ import {
 import { ulid } from "src/ulid";
 import { useAuth } from "hooks/useAuth";
 import Textarea from "components/AutosizeTextArea";
-import { SectionLinkedCard, Send } from "components/Icons";
+import {
+  Card,
+  Close,
+  Cross,
+  DeckSmall,
+  Member,
+  SectionLinkedCard,
+  Send,
+} from "components/Icons";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import { FindOrCreate } from "components/FindOrCreateEntity";
+import { SmallCard } from "components/SmallCard";
 
 export default function ChatPage() {
   let id = useSpaceID();
@@ -62,6 +72,7 @@ const Messages = () => {
               <Message
                 key={m.id}
                 sender={m.sender}
+                attachedCards={m.attachedCards}
                 ts={m.ts}
                 content={m.content}
                 doubleSend={
@@ -81,10 +92,9 @@ const Message = (props: {
   sender: string;
   ts: string;
   content: string;
+  attachedCards?: string[];
   doubleSend: boolean;
 }) => {
-  let messages = useIndex.messages();
-  let lastMessage = messages[messages.length - 1];
   let member = useIndex.ave("member/name", props.sender);
   let q = useRouter().query;
   return (
@@ -106,12 +116,18 @@ const Message = (props: {
       <pre className="MessageContent whitespace-pre-wrap font-[Quattro] text-grey-35">
         {props.content}
       </pre>
+      <div className="flex flex-wrap gap-2 pt-2">
+        {props.attachedCards?.map((e) => {
+          return <SmallCard entityID={e} href={""} key={e} />;
+        })}
+      </div>
     </div>
   );
 };
 
 const MessageInput = (props: { id: string }) => {
   let [message, setMessage] = useState("");
+  let [attachedCards, setAttachedCards] = useState<string[]>([]);
   let { session } = useAuth();
   useEffect(() => {
     let storedMsg = localStorage.getItem(
@@ -134,63 +150,137 @@ const MessageInput = (props: { id: string }) => {
         Log In to send a message!
       </div>
     );
-  } else {
-    return (
-      <div className="-mx-5 px-5 pt-3 pb-4 border-t border-grey-80 flex flex-col gap-2">
-        <div
-          onMouseDown={(e) => e.preventDefault()}
-          className={`w-full bg-bg-blue lightBorder ${
-            inputFocused
-              ? "flex flex-row justify-end rounded-md p-2 gap-4"
-              : "hidden"
-          } `}
-        >
-          <SectionLinkedCard className="hover:text-accent-blue text-grey-35" />
-          <div className="border-l text-grey-80"></div>
-          <button
-            className="text-accent-blue"
-            onClick={(e) => {
-              e.preventDefault;
-              if (!authorized || !session.session || !message) return;
-              mutate("postMessage", {
-                id: ulid(),
-                content: message,
-                sender: session.session.username,
-                ts: Date.now().toString(),
-              });
-              setMessage("");
-            }}
-          >
-            <div className="flex gap-2 font-bold">
-              <Send />
-            </div>
-          </button>
-        </div>
-        <Textarea
-          onFocus={() => setInputFocused(true)}
-          onBlur={() => setInputFocused(false)}
-          className="bg-background"
-          placeholder="write a message"
-          value={message}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              if (e.shiftKey) {
-                return;
-              }
-              e.preventDefault();
-              if (!authorized || !session.session || !message) return;
-              mutate("postMessage", {
-                id: ulid(),
-                content: message,
-                sender: session.session.username,
-                ts: Date.now().toString(),
-              });
-              setMessage("");
-            }
-          }}
-          onChange={(e) => setMessage(e.currentTarget.value)}
-        />
-      </div>
-    );
   }
+
+  const submit = () => {
+    if (!authorized || !session.session || !message) return;
+    mutate("postMessage", {
+      id: ulid(),
+      content: message,
+      attachedCards: attachedCards,
+      sender: session.session.username,
+      ts: Date.now().toString(),
+    });
+    setMessage("");
+    setAttachedCards([]);
+  };
+  return (
+    <div className="-mx-5 px-5 pt-3 pb-4 border-t border-grey-80 flex flex-col gap-2">
+      <div
+        onMouseDown={(e) => e.preventDefault()}
+        className={`w-full bg-bg-blue lightBorder ${
+          inputFocused
+            ? "flex flex-row justify-end rounded-md p-2 gap-4"
+            : "hidden"
+        } `}
+      >
+        <FindOrCreateCard
+          selected={attachedCards}
+          onSelect={(e) => setAttachedCards((a) => [...a, e])}
+        />
+        <button
+          className="text-accent-blue"
+          onClick={(e) => {
+            e.preventDefault;
+            if (!authorized || !session.session || !message) return;
+            submit();
+          }}
+        >
+          <div className="flex gap-2 font-bold">
+            <Send />
+          </div>
+        </button>
+      </div>
+      <div>
+        {attachedCards.map((e) => {
+          return (
+            <AttachedCard
+              entityID={e}
+              key={e}
+              remove={() => setAttachedCards((a) => a.filter((c) => c !== e))}
+            />
+          );
+        })}
+      </div>
+      <Textarea
+        onFocus={() => setInputFocused(true)}
+        onBlur={() => setInputFocused(false)}
+        className="bg-background"
+        placeholder="write a message"
+        value={message}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            if (e.shiftKey) {
+              return;
+            }
+            e.preventDefault();
+            submit();
+          }
+        }}
+        onChange={(e) => setMessage(e.currentTarget.value)}
+      />
+    </div>
+  );
+};
+
+const AttachedCard = (props: { entityID: string; remove: () => void }) => {
+  let title = useIndex.eav(props.entityID, "card/title");
+  return (
+    <div>
+      {title?.value}{" "}
+      <button onClick={() => props.remove()}>
+        <Cross />
+      </button>
+    </div>
+  );
+};
+
+const FindOrCreateCard = (props: {
+  onSelect: (e: string) => void;
+  selected: string[];
+}) => {
+  let [open, setOpen] = useState(false);
+  let { mutate } = useMutations();
+  let decks = useIndex.aev("deck");
+  let titles = useIndex.aev("card/title");
+  let items = titles.map((t) => {
+    return {
+      entity: t.entity,
+      display: t.value,
+      icon: !!decks.find((d) => t.entity === d.entity) ? (
+        <DeckSmall />
+      ) : (
+        <Card />
+      ),
+    };
+  });
+
+  return (
+    <>
+      <button className="border-l text-grey-80" onClick={() => setOpen(true)}>
+        <SectionLinkedCard className="hover:text-accent-blue text-grey-35" />
+      </button>
+      <FindOrCreate
+        allowBlank={false}
+        onClose={() => setOpen(false)}
+        open={open}
+        items={items}
+        selected={props.selected}
+        onSelect={async (e) => {
+          let entity;
+          if (e.type === "create") {
+            entity = ulid();
+            await mutate("createCard", {
+              entityID: entity,
+              title: e.name,
+            });
+          } else {
+            entity = e.entity;
+          }
+
+          props.onSelect(entity);
+        }}
+      />
+    </>
+  );
 };
