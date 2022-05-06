@@ -118,7 +118,13 @@ const Message = (props: {
       </pre>
       <div className="flex flex-wrap gap-2 pt-2">
         {props.attachedCards?.map((e) => {
-          return <SmallCard entityID={e} href={""} key={e} />;
+          return (
+            <SmallCard
+              entityID={e}
+              key={e}
+              href={`/s/${q.studio}/s/${q.space}/c/${e}`}
+            />
+          );
         })}
       </div>
     </div>
