@@ -7,6 +7,11 @@ import { getIdentityByUsernameFunctionName } from "./functions/get_identity_by_u
 import { getSessionByIdFunctionName } from "./functions/get_session_by_id";
 import { ValidateNewIdentityFunctionName } from "./functions/validate_new_identity";
 import { getSignupTokenFunctionName } from "./functions/get_signup_token";
+import {
+  getPhysicalCardById,
+  getPhysicalCardByIdFunctionName,
+} from "./functions/get_physical_card_by_id";
+import { CreatePhysicalCardFunctionName } from "./functions/create_physical_card";
 
 const Functions = [
   deleteSessionFunctionName,
@@ -16,6 +21,8 @@ const Functions = [
   CreateSessionFunctionName,
   CreateIdentityFunctionName,
   ValidateNewIdentityFunctionName,
+  getPhysicalCardByIdFunctionName,
+  CreatePhysicalCardFunctionName,
 ];
 const definition: RoleDefinition = {
   name: "server_role",

@@ -1,0 +1,7 @@
+CreateFunction({
+  "name": "get_physical_card_by_id",
+  "role": "server",
+  "body": Query(Lambda("args", Let([{
+    "indexEntry": Match(Index("physical_cards_by_id"), [Select("id", Var("args"))])
+  }], If(Exists(Var("indexEntry")), Select("data", Get(Var("indexEntry"))), null))))
+})
