@@ -3,7 +3,7 @@ import { ComponentViewer, Props, Stories } from "./index";
 export { getStaticProps } from "./index";
 const entities: Stories = {
   NoMessages: {
-    entities: [{}],
+    entities: [{ "card/title": "A Card!" }],
   },
   ManyMessages: {
     entities: [{}],

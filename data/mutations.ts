@@ -160,9 +160,17 @@ const createCard: Mutation<{ entityID: string; title: string }> = async (
 };
 
 const assertFact: Mutation<
-  Pick<Fact<keyof Attribute>, "attribute" | "entity" | "value" | "positions">
+  | Pick<Fact<keyof Attribute>, "attribute" | "entity" | "value" | "positions">
+  | Pick<
+      Fact<keyof Attribute>,
+      "attribute" | "entity" | "value" | "positions"
+    >[]
 > = async (args, ctx) => {
-  await ctx.assertFact({ ...args });
+  await Promise.all(
+    [args].flat().map((f) => {
+      return ctx.assertFact({ ...f });
+    })
+  );
 };
 
 const retractFact: Mutation<{ id: string }> = async (args, ctx) => {

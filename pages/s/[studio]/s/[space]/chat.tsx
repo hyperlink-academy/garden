@@ -10,10 +10,8 @@ import { useAuth } from "hooks/useAuth";
 import Textarea from "components/AutosizeTextArea";
 import {
   Card,
-  Close,
   Cross,
   DeckSmall,
-  Member,
   SectionLinkedCard,
   Send,
 } from "components/Icons";
@@ -21,6 +19,7 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import { FindOrCreate } from "components/FindOrCreateEntity";
 import { SmallCard } from "components/SmallCard";
+import { ref } from "data/Facts";
 
 export default function ChatPage() {
   let id = useSpaceID();
@@ -71,6 +70,7 @@ const Messages = () => {
             return (
               <Message
                 key={m.id}
+                entity={m.entity}
                 sender={m.sender}
                 attachedCards={m.attachedCards}
                 ts={m.ts}
@@ -89,6 +89,7 @@ const Messages = () => {
 };
 
 const Message = (props: {
+  entity?: string;
   sender: string;
   ts: string;
   content: string;
@@ -116,17 +117,26 @@ const Message = (props: {
       <pre className="MessageContent whitespace-pre-wrap font-[Quattro] text-grey-35">
         {props.content}
       </pre>
-      <div className="flex flex-wrap gap-2 pt-2">
-        {props.attachedCards?.map((e) => {
-          return (
-            <SmallCard
-              entityID={e}
-              key={e}
-              href={`/s/${q.studio}/s/${q.space}/c/${e}`}
-            />
-          );
-        })}
-      </div>
+      {!props.entity ? null : <MessageData entity={props.entity} />}
+    </div>
+  );
+};
+
+const MessageData = (props: { entity: string }) => {
+  let { studio, space } = useRouter().query;
+  let attachedCards = useIndex.eav(props.entity, "message/attachedCard") || [];
+
+  return (
+    <div className="flex flex-wrap gap-2 pt-2">
+      {attachedCards?.map((e) => {
+        return (
+          <SmallCard
+            entityID={e.value.value}
+            key={e.id}
+            href={`/s/${studio}/s/${space}/c/${e}`}
+          />
+        );
+      })}
     </div>
   );
 };
@@ -158,12 +168,34 @@ const MessageInput = (props: { id: string }) => {
     );
   }
 
-  const submit = () => {
+  const submit = async () => {
     if (!authorized || !session.session || !message) return;
+    let messageId = ulid();
+    let entity: string | undefined;
+    if (attachedCards.length > 0) {
+      entity = ulid();
+      await mutate("assertFact", {
+        entity,
+        attribute: "message/id",
+        value: messageId,
+        positions: {},
+      });
+      await mutate(
+        "assertFact",
+        attachedCards.map((c) => {
+          return {
+            entity: entity as string,
+            attribute: "message/attachedCard",
+            value: ref(c),
+            positions: {},
+          };
+        })
+      );
+    }
     mutate("postMessage", {
       id: ulid(),
+      entity,
       content: message,
-      attachedCards: attachedCards,
       sender: session.session.username,
       ts: Date.now().toString(),
     });

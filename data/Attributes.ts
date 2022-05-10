@@ -121,6 +121,16 @@ export const DefaultAttributes = {
     type: "string",
     cardinality: "one",
   },
+  "message/id": {
+    type: "string",
+    cardinality: "one",
+    unique: true,
+  },
+  "message/attachedCard": {
+    type: "reference",
+    cardinality: "many",
+    unique: false,
+  },
 } as const;
 
 export const Attribute = { ...DefaultAttributes, ...BaseAttributes };
