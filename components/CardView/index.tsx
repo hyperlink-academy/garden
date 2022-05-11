@@ -154,13 +154,6 @@ const Content = (props: { entityID: string }) => {
       onChange={async (e) => {
         let start = e.currentTarget.selectionStart,
           end = e.currentTarget.selectionEnd;
-        if (content) {
-          await mutate("updateFact", {
-            id: content.id,
-            data: { value: e.currentTarget.value },
-          });
-          return;
-        }
         await mutate("assertFact", {
           entity: props.entityID,
           attribute: "card/content",
