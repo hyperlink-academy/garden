@@ -178,6 +178,7 @@ const CardCounter = (props: {
       <button
         onClick={() => {
           if (props.position > 0) props.setPosition(props.position - 1);
+          else props.setPosition(props.length - 1);
         }}
       >
         <LeftArrow className="text-accent-blue" />
@@ -189,6 +190,7 @@ const CardCounter = (props: {
         onClick={() => {
           if (props.position < props.length - 1)
             props.setPosition(props.position + 1);
+          else props.setPosition(0);
         }}
       >
         <RightArrow className="text-accent-blue" />
