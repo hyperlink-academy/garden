@@ -27,10 +27,7 @@ export const CardCarousel = (props: {
   });
 
   return (
-    <div
-      className="h-full flex flex-col items-stretch relative"
-      onKeyDown={console.log}
-    >
+    <div className="h-full flex flex-col items-stretch relative">
       <div className="px-4 grid grid-flow-col items-center w-full pr-10 pb-2">
         <h4 className="uppercase text-accent-blue font-bold">
           <Link
