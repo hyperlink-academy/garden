@@ -3,27 +3,30 @@ import { workerAPI } from "backend/lib/api";
 import { ButtonPrimary } from "components/Buttons";
 import { Client } from "faunadb";
 import { GetServerSideProps } from "next";
-import { redirect } from "next/dist/server/api-utils";
 import { useState } from "react";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export default (props: { id: string }) => {
   let [link, setLink] = useState("");
   return (
-    <div>
+    <form
+      onSubmit={async (e) => {
+        e.preventDefault();
+        let data = await workerAPI(WORKER_URL, "claim_card", {
+          id: props.id,
+          link,
+        });
+        if (data.success) window.location.assign(data.link);
+      }}
+    >
       <div>link a card {props.id}</div>
-      <input value={link} onChange={(e) => setLink(e.currentTarget.value)} />
-      <ButtonPrimary
-        content="submit"
-        onClick={async () => {
-          let data = await workerAPI(WORKER_URL, "claim_card", {
-            id: props.id,
-            link,
-          });
-          if (data.success) window.location.assign(data.link);
-        }}
+      <input
+        value={link}
+        type="url"
+        onChange={(e) => setLink(e.currentTarget.value)}
       />
-    </div>
+      <ButtonPrimary content="submit" type="submit" />
+    </form>
   );
 };
 
