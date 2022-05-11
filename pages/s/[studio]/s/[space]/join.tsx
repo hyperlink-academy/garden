@@ -46,6 +46,7 @@ function JoinSpace(props: { id: string }) {
         spaceID: props.id,
         entityID: ulid(),
       });
+      router.push(`/s/${router.query.studio}/s/${router.query.space}`);
     }
   };
   if (isMember)

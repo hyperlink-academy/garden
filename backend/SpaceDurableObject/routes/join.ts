@@ -47,6 +47,7 @@ export const join_route = makeRoute({
         positions: { aev: "a0" },
       }),
     ]);
+    env.poke();
     return { data: { success: true } } as const;
   },
 });
