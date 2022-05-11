@@ -14,7 +14,7 @@ export type MutationContext = {
   ) => Promise<{ success: boolean }>;
   updateFact: (
     id: string,
-    data: Partial<FactMetadata>
+    data: Partial<Fact<any>>
   ) => Promise<{ success: boolean }>;
   retractFact: (id: string) => Promise<void>;
   scanIndex: {
@@ -159,6 +159,12 @@ const createCard: Mutation<{ entityID: string; title: string }> = async (
   });
 };
 
+const updateFact: Mutation<{ id: string; data: Partial<Fact<any>> }> = async (
+  args,
+  ctx
+) => {
+  await ctx.updateFact(args.id, args.data);
+};
 const assertFact: Mutation<
   | Pick<Fact<keyof Attribute>, "attribute" | "entity" | "value" | "positions">
   | Pick<
@@ -254,6 +260,7 @@ const updateLastSeenMessage: Mutation<{
 
 export const Mutations = {
   updateLastSeenMessage,
+  updateFact,
   postMessage,
   createCard,
   addSpace,

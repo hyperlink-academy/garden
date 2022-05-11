@@ -154,11 +154,18 @@ const Content = (props: { entityID: string }) => {
       onChange={async (e) => {
         let start = e.currentTarget.selectionStart,
           end = e.currentTarget.selectionEnd;
+        if (content) {
+          await mutate("updateFact", {
+            id: content.id,
+            data: { value: e.currentTarget.value },
+          });
+          return;
+        }
         await mutate("assertFact", {
           entity: props.entityID,
           attribute: "card/content",
           value: e.currentTarget.value,
-          positions: content?.positions || {},
+          positions: {},
         });
         textarea.current?.setSelectionRange(start, end);
       }}
@@ -167,7 +174,7 @@ const Content = (props: { entityID: string }) => {
 };
 
 const CardMoreOptionsMenu = () => {
-  let { authorized, mutate } = useMutations();
+  let { authorized } = useMutations();
 
   return !authorized ? null : (
     <Menu as="div" className="relative">
