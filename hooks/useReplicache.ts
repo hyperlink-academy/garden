@@ -87,13 +87,13 @@ export function FactWithIndexes<A extends keyof Attribute>(f: Fact<A>) {
   let indexes = {
     eav: `${f.entity}-${f.attribute}-${f.id}`,
     aev: `${f.attribute}-${f.entity}-${f.id}`,
-    ave: f.schema.unique ? `${f.attribute}-${f.value}` : "",
+    ave: f.schema.unique ? `${f.attribute}-${f.value}` : undefined,
     vae:
       f.schema.type === `reference`
         ? `${(f.value as { type: "reference"; value: string }).value}-${
             f.attribute
           }`
-        : "",
+        : undefined,
   };
   return { ...f, indexes };
 }
@@ -157,7 +157,7 @@ export const makeReplicache = (args: {
 }) => {
   let rep = new Replicache({
     licenseKey: "l381074b8d5224dabaef869802421225a",
-    schemaVersion: "0.0.1",
+    schemaVersion: "0.0.2",
     name: args.name,
     pushDelay: 500,
     pusher: args.pusher,
