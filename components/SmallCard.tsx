@@ -50,7 +50,7 @@ export function SortableSmallCard(
     <div style={style} ref={setNodeRef}>
       {isDragging ? (
         <div
-          className={`border-grey-80 border rounded-md w-[151px] h-24 bg-grey-90 relative top-6`}
+          className={`border-grey-80 border rounded-md w-[151px] h-24 bg-grey-90 relative`}
         />
       ) : (
         <SmallCard listeners={listeners} attributes={attributes} {...props} />
