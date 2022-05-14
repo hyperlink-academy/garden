@@ -138,7 +138,7 @@ const MessageData = (props: { entity: string }) => {
           <SmallCard
             entityID={e.value.value}
             key={e.id}
-            href={`/s/${studio}/s/${space}/c/${e}`}
+            href={`/s/${studio}/s/${space}/c/${e.value.value}`}
           />
         );
       })}
