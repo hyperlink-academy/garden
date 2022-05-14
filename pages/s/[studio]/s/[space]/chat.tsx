@@ -6,6 +6,7 @@ import {
   useSpaceID,
 } from "hooks/useReplicache";
 import { ulid } from "src/ulid";
+import Head from 'next/head'
 import { useAuth } from "hooks/useAuth";
 import Textarea from "components/AutosizeTextArea";
 import {
@@ -23,8 +24,12 @@ import { ref } from "data/Facts";
 
 export default function ChatPage() {
   let id = useSpaceID();
+  let spaceName = useIndex.aev("this/name")[0];
   return (
     <div className="h-full flex flex-col relative items-stretch">
+      <Head>
+        <title key="title">{spaceName?.value}</title>
+      </Head>
       <Messages />
       <MessageInput id={id || ""} />
     </div>
