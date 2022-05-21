@@ -31,11 +31,11 @@ export const LocalReplicacheProvider: React.FC<{
           .flatMap((e, entity) => {
             return Object.keys(e).flatMap((a) => {
               let attribute: keyof Attribute = a as keyof Attribute;
+              let value = e[attribute];
               let schema: Schema = Attribute[attribute];
               if (!schema) schema = props.defaultAttributes[attribute];
               if (schema?.cardinality === "many")
-                //@ts-ignore
-                return e[attribute].map((v) => {
+                return (value as Fact<any>["value"][]).map((v) => {
                   let id = ulid();
                   return {
                     op: "put",
@@ -49,7 +49,7 @@ export const LocalReplicacheProvider: React.FC<{
                       value: v,
                       positions: {},
                     }),
-                  };
+                  } as const;
                 });
               let id = ulid();
               return {
@@ -64,7 +64,7 @@ export const LocalReplicacheProvider: React.FC<{
                   attribute: a as keyof Attribute,
                   positions: {},
                 }),
-              };
+              } as const;
             });
           })
           .concat([
