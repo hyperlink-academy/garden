@@ -15,7 +15,7 @@ export const Backlinks = (props: { entityID: string }) => {
   return sections.length > 0 ? (
     <div className=" grid grid-flow-row gap-6 ">
       <small className="bg-background rounded-md p-2 font-bold lightBorder">
-        This card is part of {sections.length} collection{" "}
+        This card is part of {sections.length} collection
         {sections.length > 1 ? "s" : ""}
       </small>
       <ul className=" grid grid-flow-row gap-4">
