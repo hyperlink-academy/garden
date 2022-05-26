@@ -16,7 +16,7 @@ import { multipleReferenceSection, singleTextSection } from "data/Facts";
 import { useIndex, useMutations } from "hooks/useReplicache";
 import { useRef, useState } from "react";
 import { sortByPosition, updatePositions } from "src/position_helpers";
-import { ReferenceAttributes } from "data/Attributes";
+import { FilterAttributes, ReferenceAttributes } from "data/Attributes";
 
 export const Sections = (props: { entityID: string }) => {
   let sections = useIndex.eav(props.entityID, "card/section");
@@ -57,7 +57,10 @@ const Section = (props: {
         />
       </div>
       {type?.value === "string" ? (
-        <SingleTextSection entityID={props.entityID} section={props.name} />
+        <SingleTextSection
+          entityID={props.entityID}
+          section={singleTextSection(props.name)}
+        />
       ) : type?.value === "reference" && cardinality?.value === "many" ? (
         <MultipleReferenceSection
           section={multipleReferenceSection(props.name)}
@@ -68,23 +71,34 @@ const Section = (props: {
   );
 };
 
-const SingleTextSection = (props: {
+export const SingleTextSection = (props: {
   entityID: string;
-  section: string;
+  placeholder?: string;
+  section: keyof FilterAttributes<{
+    unique: any;
+    type: "string";
+    cardinality: "one";
+  }>;
   new?: boolean;
 }) => {
-  let fact = useIndex.eav(props.entityID, singleTextSection(props.section));
+  let fact = useIndex.eav(props.entityID, props.section);
   let inputEl = useRef<HTMLTextAreaElement | null>(null);
   let { authorized, mutate } = useMutations();
 
   return !authorized ? (
-    <div className="whitespace-pre-wrap">{(fact?.value as string) || ""}</div>
+    <div
+      style={{ overflowWrap: "anywhere" }}
+      className="whitespace-pre-wrap w-full"
+    >
+      {fact?.value || ""}
+    </div>
   ) : (
     <Textarea
       autoFocus={props.new}
       ref={inputEl}
+      placeholder={props.placeholder}
+      className="placeholder:italic bg-inherit w-full"
       spellCheck={false}
-      className="w-full bg-inherit"
       value={(fact?.value as string) || ""}
       onChange={async (e) => {
         let start = e.currentTarget.selectionStart,

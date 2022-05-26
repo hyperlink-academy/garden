@@ -146,3 +146,11 @@ export type ReferenceAttributes = {
     ? A
     : never]: Attribute[A];
 };
+
+export type FilterAttributes<F extends Attribute[keyof Attribute]> = {
+  [A in keyof Attribute as Attribute[A]["type"] extends F["type"]
+    ? Attribute[A]["cardinality"] extends F["cardinality"]
+      ? A
+      : never
+    : never]: Attribute[A];
+};

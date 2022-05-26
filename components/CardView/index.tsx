@@ -5,7 +5,11 @@ import { MoreOptions, Delete, DeckSmall, Member } from "components/Icons";
 import { Divider, MenuContainer, MenuItem } from "components/Layout";
 import Textarea from "components/AutosizeTextArea";
 import { useIndex, useMutations } from "hooks/useReplicache";
-import { MultipleReferenceSection, Sections } from "./Sections";
+import {
+  MultipleReferenceSection,
+  Sections,
+  SingleTextSection,
+} from "./Sections";
 import { AddSection } from "./AddSection";
 import { Backlinks } from "./Backlinks";
 import Head from "next/head";
@@ -78,7 +82,11 @@ export const CardView = (props: { entityID: string }) => {
               <Title entityID={props.entityID} />
               <CardMoreOptionsMenu />
             </div>
-            <Content entityID={props.entityID} />
+            <SingleTextSection
+              entityID={props.entityID}
+              section={"card/content"}
+              placeholder="write something..."
+            />
           </div>
 
           {!isDeck ? null : <DeckCardList entityID={props.entityID} />}
@@ -130,40 +138,6 @@ const Title = (props: { entityID: string }) => {
           attribute: "card/title",
           value: e.currentTarget.value,
           positions: title?.positions || {},
-        });
-        textarea.current?.setSelectionRange(start, end);
-      }}
-    />
-  );
-};
-
-const Content = (props: { entityID: string }) => {
-  let textarea = useRef<HTMLTextAreaElement | null>(null);
-  let content = useIndex.eav(props.entityID, "card/content");
-  let { authorized, mutate } = useMutations();
-
-  return !authorized ? (
-    <div
-      style={{ overflowWrap: "anywhere" }}
-      className="whitespace-pre-wrap w-full"
-    >
-      {content?.value || ""}
-    </div>
-  ) : (
-    <Textarea
-      ref={textarea}
-      className="placeholder:italic bg-inherit"
-      placeholder="write something..."
-      spellCheck={false}
-      value={content?.value || ""}
-      onChange={async (e) => {
-        let start = e.currentTarget.selectionStart,
-          end = e.currentTarget.selectionEnd;
-        await mutate("assertFact", {
-          entity: props.entityID,
-          attribute: "card/content",
-          value: e.currentTarget.value,
-          positions: {},
         });
         textarea.current?.setSelectionRange(start, end);
       }}
