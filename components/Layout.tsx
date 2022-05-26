@@ -58,11 +58,10 @@ export const MenuContainer: React.FC<{ className?: string }> = (props) => {
     >
       <Menu.Items
         className={`
-            px-3 py-4 
             border border-grey-80 rounded-md 
             shadow-drop bg-white 
             absolute justify-items-end 
-            flex flex-col gap-3 
+            flex flex-col
             text-right 
             origin-top-right 
             right-0 
@@ -80,7 +79,7 @@ export const MenuItem: React.FC = (props) => {
   return (
     <Menu.Item>
       {({ active }) => (
-        <div className={`px-3 py-1 ${active ? "bg-bg-blue" : ""}`}>
+        <div className={`px-3 py-4 ${active ? "bg-bg-blue" : ""}`}>
           {props.children}
         </div>
       )}
