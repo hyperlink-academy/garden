@@ -145,7 +145,7 @@ const ChatIcon = () => {
         }`}
       >
         <ChatBubble className="mx-auto" />
-        {latestMsg > lastSeen ? (
+        {lastSeen && latestMsg > lastSeen ? (
           <div className="bg-accent-red absolute rounded-full top-1.5 left-10 w-3 h-3"></div>
         ) : null}
       </a>
