@@ -39,6 +39,7 @@ export const FindOrCreate = (props: {
           <Combobox
             value=""
             onChange={(c) => {
+              if (props.selected.includes(c)) return;
               if (c === "create")
                 props.onSelect({ name: input, type: "create" });
               else props.onSelect({ entity: c, type: "existing" });
