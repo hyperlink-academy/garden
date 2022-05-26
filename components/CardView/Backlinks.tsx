@@ -12,10 +12,11 @@ export const Backlinks = (props: { entityID: string }) => {
       return acc;
     }, {} as { [k in string]: boolean })
   ) as (keyof ReferenceAttributes)[];
-  return (
+  return sections.length > 0 ? (
     <div className=" grid grid-flow-row gap-6 ">
       <small className="bg-background rounded-md p-2 font-bold lightBorder">
-        This card is part of {sections.length} collections
+        This card is part of {sections.length} collection{" "}
+        {sections.length > 1 ? "s" : ""}
       </small>
       <ul className=" grid grid-flow-row gap-4">
         {sections.map((s) => {
@@ -25,6 +26,8 @@ export const Backlinks = (props: { entityID: string }) => {
         })}
       </ul>
     </div>
+  ) : (
+    ""
   );
 };
 
