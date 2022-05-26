@@ -6,7 +6,7 @@ import {
   useSpaceID,
 } from "hooks/useReplicache";
 import { ulid } from "src/ulid";
-import Head from 'next/head'
+import Head from "next/head";
 import { useAuth } from "hooks/useAuth";
 import Textarea from "components/AutosizeTextArea";
 import {
@@ -167,8 +167,8 @@ const MessageInput = (props: { id: string }) => {
 
   if (!authorized) {
     return (
-      <div className="bg-grey-90 text-grey-55 italic border-t border-grey-80 -mx-5 px-5 pt-3 pb-4">
-        Log In to send a message!
+      <div className="bg-grey-90 text-grey-55 italic border-t border-grey-80 -mx-4 md:mx-0 px-4 pt-3 pb-4">
+        Log in to send a message!
       </div>
     );
   }
@@ -208,33 +208,14 @@ const MessageInput = (props: { id: string }) => {
     setAttachedCards([]);
   };
   return (
-    <div className="-mx-5 px-5 pt-3 pb-4 border-t border-grey-80 flex flex-col gap-2">
+    <div className="-mx-4 md:mx-0 px-4 md:px-0 py-4 border-t border-grey-80 gap-2">
       <div
-        onMouseDown={(e) => e.preventDefault()}
-        className={`w-full bg-bg-blue lightBorder ${
-          inputFocused
-            ? "flex flex-row justify-end rounded-md p-2 gap-4"
-            : "hidden"
-        } `}
+        className={`${
+          attachedCards.length > 0
+            ? "pb-4 mb-4 border-b border-grey-80 border-dashed"
+            : ""
+        }`}
       >
-        <FindOrCreateCard
-          selected={attachedCards}
-          onSelect={(e) => setAttachedCards((a) => [...a, e])}
-        />
-        <button
-          className="text-accent-blue"
-          onClick={(e) => {
-            e.preventDefault;
-            if (!authorized || !session.session || !message) return;
-            submit();
-          }}
-        >
-          <div className="flex gap-2 font-bold">
-            <Send />
-          </div>
-        </button>
-      </div>
-      <div>
         {attachedCards.map((e) => {
           return (
             <AttachedCard
@@ -245,23 +226,51 @@ const MessageInput = (props: { id: string }) => {
           );
         })}
       </div>
-      <Textarea
-        onFocus={() => setInputFocused(true)}
-        onBlur={() => setInputFocused(false)}
-        className="bg-background"
-        placeholder="write a message"
-        value={message}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            if (e.shiftKey) {
-              return;
+      <div className="flex flex-row-reverse items-center gap-2">
+        <div
+          onMouseDown={(e) => e.preventDefault()}
+          className={` ${
+            inputFocused
+              ? "flex flex-row justify-end self-end rounded-md gap-4"
+              : // : "hidden"
+                "flex flex-row justify-end self-end rounded-md gap-4"
+          } `}
+        >
+          <FindOrCreateCard
+            selected={attachedCards}
+            onSelect={(e) => setAttachedCards((a) => [...a, e])}
+          />
+          <button
+            className={`${message ? "text-accent-blue" : "text-grey-55"}`}
+            onClick={(e) => {
+              e.preventDefault;
+              if (!authorized || !session.session || !message) return;
+              submit();
+            }}
+          >
+            <div className="flex gap-2 font-bold">
+              <Send />
+            </div>
+          </button>
+        </div>
+        <Textarea
+          onFocus={() => setInputFocused(true)}
+          onBlur={() => setInputFocused(false)}
+          className="bg-background w-full"
+          placeholder="write a message"
+          value={message}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              if (e.shiftKey) {
+                return;
+              }
+              e.preventDefault();
+              submit();
             }
-            e.preventDefault();
-            submit();
-          }
-        }}
-        onChange={(e) => setMessage(e.currentTarget.value)}
-      />
+          }}
+          onChange={(e) => setMessage(e.currentTarget.value)}
+        />
+      </div>
     </div>
   );
 };
@@ -300,7 +309,7 @@ const FindOrCreateCard = (props: {
 
   return (
     <>
-      <button className="border-l text-grey-80" onClick={() => setOpen(true)}>
+      <button className="text-grey-80" onClick={() => setOpen(true)}>
         <SectionLinkedCard className="hover:text-accent-blue text-grey-35" />
       </button>
       <FindOrCreate
