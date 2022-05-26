@@ -35,9 +35,11 @@ export const CardCarousel = (props: {
           >
             <a>{Name?.value}</a>
           </Link>
-          {props.section === "deck/contains"
-            ? ""
-            : ` / ${props.section.slice(8)}`}
+          <span className="text-grey-35">
+            {props.section === "deck/contains"
+              ? ""
+              : ` > ${props.section.slice(8)}`}
+          </span>
         </h4>
       </div>
       <div
