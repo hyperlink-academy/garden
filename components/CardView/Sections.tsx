@@ -105,7 +105,7 @@ export const SingleTextSection = (props: {
           end = e.currentTarget.selectionEnd;
         await mutate("assertFact", {
           entity: props.entityID,
-          attribute: singleTextSection(props.section),
+          attribute: props.section,
           value: e.currentTarget.value,
           positions: fact?.positions || {},
         });
