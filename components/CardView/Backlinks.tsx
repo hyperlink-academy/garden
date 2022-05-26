@@ -26,9 +26,7 @@ export const Backlinks = (props: { entityID: string }) => {
         })}
       </ul>
     </div>
-  ) : (
-    ""
-  );
+  ) : null;
 };
 
 const BacklinkSection = (props: {
