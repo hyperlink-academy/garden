@@ -143,7 +143,12 @@ const Content = (props: { entityID: string }) => {
   let { authorized, mutate } = useMutations();
 
   return !authorized ? (
-    <div className="whitespace-pre-wrap w-full">{content?.value || ""}</div>
+    <div
+      style={{ overflowWrap: "anywhere" }}
+      className="whitespace-pre-wrap w-full"
+    >
+      {content?.value || ""}
+    </div>
   ) : (
     <Textarea
       ref={textarea}
