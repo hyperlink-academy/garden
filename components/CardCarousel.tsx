@@ -4,6 +4,7 @@ import { Card, LeftArrow, RightArrow, Shuffle } from "components/Icons";
 import { ReferenceAttributes } from "data/Attributes";
 import { Fact } from "data/Facts";
 import { useIndex, useMutations } from "hooks/useReplicache";
+import Head from "next/head";
 import Link from "next/link";
 import Router, { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
@@ -165,8 +166,22 @@ const CardContainer: React.FC<{
       style={{ maxWidth: "calc(100% - 16px)" }}
       className={`h-full snap-center flex-shrink-0 pb-1.5 w-full`}
     >
+      {props.selected ? (
+        <CardCarouselTitle parent={""} child={props.entity} />
+      ) : null}
       {props.children}
     </div>
+  );
+};
+
+const CardCarouselTitle = (props: { parent: string; child: string }) => {
+  let parentTitle = useIndex.eav(props.parent, "card/title");
+  let childTitle = useIndex.eav(props.child, "card/title");
+
+  return (
+    <Head>
+      <title key="title">{childTitle?.value || "Untitled"}</title>
+    </Head>
   );
 };
 

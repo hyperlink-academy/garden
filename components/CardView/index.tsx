@@ -44,13 +44,8 @@ export const CardView = (props: { entityID: string }) => {
   let title = memberName || cardTitle;
   let { ref } = usePreserveScroll<HTMLDivElement>();
   return (
-    <>
-      <Head>
-        <title key="title">{title ? title?.value : "Untitled"}</title>
-      </Head>
-
-      <div
-        className={`
+    <div
+      className={`
           h-full
           drop-shadow-md
           flex flex-col
@@ -58,17 +53,17 @@ export const CardView = (props: { entityID: string }) => {
             deck: !!isDeck,
             member: !!memberName,
           })}`}
-      >
-        {!memberName ? null : (
-          <div className="grid grid-cols-[auto_max-content] items-end text-white pb-1">
-            <Member />
-            <small>member</small>
-          </div>
-        )}
+    >
+      {!memberName ? null : (
+        <div className="grid grid-cols-[auto_max-content] items-end text-white pb-1">
+          <Member />
+          <small>member</small>
+        </div>
+      )}
 
-        <div
-          ref={ref}
-          className={`
+      <div
+        ref={ref}
+        className={`
             flex flex-col gap-6          
             overflow-y-auto
             no-scrollbar
@@ -76,29 +71,28 @@ export const CardView = (props: { entityID: string }) => {
             h-full
             ${contentStyles({ deck: !!isDeck, member: !!memberName })}
             `}
-        >
-          <div className="grid grid-auto-rows gap-3">
-            <div className="cardHeader grid grid-cols-[auto_min-content] gap-2">
-              <Title entityID={props.entityID} />
-              <CardMoreOptionsMenu entityID={props.entityID} />
-            </div>
-            <SingleTextSection
-              entityID={props.entityID}
-              section={"card/content"}
-              placeholder="write something..."
-            />
+      >
+        <div className="grid grid-auto-rows gap-3">
+          <div className="cardHeader grid grid-cols-[auto_min-content] gap-2">
+            <Title entityID={props.entityID} />
+            <CardMoreOptionsMenu entityID={props.entityID} />
           </div>
-
-          {!isDeck ? null : <DeckCardList entityID={props.entityID} />}
-
-          <Sections entityID={props.entityID} />
-
-          <AddSection cardEntity={props.entityID} />
-
-          <Backlinks entityID={props.entityID} />
+          <SingleTextSection
+            entityID={props.entityID}
+            section={"card/content"}
+            placeholder="write something..."
+          />
         </div>
+
+        {!isDeck ? null : <DeckCardList entityID={props.entityID} />}
+
+        <Sections entityID={props.entityID} />
+
+        <AddSection cardEntity={props.entityID} />
+
+        <Backlinks entityID={props.entityID} />
       </div>
-    </>
+    </div>
   );
 };
 
