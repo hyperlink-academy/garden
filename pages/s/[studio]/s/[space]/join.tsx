@@ -7,11 +7,9 @@ import { useAuth } from "hooks/useAuth";
 import { useIndex } from "hooks/useReplicache";
 import { useRouter } from "next/router";
 import { ulid } from "src/ulid";
-import { SVGProps } from "react";
+import { SVGProps, useState } from "react";
 import useSWR from "swr";
-import { SpringValue } from "react-spring";
-import { relative } from "path";
-import { spaceID } from "src/lorem";
+import { LogInModal } from "components/LoginModal";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export default function JoinSpacePage() {
@@ -41,6 +39,7 @@ export function JoinSpace(props: { id: string }) {
   let code = router.query.code as string | undefined;
   let isMember = useIndex.ave("space/member", session.session?.studio);
   let spaceName = useIndex.aev("this/name")[0];
+  let [isOpen, setLogInModal] = useState(false);
 
   const onClick = async () => {
     if (!session.token || !code || !rep || isMember) return;
@@ -90,8 +89,14 @@ export function JoinSpace(props: { id: string }) {
     );
   }
   return (
-    <div className="lightBorder p-5 flex flex-col gap-4 text-center">
-      <h3>You need an account to join spaces!</h3>
+    <div className="lightBorder p-5 flex flex-col gap-4 text-center place-items-center">
+      <h3>Log in to join this space!</h3>
+      <ButtonPrimary
+        content="Log In"
+        onClick={() => setLogInModal(true)}
+        className="justify-self-center"
+      />
+      <LogInModal isOpen={isOpen} onClose={() => setLogInModal(false)} />
       <p>
         We're still in early Alpha! If you'd like to make account, email us at{" "}
         <a href="mailto:contact@hyperlink.academy" className="text-accent-blue">
