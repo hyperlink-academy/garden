@@ -80,7 +80,7 @@ export const CardView = (props: { entityID: string }) => {
           <div className="grid grid-auto-rows gap-3">
             <div className="cardHeader grid grid-cols-[auto_min-content] gap-2">
               <Title entityID={props.entityID} />
-              <CardMoreOptionsMenu />
+              <CardMoreOptionsMenu entityID={props.entityID} />
             </div>
             <SingleTextSection
               entityID={props.entityID}
@@ -145,10 +145,11 @@ const Title = (props: { entityID: string }) => {
   );
 };
 
-const CardMoreOptionsMenu = () => {
+const CardMoreOptionsMenu = (props: { entityID: string }) => {
   let { authorized } = useMutations();
+  let memberName = useIndex.eav(props.entityID, "member/name");
 
-  return !authorized ? null : (
+  return !authorized || !!memberName ? null : (
     <Menu as="div" className="relative">
       <Menu.Button>
         <MoreOptions />
