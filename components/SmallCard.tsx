@@ -98,6 +98,31 @@ export const SmallCard = (
 
   let url = content ? isUrl(content.value) : false;
   return (
+    <BaseSmallCard
+      title={cardTitle?.value || ""}
+      content={content?.value || ""}
+      isDeck={!!isDeck}
+      href={props.href}
+      isMember={!!memberName}
+      attributes={props.attributes}
+      draggable={props.draggable}
+      onDelete={props.onDelete}
+    />
+  );
+};
+export const BaseSmallCard = (props: {
+  title: string;
+  content: string;
+  isDeck?: boolean;
+  isMember?: boolean;
+  draggable?: boolean;
+  href: string;
+  onDelete?: () => void;
+  attributes?: DraggableAttributes;
+  listeners?: SyntheticListenerMap;
+}) => {
+  let url = props.content ? isUrl(props.content) : false;
+  return (
     <div className={`w-[151px] h-24 touch-manipulation relative origin-center`}>
       <div
         className={`
@@ -105,12 +130,12 @@ export const SmallCard = (
         w-full h-24 
         overflow-hidden 
         relative
-        ${borderStyles({ deck: !!isDeck, member: !!memberName })}
+        ${borderStyles({ deck: !!props.isDeck, member: !!props.isMember })}
         `}
       >
         <div
           className={`flex flex-row gap-0 h-full
-          ${contentStyles({ deck: !!isDeck, member: !!memberName })}
+          ${contentStyles({ deck: !!props.isDeck, member: !!props.isMember })}
           `}
         >
           {!!props.draggable ? (
@@ -118,7 +143,7 @@ export const SmallCard = (
               {...props.attributes}
               {...props.listeners}
               className={`touch-manipulation pl-1 pr-2 ${
-                !!memberName ? "text-white" : "text-grey-55"
+                !!props.isMember ? "text-white" : "text-grey-55"
               }`}
             />
           ) : (
@@ -126,17 +151,13 @@ export const SmallCard = (
           )}
           <div className="flex flex-col w-full">
             <CardBody
-              member={!!memberName}
-              content={content?.value}
-              title={title?.value}
+              member={!!props.isMember}
+              content={props.content}
+              title={props.title}
               href={props.href}
             />
             {url ? (
-              <a
-                href={content?.value}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <a href={props.content} target="_blank" rel="noopener noreferrer">
                 <small className="text-accent-blue">ext</small>
               </a>
             ) : null}
@@ -152,7 +173,7 @@ export const SmallCard = (
   );
 };
 
-const CardBody = (props: {
+export const CardBody = (props: {
   member?: boolean;
   content?: string;
   title?: string;
