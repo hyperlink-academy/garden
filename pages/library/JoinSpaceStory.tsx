@@ -20,7 +20,7 @@ const stories = {
 const JoinSpaceStory = (props: Props) => {
   return (
     <ComponentViewer components={props.components} stories={stories}>
-      <JoinSpace />
+      <JoinSpace id={""} />
     </ComponentViewer>
   );
 };

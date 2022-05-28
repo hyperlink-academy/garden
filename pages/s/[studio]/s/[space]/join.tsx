@@ -64,7 +64,7 @@ export function JoinSpace(props: { id: string }) {
     return (
       <div className=" flex flex-col gap-6 place-items-center">
         <div className="flex flex-col gap-2 text-center ">
-          <h2>You've been invited to a {spaceName?.value}!</h2>
+          <h2>You've been invited to {spaceName?.value}!</h2>
           <p>A new membership card is waiting for you!</p>
         </div>
         <div className="relative">
@@ -98,7 +98,8 @@ export function JoinSpace(props: { id: string }) {
       />
       <LogInModal isOpen={isOpen} onClose={() => setLogInModal(false)} />
       <p>
-        We're still in early Alpha! If you'd like to make account, email us at{" "}
+        We're still in early alpha! If you'd like to make an account, email us
+        at{" "}
         <a href="mailto:contact@hyperlink.academy" className="text-accent-blue">
           contact@hyperlink.academy
         </a>{" "}
