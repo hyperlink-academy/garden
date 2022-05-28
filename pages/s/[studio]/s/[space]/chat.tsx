@@ -21,6 +21,7 @@ import Link from "next/link";
 import { FindOrCreate } from "components/FindOrCreateEntity";
 import { SmallCard } from "components/SmallCard";
 import { ref } from "data/Facts";
+import { exit } from "process";
 
 export default function ChatPage() {
   let id = useSpaceID();
@@ -41,6 +42,7 @@ const Messages = () => {
   let { rep } = useAuth();
   let id = useSpaceID();
   let lastMessage = messages[messages.length - 1];
+  let spaceName = useIndex.aev("this/name")[0];
 
   useEffect(() => {
     rep?.query(async (tx) => {
@@ -71,22 +73,60 @@ const Messages = () => {
       </style>
       <div className=" h-full overflow-y-auto overflow-x-hidden pb-6 flex flex-col-reverse ">
         <div className=" flex flex-col">
-          {messages.map((m, index) => {
-            return (
-              <Message
-                key={m.id}
-                entity={m.entity}
-                sender={m.sender}
-                attachedCards={m.attachedCards}
-                ts={m.ts}
-                content={m.content}
-                doubleSend={
-                  messages[index - 1]?.sender === m.sender &&
-                  parseInt(m.ts) - parseInt(messages[index - 1].ts) < 300000
-                }
-              />
-            );
-          })}
+          {/* if no messages, show welcome placeholder */}
+          {messages.length == 0 ? (
+            <>
+              <div className="MessageSender font-bold">The Hyperlink Team</div>
+              <p>You're exploring {spaceName?.value} — welcome to the chat!</p>
+              <br />
+              <ul>
+                <li>~Use this as a group chat</li>
+                <li>~Or as a log/journal/stream!</li>
+                <li>~Attach decks and cards</li>
+                <li>~Share what you're working on</li>
+                <li>
+                  ~Converse with bots <em>(COMING SOON)</em>
+                </li>
+              </ul>
+              <br />
+              <p>
+                * This message will disappear once you create the first post *
+              </p>
+              <br />
+              {/* prettier-ignore */}
+              <pre className="MessageContent whitespace-pre-wrap font-[courier] text-grey-35">
+{"       "}..--""|{"\n"}
+{"       "}|     |{"\n"}
+{"       "}| .---'{"\n"}
+{" "}(\-.--| |---------.{"\n"}
+/ \) \ | |          \{"\n"}
+|:.  | | |           |{"\n"}
+|:.  | |o|           |{"\n"}
+|:.  | `"`           |{"\n"}
+|:.  |_ __  __ _  __ /{"\n"}
+`""""`""|=`|"""""""`{"\n"}
+{"        "}|=_|{"\n"}
+{"    "}jgs |= |{"\n"}
+              </pre>
+            </>
+          ) : (
+            messages.map((m, index) => {
+              return (
+                <Message
+                  key={m.id}
+                  entity={m.entity}
+                  sender={m.sender}
+                  attachedCards={m.attachedCards}
+                  ts={m.ts}
+                  content={m.content}
+                  doubleSend={
+                    messages[index - 1]?.sender === m.sender &&
+                    parseInt(m.ts) - parseInt(messages[index - 1].ts) < 300000
+                  }
+                />
+              );
+            })
+          )}
         </div>
       </div>
     </React.Fragment>
