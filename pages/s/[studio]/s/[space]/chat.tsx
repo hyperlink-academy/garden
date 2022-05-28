@@ -8,7 +8,7 @@ import {
 import { ulid } from "src/ulid";
 import Head from "next/head";
 import { useAuth } from "hooks/useAuth";
-import Textarea from "components/AutosizeTextArea";
+import { Textarea } from "components/Textarea";
 import {
   Card,
   Cross,
@@ -21,7 +21,7 @@ import Link from "next/link";
 import { FindOrCreate } from "components/FindOrCreateEntity";
 import { SmallCard } from "components/SmallCard";
 import { ref } from "data/Facts";
-import { exit } from "process";
+import { RenderedText } from "components/Textarea/RenderedText";
 
 export default function ChatPage() {
   let id = useSpaceID();
@@ -75,40 +75,7 @@ const Messages = () => {
         <div className=" flex flex-col">
           {/* if no messages, show welcome placeholder */}
           {messages.length == 0 ? (
-            <>
-              <div className="MessageSender font-bold">The Hyperlink Team</div>
-              <p>You're exploring {spaceName?.value} — welcome to the chat!</p>
-              <br />
-              <ul>
-                <li>~Use this as a group chat</li>
-                <li>~Or as a log/journal/stream!</li>
-                <li>~Attach decks and cards</li>
-                <li>~Share what you're working on</li>
-                <li>
-                  ~Converse with bots <em>(COMING SOON)</em>
-                </li>
-              </ul>
-              <br />
-              <p>
-                * This message will disappear once you create the first post *
-              </p>
-              <br />
-              {/* prettier-ignore */}
-              <pre className="MessageContent whitespace-pre-wrap font-[courier] text-grey-35">
-{"       "}..--""|{"\n"}
-{"       "}|     |{"\n"}
-{"       "}| .---'{"\n"}
-{" "}(\-.--| |---------.{"\n"}
-/ \) \ | |          \{"\n"}
-|:.  | | |           |{"\n"}
-|:.  | |o|           |{"\n"}
-|:.  | `"`           |{"\n"}
-|:.  |_ __  __ _  __ /{"\n"}
-`""""`""|=`|"""""""`{"\n"}
-{"        "}|=_|{"\n"}
-{"    "}jgs |= |{"\n"}
-              </pre>
-            </>
+            <Placeholder spaceName={spaceName?.value} />
           ) : (
             messages.map((m, index) => {
               return (
@@ -130,6 +97,43 @@ const Messages = () => {
         </div>
       </div>
     </React.Fragment>
+  );
+};
+
+const Placeholder = (props: { spaceName: string }) => {
+  return (
+    <>
+      <div className="MessageSender font-bold">The Hyperlink Team</div>
+      <p>You're exploring {props.spaceName} — welcome to the chat!</p>
+      <br />
+      <ul>
+        <li>~Use this as a group chat</li>
+        <li>~Or as a log/journal/stream!</li>
+        <li>~Attach decks and cards</li>
+        <li>~Share what you're working on</li>
+        <li>
+          ~Converse with bots <em>(COMING SOON)</em>
+        </li>
+      </ul>
+      <br />
+      <p>* This message will disappear once you create the first post *</p>
+      <br />
+      {/* prettier-ignore */}
+      <pre className="MessageContent whitespace-pre-wrap font-[courier] text-grey-35">
+{"       "}..--""|{"\n"}
+{"       "}|     |{"\n"}
+{"       "}| .---'{"\n"}
+{" "}(\-.--| |---------.{"\n"}
+/ \) \ | |          \{"\n"}
+|:.  | | |           |{"\n"}
+|:.  | |o|           |{"\n"}
+|:.  | `"`           |{"\n"}
+|:.  |_ __  __ _  __ /{"\n"}
+`""""`""|=`|"""""""`{"\n"}
+{"        "}|=_|{"\n"}
+{"    "}jgs |= |{"\n"}
+              </pre>
+    </>
   );
 };
 
@@ -159,9 +163,10 @@ const Message = (props: {
           {new Date(parseInt(props.ts)).toLocaleDateString()}
         </div>
       </div>
-      <pre className="MessageContent whitespace-pre-wrap font-[Quattro] text-grey-35">
-        {props.content}
-      </pre>
+      <RenderedText
+        text={props.content}
+        className="MessageContent whitespace-pre-wrap font-[Quattro] text-grey-35"
+      />
       {!props.entity ? null : <MessageData entity={props.entity} />}
     </div>
   );

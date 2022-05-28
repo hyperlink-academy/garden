@@ -1,6 +1,6 @@
 import { Menu } from "@headlessui/react";
-import Textarea from "components/AutosizeTextArea";
-import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
+import { Textarea } from "components/Textarea";
+import { ButtonSecondary } from "components/Buttons";
 import { SmallCardList } from "components/SmallCardList";
 import { FindOrCreateCard } from "components/FindOrCreateEntity";
 import {

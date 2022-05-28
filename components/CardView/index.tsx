@@ -3,7 +3,7 @@ import { Menu } from "@headlessui/react";
 
 import { MoreOptions, Delete, DeckSmall, Member } from "components/Icons";
 import { Divider, MenuContainer, MenuItem } from "components/Layout";
-import Textarea from "components/AutosizeTextArea";
+import { Textarea } from "components/Textarea";
 import { useIndex, useMutations } from "hooks/useReplicache";
 import {
   MultipleReferenceSection,
@@ -39,9 +39,7 @@ const contentStyles = (args: { deck: boolean; member: boolean }) => {
 };
 export const CardView = (props: { entityID: string }) => {
   let isDeck = useIndex.eav(props.entityID, "deck");
-  let cardTitle = useIndex.eav(props.entityID, "card/title");
   let memberName = useIndex.eav(props.entityID, "member/name");
-  let title = memberName || cardTitle;
   let { ref } = usePreserveScroll<HTMLDivElement>();
   return (
     <div
