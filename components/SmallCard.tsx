@@ -96,10 +96,9 @@ export const SmallCard = (
 
   let title = !!memberName ? memberName : cardTitle;
 
-  let url = content ? isUrl(content.value) : false;
   return (
     <BaseSmallCard
-      title={cardTitle?.value || ""}
+      title={title?.value || ""}
       content={content?.value || ""}
       isDeck={!!isDeck}
       href={props.href}
@@ -110,6 +109,7 @@ export const SmallCard = (
     />
   );
 };
+
 export const BaseSmallCard = (props: {
   title: string;
   content: string;
