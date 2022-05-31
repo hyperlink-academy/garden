@@ -89,15 +89,15 @@ export const ComponentViewer: React.FC<{
           <title key="title">Hyperlink Component Library</title>
         </Head>
         <SmallCardDragContext>
-        <div style={{ maxWidth: "48rem", margin: "auto" }}>
-          <div className="flex gap-4 justify-between pt-6 pb-4 text-accent-blue px-5">
-            <PageSidebar pages={props.components} />
-            <div className="flex gap-2">
-              <BGSwitch enabled={bg} setEnabled={setBg} />
-              <AuthStatePicker
-                authState={authState}
-                setAuthState={setAuthState}
-              />
+          <div style={{ maxWidth: "48rem", margin: "auto" }}>
+            <div className="flex gap-4 justify-between pt-6 pb-4 text-accent-blue px-5">
+              <PageSidebar pages={props.components} />
+              <div className="flex gap-2">
+                <BGSwitch enabled={bg} setEnabled={setBg} />
+                <AuthStatePicker
+                  authState={authState}
+                  setAuthState={setAuthState}
+                />
               </div>
             </div>
             <div className="grid auto-rows-max gap-6 m-5">
@@ -185,30 +185,42 @@ const AuthStatePicker = (props: {
     <Menu as="div" className="relative">
       <Menu.Button className="font-bold">auth: {props.authState}</Menu.Button>
       <MenuContainer>
-        <MenuItem>
-          <button
-            className={props.authState === "loggedOut" ? "font-bold" : ""}
-            onClick={() => props.setAuthState("loggedOut")}
-          >
-            Logged Out
-          </button>
-        </MenuItem>
-        <MenuItem>
-          <button
-            className={props.authState === "loggedIn" ? "font-bold" : ""}
-            onClick={() => props.setAuthState("loggedIn")}
-          >
-            Logged In
-          </button>
-        </MenuItem>
-        <MenuItem>
-          <button
-            className={props.authState === "authorized" ? "font-bold" : ""}
-            onClick={() => props.setAuthState("authorized")}
-          >
-            Authorized
-          </button>
-        </MenuItem>
+        <Menu.Item>
+          {({ active }) => (
+            <button
+              className={`px-3 py-4 flex items-center gap-2 justify-end ${
+                active ? "bg-bg-blue" : ""
+              } ${props.authState === "loggedOut" ? "font-bold" : ""}`}
+              onClick={() => props.setAuthState("loggedOut")}
+            >
+              Logged Out
+            </button>
+          )}
+        </Menu.Item>
+        <Menu.Item>
+          {({ active }) => (
+            <button
+              className={`px-3 py-4 flex items-center gap-2 justify-end ${
+                active ? "bg-bg-blue" : ""
+              } ${props.authState === "loggedIn" ? "font-bold" : ""}`}
+              onClick={() => props.setAuthState("loggedIn")}
+            >
+              Logged In
+            </button>
+          )}
+        </Menu.Item>
+        <Menu.Item>
+          {({ active }) => (
+            <button
+              className={`px-3 py-4 flex items-center gap-2 justify-end ${
+                active ? "bg-bg-blue" : ""
+              } ${props.authState === "authorized" ? "font-bold" : ""}`}
+              onClick={() => props.setAuthState("authorized")}
+            >
+              Authorized
+            </button>
+          )}
+        </Menu.Item>
       </MenuContainer>
     </Menu>
   );

@@ -147,19 +147,31 @@ const CardMoreOptionsMenu = (props: { entityID: string }) => {
         <MoreOptions />
       </Menu.Button>
       <MenuContainer>
-        <MenuItem>
-          <button className="flex items-center gap-2">
-            <p>Remove from Deck</p>
-            <DeckSmall />
-          </button>
-        </MenuItem>
+        <Menu.Item>
+          {({ active }) => (
+            <button
+              className={`px-3 py-4 flex items-center gap-2 justify-end ${
+                active ? "bg-bg-blue" : ""
+              }`}
+            >
+              <p>Remove from Deck</p>
+              <DeckSmall />
+            </button>
+          )}
+        </Menu.Item>
         <Divider />
-        <MenuItem>
-          <button className="flex items-center gap-2 text-accent-red">
-            <p className="font-bold">Delete Card FOREVER</p>
-            <Delete />
-          </button>
-        </MenuItem>
+        <Menu.Item>
+          {({ active }) => (
+            <button
+              className={`px-3 py-4 flex items-center gap-2 justify-end ${
+                active ? "bg-bg-blue" : ""
+              }`}
+            >
+              <p className="font-bold text-accent-red">Delete Card FOREVER</p>
+              <Delete />
+            </button>
+          )}
+        </Menu.Item>
       </MenuContainer>
     </Menu>
   );
