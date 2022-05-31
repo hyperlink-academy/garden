@@ -104,6 +104,7 @@ export const SmallCard = (
       href={props.href}
       isMember={!!memberName}
       attributes={props.attributes}
+      listeners={props.listeners}
       draggable={props.draggable}
       onDelete={props.onDelete}
     />
