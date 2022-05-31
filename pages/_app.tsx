@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 import { SpaceSpaceProvider } from "components/ReplicacheProvider";
 import { SpaceLayout } from "components/SpaceLayout";
 import Head from "next/head";
+import { SmokeProvider } from "components/Smoke";
 
 export default function App({ Component, pageProps }: AppProps) {
   let router = useRouter();
@@ -14,24 +15,28 @@ export default function App({ Component, pageProps }: AppProps) {
     return <Component {...pageProps} />;
   if (router.pathname.startsWith("/s/[studio]/s/[space]")) {
     return (
-      <AuthProvider>
-        <SpaceSpaceProvider
-          notFound={<div className="p-4">404'd space</div>}
-          loading={<div className="p-4">loading space…</div>}
-        >
-          <SpaceLayout>
-            <Component {...pageProps} />
-          </SpaceLayout>
-        </SpaceSpaceProvider>
-      </AuthProvider>
+      <SmokeProvider>
+        <AuthProvider>
+          <SpaceSpaceProvider
+            notFound={<div className="p-4">404'd space</div>}
+            loading={<div className="p-4">loading space…</div>}
+          >
+            <SpaceLayout>
+              <Component {...pageProps} />
+            </SpaceLayout>
+          </SpaceSpaceProvider>
+        </AuthProvider>
+      </SmokeProvider>
     );
   }
   return (
-    <AuthProvider>
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
-    </AuthProvider>
+    <SmokeProvider>
+      <AuthProvider>
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
+      </AuthProvider>
+    </SmokeProvider>
   );
 }
 

@@ -1,8 +1,14 @@
 import { Dialog, Menu, Transition } from "@headlessui/react";
 import React, { Fragment } from "react";
 
-export const Divider = () => {
-  return <div className="border-t border-grey-80 w-full"></div>;
+export const Divider = (props: { dark: boolean }) => {
+  return (
+    <div
+      className={`border-t  w-full ${
+        props.dark ? `border-grey-55` : `border-grey-80`
+      }`}
+    ></div>
+  );
 };
 
 export const FloatingContainer: React.FC<{ className?: string }> = (props) => {

@@ -31,19 +31,14 @@ export const SmokeProvider: React.FC = (props) => {
 
 const Smoke: React.FC<{ x: number; y: number }> = (props) => {
   return (
-    <div className="toast">
+    <div
+      className={`smoke absolute z-20 rounded-full bg-accent-blue text-white py-1 px-2 pointer-events-none `}
+    >
       <style jsx>{`
-        .toast {
-          position: absolute;
+        .smoke {
           left: ${props.x}px;
-          z-index: 20;
-          border: 1px solid;
-          border-radius: 64px;
-          color: white;
-          padding: 4px 8px;
           animation-name: fadeout;
           animation-duration: 2s;
-          pointer-events: none;
         }
 
         @keyframes fadeout {
