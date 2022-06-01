@@ -40,7 +40,6 @@ export const DeckList = () => {
 
 const CreateDeck = (props: { lastDeckPosition?: string }) => {
   let { authorized, mutate } = useMutations();
-  // let [newDeckName, setNewDeckName] = useState("");
   return (
     <div>
       {!authorized ? null : (
@@ -60,33 +59,6 @@ const CreateDeck = (props: { lastDeckPosition?: string }) => {
           }}
         />
       )}
-      {/* <div className="flex">
-        {!authorized ? null : (
-          <>
-            <input
-              className="mr-2"
-              value={newDeckName}
-              placeholder="new deck"
-              onChange={(e) => setNewDeckName(e.currentTarget.value)}
-            />
-            <ButtonSecondary
-              content="create"
-              onClick={() => {
-                let entity = ulid();
-                mutate("addDeck", {
-                  newEntity: entity,
-                  name: newDeckName,
-                  position: generateKeyBetween(
-                    props.lastDeckPosition || null,
-                    null
-                  ),
-                });
-                setNewDeckName("");
-              }}
-            />
-          </>
-        )}
-      </div> */}
     </div>
   );
 };
