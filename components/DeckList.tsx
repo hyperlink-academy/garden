@@ -3,16 +3,17 @@ import { Disclosure } from "@headlessui/react";
 import useMeasure from "react-use-measure";
 import { animated, SpringValue, useSpring } from "react-spring";
 import { usePrevious } from "hooks/utils";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FindOrCreateCard } from "./FindOrCreateEntity";
-import { ButtonLink, ButtonSecondary } from "./Buttons";
+import { ButtonLink, ButtonPrimary, ButtonSecondary } from "./Buttons";
 import Link from "next/link";
-import { Card, Settings } from "./Icons";
+import { CardAdd, DeckAdd, Settings } from "./Icons";
 import { generateKeyBetween } from "src/fractional-indexing";
 import { sortByPosition } from "src/position_helpers";
 import { ulid } from "src/ulid";
 import { useRouter } from "next/router";
 import { SmallCardList } from "./SmallCardList";
+import { Textarea } from "./Textarea";
 
 export const DeckList = () => {
   let decks = useIndex.aev("deck").sort(sortByPosition("aev"));
@@ -23,10 +24,10 @@ export const DeckList = () => {
       <div className="pb-8 flex flex-col sm:flex-row justify-between">
         <CreateDeck lastDeckPosition={decks[decks.length - 1]?.positions.aev} />
         <div className="self-left sm:self-center py-2">
-          <ButtonLink
+          {/* <ButtonLink
             onClick={() => setToggleAll(!toggleAll)}
             content="toggle all"
-          />
+          /> */}
         </div>
       </div>
 
@@ -39,34 +40,53 @@ export const DeckList = () => {
 
 const CreateDeck = (props: { lastDeckPosition?: string }) => {
   let { authorized, mutate } = useMutations();
-  let [newDeckName, setNewDeckName] = useState("");
+  // let [newDeckName, setNewDeckName] = useState("");
   return (
-    <div className="flex">
+    <div>
       {!authorized ? null : (
-        <>
-          <input
-            className="mr-2"
-            value={newDeckName}
-            placeholder="new deck"
-            onChange={(e) => setNewDeckName(e.currentTarget.value)}
-          />
-          <ButtonSecondary
-            content="create"
-            onClick={() => {
-              let entity = ulid();
-              mutate("addDeck", {
-                newEntity: entity,
-                name: newDeckName,
-                position: generateKeyBetween(
-                  props.lastDeckPosition || null,
-                  null
-                ),
-              });
-              setNewDeckName("");
-            }}
-          />
-        </>
+        <ButtonSecondary
+          content="Create a New Deck"
+          icon={<DeckAdd />}
+          onClick={() => {
+            let entity = ulid();
+            mutate("addDeck", {
+              newEntity: entity,
+              name: "",
+              position: generateKeyBetween(
+                props.lastDeckPosition || null,
+                null
+              ),
+            });
+          }}
+        />
       )}
+      {/* <div className="flex">
+        {!authorized ? null : (
+          <>
+            <input
+              className="mr-2"
+              value={newDeckName}
+              placeholder="new deck"
+              onChange={(e) => setNewDeckName(e.currentTarget.value)}
+            />
+            <ButtonSecondary
+              content="create"
+              onClick={() => {
+                let entity = ulid();
+                mutate("addDeck", {
+                  newEntity: entity,
+                  name: newDeckName,
+                  position: generateKeyBetween(
+                    props.lastDeckPosition || null,
+                    null
+                  ),
+                });
+                setNewDeckName("");
+              }}
+            />
+          </>
+        )}
+      </div> */}
     </div>
   );
 };
@@ -95,7 +115,7 @@ const Deck = (props: { entity: string; toggleAll: boolean | undefined }) => {
 
   return (
     <Disclosure as="div" className="pb-8">
-      <div className="flex pb-2 gap-2 justify-between">
+      <div className="flex pb-2 gap-4 justify-between">
         <div className="flex gap-10 w-full">
           <button
             onClick={(e) => {
@@ -104,50 +124,64 @@ const Deck = (props: { entity: string; toggleAll: boolean | undefined }) => {
           >
             <DeckImage count={cardsCount} open={!!drawerOpen} />
           </button>
-          <Link
+          <DeckTitle entityID={props.entity} />
+          {/* <Link
             href={`/s/${router.query.studio}/s/${router.query.space}/c/${props.entity}`}
           >
             <a className="pb-2 w-full">
-              <h3 className="text-grey-35 text-xl">{title?.value}</h3>
-              <p>{description?.value}</p>
+              {title?.value ? (
+                <h3 className="text-grey-35 ">{title?.value}</h3>
+              ) : (
+                <h3 className="text-grey-80 italic">Untitled Deck</h3>
+              )}
+              {description?.value || title?.value ? (
+                <p>{description?.value}</p>
+              ) : (
+                <p className="text-grey-80 italic">add a description...</p>
+              )}
             </a>
-          </Link>
+          </Link> */}
         </div>
       </div>
       <Drawer open={!!drawerOpen}>
-        {!authorized ? (
-          cardsCount > 0 ? (
+        <div className="flex flex-col gap-4">
+          {cardsCount > 0 ? (
+            <SmallCardList
+              attribute="deck/contains"
+              positionKey="eav"
+              deck={props.entity}
+              cards={cards || []}
+            />
+          ) : (
+            <div className="italic place-self-center text-grey-55">
+              no cards yet!
+            </div>
+          )}
+          {!authorized ? (
             ""
           ) : (
-            <div className="italic">no cards!</div>
-          )
-        ) : (
-          <>
-            <div className={cardsCount > 0 ? "pb-4" : ""}>
-              <ButtonSecondary
+            <div className="place-items-center place-self-end flex flex-row gap-4">
+              <ButtonLink content="Deck Overview" icon={<Settings />} />
+
+              <ButtonPrimary
                 onClick={() => setFindOpen(true)}
-                icon={<Card />}
+                icon={<CardAdd />}
                 content="Add cards"
               />
+
+              <FindOrCreateCard
+                allowBlank={true}
+                entity={props.entity}
+                positionKey="eav"
+                lastPosition={lastCard?.positions["eav"]}
+                section="deck/contains"
+                open={findOpen}
+                onClose={() => setFindOpen(false)}
+                selected={cards?.map((c) => c.value.value) || []}
+              />
             </div>
-            <FindOrCreateCard
-              allowBlank={true}
-              entity={props.entity}
-              positionKey="eav"
-              lastPosition={lastCard?.positions["eav"]}
-              section="deck/contains"
-              open={findOpen}
-              onClose={() => setFindOpen(false)}
-              selected={cards?.map((c) => c.value.value) || []}
-            />
-          </>
-        )}
-        <SmallCardList
-          attribute="deck/contains"
-          positionKey="eav"
-          deck={props.entity}
-          cards={cards || []}
-        />
+          )}
+        </div>
       </Drawer>
     </Disclosure>
   );
@@ -297,5 +331,59 @@ export const Drawer: React.FC<{ open: boolean }> = (props) => {
         </div>
       </Disclosure.Panel>
     </animated.div>
+  );
+};
+
+const DeckTitle = (props: { entityID: string }) => {
+  let DeckTitle = useIndex.eav(props.entityID, "card/title");
+  let DeckDescription = useIndex.eav(props.entityID, "card/content");
+  let { authorized, mutate } = useMutations();
+  let [descriptionFocused, setDescriptionFocused] = useState(false);
+
+  return (
+    <div className="flex flex-col gap-1">
+      {!authorized ? (
+        <h2>{DeckTitle ? DeckTitle?.value : "Untitled"}</h2>
+      ) : (
+        <Textarea
+          placeholder="Untitled Deck"
+          className="text-xl font-bold bg-inherit"
+          value={DeckTitle?.value}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              setDescriptionFocused(true);
+            }
+          }}
+          onChange={async (e) => {
+            await mutate("assertFact", {
+              entity: props.entityID,
+              attribute: "card/title",
+              value: e.currentTarget.value,
+              positions: DeckTitle?.positions || {},
+            });
+          }}
+        />
+      )}
+      {!authorized ? (
+        <p>{DeckDescription ? DeckDescription?.value : ""}</p>
+      ) : (
+        <Textarea
+          focused={descriptionFocused}
+          onBlur={() => setDescriptionFocused(false)}
+          placeholder={DeckTitle?.value === "" ? "add a description..." : ""}
+          className="bg-inherit placeholder:italic"
+          value={DeckDescription?.value}
+          onChange={async (e) => {
+            await mutate("assertFact", {
+              entity: props.entityID,
+              attribute: "card/content",
+              value: e.currentTarget.value,
+              positions: DeckTitle?.positions || {},
+            });
+          }}
+        />
+      )}
+    </div>
   );
 };

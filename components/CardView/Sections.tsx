@@ -223,7 +223,9 @@ const SectionMoreOptionsMenu = (props: {
               }`}
             >
               <p>Remove</p>
-              <Close />
+              <div className="p-0.5">
+                <Close />
+              </div>
             </button>
           )}
         </Menu.Item>

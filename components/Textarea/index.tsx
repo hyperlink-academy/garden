@@ -20,7 +20,7 @@ export const Textarea = (
   }, [props.focused]);
 
   useEffect(() => {
-    if (!focused || !initialCursor || !textarea.current) return;
+    if (!focused || !textarea.current) return;
     if (textarea.current === document.activeElement) return;
     textarea.current.focus();
     textarea.current.setSelectionRange(initialCursor, initialCursor);
@@ -62,6 +62,7 @@ export const Textarea = (
       }}
       onBlur={(e) => {
         setFocused(false);
+        setInitialCursor(null);
         if (props.onBlur) props.onBlur(e);
       }}
       ref={textarea}

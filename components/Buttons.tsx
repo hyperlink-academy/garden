@@ -10,7 +10,7 @@ export function ButtonPrimary(
       {...props}
       {...{ content: undefined, icon: undefined }}
       className={`
-      p-2 m-0 
+      py-1 px-2 m-0 
       box-border
       text-white font-bold
       bg-accent-blue 
@@ -40,7 +40,7 @@ export function ButtonSecondary(
       {...props}
       {...{ content: undefined, icon: undefined }}
       className={`
-      p-2 m-0 
+      py-1 px-2 m-0 
       text-accent-blue font-bold 
       bg-white
       border rounded-md border-accent-blue 
