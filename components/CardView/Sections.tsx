@@ -189,44 +189,18 @@ const SectionMoreOptionsMenu = (props: {
         <MoreOptions />
       </Menu.Button>
       <MenuContainer>
-        <Menu.Item>
-          {({ active }) => (
-            <button
-              className={`px-3 py-4 flex items-center gap-2 justify-end ${
-                active ? "bg-bg-blue" : ""
-              }`}
-              onClick={() => moveUp()}
-            >
-              <p>Move Up</p>
-              <UpArrow />
-            </button>
-          )}
-        </Menu.Item>
-        <Menu.Item>
-          {({ active }) => (
-            <button
-              className={`px-3 py-4 flex items-center gap-2 justify-end ${
-                active ? "bg-bg-blue" : ""
-              }`}
-              onClick={() => moveDown()}
-            >
-              <p>Move Down</p>
-              <DownArrow />
-            </button>
-          )}
-        </Menu.Item>
-        <Menu.Item>
-          {({ active }) => (
-            <button
-              className={`px-3 py-4 flex items-center gap-2 justify-end ${
-                active ? "bg-bg-blue" : ""
-              }`}
-            >
-              <p>Remove</p>
-              <Close />
-            </button>
-          )}
-        </Menu.Item>
+        <MenuItem onClick={() => moveUp()}>
+          <p>Move Up</p>
+          <UpArrow />
+        </MenuItem>
+        <MenuItem onClick={() => moveDown()}>
+          <p>Move Down</p>
+          <DownArrow />
+        </MenuItem>
+        <MenuItem>
+          <p>Remove</p>
+          <Close />
+        </MenuItem>
       </MenuContainer>
     </Menu>
   );
