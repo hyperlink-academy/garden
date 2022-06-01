@@ -1,7 +1,7 @@
 import { Dialog, Menu, Transition } from "@headlessui/react";
 import React, { Fragment } from "react";
 
-export const Divider = (props: { dark: boolean }) => {
+export const Divider = (props: { dark?: boolean }) => {
   return (
     <div
       className={`border-t  w-full ${
@@ -81,13 +81,18 @@ export const MenuContainer: React.FC<{ className?: string }> = (props) => {
   );
 };
 
-export const MenuItem: React.FC = (props) => {
+export const MenuItem: React.FC<{ onClick?: () => void }> = (props) => {
   return (
     <Menu.Item>
       {({ active }) => (
-        <div className={`px-3 py-4 ${active ? "bg-bg-blue" : ""}`}>
+        <button
+          className={`px-3 py-4 flex items-center gap-2 justify-end ${
+            active ? "bg-bg-blue" : ""
+          }`}
+          onClick={() => props.onClick?.()}
+        >
           {props.children}
-        </div>
+        </button>
       )}
     </Menu.Item>
   );

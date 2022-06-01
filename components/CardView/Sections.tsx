@@ -189,6 +189,7 @@ const SectionMoreOptionsMenu = (props: {
         <MoreOptions />
       </Menu.Button>
       <MenuContainer>
+<<<<<<< HEAD
         <Menu.Item>
           {({ active }) => (
             <button
@@ -229,6 +230,20 @@ const SectionMoreOptionsMenu = (props: {
             </button>
           )}
         </Menu.Item>
+=======
+        <MenuItem onClick={() => moveUp()}>
+          <p>Move Up</p>
+          <UpArrow />
+        </MenuItem>
+        <MenuItem onClick={() => moveDown()}>
+          <p>Move Down</p>
+          <DownArrow />
+        </MenuItem>
+        <MenuItem>
+          <p>Remove</p>
+          <Close />
+        </MenuItem>
+>>>>>>> c72ffe885fb7574dc6dd399f6de5bbd54684482e
       </MenuContainer>
     </Menu>
   );

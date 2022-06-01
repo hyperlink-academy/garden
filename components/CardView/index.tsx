@@ -12,7 +12,6 @@ import {
 } from "./Sections";
 import { AddSection } from "./AddSection";
 import { Backlinks } from "./Backlinks";
-import Head from "next/head";
 import { usePreserveScroll } from "hooks/utils";
 
 const borderStyles = (args: { deck: boolean; member: boolean }) => {
@@ -147,31 +146,15 @@ const CardMoreOptionsMenu = (props: { entityID: string }) => {
         <MoreOptions />
       </Menu.Button>
       <MenuContainer>
-        <Menu.Item>
-          {({ active }) => (
-            <button
-              className={`px-3 py-4 flex items-center gap-2 justify-end ${
-                active ? "bg-bg-blue" : ""
-              }`}
-            >
-              <p>Remove from Deck</p>
-              <DeckSmall />
-            </button>
-          )}
-        </Menu.Item>
+        <MenuItem>
+          <p>Remove from Deck</p>
+          <DeckSmall />
+        </MenuItem>
         <Divider />
-        <Menu.Item>
-          {({ active }) => (
-            <button
-              className={`px-3 py-4 flex items-center gap-2 justify-end ${
-                active ? "bg-bg-blue" : ""
-              }`}
-            >
-              <p className="font-bold text-accent-red">Delete Card FOREVER</p>
-              <Delete />
-            </button>
-          )}
-        </Menu.Item>
+        <MenuItem>
+          <p className="font-bold text-accent-red">Delete Card FOREVER</p>
+          <Delete />
+        </MenuItem>
       </MenuContainer>
     </Menu>
   );
