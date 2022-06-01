@@ -5,7 +5,12 @@ import { animated, SpringValue, useSpring } from "react-spring";
 import { usePrevious } from "hooks/utils";
 import { useEffect, useRef, useState } from "react";
 import { FindOrCreateCard } from "./FindOrCreateEntity";
-import { ButtonLink, ButtonPrimary, ButtonSecondary } from "./Buttons";
+import {
+  ButtonLink,
+  ButtonPrimary,
+  ButtonSecondary,
+  ButtonTertiary,
+} from "./Buttons";
 import Link from "next/link";
 import { CardAdd, DeckAdd, Settings } from "./Icons";
 import { generateKeyBetween } from "src/fractional-indexing";
@@ -20,30 +25,32 @@ export const DeckList = () => {
   let [toggleAll, setToggleAll] = useState<boolean | undefined>(undefined);
 
   return (
-    <div>
-      <div className="pb-8 flex flex-col sm:flex-row justify-between">
-        <CreateDeck lastDeckPosition={decks[decks.length - 1]?.positions.aev} />
+    <div className="flex flex-col py-6">
+      {/* <div className="pb-8 flex flex-col sm:flex-row justify-between">
         <div className="self-left sm:self-center py-2">
-          {/* <ButtonLink
+          <ButtonLink
             onClick={() => setToggleAll(!toggleAll)}
             content="toggle all"
-          /> */}
+          />
         </div>
-      </div>
+      </div> */}
 
       {decks.map((d) => (
         <Deck entity={d.entity} toggleAll={toggleAll} key={d.entity} />
       ))}
+      <CreateDeck lastDeckPosition={decks[decks.length - 1]?.positions.aev} />
     </div>
   );
 };
 
 const CreateDeck = (props: { lastDeckPosition?: string }) => {
   let { authorized, mutate } = useMutations();
-  return (
-    <div>
-      {!authorized ? null : (
-        <ButtonSecondary
+  if (authorized === false) {
+    return null;
+  } else
+    return (
+      <div className="pt-2 pb-4 place-self-center">
+        <ButtonTertiary
           content="Create a New Deck"
           icon={<DeckAdd />}
           onClick={() => {
@@ -58,9 +65,8 @@ const CreateDeck = (props: { lastDeckPosition?: string }) => {
             });
           }}
         />
-      )}
-    </div>
-  );
+      </div>
+    );
 };
 
 let openStates: { [key: string]: boolean | undefined } = {};
@@ -133,7 +139,13 @@ const Deck = (props: { entity: string; toggleAll: boolean | undefined }) => {
             ""
           ) : (
             <div className="place-items-center place-self-end flex flex-row gap-4">
-              <ButtonLink content="Deck Overview" icon={<Settings />} />
+              <Link
+                href={`/s/${router.query.studio}/s/${router.query.space}/c/${props.entity}`}
+              >
+                <a>
+                  <ButtonLink content="Deck Overview" icon={<Settings />} />
+                </a>
+              </Link>
 
               <ButtonPrimary
                 onClick={() => setFindOpen(true)}
@@ -299,7 +311,7 @@ export const Drawer: React.FC<{ open: boolean }> = (props) => {
               }}
             />
           </div>
-          <div className="pb-8 pt-8 px-4">{props.children}</div>
+          <div className="pb-4 pt-6 px-4">{props.children}</div>
         </div>
       </Disclosure.Panel>
     </animated.div>
