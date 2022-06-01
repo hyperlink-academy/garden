@@ -189,48 +189,6 @@ const SectionMoreOptionsMenu = (props: {
         <MoreOptions />
       </Menu.Button>
       <MenuContainer>
-<<<<<<< HEAD
-        <Menu.Item>
-          {({ active }) => (
-            <button
-              className={`px-3 py-4 flex items-center gap-2 justify-end ${
-                active ? "bg-bg-blue" : ""
-              }`}
-              onClick={() => moveUp()}
-            >
-              <p>Move Up</p>
-              <UpArrow />
-            </button>
-          )}
-        </Menu.Item>
-        <Menu.Item>
-          {({ active }) => (
-            <button
-              className={`px-3 py-4 flex items-center gap-2 justify-end ${
-                active ? "bg-bg-blue" : ""
-              }`}
-              onClick={() => moveDown()}
-            >
-              <p>Move Down</p>
-              <DownArrow />
-            </button>
-          )}
-        </Menu.Item>
-        <Menu.Item>
-          {({ active }) => (
-            <button
-              className={`px-3 py-4 flex items-center gap-2 justify-end ${
-                active ? "bg-bg-blue" : ""
-              }`}
-            >
-              <p>Remove</p>
-              <div className="p-0.5">
-                <Close />
-              </div>
-            </button>
-          )}
-        </Menu.Item>
-=======
         <MenuItem onClick={() => moveUp()}>
           <p>Move Up</p>
           <UpArrow />
@@ -243,7 +201,6 @@ const SectionMoreOptionsMenu = (props: {
           <p>Remove</p>
           <Close />
         </MenuItem>
->>>>>>> c72ffe885fb7574dc6dd399f6de5bbd54684482e
       </MenuContainer>
     </Menu>
   );
