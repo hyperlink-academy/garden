@@ -5,12 +5,7 @@ import { animated, SpringValue, useSpring } from "react-spring";
 import { usePrevious } from "hooks/utils";
 import { useEffect, useRef, useState } from "react";
 import { FindOrCreateCard } from "./FindOrCreateEntity";
-import {
-  ButtonLink,
-  ButtonPrimary,
-  ButtonSecondary,
-  ButtonTertiary,
-} from "./Buttons";
+import { ButtonLink, ButtonPrimary, ButtonTertiary } from "./Buttons";
 import Link from "next/link";
 import { CardAdd, DeckAdd, Settings } from "./Icons";
 import { generateKeyBetween } from "src/fractional-indexing";
@@ -25,7 +20,7 @@ export const DeckList = () => {
   let [toggleAll, setToggleAll] = useState<boolean | undefined>(undefined);
 
   return (
-    <div className="flex flex-col py-6">
+    <div className="flex flex-col pt-6 pb-0">
       {/* <div className="pb-8 flex flex-col sm:flex-row justify-between">
         <div className="self-left sm:self-center py-2">
           <ButtonLink
@@ -49,7 +44,7 @@ const CreateDeck = (props: { lastDeckPosition?: string }) => {
     return null;
   } else
     return (
-      <div className="pt-2 pb-4 place-self-center">
+      <div className="pb-8 place-self-center">
         <ButtonTertiary
           content="Create a New Deck"
           icon={<DeckAdd />}
@@ -103,22 +98,6 @@ const Deck = (props: { entity: string; toggleAll: boolean | undefined }) => {
             <DeckImage count={cardsCount} open={!!drawerOpen} />
           </button>
           <DeckTitle entityID={props.entity} />
-          {/* <Link
-            href={`/s/${router.query.studio}/s/${router.query.space}/c/${props.entity}`}
-          >
-            <a className="pb-2 w-full">
-              {title?.value ? (
-                <h3 className="text-grey-35 ">{title?.value}</h3>
-              ) : (
-                <h3 className="text-grey-80 italic">Untitled Deck</h3>
-              )}
-              {description?.value || title?.value ? (
-                <p>{description?.value}</p>
-              ) : (
-                <p className="text-grey-80 italic">add a description...</p>
-              )}
-            </a>
-          </Link> */}
         </div>
       </div>
       <Drawer open={!!drawerOpen}>
@@ -136,7 +115,7 @@ const Deck = (props: { entity: string; toggleAll: boolean | undefined }) => {
             </div>
           )}
           {!authorized ? (
-            ""
+            <div className="-mb-2" />
           ) : (
             <div className="place-items-center place-self-end flex flex-row gap-4">
               <Link
