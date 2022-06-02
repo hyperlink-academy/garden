@@ -9,9 +9,8 @@ export const RenderedText = forwardRef<
     <Linkify options={{ className: "text-accent-blue underline" }}>
       <pre ref={ref} {...props}>
         {props.text || (
-            <span className="!text-grey-80 italic">{props.placeholder}</span>
-          ) ||
-          " "}
+          <span className="!text-grey-80 italic">{props.placeholder}</span>
+        )}
       </pre>
     </Linkify>
   );

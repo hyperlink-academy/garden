@@ -77,7 +77,6 @@ export const CardView = (props: { entityID: string }) => {
           <SingleTextSection
             entityID={props.entityID}
             section={"card/content"}
-            placeholder="write something..."
           />
         </div>
 
@@ -113,10 +112,9 @@ const Title = (props: { entityID: string }) => {
   let { authorized, mutate } = useMutations();
 
   let textarea = useRef<HTMLTextAreaElement | null>(null);
-  return !authorized || memberName ? (
-    <h2>{title ? title?.value : "Untitled"}</h2>
-  ) : (
+  return (
     <Textarea
+      previewOnly={!authorized || !!memberName}
       ref={textarea}
       placeholder="Untitled"
       className="text-xl font-bold bg-inherit"

@@ -73,7 +73,6 @@ const Section = (props: {
 
 export const SingleTextSection = (props: {
   entityID: string;
-  placeholder?: string;
   section: keyof FilterAttributes<{
     unique: any;
     type: "string";
@@ -85,18 +84,12 @@ export const SingleTextSection = (props: {
   let inputEl = useRef<HTMLTextAreaElement | null>(null);
   let { authorized, mutate } = useMutations();
 
-  return !authorized ? (
-    <div
-      style={{ overflowWrap: "anywhere" }}
-      className="whitespace-pre-wrap w-full"
-    >
-      {fact?.value || ""}
-    </div>
-  ) : (
+  return (
     <Textarea
+      previewOnly={!authorized}
       autoFocus={props.new}
       ref={inputEl}
-      placeholder={props.placeholder}
+      placeholder="write something..."
       className="placeholder:italic bg-inherit w-full"
       spellCheck={false}
       value={(fact?.value as string) || ""}
