@@ -37,6 +37,7 @@ export const Textarea = (
           ...props.style,
           whiteSpace: "pre-wrap",
           fontFamily: "inherit",
+          width: "100%",
         }}
         onClick={(e) => {
           if (e.isDefaultPrevented()) return;
