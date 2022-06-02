@@ -127,7 +127,6 @@ export const BaseSmallCard = (props: {
     <div className={`w-[151px] h-24 touch-manipulation relative origin-center`}>
       <div
         className={`
-        drop-shadow-md
         w-full h-24 
         overflow-hidden 
         relative
