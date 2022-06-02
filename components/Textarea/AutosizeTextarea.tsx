@@ -11,31 +11,23 @@ type Props = React.DetailedHTMLProps<
   HTMLTextAreaElement
 > & {
   previewOnly?: boolean;
-  customCSS?: string;
   focused?: boolean;
 };
 const AutosizeTextarea = forwardRef<HTMLTextAreaElement, Props>(
   (props: Props, ref) => {
     let [initialCursor, _setInitialCursor] = useState<number | null>(null);
-    let [focused, setFocused] = useState(false);
-    useEffect(() => {
-      if (props.focused !== undefined) {
-        setFocused(props.focused);
-      }
-    }, [props.focused]);
     let textarea = useRef<HTMLTextAreaElement | null>(null);
     useImperativeHandle(ref, () => textarea.current as HTMLTextAreaElement);
     useEffect(() => {
-      if (!focused || !initialCursor || !textarea.current) return;
+      if (!props.focused || !initialCursor || !textarea.current) return;
       if (textarea.current === document.activeElement) return;
       textarea.current.focus();
       textarea.current.setSelectionRange(initialCursor, initialCursor);
-    }, [initialCursor, focused, textarea]);
+    }, [initialCursor, props.focused, textarea]);
 
     let passDownProps = { ...props };
     delete passDownProps.focused;
     delete passDownProps.previewOnly;
-    delete passDownProps.customCSS;
 
     return (
       <div
@@ -43,15 +35,7 @@ const AutosizeTextarea = forwardRef<HTMLTextAreaElement, Props>(
         data-replicated-value={props.value}
         style={props.style}
       >
-        <textarea
-          rows={1}
-          {...passDownProps}
-          onBlur={(e) => {
-            setFocused(false);
-            if (props.onBlur) props.onBlur(e);
-          }}
-          ref={textarea}
-        />
+        <textarea rows={1} {...passDownProps} ref={textarea} />
         <style jsx>
           {`
             .grow-wrap {
@@ -85,9 +69,8 @@ const AutosizeTextarea = forwardRef<HTMLTextAreaElement, Props>(
               width: 100%;
               font: inherit;
               border: none;
-              ${props.customCSS || ""}
               /* Place on top of each other */
-            grid-area: 1 / 1 / 2 / 2;
+              grid-area: 1 / 1 / 2 / 2;
             }
 
             textarea:focus {

@@ -39,6 +39,15 @@ export const Textarea = (
           fontFamily: "inherit",
           width: "100%",
         }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            if (e.isDefaultPrevented()) return;
+            if (props.previewOnly) return;
+            setFocused(true);
+            if (typeof props.value === "string")
+              setInitialCursor(props.value?.length);
+          }
+        }}
         onClick={(e) => {
           if (e.isDefaultPrevented()) return;
           if (props.previewOnly) return;
@@ -54,17 +63,22 @@ export const Textarea = (
   return (
     <AutosizeTextarea
       {...props}
+      focused={focused}
+      onKeyDown={(e) => {
+        if (e.key === "Escape") e.currentTarget.blur();
+        props.onKeyDown?.(e);
+      }}
       onChange={async (e) => {
         if (!props.onChange) return;
         let start = e.currentTarget.selectionStart,
           end = e.currentTarget.selectionEnd;
-        await props.onChange(e);
+        await Promise.all([props.onChange(e)]);
         textarea.current?.setSelectionRange(start, end);
       }}
       onBlur={(e) => {
         setFocused(false);
         setInitialCursor(null);
-        if (props.onBlur) props.onBlur(e);
+        props.onBlur?.(e);
       }}
       ref={textarea}
     />
