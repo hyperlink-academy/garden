@@ -11,7 +11,7 @@ import { Modal } from "./Layout";
 export const SpaceList = () => {
   let spaces = useIndex.aev("space/name");
   return (
-    <div className="grid grid-cols-3 gap-4">
+    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
       {spaces?.map((a) => {
         return <Space entity={a.entity} name={a.value} />;
       })}
@@ -48,6 +48,7 @@ const Space = (props: { entity: string; name: string }) => {
       ? latestMessage - lastSeenMessage?.value
       : null;
   // TEST
+  // console.log(showUnreads);
   // let showUnreads = true;
   // let unreadCount = 5;
 
@@ -59,11 +60,11 @@ const Space = (props: { entity: string; name: string }) => {
             <Door entityID={props.entity} glow={showUnreads} />
           </a>
         </Link>
-        <div className="absolute bottom-[80px] right-[62px] rotate-[-30deg]">
+        <div className="absolute bottom-[4px] right-[8px] md:bottom-[80px] md:right-[62px] rotate-[-30deg]">
           {authorized ? <EditModal entityID={props.entity} /> : null}
         </div>
         {showUnreads ? (
-          <div className="inline-flex items-center gap-2 absolute bottom-[16px] right-[56px] rotate-[-30deg]">
+          <div className="inline-flex items-center gap-2 absolute bottom-[16px] right-[8px] md:bottom-[16px] md:right-[56px] rotate-[-30deg]">
             <span className="bg-accent-red rounded-full w-3 h-3"></span>
             <span>{unreadCount} unread</span>
           </div>

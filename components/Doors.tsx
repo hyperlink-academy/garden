@@ -81,7 +81,7 @@ export const Door = (props: {
           {/* <!-- Thicken out the original shape --> */}
           <feMorphology
             operator="dilate"
-            radius="8"
+            radius="4"
             in="SourceAlpha"
             result="thicken"
           />
