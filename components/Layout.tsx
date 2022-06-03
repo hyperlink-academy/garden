@@ -81,15 +81,21 @@ export const MenuContainer: React.FC<{ className?: string }> = (props) => {
   );
 };
 
-export const MenuItem: React.FC<{ onClick?: () => void }> = (props) => {
+export const MenuItem: React.FC<{
+  onClick?: () => void;
+  disabled?: boolean;
+}> = (props) => {
   return (
     <Menu.Item>
       {({ active }) => (
         <button
           className={`px-3 py-4 flex items-center gap-2 justify-end ${
             active ? "bg-bg-blue" : ""
+          } ${
+            props?.disabled ? "bg-grey-90 hover:bg-grey-90 text-grey-35" : ""
           }`}
           onClick={() => props.onClick?.()}
+          disabled={props?.disabled}
         >
           {props.children}
         </button>

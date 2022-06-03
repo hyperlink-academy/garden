@@ -55,7 +55,7 @@ export const CardCarousel = (props: {
               key={entity}
               entity={entity}
             >
-              <CardView entityID={entity} />
+              <CardView entityID={entity} referenceFactID={c.id} />
             </CardContainer>
           );
         })}

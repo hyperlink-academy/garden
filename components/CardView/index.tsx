@@ -36,7 +36,10 @@ const contentStyles = (args: { deck: boolean; member: boolean }) => {
       return `px-4 py-6`;
   }
 };
-export const CardView = (props: { entityID: string }) => {
+export const CardView = (props: {
+  entityID: string;
+  referenceFactID?: string;
+}) => {
   let isDeck = useIndex.eav(props.entityID, "deck");
   let memberName = useIndex.eav(props.entityID, "member/name");
   let { ref } = usePreserveScroll<HTMLDivElement>();
@@ -72,7 +75,10 @@ export const CardView = (props: { entityID: string }) => {
         <div className="grid grid-auto-rows gap-3">
           <div className="cardHeader grid grid-cols-[auto_min-content] gap-2">
             <Title entityID={props.entityID} />
-            <CardMoreOptionsMenu entityID={props.entityID} />
+            <CardMoreOptionsMenu
+              entityID={props.entityID}
+              referenceFactID={props?.referenceFactID}
+            />
           </div>
           <SingleTextSection
             entityID={props.entityID}
@@ -134,9 +140,14 @@ const Title = (props: { entityID: string }) => {
   );
 };
 
-const CardMoreOptionsMenu = (props: { entityID: string }) => {
-  let { authorized } = useMutations();
+const CardMoreOptionsMenu = (props: {
+  entityID: string;
+  referenceFactID?: string;
+}) => {
+  let { authorized, mutate } = useMutations();
   let memberName = useIndex.eav(props.entityID, "member/name");
+
+  let deleteDisabled = true;
 
   return !authorized || !!memberName ? null : (
     <Menu as="div" className="relative">
@@ -144,13 +155,35 @@ const CardMoreOptionsMenu = (props: { entityID: string }) => {
         <MoreOptions />
       </Menu.Button>
       <MenuContainer>
-        <MenuItem>
-          <p>Remove from Deck</p>
-          <DeckSmall />
-        </MenuItem>
-        <Divider />
-        <MenuItem>
-          <p className="font-bold text-accent-red">Delete Card FOREVER</p>
+        {!props?.referenceFactID ? null : (
+          <MenuItem
+            onClick={
+              !authorized
+                ? undefined
+                : () => {
+                    mutate("removeCardFromSection", {
+                      id: props?.referenceFactID as string,
+                    });
+                  }
+            }
+          >
+            <p>Remove from Deck</p>
+            <DeckSmall />
+          </MenuItem>
+        )}
+        {/* <Divider /> */}
+
+        {/* TODO: wire up delete card (and add confirmation?) */}
+        {/* TODO: check if deck card; if so display "Delete Deck…"  */}
+
+        <MenuItem disabled={deleteDisabled}>
+          <p
+            className={`font-bold ${
+              deleteDisabled ? "text-grey-35" : "text-accent-red"
+            } `}
+          >
+            Delete Card FOREVER
+          </p>
           <Delete />
         </MenuItem>
       </MenuContainer>
