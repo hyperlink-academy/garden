@@ -42,19 +42,25 @@ function getRandomFrame(frameColors: object) {
   ] as keyof typeof frameColors;
 }
 
-export const Door = (props: { entityID: string; width?: string }) => {
-  let colorKey = getRandomFrame(frameColors);
+export const Door = (props: {
+  entityID: string;
+  width?: string;
+  glow?: boolean;
+}) => {
   let image = useIndex.eav(props.entityID, "space/door/image");
-  let color1 = frameColors[colorKey][0];
-  let color2 = frameColors[colorKey][1];
+  // let colorKey = getRandomFrame(frameColors);
+  // let color1 = frameColors[colorKey][0];
+  // let color2 = frameColors[colorKey][1];
+  let color1 = "#daa520";
+  let color2 = "#ffd700";
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width={props.width || "128"}
       height="auto"
       viewBox="0 0 256 575.64"
-      // className="flex-none"
       className="flex-none -scale-x-100"
+      filter={props?.glow ? "url(#softGlow)" : ""}
     >
       <defs>
         <style>
@@ -67,13 +73,43 @@ export const Door = (props: { entityID: string; width?: string }) => {
         <clipPath id="outer-frame">
           <path d="M1.00034 447.074L1 90.5077C1.00084 61.4231 15.0766 33.3046 40.3945 21.1728L71.2673 6.85697C83.5403 1.96661 111.359 -1.29418 126.2 2.98783C210.299 27.253 257 116.088 257 200.556L257 560.528L227.104 577L1.00034 447.074Z" />
         </clipPath>
+
+        {/* GLOW EFFECT */}
+        {/* reference: https://codepen.io/dipscom/pen/mVYjPw */}
+        {/* alt example: https://stackoverflow.com/questions/54112231/is-it-possible-to-create-a-glow-effect-in-svg */}
+        <filter id="softGlow" height="200%" width="200%" x="-50%" y="-50%">
+          {/* <!-- Thicken out the original shape --> */}
+          <feMorphology
+            operator="dilate"
+            radius="8"
+            in="SourceAlpha"
+            result="thicken"
+          />
+          {/* <!-- Use a gaussian blur to create the soft blurriness of the glow --> */}
+          <feGaussianBlur in="thicken" stdDeviation="16" result="blurred" />
+          {/* <!-- Change the colour --> */}
+          <feFlood flood-color="#ffd700" result="glowColor" />
+          {/* <!-- Color in the glows --> */}
+          <feComposite
+            in="glowColor"
+            in2="blurred"
+            operator="in"
+            result="softGlow_colored"
+          />
+          {/* <!--	Layer the effects together --> */}
+          <feMerge>
+            <feMergeNode in="softGlow_colored" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
       </defs>
 
       <image
         width="100%"
         height="100%"
         preserveAspectRatio="xMinYMin slice"
-        xlinkHref={image?.value || getSequentialDoorImage(doorImages)}
+        // xlinkHref={image?.value || getSequentialDoorImage(doorImages)}
+        xlinkHref={image?.value || "/doors/door-clouds-256.jpg"}
         clipPath="url(#outer-frame)"
       />
 

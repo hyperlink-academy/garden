@@ -5,12 +5,13 @@ import { useState } from "react";
 import useSWR from "swr";
 import { ButtonLink } from "./Buttons";
 import { Door } from "./Doors";
+import { Settings } from "./Icons";
 import { Modal } from "./Layout";
 
 export const SpaceList = () => {
   let spaces = useIndex.aev("space/name");
   return (
-    <div>
+    <div className="grid grid-cols-3 gap-4">
       {spaces?.map((a) => {
         return <Space entity={a.entity} name={a.value} />;
       })}
@@ -37,24 +38,42 @@ const Space = (props: { entity: string; name: string }) => {
       return data.latestMessage;
     }
   );
-  return (
-    <div className="flex flex-row gap-4 pb-8">
-      <Link href={`/s/${studio?.value}/s/${props.name}`}>
-        <a>
-          <Door entityID={props.entity} />
-        </a>
-      </Link>
 
-      <div>
-        <div className="flex flex-row gap-2">
-          <h3 className="text-xl">{props.name}</h3>
+  let showUnreads =
+    latestMessage && lastSeenMessage && lastSeenMessage?.value < latestMessage
+      ? true
+      : false;
+  let unreadCount =
+    latestMessage && lastSeenMessage && lastSeenMessage?.value < latestMessage
+      ? latestMessage - lastSeenMessage?.value
+      : null;
+  // TEST
+  // let showUnreads = true;
+  // let unreadCount = 5;
+
+  return (
+    <div className="flex flex-col gap-4 pb-8">
+      <div className="grid grid-cols-2 relative">
+        <Link href={`/s/${studio?.value}/s/${props.name}`}>
+          <a>
+            <Door entityID={props.entity} glow={showUnreads} />
+          </a>
+        </Link>
+        <div className="absolute bottom-[80px] right-[62px] rotate-[-30deg]">
           {authorized ? <EditModal entityID={props.entity} /> : null}
         </div>
-        {latestMessage &&
-        lastSeenMessage &&
-        lastSeenMessage?.value < latestMessage ? (
-          <span>{latestMessage - lastSeenMessage.value} unread</span>
+        {showUnreads ? (
+          <div className="inline-flex items-center gap-2 absolute bottom-[16px] right-[56px] rotate-[-30deg]">
+            <span className="bg-accent-red rounded-full w-3 h-3"></span>
+            <span>{unreadCount} unread</span>
+          </div>
         ) : null}
+      </div>
+
+      <div className="w-full grid">
+        <div className="flex flex-row justify-between gap-2">
+          <h3 className="text-xl">{props.name}</h3>
+        </div>
       </div>
     </div>
   );
@@ -73,7 +92,13 @@ const EditModal = (props: { entityID: string }) => {
   let { mutate } = useMutations();
   return (
     <>
-      <ButtonLink content="edit" onClick={() => setOpen(true)} />
+      <a>
+        <ButtonLink
+          content="edit"
+          // icon={<Settings />}
+          onClick={() => setOpen(true)}
+        />
+      </a>
       <Modal open={open} onClose={() => setOpen(false)}>
         <div className="flex flex-wrap">
           {doorImages.map((f) => {
