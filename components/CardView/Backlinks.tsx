@@ -12,6 +12,11 @@ export const Backlinks = (props: { entityID: string }) => {
       return acc;
     }, {} as { [k in string]: boolean })
   ) as (keyof ReferenceAttributes)[];
+
+  // filter array for "message/attachedCard"
+  // TODO: remove when we add proper chat backlinks
+  sections = sections.filter((section) => section != "message/attachedCard");
+
   return sections.length > 0 ? (
     <div className=" grid grid-flow-row gap-6 ">
       <small className="bg-background rounded-md p-2 font-bold lightBorder">
