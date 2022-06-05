@@ -58,9 +58,10 @@ export const Door = (props: {
       xmlns="http://www.w3.org/2000/svg"
       width={props.width || "128"}
       height="auto"
-      viewBox="0 0 256 575.64"
+      viewBox="0 0 256 576"
       className="flex-none -scale-x-100"
       filter={props?.glow ? "url(#softGlow)" : ""}
+      overflow="visible"
     >
       <defs>
         <style>
