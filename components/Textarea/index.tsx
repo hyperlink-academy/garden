@@ -22,7 +22,7 @@ export const Textarea = (
   useEffect(() => {
     if (!focused || !textarea.current) return;
     if (textarea.current === document.activeElement) return;
-    textarea.current.focus();
+    textarea.current.focus({ preventScroll: true });
     textarea.current.setSelectionRange(initialCursor, initialCursor);
   }, [initialCursor, focused, textarea.current]);
 
@@ -63,7 +63,6 @@ export const Textarea = (
   return (
     <AutosizeTextarea
       {...props}
-      focused={focused}
       onKeyDown={(e) => {
         if (e.key === "Escape") e.currentTarget.blur();
         props.onKeyDown?.(e);

@@ -1,33 +1,15 @@
-import {
-  forwardRef,
-  useEffect,
-  useImperativeHandle,
-  useRef,
-  useState,
-} from "react";
+import { forwardRef, useImperativeHandle, useRef } from "react";
 
 type Props = React.DetailedHTMLProps<
   React.TextareaHTMLAttributes<HTMLTextAreaElement>,
   HTMLTextAreaElement
-> & {
-  previewOnly?: boolean;
-  focused?: boolean;
-};
+>;
 const AutosizeTextarea = forwardRef<HTMLTextAreaElement, Props>(
   (props: Props, ref) => {
-    let [initialCursor, _setInitialCursor] = useState<number | null>(null);
     let textarea = useRef<HTMLTextAreaElement | null>(null);
     useImperativeHandle(ref, () => textarea.current as HTMLTextAreaElement);
-    useEffect(() => {
-      if (!props.focused || !initialCursor || !textarea.current) return;
-      if (textarea.current === document.activeElement) return;
-      textarea.current.focus();
-      textarea.current.setSelectionRange(initialCursor, initialCursor);
-    }, [initialCursor, props.focused, textarea]);
 
     let passDownProps = { ...props };
-    delete passDownProps.focused;
-    delete passDownProps.previewOnly;
 
     return (
       <div
