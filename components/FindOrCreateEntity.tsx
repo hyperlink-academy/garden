@@ -146,7 +146,7 @@ export const FindOrCreateCard = (props: {
 }) => {
   let { mutate } = useMutations();
   let decks = useIndex.aev("deck");
-  let titles = useIndex.aev("card/title");
+  let titles = useIndex.aev("card/title").filter((f) => !!f.value);
   let members = useIndex.aev("member/name");
   let items = titles
     .map((t) => {
@@ -183,10 +183,12 @@ export const FindOrCreateCard = (props: {
 
         if (e.type === "create") {
           entity = ulid();
-          await mutate("createCard", {
-            entityID: entity,
-            title: e.name,
-          });
+          if (e.name) {
+            await mutate("createCard", {
+              entityID: entity,
+              title: e.name,
+            });
+          }
         } else {
           entity = e.entity;
         }
