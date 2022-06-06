@@ -104,9 +104,10 @@ const Placeholder = (props: { spaceName: string }) => {
   return (
     <>
       <div className="MessageSender font-bold">The Hyperlink Team</div>
-      <p>You're exploring {props.spaceName} — welcome to the chat!</p>
-      <br />
-      <ul>
+      <p className="pb-4">
+        You're exploring {props.spaceName} — welcome to the chat!
+      </p>
+      <ul className="pb-4">
         <li>~Use this as a group chat</li>
         <li>~Or as a log/journal/stream!</li>
         <li>~Attach decks and cards</li>
@@ -115,11 +116,11 @@ const Placeholder = (props: { spaceName: string }) => {
           ~Converse with bots <em>(COMING SOON)</em>
         </li>
       </ul>
-      <br />
-      <p>* This message will disappear once you create the first post *</p>
-      <br />
+      <p className="pb-4">
+        * This welcome note will disappear once you send the first message… *
+      </p>
       {/* prettier-ignore */}
-      <pre className="MessageContent whitespace-pre-wrap font-[courier] text-grey-35">
+      <pre className="MessageContent whitespace-pre-wrap text-grey-35">
 {"       "}..--""|{"\n"}
 {"       "}|     |{"\n"}
 {"       "}| .---'{"\n"}
