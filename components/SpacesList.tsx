@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import useSWR from "swr";
 import { ButtonLink } from "./Buttons";
+import { CreateOrEditSpace } from "./CreateOrEditSpace";
 import { Door } from "./Doors";
 import { Settings } from "./Icons";
 import { Modal } from "./Layout";
@@ -61,7 +62,7 @@ const Space = (props: { entity: string; name: string }) => {
           </a>
         </Link>
         <div className="absolute bottom-[4px] right-[8px] md:bottom-[80px] md:right-[62px] rotate-[-30deg]">
-          {authorized ? <EditModal entityID={props.entity} /> : null}
+          {authorized ? <EditSpaceButton spaceID={props.entity} /> : null}
         </div>
         {showUnreads ? (
           <div className="inline-flex items-center gap-2 absolute bottom-[16px] right-[8px] md:bottom-[16px] md:right-[56px] rotate-[-30deg]">
@@ -80,46 +81,20 @@ const Space = (props: { entity: string; name: string }) => {
   );
 };
 
-let doorImages: string[] = [
-  "/doors/door-clouds-256.jpg",
-  "/doors/door-chicken-256.jpg",
-  "/doors/door-field-256.jpg",
-  "/doors/door-windowseat-256.jpg",
-];
-
-const EditModal = (props: { entityID: string }) => {
+const EditSpaceButton = (props: { spaceID: string }) => {
   let [open, setOpen] = useState(false);
-  let image = useIndex.eav(props.entityID, "space/door/image");
-  let { mutate } = useMutations();
-  return (
-    <>
-      <a>
-        <ButtonLink
-          content="edit"
-          // icon={<Settings />}
-          onClick={() => setOpen(true)}
-        />
-      </a>
-      <Modal open={open} onClose={() => setOpen(false)}>
-        <div className="flex flex-wrap">
-          {doorImages.map((f) => {
-            return (
-              <button
-                onClick={() => {
-                  mutate("assertFact", {
-                    entity: props.entityID,
-                    attribute: "space/door/image",
-                    value: f,
-                    positions: {},
-                  });
-                }}
-              >
-                <img className="-scale-x-100" src={f} width={64} />
-              </button>
-            );
-          })}
-        </div>
-      </Modal>
-    </>
-  );
+  let { authorized, mutate } = useMutations();
+  if (authorized === false) {
+    return null;
+  } else
+    return (
+      <>
+        <a>
+          <ButtonLink content="edit" onClick={() => setOpen(true)} />
+        </a>
+        <Modal open={open} onClose={() => setOpen(false)}>
+          <CreateOrEditSpace setOpen={setOpen} spaceID={props.spaceID} />
+        </Modal>
+      </>
+    );
 };

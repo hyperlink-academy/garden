@@ -1,5 +1,8 @@
 import { spaceAPI, workerAPI } from "backend/lib/api";
 import { ButtonSecondary, ButtonLink } from "components/Buttons";
+import { CreateOrEditSpace } from "components/CreateOrEditSpace";
+import { Studio } from "components/Icons";
+import { Modal } from "components/Layout";
 import { SpaceProvider } from "components/ReplicacheProvider";
 import { SpaceList } from "components/SpacesList";
 import { useAuth } from "hooks/useAuth";
@@ -32,7 +35,7 @@ export default function StudioPage() {
         <Logout />
       </div>
       <SpaceList />
-      <CreateSpace spaceID={id.id} />
+      <CreateSpaceButton studioSpaceID={id.id} />
     </SpaceProvider>
   );
 }
@@ -51,39 +54,6 @@ const StudioName = () => {
   );
 };
 
-const CreateSpace = (props: { spaceID: string }) => {
-  let [name, setName] = useState("");
-  let auth = useAuth();
-  let rep = useContext(ReplicacheContext);
-  let { authorized, mutate } = useMutations();
-  return !authorized ? null : (
-    <div className="pb-4 flex">
-      <input
-        className="mr-2"
-        value={name}
-        placeholder="new space"
-        onChange={(e) => setName(e.currentTarget.value)}
-      />
-      <ButtonSecondary
-        content="create"
-        onClick={async () => {
-          if (!auth.session.loggedIn || !name) return;
-          await spaceAPI(
-            `${WORKER_URL}/space/${props.spaceID}`,
-            "create_space",
-            {
-              name,
-              token: auth.session.token,
-            }
-          );
-          setName("");
-          rep?.rep.pull();
-        }}
-      />
-    </div>
-  );
-};
-
 const Logout = () => {
   let { session, logout } = useAuth();
   let router = useRouter();
@@ -92,4 +62,31 @@ const Logout = () => {
       <ButtonLink content="logout" onClick={() => logout()} />
     </div>
   ) : null;
+};
+
+const CreateSpaceButton = (props: { studioSpaceID: string }) => {
+  let [open, setOpen] = useState(false);
+  let { authorized } = useMutations();
+  if (authorized === false) {
+    return null;
+  } else
+    return (
+      <div className="pb-4 grid">
+        <div className="place-self-center">
+          <a>
+            <ButtonSecondary
+              content="Create a New Space"
+              icon={<Studio />}
+              onClick={() => setOpen(true)}
+            />
+          </a>
+          <Modal open={open} onClose={() => setOpen(false)}>
+            <CreateOrEditSpace
+              setOpen={setOpen}
+              studioSpaceID={props.studioSpaceID}
+            />
+          </Modal>
+        </div>
+      </div>
+    );
 };
