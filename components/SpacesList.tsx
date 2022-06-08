@@ -12,7 +12,7 @@ import { Modal } from "./Layout";
 export const SpaceList = () => {
   let spaces = useIndex.aev("space/name");
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 pb-8">
       {spaces?.map((a) => {
         return <Space entity={a.entity} name={a.value} />;
       })}
@@ -61,21 +61,27 @@ const Space = (props: { entity: string; name: string }) => {
             <Door entityID={props.entity} glow={showUnreads} />
           </a>
         </Link>
-        <div className="absolute bottom-[4px] right-[8px] md:bottom-[80px] md:right-[62px] rotate-[-30deg]">
-          {authorized ? <EditSpaceButton spaceID={props.entity} /> : null}
-        </div>
-        {showUnreads ? (
-          <div className="inline-flex items-center gap-2 absolute bottom-[16px] right-[8px] md:bottom-[16px] md:right-[56px] rotate-[-30deg]">
-            <span className="bg-accent-red rounded-full w-3 h-3"></span>
-            <span>{unreadCount} unread</span>
+        <div className="flex flex-col absolute items-center bottom-[82px] left-[144px]">
+          {showUnreads ? (
+            <div className="flex flex-col mb-4 -ml-2 items-center skew-y-[-30deg] scale-x-90 scale-y-110">
+              <span className="text-sm">{unreadCount}</span>
+              <span className="bg-accent-red rounded-full w-3 h-3"></span>
+            </div>
+          ) : null}
+          <div className="rotate-[-7deg] scale-x-90 skew-y-[-15deg]">
+            {authorized ? <EditSpaceButton spaceID={props.entity} /> : null}
           </div>
-        ) : null}
+        </div>
       </div>
 
-      <div className="w-full grid">
-        <div className="flex flex-row justify-between gap-2">
+      <div className="pb-8 pt-2 md:pt-0">
+        <div className="origin-top -mt-12 pb-4 skew-y-[-30deg] scale-x-90 scale-y-110">
           <h3 className="text-xl">{props.name}</h3>
         </div>
+        {/* extra shadow - turned off b/c it's a bit much LOL */}
+        {/* <div className="origin-top -ml-4 -rotate-[30deg] skew-x-[30deg] scale-x-90 scale-y-110 blur-[1px]">
+          <h3 className="text-xl text-grey-80">{props.name}</h3>
+        </div> */}
       </div>
     </div>
   );
@@ -90,7 +96,12 @@ const EditSpaceButton = (props: { spaceID: string }) => {
     return (
       <>
         <a>
-          <ButtonLink content="edit" onClick={() => setOpen(true)} />
+          {/* <ButtonLink content="edit" onClick={() => setOpen(true)} /> */}
+          <ButtonLink
+            content=""
+            icon={<Settings />}
+            onClick={() => setOpen(true)}
+          />
         </a>
         <Modal open={open} onClose={() => setOpen(false)}>
           <CreateOrEditSpace setOpen={setOpen} spaceID={props.spaceID} />
