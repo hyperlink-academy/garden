@@ -1,7 +1,13 @@
 import { useRef } from "react";
 import { Menu } from "@headlessui/react";
 
-import { MoreOptions, Delete, DeckSmall, Member } from "components/Icons";
+import {
+  MoreOptions,
+  Delete,
+  DeckSmall,
+  Member,
+  Studio,
+} from "components/Icons";
 import { Divider, MenuContainer, MenuItem } from "components/Layout";
 import { Textarea } from "components/Textarea";
 import { useIndex, useMutations } from "hooks/useReplicache";
@@ -13,6 +19,8 @@ import {
 import { AddSection } from "./AddSection";
 import { Backlinks } from "./Backlinks";
 import { usePreserveScroll } from "hooks/utils";
+import Link from "next/link";
+import { useAuth } from "hooks/useAuth";
 
 const borderStyles = (args: { deck: boolean; member: boolean }) => {
   switch (true) {
@@ -43,6 +51,7 @@ export const CardView = (props: {
   let isDeck = useIndex.eav(props.entityID, "deck");
   let memberName = useIndex.eav(props.entityID, "member/name");
   let { ref } = usePreserveScroll<HTMLDivElement>();
+  let { session } = useAuth();
   return (
     <div
       className={`
@@ -54,11 +63,19 @@ export const CardView = (props: {
             member: !!memberName,
           })}`}
     >
-      {!memberName ? null : (
-        <div className="grid grid-cols-[auto_max-content] items-end text-white pb-1">
-          <Member />
-          <small>member</small>
-        </div>
+      {!session?.loggedIn || !memberName ? null : (
+        <>
+          <div className="grid grid-cols-[auto_max-content] items-end text-white pb-1">
+            <Member />
+            <Link href={`/s/${memberName?.value}`}>
+              <a className="justify-self-start">
+                <small>visit {memberName?.value}'s studio</small>
+                {/* <Studio className="text-white" /> */}
+              </a>
+            </Link>
+            {/* <small>member</small> */}
+          </div>
+        </>
       )}
 
       <div
