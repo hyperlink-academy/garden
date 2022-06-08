@@ -69,7 +69,6 @@ const BacklinkSection = (props: {
   return (
     <div className="flex flex-col gap-2">
       <h4>{title}</h4>
-      <AddToSection entity={props.entityID} attribute={props.attribute} />
       <SmallCardList
         backlink={true}
         attribute={props.attribute}
@@ -77,6 +76,7 @@ const BacklinkSection = (props: {
         deck={props.entityID}
         positionKey="vae"
       />
+      <AddToSection entity={props.entityID} attribute={props.attribute} />
     </div>
   );
 };
@@ -124,7 +124,14 @@ const AddToSection = (props: {
   if (!authorized) return null;
   return (
     <>
-      <ButtonSecondary content="Add" onClick={() => setOpen(true)} />
+      <ButtonSecondary
+        content={
+          props.attribute === "deck/contains"
+            ? "Add to another deck"
+            : "Link to another card"
+        }
+        onClick={() => setOpen(true)}
+      />
       <FindOrCreate
         allowBlank={false}
         onClose={() => setOpen(false)}
