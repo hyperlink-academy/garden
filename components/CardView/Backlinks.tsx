@@ -1,6 +1,6 @@
 import { ButtonSecondary } from "components/Buttons";
 import { FindOrCreate } from "components/FindOrCreateEntity";
-import { DeckSmall } from "components/Icons";
+import { Card, DeckSmall, Member } from "components/Icons";
 import { SmallCardList } from "components/SmallCardList";
 import { ReferenceAttributes } from "data/Attributes";
 import { Fact } from "data/Facts";
@@ -13,6 +13,7 @@ import {
 import { useContext, useMemo, useState } from "react";
 import { generateKeyBetween } from "src/fractional-indexing";
 import { sortByPosition } from "src/position_helpers";
+import { ulid } from "src/ulid";
 
 export const Backlinks = (props: { entityID: string }) => {
   let backlinks = useIndex.vae(props.entityID);
@@ -68,9 +69,7 @@ const BacklinkSection = (props: {
   return (
     <div className="flex flex-col gap-2">
       <h4>{title}</h4>
-      {props.attribute === "deck/contains" ? (
-        <AddToDeck entity={props.entityID} />
-      ) : null}
+      <AddToSection entity={props.entityID} attribute={props.attribute} />
       <SmallCardList
         backlink={true}
         attribute={props.attribute}
@@ -82,20 +81,50 @@ const BacklinkSection = (props: {
   );
 };
 
-const AddToDeck = (props: { entity: string }) => {
+const AddToSection = (props: {
+  entity: string;
+  attribute: keyof ReferenceAttributes;
+}) => {
   let [open, setOpen] = useState(false);
+  let titles = useIndex
+    .aev(open ? "card/title" : null)
+    .filter((f) => !!f.value);
+  let members = useIndex.aev("member/name");
   const decks = useIndex.aev(open ? "deck" : null);
-  const containingDecks = useIndex.vae(props.entity, "deck/contains");
+  let items = titles
+    .map((t) => {
+      return {
+        entity: t.entity,
+        display: t.value,
+        icon: !!decks.find((d) => t.entity === d.entity) ? (
+          <DeckSmall />
+        ) : (
+          <Card />
+        ),
+      };
+    })
+    .concat(
+      members.map((m) => {
+        return {
+          entity: m.entity,
+          display: m.value,
+          icon: <Member />,
+        };
+      })
+    )
+    .filter(
+      (f) =>
+        props.attribute !== "deck/contains" ||
+        !!decks.find((d) => f.entity === d.entity)
+    );
+  const alreadyIn = useIndex.vae(props.entity, props.attribute);
+
   let rep = useContext(ReplicacheContext);
   let { authorized, mutate } = useMutations();
-  let deckEntities = useMemo(() => {
-    return decks.map((d) => d.entity);
-  }, [decks]);
-  const decksWithNames = useIndex.eav(deckEntities, "card/title");
   if (!authorized) return null;
   return (
     <>
-      <ButtonSecondary content="Add to deck" onClick={() => setOpen(true)} />
+      <ButtonSecondary content="Add" onClick={() => setOpen(true)} />
       <FindOrCreate
         allowBlank={false}
         onClose={() => setOpen(false)}
@@ -103,29 +132,38 @@ const AddToDeck = (props: { entity: string }) => {
           if (!rep?.rep) return;
           if (d.type === "create") return;
           let cards = await rep.rep.query((tx) => {
-            return scanIndex(tx).eav(d.entity, "deck/contains");
+            return scanIndex(tx).eav(d.entity, props.attribute);
           });
+          if (props.attribute !== "deck/contains") {
+            let existingSections = await rep.rep.query((tx) =>
+              scanIndex(tx).eav(d.entity, "card/section")
+            );
+            if (
+              !existingSections.find(
+                (f) => f.value === props.attribute.slice(8)
+              )
+            ) {
+              await mutate("addSection", {
+                newSectionEntity: ulid(),
+                sectionName: props.attribute.slice(8),
+                type: "reference",
+                cardEntity: d.entity,
+                positions: "",
+              });
+            }
+          }
           let lastPosition = cards.sort(sortByPosition("eav"))[cards.length - 1]
             ?.positions.eav;
-          mutate("addCardToSection", {
+          await mutate("addCardToSection", {
             cardEntity: props.entity,
             parent: d.entity,
-            section: "deck/contains",
+            section: props.attribute,
             positions: { eav: generateKeyBetween(lastPosition || null, null) },
           });
         }}
-        selected={containingDecks.map((d) => d.entity)}
+        selected={alreadyIn.map((d) => d.entity)}
         open={open}
-        items={decksWithNames
-          .filter((d) => !!d)
-          .map((d) => {
-            let deck = d as Fact<"card/title">;
-            return {
-              display: deck.value,
-              entity: deck.entity,
-              icon: <DeckSmall />,
-            };
-          })}
+        items={items}
       />
     </>
   );
