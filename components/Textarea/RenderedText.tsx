@@ -11,12 +11,20 @@ export const RenderedText = forwardRef<
         {props.text ? (
           // One day we should do proper parsing but for now a line-based approach works
           // great
-          props.text.split("\n").map((t) => {
+          props.text.split("\n").map((t, key) => {
             if (t.startsWith("##"))
-              return <p className="font-bold text-grey-35">{t + "\n"}</p>;
+              return (
+                <p className="font-bold text-grey-35" key={key}>
+                  {t + "\n"}
+                </p>
+              );
             if (t.startsWith("#"))
-              return <p className="font-bold">{t + "\n"}</p>;
-            return <p>{t + "\n"}</p>;
+              return (
+                <p className="font-bold" key={key}>
+                  {t + "\n"}
+                </p>
+              );
+            return <p key={key}>{t + "\n"}</p>;
           })
         ) : (
           <span className="!text-grey-80 italic">{props.placeholder}</span>

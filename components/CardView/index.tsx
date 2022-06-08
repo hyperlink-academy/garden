@@ -134,24 +134,19 @@ const Title = (props: { entityID: string }) => {
   let title = memberName || cardTitle;
   let { authorized, mutate } = useMutations();
 
-  let textarea = useRef<HTMLTextAreaElement | null>(null);
   return (
     <Textarea
       previewOnly={!authorized || !!memberName}
-      ref={textarea}
       placeholder="Untitled"
       className="text-xl font-bold bg-inherit"
       value={title?.value}
       onChange={async (e) => {
-        let start = e.currentTarget.selectionStart,
-          end = e.currentTarget.selectionEnd;
         await mutate("assertFact", {
           entity: props.entityID,
           attribute: "card/title",
           value: e.currentTarget.value,
           positions: title?.positions || {},
         });
-        textarea.current?.setSelectionRange(start, end);
       }}
     />
   );

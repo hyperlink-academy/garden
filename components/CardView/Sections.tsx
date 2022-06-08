@@ -81,28 +81,23 @@ export const SingleTextSection = (props: {
   new?: boolean;
 }) => {
   let fact = useIndex.eav(props.entityID, props.section);
-  let inputEl = useRef<HTMLTextAreaElement | null>(null);
   let { authorized, mutate } = useMutations();
 
   return (
     <Textarea
       previewOnly={!authorized}
       autoFocus={props.new}
-      ref={inputEl}
       placeholder="write something..."
       className="placeholder:italic bg-inherit w-full"
       spellCheck={false}
       value={(fact?.value as string) || ""}
       onChange={async (e) => {
-        let start = e.currentTarget.selectionStart,
-          end = e.currentTarget.selectionEnd;
         await mutate("assertFact", {
           entity: props.entityID,
           attribute: props.section,
           value: e.currentTarget.value,
           positions: fact?.positions || {},
         });
-        inputEl.current?.setSelectionRange(start, end);
       }}
     />
   );
