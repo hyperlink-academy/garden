@@ -1,14 +1,7 @@
-import { useRef } from "react";
 import { Menu } from "@headlessui/react";
 
-import {
-  MoreOptions,
-  Delete,
-  DeckSmall,
-  Member,
-  Studio,
-} from "components/Icons";
-import { Divider, MenuContainer, MenuItem } from "components/Layout";
+import { MoreOptions, Delete, DeckSmall, Member } from "components/Icons";
+import { MenuContainer, MenuItem } from "components/Layout";
 import { Textarea } from "components/Textarea";
 import { useIndex, useMutations } from "hooks/useReplicache";
 import {
@@ -108,7 +101,6 @@ export const CardView = (props: {
         <Sections entityID={props.entityID} />
 
         <AddSection cardEntity={props.entityID} />
-
         <Backlinks entityID={props.entityID} />
       </div>
     </div>

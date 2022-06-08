@@ -173,19 +173,38 @@ export const makeReplicache = (args: {
   return rep;
 };
 
+type EAVResult<
+  A extends keyof Attribute,
+  V extends string | null | string[]
+> = V extends string[]
+  ? (CardinalityResult<A> | null)[]
+  : CardinalityResult<A> | null;
 export const useIndex = {
-  eav<A extends keyof Attribute>(entity: string | null, attribute: A) {
+  eav<A extends keyof Attribute, V extends string | null | string[]>(
+    entity: V,
+    attribute: A
+  ): EAVResult<A, V> {
     let rep = useContext(ReplicacheContext);
     return useSubscribe(
       rep?.rep,
       async (tx) => {
-        if (!entity) return null;
-        let result = await scanIndex(tx).eav(entity, attribute);
-        return (result as CardinalityResult<A>) || null;
+        if (!entity) return [];
+        if (typeof entity === "object") {
+          let results: Array<CardinalityResult<A> | null> = await Promise.all(
+            entity.map(async (e) => {
+              let result = await scanIndex(tx).eav(e, attribute);
+              return (result as CardinalityResult<A>) || null;
+            })
+          );
+          return results;
+        } else {
+          let result = await scanIndex(tx).eav(entity, attribute);
+          return (result as CardinalityResult<A>) || null;
+        }
       },
-      null,
-      [attribute, entity, rep]
-    );
+      typeof entity === "object" ? [] : null,
+      [attribute, rep, entity]
+    ) as EAVResult<A, V>;
   },
   ave<A extends keyof UniqueAttributes>(
     attribute: A,
@@ -202,11 +221,12 @@ export const useIndex = {
       [attribute, value]
     );
   },
-  aev<A extends keyof Attribute>(attribute: A, entity?: string) {
+  aev<A extends keyof Attribute>(attribute: A | null, entity?: string) {
     let rep = useContext(ReplicacheContext);
     return useSubscribe(
       rep?.rep,
       async (tx) => {
+        if (!attribute) return [];
         let results = await tx
           .scan({
             indexName: "aev",
