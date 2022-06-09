@@ -54,14 +54,14 @@ const Space = (props: { entity: string; name: string }) => {
   // let unreadCount = 5;
 
   return (
-    <div className="flex flex-col gap-4 pb-8">
+    <div className="flex flex-col gap-4 pb-0 md:pb-4">
       <div className="grid grid-cols-2 relative">
         <Link href={`/s/${studio?.value}/s/${props.name}`}>
           <a>
             <Door entityID={props.entity} glow={showUnreads} />
           </a>
         </Link>
-        <div className="flex flex-col absolute items-center bottom-[82px] left-[144px]">
+        <div className="flex flex-col absolute items-center bottom-[82px] left-[132px] md:left-[144px]">
           {showUnreads ? (
             <div className="flex flex-col mb-4 -ml-2 items-center skew-y-[-30deg] scale-x-90 scale-y-110">
               <span className="text-sm">{unreadCount}</span>
