@@ -12,6 +12,7 @@ export const SmallCardList = (props: {
   cards: Fact<keyof ReferenceAttributes>[];
   deck: string;
   attribute: keyof ReferenceAttributes;
+  horizontal?: boolean;
   positionKey: string;
   backlink?: boolean;
 }) => {
@@ -23,7 +24,9 @@ export const SmallCardList = (props: {
   return (
     <SortableContext items={items}>
       {itemsCount > 0 ? (
-        <div className="flex flex-wrap w-full gap-4">
+        <div
+          className={`flex w-full gap-4 ${props.horizontal ? "" : "flex-wrap"}`}
+        >
           {items.map((c, index) => {
             let entity = props.backlink ? c.entity : c.value.value;
             let attribute =

@@ -131,6 +131,21 @@ export const DefaultAttributes = {
     cardinality: "many",
     unique: false,
   },
+  "activity/name": {
+    type: "string",
+    cardinality: "one",
+    unique: false,
+  },
+  "activity/active": {
+    type: "flag",
+    cardinality: "one",
+    unique: false,
+  },
+  "activity/hand-contains": {
+    type: "reference",
+    cardinality: "many",
+    unique: false,
+  },
 } as const;
 
 export const Attribute = { ...DefaultAttributes, ...BaseAttributes };
