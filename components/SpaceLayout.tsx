@@ -46,14 +46,14 @@ export function Footer() {
         }}
         className={`menu w-full px-4`}
       >
-        <div className="grid">
+        <div className="grid max-w-3xl mx-auto">
           <div
             style={{ gridArea: "1 / 1 / 2 / 2" }}
-            className="max-w-3xl flex flex-row rounded-md bg-grey-15 px-4 -mb-0.5 mt-0.5 -ml-0.5 mr-0.5"
+            className="flex flex-row rounded-md bg-grey-15 px-4 -mb-0.5 mt-0.5 -ml-0.5 mr-0.5"
           />
           <div
             style={{ gridArea: "1 / 1 / 2 / 2" }}
-            className="max-w-3xl flex flex-row rounded-md bg-white border-2 border-grey-15 px-4 mx-auto justify-between w-full"
+            className="flex flex-row rounded-md bg-white border-2 border-grey-15 px-4 justify-between w-full"
           >
             <div className="flex flex-row">
               {!session?.loggedIn ? (
