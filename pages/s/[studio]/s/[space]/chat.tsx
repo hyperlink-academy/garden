@@ -27,7 +27,7 @@ export default function ChatPage() {
   let id = useSpaceID();
   let spaceName = useIndex.aev("this/name")[0];
   return (
-    <div className="h-full flex flex-col relative items-stretch">
+    <div className="h-full flex flex-col relative items-stretch max-w-3xl mx-auto">
       <Head>
         <title key="title">{spaceName?.value}</title>
       </Head>

@@ -51,6 +51,7 @@ export const CardView = (props: {
           h-full
           flex flex-col
           drop-shadow-md
+          max-w-3xl
           ${borderStyles({
             deck: !!isDeck,
             member: !!memberName,

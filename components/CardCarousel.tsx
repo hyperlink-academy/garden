@@ -30,7 +30,7 @@ export const CardCarousel = (props: {
   return (
     <div className="h-full flex flex-col items-stretch relative">
       <div className="px-4 grid grid-flow-col items-center w-full pr-10 pb-2">
-        <h4 className="uppercase text-accent-blue font-bold">
+        <h4 className="uppercase text-accent-blue font-bold max-w-3xl mx-auto w-full">
           <Link
             href={`/s/${router.query.studio}/s/${router.query.space}/c/${props.entityID}`}
           >
@@ -44,7 +44,10 @@ export const CardCarousel = (props: {
         </h4>
       </div>
       <div
-        className={`overflow-x-scroll flex snap-x snap-mandatory gap-4 -mx-4 px-4 no-scrollbar h-full`}
+        style={{
+          padding: "0 max(calc((100vw - 48rem) / 2), 1rem)",
+        }}
+        className={`overflow-x-scroll flex snap-x snap-mandatory gap-4 -mx-4 no-scrollbar h-full`}
       >
         {props.cards.map((c) => {
           let entity = props.backlink ? c.entity : c.value.value;
@@ -60,7 +63,7 @@ export const CardCarousel = (props: {
           );
         })}
       </div>
-      <div className="grid grid-flow-col gap-1 pb-3 px-5">
+      <div className="grid grid-flow-col gap-1 pb-3 max-w-3xl mx-auto w-full">
         <CardCounter
           position={position}
           length={props.cards.length}
@@ -122,6 +125,7 @@ const CardContainer: React.FC<{
         if (e[0]?.isIntersecting) {
           timeout = window.setTimeout(() => {
             if (window.location.href.endsWith(props.entity)) return;
+            if (!e[0]?.isIntersecting) return;
             let q = Router.query;
             let newUrl = `/s/${q.studio}/s/${q.space}/c/${q.card}/a/${q.attribute}/${props.entity}`;
             window.history.replaceState(
@@ -133,7 +137,7 @@ const CardContainer: React.FC<{
           }, 100);
         }
       },
-      { root: null, rootMargin: "0px", threshold: 1.0 }
+      { root: null, rootMargin: "0px -50%", threshold: 0 }
     );
     setTimeout(() => {
       if (node) observer.observe(node);
@@ -163,8 +167,7 @@ const CardContainer: React.FC<{
         if (q.entity === props.entity) return;
         ref.current?.scrollIntoView({ behavior: "smooth" });
       }}
-      style={{ maxWidth: "calc(100% - 16px)" }}
-      className={`h-full snap-center flex-shrink-0 pb-1.5 w-full`}
+      className={`h-full w-full snap-center flex-shrink-0 pb-1.5`}
     >
       {props.selected ? (
         <CardCarouselTitle parent={""} child={props.entity} />

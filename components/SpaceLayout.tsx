@@ -1,9 +1,9 @@
 import { useAuth } from "hooks/useAuth";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { ChatBubble, Studio, Information, DeckLarge } from "./Icons";
-import { ButtonLink, ButtonPrimary, ButtonTertiary } from "./Buttons";
-import { useContext, useEffect, useState } from "react";
+import { ChatBubble, Studio, Information, DeckLarge, ExitDoor } from "./Icons";
+import { ButtonLink, ButtonTertiary } from "./Buttons";
+import { useContext, useState } from "react";
 import { Modal } from "components/Layout";
 import { LogInModal } from "./LoginModal";
 import { SmallCardDragContext } from "./DragContext";
@@ -16,33 +16,13 @@ export const SpaceLayout: React.FC = (props) => {
   let { ref } = usePreserveScroll<HTMLDivElement>();
 
   return (
-    <div
-      style={{
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "stretch",
-        position: "relative",
-      }}
-    >
-      <div className="h-full pt-4 px-4 overflow-auto" ref={ref}>
-        <div
-          style={{
-            height: "100%",
-            margin: "auto",
-            maxWidth: "48rem",
-          }}
-        >
-          <SmallCardDragContext>{props.children}</SmallCardDragContext>
-        </div>
-      </div>
+    <div className="h-full pt-4 px-4 overflow-auto pb-16" ref={ref}>
+      <SmallCardDragContext>{props.children}</SmallCardDragContext>
       <Footer />
     </div>
   );
 };
 
-const selectedClassname =
-  "border-2 border-t-0 rounded-b-lg px-2 relative -top-0.5 bg-background border-grey-15";
 export function Footer() {
   let router = useRouter();
   let { session } = useAuth();
@@ -59,58 +39,81 @@ export function Footer() {
       `}</style>
       <div
         style={{
-          width: "100%",
-          margin: "auto",
-          maxWidth: "48rem",
+          position: "fixed",
+          bottom: "24px",
+          left: "50%",
+          transform: "translateX(-50%)",
         }}
-        className={`menu
-        grid grid-cols-[1fr,1fr,1fr] gap-1 items-center
-        bg-background border-t-2 border-grey-15 
-        px-4 pb-5
-        `}
+        className={`menu w-full px-4`}
       >
-        {/* BACK TO STUDIO */}
+        <div className="max-w-3xl flex flex-row rounded-md bg-white border-2 border-grey-15 px-4 mx-auto justify-between">
+          <div className="flex flex-row">
+            {!session?.loggedIn ? (
+              <>
+                <ButtonLink
+                  className="justify-self-start"
+                  content="Log In"
+                  onClick={() => setLogInModal(true)}
+                />
+                <LogInModal
+                  isOpen={isOpen}
+                  onClose={() => setLogInModal(false)}
+                />
+              </>
+            ) : (
+              <Link href={`/s/${session.session.username}`}>
+                <a className="justify-self-start flex items-center">
+                  <ExitDoor />
+                </a>
+              </Link>
+            )}
 
-        {!session?.loggedIn ? (
-          <>
-            <ButtonLink
-              className="justify-self-start"
-              content="Log In"
-              onClick={() => setLogInModal(true)}
-            />
-            <LogInModal isOpen={isOpen} onClose={() => setLogInModal(false)} />
-          </>
-        ) : (
-          <Link href={`/s/${session.session.username}`}>
-            <a className="justify-self-start">
-              <Studio className="text-grey-55" />
-            </a>
-          </Link>
-        )}
+            <div className="h-full py-1 px-2">
+              <svg
+                width="1"
+                height="30"
+                viewBox="0 0 1 30"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <line
+                  x1="0.5"
+                  y1="1.01709"
+                  x2="0.499999"
+                  y2="29.0171"
+                  stroke="#E6E6E6"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </div>
 
-        <div className="justify-self-center flex flex-row">
-          {/* DECKS */}
-          <Link href={`/s/${router.query.studio}/s/${router.query.space}`}>
-            <a
-              className={
-                router.pathname === "/s/[studio]/s/[space]/chat"
-                  ? "w-16"
-                  : selectedClassname
-              }
-            >
-              <DeckLarge className="mx-auto" />
-            </a>
-          </Link>
-          {/* CHAT */}
-          <ChatIcon />
+            <div className="justify-self-center flex flex-row gap-2">
+              {/* DECKS */}
+              <Link href={`/s/${router.query.studio}/s/${router.query.space}`}>
+                <a
+                  className={`w-11 px-1 ${
+                    router.pathname === "/s/[studio]/s/[space]/chat"
+                      ? ""
+                      : selectedClassname
+                  }`}
+                >
+                  <DeckLarge width={36} height={36} />
+                </a>
+              </Link>
+              {/* CHAT */}
+              <ChatIcon />
+            </div>
+          </div>
+
+          {/* INFO */}
+          <InfoModal />
         </div>
-
-        {/* INFO */}
-        <InfoModal />
       </div>
     </>
   );
 }
+
+const selectedClassname = "bg-grey-15 text-white rounded-md -mt-2 mb-2";
 
 const ChatIcon = () => {
   let router = useRouter();
@@ -147,13 +150,13 @@ const ChatIcon = () => {
   return (
     <Link href={`/s/${router.query.studio}/s/${router.query.space}/chat`}>
       <a
-        className={`relative ${
+        className={`w-11 px-1 relative ${
           router.pathname === "/s/[studio]/s/[space]/chat"
             ? selectedClassname
-            : "w-16"
+            : ""
         }`}
       >
-        <ChatBubble className="mx-auto" />
+        <ChatBubble width={36} height={36} />
         {lastSeen && latestMsg > lastSeen ? (
           <div className="bg-accent-red absolute rounded-full top-1.5 left-10 w-3 h-3"></div>
         ) : null}
@@ -166,9 +169,9 @@ function InfoModal() {
   let [isOpen, setInfoModal] = useState(false);
 
   return (
-    <div className="justify-self-end">
+    <div className="justify-self-end flex items-center">
       <button onClick={() => setInfoModal(true)}>
-        <Information className="text-grey-55" />
+        <Information />
       </button>
 
       <Modal open={isOpen} onClose={() => setInfoModal(false)}>
