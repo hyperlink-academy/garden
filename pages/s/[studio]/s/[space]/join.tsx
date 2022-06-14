@@ -62,7 +62,7 @@ export function JoinSpace(props: { id: string }) {
 
   if (session.loggedIn) {
     return (
-      <div className=" flex flex-col gap-6 place-items-center">
+      <div className=" flex flex-col gap-6 place-items-center max-w-3xl">
         <div className="flex flex-col gap-2 text-center ">
           <h2>You've been invited to {spaceName?.value}!</h2>
           <p>A new membership card is waiting for you!</p>

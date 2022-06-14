@@ -46,67 +46,78 @@ export function Footer() {
         }}
         className={`menu w-full px-4`}
       >
-        <div className="max-w-3xl flex flex-row rounded-md bg-white border-2 border-grey-15 px-4 mx-auto justify-between">
-          <div className="flex flex-row">
-            {!session?.loggedIn ? (
-              <>
-                <ButtonLink
-                  className="justify-self-start"
-                  content="Log In"
-                  onClick={() => setLogInModal(true)}
-                />
-                <LogInModal
-                  isOpen={isOpen}
-                  onClose={() => setLogInModal(false)}
-                />
-              </>
-            ) : (
-              <Link href={`/s/${session.session.username}`}>
-                <a className="justify-self-start flex items-center">
-                  <ExitDoor />
-                </a>
-              </Link>
-            )}
+        <div className="grid">
+          <div
+            style={{ gridArea: "1 / 1 / 2 / 2" }}
+            className="max-w-3xl flex flex-row rounded-md bg-grey-15 px-4 -mb-0.5 mt-0.5 -ml-0.5 mr-0.5"
+          />
+          <div
+            style={{ gridArea: "1 / 1 / 2 / 2" }}
+            className="max-w-3xl flex flex-row rounded-md bg-white border-2 border-grey-15 px-4 mx-auto justify-between w-full"
+          >
+            <div className="flex flex-row">
+              {!session?.loggedIn ? (
+                <>
+                  <ButtonLink
+                    className="justify-self-start"
+                    content="Log In"
+                    onClick={() => setLogInModal(true)}
+                  />
+                  <LogInModal
+                    isOpen={isOpen}
+                    onClose={() => setLogInModal(false)}
+                  />
+                </>
+              ) : (
+                <Link href={`/s/${session.session.username}`}>
+                  <a className="justify-self-start flex items-center">
+                    <ExitDoor />
+                  </a>
+                </Link>
+              )}
 
-            <div className="h-full py-1 px-2">
-              <svg
-                width="1"
-                height="30"
-                viewBox="0 0 1 30"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <line
-                  x1="0.5"
-                  y1="1.01709"
-                  x2="0.499999"
-                  y2="29.0171"
-                  stroke="#E6E6E6"
-                  stroke-linecap="round"
-                />
-              </svg>
-            </div>
-
-            <div className="justify-self-center flex flex-row gap-2">
-              {/* DECKS */}
-              <Link href={`/s/${router.query.studio}/s/${router.query.space}`}>
-                <a
-                  className={`w-11 px-1 ${
-                    router.pathname === "/s/[studio]/s/[space]/chat"
-                      ? ""
-                      : selectedClassname
-                  }`}
+              <div className="h-full py-1 px-2">
+                <svg
+                  width="1"
+                  height="30"
+                  viewBox="0 0 1 30"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
                 >
-                  <DeckLarge width={36} height={36} />
-                </a>
-              </Link>
-              {/* CHAT */}
-              <ChatIcon />
-            </div>
-          </div>
+                  <line
+                    x1="0.5"
+                    y1="1.01709"
+                    x2="0.499999"
+                    y2="29.0171"
+                    stroke="#E6E6E6"
+                    stroke-linecap="round"
+                  />
+                </svg>
+              </div>
 
-          {/* INFO */}
-          <InfoModal />
+              <div className="justify-self-center flex flex-row gap-2">
+                {/* DECKS */}
+                <Link
+                  href={`/s/${router.query.studio}/s/${router.query.space}`}
+                >
+                  <a
+                    className={`w-11 px-1 ${
+                      router.pathname === "/s/[studio]/s/[space]/chat"
+                        ? ""
+                        : selectedClassname
+                    }`}
+                  >
+                    <DeckLarge width={36} height={36} />
+                  </a>
+                </Link>
+                {/* CHAT */}
+                <ChatIcon />
+              </div>
+            </div>
+
+            {/* INFO */}
+            <InfoModal />
+          </div>
         </div>
       </div>
     </>
