@@ -14,9 +14,9 @@ export function usePreserveScroll<T extends HTMLElement>() {
   useEffect(() => {
     if (!ref.current) return;
 
-    setTimeout(() => {
+    window.requestAnimationFrame(() => {
       ref.current?.scrollTo({ top: scrollPositions[router.asPath] || 0 });
-    }, 20);
+    });
 
     const listener = () => {
       if (!ref.current?.scrollTop) return;
