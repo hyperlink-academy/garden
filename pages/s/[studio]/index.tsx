@@ -1,7 +1,7 @@
 import { spaceAPI, workerAPI } from "backend/lib/api";
 import { ButtonSecondary, ButtonLink } from "components/Buttons";
 import { CreateOrEditSpace } from "components/CreateOrEditSpace";
-import { Studio } from "components/Icons";
+import { SpaceNew, Studio } from "components/Icons";
 import { Modal } from "components/Layout";
 import { SpaceProvider } from "components/ReplicacheProvider";
 import { SpaceList } from "components/SpacesList";
@@ -77,8 +77,8 @@ const CreateSpaceButton = (props: { studioSpaceID: string }) => {
         <div className="place-self-center">
           <a>
             <ButtonSecondary
-              content="Create a New Space"
-              icon={<Studio />}
+              content="Create New Space!"
+              icon={<SpaceNew />}
               onClick={() => setOpen(true)}
             />
           </a>

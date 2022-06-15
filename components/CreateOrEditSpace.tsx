@@ -2,7 +2,7 @@ import { spaceAPI } from "backend/lib/api";
 import { useAuth } from "hooks/useAuth";
 import { ReplicacheContext, useMutations } from "hooks/useReplicache";
 import { useContext, useState } from "react";
-import { ButtonSecondary } from "./Buttons";
+import { ButtonSecondary, ButtonTertiary } from "./Buttons";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 
@@ -27,40 +27,30 @@ export const CreateOrEditSpace = (props: {
       {/* space name */}
       {/* TODO: allow renaming spaces */}
       {!props.studioSpaceID ? null : (
-        <input
-          className="mb-2"
-          value={name}
-          placeholder="space name…"
-          onChange={(e) => setName(e.currentTarget.value)}
-        />
-      )}
-
-      {/* door image selector */}
-      {!props.spaceID ? null : (
         <div>
-          {doorImages.map((f) => {
-            return (
-              <button
-                onClick={() => {
-                  mutate("assertFact", {
-                    entity: props.spaceID as string,
-                    attribute: "space/door/image",
-                    value: f,
-                    positions: {},
-                  });
-                }}
-              >
-                <img className="-scale-x-100" src={f} width={64} />
-              </button>
-            );
-          })}
+          <p className="font-bold">Space Name</p>
+          <input
+            className="mb-2"
+            value={name}
+            placeholder=""
+            onChange={(e) => setName(e.currentTarget.value)}
+          />
+          <DoorSelector />
         </div>
       )}
 
+      {/* door image selector */}
+      {!props.spaceID ? null : <DoorSelector />}
+
       {/* create OR close */}
       {/* TODO */}
+      <ButtonTertiary
+        content="Nevermind"
+        onClick={() => props.setOpen(false)}
+      />
+
       {!props.studioSpaceID ? (
-        <ButtonSecondary content="Close" onClick={() => props.setOpen(false)} />
+        ""
       ) : (
         <ButtonSecondary
           content="Create"
@@ -80,6 +70,31 @@ export const CreateOrEditSpace = (props: {
           }}
         />
       )}
+    </div>
+  );
+};
+
+const DoorSelector = (props: { spaceID?: string }) => {
+  let { mutate } = useMutations();
+  return (
+    <div>
+      <p>Select the Scenery</p>
+      {doorImages.map((f) => {
+        return (
+          <button
+            onClick={() => {
+              mutate("assertFact", {
+                entity: props.spaceID as string,
+                attribute: "space/door/image",
+                value: f,
+                positions: {},
+              });
+            }}
+          >
+            <img className={`-scale-x-100 opacity-30`} src={f} width={64} />
+          </button>
+        );
+      })}
     </div>
   );
 };
