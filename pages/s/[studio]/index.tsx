@@ -1,7 +1,10 @@
 import { spaceAPI, workerAPI } from "backend/lib/api";
-import { ButtonSecondary, ButtonLink } from "components/Buttons";
-import { CreateOrEditSpace } from "components/CreateOrEditSpace";
-import { SpaceNew, Studio } from "components/Icons";
+import {
+  ButtonSecondary,
+  ButtonLink,
+  ButtonTertiary,
+} from "components/Buttons";
+import { DoorSelector } from "components/DoorSelector";
 import { Modal } from "components/Layout";
 import { SpaceProvider } from "components/ReplicacheProvider";
 import { SpaceList } from "components/SpacesList";
@@ -36,7 +39,7 @@ export default function StudioPage() {
           <Logout />
         </div>
         <SpaceList />
-        <CreateSpaceButton studioSpaceID={id.id} />
+        <CreateSpace studioSpaceID={id.id} />
       </div>
     </SpaceProvider>
   );
@@ -66,9 +69,13 @@ const Logout = () => {
   ) : null;
 };
 
-const CreateSpaceButton = (props: { studioSpaceID: string }) => {
+const CreateSpace = (props: { studioSpaceID: string }) => {
   let [open, setOpen] = useState(false);
+  let [name, setName] = useState("");
+  let [door, setDoor] = useState("");
+  let auth = useAuth();
   let { authorized } = useMutations();
+  let rep = useContext(ReplicacheContext);
   if (authorized === false) {
     return null;
   } else
@@ -78,14 +85,41 @@ const CreateSpaceButton = (props: { studioSpaceID: string }) => {
           <a>
             <ButtonSecondary
               content="Create New Space!"
-              icon={<SpaceNew />}
               onClick={() => setOpen(true)}
             />
           </a>
           <Modal open={open} onClose={() => setOpen(false)}>
-            <CreateOrEditSpace
-              setOpen={setOpen}
-              studioSpaceID={props.studioSpaceID}
+            <div>
+              <p className="font-bold">Space Name</p>
+              <input
+                className="mb-2"
+                value={name}
+                placeholder=""
+                onChange={(e) => setName(e.currentTarget.value)}
+              />
+              <DoorSelector selected={door} onSelect={(d) => setDoor(d)} />
+            </div>
+            <ButtonTertiary
+              content="Nevermind"
+              onClick={() => setOpen(false)}
+            />
+
+            <ButtonSecondary
+              content="Create"
+              onClick={async () => {
+                if (!auth.session.loggedIn || !name) return;
+                await spaceAPI(
+                  `${WORKER_URL}/space/${props.studioSpaceID}`,
+                  "create_space",
+                  {
+                    name,
+                    token: auth.session.token,
+                  }
+                );
+                setName("");
+                rep?.rep.pull();
+                setOpen(false);
+              }}
             />
           </Modal>
         </div>

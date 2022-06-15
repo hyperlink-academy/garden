@@ -3,8 +3,8 @@ import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
 import Link from "next/link";
 import { useState } from "react";
 import useSWR from "swr";
-import { ButtonLink } from "./Buttons";
-import { CreateOrEditSpace } from "./CreateOrEditSpace";
+import { ButtonLink, ButtonTertiary } from "./Buttons";
+import { DoorSelector } from "components/DoorSelector";
 import { Door } from "./Doors";
 import { Settings, SettingsStudio } from "./Icons";
 import { Modal } from "./Layout";
@@ -70,7 +70,7 @@ const Space = (props: { entity: string; name: string }) => {
               <span className="bg-accent-red rounded-full w-2 h-2"></span>
             </div>
           ) : null}
-          {authorized ? <EditSpaceButton spaceID={props.entity} /> : null}
+          {authorized ? <EditSpace spaceID={props.entity} /> : null}
         </div>
       </div>
 
@@ -87,9 +87,10 @@ const Space = (props: { entity: string; name: string }) => {
   );
 };
 
-const EditSpaceButton = (props: { spaceID: string }) => {
+const EditSpace = (props: { spaceID: string }) => {
   let [open, setOpen] = useState(false);
   let { authorized, mutate } = useMutations();
+  let door = useIndex.eav(props.spaceID, "space/door/image");
   if (authorized === false) {
     return null;
   } else
@@ -104,7 +105,21 @@ const EditSpaceButton = (props: { spaceID: string }) => {
           />
         </a>
         <Modal open={open} onClose={() => setOpen(false)}>
-          <CreateOrEditSpace setOpen={setOpen} spaceID={props.spaceID} />
+          <div className="flex flex-col">
+            <DoorSelector
+              selected={door?.value}
+              onSelect={(s) => {
+                mutate("assertFact", {
+                  entity: props.spaceID as string,
+                  attribute: "space/door/image",
+                  value: s,
+                  positions: {},
+                });
+              }}
+            />
+          </div>
+
+          <ButtonTertiary content="Close" onClick={() => setOpen(false)} />
         </Modal>
       </>
     );
