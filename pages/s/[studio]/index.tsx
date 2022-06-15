@@ -30,12 +30,14 @@ export default function StudioPage() {
   if (!id.success) return <div>404 - studio not found!</div>;
   return (
     <SpaceProvider id={id.id}>
-      <div className="flex justify-between pb-8">
-        <StudioName />
-        <Logout />
+      <div className="grid grid-flow-row gap-8 my-6">
+        <div className="flex justify-between">
+          <StudioName />
+          <Logout />
+        </div>
+        <SpaceList />
+        <CreateSpaceButton studioSpaceID={id.id} />
       </div>
-      <SpaceList />
-      <CreateSpaceButton studioSpaceID={id.id} />
     </SpaceProvider>
   );
 }

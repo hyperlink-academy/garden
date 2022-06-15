@@ -64,17 +64,12 @@ const Space = (props: { entity: string; name: string }) => {
           </a>
         </Link>
         <div className="flex flex-col gap-4 w-max pb-[92px]">
-          <div className="flex flex-col ml-1.5 origin-top skew-y-[-30deg] scale-x-90 scale-y-110">
-            <span className="text-sm text-grey-35">3</span>
-            <span className="bg-accent-red rounded-full w-2 h-2"></span>
-          </div>
-
-          {/* {showUnreads ? (
-            <div className="flex flex-col mb-4 -ml-2 items-center skew-y-[-30deg] scale-x-90 scale-y-110">
-              <span className="text-sm">{unreadCount}</span>
-              <span className="bg-accent-red rounded-full w-3 h-3"></span>
+          {showUnreads ? (
+            <div className="flex flex-col ml-1.5 origin-top skew-y-[-30deg] scale-x-90 scale-y-110">
+              <span className="text-sm text-grey-35">{unreadCount}</span>
+              <span className="bg-accent-red rounded-full w-2 h-2"></span>
             </div>
-          ) : null} */}
+          ) : null}
           {authorized ? <EditSpaceButton spaceID={props.entity} /> : null}
         </div>
       </div>
