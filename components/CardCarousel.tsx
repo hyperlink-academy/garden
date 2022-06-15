@@ -153,9 +153,15 @@ const CardContainer: React.FC<{
     //@ts-ignore
     if (ref.current.scrollIntoViewIfNeeded) {
       //@ts-ignore
-      ref.current.scrollIntoViewIfNeeded();
+      ref.current.scrollIntoViewIfNeeded({
+        behavior: smooth ? "smooth" : "auto",
+        inline: "center",
+      });
     } else {
-      ref.current?.scrollIntoView({ behavior: smooth ? "smooth" : "auto" });
+      ref.current?.scrollIntoView({
+        behavior: smooth ? "smooth" : "auto",
+        inline: "center",
+      });
     }
     smooth = false;
   }, [props.selected, props.entity]);
@@ -165,7 +171,7 @@ const CardContainer: React.FC<{
       onClick={() => {
         let q = Router.query;
         if (q.entity === props.entity) return;
-        ref.current?.scrollIntoView({ behavior: "smooth" });
+        ref.current?.scrollIntoView({ behavior: "smooth", inline: "center" });
       }}
       className={`h-full w-full snap-center flex-shrink-0 pb-1.5`}
     >
