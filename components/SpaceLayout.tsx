@@ -1,8 +1,8 @@
 import { useAuth } from "hooks/useAuth";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { ChatBubble, Studio, Information, DeckLarge, ExitDoor } from "./Icons";
-import { ButtonLink, ButtonTertiary } from "./Buttons";
+import { ChatBubble, Information, DeckLarge, ExitDoor } from "./Icons";
+import { ButtonLink } from "./Buttons";
 import { useContext, useState } from "react";
 import { Modal } from "components/Layout";
 import { LogInModal } from "./LoginModal";
@@ -16,10 +16,19 @@ export const SpaceLayout: React.FC = (props) => {
   let { ref } = usePreserveScroll<HTMLDivElement>();
 
   return (
-    <div className="h-full pt-4 px-4 overflow-auto pb-16" ref={ref}>
-      <SmallCardDragContext>{props.children}</SmallCardDragContext>
-      <Footer />
-    </div>
+    <>
+      <style jsx>{`
+        @media (min-height: 500px) {
+          .navPadding {
+            padding-bottom: 64px;
+          }
+        }
+      `}</style>
+      <div className="h-full pt-4 px-4 overflow-auto navPadding" ref={ref}>
+        <SmallCardDragContext>{props.children}</SmallCardDragContext>
+        <Footer />
+      </div>
+    </>
   );
 };
 
