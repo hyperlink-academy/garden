@@ -6,13 +6,13 @@ import useSWR from "swr";
 import { ButtonLink } from "./Buttons";
 import { CreateOrEditSpace } from "./CreateOrEditSpace";
 import { Door } from "./Doors";
-import { Settings } from "./Icons";
+import { Settings, SettingsStudio } from "./Icons";
 import { Modal } from "./Layout";
 
 export const SpaceList = () => {
   let spaces = useIndex.aev("space/name");
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 pb-8">
+    <div className="grid grid-cols-[repeat(auto-fill,164px)] gap-2 justify-between">
       {spaces?.map((a) => {
         return <Space entity={a.entity} name={a.value} />;
       })}
@@ -53,29 +53,34 @@ const Space = (props: { entity: string; name: string }) => {
   // let showUnreads = true;
   // let unreadCount = 5;
 
+  // flex flex-col absolute items-center bottom-[82px] left-[132px] md:left-[144px]
+
   return (
-    <div className="flex flex-col gap-4 pb-0 md:pb-4">
-      <div className="grid grid-cols-2 relative">
+    <div className="w-min flex flex-col gap-4">
+      <div className="grid grid-cols-[max-content,max-content] gap-1 items-end ">
         <Link href={`/s/${studio?.value}/s/${props.name}`}>
           <a>
             <Door entityID={props.entity} glow={showUnreads} />
           </a>
         </Link>
-        <div className="flex flex-col absolute items-center bottom-[82px] left-[132px] md:left-[144px]">
-          {showUnreads ? (
+        <div className="flex flex-col gap-4 w-max pb-[92px]">
+          <div className="flex flex-col ml-1.5 origin-top skew-y-[-30deg] scale-x-90 scale-y-110">
+            <span className="text-sm text-grey-35">3</span>
+            <span className="bg-accent-red rounded-full w-2 h-2"></span>
+          </div>
+
+          {/* {showUnreads ? (
             <div className="flex flex-col mb-4 -ml-2 items-center skew-y-[-30deg] scale-x-90 scale-y-110">
               <span className="text-sm">{unreadCount}</span>
               <span className="bg-accent-red rounded-full w-3 h-3"></span>
             </div>
-          ) : null}
-          <div className="rotate-[-7deg] scale-x-90 skew-y-[-15deg]">
-            {authorized ? <EditSpaceButton spaceID={props.entity} /> : null}
-          </div>
+          ) : null} */}
+          {authorized ? <EditSpaceButton spaceID={props.entity} /> : null}
         </div>
       </div>
 
-      <div className="pb-8 pt-2 md:pt-0">
-        <div className="origin-top -mt-12 pb-4 skew-y-[-30deg] scale-x-90 scale-y-110">
+      <div className="">
+        <div className="origin-top-left skew-y-[-30deg] scale-x-90 scale-y-110 ml-4 w-full">
           <h3 className="text-xl">{props.name}</h3>
         </div>
         {/* extra shadow - turned off b/c it's a bit much LOL */}
@@ -99,7 +104,7 @@ const EditSpaceButton = (props: { spaceID: string }) => {
           {/* <ButtonLink content="edit" onClick={() => setOpen(true)} /> */}
           <ButtonLink
             content=""
-            icon={<Settings />}
+            icon={<SettingsStudio />}
             onClick={() => setOpen(true)}
           />
         </a>
