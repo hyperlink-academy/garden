@@ -29,7 +29,7 @@ export const CardCarousel = (props: {
 
   return (
     <div className="h-full flex flex-col items-stretch relative">
-      <div className="px-4 grid grid-flow-col items-center w-full pr-10 pb-2">
+      <div className="grid grid-flow-col items-center w-full px-1 pb-2">
         <h4 className="uppercase text-accent-blue font-bold max-w-3xl mx-auto w-full">
           <Link
             href={`/s/${router.query.studio}/s/${router.query.space}/c/${props.entityID}`}
@@ -63,7 +63,7 @@ export const CardCarousel = (props: {
           );
         })}
       </div>
-      <div className="grid grid-flow-col gap-1 pb-3 max-w-3xl mx-auto w-full">
+      <div className="grid grid-flow-col gap-1 pb-6 pt-1 max-w-3xl mx-auto w-full">
         <CardCounter
           position={position}
           length={props.cards.length}
@@ -75,7 +75,7 @@ export const CardCarousel = (props: {
           }}
         />
         {!authorized || props.backlink ? null : (
-          <div className="justify-items-end grid pt-2">
+          <div className="justify-items-end grid">
             <ButtonLink
               icon={<Card />}
               content="Add Card!"
@@ -200,14 +200,14 @@ const CardCounter = (props: {
   setPosition: (n: number) => void;
 }) => {
   return (
-    <div className="w-fit grid grid-flow-col gap-2 self-end">
+    <div className="w-fit grid grid-flow-col gap-2 self-end ">
       <button
         onClick={() => {
           if (props.position > 0) props.setPosition(props.position - 1);
           else props.setPosition(props.length - 1);
         }}
       >
-        <LeftArrow className="text-accent-blue" />
+        <LeftArrow />
       </button>
       <div className="text-grey-35 font-bold grid content-center">{`${
         props.position + 1
@@ -219,13 +219,13 @@ const CardCounter = (props: {
           else props.setPosition(0);
         }}
       >
-        <RightArrow className="text-accent-blue" />
+        <RightArrow />
       </button>
       <button
         onClick={() => {
           props.setPosition(Math.floor(Math.random() * props.length));
         }}
-        className="text-accent-blue content-center grid w-min"
+        className=" content-center grid w-min"
       >
         <Shuffle />
       </button>

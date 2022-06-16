@@ -52,6 +52,7 @@ export const CardView = (props: {
           flex flex-col
           drop-shadow-md
           max-w-3xl
+          mx-auto
           ${borderStyles({
             deck: !!isDeck,
             member: !!memberName,
@@ -182,13 +183,7 @@ const CardMoreOptionsMenu = (props: {
         {/* TODO: check if deck card; if so display "Delete Deck…"  */}
 
         <MenuItem disabled={deleteDisabled}>
-          <p
-            className={`font-bold ${
-              deleteDisabled ? "text-grey-35" : "text-accent-red"
-            } `}
-          >
-            Delete Card FOREVER
-          </p>
+          <p className="font-bold">Delete Card FOREVER</p>
           <Delete />
         </MenuItem>
       </MenuContainer>

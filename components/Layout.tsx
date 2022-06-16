@@ -92,7 +92,9 @@ export const MenuItem: React.FC<{
           className={`px-3 py-4 flex items-center gap-2 justify-end ${
             active ? "bg-bg-blue" : ""
           } ${
-            props?.disabled ? "bg-grey-90 hover:bg-grey-90 text-grey-35" : ""
+            props?.disabled
+              ? " hover:bg-transparent text-grey-80 line-through"
+              : ""
           }`}
           onClick={() => props.onClick?.()}
           disabled={props?.disabled}
