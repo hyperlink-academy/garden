@@ -10,25 +10,27 @@ export const DoorSelector = (props: {
   selected?: string;
 }) => {
   return (
-    <div>
-      <p>Select the Scenery</p>
-      {doorImages.map((f) => {
-        return (
-          <button
-            onClick={() => {
-              props.onSelect(f);
-            }}
-          >
-            <img
-              className={`-scale-x-100 ${
-                props.selected === f ? "" : "opacity-30"
-              }`}
-              src={f}
-              width={64}
-            />
-          </button>
-        );
-      })}
+    <div className="w-full flex flex-col gap-0">
+      <p className="font-bold">Set the Scenery</p>
+      <div className="grid grid-cols-[repeat(auto-fill,96px)] gap-0">
+        {doorImages.map((f) => {
+          return (
+            <button
+              onClick={() => {
+                props.onSelect(f);
+              }}
+            >
+              <img
+                className={`-scale-x-100 ${
+                  props.selected === f ? "" : "opacity-50"
+                }`}
+                src={f}
+                width={96}
+              />
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 };

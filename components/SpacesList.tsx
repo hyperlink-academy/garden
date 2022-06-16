@@ -3,7 +3,7 @@ import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
 import Link from "next/link";
 import { useState } from "react";
 import useSWR from "swr";
-import { ButtonLink, ButtonTertiary } from "./Buttons";
+import { ButtonLink, ButtonPrimary, ButtonTertiary } from "./Buttons";
 import { DoorSelector } from "components/DoorSelector";
 import { Door } from "./Doors";
 import { Settings, SettingsStudio } from "./Icons";
@@ -119,7 +119,10 @@ const EditSpace = (props: { spaceID: string }) => {
             />
           </div>
 
-          <ButtonTertiary content="Close" onClick={() => setOpen(false)} />
+          {/* <ButtonTertiary content="Nevermind" onClick={() => setOpen(false)} /> */}
+          <div className="flex gap-4 place-self-center">
+            <ButtonPrimary content="Done!" onClick={() => setOpen(false)} />
+          </div>
         </Modal>
       </>
     );
