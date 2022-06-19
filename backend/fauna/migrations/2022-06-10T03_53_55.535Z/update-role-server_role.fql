@@ -1,0 +1,55 @@
+Update(Role("server_role"), {
+  "privileges": [{
+    "resource": Function("delete_session"),
+    "actions": {
+      "call": true
+    }
+  }, {
+    "resource": Function("get_signup_token"),
+    "actions": {
+      "call": true
+    }
+  }, {
+    "resource": Function("get_session_by_id"),
+    "actions": {
+      "call": true
+    }
+  }, {
+    "resource": Function("get_identity_by_username"),
+    "actions": {
+      "call": true
+    }
+  }, {
+    "resource": Function("create_session"),
+    "actions": {
+      "call": true
+    }
+  }, {
+    "resource": Function("create_identity"),
+    "actions": {
+      "call": true
+    }
+  }, {
+    "resource": Function("validate_new_identity"),
+    "actions": {
+      "call": true
+    }
+  }, {
+    "resource": Function("get_physical_card_by_id"),
+    "actions": {
+      "call": true
+    }
+  }, {
+    "resource": Function("create_physical_card"),
+    "actions": {
+      "call": true
+    }
+  }, {
+    "resource": Function("create_file_upload"),
+    "actions": {
+      "call": true
+    }
+  }],
+  "data": null,
+  "membership": null
+})

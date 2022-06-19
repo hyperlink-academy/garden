@@ -1,0 +1,16 @@
+CreateFunction({
+  "name": "delete_file_upload",
+  "role": "server",
+  "body": Query(Lambda("a", Let([{
+    "user": Call(Function("get_session_by_id"), {
+      "id": Select("token", Var("a"))
+    })
+  }], If(IsNull(Var("user")), {
+    "success": false
+  }, If(Exists(Ref(Collection("file_uploads"), Select("id", Var("a")))), Update(Ref(Collection("file_uploads"), Select("id", Var("a"))), {
+    "data": {
+      "deleted": true,
+      "deletedAt": Now()
+    }
+  }), null)))))
+})
