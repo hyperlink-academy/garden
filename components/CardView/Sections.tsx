@@ -115,21 +115,6 @@ export const MultipleReferenceSection = (props: {
   let [open, setOpen] = useState(false);
   return (
     <div className="flex flex-col gap-4">
-      {!authorized ? null : (
-        <>
-          <ButtonSecondary onClick={() => setOpen(true)} content="Add Cards!" />
-          <FindOrCreateCard
-            entity={props.entityID}
-            positionKey="eav"
-            section={props.section}
-            lastPosition={earliestCard?.positions["eav"]}
-            open={open}
-            allowBlank={true}
-            onClose={() => setOpen(false)}
-            selected={references?.map((c) => c.value.value) || []}
-          />
-        </>
-      )}
       <div className="">
         {/* hack to remove extra space*/}
         <SmallCardList

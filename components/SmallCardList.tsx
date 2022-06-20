@@ -1,9 +1,19 @@
 import { SortableContext } from "@dnd-kit/sortable";
 import { ReferenceAttributes } from "data/Attributes";
 import { Fact } from "data/Facts";
-import { useMutations } from "hooks/useReplicache";
+import {
+  ReplicacheContext,
+  scanIndex,
+  useIndex,
+  useMutations,
+} from "hooks/useReplicache";
 import { useRouter } from "next/router";
+import { useState, useContext } from "react";
+import { generateKeyBetween } from "src/fractional-indexing";
 import { sortByPosition } from "src/position_helpers";
+import { ulid } from "src/ulid";
+import { FindOrCreate } from "./FindOrCreateEntity";
+import { Add, Card, DeckSmall, Member } from "./Icons";
 import { SortableSmallCard } from "./SmallCard";
 
 // Currently this is rendered inside a DnD Context and used in a couple
@@ -11,6 +21,7 @@ import { SortableSmallCard } from "./SmallCard";
 export const SmallCardList = (props: {
   cards: Fact<keyof ReferenceAttributes>[];
   deck: string;
+  addCard?: () => {};
   attribute: keyof ReferenceAttributes;
   horizontal?: boolean;
   positionKey: string;
@@ -23,47 +34,174 @@ export const SmallCardList = (props: {
 
   return (
     <SortableContext items={items}>
-      {itemsCount > 0 ? (
-        <div
-          className={`flex w-full gap-4 ${props.horizontal ? "" : "flex-wrap"}`}
-        >
-          {items.map((c, index) => {
-            let entity = props.backlink ? c.entity : c.value.value;
-            let attribute =
-              props.attribute === "deck/contains"
-                ? "cards"
-                : props.attribute.slice(8);
+      <div
+        className={`flex w-full gap-4 ${props.horizontal ? "" : "flex-wrap"}`}
+      >
+        {items.map((c, index) => {
+          let entity = props.backlink ? c.entity : c.value.value;
+          let attribute =
+            props.attribute === "deck/contains"
+              ? "cards"
+              : props.attribute.slice(8);
 
-            return (
-              <SortableSmallCard
-                parent={props.deck}
-                siblings={props.cards}
-                positionKey={props.positionKey}
-                section={props.attribute}
-                index={index}
-                onDelete={
-                  !authorized
-                    ? undefined
-                    : () => {
-                        mutate("removeCardFromSection", {
-                          id: c.id,
-                        });
-                      }
-                }
-                draggable={authorized}
-                key={c.id}
-                href={`/s/${studio}/s/${space}/c/${props.deck}/${
-                  props.backlink ? "b" : "a"
-                }/${attribute}/${entity}`}
-                entityID={entity}
-                id={c.id}
-              />
-            );
-          })}
-        </div>
-      ) : (
-        ""
-      )}
+          return (
+            <SortableSmallCard
+              parent={props.deck}
+              siblings={props.cards}
+              positionKey={props.positionKey}
+              section={props.attribute}
+              index={index}
+              onDelete={
+                !authorized
+                  ? undefined
+                  : () => {
+                      mutate("removeCardFromSection", {
+                        id: c.id,
+                      });
+                    }
+              }
+              draggable={authorized}
+              key={c.id}
+              href={`/s/${studio}/s/${space}/c/${props.deck}/${
+                props.backlink ? "b" : "a"
+              }/${attribute}/${entity}`}
+              entityID={entity}
+              id={c.id}
+            />
+          );
+        })}
+        <AddToSection
+          attribute={props.attribute}
+          entity={props.deck}
+          backlink={props.backlink}
+        />
+      </div>
     </SortableContext>
+  );
+};
+const AddToSection = (props: {
+  entity: string;
+  backlink?: boolean;
+  attribute: keyof ReferenceAttributes;
+}) => {
+  let [open, setOpen] = useState(false);
+  let titles = useIndex
+    .aev(open ? "card/title" : null)
+    .filter((f) => !!f.value);
+  let members = useIndex.aev("member/name");
+  const decks = useIndex.aev(open ? "deck" : null);
+  let items = titles
+    .map((t) => {
+      return {
+        entity: t.entity,
+        display: t.value,
+        icon: !!decks.find((d) => t.entity === d.entity) ? (
+          <DeckSmall />
+        ) : (
+          <Card />
+        ),
+      };
+    })
+    .concat(
+      members.map((m) => {
+        return {
+          entity: m.entity,
+          display: m.value,
+          icon: <Member />,
+        };
+      })
+    )
+    .filter(
+      (f) =>
+        props.attribute !== "deck/contains" ||
+        !props.backlink ||
+        !!decks.find((d) => f.entity === d.entity)
+    );
+  const alreadyIn = useIndex.vae(props.entity, props.attribute);
+  const alreadyInEAV = useIndex.eav(props.entity, props.attribute);
+
+  let rep = useContext(ReplicacheContext);
+  let { authorized, mutate } = useMutations();
+  if (!authorized) return null;
+  return (
+    <>
+      {/* height and width of this add card button should match the height and width of the small card (SmallCard.tsx) */}
+      <button
+        className={`
+        AddCardToBacklinkButton
+        h-24 w-[151px] 
+        text-grey-55 hover:text-accent-blue
+        border border-dashed border-grey-55 rounded-lg hover:border-accent-blue 
+        grid place-items-center`}
+        onClick={() => setOpen(true)}
+      >
+        <Add />
+      </button>
+      <FindOrCreate
+        allowBlank={false}
+        onClose={() => setOpen(false)}
+        onSelect={async (d) => {
+          if (!rep?.rep) return;
+          if (d.type === "create") return;
+          if (props.backlink) {
+            let cards = await rep.rep.query((tx) => {
+              return scanIndex(tx).eav(d.entity, props.attribute);
+            });
+            if (props.attribute !== "deck/contains") {
+              let existingSections = await rep.rep.query((tx) =>
+                scanIndex(tx).eav(d.entity, "card/section")
+              );
+              if (
+                !existingSections.find(
+                  (f) => f.value === props.attribute.slice(8)
+                )
+              ) {
+                await mutate("addSection", {
+                  newSectionEntity: ulid(),
+                  sectionName: props.attribute.slice(8),
+                  type: "reference",
+                  cardEntity: d.entity,
+                  positions: "",
+                });
+              }
+            }
+            let lastPosition = cards.sort(sortByPosition("eav"))[
+              cards.length - 1
+            ]?.positions.eav;
+            await mutate("addCardToSection", {
+              cardEntity: props.entity,
+              parent: d.entity,
+              section: props.attribute,
+              positions: {
+                eav: generateKeyBetween(lastPosition || null, null),
+              },
+            });
+          } else {
+            let cards = await rep.rep.query((tx) => {
+              return scanIndex(tx).eav(props.entity, props.attribute);
+            });
+            console.log(cards);
+            let lastPosition = cards.sort(sortByPosition("eav"))[
+              cards.length - 1
+            ]?.positions.eav;
+            await mutate("addCardToSection", {
+              cardEntity: d.entity,
+              parent: props.entity,
+              section: props.attribute,
+              positions: {
+                eav: generateKeyBetween(lastPosition || null, null),
+              },
+            });
+          }
+        }}
+        selected={
+          props.backlink
+            ? alreadyIn.map((d) => d.entity)
+            : alreadyInEAV?.map((d) => d.entity) || []
+        }
+        open={open}
+        items={items}
+      />
+    </>
   );
 };

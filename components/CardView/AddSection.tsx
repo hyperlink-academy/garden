@@ -6,10 +6,6 @@ import { useContext, useState } from "react";
 import { ulid } from "src/ulid";
 import { Combobox } from "@headlessui/react";
 
-//TODO
-// 1. Wire up add section state
-// 2. Fix actually adding section logic
-
 export const AddSection = (props: { cardEntity: string }) => {
   let [state, setState] = useState<"closed" | "add" | "create">("closed");
   let { authorized, mutate } = useMutations();
@@ -23,21 +19,22 @@ export const AddSection = (props: { cardEntity: string }) => {
     );
   let types = useIndex.aev("type");
 
-  return !authorized ? (
-    <Divider />
-  ) : (
-    <div className="addSectionButton grid grid-auto-row gap-2 pb-6">
-      <button
-        className="grid grid-cols-[1fr_max-content_1fr] gap-4 items-center text-grey-80"
-        onClick={() => setState("add")}
-      >
-        <Divider />
-        <div className="flex gap-2">
+  return !authorized ? null : (
+    <div className="addSectionButton grid grid-auto-row gap-2 ">
+      {/* <div className="mx-auto ">
+        <ButtonTertiary
+          content="Add Section"
+          icon={<Add />}
+          onClick={() => setState("add")}
+        />
+      </div> */}
+      <button onClick={() => setState("add")}>
+        <div className="flex gap-2 text-accent-blue">
           <Add />
-          <h4 className="text-grey-80 ">Add Section</h4>
+          <h4 className="text-accent-blue">Add Section</h4>
         </div>
-        <Divider />
       </button>
+
       <Modal open={state !== "closed"} onClose={() => setState("closed")}>
         {state === "add" ? (
           <SelectSection

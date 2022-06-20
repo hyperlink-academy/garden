@@ -1,19 +1,7 @@
-import { ButtonSecondary } from "components/Buttons";
-import { FindOrCreate } from "components/FindOrCreateEntity";
-import { Card, DeckSmall, Member } from "components/Icons";
+import { Divider } from "components/Layout";
 import { SmallCardList } from "components/SmallCardList";
 import { ReferenceAttributes } from "data/Attributes";
-import { Fact } from "data/Facts";
-import {
-  ReplicacheContext,
-  scanIndex,
-  useIndex,
-  useMutations,
-} from "hooks/useReplicache";
-import { useContext, useMemo, useState } from "react";
-import { generateKeyBetween } from "src/fractional-indexing";
-import { sortByPosition } from "src/position_helpers";
-import { ulid } from "src/ulid";
+import { useIndex } from "hooks/useReplicache";
 
 export const Backlinks = (props: { entityID: string }) => {
   let backlinks = useIndex.vae(props.entityID);
@@ -32,11 +20,9 @@ export const Backlinks = (props: { entityID: string }) => {
   sections = sections.filter((section) => section != "message/attachedCard");
 
   return sections.length > 0 ? (
-    <div className=" grid grid-flow-row gap-6 ">
-      <small className="bg-background rounded-md p-2 font-bold lightBorder">
-        This card is part of {sections.length} collection
-        {sections.length > 1 ? "s" : ""}
-      </small>
+    <div className=" grid grid-flow-row gap-3 ">
+      <Divider />
+      <p className="font-bold text-grey-35">Referenced in</p>
       <ul className=" grid grid-flow-row gap-4">
         {sections.map((s) => {
           return (
@@ -59,16 +45,13 @@ const BacklinkSection = (props: {
       "Decks"
     ) : (
       <p>
-        <span className="">{props.attribute.slice(8)}</span>
-        <span className="font-normal normal-case text-grey-55">
-          {" "}
-          section in
-        </span>
+        <span className="font-bold">{props.attribute.slice(8)}</span>
+        <span className="font-normal"> section of</span>
       </p>
     );
   return (
     <div className="flex flex-col gap-2">
-      <h4>{title}</h4>
+      <p className="font-bold text-grey-55">{title}</p>
       <SmallCardList
         backlink={true}
         attribute={props.attribute}
@@ -76,102 +59,6 @@ const BacklinkSection = (props: {
         deck={props.entityID}
         positionKey="vae"
       />
-      <AddToSection entity={props.entityID} attribute={props.attribute} />
     </div>
-  );
-};
-
-const AddToSection = (props: {
-  entity: string;
-  attribute: keyof ReferenceAttributes;
-}) => {
-  let [open, setOpen] = useState(false);
-  let titles = useIndex
-    .aev(open ? "card/title" : null)
-    .filter((f) => !!f.value);
-  let members = useIndex.aev("member/name");
-  const decks = useIndex.aev(open ? "deck" : null);
-  let items = titles
-    .map((t) => {
-      return {
-        entity: t.entity,
-        display: t.value,
-        icon: !!decks.find((d) => t.entity === d.entity) ? (
-          <DeckSmall />
-        ) : (
-          <Card />
-        ),
-      };
-    })
-    .concat(
-      members.map((m) => {
-        return {
-          entity: m.entity,
-          display: m.value,
-          icon: <Member />,
-        };
-      })
-    )
-    .filter(
-      (f) =>
-        props.attribute !== "deck/contains" ||
-        !!decks.find((d) => f.entity === d.entity)
-    );
-  const alreadyIn = useIndex.vae(props.entity, props.attribute);
-
-  let rep = useContext(ReplicacheContext);
-  let { authorized, mutate } = useMutations();
-  if (!authorized) return null;
-  return (
-    <>
-      <ButtonSecondary
-        content={
-          props.attribute === "deck/contains"
-            ? "Add to another deck"
-            : "Link to another card"
-        }
-        onClick={() => setOpen(true)}
-      />
-      <FindOrCreate
-        allowBlank={false}
-        onClose={() => setOpen(false)}
-        onSelect={async (d) => {
-          if (!rep?.rep) return;
-          if (d.type === "create") return;
-          let cards = await rep.rep.query((tx) => {
-            return scanIndex(tx).eav(d.entity, props.attribute);
-          });
-          if (props.attribute !== "deck/contains") {
-            let existingSections = await rep.rep.query((tx) =>
-              scanIndex(tx).eav(d.entity, "card/section")
-            );
-            if (
-              !existingSections.find(
-                (f) => f.value === props.attribute.slice(8)
-              )
-            ) {
-              await mutate("addSection", {
-                newSectionEntity: ulid(),
-                sectionName: props.attribute.slice(8),
-                type: "reference",
-                cardEntity: d.entity,
-                positions: "",
-              });
-            }
-          }
-          let lastPosition = cards.sort(sortByPosition("eav"))[cards.length - 1]
-            ?.positions.eav;
-          await mutate("addCardToSection", {
-            cardEntity: props.entity,
-            parent: d.entity,
-            section: props.attribute,
-            positions: { eav: generateKeyBetween(lastPosition || null, null) },
-          });
-        }}
-        selected={alreadyIn.map((d) => d.entity)}
-        open={open}
-        items={items}
-      />
-    </>
   );
 };

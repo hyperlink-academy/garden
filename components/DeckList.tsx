@@ -117,20 +117,14 @@ const Deck = (props: { entity: string; toggleAll: boolean | undefined }) => {
           {!authorized ? (
             <div className="-mb-2" />
           ) : (
-            <div className="place-items-center place-self-end flex flex-row gap-4">
+            <div className="place-items-center  flex flex-row gap-4">
               <Link
                 href={`/s/${router.query.studio}/s/${router.query.space}/c/${props.entity}`}
               >
                 <a>
-                  <ButtonLink content="Deck Overview" icon={<Settings />} />
+                  <ButtonLink content="Deck Info" icon={<Settings />} />
                 </a>
               </Link>
-
-              <ButtonPrimary
-                onClick={() => setFindOpen(true)}
-                icon={<CardAdd />}
-                content="Add cards"
-              />
 
               <FindOrCreateCard
                 allowBlank={true}

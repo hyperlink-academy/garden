@@ -53,7 +53,7 @@ export function Footer() {
           left: "50%",
           transform: "translateX(-50%)",
         }}
-        className={`menu w-full px-4`}
+        className={`menu z-50 w-full px-4`}
       >
         <div className="grid max-w-3xl mx-auto">
           <div
