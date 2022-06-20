@@ -131,7 +131,32 @@ const CardImage = (props: { entity: string }) => {
   let spaceID = useSpaceID();
   let image = useIndex.eav(props.entity, "card/image");
   return (
-    <div>
+    <div
+      onPaste={async (e) => {
+        let items = e.clipboardData.items;
+        if (!items[0].type.includes("image") || !session.session) return;
+        let image = items[0].getAsFile();
+        if (!image) return;
+
+        let res = await fetch(`${WORKER_URL}/space/${spaceID}/upload_file`, {
+          headers: {
+            "X-Authorization": session.session.id,
+          },
+          method: "POST",
+          body: image,
+        });
+        let data = (await res.json()) as
+          | { success: false }
+          | { success: true; data: { id: string } };
+        if (!data.success) return;
+        await mutate("assertFact", {
+          entity: props.entity,
+          attribute: "card/image",
+          value: { type: "file", id: data.data.id, filetype: "image" },
+          positions: {},
+        });
+      }}
+    >
       {!image ? null : (
         <div>
           <img src={`${WORKER_URL}/static/${image.value.id}`} />
