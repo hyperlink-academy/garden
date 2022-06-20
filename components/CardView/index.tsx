@@ -3,7 +3,7 @@ import { Menu } from "@headlessui/react";
 import { MoreOptions, Delete, DeckSmall, Member } from "components/Icons";
 import { MenuContainer, MenuItem } from "components/Layout";
 import { Textarea } from "components/Textarea";
-import { useIndex, useMutations } from "hooks/useReplicache";
+import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
 import {
   MultipleReferenceSection,
   Sections,
@@ -14,6 +14,7 @@ import { Backlinks } from "./Backlinks";
 import { usePreserveScroll } from "hooks/utils";
 import Link from "next/link";
 import { useAuth } from "hooks/useAuth";
+import { spaceAPI } from "backend/lib/api";
 
 const borderStyles = (args: { deck: boolean; member: boolean }) => {
   switch (true) {
@@ -96,6 +97,7 @@ export const CardView = (props: {
             entityID={props.entityID}
             section={"card/content"}
           />
+          <CardImage entity={props.entityID} />
         </div>
 
         {!isDeck ? null : <DeckCardList entityID={props.entityID} />}
@@ -117,6 +119,60 @@ const DeckCardList = (props: { entityID: string }) => {
       <MultipleReferenceSection
         entityID={props.entityID}
         section="deck/contains"
+      />
+    </div>
+  );
+};
+
+const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
+const CardImage = (props: { entity: string }) => {
+  let { session } = useAuth();
+  let { mutate } = useMutations();
+  let spaceID = useSpaceID();
+  let image = useIndex.eav(props.entity, "card/image");
+  return (
+    <div>
+      {!image ? null : (
+        <div>
+          <img src={`${WORKER_URL}/static/${image.value.id}`} />
+          <button
+            onClick={() => {
+              if (!image || !session.token) return;
+              mutate("retractFact", { id: image.id });
+              spaceAPI(`${WORKER_URL}/space/${spaceID}`, "delete_file_upload", {
+                token: session.token,
+                fileID: image.value.id,
+              });
+            }}
+          >
+            x
+          </button>
+        </div>
+      )}
+      <input
+        type="file"
+        accept="image/*"
+        onChange={async (e) => {
+          let files = e.currentTarget.files;
+          if (!files || !session.session || !spaceID) return;
+          let res = await fetch(`${WORKER_URL}/space/${spaceID}/upload_file`, {
+            headers: {
+              "X-Authorization": session.session.id,
+            },
+            method: "POST",
+            body: files[0],
+          });
+          let data = (await res.json()) as
+            | { success: false }
+            | { success: true; data: { id: string } };
+          if (!data.success) return;
+          await mutate("assertFact", {
+            entity: props.entity,
+            attribute: "card/image",
+            value: { type: "file", id: data.data.id, filetype: "image" },
+            positions: {},
+          });
+        }}
       />
     </div>
   );

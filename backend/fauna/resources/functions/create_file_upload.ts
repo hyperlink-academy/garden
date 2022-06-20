@@ -27,7 +27,7 @@ const definition: FunctionDefinition = {
       let args = (value: keyof Args) => q.Select(value, a);
       return q.Let(
         {
-          user: q.Call(q.Function(getSessionByIdFunctionName), {
+          session: q.Call(q.Function(getSessionByIdFunctionName), {
             id: args("token"),
           }),
         },
@@ -40,7 +40,7 @@ const definition: FunctionDefinition = {
               "ref",
               CreateFileUpload({
                 hash: args("hash"),
-                user: q.Var("user"),
+                user: q.Select("user", q.Var("session")),
                 createdAt: args("createdAt"),
                 space: args("space"),
               })

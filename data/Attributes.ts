@@ -14,6 +14,7 @@ export const BaseAttributes = {
     unique: false,
     cardinality: "one",
     "union/value": [
+      "file",
       "string",
       "union",
       "reference",
@@ -53,6 +54,11 @@ export const DefaultAttributes = {
   },
   deck: {
     type: "flag",
+    unique: false,
+    cardinality: "one",
+  },
+  "card/image": {
+    type: "file",
     unique: false,
     cardinality: "one",
   },

@@ -31,6 +31,7 @@ let router = makeRouter(Routes);
 export type Bindings = {
   FAUNA_KEY: string;
   SPACES: DurableObjectNamespace;
+  USER_UPLOADS: R2Bucket;
 };
 
 async function handleRequest(request: Request, env: Bindings) {
@@ -50,5 +51,24 @@ async function handleRequest(request: Request, env: Bindings) {
       new Request(newUrl.toString(), new Request(request))
     );
     return new Response(result.body, result);
+  }
+  if (path[2] === "static") {
+    try {
+      const object = await env.USER_UPLOADS.get(path[3]);
+
+      if (!object || !object.body) {
+        return new Response("Object Not Found", { status: 404 });
+      }
+
+      const headers = new Headers();
+      object.writeHttpMetadata(headers);
+      headers.set("etag", object.httpEtag);
+
+      return new Response(object.body, {
+        headers,
+      });
+    } catch (e) {
+      console.log(e);
+    }
   }
 }

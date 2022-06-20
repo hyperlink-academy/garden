@@ -5,6 +5,7 @@ import { graphqlServer } from "./graphql";
 import { init } from "./initialize";
 import { claimRoute } from "./routes/claim";
 import { create_space_route } from "./routes/create_space";
+import { delete_file_upload_route } from "./routes/delete_file_upload";
 import { get_latest_message } from "./routes/get_latest_message";
 import { get_share_code_route } from "./routes/get_share_code";
 import { get_space_route } from "./routes/get_space";
@@ -12,11 +13,13 @@ import { join_route } from "./routes/join";
 import { pullRoute } from "./routes/pull";
 import { push_route } from "./routes/push";
 import { connect } from "./socket";
+import { handleFileUpload } from "./upload_file";
 
 export type Env = {
   factStore: ReturnType<typeof store>;
   storage: DurableObjectStorage;
   poke: () => void;
+  id: string;
   env: Bindings;
 };
 
@@ -29,6 +32,7 @@ let routes = [
   get_share_code_route,
   get_latest_message,
   join_route,
+  delete_file_upload_route,
 ];
 export type SpaceRoutes = typeof routes;
 let router = makeRouter(routes);
@@ -60,6 +64,7 @@ export class SpaceDurableObject implements DurableObject {
     let ctx = {
       storage: this.state.storage,
       env: this.env,
+      id: this.state.id.toString(),
       poke: () => {
         if (this.throttled) {
           return;
@@ -76,6 +81,9 @@ export class SpaceDurableObject implements DurableObject {
       factStore: store(this.state.storage),
     };
     switch (path[1]) {
+      case "upload_file": {
+        return handleFileUpload(request, ctx);
+      }
       case "socket": {
         return connect.bind(this)(request);
       }

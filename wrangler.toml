@@ -1,11 +1,8 @@
 name = "hyperlink-garden"
 account_id = "81c1ee2e102b2279be9311f73c01ec7f"
 workers_dev = true
-type = "javascript"
 
-route = ''
-zone_id = ''
-usage_model = ''
+usage_model = 'unbound'
 compatibility_flags = []
 
 compatibility_date = "2022-01-31"
@@ -13,6 +10,15 @@ compatibility_date = "2022-01-31"
 kv_namespaces = [ 
 ]
 
+main = "out/index.mjs"
+
+[triggers]
+crons = ["* */1 * * *"]
+
+[[r2_buckets]]
+binding = 'USER_UPLOADS' # <~ valid JavaScript variable name
+bucket_name = 'garden-user-uploads'
+preview_bucket_name = 'user-uploads-dev'
 
 [durable_objects]
 bindings = [
@@ -23,14 +29,10 @@ bindings = [
 tag = "v1"
 new_classes = ["SpaceDurableObject"]
 
+
 [build]
 command = "npm run build-backend"
 
-[build.upload]
-format = "modules"
-dir = "out"
-main = "./index.mjs"
-
-[[build.upload.rules]]
+[[rules]]
 type = "ESModule"
 globs = ["**/*.mjs"]
