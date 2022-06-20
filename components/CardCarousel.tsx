@@ -163,17 +163,19 @@ const CardContainer: React.FC<{
         inline: "center",
       });
     }
+    ref.current.focus();
     smooth = false;
   }, [props.selected, props.entity]);
   return (
     <div
+      tabIndex={0}
       ref={ref}
       onClick={() => {
         let q = Router.query;
         if (q.entity === props.entity) return;
         ref.current?.scrollIntoView({ behavior: "smooth", inline: "center" });
       }}
-      className={`h-full w-full snap-center flex-shrink-0 pb-1.5`}
+      className={`h-full w-full snap-center flex-shrink-0 pb-1.5 focus:outline-none`}
     >
       {props.selected ? (
         <CardCarouselTitle parent={""} child={props.entity} />
