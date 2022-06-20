@@ -67,14 +67,11 @@ const CreateDeck = (props: { lastDeckPosition?: string }) => {
 let openStates: { [key: string]: boolean | undefined } = {};
 
 const Deck = (props: { entity: string; toggleAll: boolean | undefined }) => {
-  let title = useIndex.eav(props.entity, "card/title");
   let { authorized } = useMutations();
   let description = useIndex.eav(props.entity, "card/content");
   let cards = useIndex.eav(props.entity, "deck/contains");
   let cardsCount = cards ? cards.length : 0;
-  let lastCard = cards?.sort(sortByPosition("eav"))[cards.length - 1];
 
-  let [findOpen, setFindOpen] = useState(false);
   let [drawerOpen, setDrawerOpen] = useState(openStates[props.entity]);
 
   let router = useRouter();
@@ -102,42 +99,22 @@ const Deck = (props: { entity: string; toggleAll: boolean | undefined }) => {
       </div>
       <Drawer open={!!drawerOpen}>
         <div className="flex flex-col gap-4">
-          {cardsCount > 0 ? (
-            <SmallCardList
-              attribute="deck/contains"
-              positionKey="eav"
-              deck={props.entity}
-              cards={cards || []}
-            />
-          ) : (
-            <div className="italic place-self-center text-grey-55">
-              no cards yet!
-            </div>
-          )}
-          {!authorized ? (
-            <div className="-mb-2" />
-          ) : (
-            <div className="place-items-center  flex flex-row gap-4">
-              <Link
-                href={`/s/${router.query.studio}/s/${router.query.space}/c/${props.entity}`}
-              >
-                <a>
-                  <ButtonLink content="Deck Info" icon={<Settings />} />
-                </a>
-              </Link>
+          <SmallCardList
+            attribute="deck/contains"
+            positionKey="eav"
+            deck={props.entity}
+            cards={cards || []}
+          />
 
-              <FindOrCreateCard
-                allowBlank={true}
-                entity={props.entity}
-                positionKey="eav"
-                lastPosition={lastCard?.positions["eav"]}
-                section="deck/contains"
-                open={findOpen}
-                onClose={() => setFindOpen(false)}
-                selected={cards?.map((c) => c.value.value) || []}
-              />
-            </div>
-          )}
+          <div className="place-items-center  flex flex-row gap-4">
+            <Link
+              href={`/s/${router.query.studio}/s/${router.query.space}/c/${props.entity}`}
+            >
+              <a>
+                <ButtonLink content="Deck Info" icon={<Settings />} />
+              </a>
+            </Link>
+          </div>
         </div>
       </Drawer>
     </Disclosure>
