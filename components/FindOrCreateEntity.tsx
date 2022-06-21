@@ -68,7 +68,7 @@ export const FindOrCreate = (props: {
             {/* I am aware the max height in the Combobox.Options is gross, but max-h-full does work and this is the best i could do D:*/}
             <Combobox.Options
               static
-              className="w-full pt-2 flex-col flex gap-2 h-min max-h-[calc(100vh-12rem)] overflow-y-auto"
+              className="w-full pt-2 flex-col flex gap-2 h-min max-h-[calc(100vh-16rem)] overflow-y-auto"
             >
               {inputExists ? null : (
                 <Combobox.Option key={"create"} value={"create"}>
