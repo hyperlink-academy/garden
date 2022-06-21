@@ -53,7 +53,7 @@
     "@types/react-window": "^1.8.5",
     "autoprefixer": "^10.4.4",
     "esbuild": "^0.14.27",
-    "miniflare": "^2.3.0",
+    "miniflare": "^2.5.0",
     "postcss": "^8.4.12",
     "tailwindcss": "^3.0.23"
   }
