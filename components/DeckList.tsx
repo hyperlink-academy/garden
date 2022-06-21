@@ -3,11 +3,10 @@ import { Disclosure } from "@headlessui/react";
 import useMeasure from "react-use-measure";
 import { animated, SpringValue, useSpring } from "react-spring";
 import { usePrevious } from "hooks/utils";
-import { useEffect, useRef, useState } from "react";
-import { FindOrCreateCard } from "./FindOrCreateEntity";
-import { ButtonLink, ButtonPrimary, ButtonTertiary } from "./Buttons";
+import { useEffect, useState } from "react";
+import { ButtonLink, ButtonTertiary } from "./Buttons";
 import Link from "next/link";
-import { CardAdd, DeckAdd, Settings } from "./Icons";
+import { DeckAdd, Settings } from "./Icons";
 import { generateKeyBetween } from "src/fractional-indexing";
 import { sortByPosition } from "src/position_helpers";
 import { ulid } from "src/ulid";
@@ -67,7 +66,6 @@ const CreateDeck = (props: { lastDeckPosition?: string }) => {
 let openStates: { [key: string]: boolean | undefined } = {};
 
 const Deck = (props: { entity: string; toggleAll: boolean | undefined }) => {
-  let { authorized } = useMutations();
   let description = useIndex.eav(props.entity, "card/content");
   let cards = useIndex.eav(props.entity, "deck/contains");
   let cardsCount = cards ? cards.length : 0;
