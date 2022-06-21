@@ -138,7 +138,7 @@ const AddToSection = (props: {
         <Add />
       </button>
       <FindOrCreate
-        allowBlank={false}
+        allowBlank={true}
         onClose={() => setOpen(false)}
         onSelect={async (d) => {
           if (!rep?.rep) return;
