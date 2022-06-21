@@ -243,7 +243,7 @@ const AddToSection = (props: {
         selected={
           props.backlink
             ? alreadyIn.map((d) => d.entity)
-            : alreadyInEAV?.map((d) => d.entity) || []
+            : alreadyInEAV?.map((d) => d.value.value) || []
         }
         open={open}
         items={items}
