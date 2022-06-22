@@ -84,11 +84,12 @@ export const SmallCardDragContext: React.FC = (props) => {
 };
 
 const DeleteZone = (props: { display: boolean }) => {
-  let { setNodeRef } = useDroppable({ id: "delete" });
+  let { setNodeRef, isOver } = useDroppable({ id: "delete" });
   let transition = useTransition(props.display, {
     config: { mass: 0.1, tension: 500, friction: 25 },
     from: { width: 0 },
     enter: { width: 32 },
+    update: { width: isOver ? 64 : 32 },
     leave: { width: 0 },
     delay: 100,
     reverse: props.display,
@@ -98,21 +99,22 @@ const DeleteZone = (props: { display: boolean }) => {
       show &&
       createPortal(
         <animated.div
-          ref={setNodeRef}
           className="rounded-md"
           style={{
-            writingMode: "vertical-rl",
-            position: "absolute",
+            writingMode: "vertical-lr",
+            position: "fixed",
             height: "calc(100vh - 256px)",
             right: 0,
+            zIndex: 5,
             width: a.width.to((w) => `${w}px`),
-            top: "128px",
+            top: "96px",
             background: "lightgrey",
             textAlign: "center",
+            verticalAlign: "bottom",
             overflow: "hidden",
           }}
         >
-          Drag here to delete
+          <div ref={setNodeRef}>Drag here to delete</div>
         </animated.div>,
         document.body
       )
