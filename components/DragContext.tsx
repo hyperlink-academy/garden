@@ -37,7 +37,7 @@ export const SmallCardDragContext: React.FC = (props) => {
         if (over) {
           if (!active) return;
           if (over.id === "delete") {
-            mutate("removeCardFromSection", { id: active.id });
+            mutate("removeCardFromSection", { id: active.id as string });
             return;
           }
           let index = over.data.current?.index;
@@ -59,7 +59,7 @@ export const SmallCardDragContext: React.FC = (props) => {
           )
             return;
           let newPositions = updatePositions(positionKey, siblings, [
-            [active.id, currentIndex < index ? index : index - 1],
+            [active.id as string, currentIndex < index ? index : index - 1],
           ]);
           await mutate("updatePositions", {
             positionKey: positionKey,
