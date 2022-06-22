@@ -1,8 +1,6 @@
 import { Menu } from "@headlessui/react";
 import { Textarea } from "components/Textarea";
-import { ButtonSecondary } from "components/Buttons";
 import { SmallCardList } from "components/SmallCardList";
-import { FindOrCreateCard } from "components/FindOrCreateEntity";
 import {
   Close,
   DownArrow,
@@ -13,7 +11,7 @@ import {
 } from "components/Icons";
 import { MenuContainer, MenuItem } from "components/Layout";
 import { multipleReferenceSection, singleTextSection } from "data/Facts";
-import { useIndex, useMutations } from "hooks/useReplicache";
+import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
 import { useRef, useState } from "react";
 import { sortByPosition, updatePositions } from "src/position_helpers";
 import { FilterAttributes, ReferenceAttributes } from "data/Attributes";
@@ -44,15 +42,21 @@ const Section = (props: {
   let entity = useIndex.ave("name", `section/${props.name}`);
   let cardinality = useIndex.eav(entity?.entity || null, "cardinality");
   let type = useIndex.eav(entity?.entity || null, "type");
+  let [focused, setFocused] = useState(false);
   return (
     <div className="textSection grid grid-auto-rows gap-2">
-      <div className="grid grid-cols-[auto_min-content_min-content] gap-2 items-center">
+      <div
+        onClick={() => setFocused(true)}
+        onMouseOver={() => setFocused(true)}
+        onMouseLeave={() => setFocused(false)}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        className="grid grid-cols-[auto_min-content_min-content] gap-2 items-center h-6"
+      >
         <h4>{props.name}</h4>
-        <div className="text-grey-55">
-          {type?.value === "string" ? <SectionText /> : <SectionLinkedCard />}
-        </div>
         <SectionMoreOptionsMenu
           entityID={props.entityID}
+          display={focused}
           factID={props.factID}
         />
       </div>
@@ -129,6 +133,7 @@ export const MultipleReferenceSection = (props: {
 };
 
 const SectionMoreOptionsMenu = (props: {
+  display: boolean;
   factID: string;
   entityID: string;
 }) => {
@@ -158,23 +163,30 @@ const SectionMoreOptionsMenu = (props: {
 
   return !authorized ? null : (
     <Menu as="div" className="relative">
-      <Menu.Button>
-        <MoreOptions />
-      </Menu.Button>
-      <MenuContainer>
-        <MenuItem onClick={() => moveUp()}>
-          <p>Move Up</p>
-          <UpArrow />
-        </MenuItem>
-        <MenuItem onClick={() => moveDown()}>
-          <p>Move Down</p>
-          <DownArrow />
-        </MenuItem>
-        <MenuItem>
-          <p>Remove</p>
-          <Close />
-        </MenuItem>
-      </MenuContainer>
+      {({ open }) => {
+        if (!open && !props.display) return null;
+        return (
+          <>
+            <Menu.Button>
+              <MoreOptions />
+            </Menu.Button>
+            <MenuContainer>
+              <MenuItem onClick={() => moveUp()}>
+                <p>Move Up</p>
+                <UpArrow />
+              </MenuItem>
+              <MenuItem onClick={() => moveDown()}>
+                <p>Move Down</p>
+                <DownArrow />
+              </MenuItem>
+              <MenuItem>
+                <p>Remove</p>
+                <Close />
+              </MenuItem>
+            </MenuContainer>
+          </>
+        );
+      }}
     </Menu>
   );
 };

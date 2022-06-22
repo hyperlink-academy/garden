@@ -5,6 +5,7 @@ import { ReferenceAttributes } from "data/Attributes";
 import { Fact } from "data/Facts";
 import { useIndex } from "hooks/useReplicache";
 import Link from "next/link";
+import { useState } from "react";
 import { isUrl } from "src/isUrl";
 import { Gripper } from "./Gripper";
 import { Close, Member } from "./Icons";
@@ -123,8 +124,16 @@ export const BaseSmallCard = (props: {
   listeners?: SyntheticListenerMap;
 }) => {
   let url = props.content ? isUrl(props.content) : false;
+  let [focused, setFocused] = useState(false);
   return (
-    <div className={`w-[151px] h-24 touch-manipulation relative origin-center`}>
+    <div
+      className={`w-[151px] h-24 touch-manipulation relative origin-center`}
+      onClick={() => setFocused(true)}
+      onMouseOver={() => setFocused(true)}
+      onMouseLeave={() => setFocused(false)}
+      onFocus={() => setFocused(true)}
+      onBlur={() => setFocused(false)}
+    >
       <div
         className={`
         w-full h-24 
@@ -164,8 +173,8 @@ export const BaseSmallCard = (props: {
           </div>
         </div>
       </div>
-      {!!props.onDelete ? (
-        <button onClick={props.onDelete}>
+      {!!props.onDelete && focused ? (
+        <button onClick={() => props.onDelete?.()}>
           <Close className="text-accent-blue absolute -right-2.5 -top-2 z-10" />
         </button>
       ) : null}

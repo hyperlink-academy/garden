@@ -5,6 +5,7 @@ import {
   DragOverlay,
   MouseSensor,
   TouchSensor,
+  useDroppable,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
@@ -12,6 +13,8 @@ import { ReferenceAttributes } from "data/Attributes";
 import { Fact } from "data/Facts";
 import { useMutations } from "hooks/useReplicache";
 import { useState } from "react";
+import { createPortal } from "react-dom";
+import { animated, useTransition } from "react-spring";
 import { updatePositions } from "src/position_helpers";
 import { SmallCard } from "./SmallCard";
 
@@ -33,6 +36,10 @@ export const SmallCardDragContext: React.FC = (props) => {
         setActiveCard(null);
         if (over) {
           if (!active) return;
+          if (over.id === "delete") {
+            mutate("removeCardFromSection", { id: active.id });
+            return;
+          }
           let index = over.data.current?.index;
           let currentIndex: number | undefined = active.data.current?.index;
           let parent: string | undefined = over.data.current?.parent;
@@ -71,6 +78,43 @@ export const SmallCardDragContext: React.FC = (props) => {
           />
         ) : null}
       </DragOverlay>
+      {<DeleteZone display={!!activeCard} />}
     </DndContext>
+  );
+};
+
+const DeleteZone = (props: { display: boolean }) => {
+  let { setNodeRef } = useDroppable({ id: "delete" });
+  let transition = useTransition(props.display, {
+    config: { mass: 0.1, tension: 500, friction: 25 },
+    from: { width: 0 },
+    enter: { width: 32 },
+    leave: { width: 0 },
+    delay: 100,
+    reverse: props.display,
+  });
+  return transition(
+    (a, show) =>
+      show &&
+      createPortal(
+        <animated.div
+          ref={setNodeRef}
+          className="rounded-md"
+          style={{
+            writingMode: "vertical-rl",
+            position: "absolute",
+            height: "calc(100vh - 256px)",
+            right: 0,
+            width: a.width.to((w) => `${w}px`),
+            top: "128px",
+            background: "lightgrey",
+            textAlign: "center",
+            overflow: "hidden",
+          }}
+        >
+          Drag here to delete
+        </animated.div>,
+        document.body
+      )
   );
 };
