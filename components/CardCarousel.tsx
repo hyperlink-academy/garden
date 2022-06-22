@@ -134,7 +134,7 @@ const CardContainer: React.FC<{
               newUrl
             );
             props.onFocus();
-          }, 100);
+          }, 200);
         }
       },
       { root: null, rootMargin: "0px -50%", threshold: 0 }
