@@ -128,11 +128,12 @@ export const BaseSmallCard = (props: {
   return (
     <div
       className={`w-[151px] h-24 touch-manipulation relative origin-center`}
-      onClick={() => setFocused(true)}
-      onMouseOver={() => setFocused(true)}
-      onMouseLeave={() => setFocused(false)}
-      onFocus={() => setFocused(true)}
-      onBlur={() => setFocused(false)}
+      onPointerOver={(e) => {
+        if (e.pointerType === "mouse") setFocused(true);
+      }}
+      onPointerLeave={(e) => {
+        if (e.pointerType === "mouse") setFocused(false);
+      }}
     >
       <div
         className={`
