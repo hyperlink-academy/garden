@@ -37,7 +37,7 @@ export const scanIndex = (tx: ReadTransaction) => {
       let results = await tx
         .scan({
           indexName: "eav",
-          prefix: `${entity}-${attribute}`,
+          prefix: `${entity}-${attribute}-`,
         })
         .values()
         .toArray();
