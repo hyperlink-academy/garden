@@ -15,5 +15,12 @@ export default function DeckPage() {
       : multipleReferenceSection(attribute);
 
   let cards = useIndex.eav(card, section)?.sort(sortByPosition("eav")) || [];
-  return <CardCarousel entityID={card} section={section} cards={cards} />;
+  return (
+    <CardCarousel
+      entityID={card}
+      section={section}
+      cards={cards}
+      key={`${card}/${attribute}`}
+    />
+  );
 }
