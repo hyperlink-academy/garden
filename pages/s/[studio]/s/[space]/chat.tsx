@@ -31,14 +31,14 @@ export default function ChatPage() {
       <Head>
         <title key="title">{spaceName?.value}</title>
       </Head>
-      <Messages />
-      <MessageInput id={id || ""} />
+      <Messages topic="general" />
+      <MessageInput id={id || ""} topic={"general"} />
     </div>
   );
 }
 
-const Messages = () => {
-  let messages = useIndex.messages();
+export const Messages = (props: { topic: string }) => {
+  let messages = useIndex.messages(props.topic);
   let { rep } = useAuth();
   let id = useSpaceID();
   let lastMessage = messages[messages.length - 1];
@@ -192,7 +192,7 @@ const MessageData = (props: { entity: string }) => {
   );
 };
 
-const MessageInput = (props: { id: string }) => {
+export const MessageInput = (props: { id: string; topic: string }) => {
   let [message, setMessage] = useState("");
   let [attachedCards, setAttachedCards] = useState<string[]>([]);
   let { session } = useAuth();
@@ -246,6 +246,7 @@ const MessageInput = (props: { id: string }) => {
     mutate("postMessage", {
       id: ulid(),
       entity,
+      topic: props.topic,
       content: message,
       sender: session.session.username,
       ts: Date.now().toString(),
