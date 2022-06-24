@@ -78,7 +78,7 @@ export function MessageWithIndexes(m: Message) {
   return {
     ...m,
     indexes: {
-      messages: `${m.ts}-${m.id}`,
+      messages: `${m.topic || "general"}-${m.ts}-${m.id}`,
     },
   };
 }
@@ -157,7 +157,7 @@ export const makeReplicache = (args: {
 }) => {
   let rep = new Replicache({
     licenseKey: "l381074b8d5224dabaef869802421225a",
-    schemaVersion: "0.0.2",
+    schemaVersion: "0.0.3",
     name: args.name,
     pushDelay: 500,
     pusher: args.pusher,
@@ -258,13 +258,13 @@ export const useIndex = {
       [entity, attribute]
     );
   },
-  messages() {
+  messages(topic: string) {
     let rep = useContext(ReplicacheContext);
     return useSubscribe(
       rep?.rep,
       async (tx) => {
         let messages = await tx
-          .scan({ indexName: "messages" })
+          .scan({ indexName: "messages", prefix: topic })
           .values()
           .toArray();
         return messages as Message[];

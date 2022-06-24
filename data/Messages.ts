@@ -1,5 +1,6 @@
 export type Message = {
   id: string;
+  topic?: string;
   index?: number;
   attachedCards?: string[];
   sender: string;
