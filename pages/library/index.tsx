@@ -89,8 +89,11 @@ export const ComponentViewer: React.FC<{
           <title key="title">Hyperlink Component Library</title>
         </Head>
         <SmallCardDragContext>
-          <div style={{ maxWidth: "48rem", margin: "auto" }}>
-            <div className="flex gap-4 justify-between pt-6 pb-4 text-accent-blue px-5">
+          <div
+            className="max-w-3xl m-auto p-6"
+            style={{ maxWidth: "48rem", margin: "auto" }}
+          >
+            <div className="flex gap-4 justify-between p-6 pb-4 text-accent-blue px-5">
               <PageSidebar pages={props.components} />
               <div className="flex gap-2">
                 <BGSwitch enabled={bg} setEnabled={setBg} />
@@ -100,11 +103,12 @@ export const ComponentViewer: React.FC<{
                 />
               </div>
             </div>
-            <div className="grid auto-rows-max gap-6 m-5">
+            <div className="flex flex-col gap-6 w-full">
               <div
                 className={`
               ComponentViewPort
-              grid auto-rows-max gap-6
+              flex flex-col gap-6
+              w-full
               ${
                 bg
                   ? "bg-white border border-grey-80 rounded-lg shadow-drop p-5"

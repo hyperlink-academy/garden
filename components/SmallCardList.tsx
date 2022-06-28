@@ -35,7 +35,9 @@ export const SmallCardList = (props: {
   return (
     <SortableContext items={items}>
       <div
-        className={`flex w-full gap-4 ${props.horizontal ? "" : "flex-wrap"}`}
+        className={`flex w-full gap-4 ${
+          props.horizontal ? "py-2" : "flex-wrap"
+        }`}
       >
         {items.map((c, index) => {
           let entity = props.backlink ? c.entity : c.value.value;

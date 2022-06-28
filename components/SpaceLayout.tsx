@@ -1,7 +1,13 @@
 import { useAuth } from "hooks/useAuth";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { ChatBubble, Information, DeckLarge, ExitDoor } from "./Icons";
+import {
+  ChatBubble,
+  Information,
+  DeckLarge,
+  ExitDoor,
+  ActivityBlocks,
+} from "./Icons";
 import { ButtonLink } from "./Buttons";
 import { useContext, useState } from "react";
 import { Modal } from "components/Layout";
@@ -106,21 +112,26 @@ export function Footer() {
 
               <div className="justify-self-center flex flex-row gap-2">
                 {/* DECKS */}
-                <Link
-                  href={`/s/${router.query.studio}/s/${router.query.space}`}
+                <FooterItem
+                  active={(r) => !r.endsWith("chat") && !r.endsWith("activity")}
+                  route={`/s/${router.query.studio}/s/${router.query.space}`}
                 >
-                  <a
-                    className={`w-11 px-1 ${
-                      router.pathname === "/s/[studio]/s/[space]/chat"
-                        ? ""
-                        : selectedClassname
-                    }`}
-                  >
-                    <DeckLarge width={36} height={36} />
-                  </a>
-                </Link>
+                  <DeckLarge width={32} height={32} />
+                </FooterItem>
                 {/* CHAT */}
-                <ChatIcon />
+                <FooterItem
+                  active={(r) => r.endsWith("chat")}
+                  route={`/s/${router.query.studio}/s/${router.query.space}/chat`}
+                >
+                  <ChatIcon />
+                </FooterItem>
+
+                <FooterItem
+                  active={(r) => r.endsWith("activity")}
+                  route={`/s/${router.query.studio}/s/${router.query.space}/activity`}
+                >
+                  <ActivityBlocks />
+                </FooterItem>
               </div>
             </div>
 
@@ -133,10 +144,27 @@ export function Footer() {
   );
 }
 
-const selectedClassname = "bg-grey-15 text-white rounded-md -mt-2 mb-2";
+const FooterItem: React.FC<{
+  route: string;
+  active: (route: string) => boolean;
+}> = (props) => {
+  let router = useRouter();
+  console.log(router.asPath);
+  let selected = props.active(router.asPath);
+  return (
+    <Link href={props.route}>
+      <a
+        className={`w-10 px-1 ${
+          !selected ? "" : "bg-grey-15 text-white rounded-md -mt-2 mb-2"
+        }`}
+      >
+        {props.children}
+      </a>
+    </Link>
+  );
+};
 
 const ChatIcon = () => {
-  let router = useRouter();
   let ctx = useContext(ReplicacheContext);
   let spaceID = useSpaceID();
   let { rep: studio } = useAuth();
@@ -168,20 +196,12 @@ const ChatIcon = () => {
   );
 
   return (
-    <Link href={`/s/${router.query.studio}/s/${router.query.space}/chat`}>
-      <a
-        className={`w-11 px-1 relative ${
-          router.pathname === "/s/[studio]/s/[space]/chat"
-            ? selectedClassname
-            : ""
-        }`}
-      >
-        <ChatBubble width={36} height={36} />
-        {lastSeen && latestMsg > lastSeen ? (
-          <div className="bg-accent-red absolute rounded-full top-1.5 left-10 w-3 h-3"></div>
-        ) : null}
-      </a>
-    </Link>
+    <div>
+      <ChatBubble width={32} height={32} />
+      {lastSeen && latestMsg > lastSeen ? (
+        <div className="bg-accent-red absolute rounded-full top-1.5 left-10 w-3 h-3"></div>
+      ) : null}
+    </div>
   );
 };
 
