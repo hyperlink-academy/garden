@@ -3,7 +3,7 @@ import { Menu } from "@headlessui/react";
 import { MoreOptions, Delete, DeckSmall, Member } from "components/Icons";
 import { MenuContainer, MenuItem } from "components/Layout";
 import { Textarea } from "components/Textarea";
-import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
+import { useIndex, useMutations } from "hooks/useReplicache";
 import {
   MultipleReferenceSection,
   Sections,
@@ -11,12 +11,11 @@ import {
 } from "./Sections";
 import { AddSection } from "./AddSection";
 import { Backlinks } from "./Backlinks";
-import { usePreserveScroll } from "hooks/utils";
+import { usePreserveScroll, usePrevious } from "hooks/utils";
 import Link from "next/link";
 import { useAuth } from "hooks/useAuth";
-import { spaceAPI } from "backend/lib/api";
 import { ImageSection } from "./ImageSection";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const borderStyles = (args: { deck: boolean; member: boolean }) => {
   switch (true) {
@@ -46,17 +45,44 @@ export const CardView = (props: {
 }) => {
   let isDeck = useIndex.eav(props.entityID, "deck");
   let memberName = useIndex.eav(props.entityID, "member/name");
+  let parentContainer = useRef<HTMLDivElement>(null);
   let { ref } = usePreserveScroll<HTMLDivElement>();
   let { session } = useAuth();
   let [open, setOpen] = useState<"card" | "backlink">("card");
+  let previousOpen = usePrevious(open);
+  useEffect(() => {
+    if (!parentContainer.current) return;
+    if (open === "card" && previousOpen === "backlink") {
+      parentContainer.current.scrollTo({
+        left: 0,
+        top: 0,
+        behavior: "smooth",
+      });
+    }
+    if (open === "backlink" && previousOpen === "card") {
+      let bottomedScrollPosition =
+        parentContainer.current.children[0].clientHeight -
+        (parentContainer.current.clientHeight -
+          parentContainer.current.children[2].clientHeight);
+
+      parentContainer.current.scrollTo({
+        left: 0,
+        top: bottomedScrollPosition,
+        behavior: "smooth",
+      });
+    }
+  }, [open]);
+
   return (
     <div
+      ref={parentContainer}
       className={`
         cardAndBacklink 
         max-w-3xl mx-auto
         h-full
         overflow-y-scroll       
         relative
+        no-scrollbar
         snap-y snap-mandatory
         `}
       onScroll={(e) => {
@@ -88,7 +114,6 @@ export const CardView = (props: {
       <div
         className={`
         card
-        ${open === "card" ? " overflow-y-scroll" : "overflow-y-hidden"}
         z-20
         h-[calc(100%-16px)]
         absolute
@@ -103,18 +128,8 @@ export const CardView = (props: {
           member: !!memberName,
         })}
         `}
-        onClick={(e) => {
-          if (open === "backlink") {
-            setOpen("card");
-
-            e.currentTarget.parentElement?.scrollTo({
-              left: 0,
-              top: 0,
-              behavior: "smooth",
-            });
-          } else {
-            null;
-          }
+        onClick={() => {
+          setOpen("card");
         }}
       >
         {!session?.loggedIn || !memberName ? null : (
@@ -137,8 +152,8 @@ export const CardView = (props: {
           ref={ref}
           className={`
             cardContent
+        ${open === "card" ? " overflow-y-scroll" : "overflow-y-hidden"}
             flex flex-col gap-6          
-            overflow-y-auto
             no-scrollbar
             w-full
             h-full

@@ -105,7 +105,7 @@ const DeleteZone = (props: { display: boolean }) => {
             position: "fixed",
             height: "calc(100vh - 256px)",
             right: 0,
-            zIndex: 5,
+            zIndex: 50,
             width: a.width.to((w) => `${w}px`),
             top: "96px",
             background: "lightgrey",

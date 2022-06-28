@@ -47,7 +47,7 @@ export const CardCarousel = (props: {
         style={{
           padding: "0 max(calc((100vw - 48rem) / 2), 1rem)",
         }}
-        className={`overflow-x-scroll flex snap-x snap-mandatory gap-4 -mx-4 no-scrollbar h-full`}
+        className={`overflow-x-scroll flex snap-x snap-mandatory gap-4 -mx-4 no-scrollbar h-full scroll-smooth`}
       >
         {props.cards.map((c) => {
           let entity = props.backlink ? c.entity : c.value.value;

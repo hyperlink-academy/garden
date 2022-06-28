@@ -1,4 +1,3 @@
-import { Divider } from "components/Layout";
 import { SmallCardList } from "components/SmallCardList";
 import { ReferenceAttributes } from "data/Attributes";
 import { useIndex } from "hooks/useReplicache";
@@ -26,11 +25,12 @@ export const Backlinks = (props: {
   return sections.length > 0 ? (
     <div
       className={`
+      focus:outline-none
+      no-scrollbar
       backlinks 
       flex flex-col gap-3 
       pt-12 p-4
       ${props.open === "backlink" ? " overflow-y-scroll" : " overflow-y-hidden"}
-      ${props.open === "backlink" ? "" : " [[:]]"}
       sticky
       top-0
       left-0
@@ -44,23 +44,8 @@ export const Backlinks = (props: {
       shadow-inner
       `}
       tabIndex={0}
-      onClick={(e) => {
-        if (!e.currentTarget.parentElement) return;
-        let bottomedScrollPosition =
-          e.currentTarget.clientHeight -
-          (e.currentTarget.parentElement.clientHeight -
-            e.currentTarget.parentElement.children[2].clientHeight);
-        if (props.open === "card") {
-          props.onOpen();
-          console.log(e.currentTarget.parentElement);
-          e.currentTarget.parentElement?.scrollTo({
-            left: 0,
-            top: bottomedScrollPosition,
-            behavior: "smooth",
-          });
-        } else {
-          null;
-        }
+      onClick={() => {
+        props.onOpen();
       }}
     >
       <h3 className="font-bold text-grey-35">References</h3>
