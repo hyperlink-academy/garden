@@ -6,7 +6,7 @@ export const RenderedText = forwardRef<
   { text: string } & JSX.IntrinsicElements["pre"]
 >((props, ref) => {
   return (
-    <Linkify options={{ className: "text-accent-blue underline break-words" }}>
+    <Linkify options={{ className: "text-accent-blue underline break-all" }}>
       <pre
         ref={ref}
         {...{ ...props, value: undefined }}
