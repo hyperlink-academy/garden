@@ -20,18 +20,12 @@ export const AddSection = (props: { cardEntity: string }) => {
   let types = useIndex.aev("type");
 
   return !authorized ? null : (
-    <div className="addSectionButton grid grid-auto-row gap-2 ">
-      {/* <div className="mx-auto ">
-        <ButtonTertiary
-          content="Add Section"
-          icon={<Add />}
-          onClick={() => setState("add")}
-        />
-      </div> */}
+    <div className="addSectionButton grid grid-auto-row gap-4 mt-8 ">
+      <Divider />
       <button onClick={() => setState("add")}>
-        <div className="flex gap-2 text-accent-blue">
+        <div className="flex gap-2 text-grey-80 hover:text-accent-blue">
           <Add />
-          <h4 className="text-accent-blue">Add Section</h4>
+          <h4 className="text-inherit">Add Section</h4>
         </div>
       </button>
 

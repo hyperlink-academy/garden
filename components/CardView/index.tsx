@@ -16,6 +16,7 @@ import Link from "next/link";
 import { useAuth } from "hooks/useAuth";
 import { spaceAPI } from "backend/lib/api";
 import { ImageSection } from "./ImageSection";
+import { useState } from "react";
 
 const borderStyles = (args: { deck: boolean; member: boolean }) => {
   switch (true) {
@@ -47,37 +48,95 @@ export const CardView = (props: {
   let memberName = useIndex.eav(props.entityID, "member/name");
   let { ref } = usePreserveScroll<HTMLDivElement>();
   let { session } = useAuth();
+  let [open, setOpen] = useState<"card" | "backlink">("card");
   return (
     <div
       className={`
-          h-full
-          flex flex-col
-          drop-shadow-md
-          max-w-3xl
-          mx-auto
-          ${borderStyles({
-            deck: !!isDeck,
-            member: !!memberName,
-          })}`}
+        cardAndBacklink 
+        max-w-3xl mx-auto
+        h-full
+        overflow-y-scroll       
+        relative
+        snap-y snap-mandatory
+        `}
+      onScroll={(e) => {
+        let wrapperContentHeight = e.currentTarget.scrollHeight;
+        let wrapperHeight = e.currentTarget.clientHeight;
+
+        let bottomedScrollPosition = wrapperContentHeight - wrapperHeight;
+
+        if (e.currentTarget.scrollTop < 1) {
+          setOpen("card");
+        }
+        if (
+          e.currentTarget.scrollTop <= bottomedScrollPosition &&
+          e.currentTarget.scrollTop > bottomedScrollPosition - 1
+        ) {
+          setOpen("backlink");
+          (e.currentTarget.children[0] as HTMLElement)?.focus();
+        }
+      }}
     >
-      {!session?.loggedIn || !memberName ? null : (
-        <>
-          <div className="grid grid-cols-[auto_max-content] items-end text-white pb-1">
-            <Member />
-            <Link href={`/s/${memberName?.value}`}>
-              <a className="justify-self-start">
-                <small>visit {memberName?.value}'s studio</small>
-                {/* <Studio className="text-white" /> */}
-              </a>
-            </Link>
-            {/* <small>member</small> */}
-          </div>
-        </>
-      )}
+      <Backlinks
+        entityID={props.entityID}
+        open={open}
+        onOpen={() => {
+          setOpen("backlink");
+        }}
+      />
 
       <div
-        ref={ref}
         className={`
+        card
+        ${open === "card" ? " overflow-y-scroll" : "overflow-y-hidden"}
+        z-20
+        h-[calc(100%-16px)]
+        absolute
+        left-0
+        top-0
+        right-0
+        snap-start
+
+        flex flex-col
+        ${borderStyles({
+          deck: !!isDeck,
+          member: !!memberName,
+        })}
+        `}
+        onClick={(e) => {
+          if (open === "backlink") {
+            setOpen("card");
+
+            e.currentTarget.parentElement?.scrollTo({
+              left: 0,
+              top: 0,
+              behavior: "smooth",
+            });
+          } else {
+            null;
+          }
+        }}
+      >
+        {!session?.loggedIn || !memberName ? null : (
+          <>
+            <div className="grid grid-cols-[auto_max-content] items-end text-white pb-1">
+              <Member />
+              <Link href={`/s/${memberName?.value}`}>
+                <a className="justify-self-start">
+                  <small>visit {memberName?.value}'s studio</small>
+                  {/* <Studio className="text-white" /> */}
+                </a>
+              </Link>
+              {/* <small>member</small> */}
+            </div>
+          </>
+        )}
+
+        {/* CARD CONTENT HERE */}
+        <div
+          ref={ref}
+          className={`
+            cardContent
             flex flex-col gap-6          
             overflow-y-auto
             no-scrollbar
@@ -85,29 +144,31 @@ export const CardView = (props: {
             h-full
             ${contentStyles({ deck: !!isDeck, member: !!memberName })}
             `}
-      >
-        <div className="grid grid-auto-rows gap-3">
-          <div className="cardHeader grid grid-cols-[auto_min-content] gap-2">
-            <Title entityID={props.entityID} />
-            <CardMoreOptionsMenu
+        >
+          <div className="cardDefaultSection grid grid-auto-rows gap-3">
+            <div className="cardHeader grid grid-cols-[auto_min-content] gap-2">
+              <Title entityID={props.entityID} />
+              <CardMoreOptionsMenu
+                entityID={props.entityID}
+                referenceFactID={props?.referenceFactID}
+              />
+            </div>
+            <SingleTextSection
               entityID={props.entityID}
-              referenceFactID={props?.referenceFactID}
+              section={"card/content"}
             />
+            <ImageSection entity={props.entityID} />
           </div>
-          <SingleTextSection
-            entityID={props.entityID}
-            section={"card/content"}
-          />
-          <ImageSection entity={props.entityID} />
+
+          {!isDeck ? null : <DeckCardList entityID={props.entityID} />}
+
+          <Sections entityID={props.entityID} />
+
+          <AddSection cardEntity={props.entityID} />
         </div>
-
-        {!isDeck ? null : <DeckCardList entityID={props.entityID} />}
-
-        <Sections entityID={props.entityID} />
-
-        <AddSection cardEntity={props.entityID} />
-        <Backlinks entityID={props.entityID} />
+        {/* CARD CONTENT HERE */}
       </div>
+      <div className="spacer snap-end h-[calc(100%-42px)]" />
     </div>
   );
 };

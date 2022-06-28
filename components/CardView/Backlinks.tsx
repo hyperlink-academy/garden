@@ -3,7 +3,11 @@ import { SmallCardList } from "components/SmallCardList";
 import { ReferenceAttributes } from "data/Attributes";
 import { useIndex } from "hooks/useReplicache";
 
-export const Backlinks = (props: { entityID: string }) => {
+export const Backlinks = (props: {
+  entityID: string;
+  open?: string;
+  onOpen: () => void;
+}) => {
   let backlinks = useIndex.vae(props.entityID);
   let sections = Object.keys(
     backlinks.reduce(
@@ -20,10 +24,51 @@ export const Backlinks = (props: { entityID: string }) => {
   sections = sections.filter((section) => section != "message/attachedCard");
 
   return sections.length > 0 ? (
-    <div className=" grid grid-flow-row gap-3 ">
-      <Divider />
-      <p className="font-bold text-grey-35">Referenced in</p>
-      <ul className=" grid grid-flow-row gap-4">
+    <div
+      className={`
+      backlinks 
+      flex flex-col gap-3 
+      pt-12 p-4
+      ${props.open === "backlink" ? " overflow-y-scroll" : " overflow-y-hidden"}
+      ${props.open === "backlink" ? "" : " [[:]]"}
+      sticky
+      top-0
+      left-0
+      right-0
+      z-0
+      h-full
+      rounded-lg
+      bg-[#FFF2D8]
+      w-[97%]
+      mx-auto
+      shadow-inner
+      `}
+      tabIndex={0}
+      onClick={(e) => {
+        if (!e.currentTarget.parentElement) return;
+        let bottomedScrollPosition =
+          e.currentTarget.clientHeight -
+          (e.currentTarget.parentElement.clientHeight -
+            e.currentTarget.parentElement.children[2].clientHeight);
+        if (props.open === "card") {
+          props.onOpen();
+          console.log(e.currentTarget.parentElement);
+          e.currentTarget.parentElement?.scrollTo({
+            left: 0,
+            top: bottomedScrollPosition,
+            behavior: "smooth",
+          });
+        } else {
+          null;
+        }
+      }}
+    >
+      <h3 className="font-bold text-grey-35">References</h3>
+      <ul
+        className={` 
+      ${props.open === "backlink" ? " " : "pointer-events-none"}
+       flex flex-col gap-4 `}
+      >
         {sections.map((s) => {
           return (
             <BacklinkSection entityID={props.entityID} attribute={s} key={s} />

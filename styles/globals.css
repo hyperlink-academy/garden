@@ -135,7 +135,6 @@ input {
 
 .deckCardBorder {
   z-index: 0;
-  position: relative;
   padding-left: 8px;
   padding-bottom: 8px;
 }
@@ -155,7 +154,6 @@ input {
 
 .memberCardBorder {
   z-index: 0;
-  position: relative;
   padding-left: 4px;
   padding-bottom: 4px;
 }
