@@ -52,8 +52,11 @@ export const CardView = (props: {
   let previousOpen = usePrevious(open);
   useEffect(() => {
     if (!parentContainer.current) return;
+    let parent = parentContainer.current;
+    let backlinks = parent.children[0];
+    let card = parent.children[2];
     if (open === "card" && previousOpen === "backlink") {
-      parentContainer.current.scrollTo({
+      parent.scrollTo({
         left: 0,
         top: 0,
         behavior: "smooth",
@@ -61,15 +64,13 @@ export const CardView = (props: {
     }
     if (open === "backlink" && previousOpen === "card") {
       let bottomedScrollPosition =
-        parentContainer.current.children[0].clientHeight -
-        (parentContainer.current.clientHeight -
-          parentContainer.current.children[2].clientHeight);
-
-      parentContainer.current.scrollTo({
+        backlinks.clientHeight - (parent.clientHeight - card.clientHeight);
+      parent.scrollTo({
         left: 0,
         top: bottomedScrollPosition,
         behavior: "smooth",
       });
+      (backlinks as HTMLElement).focus();
     }
   }, [open]);
 
@@ -93,13 +94,13 @@ export const CardView = (props: {
 
         if (e.currentTarget.scrollTop < 1) {
           setOpen("card");
+          return;
         }
         if (
           e.currentTarget.scrollTop <= bottomedScrollPosition &&
-          e.currentTarget.scrollTop > bottomedScrollPosition - 1
+          e.currentTarget.scrollTop >= bottomedScrollPosition - 1
         ) {
           setOpen("backlink");
-          (e.currentTarget.children[0] as HTMLElement)?.focus();
         }
       }}
     >
