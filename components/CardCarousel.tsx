@@ -1,7 +1,7 @@
 import { ButtonLink } from "components/Buttons";
 import { CardView } from "components/CardView";
 import { Card, LeftArrow, RightArrow, Shuffle } from "components/Icons";
-import { ReferenceAttributes } from "data/Attributes";
+import { ReferenceAttributes, ShortCodes } from "data/Attributes";
 import { Fact } from "data/Facts";
 import { useIndex, useMutations } from "hooks/useReplicache";
 import Head from "next/head";
@@ -37,9 +37,8 @@ export const CardCarousel = (props: {
             <a>{Name?.value}</a>
           </Link>
           <span className="text-grey-35">
-            {props.section === "deck/contains"
-              ? ""
-              : ` > ${props.section.slice(8)}`}
+            {ShortCodes[props.section as keyof ReferenceAttributes] ||
+              ` > ${props.section.slice(8)}`}
           </span>
         </h4>
       </div>

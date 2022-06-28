@@ -154,6 +154,17 @@ export const DefaultAttributes = {
   },
 } as const;
 
+export const ShortCodes: { [k in keyof Attribute]?: string | undefined } = {
+  "deck/contains": "cards",
+  "activity/hand-contains": "hand",
+};
+
+export const AttributeFromShortCode = (a: string) => {
+  return Object.entries(ShortCodes).find((f) => f[1] === a)?.[0] as
+    | keyof Attribute
+    | undefined;
+};
+
 export const Attribute = { ...DefaultAttributes, ...BaseAttributes };
 export type Attribute = typeof Attribute;
 export type UniqueAttributes = {

@@ -11,7 +11,7 @@ export default function ActivityPage() {
 export const Activity = (props: { entity: string }) => {
   let name = useIndex.eav(props.entity, "activity/name");
   return (
-    <div className="w-full flex flex-col relative items-stretch w-full">
+    <div className="w-full flex flex-col relative items-stretch mx-auto max-w-3xl">
       <h1>{name?.value}</h1>
       <h2>In Hand</h2>
       <Hand entity={props.entity} />

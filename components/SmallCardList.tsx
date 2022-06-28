@@ -1,5 +1,5 @@
 import { SortableContext } from "@dnd-kit/sortable";
-import { ReferenceAttributes } from "data/Attributes";
+import { ReferenceAttributes, ShortCodes } from "data/Attributes";
 import { Fact } from "data/Facts";
 import {
   ReplicacheContext,
@@ -41,10 +41,9 @@ export const SmallCardList = (props: {
       >
         {items.map((c, index) => {
           let entity = props.backlink ? c.entity : c.value.value;
-          let attribute =
-            props.attribute === "deck/contains"
-              ? "cards"
-              : props.attribute.slice(8);
+          let attribute = ShortCodes[props.attribute]
+            ? ShortCodes[props.attribute]
+            : props.attribute.slice(8);
 
           return (
             <SortableSmallCard
