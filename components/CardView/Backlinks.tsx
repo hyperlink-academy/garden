@@ -18,9 +18,11 @@ export const Backlinks = (props: {
     )
   ) as (keyof ReferenceAttributes)[];
 
-  // filter array for "message/attachedCard"
-  // TODO: remove when we add proper chat backlinks
-  sections = sections.filter((section) => section != "message/attachedCard");
+  // TODO: remove when we add proper chat and activity backlinks
+  sections = sections.filter(
+    (section) =>
+      section !== "message/attachedCard" && section !== "activity/hand-contains"
+  );
 
   return sections.length > 0 ? (
     <div
