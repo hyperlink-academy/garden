@@ -43,11 +43,17 @@ export const CardCarousel = (props: {
         </h4>
       </div>
       <div
-        style={{
-          padding: "0 max(calc((100vw - 48rem) / 2), 1rem)",
-        }}
-        className={`overflow-x-scroll flex snap-x snap-mandatory gap-4 -mx-4 no-scrollbar h-full scroll-smooth`}
+        style={{}}
+        className={`
+        overflow-x-scroll snap-x snap-mandatory scroll-smooth
+        flex gap-2 -mx-4 
+        no-scrollbar 
+        h-full `}
       >
+        <div
+          style={{ width: "max(calc((100vw - 48rem) / 2), 1rem)" }}
+          className={`flex-shrink-0`}
+        />
         {props.cards.map((c) => {
           let entity = props.backlink ? c.entity : c.value.value;
           return (
@@ -61,7 +67,12 @@ export const CardCarousel = (props: {
             </CardContainer>
           );
         })}
+        <div
+          style={{ width: "max(calc((100vw - 48rem) / 2), 1rem)" }}
+          className={`flex-shrink-0`}
+        />
       </div>
+
       <div className="grid grid-flow-col gap-1 pb-6 pt-1 max-w-3xl mx-auto w-full">
         <CardCounter
           position={position}
@@ -174,7 +185,7 @@ const CardContainer: React.FC<{
         if (q.entity === props.entity) return;
         ref.current?.scrollIntoView({ behavior: "smooth", inline: "center" });
       }}
-      className={`h-full w-full snap-center flex-shrink-0 pb-1.5 focus:outline-none`}
+      className={`h-full w-[calc(100%-32px)] max-w-3xl snap-center flex-shrink-0 pb-1.5 focus:outline-none `}
     >
       {props.selected ? (
         <CardCarouselTitle parent={""} child={props.entity} />
