@@ -173,38 +173,22 @@ export const makeReplicache = (args: {
   return rep;
 };
 
-type EAVResult<
-  A extends keyof Attribute,
-  V extends string | null | string[]
-> = V extends string[]
-  ? (CardinalityResult<A> | null)[]
-  : CardinalityResult<A> | null;
 export const useIndex = {
-  eav<A extends keyof Attribute, V extends string | null | string[]>(
-    entity: V,
+  eav<A extends keyof Attribute>(
+    entity: string | null,
     attribute: A
-  ): EAVResult<A, V> {
+  ): CardinalityResult<A> | null {
     let rep = useContext(ReplicacheContext);
     return useSubscribe(
       rep?.rep,
       async (tx) => {
-        if (!entity) return [];
-        if (typeof entity === "object") {
-          let results: Array<CardinalityResult<A> | null> = await Promise.all(
-            entity.map(async (e) => {
-              let result = await scanIndex(tx).eav(e, attribute);
-              return (result as CardinalityResult<A>) || null;
-            })
-          );
-          return results;
-        } else {
-          let result = await scanIndex(tx).eav(entity, attribute);
-          return (result as CardinalityResult<A>) || null;
-        }
+        if (!entity) return null;
+        let result = await scanIndex(tx).eav(entity, attribute);
+        return (result as CardinalityResult<A>) || null;
       },
-      typeof entity === "object" ? [] : null,
+      null,
       [attribute, rep, entity]
-    ) as EAVResult<A, V>;
+    );
   },
   ave<A extends keyof UniqueAttributes>(
     attribute: A,
@@ -285,7 +269,7 @@ export const useMutations = () => {
   let auth = useSubscribe(
     rep?.rep,
     async (tx) => {
-      if (!session || !session.loggedIn) return false;
+      if (!session || !session.loggedIn) return null;
       let fact = (await tx
         .scan({
           indexName: "ave",
@@ -293,15 +277,16 @@ export const useMutations = () => {
         })
         .values()
         .toArray()) as Fact<"space/member">[];
-      if (!fact[0]) return false;
-      return true;
+      if (!fact[0]) return null;
+      return fact[0];
     },
-    false,
+    null,
     [session.session?.studio]
   );
 
   return {
-    authorized: auth,
+    authorized: !!auth,
+    memberEntity: auth?.entity || null,
     mutate<T extends keyof typeof Mutations>(
       mutation: T,
       args: Parameters<typeof Mutations[T]>[0]

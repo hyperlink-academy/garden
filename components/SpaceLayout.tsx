@@ -14,9 +14,15 @@ import { Modal } from "components/Layout";
 import { LogInModal } from "./LoginModal";
 import { SmallCardDragContext } from "./DragContext";
 import { usePreserveScroll } from "hooks/utils";
-import { ReplicacheContext, scanIndex, useSpaceID } from "hooks/useReplicache";
+import {
+  ReplicacheContext,
+  scanIndex,
+  useIndex,
+  useSpaceID,
+} from "hooks/useReplicache";
 import { useSubscribe } from "replicache-react";
 import { Message } from "data/Messages";
+import { useInActivity } from "hooks/useInActivity";
 
 export const SpaceLayout: React.FC = (props) => {
   let { ref } = usePreserveScroll<HTMLDivElement>();
@@ -113,7 +119,9 @@ export function Footer() {
               <div className="justify-self-center flex flex-row gap-2">
                 {/* DECKS */}
                 <FooterItem
-                  active={(r) => !r.endsWith("chat") && !r.endsWith("activity")}
+                  active={(r) =>
+                    !r.includes("/chat") && !r.includes("/activity")
+                  }
                   route={`/s/${router.query.studio}/s/${router.query.space}`}
                 >
                   <DeckLarge width={32} height={32} />
@@ -126,12 +134,7 @@ export function Footer() {
                   <ChatIcon />
                 </FooterItem>
 
-                <FooterItem
-                  active={(r) => r.endsWith("activity")}
-                  route={`/s/${router.query.studio}/s/${router.query.space}/activity`}
-                >
-                  <ActivityBlocks />
-                </FooterItem>
+                <Activity />
               </div>
             </div>
 
@@ -144,12 +147,47 @@ export function Footer() {
   );
 }
 
+const Activity = () => {
+  let router = useRouter();
+  let inActivity = useInActivity();
+  let activityName = useIndex.eav(
+    inActivity?.value.value || null,
+    "activity/name"
+  );
+  let selected = router.asPath.includes("/activity");
+  return (
+    <Link
+      href={`/s/${router.query.studio}/s/${router.query.space}/activity${
+        !inActivity ? "" : `/${inActivity.value.value}`
+      }`}
+    >
+      <a
+        className={`px-1 grid grid-flow-col ${
+          !selected ? "" : "bg-grey-15 text-white rounded-md -mt-2 mb-2"
+        }`}
+      >
+        {activityName ? (
+          <small
+            className={`self-baseline mt-[5px] italic col-start-1 row-start-1 ml-3 pl-8 pr-4 whitespace-nowrap overflow-hidden mr-4 ${
+              !selected ? "bg-grey-90 rounded-r-full " : ""
+            }`}
+          >
+            {activityName?.value}
+          </small>
+        ) : null}
+        <span className="col-start-1 row-start-1">
+          <ActivityBlocks />
+        </span>
+      </a>
+    </Link>
+  );
+};
+
 const FooterItem: React.FC<{
   route: string;
   active: (route: string) => boolean;
 }> = (props) => {
   let router = useRouter();
-  console.log(router.asPath);
   let selected = props.active(router.asPath);
   return (
     <Link href={props.route}>

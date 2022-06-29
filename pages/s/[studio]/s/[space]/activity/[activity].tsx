@@ -1,6 +1,10 @@
 import { SmallCardList } from "components/SmallCardList";
-import { useIndex } from "hooks/useReplicache";
+import { ref } from "data/Facts";
+import { useAuth } from "hooks/useAuth";
+import { useInActivity } from "hooks/useInActivity";
+import { ReplicacheContext, useIndex, useMutations } from "hooks/useReplicache";
 import { useRouter } from "next/router";
+import { useContext, useEffect } from "react";
 import { MessageInput, Messages } from "../chat";
 
 export default function ActivityPage() {
@@ -10,6 +14,20 @@ export default function ActivityPage() {
 
 export const Activity = (props: { entity: string }) => {
   let name = useIndex.eav(props.entity, "activity/name");
+  let { mutate, authorized, memberEntity } = useMutations();
+
+  let inActivity = useInActivity();
+  useEffect(() => {
+    if (!memberEntity) return;
+    if (authorized && inActivity?.value.value !== props.entity) {
+      mutate("assertFact", {
+        entity: memberEntity,
+        attribute: "member/in-activity",
+        value: ref(props.entity),
+        positions: {},
+      });
+    }
+  }, [props.entity, !!inActivity, authorized]);
   return (
     <div className="w-full flex flex-col relative items-stretch mx-auto max-w-3xl">
       <h1>{name?.value}</h1>

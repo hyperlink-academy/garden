@@ -3,13 +3,25 @@ import { AddActivityBlocks, Checkmark, RightArrow } from "components/Icons";
 import { Textarea } from "components/Textarea";
 import { flag } from "data/Facts";
 import { useAuth } from "hooks/useAuth";
+import { useInActivity } from "hooks/useInActivity";
 import { useIndex, useMutations } from "hooks/useReplicache";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useEffect } from "react";
 import { ulid } from "src/ulid";
 
 export default function ActivityIndex() {
   let activeActivities = useIndex.aev("activity/active");
+  let { mutate, authorized } = useMutations();
+  let inActivity = useInActivity();
+
+  useEffect(() => {
+    if (authorized && inActivity) {
+      console.log("why");
+      mutate("retractFact", { id: inActivity.id });
+    }
+  }, [authorized, inActivity]);
+
   let allActivities = useIndex
     .aev("activity/name")
     .filter((f) => !activeActivities.find((f2) => f2.entity === f.entity))

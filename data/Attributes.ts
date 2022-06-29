@@ -152,6 +152,11 @@ export const DefaultAttributes = {
     cardinality: "many",
     unique: false,
   },
+  "member/in-activity": {
+    type: "reference",
+    cardinality: "one",
+    unique: false,
+  },
 } as const;
 
 export const ShortCodes: { [k in keyof Attribute]?: string | undefined } = {
