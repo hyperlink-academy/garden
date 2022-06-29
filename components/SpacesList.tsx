@@ -1,20 +1,21 @@
 import { spaceAPI } from "backend/lib/api";
 import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
 import Link from "next/link";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import useSWR from "swr";
 import { ButtonLink, ButtonPrimary, ButtonTertiary } from "./Buttons";
 import { DoorSelector } from "components/DoorSelector";
 import { Door } from "./Doors";
 import { Settings, SettingsStudio } from "./Icons";
 import { Modal } from "./Layout";
+import { prefetchSpaceId } from "./ReplicacheProvider";
 
 export const SpaceList = () => {
   let spaces = useIndex.aev("space/name");
   return (
     <div className="grid grid-cols-[repeat(auto-fill,164px)] gap-2 justify-between">
       {spaces?.map((a) => {
-        return <Space entity={a.entity} name={a.value} />;
+        return <Space entity={a.entity} name={a.value} key={a.id} />;
       })}
     </div>
   );
@@ -26,6 +27,7 @@ const Space = (props: { entity: string; name: string }) => {
   let spaceID = useIndex.eav(props.entity, "space/id");
   let lastSeenMessage = useIndex.eav(props.entity, "space/lastSeenMessage");
   let { authorized } = useMutations();
+  let prefetched = useRef(false);
 
   let { data: latestMessage } = useSWR(
     `${studio?.value}/${props.name}/latestMessage`,
@@ -57,7 +59,21 @@ const Space = (props: { entity: string; name: string }) => {
 
   return (
     <div className="w-min flex flex-col gap-4">
-      <div className="grid grid-cols-[max-content,max-content] gap-1 items-end ">
+      <div
+        className="grid grid-cols-[max-content,max-content] gap-1 items-end "
+        onPointerDown={() => {
+          if (prefetched.current) return;
+          if (!studio?.value) return;
+          prefetchSpaceId(studio.value, props.name);
+          prefetched.current = true;
+        }}
+        onMouseOver={() => {
+          if (prefetched.current) return;
+          if (!studio?.value) return;
+          prefetchSpaceId(studio.value, props.name);
+          prefetched.current = true;
+        }}
+      >
         <Link href={`/s/${studio?.value}/s/${props.name}`}>
           <a>
             <Door entityID={props.entity} glow={showUnreads} />

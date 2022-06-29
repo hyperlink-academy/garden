@@ -12,36 +12,25 @@ import { SpaceProvider } from "components/ReplicacheProvider";
 import { SpaceList } from "components/SpacesList";
 import { useAuth } from "hooks/useAuth";
 import { ReplicacheContext, useIndex, useMutations } from "hooks/useReplicache";
+import { GetStaticPropsContext, InferGetStaticPropsType } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useContext, useState } from "react";
-import useSWR from "swr";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
-export default function StudioPage() {
-  let router = useRouter();
-  let { data: id } = useSWR(
-    "/space/" + router.query.studio,
-    () => {
-      let id = workerAPI(WORKER_URL, "get_studio", {
-        name: router.query.studio as string,
-      });
-      return id;
-    },
-    { revalidateOnFocus: false }
-  );
-
-  if (!id) return <div>loading…</div>;
-  if (!id.success) return <div>404 - studio not found!</div>;
+type Props = InferGetStaticPropsType<typeof getStaticProps>;
+export default function StudioPage(props: Props) {
+  if (props.notFound) return <div>404 - studio not found!</div>;
+  if (!props.id) return <div>loading </div>;
   return (
-    <SpaceProvider id={id.id}>
+    <SpaceProvider id={props.id}>
       <div className="grid grid-flow-row gap-8 my-6">
         <div className="flex justify-between">
           <StudioName />
           <Logout />
         </div>
         <SpaceList />
-        <CreateSpace studioSpaceID={id.id} />
+        <CreateSpace studioSpaceID={props.id} />
       </div>
     </SpaceProvider>
   );
@@ -49,6 +38,7 @@ export default function StudioPage() {
 
 const StudioName = () => {
   let name = useIndex.aev("this/name", "")[0];
+  if (!name) return null;
   return (
     <>
       <Head>
@@ -135,3 +125,18 @@ const CreateSpace = (props: { studioSpaceID: string }) => {
       </div>
     );
 };
+
+export async function getStaticPaths() {
+  return { paths: [], fallback: true };
+}
+
+export async function getStaticProps(ctx: GetStaticPropsContext) {
+  if (!ctx.params?.studio)
+    return { props: { notFound: true }, revalidate: 10 } as const;
+  let id = await workerAPI(WORKER_URL, "get_studio", {
+    name: ctx.params?.studio as string,
+  });
+  if (!id.success)
+    return { props: { notFound: true }, revalidate: 10 } as const;
+  return { props: { notFound: false, id: id.id } };
+}

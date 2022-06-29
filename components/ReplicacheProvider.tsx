@@ -11,7 +11,7 @@ import { useEffect, useRef, useState } from "react";
 import { PullRequest, PushRequest } from "replicache";
 import { useAuth } from "hooks/useAuth";
 import { useRouter } from "next/router";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL as string;
@@ -46,6 +46,14 @@ export const SpaceProvider: React.FC<{ id: string }> = (props) => {
       {props.children}
     </ReplicacheContext.Provider>
   );
+};
+
+export const prefetchSpaceId = (studio: string, space: string) => {
+  let id = workerAPI(WORKER_URL, "get_space", {
+    studio: studio,
+    space: space,
+  });
+  mutate("/studio/" + studio + "/space/" + space, id);
 };
 
 export const SpaceSpaceProvider: React.FC<{
