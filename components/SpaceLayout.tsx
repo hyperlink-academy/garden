@@ -163,12 +163,14 @@ const Activity = () => {
     >
       <a
         className={`px-1 grid grid-flow-col ${
-          !selected ? "" : "bg-grey-15 text-white rounded-md -mt-2 mb-2"
+          !selected
+            ? ""
+            : "bg-grey-15 text-white rounded-md relative -top-2 mb-1"
         }`}
       >
         {activityName ? (
           <small
-            className={`self-baseline mt-[5px] italic col-start-1 row-start-1 ml-3 pl-8 pr-4 whitespace-nowrap overflow-hidden mr-4 ${
+            className={`self-baseline mt-[5px] italic col-start-1 row-start-1 ml-4 pl-5 pr-4 whitespace-nowrap overflow-hidden mr-4 ${
               !selected ? "bg-grey-90 rounded-r-full " : ""
             }`}
           >
@@ -193,7 +195,9 @@ const FooterItem: React.FC<{
     <Link href={props.route}>
       <a
         className={`w-10 px-1 ${
-          !selected ? "" : "bg-grey-15 text-white rounded-md -mt-2 mb-2"
+          !selected
+            ? ""
+            : "bg-grey-15 text-white rounded-md relative -top-2 mb-1"
         }`}
       >
         {props.children}
