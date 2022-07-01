@@ -115,7 +115,6 @@ export const CardView = (props: {
       <div
         className={`
         card
-        z-20
         h-[calc(100%-16px)]
         absolute
         left-0
