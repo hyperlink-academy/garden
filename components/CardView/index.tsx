@@ -152,7 +152,7 @@ export const CardView = (props: {
           ref={ref}
           className={`
             cardContent
-        ${open === "card" ? " overflow-y-scroll" : "overflow-y-hidden"}
+        ${open === "card" ? "overflow-y-auto" : "overflow-y-hidden"}
             flex flex-col gap-6          
             no-scrollbar
             w-full

@@ -45,7 +45,7 @@ export const CardCarousel = (props: {
       <div
         style={{}}
         className={`
-        overflow-x-scroll snap-x snap-mandatory scroll-smooth
+        overflow-x-scroll snap-x snap-mandatory
         flex gap-2 -mx-4 
         no-scrollbar 
         h-full `}
@@ -161,19 +161,11 @@ const CardContainer: React.FC<{
     if (!ref.current) return;
     if (!props.selected) return;
     //@ts-ignore
-    if (ref.current.scrollIntoViewIfNeeded) {
-      //@ts-ignore
-      ref.current.scrollIntoViewIfNeeded({
-        behavior: smooth ? "smooth" : "auto",
-        inline: "center",
-      });
-    } else {
-      ref.current?.scrollIntoView({
-        behavior: smooth ? "smooth" : "auto",
-        inline: "center",
-      });
-    }
-    ref.current.focus();
+    ref.current?.scrollIntoView({
+      behavior: smooth ? "smooth" : "auto",
+      inline: "center",
+    });
+    ref.current.focus({ preventScroll: true });
     smooth = false;
   }, [props.selected, props.entity]);
   return (

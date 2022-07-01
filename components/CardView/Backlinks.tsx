@@ -76,10 +76,10 @@ const BacklinkSection = (props: {
     props.attribute === "deck/contains" ? (
       "Decks"
     ) : (
-      <p>
+      <>
         <span className="font-bold">{props.attribute.slice(8)}</span>
         <span className="font-normal"> section of</span>
-      </p>
+      </>
     );
   return (
     <div className="flex flex-col gap-2">
