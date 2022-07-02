@@ -13,7 +13,6 @@ export default function DeckPage() {
     (AttributeFromShortCode(attribute) as keyof ReferenceAttributes) ||
     multipleReferenceSection(attribute);
 
-  console.log(section);
   let cards = useIndex.eav(card, section)?.sort(sortByPosition("eav")) || [];
   return (
     <CardCarousel
