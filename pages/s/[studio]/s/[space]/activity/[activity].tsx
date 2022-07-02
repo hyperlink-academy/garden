@@ -1,10 +1,11 @@
+import { Divider } from "components/Layout";
 import { SmallCardList } from "components/SmallCardList";
 import { ref } from "data/Facts";
-import { useAuth } from "hooks/useAuth";
 import { useInActivity } from "hooks/useInActivity";
-import { ReplicacheContext, useIndex, useMutations } from "hooks/useReplicache";
-import { useRouter } from "next/router";
-import { useContext, useEffect } from "react";
+import { useIndex, useMutations } from "hooks/useReplicache";
+import Link from "next/link";
+import router, { useRouter } from "next/router";
+import { useEffect } from "react";
 import { MessageInput, Messages } from "../chat";
 
 export default function ActivityPage() {
@@ -15,6 +16,7 @@ export default function ActivityPage() {
 export const Activity = (props: { entity: string }) => {
   let name = useIndex.eav(props.entity, "activity/name");
   let { mutate, authorized, memberEntity } = useMutations();
+  let { query } = useRouter();
 
   let inActivity = useInActivity();
   useEffect(() => {
@@ -29,10 +31,18 @@ export const Activity = (props: { entity: string }) => {
     }
   }, [props.entity, !!inActivity, authorized]);
   return (
-    <div className="w-full flex flex-col relative items-stretch mx-auto max-w-3xl">
-      <h1>{name?.value}</h1>
-      <h2>In Hand</h2>
-      <Hand entity={props.entity} />
+    <div className="h-full flex flex-col gap-4 max-w-3xl mx-auto pb-6">
+      <div className="pt-4 grid grid-cols-[auto_max-content] gap-4">
+        <h2>{name?.value}</h2>
+        <Link href={`/s/${query.studio}/s/${query.space}/activity`}>
+          <a className="text-right text-accent-red pt-0.5">Exit</a>
+        </Link>
+      </div>
+      <div>
+        <h4>Cards In Hand</h4>
+        <Hand entity={props.entity} />
+        <Divider />
+      </div>
       <Messages topic={props.entity} />
       <MessageInput id={props.entity} topic={props.entity} />
     </div>
@@ -42,7 +52,7 @@ export const Activity = (props: { entity: string }) => {
 const Hand = (props: { entity: string }) => {
   let cards = useIndex.eav(props.entity, "activity/hand-contains");
   return (
-    <div className="overflow-x-auto p-4" style={{ width: "100%" }}>
+    <div className="overflow-x-auto p-4 w-full">
       <SmallCardList
         horizontal
         cards={cards || []}
