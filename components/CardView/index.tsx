@@ -16,6 +16,7 @@ import Link from "next/link";
 import { useAuth } from "hooks/useAuth";
 import { ImageSection } from "./ImageSection";
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/router";
 
 const borderStyles = (args: { deck: boolean; member: boolean }) => {
   switch (true) {
@@ -233,6 +234,7 @@ const CardMoreOptionsMenu = (props: {
   let memberName = useIndex.eav(props.entityID, "member/name");
 
   let deleteDisabled = true;
+  let { query: q } = useRouter();
 
   return !authorized || !!memberName ? null : (
     <Menu as="div" className="relative">
@@ -256,6 +258,12 @@ const CardMoreOptionsMenu = (props: {
             <DeckSmall />
           </MenuItem>
         )}
+
+        <MenuItem>
+          <Link href={`/s/${q.studio}/s/${q.space}/c/${props.entityID}/print`}>
+            <a>Print</a>
+          </Link>
+        </MenuItem>
         {/* <Divider /> */}
 
         {/* TODO: wire up delete card (and add confirmation?) */}
