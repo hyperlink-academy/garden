@@ -31,20 +31,33 @@ export const Activity = (props: { entity: string }) => {
     }
   }, [props.entity, !!inActivity, authorized]);
   return (
-    <div className="h-full flex flex-col gap-4 max-w-3xl mx-auto pb-6">
-      <div className="pt-4 grid grid-cols-[auto_max-content] gap-4">
+    <div className="h-full max-w-3xl mx-auto pb-6 flex flex-col gap-4">
+      <div className="pt-4  grid grid-cols-[auto_max-content] gap-4 grow-0">
         <h2>{name?.value}</h2>
         <Link href={`/s/${query.studio}/s/${query.space}/activity`}>
           <a className="text-right text-accent-red pt-0.5">Exit</a>
         </Link>
       </div>
-      <div>
+      <div className="grow-0">
         <h4>Cards In Hand</h4>
         <Hand entity={props.entity} />
         <Divider />
       </div>
-      <Messages topic={props.entity} />
-      <MessageInput id={props.entity} topic={props.entity} />
+      <div
+        className={`
+        grow 
+        lightBorder
+        bg-white
+        rounded-lg
+        relative
+
+        `}
+      >
+        <div className="absolute top-0 bottom-0 left-0 right-0 flex flex-col gap-4 h-full p-4">
+          <Messages topic={props.entity} />
+          <MessageInput id={props.entity} topic={props.entity} />
+        </div>
+      </div>
     </div>
   );
 };

@@ -91,10 +91,10 @@ const ActivityItem = (props: { entity: string }) => {
   let { mutate, authorized } = useMutations();
   let { query: q } = useRouter();
   return (
-    <div className="flex flex-row gap-4 items-center bg-white">
+    <div className="flex flex-row gap-4 items-center ">
       {!authorized ? null : (
         <button
-          className={`rounded-md w-4 h-4 content-center pl-0.5 ${
+          className={`rounded-md w-4 h-4 content-center pl-0.5 bg-white ${
             !isActive ? "text-grey-55 border-2" : "border"
           }`}
           onClick={async () => {

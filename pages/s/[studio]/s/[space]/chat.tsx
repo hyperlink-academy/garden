@@ -32,7 +32,9 @@ export default function ChatPage() {
         <title key="title">{spaceName?.value}</title>
       </Head>
       <Messages topic="general" />
-      <MessageInput id={id || ""} topic={"general"} />
+      <div className="pb-6">
+        <MessageInput id={id || ""} topic={"general"} />
+      </div>
     </div>
   );
 }
@@ -213,8 +215,10 @@ export const MessageInput = (props: { id: string; topic: string }) => {
 
   if (!authorized) {
     return (
-      <div className="bg-grey-90 text-grey-55 italic border-t border-grey-80 -mx-4 md:mx-0 px-4 pt-3 pb-4">
-        Log in to send a message!
+      <div className=" text-grey-55 italic border-t border-grey-80 -mx-4 md:mx-0 px-4 pt-2 pb-2">
+        <div className="bg-grey-90 p-2 rounded-md">
+          Log in to send a message!
+        </div>
       </div>
     );
   }
@@ -255,7 +259,7 @@ export const MessageInput = (props: { id: string; topic: string }) => {
     setAttachedCards([]);
   };
   return (
-    <div className="-mx-4 md:mx-0 px-4 md:px-0 py-4 border-t border-grey-80 gap-2">
+    <div className="-mx-4 md:mx-0 px-4 md:px-0 pt-4 border-t border-grey-80 gap-2">
       <div
         className={`${
           attachedCards.length > 0
@@ -303,7 +307,7 @@ export const MessageInput = (props: { id: string; topic: string }) => {
         <Textarea
           onFocus={() => setInputFocused(true)}
           onBlur={() => setInputFocused(false)}
-          className="bg-background w-full"
+          className="bg-inherit w-full"
           placeholder="write a message"
           value={message}
           onKeyDown={(e) => {
