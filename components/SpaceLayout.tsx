@@ -55,7 +55,7 @@ export function Footer() {
   return (
     <>
       <style jsx>{`
-        @media (max-height: 500px), @media print {
+        @media print (max-height: 500px) {
           .menu {
             display: none;
           }
