@@ -2,6 +2,7 @@ import { Attribute } from "data/Attributes";
 import { Fact, Schema } from "data/Facts";
 import { CardinalityResult, MutationContext } from "data/mutations";
 import { ulid } from "src/ulid";
+import { Lock } from "src/lock";
 
 export const indexes = {
   ea: (entity: string, attribute: string, factID: string) =>
@@ -11,6 +12,7 @@ export const indexes = {
   ti: (time: string, factID: string) => `ti-${time}-${factID}`,
 };
 
+let lock = new Lock();
 export const store = (storage: DurableObjectStorage) => {
   async function getSchema(attribute: string): Promise<Schema | undefined> {
     let defaultAttribute = Attribute[attribute as keyof Attribute];
@@ -103,7 +105,7 @@ export const store = (storage: DurableObjectStorage) => {
           success: false,
         };
 
-      writeFactToStore(
+      await writeFactToStore(
         {
           ...existingFact,
           ...data,
@@ -115,28 +117,35 @@ export const store = (storage: DurableObjectStorage) => {
       return { success: true };
     },
     retractFact: async (id) => {
-      let fact = await storage.get<Fact<keyof Attribute>>(indexes.factID(id));
-      if (!fact) return;
-      await writeFactToStore(
-        { ...fact, retracted: true, lastUpdated: Date.now().toString() },
-        fact.schema
-      );
+      lock.withLock(async () => {
+        let fact = await storage.get<Fact<keyof Attribute>>(indexes.factID(id));
+        if (!fact) return;
+        await writeFactToStore(
+          { ...fact, retracted: true, lastUpdated: Date.now().toString() },
+          fact.schema
+        );
+      });
     },
     assertFact: async (f) => {
-      let schema = await getSchema(f.attribute);
-      if (!schema)
-        return { success: false, error: "Invalid attribute" } as const;
-      let factID = ulid();
-      let lastUpdated = Date.now().toString();
-      if (schema.cardinality === "one") {
-        let existingFact = (await scanIndex.eav(f.entity, f.attribute)) as
-          | Fact<keyof Attribute>
-          | undefined;
-        // We might want to preserve positions of the existing fact as well
-        if (existingFact) factID = existingFact.id;
-      }
-      writeFactToStore({ ...f, id: factID, lastUpdated, schema }, schema);
-      return { success: true };
+      return lock.withLock(async () => {
+        let schema = await getSchema(f.attribute);
+        if (!schema)
+          return { success: false, error: "Invalid attribute" } as const;
+        let factID = ulid();
+        let lastUpdated = Date.now().toString();
+        if (schema.cardinality === "one") {
+          let existingFact = (await scanIndex.eav(f.entity, f.attribute)) as
+            | Fact<keyof Attribute>
+            | undefined;
+          // We might want to preserve positions of the existing fact as well
+          if (existingFact) factID = existingFact.id;
+        }
+        await writeFactToStore(
+          { ...f, id: factID, lastUpdated, schema },
+          schema
+        );
+        return { success: true };
+      });
     },
   };
   return { ...context, writeFactToStore, getSchema };
