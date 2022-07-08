@@ -7,7 +7,6 @@ import { useIndex } from "hooks/useReplicache";
 import Link from "next/link";
 import { useState } from "react";
 import { isUrl } from "src/isUrl";
-import { parentPort } from "worker_threads";
 import { Gripper } from "./Gripper";
 import { Close, Member } from "./Icons";
 
@@ -215,7 +214,6 @@ export const CardBody = (props: {
   content?: string;
   title?: string;
   href: string;
-  entity?: string;
   image?: string;
 }) => {
   if (props.member)
