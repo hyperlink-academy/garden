@@ -34,8 +34,16 @@ export const SmallCardList = (props: {
 
   return (
     <SortableContext items={items}>
+      <style jsx>{`
+        @media (max-width: 360px) {
+          .smallCardList {
+            place-content: space-between;
+            gap: 1rem 0rem;
+          }
+        }
+      `}</style>
       <div
-        className={`flex w-full gap-4 ${
+        className={`smallCardList flex w-full ${
           props.horizontal ? "py-2" : "flex-wrap"
         }`}
       >

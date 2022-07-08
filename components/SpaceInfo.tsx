@@ -47,6 +47,15 @@ const Members = () => {
 
   return (
     <div>
+      <style jsx>{`
+        @media (max-width: 360px) {
+          .membersCardList {
+            place-content: space-between;
+            gap: 1rem 0rem;
+          }
+        }
+      `}</style>
+
       <Disclosure>
         <button
           className="membersList grid grid-cols-[max-content_max-content] gap-2 items-center font-bold"
@@ -58,7 +67,7 @@ const Members = () => {
 
         <Drawer open={!!toggle}>
           <div className="flex flex-col gap-4">
-            <div className="flex flex-wrap gap-4">
+            <div className="membersCardList flex flex-wrap gap-4">
               {members.map((m) => (
                 <SmallCard
                   key={m.entity}
@@ -107,15 +116,15 @@ const Join = () => {
 
   if (isMember && inviteLink) {
     return (
-      <div className="self-start flex flex-col gap-2 lightBorder p-4 w-full place-items-center">
+      <div className="self-start flex flex-col gap-2 lightBorder w-full p-4 place-items-center">
         <p className="font-bold">
           Copy and share this invite link to add new members!
         </p>
-        <div className="flex flex-row gap-2">
+        <div className="flex flex-row gap-2 w-full">
           <input
             readOnly
             value={inviteLink}
-            className="bg-grey-90 text-grey-55"
+            className="bg-grey-90 text-grey-55 w-full"
           />
           <ButtonPrimary onClick={getShareLink} content="Copy!" />
         </div>
