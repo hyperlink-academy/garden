@@ -102,6 +102,7 @@ export const SmallCard = (
 
   return (
     <BaseSmallCard
+      entityID={props.entityID}
       title={title?.value || ""}
       content={content?.value || ""}
       isDeck={!!isDeck}
@@ -117,6 +118,7 @@ export const SmallCard = (
 };
 
 export const BaseSmallCard = (props: {
+  entityID: string;
   title: string;
   content: string;
   isDeck?: boolean;
@@ -167,6 +169,7 @@ export const BaseSmallCard = (props: {
             <Gripper
               {...props.attributes}
               {...props.listeners}
+              {...props}
               className={`touch-manipulation pl-1 pr-2 ${
                 !!props.isMember ? "text-white" : "text-grey-55"
               }`}

@@ -10,7 +10,7 @@ export const Gripper = (props: DivProps) => {
       >
         <defs>
           <pattern
-            id="Pattern"
+            id={"pattern_" + props.entityID}
             x="0"
             y="0"
             width="6"
@@ -23,7 +23,7 @@ export const Gripper = (props: DivProps) => {
             <rect x="4" y="4" width="2" height="2" rx="1" fill="currentColor" />
           </pattern>
         </defs>
-        <rect fill="url(#Pattern)" width="6" height="100%" />
+        <rect fill={"url(#pattern_" + props.entityID} width="6" height="100%" />
       </svg>
     </div>
   );
