@@ -13,7 +13,7 @@ kv_namespaces = [
 main = "out/index.mjs"
 
 [triggers]
-crons = ["* */1 * * *"]
+crons = ["0 */1 * * *"]
 
 [[r2_buckets]]
 binding = 'USER_UPLOADS' # <~ valid JavaScript variable name
