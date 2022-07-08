@@ -8,7 +8,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { isUrl } from "src/isUrl";
 import { Gripper } from "./Gripper";
-import { Close, Member } from "./Icons";
+import { Close, ExternalLink, Member } from "./Icons";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 
@@ -189,8 +189,13 @@ export const BaseSmallCard = (props: {
                   href={props.content}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
                 >
-                  <small className="text-accent-blue">ext</small>
+                  <div className="text-accent-blue float-right -mr-1">
+                    <ExternalLink />
+                  </div>
                 </a>
               ) : null}
             </a>
