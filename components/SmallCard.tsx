@@ -186,6 +186,7 @@ export const BaseSmallCard = (props: {
                 title={props.title}
                 href={props.href}
                 entity={props.entity}
+                image={props.image}
               />
               {url ? (
                 <a
@@ -214,10 +215,9 @@ export const CardBody = (props: {
   content?: string;
   title?: string;
   href: string;
-  entity: string;
+  entity?: string;
+  image?: string;
 }) => {
-  let image = useIndex.eav(props.entity, "card/image");
-
   if (props.member)
     return (
       <span className="w-full h-full">
@@ -239,7 +239,7 @@ export const CardBody = (props: {
         <small>
           <pre
             className={`whitespace-pre-wrap truncate leading-tight ${
-              !image ? "" : "rounded-[3px] px-1 bg-white/75"
+              !props.image ? "" : "rounded-[3px] px-1 bg-white/75"
             } `}
           >
             {props.content}
@@ -248,7 +248,7 @@ export const CardBody = (props: {
       ) : (
         <h4
           className={`normal-case leading-tight  text-ellipsis  ${
-            !image ? "" : "rounded-[3px] px-1 bg-white/75"
+            !props.image ? "" : "rounded-[3px] px-1 bg-white/75"
           }`}
         >
           {props.title}
