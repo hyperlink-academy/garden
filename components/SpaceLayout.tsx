@@ -119,7 +119,7 @@ export function Footer() {
                 </svg>
               </div>
 
-              <div className="justify-self-center items-center flex flex-row gap-2 mr-2">
+              <div className="justify-self-center items-center flex flex-row gap-1 md:gap-2 mr-2">
                 {/* DECKS */}
                 <FooterItem
                   active={(r) =>
@@ -165,7 +165,7 @@ const Activity = () => {
       }`}
     >
       <a
-        className={`px-1 grid grid-flow-col ${
+        className={`px-0.5 md:px-1 grid grid-flow-col ${
           !selected
             ? ""
             : "bg-grey-15 text-white rounded-md relative -top-2 mb-1"
@@ -173,7 +173,7 @@ const Activity = () => {
       >
         {activityName ? (
           <small
-            className={`self-baseline mt-[5px] italic col-start-1 row-start-1 ml-4 mr-2 pl-5 pr-4 whitespace-nowrap overflow-hidden ${
+            className={`self-baseline mt-[5px] italic col-start-1 row-start-1 ml-4 mr-0 pl-5 pr-4 whitespace-nowrap overflow-hidden ${
               !selected ? "bg-grey-90 rounded-r-full " : ""
             }`}
           >
@@ -197,7 +197,7 @@ const FooterItem: React.FC<{
   return (
     <Link href={props.route}>
       <a
-        className={`w-10 px-1 ${
+        className={`px-0.5 md:px-1 ${
           !selected
             ? ""
             : "bg-grey-15 text-white rounded-md relative -top-2 mb-1"
