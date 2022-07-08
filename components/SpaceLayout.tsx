@@ -173,7 +173,7 @@ const Activity = () => {
       >
         {activityName ? (
           <small
-            className={`self-baseline mt-[5px] italic col-start-1 row-start-1 ml-4 mr-0 pl-5 pr-4 whitespace-nowrap overflow-hidden ${
+            className={`self-baseline mt-[5px] italic col-start-1 row-start-1 ml-4 mr-1 md:mr-0 pl-5 pr-2 whitespace-nowrap overflow-hidden ${
               !selected ? "bg-grey-90 rounded-r-full " : ""
             }`}
           >
