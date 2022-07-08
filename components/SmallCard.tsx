@@ -112,13 +112,13 @@ export const SmallCard = (
       listeners={props.listeners}
       draggable={props.draggable}
       onDelete={props.onDelete}
-      image={`${WORKER_URL}/static/${image?.value.id}`}
+      image={image?.value.id}
     />
   );
 };
 
 export const BaseSmallCard = (props: {
-  entityID: string;
+  entityID?: string;
   title: string;
   content: string;
   isDeck?: boolean;
@@ -157,7 +157,9 @@ export const BaseSmallCard = (props: {
         })}
         `}
         style={{
-          background: `url(${props.image})`,
+          background: `${
+            props.image ? `url(${WORKER_URL}/static/${props.image})` : "white"
+          }`,
         }}
       >
         <div
