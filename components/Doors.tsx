@@ -96,7 +96,7 @@ export const Door = (props: {
           {/* <!-- Use a gaussian blur to create the soft blurriness of the glow --> */}
           <feGaussianBlur in="thicken" stdDeviation="16" result="blurred" />
           {/* <!-- Change the colour --> */}
-          <feFlood flood-color="#ffd700" result="glowColor" />
+          <feFlood floodColor="#ffd700" result="glowColor" />
           {/* <!-- Color in the glows --> */}
           <feComposite
             in="glowColor"
