@@ -13,10 +13,20 @@ import { prefetchSpaceId } from "./ReplicacheProvider";
 export const SpaceList = () => {
   let spaces = useIndex.aev("space/name");
   return (
-    <div className="grid grid-cols-[repeat(auto-fill,164px)] gap-2 justify-between">
-      {spaces?.map((a) => {
-        return <Space entity={a.entity} name={a.value} key={a.id} />;
-      })}
+    <div>
+      <style jsx>{`
+        @media (max-width: 360px) {
+          .smallCardList {
+            place-content: space-between;
+            gap: 0;
+          }
+        }
+      `}</style>
+      <div className="smallCardList grid grid-cols-[repeat(auto-fill,148px)] justify-between gap-4">
+        {spaces?.map((a) => {
+          return <Space entity={a.entity} name={a.value} key={a.id} />;
+        })}
+      </div>
     </div>
   );
 };
@@ -60,7 +70,7 @@ const Space = (props: { entity: string; name: string }) => {
   return (
     <div className="w-min flex flex-col gap-4">
       <div
-        className="grid grid-cols-[max-content,max-content] gap-1 items-end "
+        className="grid grid-cols-[max-content,max-content] -ml-2 gap-1 items-end "
         onPointerDown={() => {
           if (prefetched.current) return;
           if (!studio?.value) return;
@@ -79,7 +89,7 @@ const Space = (props: { entity: string; name: string }) => {
             <Door entityID={props.entity} glow={showUnreads} />
           </a>
         </Link>
-        <div className="flex flex-col gap-4 w-max pb-[92px]">
+        <div className="flex flex-col gap-4 w-[20px] pb-[92px]">
           {showUnreads ? (
             <div className="flex flex-col ml-1.5 origin-top skew-y-[-30deg] scale-x-90 scale-y-110">
               <span className="text-sm text-grey-35">{unreadCount}</span>
@@ -91,7 +101,7 @@ const Space = (props: { entity: string; name: string }) => {
       </div>
 
       <div className="">
-        <div className="origin-top-left skew-y-[-30deg] scale-x-90 scale-y-110 ml-4 w-full">
+        <div className="origin-top-left skew-y-[-30deg] scale-x-90 scale-y-110 ml-2 w-full">
           <h3 className="text-xl">{props.name}</h3>
         </div>
         {/* extra shadow - turned off b/c it's a bit much LOL */}
