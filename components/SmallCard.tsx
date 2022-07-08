@@ -184,7 +184,6 @@ export const BaseSmallCard = (props: {
                 content={props.content}
                 title={props.title}
                 href={props.href}
-                entity={props.entity}
                 image={props.image}
               />
               {url ? (
