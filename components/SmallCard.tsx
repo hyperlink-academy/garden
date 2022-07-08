@@ -111,7 +111,6 @@ export const SmallCard = (
       listeners={props.listeners}
       draggable={props.draggable}
       onDelete={props.onDelete}
-      entity={props.entityID}
       image={`${WORKER_URL}/static/${image?.value.id}`}
     />
   );
@@ -127,7 +126,6 @@ export const BaseSmallCard = (props: {
   onDelete?: () => void;
   attributes?: DraggableAttributes;
   listeners?: SyntheticListenerMap;
-  entity: string;
   image?: string;
 }) => {
   let url = props.content ? isUrl(props.content) : false;
