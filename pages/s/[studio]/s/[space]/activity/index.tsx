@@ -5,6 +5,7 @@ import { flag } from "data/Facts";
 import { useAuth } from "hooks/useAuth";
 import { useInActivity } from "hooks/useInActivity";
 import { useIndex, useMutations } from "hooks/useReplicache";
+import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
@@ -26,8 +27,15 @@ export default function ActivityIndex() {
     .aev("activity/name")
     .filter((f) => !activeActivities.find((f2) => f2.entity === f.entity))
     .sort((a, b) => (a.id > b.id ? -1 : 1));
+
+  let spaceName = useIndex.aev("this/name")[0];
+
   return (
     <div className="flex flex-col gap-4 max-w-3xl mx-auto w-full">
+      <Head>
+        <title key="title">{spaceName?.value}</title>
+      </Head>
+
       <h1>Activities</h1>
       <div className="flex flex-col gap-16">
         <div className="flex flex-col gap-4">

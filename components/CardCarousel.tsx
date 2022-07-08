@@ -190,10 +190,13 @@ const CardContainer: React.FC<{
 const CardCarouselTitle = (props: { parent: string; child: string }) => {
   let parentTitle = useIndex.eav(props.parent, "card/title");
   let childTitle = useIndex.eav(props.child, "card/title");
+  let memberName = useIndex.eav(props.child, "member/name");
 
   return (
     <Head>
-      <title key="title">{childTitle?.value || "Untitled"}</title>
+      <title key="title">
+        {childTitle?.value || memberName?.value || "Untitled"}
+      </title>
     </Head>
   );
 };

@@ -17,9 +17,12 @@ export default () => {
 
 const CardTitle = (props: { card: string }) => {
   let cardTitle = useIndex.eav(props.card, "card/title");
+  let memberName = useIndex.eav(props.card, "member/name");
   return (
     <Head>
-      <title key="title">{cardTitle?.value || "Untitled"}</title>
+      <title key="title">
+        {cardTitle?.value || memberName?.value || "Untitled"}
+      </title>
     </Head>
   );
 };

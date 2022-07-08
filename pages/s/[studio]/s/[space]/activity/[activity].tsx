@@ -3,6 +3,7 @@ import { SmallCardList } from "components/SmallCardList";
 import { ref } from "data/Facts";
 import { useInActivity } from "hooks/useInActivity";
 import { useIndex, useMutations } from "hooks/useReplicache";
+import Head from "next/head";
 import Link from "next/link";
 import router, { useRouter } from "next/router";
 import { useEffect } from "react";
@@ -10,7 +11,12 @@ import { MessageInput, Messages } from "../chat";
 
 export default function ActivityPage() {
   let { query } = useRouter();
-  return <Activity entity={query.activity as string} />;
+  return (
+    <>
+      <ActivityTitle entity={query.activity as string} />
+      <Activity entity={query.activity as string} />
+    </>
+  );
 }
 
 export const Activity = (props: { entity: string }) => {
@@ -74,5 +80,14 @@ const Hand = (props: { entity: string }) => {
         positionKey="eav"
       />
     </div>
+  );
+};
+
+const ActivityTitle = (props: { entity: string }) => {
+  let name = useIndex.eav(props.entity, "activity/name");
+  return (
+    <Head>
+      <title key="title">{name?.value || "Untitled Activity"}</title>
+    </Head>
   );
 };
