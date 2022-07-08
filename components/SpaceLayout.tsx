@@ -73,11 +73,11 @@ export function Footer() {
         <div className="grid max-w-3xl mx-auto">
           <div
             style={{ gridArea: "1 / 1 / 2 / 2" }}
-            className="flex flex-row rounded-md bg-grey-15 px-4 -mb-0.5 mt-0.5 -ml-0.5 mr-0.5"
+            className="flex flex-row rounded-md bg-grey-15 -mb-0.5 mt-0.5 -ml-0.5 mr-0.5"
           />
           <div
             style={{ gridArea: "1 / 1 / 2 / 2" }}
-            className="flex flex-row rounded-md bg-white border-2 border-grey-15 px-4 justify-between w-full"
+            className="flex flex-row rounded-md bg-white border-2 border-grey-15 px-2 md:px-4 justify-between w-full"
           >
             <div className="flex flex-row">
               {!session?.loggedIn ? (
@@ -100,26 +100,26 @@ export function Footer() {
                 </Link>
               )}
 
-              <div className="h-full py-1 px-2">
+              <div className="h-full py-1 pl-2 md:pl-4 pr-2 md:pr-3">
                 <svg
                   width="1"
-                  height="30"
-                  viewBox="0 0 1 30"
+                  height="32"
+                  viewBox="0 0 1 32"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
                 >
                   <line
-                    x1="0.5"
-                    y1="1.01709"
-                    x2="0.499999"
-                    y2="29.0171"
+                    x1="0"
+                    y1="4"
+                    x2="0"
+                    y2="28"
                     stroke="#E6E6E6"
                     stroke-linecap="round"
                   />
                 </svg>
               </div>
 
-              <div className="justify-self-center flex flex-row gap-2">
+              <div className="justify-self-center items-center flex flex-row gap-2 mr-2">
                 {/* DECKS */}
                 <FooterItem
                   active={(r) =>
@@ -173,7 +173,7 @@ const Activity = () => {
       >
         {activityName ? (
           <small
-            className={`self-baseline mt-[5px] italic col-start-1 row-start-1 ml-4 pl-5 pr-4 whitespace-nowrap overflow-hidden mr-4 ${
+            className={`self-baseline mt-[5px] italic col-start-1 row-start-1 ml-4 mr-2 pl-5 pr-4 whitespace-nowrap overflow-hidden ${
               !selected ? "bg-grey-90 rounded-r-full " : ""
             }`}
           >
