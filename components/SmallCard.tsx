@@ -7,8 +7,11 @@ import { useIndex } from "hooks/useReplicache";
 import Link from "next/link";
 import { useState } from "react";
 import { isUrl } from "src/isUrl";
+import { parentPort } from "worker_threads";
 import { Gripper } from "./Gripper";
 import { Close, Member } from "./Icons";
+
+const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 
 type Props = {
   href: string;
@@ -94,6 +97,7 @@ export const SmallCard = (
   let content = useIndex.eav(props.entityID, "card/content");
   let isDeck = useIndex.eav(props.entityID, "deck");
   let memberName = useIndex.eav(props.entityID, "member/name");
+  let image = useIndex.eav(props.entityID, "card/image");
 
   let title = !!memberName ? memberName : cardTitle;
 
@@ -108,6 +112,8 @@ export const SmallCard = (
       listeners={props.listeners}
       draggable={props.draggable}
       onDelete={props.onDelete}
+      entity={props.entityID}
+      image={`${WORKER_URL}/static/${image?.value.id}`}
     />
   );
 };
@@ -122,9 +128,12 @@ export const BaseSmallCard = (props: {
   onDelete?: () => void;
   attributes?: DraggableAttributes;
   listeners?: SyntheticListenerMap;
+  entity: string;
+  image?: string;
 }) => {
   let url = props.content ? isUrl(props.content) : false;
   let [focused, setFocused] = useState(false);
+
   return (
     <div
       className={`w-[151px] h-24 touch-manipulation relative origin-center`}
@@ -140,11 +149,20 @@ export const BaseSmallCard = (props: {
         w-full h-24 
         overflow-hidden 
         relative
-        ${borderStyles({ deck: !!props.isDeck, member: !!props.isMember })}
+        !bg-cover
+        !bg-center
+        !bg-no-repeat
+        ${borderStyles({
+          deck: !!props.isDeck,
+          member: !!props.isMember,
+        })}
         `}
+        style={{
+          background: `url(${props.image})`,
+        }}
       >
         <div
-          className={`flex flex-row gap-0 h-full
+          className={`flex flex-row gap-0 h-full 
           ${contentStyles({ deck: !!props.isDeck, member: !!props.isMember })}
           `}
         >
@@ -159,19 +177,27 @@ export const BaseSmallCard = (props: {
           ) : (
             <div className="pr-[inherit]" />
           )}
-          <div className="flex flex-col w-full">
-            <CardBody
-              member={!!props.isMember}
-              content={props.content}
-              title={props.title}
-              href={props.href}
-            />
-            {url ? (
-              <a href={props.content} target="_blank" rel="noopener noreferrer">
-                <small className="text-accent-blue">ext</small>
-              </a>
-            ) : null}
-          </div>
+
+          <Link href={props.href}>
+            <a className="flex flex-col w-full">
+              <CardBody
+                member={!!props.isMember}
+                content={props.content}
+                title={props.title}
+                href={props.href}
+                entity={props.entity}
+              />
+              {url ? (
+                <a
+                  href={props.content}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <small className="text-accent-blue">ext</small>
+                </a>
+              ) : null}
+            </a>
+          </Link>
         </div>
       </div>
       {!!props.onDelete && focused ? (
@@ -188,37 +214,46 @@ export const CardBody = (props: {
   content?: string;
   title?: string;
   href: string;
+  entity: string;
 }) => {
+  let image = useIndex.eav(props.entity, "card/image");
+
   if (props.member)
     return (
-      <Link href={props.href}>
-        <a className="w-full h-full">
-          <div className="h-full grid gap-1 grid-rows-[min-content,auto]">
-            <div className="grid grid-cols-[auto_max-content] items-end text-white">
-              <Member />
-              <small>member</small>
-            </div>
-
-            <div className="w-full bg-white rounded-md text-accent-red font-bold grid py-1 px-2 leading-tight text-ellipsis overflow-hidden">
-              <span className="self-end">{props.title}</span>
-            </div>
+      <span className="w-full h-full">
+        <div className="h-full grid gap-1 grid-rows-[min-content,auto]">
+          <div className="grid grid-cols-[auto_max-content] items-end text-white">
+            <Member />
+            <small>member</small>
           </div>
-        </a>
-      </Link>
+
+          <div className="w-full bg-white rounded-md text-accent-red font-bold grid py-1 px-2 leading-tight text-ellipsis overflow-hidden">
+            <span className="self-end">{props.title}</span>
+          </div>
+        </div>
+      </span>
     );
   return (
-    <Link href={props.href}>
-      <a className={`w-full overflow-hidden h-full`}>
-        {!props.title ? (
-          <small>
-            <pre className="whitespace-pre-wrap truncate">{props.content}</pre>
-          </small>
-        ) : (
-          <h4 className="normal-case leading-tight h-full text-ellipsis">
-            {props.title}
-          </h4>
-        )}
-      </a>
-    </Link>
+    <span className="w-full overflow-hidden h-full">
+      {!props.title ? (
+        <small>
+          <pre
+            className={`whitespace-pre-wrap truncate leading-tight ${
+              !image ? "" : "rounded-[3px] px-1 bg-white/75"
+            } `}
+          >
+            {props.content}
+          </pre>
+        </small>
+      ) : (
+        <h4
+          className={`normal-case leading-tight  text-ellipsis  ${
+            !image ? "" : "rounded-[3px] px-1 bg-white/75"
+          }`}
+        >
+          {props.title}
+        </h4>
+      )}
+    </span>
   );
 };

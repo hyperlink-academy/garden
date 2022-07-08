@@ -91,9 +91,8 @@ a {
   text-decoration: none;
 }
 
-pre-wrap {
-  font-family: "Quattro";
-  color: aqua;
+pre {
+  font-family: "Quattro" !important;
 }
 
 /* END FONT STYLING */
@@ -131,6 +130,7 @@ input {
   @apply border-grey-80;
   @apply rounded-lg;
   @apply bg-white;
+  @apply bg-cover;
 }
 
 .deckCardBorder {
