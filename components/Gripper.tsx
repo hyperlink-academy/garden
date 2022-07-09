@@ -1,7 +1,7 @@
 type DivProps = JSX.IntrinsicElements["div"];
 export const Gripper = (props: DivProps) => {
   return (
-    <div {...props}>
+    <div {...props} id={`drag-gripper-${props.id}`}>
       <svg
         width="6"
         height="100%"
