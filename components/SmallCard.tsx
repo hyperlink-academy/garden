@@ -171,7 +171,7 @@ export const BaseSmallCard = (props: {
             <Gripper
               {...props.attributes}
               {...props.listeners}
-              {...props}
+              id={props.entityID}
               className={`touch-manipulation pl-1 pr-2 ${
                 !!props.isMember ? "text-white" : "text-grey-55"
               }`}
