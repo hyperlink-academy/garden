@@ -6,15 +6,25 @@ on:
       - main
 
 jobs:
-  deploy:
+  test:
     runs-on: ubuntu-latest
-    name: Deploy
+    name: test
     steps:
       - uses: actions/checkout@v2
       - name: Install
         run: "npm i"
       - name: Typecheck
         run: "npx tsc"
+      - name: Test
+        run: "npm run test"
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy
+    needs: [test]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install
+        run: "npm i"
       - name: Publish Worker
         uses: cloudflare/wrangler-action@2.0.0
         with:
