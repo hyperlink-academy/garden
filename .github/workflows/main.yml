@@ -10,22 +10,25 @@ jobs:
     runs-on: ubuntu-latest
     name: test
     steps:
-      - uses: actions/checkout@v2
-      - name: Install
-        run: "npm i"
-      - name: Typecheck
-        run: "npx tsc"
-      - name: Test
-        run: "npm run test"
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 17
+          cache: "npm"
+      - run: "npm i"
+      - run: "npx tsc"
+      - run: "npm run test"
   deploy:
     runs-on: ubuntu-latest
     name: Deploy
     needs: [test]
     steps:
-      - uses: actions/checkout@v2
-      - name: Install
-        run: "npm i"
-      - name: Publish Worker
-        uses: cloudflare/wrangler-action@2.0.0
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 17
+          cache: "npm"
+      - run: "npm i"
+      - uses: cloudflare/wrangler-action@2.0.0
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
