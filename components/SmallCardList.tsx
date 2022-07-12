@@ -43,7 +43,7 @@ export const SmallCardList = (props: {
         }
       `}</style>
       <div
-        className={`smallCardList flex w-full ${
+        className={`smallCardList flex w-full gap-4 ${
           props.horizontal ? "py-2" : "flex-wrap"
         }`}
       >

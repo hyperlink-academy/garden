@@ -16,13 +16,13 @@ export const SpaceList = () => {
     <div>
       <style jsx>{`
         @media (max-width: 360px) {
-          .smallCardList {
+          .spacesList {
             place-content: space-between;
             gap: 0;
           }
         }
       `}</style>
-      <div className="smallCardList grid grid-cols-[repeat(auto-fill,148px)] justify-between gap-4">
+      <div className="spacesList grid grid-cols-[repeat(auto-fill,148px)] justify-between gap-4">
         {spaces?.map((a) => {
           return <Space entity={a.entity} name={a.value} key={a.id} />;
         })}
