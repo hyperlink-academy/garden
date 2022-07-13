@@ -2,7 +2,6 @@ import { Bindings } from "backend";
 import { makeRouter } from "backend/lib/api";
 import { store } from "./fact_store";
 import { graphqlServer } from "./graphql";
-import { init } from "./initialize";
 import { claimRoute } from "./routes/claim";
 import { create_space_route } from "./routes/create_space";
 import { delete_file_upload_route } from "./routes/delete_file_upload";
@@ -52,7 +51,7 @@ export class SpaceDurableObject implements DurableObject {
       await this.state.storage.deleteAll();
       this.state.storage.put("meta-lastVersion", this.version);
       try {
-        await init(this.state.storage);
+        //TODO apply migrations here
       } catch (e) {
         console.log("CONSTRUCTOR ERROR", e);
       }

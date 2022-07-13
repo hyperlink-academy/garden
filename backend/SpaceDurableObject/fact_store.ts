@@ -1,4 +1,4 @@
-import { Attribute } from "data/Attributes";
+import { Attribute, UniqueAttributes } from "data/Attributes";
 import { Fact, Schema } from "data/Facts";
 import { CardinalityResult, MutationContext } from "data/mutations";
 import { ulid } from "src/ulid";
@@ -17,6 +17,7 @@ export const store = (storage: DurableObjectStorage) => {
   async function getSchema(attribute: string): Promise<Schema | undefined> {
     let defaultAttribute = Attribute[attribute as keyof Attribute];
     if (defaultAttribute) return defaultAttribute;
+
     let attributeFact = await scanIndex.ave("name", attribute);
     if (!attributeFact) return;
 
@@ -33,6 +34,13 @@ export const store = (storage: DurableObjectStorage) => {
   }
 
   const writeFactToStore = async (f: Fact<keyof Attribute>, schema: Schema) => {
+    if (schema.unique) {
+      let existingUniqueValue = await scanIndex.ave(
+        f.attribute as keyof UniqueAttributes,
+        f.value as string
+      );
+      if (existingUniqueValue) return { success: false };
+    }
     let existingFact = await storage.get<Fact<keyof Attribute>>(
       indexes.factID(f.id)
     );
@@ -54,6 +62,7 @@ export const store = (storage: DurableObjectStorage) => {
     if (schema.unique) {
       storage.put(indexes.av(f.attribute, f.value as string), f);
     }
+    return { success: true };
   };
 
   const scanIndex: MutationContext["scanIndex"] = {
@@ -71,16 +80,13 @@ export const store = (storage: DurableObjectStorage) => {
       return results as CardinalityResult<typeof attribute>;
     },
     ave: async (attribute, value) => {
-      let results = [
-        ...(
-          await storage.list<Fact<keyof Attribute>>({
-            prefix: `av-${attribute}-${value}`,
-          })
-        ).values(),
-      ].filter((f) => !f.retracted);
-      return results[0] as Fact<typeof attribute>;
+      let result = await storage.get<Fact<keyof Attribute>>(
+        indexes.av(attribute, value)
+      );
+      return result?.retracted ? undefined : (result as Fact<typeof attribute>);
     },
   };
+
   let context: MutationContext = {
     scanIndex,
     postMessage: async (m) => {
@@ -105,7 +111,7 @@ export const store = (storage: DurableObjectStorage) => {
           success: false,
         };
 
-      await writeFactToStore(
+      return await writeFactToStore(
         {
           ...existingFact,
           ...data,
@@ -114,13 +120,12 @@ export const store = (storage: DurableObjectStorage) => {
         },
         schema
       );
-      return { success: true };
     },
     retractFact: async (id) => {
       lock.withLock(async () => {
         let fact = await storage.get<Fact<keyof Attribute>>(indexes.factID(id));
         if (!fact) return;
-        await writeFactToStore(
+        return await writeFactToStore(
           { ...fact, retracted: true, lastUpdated: Date.now().toString() },
           fact.schema
         );
@@ -140,11 +145,10 @@ export const store = (storage: DurableObjectStorage) => {
           // We might want to preserve positions of the existing fact as well
           if (existingFact) factID = existingFact.id;
         }
-        await writeFactToStore(
+        return await writeFactToStore(
           { ...f, id: factID, lastUpdated, schema },
           schema
         );
-        return { success: true };
       });
     },
   };

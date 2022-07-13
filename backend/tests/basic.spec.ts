@@ -6,9 +6,6 @@ const { SPACES } = getMiniflareBindings();
 const id = SPACES.newUniqueId();
 const stub = SPACES.get(id);
 
-// Note this is beforeAll, not beforeEach, yet each test still has isolated storage.
-// See https://v2.miniflare.dev/jest.html#isolated-storage for more details.
-//
 beforeAll(async () => {
   // Gotta initialize the DO
   await stub.fetch("http://localhost/poke");
@@ -17,13 +14,6 @@ beforeAll(async () => {
 test("single cardinality asserts should only create one fact even with multiple competing asserts", async () => {
   const storage = await getMiniflareDurableObjectStorage(id);
   let fact_store = store(storage);
-
-  let latestFact = [
-    ...(
-      await storage.list<Fact<any>>({ prefix: "ti-", limit: 1, reverse: true })
-    ).values(),
-  ][0];
-  expect(latestFact).toBeTruthy();
 
   let entity = ulid();
   await Promise.all(
@@ -39,8 +29,88 @@ test("single cardinality asserts should only create one fact even with multiple 
   let newFacts = [
     ...(await storage.list<Fact<any>>({
       prefix: "ti-",
-      startAfter: `ti-${latestFact.lastUpdated}-z`,
+      startAfter: `ti-`,
     })),
   ];
   expect(newFacts.length).toEqual(1);
+});
+
+test("you can't assert a fact with an unknown attribute", async () => {
+  const storage = await getMiniflareDurableObjectStorage(id);
+  let fact_store = store(storage);
+
+  let entity = ulid();
+  let result = await fact_store.assertFact({
+    entity,
+    attribute: "unknown attr" as "card/content",
+    value: "nada",
+    positions: {},
+  });
+  expect(result.success).toBe(false);
+  let newFacts = [
+    ...(await storage.list<Fact<any>>({
+      prefix: "ti-",
+      startAfter: `ti-`,
+    })),
+  ];
+  expect(newFacts.length).toEqual(0);
+});
+
+test("you can assert a fact if you create the attribute first", async () => {
+  const storage = await getMiniflareDurableObjectStorage(id);
+  let fact_store = store(storage);
+  let newAttrbuteName = "a-new-attribute" as "arbitrarySectionStringType";
+
+  let attributeEntity = ulid();
+  await Promise.all([
+    fact_store.assertFact({
+      entity: attributeEntity,
+      attribute: "name",
+      value: newAttrbuteName,
+      positions: {},
+    }),
+    fact_store.assertFact({
+      entity: attributeEntity,
+      attribute: "type",
+      value: "string",
+      positions: {},
+    }),
+  ]);
+
+  let result = await fact_store.assertFact({
+    entity: ulid(),
+    attribute: newAttrbuteName,
+    value: "a value",
+    positions: {},
+  });
+  expect(result.success).toBe(true);
+});
+
+test("You can't create multiple facts with the same value of a unique attribute", async () => {
+  const storage = await getMiniflareDurableObjectStorage(id);
+  let fact_store = store(storage);
+  let uniqueValue = "a unique value";
+
+  let originalEntity = ulid();
+  await fact_store.assertFact({
+    entity: originalEntity,
+    attribute: "card/title",
+    value: uniqueValue,
+    positions: {},
+  });
+
+  expect(
+    (await fact_store.scanIndex.ave("card/title", uniqueValue))?.entity
+  ).toBe(originalEntity);
+
+  let result = await fact_store.assertFact({
+    entity: ulid(),
+    attribute: "card/title",
+    value: uniqueValue,
+    positions: {},
+  });
+  expect(result.success).toBe(false);
+  expect(
+    (await fact_store.scanIndex.ave("card/title", uniqueValue))?.entity
+  ).toBe(originalEntity);
 });
