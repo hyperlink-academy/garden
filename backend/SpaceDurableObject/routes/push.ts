@@ -4,6 +4,8 @@ import { Env } from "..";
 import { Client } from "faunadb";
 import { getSessionById } from "backend/fauna/resources/functions/get_session_by_id";
 import { Mutations } from "data/mutations";
+import { store } from "../fact_store";
+import { CachedStorage } from "../storage_cache";
 
 export const push_route = makeRoute({
   route: "push",
@@ -34,6 +36,8 @@ export const push_route = makeRoute({
       return {
         data: { success: false, error: "Invalid session token" },
       } as const;
+    let cachedStore = new CachedStorage(env.storage);
+    let fact_store = store(cachedStore);
 
     let isMember = await env.factStore.scanIndex.ave(
       "space/member",
@@ -49,6 +53,8 @@ export const push_route = makeRoute({
       } as const;
     }
 
+    let release = await env.pushLock.lock();
+
     for (let i = 0; i < msg.mutations.length; i++) {
       let mutation = msg.mutations[i];
       lastMutationID = mutation.id;
@@ -57,7 +63,7 @@ export const push_route = makeRoute({
         continue;
       }
       try {
-        await Mutations[name](mutation.args, env.factStore);
+        await Mutations[name](mutation.args, fact_store);
       } catch (e) {
         console.log(
           `Error occured while running mutation: ${name}`,
@@ -65,7 +71,10 @@ export const push_route = makeRoute({
         );
       }
     }
-    env.storage.put<number>(`lastMutationID-${msg.clientID}`, lastMutationID);
+    cachedStore.put<number>(`lastMutationID-${msg.clientID}`, lastMutationID);
+    await cachedStore.flush();
+    release();
+
     env.poke();
     return { data: { success: true, errors: [] } };
   },

@@ -13,7 +13,13 @@ export const indexes = {
 };
 
 let lock = new Lock();
-export const store = (storage: DurableObjectStorage) => {
+export interface BasicStorage {
+  get<T = unknown>(key: string): Promise<T | undefined>;
+  list<T = unknown>(options?: { prefix: string }): Promise<Map<string, T>>;
+  put<T>(key: string, value: T): Promise<void>;
+  delete(key: string, options?: DurableObjectPutOptions): Promise<boolean>;
+}
+export const store = (storage: BasicStorage) => {
   async function getSchema(attribute: string): Promise<Schema | undefined> {
     let defaultAttribute = Attribute[attribute as keyof Attribute];
     if (defaultAttribute) return defaultAttribute;
@@ -152,5 +158,9 @@ export const store = (storage: DurableObjectStorage) => {
       });
     },
   };
-  return { ...context, writeFactToStore, getSchema };
+  return {
+    ...context,
+    writeFactToStore,
+    getSchema,
+  };
 };

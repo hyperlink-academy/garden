@@ -1,4 +1,5 @@
 import { Bindings } from "backend";
+import { Lock } from "src/lock";
 import { makeRouter } from "backend/lib/api";
 import { store } from "./fact_store";
 import { graphqlServer } from "./graphql";
@@ -18,6 +19,7 @@ export type Env = {
   factStore: ReturnType<typeof store>;
   storage: DurableObjectStorage;
   poke: () => void;
+  pushLock: Lock;
   id: string;
   env: Bindings;
 };
@@ -40,6 +42,7 @@ export class SpaceDurableObject implements DurableObject {
   version = 1;
   throttled = false;
   sockets: Array<{ socket: WebSocket; id: string }> = [];
+  pushLock = new Lock();
   constructor(
     private readonly state: DurableObjectState,
     private readonly env: Bindings
@@ -63,6 +66,7 @@ export class SpaceDurableObject implements DurableObject {
     let ctx = {
       storage: this.state.storage,
       env: this.env,
+      pushLock: this.pushLock,
       id: this.state.id.toString(),
       poke: () => {
         if (this.throttled) {

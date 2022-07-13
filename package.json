@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "build-frontend": "next build",
-    "test": "npm run build-backend && node --experimental-vm-modules --no-warnings --input-type=module node_modules/jest/bin/jest.js",
+    "test": "npm run build-backend && NODE_OPTIONS='--experimental-vm-modules --no-warnings' npx jest",
     "build-backend": "esbuild ./backend/index.ts --target=esnext --format=esm --bundle --outfile=./out/index.mjs"
   },
   "repository": {
