@@ -11,6 +11,24 @@ beforeAll(async () => {
   await stub.fetch("http://localhost/poke");
 });
 
+test("retracting a fact marks it as retracted", async () => {
+  const storage = await getMiniflareDurableObjectStorage(id);
+  let fact_store = store(storage);
+  let entity = ulid();
+  await fact_store.assertFact({
+    entity,
+    attribute: "card/title",
+    value: "Title",
+    positions: {},
+  });
+  let fact = await fact_store.scanIndex.eav(entity, "card/title");
+  expect(fact?.value).toBe("Title");
+  if (!fact) throw new Error();
+  await fact_store.retractFact(fact.id);
+  let retractedFact = await fact_store.scanIndex.eav(entity, "card/title");
+  expect(retractedFact).toBeFalsy();
+});
+
 test("single cardinality asserts should only create one fact even with multiple competing asserts", async () => {
   const storage = await getMiniflareDurableObjectStorage(id);
   let fact_store = store(storage);
