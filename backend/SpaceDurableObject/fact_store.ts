@@ -128,10 +128,10 @@ export const store = (storage: BasicStorage) => {
       );
     },
     retractFact: async (id) => {
-      lock.withLock(async () => {
+      return lock.withLock(async () => {
         let fact = await storage.get<Fact<keyof Attribute>>(indexes.factID(id));
         if (!fact) return;
-        return await writeFactToStore(
+        await writeFactToStore(
           { ...fact, retracted: true, lastUpdated: Date.now().toString() },
           fact.schema
         );
