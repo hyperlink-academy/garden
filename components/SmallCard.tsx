@@ -158,7 +158,7 @@ export const BaseSmallCard = (props: {
         `}
         style={{
           background: `${
-            props.image ? `url(${WORKER_URL}/static/${props.image})` : "white"
+            props.image ? `url(${WORKER_URL}/static/${props.image})` : ""
           }`,
         }}
       >

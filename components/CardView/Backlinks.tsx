@@ -27,12 +27,9 @@ export const Backlinks = (props: {
   return sections.length > 0 ? (
     <div
       className={`
+      backlinkWrapper
       focus:outline-none
-      no-scrollbar
-      backlinks 
-      flex flex-col gap-3 
-      pt-12 p-4
-      ${props.open === "backlink" ? " overflow-y-scroll" : " overflow-y-hidden"}
+      px-4 
       sticky
       top-0
       left-0
@@ -43,25 +40,44 @@ export const Backlinks = (props: {
       bg-[#FFF2D8]
       w-[97%]
       mx-auto
-      shadow-inner
+      grid grid-rows-[auto_max-content]
+      
       `}
       tabIndex={0}
       onClick={() => {
         props.onOpen();
       }}
     >
-      <h3 className="font-bold text-grey-35">References</h3>
-      <ul
-        className={` 
-      ${props.open === "backlink" ? " " : "pointer-events-none"}
-       flex flex-col gap-4 `}
+      <div
+        className={`backlinks  
+        pt-12 py-4 flex flex-col gap-3 h-full overflow-y-scroll no-scrollbar
+     
+        `}
       >
-        {sections.map((s) => {
-          return (
-            <BacklinkSection entityID={props.entityID} attribute={s} key={s} />
-          );
-        })}
-      </ul>
+        <h3 className="font-bold text-grey-35">References</h3>
+        <ul
+          className={` 
+            ${props.open === "backlink" ? " " : "pointer-events-none"}
+            flex flex-col gap-4 `}
+        >
+          {sections.map((s) => {
+            return (
+              <BacklinkSection
+                entityID={props.entityID}
+                attribute={s}
+                key={s}
+              />
+            );
+          })}
+        </ul>
+      </div>
+      <small
+        className={` font-bold text-grey-35 pb-1  transition-opacity ${
+          props.open === "backlink" ? "h-0 opacity-0" : "h-max"
+        } `}
+      >
+        References
+      </small>
     </div>
   ) : null;
 };

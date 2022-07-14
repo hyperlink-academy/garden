@@ -46,6 +46,7 @@ export const CardView = (props: {
 }) => {
   let isDeck = useIndex.eav(props.entityID, "deck");
   let memberName = useIndex.eav(props.entityID, "member/name");
+  let cardTitle = useIndex.eav(props.entityID, "card/title");
   let parentContainer = useRef<HTMLDivElement>(null);
   let { ref } = usePreserveScroll<HTMLDivElement>();
   let { session } = useAuth();
@@ -105,6 +106,8 @@ export const CardView = (props: {
         }
       }}
     >
+      {/* Backlinks are a sticky div that sits behind another div that contains the card and a big ol empty div. 
+      The card and empty div scroll together above the backlinks.  */}
       <Backlinks
         entityID={props.entityID}
         open={open}
@@ -112,17 +115,17 @@ export const CardView = (props: {
           setOpen("backlink");
         }}
       />
-
+      {/* The h calc here determines the height of the card, and therefore, how much of the backlinks will peek out underneath it. 
+      Another calc on the empty div (className =  spacer) determines how much the card will peek in when the backlinks are revealed*/}
       <div
         className={`
         card
-        h-[calc(100%-16px)]
+        h-[calc(100%-24px)]
         absolute
         left-0
         top-0
         right-0
         snap-start
-
         flex flex-col
         ${borderStyles({
           deck: !!isDeck,
@@ -139,11 +142,9 @@ export const CardView = (props: {
               <Member />
               <Link href={`/s/${memberName?.value}`}>
                 <a className="justify-self-start">
-                  <small>visit {memberName?.value}'s studio</small>
-                  {/* <Studio className="text-white" /> */}
+                  <small>visit studio</small>
                 </a>
               </Link>
-              {/* <small>member</small> */}
             </div>
           </>
         )}
@@ -182,9 +183,27 @@ export const CardView = (props: {
 
           <AddSection cardEntity={props.entityID} />
         </div>
-        {/* CARD CONTENT HERE */}
+        {/* END CARD CONTENT */}
+
+        {/* THE NAME OF THE CARD SHOWS AT THE VERY BOTTOM IF BACKLINKS ARE OPEN */}
+        {/* <small
+          className={` font-bold ${
+            !memberName ? "text-grey-35" : "text-white"
+          } px-4 pb-1 transition-opacity ${
+            open === "card" ? "hidden" : "block"
+          }`}
+        >
+          {!!cardTitle
+            ? cardTitle.value
+            : !!memberName
+            ? memberName.value
+            : "Untitled"}
+        </small> */}
       </div>
-      <div className="spacer snap-end h-[calc(100%-42px)]" />
+      {/* This is a blank div that allows the card to slide up, revealing the backlinks underneath. 
+      The calc controls how much the card will slide up. 
+      Bigger number, more of the bottom og the card peeks in, Smaller number, less of it peeks in. */}
+      <div className="spacer snap-end h-[calc(100%-60px)]" />
     </div>
   );
 };
