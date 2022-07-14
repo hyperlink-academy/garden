@@ -45,7 +45,8 @@ export const store = (storage: BasicStorage) => {
         f.attribute as keyof UniqueAttributes,
         f.value as string
       );
-      if (existingUniqueValue) return { success: false };
+      if (existingUniqueValue && existingUniqueValue.id !== f.id)
+        return { success: false };
     }
     let existingFact = await storage.get<Fact<keyof Attribute>>(
       indexes.factID(f.id)
