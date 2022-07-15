@@ -31,7 +31,9 @@ export const SpaceLayout: React.FC = (props) => {
     <>
       <style jsx>{`
         @media print {
-          height: auto;
+          .navPadding {
+            height: auto;
+          }
         }
         @media (min-height: 500px) {
           .navPadding {
@@ -55,7 +57,12 @@ export function Footer() {
   return (
     <>
       <style jsx>{`
-        @media print (max-height: 500px) {
+        @media print {
+          .menu {
+            display: none;
+          }
+        }
+        @media (max-height: 500px) {
           .menu {
             display: none;
           }
