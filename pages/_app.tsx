@@ -2,7 +2,6 @@ import "styles/globals.css";
 import type { AppProps } from "next/app";
 import React from "react";
 import { AuthProvider, useAuth } from "hooks/useAuth";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { SpaceSpaceProvider } from "components/ReplicacheProvider";
 import { SpaceLayout } from "components/SpaceLayout";
@@ -11,7 +10,7 @@ import { SmokeProvider } from "components/Smoke";
 
 export default function App({ Component, pageProps }: AppProps) {
   let router = useRouter();
-  if (router.pathname.startsWith("/library"))
+  if (router.pathname.startsWith("/library") || router.pathname === "/")
     return <Component {...pageProps} />;
   if (router.pathname.startsWith("/s/[studio]/s/[space]")) {
     return (
