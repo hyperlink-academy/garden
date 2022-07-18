@@ -1,6 +1,8 @@
+import { CollapseTiny } from "components/Icons";
 import { SmallCardList } from "components/SmallCardList";
 import { ReferenceAttributes } from "data/Attributes";
 import { useIndex } from "hooks/useReplicache";
+import ChatPage from "pages/s/[studio]/s/[space]/chat";
 
 export const Backlinks = (props: {
   entityID: string;
@@ -71,13 +73,14 @@ export const Backlinks = (props: {
           })}
         </ul>
       </div>
-      <small
-        className={` font-bold text-grey-35 pb-1  transition-opacity ${
-          props.open === "backlink" ? "h-0 opacity-0" : "h-max"
+      <div
+        className={` text-grey-55 flex gap-2 items-center justify-end overflow-hidden transition-all duration-75 ${
+          props.open === "backlink" ? "h-0" : "h-max pb-0.5 pt-1 "
         } `}
       >
-        References
-      </small>
+        <p className="text-[12px]">references</p>
+        <CollapseTiny />
+      </div>
     </div>
   ) : null;
 };

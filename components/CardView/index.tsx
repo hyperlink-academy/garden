@@ -22,7 +22,7 @@ const borderStyles = (args: { deck: boolean; member: boolean }) => {
   switch (true) {
     //styles can be found is global.css
     case args.member:
-      return `memberCardBorder !pl-3 pr-2 !pb-3 pt-2`;
+      return `memberCardBorder`;
     case args.deck:
       return `deckCardBorder`;
     default:
@@ -33,7 +33,7 @@ const borderStyles = (args: { deck: boolean; member: boolean }) => {
 const contentStyles = (args: { deck: boolean; member: boolean }) => {
   switch (true) {
     case args.member:
-      return `bg-white rounded-md px-3 pt-3 pb-6`;
+      return `bg-white rounded-md ml-2 mr-2 mb-2 mt-0 px-3 pt-3 pb-6`;
     case args.deck:
       return `px-4 py-6`;
     default:
@@ -120,13 +120,13 @@ export const CardView = (props: {
       <div
         className={`
         card
-        h-[calc(100%-24px)]
+        h-[calc(100%-20px)]
         absolute
         left-0
         top-0
         right-0
         snap-start
-        flex flex-col
+        flex flex-col gap-0
         ${borderStyles({
           deck: !!isDeck,
           member: !!memberName,
@@ -138,7 +138,7 @@ export const CardView = (props: {
       >
         {!session?.loggedIn || !memberName ? null : (
           <>
-            <div className="grid grid-cols-[auto_max-content] items-end text-white pb-1">
+            <div className="grid grid-cols-[auto_max-content] items-end text-white px-2 pt-2 pb-1">
               <Member />
               <Link href={`/s/${memberName?.value}`}>
                 <a className="justify-self-start">
@@ -157,7 +157,7 @@ export const CardView = (props: {
         ${open === "card" ? "overflow-y-auto" : "overflow-y-hidden"}
             flex flex-col gap-6          
             no-scrollbar
-            w-full
+            w-auto
             h-full
             ${contentStyles({ deck: !!isDeck, member: !!memberName })}
             `}
@@ -202,8 +202,8 @@ export const CardView = (props: {
       </div>
       {/* This is a blank div that allows the card to slide up, revealing the backlinks underneath. 
       The calc controls how much the card will slide up. 
-      Bigger number, more of the bottom og the card peeks in, Smaller number, less of it peeks in. */}
-      <div className="spacer snap-end h-[calc(100%-60px)]" />
+      Bigger number, more of the bottom of the card peeks in, Smaller number, less of it peeks in. */}
+      <div className="spacer snap-end h-[calc(100%-48px)]" />
     </div>
   );
 };
