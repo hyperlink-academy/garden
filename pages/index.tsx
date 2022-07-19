@@ -5,6 +5,9 @@ import { LogInModal } from "components/LoginModal";
 import { useState } from "react";
 import { ButtonLink } from "components/Buttons";
 import { ExitDoor } from "components/Icons";
+import { Modal } from "components/Layout";
+import { useRouter } from "next/router";
+import { LoginForm } from "./login";
 
 export default function IndexPage() {
   return (
@@ -167,9 +170,9 @@ const LoginBar = () => {
 };
 
 const LoginBox = () => {
-  let [isOpen, setLogInModal] = useState(false);
+  let [isOpen, setIsOpen] = useState(false);
   let { session } = useAuth();
-  console.log(session);
+  let router = useRouter();
 
   return (
     // <div className="px-8 py-4 bg-white border-2 border-dashed border-accent-gold z-10 m-auto">
@@ -181,12 +184,14 @@ const LoginBox = () => {
             style={{ margin: "auto" }}
             className="justify-self-start"
             content="Hypernaut Entry Portal: Log In!"
-            onClick={() => setLogInModal(true)}
+            onClick={() => setIsOpen(true)}
           />
           <p className="italic">
             Invite-only for now — read below for details ✨
           </p>
-          <LogInModal isOpen={isOpen} onClose={() => setLogInModal(false)} />
+          <Modal open={isOpen} onClose={() => setIsOpen(false)}>
+            <LoginForm onLogin={(s) => router.push(`/s/${s.username}`)} />
+          </Modal>
         </div>
       ) : (
         <Link href={`/s/${session.session.username}`}>
