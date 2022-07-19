@@ -13,6 +13,7 @@ import {
   Card,
   Cross,
   DeckSmall,
+  Member,
   SectionLinkedCard,
   Send,
 } from "components/Icons";
@@ -22,12 +23,13 @@ import { FindOrCreate } from "components/FindOrCreateEntity";
 import { SmallCard } from "components/SmallCard";
 import { ref } from "data/Facts";
 import { RenderedText } from "components/Textarea/RenderedText";
+import { monitorEventLoopDelay } from "perf_hooks";
 
 export default function ChatPage() {
   let id = useSpaceID();
   let spaceName = useIndex.aev("this/name")[0];
   return (
-    <div className="h-full flex flex-col relative items-stretch max-w-3xl mx-auto">
+    <div className="h-full flex flex-col relative items-stretch max-w-3xl mx-auto text-[15px] leading-[24px]">
       <Head>
         <title key="title">{spaceName?.value}</title>
       </Head>
@@ -66,13 +68,6 @@ export const Messages = (props: { topic: string }) => {
 
   return (
     <React.Fragment>
-      <style jsx>
-        {`
-          .Message:hover .MessageInfo {
-            display: block;
-          }
-        `}
-      </style>
       <div className=" h-full overflow-y-auto overflow-x-hidden pb-6 flex flex-col-reverse ">
         <div className=" flex flex-col">
           {/* if no messages, show welcome placeholder */}
@@ -152,25 +147,39 @@ const Message = (props: {
   let q = useRouter().query;
   return (
     <div
-      className={`Message flex flex-col ${props.doubleSend ? "pt-1" : "pt-4"}`}
+      className={`grid grid-cols-[max-content_auto] gap-2 sm:gap-3 ${
+        props.doubleSend ? "pt-3 sm:pt-4" : "pt-5 sm:pt-6 "
+      }`}
     >
-      <div className="grid grid-cols-[auto_max-content]">
-        {props.doubleSend ? null : (
-          <Link href={`/s/${q.studio}/s/${q.space}/c/${member?.entity}`}>
-            <a>
-              <div className={`MessageSender font-bold `}>{props.sender}</div>
-            </a>
-          </Link>
-        )}
-        <div className="MessageInfo hidden italic text-grey-80">
-          {new Date(parseInt(props.ts)).toLocaleDateString()}
-        </div>
+      <style jsx>
+        {`
+          .messageHeader:hover .messageInfo {
+            display: block;
+          }
+        `}
+      </style>
+      <div className={`h-6 w-6 mt-.5 `}>
+        {props.doubleSend ? null : <Member />}
       </div>
-      <RenderedText
-        text={props.content}
-        className="MessageContent whitespace-pre-wrap font-[Quattro] text-grey-35"
-      />
-      {!props.entity ? null : <MessageData entity={props.entity} />}
+      <div className={`messageWrapper flex flex-col `}>
+        {props.doubleSend ? null : (
+          <div className=" messageHeader pb-.5 grid grid-cols-[auto_max-content]">
+            <Link href={`/s/${q.studio}/s/${q.space}/c/${member?.entity}`}>
+              <a>
+                <div className={`messageSender font-bold `}>{props.sender}</div>
+              </a>
+            </Link>
+            <div className="messageInfo hidden italic text-grey-80">
+              {new Date(parseInt(props.ts)).toLocaleDateString()}
+            </div>
+          </div>
+        )}
+        <RenderedText
+          text={props.content}
+          className="messageContent  whitespace-pre-wrap font-[Quattro] "
+        />
+        {!props.entity ? null : <MessageData entity={props.entity} />}
+      </div>
     </div>
   );
 };
@@ -180,7 +189,7 @@ const MessageData = (props: { entity: string }) => {
   let attachedCards = useIndex.eav(props.entity, "message/attachedCard") || [];
 
   return (
-    <div className="flex flex-wrap gap-2 pt-2">
+    <div className="flex flex-wrap gap-2 pt-3">
       {attachedCards?.map((e) => {
         return (
           <SmallCard
@@ -213,6 +222,7 @@ export const MessageInput = (props: { id: string; topic: string }) => {
   let { authorized, mutate } = useMutations();
   let [inputFocused, setInputFocused] = useState(false);
 
+  // STATE OF MESSAGE INPUT IF NOT LOGGED IN
   if (!authorized) {
     return (
       <div className=" text-grey-55 italic border-t border-grey-80 -mx-4 md:mx-0 px-4 pt-2 pb-2">
@@ -258,15 +268,20 @@ export const MessageInput = (props: { id: string; topic: string }) => {
     setMessage("");
     setAttachedCards([]);
   };
+
   return (
-    <div className="-mx-4 md:mx-0 px-4 md:px-0 pt-4 border-t border-grey-80 gap-2">
+    // the message input is 16px and the rest of chat is 15px.
+    // this is because on mobile, browsers will automatically zoom in if you click on form elements with font size less thn 16px
+    <div className="-mx-4 md:mx-0 px-4 md:px-0 pt-4 border-t text-base border-grey-80 gap-2">
+      {/* ATTACHED CARDS IN MESSAGE INPUT */}
       <div
         className={`${
           attachedCards.length > 0
-            ? "pb-4 mb-4 border-b border-grey-80 border-dashed"
+            ? "flex flex-col gap-0 pb-4 mb-4 border-b border-grey-80 border-dashed"
             : ""
         }`}
       >
+        <h4 className="pb-1">Attached Cards</h4>
         {attachedCards.map((e) => {
           return (
             <AttachedCard
@@ -277,6 +292,8 @@ export const MessageInput = (props: { id: string; topic: string }) => {
           );
         })}
       </div>
+
+      {/* VANILLA MESSAGE INPUT  */}
       <div className="flex flex-row-reverse items-center gap-2">
         <div
           onMouseDown={(e) => e.preventDefault()}
@@ -328,10 +345,13 @@ export const MessageInput = (props: { id: string; topic: string }) => {
 
 const AttachedCard = (props: { entityID: string; remove: () => void }) => {
   let title = useIndex.eav(props.entityID, "card/title");
+  let isDeck = useIndex.eav(props.entityID, "deck");
+
   return (
-    <div>
+    <div className="grid grid-cols-[max-content_auto_max-content] place-items-start gap-2 hover:bg-bg-blue py-1 px-2 -mx-2 rounded-md">
+      <div className="pt-0.5">{isDeck ? <DeckSmall /> : <Card />}</div>
       {title?.value}{" "}
-      <button onClick={() => props.remove()}>
+      <button className="text-grey-55 pt-1" onClick={() => props.remove()}>
         <Cross />
       </button>
     </div>
