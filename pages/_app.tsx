@@ -10,8 +10,16 @@ import { SmokeProvider } from "components/Smoke";
 
 export default function App({ Component, pageProps }: AppProps) {
   let router = useRouter();
-  if (router.pathname.startsWith("/library") || router.pathname === "/")
+  if (router.pathname.startsWith("/library"))
     return <Component {...pageProps} />;
+  if (router.pathname === "/")
+    return (
+      <SmokeProvider>
+        <AuthProvider>
+          <Component {...pageProps} />
+        </AuthProvider>
+      </SmokeProvider>
+    );
   if (router.pathname.startsWith("/s/[studio]/s/[space]")) {
     return (
       <SmokeProvider>
@@ -44,7 +52,7 @@ const Layout: React.FC = (props) => {
   return (
     <>
       <Head>
-        <title key="title">Hyperlink Garden</title>
+        <title key="title">Hyperlink Academy</title>
       </Head>
       <div style={{ maxWidth: "48rem", margin: "auto", padding: "1rem" }}>
         {props.children}
