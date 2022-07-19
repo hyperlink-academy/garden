@@ -14,6 +14,7 @@ import { pullRoute } from "./routes/pull";
 import { push_route } from "./routes/push";
 import { connect } from "./socket";
 import { handleFileUpload } from "./upload_file";
+import { migrations } from "./migrations";
 
 export type Env = {
   factStore: ReturnType<typeof store>;
@@ -39,7 +40,6 @@ export type SpaceRoutes = typeof routes;
 let router = makeRouter(routes);
 
 export class SpaceDurableObject implements DurableObject {
-  version = 1;
   throttled = false;
   sockets: Array<{ socket: WebSocket; id: string }> = [];
   pushLock = new Lock();
@@ -48,16 +48,25 @@ export class SpaceDurableObject implements DurableObject {
     private readonly env: Bindings
   ) {
     this.state.blockConcurrencyWhile(async () => {
-      let version =
-        (await this.state.storage.get<number>("meta-lastVersion")) || 0;
-      if (this.version <= version) return;
-      await this.state.storage.deleteAll();
-      this.state.storage.put("meta-lastVersion", this.version);
+      let lastAppliedMigration = await this.state.storage.get<string>(
+        "meta-lastAppliedMigration"
+      );
+      let pendingMigrations = migrations.filter(
+        (m) => !lastAppliedMigration || m.date > lastAppliedMigration
+      );
+
+      if (pendingMigrations.length === 0) return;
       try {
-        //TODO apply migrations here
+        for (let i = 0; i < pendingMigrations.length; i++) {
+          await pendingMigrations[i].run(this.state.storage);
+        }
       } catch (e) {
         console.log("CONSTRUCTOR ERROR", e);
       }
+      await this.state.storage.put(
+        "meta-lastAppliedMigration",
+        pendingMigrations[pendingMigrations.length - 1].date
+      );
     });
   }
   async fetch(request: Request) {

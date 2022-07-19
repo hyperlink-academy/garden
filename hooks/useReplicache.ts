@@ -1,3 +1,4 @@
+import { latestMigration } from "backend/SpaceDurableObject/migrations";
 import {
   Attribute,
   ReferenceAttributes,
@@ -157,7 +158,7 @@ export const makeReplicache = (args: {
 }) => {
   let rep = new Replicache({
     licenseKey: "l381074b8d5224dabaef869802421225a",
-    schemaVersion: "0.0.3",
+    schemaVersion: latestMigration,
     name: args.name,
     pushDelay: 500,
     pusher: args.pusher,
