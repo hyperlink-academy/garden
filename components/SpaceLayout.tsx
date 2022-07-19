@@ -120,7 +120,7 @@ export function Footer() {
                     y1="4"
                     x2="0"
                     y2="28"
-                    stroke="#E6E6E6"
+                    stroke="#8C8C8C"
                     stroke-linecap="round"
                   />
                 </svg>

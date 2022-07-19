@@ -79,7 +79,9 @@ export const Backlinks = (props: {
         } `}
       >
         <p className="text-[12px]">references</p>
-        <CollapseTiny />
+        <div className="pt-0.5">
+          <CollapseTiny />
+        </div>
       </div>
     </div>
   ) : null;

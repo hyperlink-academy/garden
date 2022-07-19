@@ -1,6 +1,12 @@
 import { ButtonLink } from "components/Buttons";
 import { CardView } from "components/CardView";
-import { Card, LeftArrow, RightArrow, Shuffle } from "components/Icons";
+import {
+  Card,
+  CardAdd,
+  LeftArrow,
+  RightArrow,
+  Shuffle,
+} from "components/Icons";
 import { ReferenceAttributes, ShortCodes } from "data/Attributes";
 import { Fact } from "data/Facts";
 import { useIndex, useMutations } from "hooks/useReplicache";
@@ -34,7 +40,7 @@ export const CardCarousel = (props: {
           <Link
             href={`/s/${router.query.studio}/s/${router.query.space}/c/${props.entityID}`}
           >
-            <a>{Name?.value}</a>
+            <a>{Name?.value} </a>
           </Link>
           <span className="text-grey-35">
             {ShortCodes[props.section as keyof ReferenceAttributes] ||
@@ -87,7 +93,7 @@ export const CardCarousel = (props: {
         {!authorized || props.backlink ? null : (
           <div className="justify-items-end grid">
             <ButtonLink
-              icon={<Card />}
+              icon={<CardAdd />}
               content="Add Card!"
               onClick={async () => {
                 let newCard = ulid();
