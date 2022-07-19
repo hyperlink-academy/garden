@@ -278,7 +278,7 @@ export const MessageInput = (props: { id: string; topic: string }) => {
         className={`${
           attachedCards.length > 0
             ? "flex flex-col gap-0 pb-4 mb-4 border-b border-grey-80 border-dashed"
-            : ""
+            : "hidden"
         }`}
       >
         <h4 className="pb-1">Attached Cards</h4>
