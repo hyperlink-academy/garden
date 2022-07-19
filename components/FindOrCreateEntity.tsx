@@ -20,6 +20,7 @@ export const FindOrCreate = (props: {
   ) => void;
 }) => {
   let [input, setInput] = useState("");
+  let [added, setAdded] = useState<{ name: string; type: string }[]>([]);
   let items = props.items.filter((f) => {
     if (/[A-Z]/g.test(input)) return f.display.includes(input);
     return f.display.toLocaleLowerCase().includes(input.toLocaleLowerCase());
@@ -38,11 +39,13 @@ export const FindOrCreate = (props: {
         <div className="">
           <Combobox
             value=""
-            onChange={(c) => {
-              if (props.selected.includes(c)) return;
-              if (c === "create")
-                props.onSelect({ name: input, type: "create" });
-              else props.onSelect({ entity: c, type: "existing" });
+            onChange={(addedItem: string) => {
+              if (props.selected.includes(addedItem)) return;
+              if (addedItem === "create")
+                setAdded([...added, { name: input, type: "create" }]);
+              else {
+                setAdded([...added, { name: addedItem, type: "existing" }]);
+              }
             }}
             as="div"
             className={`
@@ -55,6 +58,16 @@ export const FindOrCreate = (props: {
               bg-white shadow-drop border border-grey-80 rounded-md
               `}
           >
+            <ul>
+              {added.map((addedItem) => (
+                <li>
+                  {
+                    items.find((item) => item.entity === addedItem.name)
+                      ?.display
+                  }
+                </li>
+              ))}
+            </ul>
             <Combobox.Input
               value={input}
               className="mx-3 mt-4"
@@ -98,7 +111,6 @@ export const FindOrCreate = (props: {
               )}
               {items.map((item) => {
                 return (
-                  //how to get selected items to the top of the list??? collapsable....? maybe not.
                   <Combobox.Option key={item.entity} value={item.entity}>
                     {({ active }) => {
                       return (
