@@ -16,14 +16,13 @@ export default function IndexPage() {
         <title key="title">Hyperlink Academy</title>
       </Head>
       <div className="py-8 md:py-16 px-8 max-w-4xl flex-col gap-8 m-auto flex">
-        {/* login */}
-        {/* <LoginBar /> */}
-
         {/* title */}
         <div className="text-center">
-          <h1 className="text-6xl	pb-8">Hyperlink Academy</h1>
-          <p className="text-2xl ">
-            Build shared spaces for lifelong learning.
+          <h1 className="text-4xl md:text-6xl	pb-4 md:pb-8">
+            Hyperlink Academy
+          </h1>
+          <p className="text-xl md:text-2xl ">
+            Build shared spaces for learning.
           </p>
         </div>
 
@@ -61,7 +60,7 @@ export default function IndexPage() {
           </p>
           <p>
             🌱 Now, we're making something new — a place to bring people into
-            purpose-built spaces to create, learn, and collaborate.
+            purpose-built spaces to create and collaborate.
           </p>
         </div>
 
@@ -106,7 +105,7 @@ export default function IndexPage() {
             </p>
             <p>
               We're curating book collections, organizing recipes, cultivating
-              writing practices, learning music & more…
+              writing practices, making music & more…
             </p>
             <p>Want to build learning worlds with us?</p>
             <p>
@@ -123,10 +122,9 @@ export default function IndexPage() {
                 className="text-accent-blue"
                 href="mailto:contact@hyperlink.academy"
               >
-                write us
+                tell us about
               </a>{" "}
-              with ideas for a Space you'd like to make, and we'll get back to
-              you!
+              a Space you'd like to make, and we can talk more!
             </p>
             <p>—Hyperlink Team (Jared + Celine + Brendan)</p>
           </div>
@@ -138,7 +136,7 @@ export default function IndexPage() {
 
 const Divider = (props: { marginTop: string; marginBottom: string }) => (
   <hr
-    className={`skew-x-[14deg] rotate-[14deg] border-[16px] w-64 md:w-96 mx-auto border-dashed border-accent-gold ${props.marginTop} ${props.marginBottom}`}
+    className={`skew-x-[14deg] rotate-[14deg] border-[12px] w-64 md:w-96 mx-auto border-solid border-accent-gold ${props.marginTop} ${props.marginBottom}`}
   />
 );
 
@@ -175,8 +173,7 @@ const LoginBox = () => {
   let router = useRouter();
 
   return (
-    // <div className="px-8 py-4 bg-white border-2 border-dashed border-accent-gold z-10 m-auto">
-    <div className="skew-x-[14deg] rotate-[14deg] px-8 py-4 bg-white border-2 border-dashed border-accent-gold z-10 mx-auto my-8 md:my-16">
+    <div className="px-8 py-4 bg-white border-2 border-solid border-accent-gold z-10 mx-auto">
       {!session?.loggedIn ? (
         <div className="text-center m-auto space-y-2">
           <ButtonLink
@@ -206,7 +203,7 @@ const LoginBox = () => {
 };
 
 const NewsletterForm = () => {
-  // TODO: migrate email newsletter / buttondown functionality?!
+  // TODO: migrate custom email handling? for now using buttondown form embed!
 
   return (
     <form
@@ -216,10 +213,10 @@ const NewsletterForm = () => {
       onSubmit={() =>
         window.open("https://buttondown.email/hyperlink", "popupwindow")
       }
-      className="embeddable-buttondown-form skew-x-[14deg] rotate-[14deg] px-8 py-4 flex flex-col md:flex-row gap-4 items-center place-content-center  bg-white border-2 border-dashed border-accent-gold z-10 mx-auto my-16 md:my-24"
+      className="embeddable-buttondown-form px-8 py-4 flex flex-col md:flex-row gap-4 items-center place-content-center  bg-white border-2 border-solid border-accent-gold z-10 mx-auto my-8"
     >
-      <label htmlFor="bd-email">Email: </label>
-      <input type="email" name="email" id="bd-email" />
+      <label htmlFor="bd-email">Email? </label>
+      <input type="email" name="email" id="bd-email" placeholder="email!" />
       <input
         className="py-2 px-4 m-0       
       text-white font-bold bg-accent-blue border rounded-md border-accent-blue 
