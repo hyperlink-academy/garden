@@ -1,19 +1,19 @@
 import { Combobox, Dialog, Transition } from "@headlessui/react";
-import { useIndex, useMutations } from "hooks/useReplicache";
 import { useState } from "react";
-import { generateKeyBetween } from "src/fractional-indexing";
-import { ulid } from "src/ulid";
 import { ButtonLink } from "./Buttons";
-import { Add, Card, Checkmark, DeckSmall, Member } from "./Icons";
+import { Add, Checkmark } from "./Icons";
 
 // Can I adapt this to work for section names as well?
 // They are a single select
 // use react state not replicache state
+
+type Item = { display: string; entity: string; icon?: React.ReactElement };
+
 export const FindOrCreate = (props: {
   allowBlank: boolean;
   open: boolean;
   onClose: () => void;
-  items: { display: string; entity: string; icon?: React.ReactElement }[];
+  items: Item[];
   selected: string[];
   onSelect: (
     id: { entity: string; type: "existing" } | { name: string; type: "create" }
@@ -21,10 +21,12 @@ export const FindOrCreate = (props: {
 }) => {
   let [input, setInput] = useState("");
   let [added, setAdded] = useState<{ name: string; type: string }[]>([]);
+
   let items = props.items.filter((f) => {
     if (/[A-Z]/g.test(input)) return f.display.includes(input);
     return f.display.toLocaleLowerCase().includes(input.toLocaleLowerCase());
   });
+
   let inputExists = !!items.find(
     (i) => i.display.toLocaleLowerCase() === input.toLocaleLowerCase()
   );
@@ -83,55 +85,15 @@ export const FindOrCreate = (props: {
               static
               className="w-full pt-2 flex-col flex gap-2 h-min max-h-[calc(100vh-16rem)] overflow-y-auto"
             >
-              {inputExists ? null : (
-                <Combobox.Option key={"create"} value={"create"}>
-                  {input || props.allowBlank
-                    ? ({ active }) => {
-                        return (
-                          <SearchItem active={active}>
-                            <div
-                              className={`
-                              py-2 w-full
-                              text-accent-blue font-bold 
-                              grid grid-cols-[min-content_auto] gap-2
-                            `}
-                            >
-                              <Add />
-                              <div>
-                                {!input
-                                  ? "Create a blank card"
-                                  : `Create "${input}"`}
-                              </div>
-                            </div>
-                          </SearchItem>
-                        );
-                      }
-                    : null}
-                </Combobox.Option>
+              {inputExists || (!input && props.allowBlank) ? null : (
+                <CreateButton value={input} />
               )}
               {items.map((item) => {
                 return (
-                  <Combobox.Option key={item.entity} value={item.entity}>
-                    {({ active }) => {
-                      return (
-                        <SearchItem active={active}>
-                          <div
-                            className={`gap-2 items-center ${
-                              props.selected.includes(item.entity)
-                                ? "grid grid-cols-[min-content_auto_min-content] text-grey-80 "
-                                : "grid grid-cols-[min-content_auto]"
-                            }`}
-                          >
-                            {item.icon}
-                            {item.display}
-                            {props.selected.includes(item.entity) ? (
-                              <Checkmark className="justify-self-end" />
-                            ) : null}
-                          </div>
-                        </SearchItem>
-                      );
-                    }}
-                  </Combobox.Option>
+                  <SearchResult
+                    {...item}
+                    selected={props.selected.includes(item.entity)}
+                  />
                 );
               })}
             </Combobox.Options>
@@ -146,73 +108,54 @@ export const FindOrCreate = (props: {
   );
 };
 
-export const FindOrCreateCard = (props: {
-  entity: string;
-  section: string;
-  positionKey: string;
-  open: boolean;
-  allowBlank: boolean;
-  onClose: () => void;
-  selected: string[];
-  lastPosition?: string;
-}) => {
-  let { mutate } = useMutations();
-  let decks = useIndex.aev("deck");
-  let titles = useIndex.aev("card/title").filter((f) => !!f.value);
-  let members = useIndex.aev("member/name");
-  let items = titles
-    .map((t) => {
-      return {
-        entity: t.entity,
-        display: t.value,
-        icon: !!decks.find((d) => t.entity === d.entity) ? (
-          <DeckSmall />
-        ) : (
-          <Card />
-        ),
-      };
-    })
-    .concat(
-      members.map((m) => {
-        return {
-          entity: m.entity,
-          display: m.value,
-          icon: <Member />,
-        };
-      })
-    );
-
+const CreateButton = (props: { value: string }) => {
   return (
-    <FindOrCreate
-      allowBlank={props.allowBlank}
-      onClose={props.onClose}
-      open={props.open}
-      items={items}
-      selected={props.selected}
-      onSelect={async (e) => {
-        let position = generateKeyBetween(props.lastPosition || null, null);
-        let entity;
-
-        if (e.type === "create") {
-          entity = ulid();
-          if (e.name) {
-            await mutate("createCard", {
-              entityID: entity,
-              title: e.name,
-            });
-          }
-        } else {
-          entity = e.entity;
-        }
-
-        mutate("addCardToSection", {
-          cardEntity: entity,
-          parent: props.entity,
-          positions: { [props.positionKey]: position },
-          section: props.section,
-        });
+    <Combobox.Option key={"create"} value={"create"}>
+      {({ active }) => {
+        return (
+          <SearchItem active={active}>
+            <div
+              className={`py-2 w-full
+                          text-accent-blue font-bold 
+                          grid grid-cols-[min-content_auto] gap-2`}
+            >
+              <Add />
+              <div>
+                {!props.value
+                  ? "Create a blank card"
+                  : `Create "${props.value}"`}
+              </div>
+            </div>
+          </SearchItem>
+        );
       }}
-    />
+    </Combobox.Option>
+  );
+};
+
+const SearchResult = (props: Item & { selected: boolean }) => {
+  return (
+    <Combobox.Option key={props.entity} value={props.entity}>
+      {({ active }) => {
+        return (
+          <SearchItem active={active}>
+            <div
+              className={`gap-2 items-center ${
+                props.selected
+                  ? "grid grid-cols-[min-content_auto_min-content] text-grey-80 "
+                  : "grid grid-cols-[min-content_auto]"
+              }`}
+            >
+              {props.icon}
+              {props.display}
+              {props.selected ? (
+                <Checkmark className="justify-self-end" />
+              ) : null}
+            </div>
+          </SearchItem>
+        );
+      }}
+    </Combobox.Option>
   );
 };
 
