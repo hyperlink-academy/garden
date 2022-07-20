@@ -27,9 +27,13 @@ export const FindOrCreate = (props: {
     return f.display.toLocaleLowerCase().includes(input.toLocaleLowerCase());
   });
 
-  let inputExists = !!items.find(
-    (i) => i.display.toLocaleLowerCase() === input.toLocaleLowerCase()
-  );
+  let inputExists =
+    !!items.find(
+      (i) => i.display.toLocaleLowerCase() === input.toLocaleLowerCase()
+    ) ||
+    !!added.find(
+      (i) => i.name.toLocaleLowerCase() === input.toLocaleLowerCase()
+    );
   return (
     <Transition show={props.open} className="fixed">
       <Dialog
@@ -48,6 +52,7 @@ export const FindOrCreate = (props: {
               else {
                 setAdded([...added, { name: addedItem, type: "existing" }]);
               }
+              console.log([added]);
             }}
             as="div"
             className={`
@@ -63,12 +68,16 @@ export const FindOrCreate = (props: {
             <ul>
               {added.map((addedItem) => (
                 <li>
-                  {
-                    items.find((item) => item.entity === addedItem.name)
-                      ?.display
-                  }
+                  {addedItem.type === "create"
+                    ? addedItem.name
+                    : props.items.find((item) => item.entity === addedItem.name)
+                        ?.display}
                 </li>
               ))}
+              <ButtonLink
+                content={`Add ${added.length} cards`}
+                onClick={props.onClose}
+              />
             </ul>
             <Combobox.Input
               value={input}
@@ -85,8 +94,8 @@ export const FindOrCreate = (props: {
               static
               className="w-full pt-2 flex-col flex gap-2 h-min max-h-[calc(100vh-16rem)] overflow-y-auto"
             >
-              {inputExists || (!input && props.allowBlank) ? null : (
-                <CreateButton value={input} />
+              {!input && !props.allowBlank ? null : (
+                <CreateButton value={input} inputExists={!!inputExists} />
               )}
               {items.map((item) => {
                 return (
@@ -97,10 +106,6 @@ export const FindOrCreate = (props: {
                 );
               })}
             </Combobox.Options>
-            <div className="h-max grid grid-cols-[auto_min-content] p-4 ">
-              <h4>{props.selected.length} cards added</h4>
-              <ButtonLink content="DONE!" onClick={props.onClose} />
-            </div>
           </Combobox>
         </div>
       </Dialog>
@@ -108,24 +113,39 @@ export const FindOrCreate = (props: {
   );
 };
 
-const CreateButton = (props: { value: string }) => {
+const CreateButton = (props: { value: string; inputExists: boolean }) => {
   return (
-    <Combobox.Option key={"create"} value={"create"}>
+    <Combobox.Option
+      key={"create"}
+      value={"create"}
+      disabled={props.inputExists}
+    >
       {({ active }) => {
         return (
           <SearchItem active={active}>
-            <div
-              className={`py-2 w-full
+            {!props.inputExists ? (
+              <div
+                className={`py-2 w-full
                           text-accent-blue font-bold 
                           grid grid-cols-[min-content_auto] gap-2`}
-            >
-              <Add />
-              <div>
-                {!props.value
-                  ? "Create a blank card"
-                  : `Create "${props.value}"`}
+              >
+                <Add />
+                <div>
+                  {!props.value
+                    ? "Create a blank card"
+                    : `Create "${props.value}"`}
+                </div>
               </div>
-            </div>
+            ) : (
+              <div
+                className={`py-2 w-full
+                          text-grey-55 font-bold 
+                          grid grid-cols-[min-content_auto] gap-2`}
+              >
+                <Add />
+                <div>"{props.value}" already exists</div>
+              </div>
+            )}
           </SearchItem>
         );
       }}

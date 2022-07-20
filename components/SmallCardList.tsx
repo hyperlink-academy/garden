@@ -149,6 +149,7 @@ const AddToSection = (props: {
       <FindOrCreate
         allowBlank={true}
         onClose={() => setOpen(false)}
+        //START OF ON SELECT LOGIC
         onSelect={async (d) => {
           if (!rep?.rep) return;
           if (props.backlink) {
@@ -249,6 +250,7 @@ const AddToSection = (props: {
             });
           }
         }}
+        // END OF ONSELECT LOGIC
         selected={
           props.backlink
             ? alreadyIn.map((d) => d.entity)
