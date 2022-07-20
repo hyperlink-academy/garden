@@ -43,7 +43,7 @@ export default {
           a.lastUpdated > b.lastUpdated ? 1 : -1
         );
         return entries.flatMap((f, i) => {
-          if (i === entries.length) return [];
+          if (i === entries.length - 1) return [];
           return [
             indexes.ti(f.lastUpdated, f.id),
             indexes.ea(f.entity, f.attribute, f.id),
