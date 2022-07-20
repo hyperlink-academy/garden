@@ -23,7 +23,6 @@ import { FindOrCreate } from "components/FindOrCreateEntity";
 import { SmallCard } from "components/SmallCard";
 import { ref } from "data/Facts";
 import { RenderedText } from "components/Textarea/RenderedText";
-import { monitorEventLoopDelay } from "perf_hooks";
 
 export default function ChatPage() {
   let id = useSpaceID();
@@ -245,16 +244,15 @@ export const MessageInput = (props: { id: string; topic: string }) => {
         value: messageId,
         positions: {},
       });
-      await mutate(
-        "assertFact",
-        attachedCards.map((c) => {
-          return {
-            entity: entity as string,
-            attribute: "message/attachedCard",
-            value: ref(c),
+      await Promise.all(
+        attachedCards.map((c) =>
+          mutate("addCardToSection", {
+            cardEntity: c,
+            parent: entity as string,
+            section: "message/attachedCard",
             positions: {},
-          };
-        })
+          })
+        )
       );
     }
     mutate("postMessage", {
