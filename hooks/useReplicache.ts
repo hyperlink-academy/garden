@@ -4,7 +4,7 @@ import {
   ReferenceAttributes,
   UniqueAttributes,
 } from "data/Attributes";
-import { Fact, Schema } from "data/Facts";
+import { Fact, ReferenceType, Schema } from "data/Facts";
 import { Message } from "data/Messages";
 import { CardinalityResult, MutationContext, Mutations } from "data/mutations";
 import { createContext, useContext } from "react";
@@ -34,19 +34,30 @@ export let ReplicacheContext = createContext<{
 export const scanIndex = (tx: ReadTransaction) => {
   const q: MutationContext["scanIndex"] = {
     eav: async (entity, attribute) => {
-      let schema = await getSchema(tx, attribute);
       let results = await tx
         .scan({
           indexName: "eav",
-          prefix: `${entity}-${attribute}-`,
+          prefix: `${entity}-${attribute ? `${attribute}-` : ""}`,
         })
         .values()
         .toArray();
+
+      if (!attribute) return results as CardinalityResult<typeof attribute>;
+      let schema = await getSchema(tx, attribute);
       if (schema?.cardinality === "one")
         return results[0] as CardinalityResult<typeof attribute>;
       return results as CardinalityResult<typeof attribute>;
     },
-
+    vae: async (entity, attribute) => {
+      let results = await tx
+        .scan({
+          indexName: "vae",
+          prefix: `${entity}-${attribute || ""}`,
+        })
+        .values()
+        .toArray();
+      return results as Fact<Exclude<typeof attribute, undefined>>[];
+    },
     ave: async (attribute, value) => {
       let results = await tx
         .scan({
@@ -91,9 +102,7 @@ export function FactWithIndexes<A extends keyof Attribute>(f: Fact<A>) {
     ave: f.schema.unique ? `${f.attribute}-${f.value}` : undefined,
     vae:
       f.schema.type === `reference`
-        ? `${(f.value as { type: "reference"; value: string }).value}-${
-            f.attribute
-          }`
+        ? `${(f.value as ReferenceType).value}-${f.attribute}`
         : undefined,
   };
   return { ...f, indexes };
@@ -108,6 +117,7 @@ let mutators: ReplicacheMutators = Object.keys(Mutations).reduce((acc, k) => {
     let context: MutationContext = {
       scanIndex: q,
       retractFact: async (id) => {
+        console.log("retracting");
         await tx.del(id);
         return;
       },

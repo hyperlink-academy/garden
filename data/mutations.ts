@@ -1,5 +1,5 @@
-import { Attribute } from "./Attributes";
-import { Fact, FactMetadata, ref } from "./Facts";
+import { Attribute, ReferenceAttributes } from "./Attributes";
+import { Fact, ref } from "./Facts";
 import { Message } from "./Messages";
 
 export type MutationContext = {
@@ -13,7 +13,11 @@ export type MutationContext = {
   ) => Promise<{ success: boolean }>;
   retractFact: (id: string) => Promise<void>;
   scanIndex: {
-    eav: <A extends keyof Attribute>(
+    vae: <A extends keyof ReferenceAttributes>(
+      entity: string,
+      attribute?: A
+    ) => Promise<Fact<A>[]>;
+    eav: <A extends keyof Attribute | null>(
       entity: string,
       attribute: A
     ) => Promise<CardinalityResult<A>>;
@@ -30,12 +34,15 @@ type UniqueFacts = {
     : never]: Attribute[A];
 };
 
-export type CardinalityResult<A extends keyof Attribute> =
-  Attribute[A] extends {
-    cardinality: "one";
-  }
-    ? Fact<A> | null
-    : Fact<A>[];
+type OptionalAttribute<A extends keyof Attribute | null> =
+  A extends keyof Attribute ? A : keyof Attribute;
+export type CardinalityResult<A extends keyof Attribute | null> = null extends A
+  ? Fact<keyof Attribute>[]
+  : Attribute[OptionalAttribute<A>] extends {
+      cardinality: "one";
+    }
+  ? Fact<OptionalAttribute<A>> | null
+  : Fact<OptionalAttribute<A>>[];
 
 type Mutation<T> = (args: T, ctx: MutationContext) => Promise<void>;
 
@@ -247,8 +254,16 @@ const updateLastSeenMessage: Mutation<{
   });
 };
 
+const deleteEntity: Mutation<{ entity: string }> = async (args, ctx) => {
+  let references = await ctx.scanIndex.vae(args.entity);
+  let facts = await ctx.scanIndex.eav(args.entity, null);
+  console.log("deleting?");
+  await Promise.all(facts.concat(references).map((f) => ctx.retractFact(f.id)));
+};
+
 export const Mutations = {
   updateLastSeenMessage,
+  deleteEntity,
   postMessage,
   createCard,
   addSpace,

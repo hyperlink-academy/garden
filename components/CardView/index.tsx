@@ -46,7 +46,6 @@ export const CardView = (props: {
 }) => {
   let isDeck = useIndex.eav(props.entityID, "deck");
   let memberName = useIndex.eav(props.entityID, "member/name");
-  let cardTitle = useIndex.eav(props.entityID, "card/title");
   let parentContainer = useRef<HTMLDivElement>(null);
   let { ref } = usePreserveScroll<HTMLDivElement>();
   let { session } = useAuth();
@@ -232,7 +231,7 @@ const Title = (props: { entityID: string }) => {
       previewOnly={!authorized || !!memberName}
       placeholder="Untitled"
       className="text-xl font-bold bg-inherit"
-      value={title?.value}
+      value={title?.value || ""}
       onChange={async (e) => {
         await mutate("assertFact", {
           entity: props.entityID,
@@ -252,7 +251,6 @@ const CardMoreOptionsMenu = (props: {
   let { authorized, mutate } = useMutations();
   let memberName = useIndex.eav(props.entityID, "member/name");
 
-  let deleteDisabled = true;
   let { query: q } = useRouter();
 
   return !authorized || !!memberName ? null : (
@@ -288,7 +286,11 @@ const CardMoreOptionsMenu = (props: {
         {/* TODO: wire up delete card (and add confirmation?) */}
         {/* TODO: check if deck card; if so display "Delete Deck…"  */}
 
-        <MenuItem disabled={deleteDisabled}>
+        <MenuItem
+          onClick={() => {
+            mutate("deleteEntity", { entity: props.entityID });
+          }}
+        >
           <p className="font-bold">Delete Card FOREVER</p>
           <Delete />
         </MenuItem>

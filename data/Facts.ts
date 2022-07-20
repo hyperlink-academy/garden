@@ -35,14 +35,13 @@ type Value<A extends AttributeName> = Attribute[A] extends {
         id: string;
         filetype: "image";
       };
-      reference: {
-        type: "reference";
-        value: string;
-      };
+      reference: ReferenceType;
       flag: {
         type: "flag";
       };
     }[Attribute[A]["type"]];
+
+export type ReferenceType = { type: "reference"; value: string };
 
 export const ref = (ref: string) => {
   return { type: "reference", value: ref } as const;

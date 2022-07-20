@@ -280,7 +280,7 @@ const DeckTitle = (props: { entityID: string }) => {
         <Textarea
           placeholder="Untitled Deck"
           className="text-xl font-bold bg-inherit"
-          value={DeckTitle?.value}
+          value={DeckTitle?.value || ""}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               e.preventDefault();
@@ -305,7 +305,7 @@ const DeckTitle = (props: { entityID: string }) => {
           onBlur={() => setDescriptionFocused(false)}
           placeholder={DeckTitle?.value === "" ? "add a description..." : ""}
           className="bg-inherit placeholder:italic"
-          value={DeckDescription?.value}
+          value={DeckDescription?.value || ""}
           onChange={async (e) => {
             await mutate("assertFact", {
               entity: props.entityID,

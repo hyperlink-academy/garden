@@ -1,5 +1,5 @@
 import { Attribute, UniqueAttributes } from "data/Attributes";
-import { Fact, Schema } from "data/Facts";
+import { Fact, ReferenceType, Schema } from "data/Facts";
 import { CardinalityResult, MutationContext } from "data/mutations";
 import { ulid } from "src/ulid";
 import { Lock } from "src/lock";
@@ -8,6 +8,11 @@ export const indexes = {
   ea: (entity: string, attribute: string, factID: string) =>
     `ea-${entity}-${attribute}-${factID}`,
   av: (attribute: string, value: string) => `av-${attribute}-${value}`,
+  va: (
+    v: { type: "reference"; value: string },
+    attribute: string,
+    factID: string
+  ) => `va-${v.value}-${attribute}-${factID}`,
   factID: (factID: string) => `factID-${factID}`,
   ti: (time: string, factID: string) => `ti-${time}-${factID}`,
 };
@@ -61,6 +66,15 @@ export const store = (storage: BasicStorage) => {
         storage.delete(
           indexes.av(existingFact.attribute, existingFact.value as string)
         );
+
+      if (schema.type === "reference")
+        storage.delete(
+          indexes.va(
+            existingFact.value as ReferenceType,
+            existingFact.attribute,
+            existingFact.id
+          )
+        );
     }
 
     storage.put(indexes.factID(f.id), f);
@@ -69,19 +83,34 @@ export const store = (storage: BasicStorage) => {
     if (schema.unique) {
       storage.put(indexes.av(f.attribute, f.value as string), f);
     }
+    if (schema.type === "reference") {
+      storage.put(indexes.va(f.value as ReferenceType, f.attribute, f.id), f);
+    }
     return { success: true };
   };
 
   const scanIndex: MutationContext["scanIndex"] = {
-    eav: async (entity, attribute) => {
-      let schema = await getSchema(attribute);
+    vae: async (entity, attribute) => {
       let results = [
         ...(
-          await storage.list<Fact<keyof Attribute>>({
-            prefix: `ea-${entity}-${attribute}`,
+          await storage.list<Fact<Exclude<typeof attribute, undefined>>>({
+            prefix: `va-${entity}-${attribute || ""}`,
           })
         ).values(),
       ].filter((f) => !f.retracted);
+      return results;
+    },
+    eav: async (entity, attribute) => {
+      let results = [
+        ...(
+          await storage.list<Fact<keyof Attribute>>({
+            prefix: `ea-${entity}-${attribute || ""}`,
+          })
+        ).values(),
+      ].filter((f) => !f.retracted);
+      if (!attribute) return results as CardinalityResult<typeof attribute>;
+
+      let schema = await getSchema(attribute);
       if (schema?.cardinality === "one")
         return results[0] as CardinalityResult<typeof attribute>;
       return results as CardinalityResult<typeof attribute>;

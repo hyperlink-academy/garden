@@ -27,7 +27,7 @@ export default {
           a.lastUpdated > b.lastUpdated ? 1 : -1
         );
         return entries.flatMap((e, index) => {
-          if (index === entries.length) return [];
+          if (index === entries.length - 1) return [];
           return [indexes.ti(e.lastUpdated, e.id)];
         });
       });
