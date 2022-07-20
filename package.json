@@ -36,7 +36,6 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-use-measure": "^2.1.1",
-    "react-virtual": "^2.10.4",
     "replicache": "^10.0.0",
     "replicache-react": "^2.7.0",
     "swr": "^1.2.2",
