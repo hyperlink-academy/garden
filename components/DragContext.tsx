@@ -14,7 +14,7 @@ import { Fact } from "data/Facts";
 import { useMutations } from "hooks/useReplicache";
 import { useState } from "react";
 import { createPortal } from "react-dom";
-import { animated, useTransition } from "react-spring";
+import { animated, useTransition } from "@react-spring/web";
 import { updatePositions } from "src/position_helpers";
 import { SmallCard } from "./SmallCard";
 

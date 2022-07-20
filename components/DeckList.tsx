@@ -1,7 +1,7 @@
 import { useIndex, useMutations } from "hooks/useReplicache";
 import { Disclosure } from "@headlessui/react";
 import useMeasure from "react-use-measure";
-import { animated, SpringValue, useSpring } from "react-spring";
+import { animated, SpringValue, useSpring } from "@react-spring/web";
 import { usePrevious } from "hooks/utils";
 import { useEffect, useState } from "react";
 import { ButtonLink, ButtonTertiary } from "./Buttons";
