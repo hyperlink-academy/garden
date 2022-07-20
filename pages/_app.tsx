@@ -10,8 +10,7 @@ import { SmokeProvider } from "components/Smoke";
 
 export default function App({ Component, pageProps }: AppProps) {
   let router = useRouter();
-  if (router.pathname.startsWith("/library"))
-    return <Component {...pageProps} />;
+  if (router.pathname.startsWith("/dev")) return <Component {...pageProps} />;
   if (router.pathname === "/")
     return (
       <SmokeProvider>

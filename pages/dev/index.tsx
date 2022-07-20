@@ -344,7 +344,7 @@ IndexPage.metadata = { name: "Home" };
 export default IndexPage;
 
 export async function getStaticProps() {
-  let componentLibraryPath = path.join(process.cwd(), "/pages/library/");
+  let componentLibraryPath = path.join(process.cwd(), "/pages/dev/");
   let componentFiles = await fs.readdir(componentLibraryPath);
   let components = await Promise.all(
     componentFiles
@@ -352,7 +352,7 @@ export async function getStaticProps() {
       .map(async (c) => {
         let component = await import("./" + c);
         return {
-          path: `/library/${c.split(".")[0]}`,
+          path: `/dev/${c.split(".")[0]}`,
           metadata: component.default.metadata as Metadata,
         };
       })
