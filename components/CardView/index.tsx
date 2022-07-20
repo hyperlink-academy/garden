@@ -46,7 +46,6 @@ export const CardView = (props: {
 }) => {
   let isDeck = useIndex.eav(props.entityID, "deck");
   let memberName = useIndex.eav(props.entityID, "member/name");
-  let cardTitle = useIndex.eav(props.entityID, "card/title");
   let parentContainer = useRef<HTMLDivElement>(null);
   let { ref } = usePreserveScroll<HTMLDivElement>();
   let { session } = useAuth();
@@ -232,7 +231,7 @@ const Title = (props: { entityID: string }) => {
       previewOnly={!authorized || !!memberName}
       placeholder="Untitled"
       className="text-xl font-bold bg-inherit"
-      value={title?.value}
+      value={title?.value || ""}
       onChange={async (e) => {
         await mutate("assertFact", {
           entity: props.entityID,
