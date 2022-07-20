@@ -252,7 +252,6 @@ const CardMoreOptionsMenu = (props: {
   let { authorized, mutate } = useMutations();
   let memberName = useIndex.eav(props.entityID, "member/name");
 
-  let deleteDisabled = true;
   let { query: q } = useRouter();
 
   return !authorized || !!memberName ? null : (
@@ -288,7 +287,11 @@ const CardMoreOptionsMenu = (props: {
         {/* TODO: wire up delete card (and add confirmation?) */}
         {/* TODO: check if deck card; if so display "Delete Deck…"  */}
 
-        <MenuItem disabled={deleteDisabled}>
+        <MenuItem
+          onClick={() => {
+            mutate("deleteEntity", { entity: props.entityID });
+          }}
+        >
           <p className="font-bold">Delete Card FOREVER</p>
           <Delete />
         </MenuItem>

@@ -1,7 +1,6 @@
 import { createServer } from "@graphql-yoga/common";
-import { Attribute, ReferenceAttributes } from "data/Attributes";
-import { Fact, Schema } from "data/Facts";
-import { CardinalityResult } from "data/mutations";
+import { Attribute, FilterAttributes } from "data/Attributes";
+import { Fact } from "data/Facts";
 import { Env } from ".";
 export async function graphqlServer(request: Request, ctx: Env) {
   let sections = await Promise.all(
@@ -73,21 +72,40 @@ export async function graphqlServer(request: Request, ctx: Env) {
 
               if (attribute?.type === "reference") {
                 if (attribute?.cardinality === "many") {
-                  let data: Fact<keyof ReferenceAttributes>[] = facts as Fact<
-                    keyof ReferenceAttributes
-                  >[];
+                  let data = await ctx.factStore.scanIndex.eav(
+                    parent.id,
+                    attributeName as keyof FilterAttributes<{
+                      unique: any;
+                      cardinality: "many";
+                      type: "reference";
+                    }>
+                  );
                   return data.map((f) => ({ id: f.value.value }));
                 }
-                let data = facts as CardinalityResult<any> as Fact<
-                  keyof ReferenceAttributes
-                >;
-                return { id: data.value.value };
+
+                let data = await ctx.factStore.scanIndex.eav(
+                  parent.id,
+                  attributeName as keyof FilterAttributes<{
+                    unique: any;
+                    cardinality: "one";
+                    type: "reference";
+                  }>
+                );
+                return { id: data?.value.value };
               }
               if (attribute?.cardinality === "many") {
                 return facts.map((f) => f.value);
               }
-              let data = facts as CardinalityResult<any> as Fact<any>;
-              return data.value;
+
+              let data = await ctx.factStore.scanIndex.eav(
+                parent.id,
+                attributeName as keyof FilterAttributes<{
+                  unique: any;
+                  type: any;
+                  cardinality: "one";
+                }>
+              );
+              return data?.value;
             };
             return acc;
           }, {} as { [k: string]: (p: { id: string }) => any }),
@@ -95,27 +113,49 @@ export async function graphqlServer(request: Request, ctx: Env) {
             acc[slugify(s.name)] = async (parent: { id: string }) => {
               let attributeName = s.name;
               let attribute = s.schema;
-              let facts = await ctx.factStore.scanIndex.eav(
-                parent.id,
-                attributeName as keyof Attribute
-              );
               if (attribute?.type === "reference") {
                 if (attribute?.cardinality === "many") {
-                  let data: Fact<keyof ReferenceAttributes>[] = facts as Fact<
-                    keyof ReferenceAttributes
-                  >[];
+                  let data = await ctx.factStore.scanIndex.eav(
+                    parent.id,
+                    attributeName as keyof FilterAttributes<{
+                      cardinality: "many";
+                      type: "reference";
+                      unique: any;
+                    }>
+                  );
                   return data.map((f) => ({ id: f.value.value }));
                 }
-                let data = facts as CardinalityResult<any> as Fact<
-                  keyof ReferenceAttributes
-                >;
-                return { id: data.value.value };
+                let data = await ctx.factStore.scanIndex.eav(
+                  parent.id,
+                  attributeName as keyof FilterAttributes<{
+                    unique: any;
+                    type: "reference";
+                    cardinality: "one";
+                  }>
+                );
+                return { id: data?.value.value };
               }
               if (attribute?.cardinality === "many") {
-                return facts.map((f) => f.value);
+                let data = await ctx.factStore.scanIndex.eav(
+                  parent.id,
+                  attributeName as keyof FilterAttributes<{
+                    cardinality: "many";
+                    type: any;
+                    unique: any;
+                  }>
+                );
+                return data.map((f) => f.value);
               }
-              let data = facts as CardinalityResult<any> as Fact<any>;
-              return data.value;
+
+              let data = await ctx.factStore.scanIndex.eav(
+                parent.id,
+                attributeName as keyof FilterAttributes<{
+                  cardinality: "one";
+                  type: any;
+                  unique: any;
+                }>
+              );
+              return data?.value;
             };
 
             return acc;
