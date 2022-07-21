@@ -152,6 +152,8 @@ const AddToSection = (props: {
         //START OF ON SELECT LOGIC
         onSelect={async (d) => {
           if (!rep?.rep) return;
+          // if youre adding to a backlink section, then the entity is a string
+          // if youre creating a new deck
           if (props.backlink) {
             let entity: string;
 

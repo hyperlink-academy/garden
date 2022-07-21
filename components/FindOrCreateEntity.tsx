@@ -109,6 +109,13 @@ export const FindOrCreate = (props: {
                   <SearchResult
                     {...item}
                     selected={props.selected.includes(item.entity)}
+                    added={
+                      added.find(
+                        (addedItem) =>
+                          addedItem.type === "existing" &&
+                          addedItem.entity === item.entity
+                      ) !== undefined
+                    }
                   />
                 );
               })}
@@ -160,16 +167,16 @@ const CreateButton = (props: { value: string; inputExists: boolean }) => {
   );
 };
 
-const SearchResult = (props: Item & { selected: boolean }) => {
+const SearchResult = (props: Item & { selected: boolean; added: boolean }) => {
   return (
     <Combobox.Option key={props.entity} value={props.entity}>
       {({ active }) => {
         return (
           <SearchItem active={active}>
             <div
-              className={`gap-2 items-center ${
+              className={`gap-2 items-center grid grid-cols-[min-content_auto_min-content] ${
                 props.selected
-                  ? "grid grid-cols-[min-content_auto_min-content] text-grey-80 "
+                  ? " text-grey-80 "
                   : "grid grid-cols-[min-content_auto]"
               }`}
             >
@@ -177,7 +184,11 @@ const SearchResult = (props: Item & { selected: boolean }) => {
               {props.display}
               {props.selected ? (
                 <Checkmark className="justify-self-end" />
-              ) : null}
+              ) : props.added ? (
+                <Checkmark className="text-accent-blue" />
+              ) : (
+                <div className="rounded-full h-4 w-4 border border-dashed text-grey-55 "></div>
+              )}
             </div>
           </SearchItem>
         );
