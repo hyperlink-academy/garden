@@ -8,19 +8,19 @@ import { Add, Checkmark } from "./Icons";
 // use react state not replicache state
 
 type Item = { display: string; entity: string; icon?: React.ReactElement };
-
+type AddedItem =
+  | { entity: string; type: "existing" }
+  | { name: string; type: "create" };
 export const FindOrCreate = (props: {
   allowBlank: boolean;
   open: boolean;
   onClose: () => void;
   items: Item[];
   selected: string[];
-  onSelect: (
-    id: { entity: string; type: "existing" } | { name: string; type: "create" }
-  ) => void;
+  onSelect: (item: AddedItem) => void;
 }) => {
   let [input, setInput] = useState("");
-  let [added, setAdded] = useState<{ name: string; type: string }[]>([]);
+  let [added, setAdded] = useState<AddedItem[]>([]);
 
   let items = props.items.filter((f) => {
     if (/[A-Z]/g.test(input)) return f.display.includes(input);
@@ -32,7 +32,9 @@ export const FindOrCreate = (props: {
       (i) => i.display.toLocaleLowerCase() === input.toLocaleLowerCase()
     ) ||
     !!added.find(
-      (i) => i.name.toLocaleLowerCase() === input.toLocaleLowerCase()
+      (i) =>
+        i.type === "create" &&
+        i.name.toLocaleLowerCase() === input.toLocaleLowerCase()
     );
   return (
     <Transition show={props.open} className="fixed">
@@ -50,7 +52,7 @@ export const FindOrCreate = (props: {
               if (addedItem === "create")
                 setAdded([...added, { name: input, type: "create" }]);
               else {
-                setAdded([...added, { name: addedItem, type: "existing" }]);
+                setAdded([...added, { entity: addedItem, type: "existing" }]);
               }
               console.log([added]);
             }}
@@ -70,13 +72,18 @@ export const FindOrCreate = (props: {
                 <li>
                   {addedItem.type === "create"
                     ? addedItem.name
-                    : props.items.find((item) => item.entity === addedItem.name)
-                        ?.display}
+                    : props.items.find(
+                        (item) => item.entity === addedItem.entity
+                      )?.display}
                 </li>
               ))}
               <ButtonLink
                 content={`Add ${added.length} cards`}
-                onClick={props.onClose}
+                onClick={() => {
+                  added.map((addedItem) => props.onSelect(addedItem));
+                  props.onClose();
+                  setAdded([]);
+                }}
               />
             </ul>
             <Combobox.Input
