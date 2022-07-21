@@ -5,7 +5,6 @@ import { useRouter } from "next/router";
 
 import { useIndex, useMutations } from "hooks/useReplicache";
 import { Disclosure } from "@headlessui/react";
-import { animated, SpringValue, useSpring } from "react-spring";
 
 import { ReferenceAttributes } from "data/Attributes";
 import { Fact } from "data/Facts";

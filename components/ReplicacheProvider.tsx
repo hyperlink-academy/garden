@@ -62,7 +62,7 @@ export const SpaceSpaceProvider: React.FC<{
 }> = (props) => {
   let router = useRouter();
   let { data: id } = useSWR(
-    "/studio/" + router.query.studio + "/space/" + router.query.space,
+    "persist-/studio/" + router.query.studio + "/space/" + router.query.space,
     () => {
       let id = workerAPI(WORKER_URL, "get_space", {
         studio: router.query.studio as string,
@@ -87,7 +87,7 @@ export const makeSpaceReplicache = ({
   token?: string;
 }) =>
   makeReplicache({
-    name: `space-${id}-${session}`,
+    name: `space-${id}-${session}-${WORKER_URL}`,
     pusher: async (request) => {
       let data: PushRequest = await request.json();
       if (!token)
