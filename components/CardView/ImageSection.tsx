@@ -32,66 +32,73 @@ export const ImageSection = (props: { entity: string }) => {
         </button>
       </div>
     ) : (
-      // <div
-      //   onPaste={async (e) => {
-      //     let items = e.clipboardData.items;
-      //     if (!items[0].type.includes("image") || !session.session) return;
-      //     let image = items[0].getAsFile();
-      //     if (!image) return;
-
-      //     let res = await fetch(`${WORKER_URL}/space/${spaceID}/upload_file`, {
-      //       headers: {
-      //         "X-Authorization": session.session.id,
-      //       },
-      //       method: "POST",
-      //       body: image,
-      //     });
-      //     let data = (await res.json()) as
-      //       | { success: false }
-      //       | { success: true; data: { id: string } };
-      //     if (!data.success) return;
-      //     await mutate("assertFact", {
-      //       entity: props.entity,
-      //       attribute: "card/image",
-      //       value: { type: "file", id: data.data.id, filetype: "image" },
-      //       positions: {},
-      //     });
-      //   }}
-      // >
-
-      <label className="inline-block w-max text-grey-55 hover:text-accent-blue pt-2">
+      <AddImage
+        onUpload={async (imageID) => {
+          await mutate("assertFact", {
+            entity: props.entity,
+            attribute: "card/image",
+            value: { type: "file", id: imageID, filetype: "image" },
+            positions: {},
+          });
+        }}
+      >
         <SectionImageAdd />
-        <input
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={async (e) => {
-            let files = e.currentTarget.files;
-            if (!files || !session.session || !spaceID) return;
-            let res = await fetch(
-              `${WORKER_URL}/space/${spaceID}/upload_file`,
-              {
-                headers: {
-                  "X-Authorization": session.session.id,
-                },
-                method: "POST",
-                body: files[0],
-              }
-            );
-            let data = (await res.json()) as
-              | { success: false }
-              | { success: true; data: { id: string } };
-            if (!data.success) return;
-            await mutate("assertFact", {
-              entity: props.entity,
-              attribute: "card/image",
-              value: { type: "file", id: data.data.id, filetype: "image" },
-              positions: {},
-            });
-          }}
-        />
-      </label>
-      // </div>
+      </AddImage>
     )
+  );
+};
+
+export const AddImage: React.FC<{ onUpload: (imageID: string) => void }> = (
+  props
+) => {
+  let { session } = useAuth();
+  let spaceID = useSpaceID();
+
+  return (
+    <label
+      className="inline-block w-max text-grey-55 hover:text-accent-blue pt-2"
+      onPaste={async (e) => {
+        let items = e.clipboardData.items;
+        if (!items[0].type.includes("image") || !session.session) return;
+        let image = items[0].getAsFile();
+        if (!image) return;
+
+        let res = await fetch(`${WORKER_URL}/space/${spaceID}/upload_file`, {
+          headers: {
+            "X-Authorization": session.session.id,
+          },
+          method: "POST",
+          body: image,
+        });
+        let data = (await res.json()) as
+          | { success: false }
+          | { success: true; data: { id: string } };
+        if (!data.success) return;
+        props.onUpload(data.data.id);
+      }}
+    >
+      {props.children}
+      <input
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={async (e) => {
+          let files = e.currentTarget.files;
+          if (!files || !session.session || !spaceID) return;
+          let res = await fetch(`${WORKER_URL}/space/${spaceID}/upload_file`, {
+            headers: {
+              "X-Authorization": session.session.id,
+            },
+            method: "POST",
+            body: files[0],
+          });
+          let data = (await res.json()) as
+            | { success: false }
+            | { success: true; data: { id: string } };
+          if (!data.success) return;
+          props.onUpload(data.data.id);
+        }}
+      />
+    </label>
   );
 };

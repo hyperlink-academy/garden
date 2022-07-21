@@ -31,7 +31,7 @@ export const delete_file_upload_route = makeRoute({
     );
     if (!isMember)
       return { data: { success: false, error: "user is not a member" } };
-    deleteFileUpload(fauna, { id: msg.fileID, token: msg.token });
+    await deleteFileUpload(fauna, { id: msg.fileID, token: msg.token });
 
     return { data: { success: true } };
   },

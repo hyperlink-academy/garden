@@ -529,6 +529,7 @@ export const SectionLinkedCard = (props: SVGProps<SVGSVGElement>) => {
 export const SectionImageAdd = (props: SVGProps<SVGSVGElement>) => {
   return (
     <svg
+      {...props}
       width="24"
       height="24"
       viewBox="0 0 24 24"

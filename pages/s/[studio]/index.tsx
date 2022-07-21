@@ -5,7 +5,7 @@ import {
   ButtonTertiary,
   ButtonPrimary,
 } from "components/Buttons";
-import { DoorSelector } from "components/DoorSelector";
+import { Door, DoorSelector } from "components/DoorSelector";
 import { SpaceNew } from "components/Icons";
 import { Modal } from "components/Layout";
 import { SpaceProvider } from "components/ReplicacheProvider";
@@ -64,7 +64,7 @@ const Logout = () => {
 const CreateSpace = (props: { studioSpaceID: string }) => {
   let [open, setOpen] = useState(false);
   let [name, setName] = useState("");
-  let [door, setDoor] = useState("");
+  let [door, setDoor] = useState<Door | undefined>();
   let auth = useAuth();
   let { authorized } = useMutations();
   let rep = useContext(ReplicacheContext);
