@@ -142,20 +142,24 @@ const EditSpace = (props: { spaceID: string }) => {
                   : undefined
               }
               onSelect={async (s) => {
-                if (s.type === "default")
+                if (s.type === "default") {
+                  if (uploadedDoor)
+                    await mutate("retractFact", { id: uploadedDoor.id });
                   await mutate("assertFact", {
                     entity: props.spaceID as string,
                     attribute: "space/door/image",
                     value: s.value,
                     positions: {},
                   });
-                else
+                } else {
+                  if (door) await mutate("retractFact", { id: door.id });
                   await mutate("assertFact", {
                     entity: props.spaceID as string,
                     attribute: "space/door/uploaded-image",
                     value: { type: "file", id: s.value, filetype: "image" },
                     positions: {},
                   });
+                }
               }}
             />
           </div>
