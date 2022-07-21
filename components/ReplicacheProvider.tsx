@@ -60,26 +60,15 @@ export const SpaceSpaceProvider: React.FC<{
   loading: React.ReactElement;
   notFound: React.ReactElement;
 }> = (props) => {
-  let { query } = useRouter();
-  let { data: id, mutate } = useSWR(
-    "/studio/" + query.studio + "/space/" + query.space,
-    async () => {
-      let key = `ids-${query.studio}-${query.space}`;
-      let id = localStorage.getItem(key);
-
-      let remoteResult = workerAPI(WORKER_URL, "get_space", {
-        studio: query.studio as string,
-        space: query.space as string,
-      }).then((res) => {
-        if (res.success) {
-          localStorage.setItem(key, res.id);
-          if (id) mutate(res, { revalidate: false });
-        }
-        return res;
+  let router = useRouter();
+  let { data: id } = useSWR(
+    "persist-/studio/" + router.query.studio + "/space/" + router.query.space,
+    () => {
+      let id = workerAPI(WORKER_URL, "get_space", {
+        studio: router.query.studio as string,
+        space: router.query.space as string,
       });
-
-      if (!id) return remoteResult;
-      return { success: true, id } as const;
+      return id;
     },
     { revalidateOnFocus: false }
   );
