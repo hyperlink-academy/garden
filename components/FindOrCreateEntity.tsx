@@ -34,6 +34,7 @@ export const FindOrCreate = (props: {
     !!added.find(
       (i) =>
         i.type === "create" &&
+        i.name !== "" &&
         i.name.toLocaleLowerCase() === input.toLocaleLowerCase()
     );
   return (
@@ -47,12 +48,20 @@ export const FindOrCreate = (props: {
         <div className="">
           <Combobox
             value=""
-            onChange={(addedItem: string) => {
-              if (props.selected.includes(addedItem)) return;
-              if (addedItem === "create")
+            onChange={(optionValue: string) => {
+              if (props.selected.includes(optionValue)) return;
+              if (
+                added.find(
+                  (addedItem) =>
+                    addedItem.type === "existing" &&
+                    addedItem.entity === optionValue
+                ) !== undefined
+              )
+                return;
+              if (optionValue === "create")
                 setAdded([...added, { name: input, type: "create" }]);
               else {
-                setAdded([...added, { entity: addedItem, type: "existing" }]);
+                setAdded([...added, { entity: optionValue, type: "existing" }]);
               }
               console.log([added]);
             }}
@@ -70,8 +79,10 @@ export const FindOrCreate = (props: {
             <ul>
               {added.map((addedItem) => (
                 <li>
-                  {addedItem.type === "create"
+                  {addedItem.type === "create" && addedItem.name !== ""
                     ? addedItem.name
+                    : addedItem.type === "create" && addedItem.name === ""
+                    ? "New Untitled Card"
                     : props.items.find(
                         (item) => item.entity === addedItem.entity
                       )?.display}
@@ -137,7 +148,7 @@ const CreateButton = (props: { value: string; inputExists: boolean }) => {
       {({ active }) => {
         return (
           <SearchItem active={active}>
-            {!props.inputExists ? (
+            {!props.inputExists || props.value === "" ? (
               <div
                 className={`py-2 w-full
                           text-accent-blue font-bold 
