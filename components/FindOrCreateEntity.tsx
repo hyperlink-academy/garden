@@ -1,5 +1,6 @@
 import { Combobox, Dialog, Transition } from "@headlessui/react";
-import { useState } from "react";
+import { type } from "os";
+import { useRef, useState } from "react";
 import { ButtonLink } from "./Buttons";
 import { Add, Checkmark } from "./Icons";
 
@@ -21,6 +22,9 @@ export const FindOrCreate = (props: {
 }) => {
   let [input, setInput] = useState("");
   let [added, setAdded] = useState<AddedItem[]>([]);
+  let isMultiSelect = useRef(false);
+  // isMultiSelect.current
+  // isMultiSelect.current = false
 
   let items = props.items.filter((f) => {
     if (/[A-Z]/g.test(input)) return f.display.includes(input);
@@ -40,7 +44,11 @@ export const FindOrCreate = (props: {
   return (
     <Transition show={props.open} className="fixed">
       <Dialog
-        onClose={props.onClose}
+        onClose={() => {
+          props.onClose();
+          setAdded([]);
+          isMultiSelect.current = false;
+        }}
         className="fixed z-10 inset-0 overflow-y-hidden"
       >
         <Dialog.Overlay className="overlay" />
@@ -49,8 +57,10 @@ export const FindOrCreate = (props: {
           <Combobox
             value=""
             onChange={(optionValue: string) => {
-              if (props.selected.includes(optionValue)) return;
+              console.log(isMultiSelect.current);
+              // if the item is already in the deck or already in the added[], don't do anything
               if (
+                props.selected.includes(optionValue) ||
                 added.find(
                   (addedItem) =>
                     addedItem.type === "existing" &&
@@ -58,12 +68,28 @@ export const FindOrCreate = (props: {
                 ) !== undefined
               )
                 return;
-              if (optionValue === "create")
-                setAdded([...added, { name: input, type: "create" }]);
-              else {
-                setAdded([...added, { entity: optionValue, type: "existing" }]);
+              // clicking the checkbox on a search result sets state to multiselect.
+              // if isMultiSelect = false then onselect and onclose that bish
+
+              // TODO!!!! MAKE IT WORK WITH CREATE!
+
+              if (isMultiSelect.current === false) {
+                props.onSelect({ entity: optionValue, type: "existing" });
+                props.onClose();
+                setAdded([]);
+                isMultiSelect.current = false;
+              } else {
+                // if isMultiSelect is true, then add clicked items to the added[]
+                if (optionValue === "create")
+                  setAdded([...added, { name: input, type: "create" }]);
+                else {
+                  setAdded([
+                    ...added,
+                    { entity: optionValue, type: "existing" },
+                  ]);
+                }
+                console.log([added]);
               }
-              console.log([added]);
             }}
             as="div"
             className={`
@@ -84,7 +110,9 @@ export const FindOrCreate = (props: {
                     : addedItem.type === "create" && addedItem.name === ""
                     ? "New Untitled Card"
                     : props.items.find(
-                        (item) => item.entity === addedItem.entity
+                        (item) =>
+                          addedItem.type === "existing" &&
+                          item.entity === addedItem.entity
                       )?.display}
                 </li>
               ))}
@@ -94,6 +122,7 @@ export const FindOrCreate = (props: {
                   added.map((addedItem) => props.onSelect(addedItem));
                   props.onClose();
                   setAdded([]);
+                  isMultiSelect.current = false;
                 }}
               />
             </ul>
@@ -102,12 +131,15 @@ export const FindOrCreate = (props: {
               className="mx-3 mt-4"
               placeholder="find or create cards..."
               onKeyDown={(e: React.KeyboardEvent) => {
-                if (e.key === "Escape") props.onClose();
+                if (e.key === "Escape") {
+                  props.onClose();
+                  setAdded([]);
+                  isMultiSelect.current = false;
+                }
               }}
               onChange={(e) => setInput(e.currentTarget.value)}
             />
 
-            {/* I am aware the max height in the Combobox.Options is gross, but max-h-full does work and this is the best i could do D:*/}
             <Combobox.Options
               static
               className="w-full pt-2 flex-col flex gap-2 h-min max-h-[calc(100vh-16rem)] overflow-y-auto"
@@ -127,6 +159,9 @@ export const FindOrCreate = (props: {
                           addedItem.entity === item.entity
                       ) !== undefined
                     }
+                    setMultiSelect={() => {
+                      isMultiSelect.current = true;
+                    }}
                   />
                 );
               })}
@@ -178,7 +213,13 @@ const CreateButton = (props: { value: string; inputExists: boolean }) => {
   );
 };
 
-const SearchResult = (props: Item & { selected: boolean; added: boolean }) => {
+const SearchResult = (
+  props: Item & {
+    selected: boolean;
+    added: boolean;
+    setMultiSelect: () => void;
+  }
+) => {
   return (
     <Combobox.Option key={props.entity} value={props.entity}>
       {({ active }) => {
@@ -198,7 +239,11 @@ const SearchResult = (props: Item & { selected: boolean; added: boolean }) => {
               ) : props.added ? (
                 <Checkmark className="text-accent-blue" />
               ) : (
-                <div className="rounded-full h-4 w-4 border border-dashed text-grey-55 "></div>
+                <div
+                  className="rounded-full h-4 w-4 border border-dashed text-grey-55"
+                  onClick={() => props.setMultiSelect()}
+                />
+                // add an event listener to this div so that it sets a state to multiselect if clicked.
               )}
             </div>
           </SearchItem>
