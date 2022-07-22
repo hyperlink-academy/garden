@@ -21,7 +21,6 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import { FindOrCreate } from "components/FindOrCreateEntity";
 import { SmallCard } from "components/SmallCard";
-import { ref } from "data/Facts";
 import { RenderedText } from "components/Textarea/RenderedText";
 
 export default function ChatPage() {
@@ -233,7 +232,12 @@ export const MessageInput = (props: { id: string; topic: string }) => {
   }
 
   const submit = async () => {
-    if (!authorized || !session.session || !message) return;
+    if (
+      !authorized ||
+      !session.session ||
+      (!message && attachedCards.length === 0)
+    )
+      return;
     let messageId = ulid();
     let entity: string | undefined;
     if (attachedCards.length > 0) {
