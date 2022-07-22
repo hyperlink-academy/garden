@@ -72,56 +72,54 @@ const CreateSpace = (props: { studioSpaceID: string }) => {
     return null;
   } else
     return (
-      <div>
-        <div className="w-full grid">
-          <a className="place-self-center">
-            <ButtonSecondary
-              icon={<SpaceNew />}
-              content="Create New Space!"
-              onClick={() => setOpen(true)}
-            />
-          </a>
-          <Modal open={open} onClose={() => setOpen(false)}>
-            <div className="w-full flex flex-col gap-6">
-              <div className="w-full flex flex-col gap-1">
-                <p className="font-bold">Name this space</p>
-                <input
-                  className="w-full"
-                  value={name}
-                  placeholder=""
-                  onChange={(e) => setName(e.currentTarget.value)}
-                />
-              </div>
-              <DoorSelector selected={door} onSelect={(d) => setDoor(d)} />
-
-              <div className="flex gap-4 place-self-end">
-                <ButtonTertiary
-                  content="Nevermind"
-                  onClick={() => setOpen(false)}
-                />
-
-                <ButtonPrimary
-                  content="Create!"
-                  disabled={!name || !door}
-                  onClick={async () => {
-                    if (!auth.session.loggedIn || !name) return;
-                    await spaceAPI(
-                      `${WORKER_URL}/space/${props.studioSpaceID}`,
-                      "create_space",
-                      {
-                        name,
-                        token: auth.session.token,
-                      }
-                    );
-                    setName("");
-                    rep?.rep.pull();
-                    setOpen(false);
-                  }}
-                />
-              </div>
+      <div className="w-full grid">
+        <a className="place-self-center">
+          <ButtonSecondary
+            icon={<SpaceNew />}
+            content="Create New Space!"
+            onClick={() => setOpen(true)}
+          />
+        </a>
+        <Modal open={open} onClose={() => setOpen(false)}>
+          <div className="flex flex-col gap-6 overflow-y-scroll">
+            <div className="flex flex-col gap-1">
+              <p className="font-bold">Name this space</p>
+              <input
+                className="w-full"
+                value={name}
+                placeholder=""
+                onChange={(e) => setName(e.currentTarget.value)}
+              />
             </div>
-          </Modal>
-        </div>
+            <DoorSelector selected={door} onSelect={(d) => setDoor(d)} />
+
+            <div className="flex gap-4 place-self-end">
+              <ButtonTertiary
+                content="Nevermind"
+                onClick={() => setOpen(false)}
+              />
+
+              <ButtonPrimary
+                content="Create!"
+                disabled={!name || !door}
+                onClick={async () => {
+                  if (!auth.session.loggedIn || !name) return;
+                  await spaceAPI(
+                    `${WORKER_URL}/space/${props.studioSpaceID}`,
+                    "create_space",
+                    {
+                      name,
+                      token: auth.session.token,
+                    }
+                  );
+                  setName("");
+                  rep?.rep.pull();
+                  setOpen(false);
+                }}
+              />
+            </div>
+          </div>
+        </Modal>
       </div>
     );
 };
