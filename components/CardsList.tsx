@@ -17,7 +17,7 @@ export const CardsList = () => {
         // horizontal
         cards={cards || []}
         deck={deck.entity}
-        attribute="activity/hand-contains"
+        attribute="deck/contains"
         positionKey="eav"
       />
     </div>
