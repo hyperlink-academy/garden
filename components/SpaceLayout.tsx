@@ -7,6 +7,7 @@ import {
   DeckLarge,
   ExitDoor,
   ActivityBlocks,
+  Studio,
 } from "./Icons";
 import { ButtonLink } from "./Buttons";
 import { useContext, useState } from "react";
@@ -127,15 +128,22 @@ export function Footer() {
               </div>
 
               <div className="justify-self-center items-center flex flex-row gap-1 md:gap-2 mr-2">
+                {/* HOME */}
+                {/* NB: TESTING! */}
+                <Home />
+
                 {/* DECKS */}
                 <FooterItem
                   active={(r) =>
-                    !r.includes("/chat") && !r.includes("/activity")
+                    !r.includes("/chat") &&
+                    !r.includes("/activity") &&
+                    !r.includes("/home")
                   }
                   route={`/s/${router.query.studio}/s/${router.query.space}`}
                 >
                   <DeckLarge width={32} height={32} />
                 </FooterItem>
+
                 {/* CHAT */}
                 <FooterItem
                   active={(r) => r.endsWith("chat")}
@@ -144,6 +152,7 @@ export function Footer() {
                   <ChatIcon />
                 </FooterItem>
 
+                {/* ACTIVITIES */}
                 <Activity />
               </div>
             </div>
@@ -316,3 +325,22 @@ function InfoModal() {
     </div>
   );
 }
+
+const Home = () => {
+  let router = useRouter();
+
+  // do we have a "home" deck?
+  let deck = useIndex.ave("card/title", "Home");
+
+  // prevent complaints below about maybe null deck prop
+  if (deck === null) return null;
+
+  return (
+    <FooterItem
+      active={(r) => r.endsWith("home")}
+      route={`/s/${router.query.studio}/s/${router.query.space}/home`}
+    >
+      <Studio width={32} height={32} />
+    </FooterItem>
+  );
+};
