@@ -56,7 +56,6 @@ export const SmallCardList = (props: {
           return (
             <SortableSmallCard
               parent={props.deck}
-              siblings={props.cards}
               positionKey={props.positionKey}
               section={props.attribute}
               index={index}
