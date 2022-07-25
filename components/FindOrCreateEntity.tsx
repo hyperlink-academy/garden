@@ -1,3 +1,4 @@
+import { arraySwap } from "@dnd-kit/sortable";
 import { Combobox, Dialog, Transition } from "@headlessui/react";
 import { type } from "os";
 import { useRef, useState } from "react";
@@ -8,10 +9,16 @@ import { Add, Checkmark } from "./Icons";
 // They are a single select
 // use react state not replicache state
 
+// TOP LEVEL NOTES (6.25.22)
+// FindandCreate modal draws from 2 arrays.
+// Selected = things that are already included in the list you are adding to
+// Added = things that you clicked after opening the modal. These aren't added yet, but will be once you hit submit.
+
 type Item = { display: string; entity: string; icon?: React.ReactElement };
 type AddedItem =
   | { entity: string; type: "existing" }
   | { name: string; type: "create" };
+
 export const FindOrCreate = (props: {
   allowBlank: boolean;
   open: boolean;
@@ -23,9 +30,8 @@ export const FindOrCreate = (props: {
   let [input, setInput] = useState("");
   let [added, setAdded] = useState<AddedItem[]>([]);
   let isMultiSelect = useRef(false);
-  // isMultiSelect.current
-  // isMultiSelect.current = false
 
+  // THIS IS WHERE THE RESULTS ARE FILTERED!
   let items = props.items.filter((f) => {
     if (/[A-Z]/g.test(input)) return f.display.includes(input);
     return f.display.toLocaleLowerCase().includes(input.toLocaleLowerCase());
@@ -70,9 +76,6 @@ export const FindOrCreate = (props: {
                 return;
               // clicking the checkbox on a search result sets state to multiselect.
               // if isMultiSelect = false then onselect and onclose that bish
-
-              // TODO!!!! MAKE IT WORK WITH CREATE!
-
               if (isMultiSelect.current === false) {
                 props.onSelect({ entity: optionValue, type: "existing" });
                 props.onClose();
@@ -103,6 +106,7 @@ export const FindOrCreate = (props: {
               `}
           >
             <ul>
+              {/* if isMultiselect = true, take all the stuff in the added[] and display it at the top, with a submit button. If not, show nothing! */}
               {added.map((addedItem) => (
                 <li>
                   {addedItem.type === "create" && addedItem.name !== ""
@@ -151,7 +155,7 @@ export const FindOrCreate = (props: {
                 return (
                   <SearchResult
                     {...item}
-                    selected={props.selected.includes(item.entity)}
+                    disabled={props.selected.includes(item.entity)}
                     added={
                       added.find(
                         (addedItem) =>
@@ -215,32 +219,43 @@ const CreateButton = (props: { value: string; inputExists: boolean }) => {
 
 const SearchResult = (
   props: Item & {
-    selected: boolean;
+    disabled: boolean;
     added: boolean;
     setMultiSelect: () => void;
   }
 ) => {
   return (
-    <Combobox.Option key={props.entity} value={props.entity}>
+    <Combobox.Option
+      key={props.entity}
+      value={props.entity}
+      disabled={props.disabled}
+    >
       {({ active }) => {
         return (
           <SearchItem active={active}>
+            <style jsx>
+              {`
+                .searchResult:hover .searchResultEmptyCheck {
+                  display: block;
+                }
+              `}
+            </style>
             <div
-              className={`gap-2 items-center grid grid-cols-[min-content_auto_min-content] ${
-                props.selected
-                  ? " text-grey-80 "
-                  : "grid grid-cols-[min-content_auto]"
+              className={`searchResult gap-2 grid grid-cols-[min-content_auto_min-content]  ${
+                props.disabled
+                  ? " text-grey-80 cursor-default"
+                  : "cursor-pointer"
               }`}
             >
-              {props.icon}
-              {props.display}
-              {props.selected ? (
-                <Checkmark className="justify-self-end" />
+              <div className="searchResultIcon mt-[1px]">{props.icon}</div>
+              <div className="searchResultName">{props.display}</div>
+              {props.disabled ? (
+                <Checkmark className="searchReultSelectedCheck text-grey-90 justify-self-end mt-[5px]" />
               ) : props.added ? (
-                <Checkmark className="text-accent-blue" />
+                <Checkmark className="searchResultAddedCheck text-accent-blue mt-[5px]" />
               ) : (
                 <div
-                  className="rounded-full h-4 w-4 border border-dashed text-grey-55"
+                  className="searchResultEmptyCheck w-4 h-4 mt-[5px] rounded-full border border-dashed text-grey-55 hover:text-accent-blue hover:border-2 sm:hidden"
                   onClick={() => props.setMultiSelect()}
                 />
                 // add an event listener to this div so that it sets a state to multiselect if clicked.
