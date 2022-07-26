@@ -3,8 +3,9 @@ import { arraySwap } from "@dnd-kit/sortable";
 import { Combobox, Dialog, Transition } from "@headlessui/react";
 import { type } from "os";
 import { useRef, useState } from "react";
-import { ButtonLink } from "./Buttons";
+import { ButtonLink, ButtonPrimary } from "./Buttons";
 import { Add, Checkmark, Cross } from "./Icons";
+import { Divider } from "./Layout";
 
 // Can I adapt this to work for section names as well?
 // They are a single select
@@ -30,6 +31,7 @@ export const FindOrCreate = (props: {
 }) => {
   let [input, setInput] = useState("");
   let [added, setAdded] = useState<AddedItem[]>([]);
+  let [addedItemsList, setAddedItemsList] = useState(false);
   let isMultiSelect = useRef(false);
 
   // THIS IS WHERE THE RESULTS ARE FILTERED!
@@ -54,6 +56,7 @@ export const FindOrCreate = (props: {
         onClose={() => {
           props.onClose();
           setAdded([]);
+          setInput("");
           isMultiSelect.current = false;
         }}
         className="fixed z-10 inset-0 overflow-y-hidden"
@@ -87,7 +90,7 @@ export const FindOrCreate = (props: {
                 if (findAddedItem !== undefined) {
                   let addedItemIndex = added.indexOf(findAddedItem);
                   added.splice(addedItemIndex, 1);
-                  setAdded([...added]); //create a new array to force a refresh of the listedAddedItems
+                  setAdded([...added]); //create a new array to force a refresh of the addedList
                 }
                 // ELSE add clicked items to the added[]
                 else if (optionValue === "create") {
@@ -113,41 +116,6 @@ export const FindOrCreate = (props: {
               bg-white shadow-drop border border-grey-80 rounded-md
               `}
           >
-            <ul className="ListedAddedItems">
-              {/* if isMultiselect = true, take all the stuff in the added[] and display it at the top, with a submit button. If not, show nothing! */}
-              {added.map((addedItem) => (
-                <li className="listedAddedItem grid grid-cols-[auto_max-content]">
-                  <div>
-                    {addedItem.type === "create" && addedItem.name !== ""
-                      ? addedItem.name
-                      : addedItem.type === "create" && addedItem.name === ""
-                      ? "New Untitled Card"
-                      : props.items.find(
-                          (item) =>
-                            addedItem.type === "existing" &&
-                            item.entity === addedItem.entity
-                        )?.display}
-                  </div>
-                  <button
-                    onClick={() => {
-                      added.splice(added.indexOf(addedItem), 1);
-                      setAdded([...added]);
-                    }}
-                  >
-                    <Cross />
-                  </button>
-                </li>
-              ))}
-              <ButtonLink
-                content={`Add ${added.length} cards`}
-                onClick={() => {
-                  added.map((addedItem) => props.onSelect(addedItem));
-                  props.onClose();
-                  setAdded([]);
-                  isMultiSelect.current = false;
-                }}
-              />
-            </ul>
             <Combobox.Input
               value={input}
               className="mx-3 mt-4"
@@ -162,6 +130,62 @@ export const FindOrCreate = (props: {
               onChange={(e) => setInput(e.currentTarget.value)}
             />
 
+            <div className="addedList flex flex-col gap-2 m-3 p-3 lightBorder">
+              {/* if isMultiselect = true, take all the stuff in the added[] and display it at the top, with a submit button. If not, show nothing! */}
+              <div className="grid grid-cols-[auto_max-content] items-center">
+                <ButtonLink
+                  content={`${added.length} selected`}
+                  onClick={() => {
+                    setAddedItemsList(!addedItemsList);
+                  }}
+                />
+                <ButtonPrimary
+                  content={`Add Cards!`}
+                  onClick={() => {
+                    added.map((addedItem) => props.onSelect(addedItem));
+                    props.onClose();
+                    setAdded([]);
+                    isMultiSelect.current = false;
+                  }}
+                />
+              </div>
+              {addedItemsList === false ? (
+                ""
+              ) : (
+                <ul className="flex flex-col gap-1">
+                  <Divider />
+                  {added.length === 0 ? (
+                    <div>nothing here</div>
+                  ) : (
+                    added.map((addedItem) => (
+                      <li className="addedListItem grid grid-cols-[max-content_auto_max-content] gap-2 ">
+                        <div className="w-6 h-6 rounded-full bg-test-pink"></div>
+                        <div>
+                          {addedItem.type === "create" && addedItem.name !== ""
+                            ? addedItem.name
+                            : addedItem.type === "create" &&
+                              addedItem.name === ""
+                            ? "New Untitled Card"
+                            : props.items.find(
+                                (item) =>
+                                  addedItem.type === "existing" &&
+                                  item.entity === addedItem.entity
+                              )?.display}
+                        </div>
+                        <button
+                          onClick={() => {
+                            added.splice(added.indexOf(addedItem), 1);
+                            setAdded([...added]);
+                          }}
+                        >
+                          <Cross />
+                        </button>
+                      </li>
+                    ))
+                  )}
+                </ul>
+              )}
+            </div>
             <Combobox.Options
               static
               className="w-full pt-2 flex-col flex gap-2 h-min max-h-[calc(100vh-16rem)] overflow-y-auto"
