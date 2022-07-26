@@ -1,3 +1,4 @@
+import { cornersOfRectangle } from "@dnd-kit/core/dist/utilities/algorithms/helpers";
 import { arraySwap } from "@dnd-kit/sortable";
 import { Combobox, Dialog, Transition } from "@headlessui/react";
 import { type } from "os";
@@ -63,7 +64,6 @@ export const FindOrCreate = (props: {
           <Combobox
             value=""
             onChange={(optionValue: string) => {
-              console.log(isMultiSelect.current);
               // if the item is already in the deck or already in the added[], don't do anything
               if (
                 props.selected.includes(optionValue) ||
@@ -74,6 +74,7 @@ export const FindOrCreate = (props: {
                 ) !== undefined
               )
                 return;
+              console.log("on change happening");
               // clicking the checkbox on a search result sets state to multiselect.
               // if isMultiSelect = false then onselect and onclose that bish
               if (isMultiSelect.current === false) {
@@ -91,7 +92,6 @@ export const FindOrCreate = (props: {
                     { entity: optionValue, type: "existing" },
                   ]);
                 }
-                console.log([added]);
               }
             }}
             as="div"
@@ -165,6 +165,7 @@ export const FindOrCreate = (props: {
                     }
                     setMultiSelect={() => {
                       isMultiSelect.current = true;
+                      console.log("multiSelect is " + isMultiSelect.current);
                     }}
                   />
                 );
@@ -224,6 +225,18 @@ const SearchResult = (
     setMultiSelect: () => void;
   }
 ) => {
+  let isLongPress = useRef(false);
+  let longPressTimer = useRef<number>();
+
+  const TriggerLongPress = () => {
+    isLongPress.current = false;
+
+    longPressTimer.current = window.setTimeout(() => {
+      isLongPress.current = true;
+      props.setMultiSelect();
+      console.log("delayed result! " + isLongPress.current);
+    }, 500);
+  };
   return (
     <Combobox.Option
       key={props.entity}
@@ -233,19 +246,42 @@ const SearchResult = (
       {({ active }) => {
         return (
           <SearchItem active={active}>
-            <style jsx>
-              {`
-                .searchResult:hover .searchResultEmptyCheck {
-                  display: block;
-                }
-              `}
-            </style>
             <div
-              className={`searchResult gap-2 grid grid-cols-[min-content_auto_min-content]  ${
+              className={`searchResult select-none gap-2 grid grid-cols-[min-content_auto_min-content]  ${
                 props.disabled
                   ? " text-grey-80 cursor-default"
                   : "cursor-pointer"
               }`}
+              onClick={(e) => {
+                if (e.shiftKey) {
+                  props.setMultiSelect();
+                }
+              }}
+              // START LONGPRESS LOGIC
+              // If you LongPress or LongClick, you will trigger multiselect. Here, we start a timer for .5 seconds when the user clicks
+              onMouseDown={() => {
+                TriggerLongPress();
+              }}
+              onTouchStart={() => {
+                TriggerLongPress();
+                console.log("touch");
+              }}
+              // If the user clicks for .5 seconds or more, then isMultiselect = true. Else, just regular click.
+              onMouseUp={() => {
+                window.clearTimeout(longPressTimer.current);
+
+                if (isLongPress.current === true) {
+                  console.log("longpressed!");
+                }
+              }}
+              onTouchEnd={() => {
+                window.clearTimeout(longPressTimer.current);
+
+                if (isLongPress.current === true) {
+                  console.log("notouch");
+                }
+              }}
+              //END LONGPRESS LOGIC
             >
               <div className="searchResultIcon mt-[1px]">{props.icon}</div>
               <div className="searchResultName">{props.display}</div>
@@ -258,7 +294,6 @@ const SearchResult = (
                   className="searchResultEmptyCheck w-4 h-4 mt-[5px] rounded-full border border-dashed text-grey-55 hover:text-accent-blue hover:border-2 sm:hidden"
                   onClick={() => props.setMultiSelect()}
                 />
-                // add an event listener to this div so that it sets a state to multiselect if clicked.
               )}
             </div>
           </SearchItem>
