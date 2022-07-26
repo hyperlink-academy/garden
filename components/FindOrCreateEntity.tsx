@@ -4,7 +4,7 @@ import { Combobox, Dialog, Transition } from "@headlessui/react";
 import { type } from "os";
 import { useRef, useState } from "react";
 import { ButtonLink } from "./Buttons";
-import { Add, Checkmark } from "./Icons";
+import { Add, Checkmark, Cross } from "./Icons";
 
 // Can I adapt this to work for section names as well?
 // They are a single select
@@ -87,7 +87,7 @@ export const FindOrCreate = (props: {
                 if (findAddedItem !== undefined) {
                   let addedItemIndex = added.indexOf(findAddedItem);
                   added.splice(addedItemIndex, 1);
-                  setAdded([...added]); //create a new array to force a refresh of the addedItemsList
+                  setAdded([...added]); //create a new array to force a refresh of the listedAddedItems
                 }
                 // ELSE add clicked items to the added[]
                 else if (optionValue === "create")
@@ -111,19 +111,29 @@ export const FindOrCreate = (props: {
               bg-white shadow-drop border border-grey-80 rounded-md
               `}
           >
-            <ul className="addedItemsList">
+            <ul className="ListedAddedItems">
               {/* if isMultiselect = true, take all the stuff in the added[] and display it at the top, with a submit button. If not, show nothing! */}
               {added.map((addedItem) => (
-                <li>
-                  {addedItem.type === "create" && addedItem.name !== ""
-                    ? addedItem.name
-                    : addedItem.type === "create" && addedItem.name === ""
-                    ? "New Untitled Card"
-                    : props.items.find(
-                        (item) =>
-                          addedItem.type === "existing" &&
-                          item.entity === addedItem.entity
-                      )?.display}
+                <li className="listedAddedItem grid grid-cols-[auto_max-content]">
+                  <div>
+                    {addedItem.type === "create" && addedItem.name !== ""
+                      ? addedItem.name
+                      : addedItem.type === "create" && addedItem.name === ""
+                      ? "New Untitled Card"
+                      : props.items.find(
+                          (item) =>
+                            addedItem.type === "existing" &&
+                            item.entity === addedItem.entity
+                        )?.display}
+                  </div>
+                  <button
+                    onClick={() => {
+                      added.splice(added.indexOf(addedItem), 1);
+                      setAdded([...added]);
+                    }}
+                  >
+                    <Cross />
+                  </button>
                 </li>
               ))}
               <ButtonLink
