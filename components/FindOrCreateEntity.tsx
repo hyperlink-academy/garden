@@ -90,13 +90,15 @@ export const FindOrCreate = (props: {
                   setAdded([...added]); //create a new array to force a refresh of the listedAddedItems
                 }
                 // ELSE add clicked items to the added[]
-                else if (optionValue === "create")
+                else if (optionValue === "create") {
                   setAdded([...added, { name: input, type: "create" }]);
-                else {
+                  setInput("");
+                } else {
                   setAdded([
                     ...added,
                     { entity: optionValue, type: "existing" },
                   ]);
+                  setInput("");
                 }
               }
             }}
@@ -262,8 +264,15 @@ const SearchResult = (
       {({ active }) => {
         return (
           <SearchItem active={active}>
+            <style jsx>
+              {`
+                .searchResult:hover .searchResultEmptyCheck {
+                  display: block;
+                }
+              `}
+            </style>
             <div
-              className={`searchResult select-none gap-2 grid grid-cols-[min-content_auto_min-content]  ${
+              className={`searchResult select-none gap-2 grid grid-cols-[min-content_auto_min-content] ${
                 props.disabled
                   ? " text-grey-80 cursor-default"
                   : "cursor-pointer"
