@@ -1,0 +1,8 @@
+CreateIndex({
+  "name": "deleted_file_uploads",
+  "source": Collection("file_uploads"),
+  "terms": [{
+    "field": ["data", "deleted"]
+  }],
+  "values": []
+})

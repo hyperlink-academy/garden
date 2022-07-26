@@ -10,12 +10,15 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import { ReferenceAttributes } from "data/Attributes";
-import { Fact } from "data/Facts";
-import { useMutations } from "hooks/useReplicache";
-import { useState } from "react";
+import {
+  ReplicacheContext,
+  scanIndex,
+  useMutations,
+} from "hooks/useReplicache";
+import { useContext, useState } from "react";
 import { createPortal } from "react-dom";
 import { animated, useTransition } from "@react-spring/web";
-import { updatePositions } from "src/position_helpers";
+import { sortByPosition, updatePositions } from "src/position_helpers";
 import { SmallCard } from "./SmallCard";
 
 export const SmallCardDragContext: React.FC = (props) => {
@@ -24,6 +27,7 @@ export const SmallCardDragContext: React.FC = (props) => {
   const touchSensor = useSensor(TouchSensor, {});
   const sensors = useSensors(mouseSensor, touchSensor);
   let { mutate } = useMutations();
+  let rep = useContext(ReplicacheContext);
   return (
     <DndContext
       collisionDetection={closestCenter}
@@ -34,6 +38,7 @@ export const SmallCardDragContext: React.FC = (props) => {
       onDragEnd={async (data) => {
         let { over, active } = data;
         setActiveCard(null);
+        if (!rep?.rep) return;
         if (over) {
           if (!active) return;
           if (over.id === "delete") {
@@ -46,18 +51,22 @@ export const SmallCardDragContext: React.FC = (props) => {
           let section: keyof ReferenceAttributes | undefined =
             over.data.current?.section;
           let positionKey: string | undefined = over.data.current?.positionKey;
-          let siblings: Fact<keyof ReferenceAttributes>[] | undefined =
-            over.data.current?.siblings;
 
           if (
             index === undefined ||
             currentIndex === undefined ||
-            !siblings ||
             !positionKey ||
             !parent ||
             !section
           )
             return;
+
+          let siblings = (
+            await rep.rep.query((tx) => {
+              if (!parent || !section) return [];
+              return scanIndex(tx).eav(parent, section);
+            })
+          ).sort(sortByPosition(positionKey));
           let newPositions = updatePositions(positionKey, siblings, [
             [active.id as string, currentIndex < index ? index : index - 1],
           ]);

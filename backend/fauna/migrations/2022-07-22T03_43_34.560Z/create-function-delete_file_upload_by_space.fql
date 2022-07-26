@@ -1,0 +1,18 @@
+CreateFunction({
+  "name": "delete_file_upload_by_space",
+  "role": "server",
+  "body": Query(Lambda("a", Let([{
+    "user": Call(Function("get_session_by_id"), {
+      "id": Select("token", Var("a"))
+    })
+  }, {
+    "files": Select("data", Paginate(Match(Index("file_uploads_by_space"), Select("spaceID", Var("a")))))
+  }], If(IsNull(Var("user")), {
+    "success": false
+  }, Foreach(Var("files"), Lambda("f", Update(Var("f"), {
+    "data": {
+      "deleted": true,
+      "deletedAt": Now()
+    }
+  })))))))
+})

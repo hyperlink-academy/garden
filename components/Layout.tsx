@@ -42,6 +42,8 @@ export const Modal: React.FC<{ open: boolean; onClose: () => void }> = (
               fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
               grid grid-flow-row gap-4
               max-w-md
+              overflow-auto
+              max-h-[calc(100%-32px)]
               w-[calc(100%-56px)]
               `}
       >

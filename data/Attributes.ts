@@ -102,6 +102,11 @@ export const DefaultAttributes = {
     unique: false,
     cardinality: "one",
   },
+  "space/door/uploaded-image": {
+    type: "file",
+    unique: false,
+    cardinality: "one",
+  },
   "space/name": {
     type: "string",
     unique: true,

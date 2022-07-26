@@ -1,53 +1,19 @@
 import { useIndex } from "hooks/useReplicache";
-import { SVGProps } from "react";
 
-let doorImages: string[] = [
-  "/doors/door-clouds-256.jpg",
-  "/doors/door-chicken-256.jpg",
-  "/doors/door-field-256.jpg",
-  "/doors/door-windowseat-256.jpg",
-];
-
-var doorIndex = 0;
-function getSequentialDoorImage(doorImages: string[]) {
-  var length = doorImages.length;
-  if (doorIndex <= length - 1) {
-    doorIndex++;
-    return doorImages[doorIndex - 1];
-  } else {
-    doorIndex = 1;
-    return doorImages[doorIndex - 1];
-  }
-}
-
-let frameColors = {
-  skyblue: ["#87ceeb", "#e0ffff"], //skyblue, lightcyan
-  salmon: ["#fa8072", "#ffa07a"], //salmon, lightsalmon
-  plum: ["#9932cc", "#dda0dd"], //darkorchid, plum
-  lavender: ["#d8bfd8", "#fff0f5"], //thistle, lavenderblush
-  "green - light": ["#3cb371", "#90ee90"], //mediumseagreen, lightgreen
-  "green - dark": ["#008000", "#006400"], //green, darkgreen
-  "gold - light": ["#ffd700", "#ffe4b5"], //gold, moccasin
-  "gold - dark": ["#daa520", "#ffd700"], //goldenrod, gold
-  "blue - med light": ["#0000ff", "#6495ed"], //blue, cornflowerblue
-  "blue - dark": ["#000080", "#0000ff"], //navy, blue
-  "crimson - light": ["#dc143c", "#f08080"], //crimson, lightcoral
-  "crimson - dark": ["#b22222", "#dc143c"], //firebrick, crimson
-};
-
-function getRandomFrame(frameColors: object) {
-  var length = Object.keys(frameColors).length;
-  return Object.keys(frameColors)[
-    Math.floor(Math.random() * length)
-  ] as keyof typeof frameColors;
-}
-
+const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export const Door = (props: {
   entityID: string;
   width?: string;
   glow?: boolean;
 }) => {
-  let image = useIndex.eav(props.entityID, "space/door/image");
+  let defaultDoor = useIndex.eav(props.entityID, "space/door/image");
+  let uploadedDoor = useIndex.eav(props.entityID, "space/door/uploaded-image");
+  let image = uploadedDoor
+    ? `${WORKER_URL}/static/${uploadedDoor.value.id}`
+    : defaultDoor
+    ? defaultDoor.value
+    : "/doors/door-clouds-256.jpg";
+
   // let colorKey = getRandomFrame(frameColors);
   // let color1 = frameColors[colorKey][0];
   // let color2 = frameColors[colorKey][1];
@@ -75,41 +41,9 @@ export const Door = (props: {
           {color3}
           {`;} .cls-4{fill:white;}`}
         </style>
-        <clipPath id="outer-frame">
-          <path
-            className="cls-1"
-            d="M196.56,521.92,28.19,427.57V119.84c0-27.47,13.1-70.32,57.88-65.3,50.79,5.7,111,78.77,110.9,165.32C196.91,295,196.56,521.92,196.56,521.92Z"
-          />
-        </clipPath>
+        {OuterFrameClipPath}
 
-        {/* GLOW EFFECT */}
-        {/* reference: https://codepen.io/dipscom/pen/mVYjPw */}
-        {/* alt example: https://stackoverflow.com/questions/54112231/is-it-possible-to-create-a-glow-effect-in-svg */}
-        <filter id="softGlow" height="200%" width="200%" x="-50%" y="-50%">
-          {/* <!-- Thicken out the original shape --> */}
-          <feMorphology
-            operator="dilate"
-            radius="4"
-            in="SourceAlpha"
-            result="thicken"
-          />
-          {/* <!-- Use a gaussian blur to create the soft blurriness of the glow --> */}
-          <feGaussianBlur in="thicken" stdDeviation="16" result="blurred" />
-          {/* <!-- Change the colour --> */}
-          <feFlood floodColor="#ffd700" result="glowColor" />
-          {/* <!-- Color in the glows --> */}
-          <feComposite
-            in="glowColor"
-            in2="blurred"
-            operator="in"
-            result="softGlow_colored"
-          />
-          {/* <!--	Layer the effects together --> */}
-          <feMerge>
-            <feMergeNode in="softGlow_colored" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
+        {SoftGlowFilter}
       </defs>
 
       <image
@@ -117,7 +51,7 @@ export const Door = (props: {
         height="100%"
         preserveAspectRatio="xMinYMin slice"
         // xlinkHref={image?.value || getSequentialDoorImage(doorImages)}
-        xlinkHref={image?.value || "/doors/door-clouds-256.jpg"}
+        xlinkHref={image}
         clipPath="url(#outer-frame)"
       />
       {/* <defs><style>.cls-1{fill:#fbb040;}.cls-2{fill:#f4c470;}.cls-3{fill:#ef852e;}.cls-4{fill:#fff;}</style></defs> */}
@@ -136,6 +70,76 @@ export const Door = (props: {
       <path
         className="cls-3"
         d="M21.34,112.7v55.83c.23-16.95,3.3-76.81,34.37-109.4,0,0,0,0,0,0a27.69,27.69,0,0,1,1.93-2.53C32.9,61.82,21.34,88.08,21.34,112.7ZM27.57,427a1,1,0,0,1-.45,1.34l0,0a1,1,0,0,1-.43.1,1,1,0,0,1-.89-.56,1,1,0,0,1,1.81-.9Zm4.36-3.45a1,1,0,1,1,.93,1.77l-2.22,1.16a1,1,0,0,1-.46.11,1,1,0,0,1-.89-.54,1,1,0,0,1,.42-1.34Zm13.46-7a1,1,0,0,1,.93,1.77l-9,4.7a.93.93,0,0,1-.46.12,1,1,0,0,1-.46-1.89ZM204.42,119c16.61,36.6,16.91,65.77,16.91,77.52V551.68l-14.69,8.7V205.26a180.68,180.68,0,0,0-34-105.48C140.24,54.3,95.84,35.65,66.88,35.65a64.6,64.6,0,0,0-15,1.71c11.72-3.74,27-7.41,37.1-7.42C127.57,29.91,177.82,60.41,204.42,119ZM186.64,505.26v20.55l-26.55-15.27Z"
+      />
+    </svg>
+  );
+};
+
+{
+  /* GLOW EFFECT */
+}
+{
+  /* reference: https://codepen.io/dipscom/pen/mVYjPw */
+}
+{
+  /* alt example: https://stackoverflow.com/questions/54112231/is-it-possible-to-create-a-glow-effect-in-svg */
+}
+const SoftGlowFilter = (
+  <filter id="softGlow" height="200%" width="200%" x="-50%" y="-50%">
+    {/* <!-- Thicken out the original shape --> */}
+    <feMorphology
+      operator="dilate"
+      radius="4"
+      in="SourceAlpha"
+      result="thicken"
+    />
+    {/* <!-- Use a gaussian blur to create the soft blurriness of the glow --> */}
+    <feGaussianBlur in="thicken" stdDeviation="16" result="blurred" />
+    {/* <!-- Change the colour --> */}
+    <feFlood floodColor="#ffd700" result="glowColor" />
+    {/* <!-- Color in the glows --> */}
+    <feComposite
+      in="glowColor"
+      in2="blurred"
+      operator="in"
+      result="softGlow_colored"
+    />
+    {/* <!--	Layer the effects together --> */}
+    <feMerge>
+      <feMergeNode in="softGlow_colored" />
+      <feMergeNode in="SourceGraphic" />
+    </feMerge>
+  </filter>
+);
+
+const OuterFrameClipPath = (
+  <clipPath id="outer-frame">
+    <path
+      className="cls-1"
+      d="M196.56,521.92,28.19,427.57V119.84c0-27.47,13.1-70.32,57.88-65.3,50.79,5.7,111,78.77,110.9,165.32C196.91,295,196.56,521.92,196.56,521.92Z"
+    />
+  </clipPath>
+);
+
+export const DoorClippedImage = (props: { url: string }) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={"128"}
+      height="auto"
+      viewBox="0 0 256 576"
+      className="flex-none -scale-x-100"
+      overflow="visible"
+    >
+      <defs>{OuterFrameClipPath}</defs>
+
+      <image
+        width="100%"
+        height="100%"
+        preserveAspectRatio="xMinYMin slice"
+        // xlinkHref={image?.value || getSequentialDoorImage(doorImages)}
+        xlinkHref={props.url}
+        clipPath="url(#outer-frame)"
       />
     </svg>
   );

@@ -14,7 +14,11 @@ import { multipleReferenceSection, singleTextSection } from "data/Facts";
 import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
 import { useRef, useState } from "react";
 import { sortByPosition, updatePositions } from "src/position_helpers";
-import { FilterAttributes, ReferenceAttributes } from "data/Attributes";
+import {
+  Attribute,
+  FilterAttributes,
+  ReferenceAttributes,
+} from "data/Attributes";
 
 export const Sections = (props: { entityID: string }) => {
   let sections = useIndex.eav(props.entityID, "card/section");
@@ -55,6 +59,7 @@ const Section = (props: {
       >
         <h4>{props.name}</h4>
         <SectionMoreOptionsMenu
+          section={`section/${props.name}`}
           entityID={props.entityID}
           display={focused}
           factID={props.factID}
@@ -133,11 +138,14 @@ export const MultipleReferenceSection = (props: {
 };
 
 const SectionMoreOptionsMenu = (props: {
+  section: string;
   display: boolean;
   factID: string;
   entityID: string;
 }) => {
   let { mutate, authorized } = useMutations();
+  let facts = useIndex.eav(props.entityID, props.section as keyof Attribute);
+  let empty = Array.isArray(facts) ? facts.length === 0 : !facts;
   let sections = useIndex
     .eav(props.entityID, "card/section")
     ?.sort(sortByPosition("eav"));
@@ -160,6 +168,9 @@ const SectionMoreOptionsMenu = (props: {
     ]);
     await mutate("updatePositions", { positionKey: "eav", newPositions });
   };
+  const remove = async () => {
+    await mutate("retractFact", { id: props.factID });
+  };
 
   return !authorized ? null : (
     <Menu as="div" className="relative">
@@ -179,10 +190,12 @@ const SectionMoreOptionsMenu = (props: {
                 <p>Move Down</p>
                 <DownArrow />
               </MenuItem>
-              <MenuItem>
-                <p>Remove</p>
-                <Close />
-              </MenuItem>
+              {!empty ? null : (
+                <MenuItem onClick={() => remove()}>
+                  <p>Remove</p>
+                  <Close />
+                </MenuItem>
+              )}
             </MenuContainer>
           </>
         );

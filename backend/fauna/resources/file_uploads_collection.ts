@@ -11,7 +11,6 @@ export type FileUpload = {
 export const CreateFileUpload = (S: { [k in keyof FileUpload]: Expr }) =>
   q.Create(q.Collection(FileUploadsCollectionName), {
     data: S,
-    ttl: q.TimeAdd(q.Now(), 7, "days"),
   });
 
 export default q.CreateCollection({

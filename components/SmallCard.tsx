@@ -25,7 +25,6 @@ export function SortableSmallCard(
     index: number;
     parent: string;
     section: string;
-    siblings: Fact<keyof ReferenceAttributes>[];
     positionKey: string;
   } & Props
 ) {
@@ -34,7 +33,6 @@ export function SortableSmallCard(
       disabled: !props.draggable,
       id: props.id,
       data: {
-        siblings: props.siblings,
         entityID: props.entityID,
         index: props.index,
         positionKey: props.positionKey,

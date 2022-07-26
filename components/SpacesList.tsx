@@ -117,6 +117,7 @@ const EditSpace = (props: { spaceID: string }) => {
   let [open, setOpen] = useState(false);
   let { authorized, mutate } = useMutations();
   let door = useIndex.eav(props.spaceID, "space/door/image");
+  let uploadedDoor = useIndex.eav(props.spaceID, "space/door/uploaded-image");
   if (authorized === false) {
     return null;
   } else
@@ -133,14 +134,32 @@ const EditSpace = (props: { spaceID: string }) => {
         <Modal open={open} onClose={() => setOpen(false)}>
           <div className="flex flex-col">
             <DoorSelector
-              selected={door?.value}
-              onSelect={(s) => {
-                mutate("assertFact", {
-                  entity: props.spaceID as string,
-                  attribute: "space/door/image",
-                  value: s,
-                  positions: {},
-                });
+              selected={
+                uploadedDoor
+                  ? { type: "uploaded", value: uploadedDoor.value.id }
+                  : door
+                  ? { type: "default", value: door.value }
+                  : undefined
+              }
+              onSelect={async (s) => {
+                if (s.type === "default") {
+                  if (uploadedDoor)
+                    await mutate("retractFact", { id: uploadedDoor.id });
+                  await mutate("assertFact", {
+                    entity: props.spaceID as string,
+                    attribute: "space/door/image",
+                    value: s.value,
+                    positions: {},
+                  });
+                } else {
+                  if (door) await mutate("retractFact", { id: door.id });
+                  await mutate("assertFact", {
+                    entity: props.spaceID as string,
+                    attribute: "space/door/uploaded-image",
+                    value: { type: "file", id: s.value, filetype: "image" },
+                    positions: {},
+                  });
+                }
               }}
             />
           </div>
