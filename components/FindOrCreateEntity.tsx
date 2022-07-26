@@ -64,18 +64,18 @@ export const FindOrCreate = (props: {
           <Combobox
             value=""
             onChange={(optionValue: string) => {
-              // if the item is already in the deck or already in the added[], don't do anything
-              if (
-                props.selected.includes(optionValue) ||
-                added.find(
-                  (addedItem) =>
-                    addedItem.type === "existing" &&
-                    addedItem.entity === optionValue
-                ) !== undefined
-              )
-                return;
+              let findAddedItem = added.find(
+                (addedItem) =>
+                  addedItem.type === "existing" &&
+                  addedItem.entity === optionValue
+              );
+
+              // if the item is already in the deck, don't do anything
+              if (props.selected.includes(optionValue)) return;
               console.log("on change happening");
-              // clicking the checkbox on a search result sets state to multiselect.
+              // if the item is already in the added[], remove it!
+
+              // NOTE: clicking the checkbox, shift clicking, longpress/click on a search result sets state to multiselect.
               // if isMultiSelect = false then onselect and onclose that bish
               if (isMultiSelect.current === false) {
                 props.onSelect({ entity: optionValue, type: "existing" });
@@ -83,8 +83,14 @@ export const FindOrCreate = (props: {
                 setAdded([]);
                 isMultiSelect.current = false;
               } else {
-                // if isMultiSelect is true, then add clicked items to the added[]
-                if (optionValue === "create")
+                // if isMultiSelect is true, and if the item is already added, then remove from added[],
+                if (findAddedItem !== undefined) {
+                  let addedItemIndex = added.indexOf(findAddedItem);
+                  added.splice(addedItemIndex, 1);
+                  setAdded([...added]); //create a new array to force a refresh of the addedItemsList
+                }
+                // ELSE add clicked items to the added[]
+                else if (optionValue === "create")
                   setAdded([...added, { name: input, type: "create" }]);
                 else {
                   setAdded([
@@ -105,7 +111,7 @@ export const FindOrCreate = (props: {
               bg-white shadow-drop border border-grey-80 rounded-md
               `}
           >
-            <ul>
+            <ul className="addedItemsList">
               {/* if isMultiselect = true, take all the stuff in the added[] and display it at the top, with a submit button. If not, show nothing! */}
               {added.map((addedItem) => (
                 <li>
