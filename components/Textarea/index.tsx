@@ -9,7 +9,7 @@ export const Textarea = (
   } & JSX.IntrinsicElements["textarea"]
 ) => {
   let textarea = useRef<HTMLTextAreaElement | null>(null);
-  let pre = useRef<HTMLPreElement | null>(null);
+  let previewElement = useRef<HTMLPreElement | null>(null);
 
   let [initialCursor, setInitialCursor] = useState<number | null>(null);
   let [focused, setFocused] = useState(false);
@@ -31,7 +31,7 @@ export const Textarea = (
       <RenderedText
         {...(props as JSX.IntrinsicElements["pre"])}
         text={props.value}
-        ref={pre}
+        ref={previewElement}
         tabIndex={0}
         style={{
           ...props.style,
@@ -51,11 +51,13 @@ export const Textarea = (
         onClick={(e) => {
           if (e.isDefaultPrevented()) return;
           if (props.previewOnly) return;
-          let range = window.getSelection()?.getRangeAt(0);
-          if (!range || !pre.current) return;
-          range.setStart(pre.current, 0);
+          if (props.value) {
+            let range = window.getSelection()?.getRangeAt(0);
+            if (!range || !previewElement.current) return;
+            range.setStart(previewElement.current, 0);
+            setInitialCursor(range.toString().length);
+          }
           setFocused(true);
-          setInitialCursor(range.toString().length);
         }}
       />
     );

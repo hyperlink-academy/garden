@@ -8,6 +8,7 @@ export const RenderedText = forwardRef<
   return (
     <Linkify options={{ className: "text-accent-blue underline break-all" }}>
       <pre
+        role="link"
         ref={ref}
         {...{ ...props, value: undefined }}
         className={`${props.className} break-words`}
