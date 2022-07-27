@@ -3,6 +3,7 @@ import { arraySwap } from "@dnd-kit/sortable";
 import { Combobox, Dialog, Transition } from "@headlessui/react";
 import { type } from "os";
 import { useRef, useState } from "react";
+import { StringMappingType } from "typescript";
 import { ButtonLink, ButtonPrimary } from "./Buttons";
 import { Add, Checkmark, Cross } from "./Icons";
 import { Divider } from "./Layout";
@@ -65,7 +66,7 @@ export const FindOrCreate = (props: {
 
         <div className="">
           <Combobox
-            value=""
+            value={isMultiSelect ? added : ""}
             onChange={(optionValue: string) => {
               let findAddedItem = added.find(
                 (addedItem) =>
@@ -75,8 +76,6 @@ export const FindOrCreate = (props: {
 
               // if the item is already in the deck, don't do anything
               if (props.selected.includes(optionValue)) return;
-              console.log("on change happening");
-              // if the item is already in the added[], remove it!
 
               // NOTE: clicking the checkbox, shift clicking, longpress/click on a search result sets state to multiselect.
               // if isMultiSelect = false then onselect and onclose that bish
@@ -85,25 +84,23 @@ export const FindOrCreate = (props: {
                 props.onClose();
                 setAdded([]);
                 isMultiSelect.current = false;
-              } else {
-                // if isMultiSelect is true, and if the item is already added, then remove from added[],
-                if (findAddedItem !== undefined) {
-                  let addedItemIndex = added.indexOf(findAddedItem);
-                  added.splice(addedItemIndex, 1);
-                  setAdded([...added]); //create a new array to force a refresh of the addedList
-                }
-                // ELSE add clicked items to the added[]
-                else if (optionValue === "create") {
-                  setAdded([...added, { name: input, type: "create" }]);
-                  setInput("");
-                } else {
-                  setAdded([
-                    ...added,
-                    { entity: optionValue, type: "existing" },
-                  ]);
-                  setInput("");
-                }
+                return;
               }
+
+              // if isMultiSelect is true, and if the item is already added, then remove from added[],
+              if (findAddedItem !== undefined) {
+                let addedItemIndex = added.indexOf(findAddedItem);
+                added.splice(addedItemIndex, 1);
+                setAdded([...added]); //create a new array to force a refresh of the addedList
+                return;
+              }
+
+              setAdded([
+                ...added,
+                optionValue === "create"
+                  ? { name: input, type: "create" }
+                  : { entity: optionValue, type: "existing" },
+              ]);
             }}
             as="div"
             className={`
@@ -121,10 +118,17 @@ export const FindOrCreate = (props: {
               className="mx-3 mt-4"
               placeholder="find or create cards..."
               onKeyDown={(e: React.KeyboardEvent) => {
+                //HeadlessUI handles keyboard nav from here!!
+
                 if (e.key === "Escape") {
                   props.onClose();
                   setAdded([]);
                   isMultiSelect.current = false;
+                }
+
+                if (e.key === "Enter" && e.shiftKey) {
+                  console.log("trying to multiselect");
+                  isMultiSelect.current = true;
                 }
               }}
               onChange={(e) => setInput(e.currentTarget.value)}
@@ -197,6 +201,19 @@ export const FindOrCreate = (props: {
                 return (
                   <SearchResult
                     {...item}
+                    addItem={(optionValue) => {
+                      if (
+                        added.find(
+                          (f) =>
+                            f.type === "existing" && f.entity === optionValue
+                        )
+                      )
+                        return;
+                      setAdded([
+                        ...added,
+                        { type: "existing", entity: optionValue },
+                      ]);
+                    }}
                     disabled={props.selected.includes(item.entity)}
                     added={
                       added.find(
@@ -264,6 +281,7 @@ const SearchResult = (
   props: Item & {
     disabled: boolean;
     added: boolean;
+    addItem: (s: string) => void;
     setMultiSelect: () => void;
   }
 ) => {
@@ -276,6 +294,8 @@ const SearchResult = (
     longPressTimer.current = window.setTimeout(() => {
       isLongPress.current = true;
       props.setMultiSelect();
+      props.addItem(props.entity);
+
       console.log("delayed result! " + isLongPress.current);
     }, 500);
   };
@@ -305,25 +325,30 @@ const SearchResult = (
                 if (e.shiftKey) {
                   props.setMultiSelect();
                 }
+                if (isLongPress.current) {
+                  e.preventDefault();
+                }
               }}
               // START LONGPRESS LOGIC
               // If you LongPress or LongClick, you will trigger multiselect. Here, we start a timer for .5 seconds when the user clicks
-              onMouseDown={() => {
+              onMouseDown={(e) => {
                 TriggerLongPress();
               }}
+              onContextMenu={(e) => e.preventDefault()}
               onTouchStart={() => {
                 TriggerLongPress();
+
                 console.log("touch");
               }}
               // If the user clicks for .5 seconds or more, then isMultiselect = true. Else, just regular click.
-              onMouseUp={() => {
+              onMouseUp={(e) => {
                 window.clearTimeout(longPressTimer.current);
 
                 if (isLongPress.current === true) {
                   console.log("longpressed!");
                 }
               }}
-              onTouchEnd={() => {
+              onTouchEnd={(e) => {
                 window.clearTimeout(longPressTimer.current);
 
                 if (isLongPress.current === true) {
