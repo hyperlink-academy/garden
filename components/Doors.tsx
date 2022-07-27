@@ -8,15 +8,12 @@ export const Door = (props: {
 }) => {
   let defaultDoor = useIndex.eav(props.entityID, "space/door/image");
   let uploadedDoor = useIndex.eav(props.entityID, "space/door/uploaded-image");
+
   let image = uploadedDoor
     ? `${WORKER_URL}/static/${uploadedDoor.value.id}`
     : defaultDoor
     ? defaultDoor.value
     : "/doors/door-clouds-256.jpg";
-
-  // let colorKey = getRandomFrame(frameColors);
-  // let color1 = frameColors[colorKey][0];
-  // let color2 = frameColors[colorKey][1];
   let color1 = "#ffec96";
   let color2 = "#ffd700";
   let color3 = "#daa520";
@@ -46,15 +43,29 @@ export const Door = (props: {
         {SoftGlowFilter}
       </defs>
 
-      <image
+      {/* rotating images */}
+      {/* NB: this is hacky! */}
+      {/* we're flipping the whole svg, but first want to unflip the image */}
+      {/* but ONLY if uploaded - defaults need to be flipped to match frames! */}
+      {/* TODO: fix issue where we see all default images while loading? */}
+      <g
         width="100%"
         height="100%"
-        preserveAspectRatio="xMinYMin slice"
-        // xlinkHref={image?.value || getSequentialDoorImage(doorImages)}
-        xlinkHref={image}
         clipPath="url(#outer-frame)"
-      />
-      {/* <defs><style>.cls-1{fill:#fbb040;}.cls-2{fill:#f4c470;}.cls-3{fill:#ef852e;}.cls-4{fill:#fff;}</style></defs> */}
+        fill="transparent"
+      >
+        <image
+          width="100%"
+          height="100%"
+          preserveAspectRatio="xMinYMin slice"
+          xlinkHref={image}
+          className={
+            !defaultDoor && image !== "/doors/door-clouds-256.jpg"
+              ? "-scale-x-100 origin-center"
+              : ""
+          }
+        />
+      </g>
       <path
         className="cls-2"
         d="M57.65,56.59,61.11,56c8.52-1.08,18.47.22,29.9,4.71,65.93,25.86,95.63,93.83,95.63,144.54V525.81l-26.55-15.27L21.34,430.76V173.12s-.05-1.65,0-4.59V112.7c0-24.62,11.56-50.88,36.31-56.11M1.34,112.7V442.33l205.3,118.05V205.26a180.68,180.68,0,0,0-34-105.48C140.24,54.3,95.84,35.65,66.88,35.65a64.6,64.6,0,0,0-15,1.71,104.81,104.81,0,0,0-14.41,5.51C13.65,55.83,1.34,84.4,1.34,112.7Z"
@@ -137,7 +148,6 @@ export const DoorClippedImage = (props: { url: string }) => {
         width="100%"
         height="100%"
         preserveAspectRatio="xMinYMin slice"
-        // xlinkHref={image?.value || getSequentialDoorImage(doorImages)}
         xlinkHref={props.url}
         clipPath="url(#outer-frame)"
       />
