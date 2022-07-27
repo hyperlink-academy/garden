@@ -87,7 +87,7 @@ export const SmallCardList = (props: {
     </SortableContext>
   );
 };
-const AddToSection = (props: {
+export const AddToSection = (props: {
   entity: string;
   backlink?: boolean;
   attribute: keyof ReferenceAttributes;

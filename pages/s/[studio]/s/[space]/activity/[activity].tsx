@@ -1,5 +1,7 @@
+import { CardContainer, Carousel } from "components/CardCarousel";
+import { CardView } from "components/CardView";
 import { Divider } from "components/Layout";
-import { SmallCardList } from "components/SmallCardList";
+import { AddToSection, SmallCardList } from "components/SmallCardList";
 import { ref } from "data/Facts";
 import { useInActivity } from "hooks/useInActivity";
 import { useIndex, useMutations } from "hooks/useReplicache";
@@ -25,6 +27,7 @@ export const Activity = (props: { entity: string }) => {
   let { query } = useRouter();
 
   let inActivity = useInActivity();
+  let cards = useIndex.eav(props.entity, "activity/hand-contains");
   useEffect(() => {
     if (!memberEntity) return;
     if (authorized && inActivity?.value.value !== props.entity) {
@@ -37,33 +40,49 @@ export const Activity = (props: { entity: string }) => {
     }
   }, [props.entity, !!inActivity, authorized]);
   return (
-    <div className="h-full max-w-3xl mx-auto pb-6 flex flex-col gap-4">
-      <div className="pt-4  grid grid-cols-[auto_max-content] gap-4 grow-0">
+    <div className="h-full flex flex-col gap-4">
+      <div className=" max-w-3xl m-auto w-full pt-4  grid grid-cols-[auto_max-content] gap-4 grow-0">
         <h2>{name?.value}</h2>
         <Link href={`/s/${query.studio}/s/${query.space}/activity`}>
           <a className="text-right text-accent-red pt-0.5">Exit</a>
         </Link>
       </div>
-      <div className="grow-0">
-        <h4>Cards In Hand</h4>
-        <Hand entity={props.entity} />
-        <Divider />
-      </div>
-      <div
-        className={`
+      <Carousel>
+        <CardContainer onFocus={() => {}} selected={false} key={"chat"}>
+          <div
+            className={`
         grow 
+        h-full
         lightBorder
         bg-white
         rounded-lg
         relative
 
         `}
-      >
-        <div className="absolute top-0 bottom-0 left-0 right-0 flex flex-col gap-4 h-full p-4">
-          <Messages topic={props.entity} />
-          <MessageInput id={props.entity} topic={props.entity} />
-        </div>
-      </div>
+          >
+            <div className="absolute top-0 bottom-0 left-0 right-0 flex flex-col gap-4 h-full p-4">
+              <Messages topic={props.entity} />
+              <MessageInput id={props.entity} topic={props.entity} />
+            </div>
+          </div>
+        </CardContainer>
+        {cards?.map((c) => {
+          let entity = c.value.value;
+          return (
+            <CardContainer onFocus={() => {}} selected={false} key={entity}>
+              <CardView entityID={entity} referenceFactID={c.id} />
+            </CardContainer>
+          );
+        })}
+        <CardContainer onFocus={() => {}} selected={false} key="create">
+          <div className="h-full w-full flex items-center">
+            <AddToSection
+              entity={props.entity}
+              attribute="activity/hand-contains"
+            />
+          </div>
+        </CardContainer>
+      </Carousel>
     </div>
   );
 };

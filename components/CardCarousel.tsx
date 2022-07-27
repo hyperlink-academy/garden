@@ -1,12 +1,6 @@
 import { ButtonLink } from "components/Buttons";
 import { CardView } from "components/CardView";
-import {
-  Card,
-  CardAdd,
-  LeftArrow,
-  RightArrow,
-  Shuffle,
-} from "components/Icons";
+import { CardAdd, LeftArrow, RightArrow, Shuffle } from "components/Icons";
 import { ReferenceAttributes, ShortCodes } from "data/Attributes";
 import { Fact } from "data/Facts";
 import { useIndex, useMutations } from "hooks/useReplicache";
@@ -48,36 +42,33 @@ export const CardCarousel = (props: {
           </span>
         </h4>
       </div>
-      <div
-        style={{}}
-        className={`
-        overflow-x-scroll snap-x snap-mandatory
-        flex gap-2 -mx-4 
-        no-scrollbar 
-        h-full `}
-      >
-        <div
-          style={{ width: "max(calc((100vw - 48rem) / 2), 1rem)" }}
-          className={`flex-shrink-0`}
-        />
+      {selectedChild ? (
+        <CardCarouselTitle parent={""} child={selectedChild as string} />
+      ) : null}
+      <Carousel>
         {props.cards.map((c) => {
           let entity = props.backlink ? c.entity : c.value.value;
           return (
             <CardContainer
-              onFocus={() => setSelectedChild(entity)}
+              onFocus={() => {
+                if (window.location.href.endsWith(entity)) return;
+                let q = Router.query;
+                let newUrl = `/s/${q.studio}/s/${q.space}/c/${q.card}/a/${q.attribute}/${entity}`;
+                window.history.replaceState(
+                  { ...window.history.state, as: newUrl, url: newUrl },
+                  "",
+                  newUrl
+                );
+                setSelectedChild(entity);
+              }}
               selected={selectedChild === entity}
               key={entity}
-              entity={entity}
             >
               <CardView entityID={entity} referenceFactID={c.id} />
             </CardContainer>
           );
         })}
-        <div
-          style={{ width: "max(calc((100vw - 48rem) / 2), 1rem)" }}
-          className={`flex-shrink-0`}
-        />
-      </div>
+      </Carousel>
 
       <div className="grid grid-flow-col gap-1 pb-6 pt-1 max-w-3xl mx-auto w-full">
         <CardCounter
@@ -122,10 +113,31 @@ export const CardCarousel = (props: {
     </div>
   );
 };
+export const Carousel: React.FC = (props) => {
+  return (
+    <div
+      style={{}}
+      className={`
+        overflow-x-scroll snap-x snap-mandatory
+        flex gap-2 -mx-4 
+        no-scrollbar 
+        h-full `}
+    >
+      <div
+        style={{ width: "max(calc((100vw - 48rem) / 2), 1rem)" }}
+        className={`flex-shrink-0`}
+      />
+      {props.children}
+      <div
+        style={{ width: "max(calc((100vw - 48rem) / 2), 1rem)" }}
+        className={`flex-shrink-0`}
+      />
+    </div>
+  );
+};
 
-const CardContainer: React.FC<{
+export const CardContainer: React.FC<{
   selected: boolean;
-  entity: string;
   onFocus: () => void;
 }> = (props) => {
   let ref = useRef<HTMLDivElement>(null);
@@ -140,15 +152,7 @@ const CardContainer: React.FC<{
         }
         if (e[0]?.isIntersecting) {
           timeout = window.setTimeout(() => {
-            if (window.location.href.endsWith(props.entity)) return;
             if (!e[0]?.isIntersecting) return;
-            let q = Router.query;
-            let newUrl = `/s/${q.studio}/s/${q.space}/c/${q.card}/a/${q.attribute}/${props.entity}`;
-            window.history.replaceState(
-              { ...window.history.state, as: newUrl, url: newUrl },
-              "",
-              newUrl
-            );
             props.onFocus();
           }, 200);
         }
@@ -161,7 +165,7 @@ const CardContainer: React.FC<{
     return () => {
       if (node) observer.unobserve(node);
     };
-  }, [ref, props.entity, props.selected]);
+  }, [ref, props.selected]);
 
   useEffect(() => {
     if (!ref.current) return;
@@ -173,21 +177,16 @@ const CardContainer: React.FC<{
     });
     ref.current.focus({ preventScroll: true });
     smooth = false;
-  }, [props.selected, props.entity]);
+  }, [props.selected]);
   return (
     <div
       tabIndex={0}
       ref={ref}
       onClick={() => {
-        let q = Router.query;
-        if (q.entity === props.entity) return;
         ref.current?.scrollIntoView({ behavior: "smooth", inline: "center" });
       }}
       className={`h-full w-[calc(100%-32px)] max-w-3xl snap-center flex-shrink-0 pb-1.5 focus:outline-none `}
     >
-      {props.selected ? (
-        <CardCarouselTitle parent={""} child={props.entity} />
-      ) : null}
       {props.children}
     </div>
   );
