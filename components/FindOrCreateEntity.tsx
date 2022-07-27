@@ -1,48 +1,106 @@
+import { cornersOfRectangle } from "@dnd-kit/core/dist/utilities/algorithms/helpers";
+import { arraySwap } from "@dnd-kit/sortable";
 import { Combobox, Dialog, Transition } from "@headlessui/react";
-import { useIndex, useMutations } from "hooks/useReplicache";
-import { useState } from "react";
-import { generateKeyBetween } from "src/fractional-indexing";
-import { ulid } from "src/ulid";
-import { ButtonLink } from "./Buttons";
-import { Add, Card, Checkmark, DeckSmall, Member } from "./Icons";
+import { type } from "os";
+import { useRef, useState } from "react";
+import { StringMappingType } from "typescript";
+import { ButtonLink, ButtonPrimary } from "./Buttons";
+import { Add, Checkmark, Cross } from "./Icons";
+import { Divider } from "./Layout";
 
 // Can I adapt this to work for section names as well?
 // They are a single select
 // use react state not replicache state
+
+// TOP LEVEL NOTES (6.25.22)
+// FindandCreate modal draws from 2 arrays.
+// Selected = things that are already included in the list you are adding to
+// Added = things that you clicked after opening the modal. These aren't added yet, but will be once you hit submit.
+
+type Item = { display: string; entity: string; icon?: React.ReactElement };
+type AddedItem =
+  | { entity: string; type: "existing" }
+  | { name: string; type: "create" };
+
 export const FindOrCreate = (props: {
   allowBlank: boolean;
   open: boolean;
   onClose: () => void;
-  items: { display: string; entity: string; icon?: React.ReactElement }[];
+  items: Item[];
   selected: string[];
-  onSelect: (
-    id: { entity: string; type: "existing" } | { name: string; type: "create" }
-  ) => void;
+  onSelect: (item: AddedItem) => void;
 }) => {
   let [input, setInput] = useState("");
+  let [added, setAdded] = useState<AddedItem[]>([]);
+  let [addedItemsList, setAddedItemsList] = useState(false);
+  let isMultiSelect = useRef(false);
+
+  // THIS IS WHERE THE RESULTS ARE FILTERED!
   let items = props.items.filter((f) => {
     if (/[A-Z]/g.test(input)) return f.display.includes(input);
     return f.display.toLocaleLowerCase().includes(input.toLocaleLowerCase());
   });
-  let inputExists = !!items.find(
-    (i) => i.display.toLocaleLowerCase() === input.toLocaleLowerCase()
-  );
+
+  let inputExists =
+    !!items.find(
+      (i) => i.display.toLocaleLowerCase() === input.toLocaleLowerCase()
+    ) ||
+    !!added.find(
+      (i) =>
+        i.type === "create" &&
+        i.name !== "" &&
+        i.name.toLocaleLowerCase() === input.toLocaleLowerCase()
+    );
   return (
     <Transition show={props.open} className="fixed">
       <Dialog
-        onClose={props.onClose}
+        onClose={() => {
+          props.onClose();
+          setAdded([]);
+          setInput("");
+          isMultiSelect.current = false;
+        }}
         className="fixed z-10 inset-0 overflow-y-hidden"
       >
         <Dialog.Overlay className="overlay" />
 
         <div className="">
           <Combobox
-            value=""
-            onChange={(c) => {
-              if (props.selected.includes(c)) return;
-              if (c === "create")
-                props.onSelect({ name: input, type: "create" });
-              else props.onSelect({ entity: c, type: "existing" });
+            value={isMultiSelect ? added : ""}
+            onChange={(optionValue: string) => {
+              let findAddedItem = added.find(
+                (addedItem) =>
+                  addedItem.type === "existing" &&
+                  addedItem.entity === optionValue
+              );
+
+              // if the item is already in the deck, don't do anything
+              if (props.selected.includes(optionValue)) return;
+
+              // NOTE: clicking the checkbox, shift clicking, longpress/click on a search result sets state to multiselect.
+              // if isMultiSelect = false then onselect and onclose that bish
+              if (isMultiSelect.current === false) {
+                props.onSelect({ entity: optionValue, type: "existing" });
+                props.onClose();
+                setAdded([]);
+                isMultiSelect.current = false;
+                return;
+              }
+
+              // if isMultiSelect is true, and if the item is already added, then remove from added[],
+              if (findAddedItem !== undefined) {
+                let addedItemIndex = added.indexOf(findAddedItem);
+                added.splice(addedItemIndex, 1);
+                setAdded([...added]); //create a new array to force a refresh of the addedList
+                return;
+              }
+
+              setAdded([
+                ...added,
+                optionValue === "create"
+                  ? { name: input, type: "create" }
+                  : { entity: optionValue, type: "existing" },
+              ]);
             }}
             as="div"
             className={`
@@ -60,73 +118,118 @@ export const FindOrCreate = (props: {
               className="mx-3 mt-4"
               placeholder="find or create cards..."
               onKeyDown={(e: React.KeyboardEvent) => {
-                if (e.key === "Escape") props.onClose();
+                //HeadlessUI handles keyboard nav from here!!
+
+                if (e.key === "Escape") {
+                  props.onClose();
+                  setAdded([]);
+                  isMultiSelect.current = false;
+                }
+
+                if (e.key === "Enter" && e.shiftKey) {
+                  console.log("trying to multiselect");
+                  isMultiSelect.current = true;
+                }
               }}
               onChange={(e) => setInput(e.currentTarget.value)}
             />
 
-            {/* I am aware the max height in the Combobox.Options is gross, but max-h-full does work and this is the best i could do D:*/}
+            <div className="addedList flex flex-col gap-2 m-3 p-3 lightBorder">
+              {/* if isMultiselect = true, take all the stuff in the added[] and display it at the top, with a submit button. If not, show nothing! */}
+              <div className="grid grid-cols-[auto_max-content] items-center">
+                <ButtonLink
+                  content={`${added.length} selected`}
+                  onClick={() => {
+                    setAddedItemsList(!addedItemsList);
+                  }}
+                />
+                <ButtonPrimary
+                  content={`Add Cards!`}
+                  onClick={() => {
+                    added.map((addedItem) => props.onSelect(addedItem));
+                    props.onClose();
+                    setAdded([]);
+                    isMultiSelect.current = false;
+                  }}
+                />
+              </div>
+              {addedItemsList === false ? (
+                ""
+              ) : (
+                <ul className="flex flex-col gap-1">
+                  <Divider />
+                  {added.length === 0 ? (
+                    <div>nothing here</div>
+                  ) : (
+                    added.map((addedItem) => (
+                      <li className="addedListItem grid grid-cols-[max-content_auto_max-content] gap-2 ">
+                        <div className="w-6 h-6 rounded-full bg-test-pink"></div>
+                        <div>
+                          {addedItem.type === "create" && addedItem.name !== ""
+                            ? addedItem.name
+                            : addedItem.type === "create" &&
+                              addedItem.name === ""
+                            ? "New Untitled Card"
+                            : props.items.find(
+                                (item) =>
+                                  addedItem.type === "existing" &&
+                                  item.entity === addedItem.entity
+                              )?.display}
+                        </div>
+                        <button
+                          onClick={() => {
+                            added.splice(added.indexOf(addedItem), 1);
+                            setAdded([...added]);
+                          }}
+                        >
+                          <Cross />
+                        </button>
+                      </li>
+                    ))
+                  )}
+                </ul>
+              )}
+            </div>
             <Combobox.Options
               static
               className="w-full pt-2 flex-col flex gap-2 h-min max-h-[calc(100vh-16rem)] overflow-y-auto"
             >
-              {inputExists ? null : (
-                <Combobox.Option key={"create"} value={"create"}>
-                  {input || props.allowBlank
-                    ? ({ active }) => {
-                        return (
-                          <SearchItem active={active}>
-                            <div
-                              className={`
-                              py-2 w-full
-                              text-accent-blue font-bold 
-                              grid grid-cols-[min-content_auto] gap-2
-                            `}
-                            >
-                              <Add />
-                              <div>
-                                {!input
-                                  ? "Create a blank card"
-                                  : `Create "${input}"`}
-                              </div>
-                            </div>
-                          </SearchItem>
-                        );
-                      }
-                    : null}
-                </Combobox.Option>
+              {!input && !props.allowBlank ? null : (
+                <CreateButton value={input} inputExists={!!inputExists} />
               )}
               {items.map((item) => {
                 return (
-                  //how to get selected items to the top of the list??? collapsable....? maybe not.
-                  <Combobox.Option key={item.entity} value={item.entity}>
-                    {({ active }) => {
-                      return (
-                        <SearchItem active={active}>
-                          <div
-                            className={`gap-2 items-center ${
-                              props.selected.includes(item.entity)
-                                ? "grid grid-cols-[min-content_auto_min-content] text-grey-80 "
-                                : "grid grid-cols-[min-content_auto]"
-                            }`}
-                          >
-                            {item.icon}
-                            {item.display}
-                            {props.selected.includes(item.entity) ? (
-                              <Checkmark className="justify-self-end" />
-                            ) : null}
-                          </div>
-                        </SearchItem>
-                      );
+                  <SearchResult
+                    {...item}
+                    addItem={(optionValue) => {
+                      if (
+                        added.find(
+                          (f) =>
+                            f.type === "existing" && f.entity === optionValue
+                        )
+                      )
+                        return;
+                      setAdded([
+                        ...added,
+                        { type: "existing", entity: optionValue },
+                      ]);
                     }}
-                  </Combobox.Option>
+                    disabled={props.selected.includes(item.entity)}
+                    added={
+                      added.find(
+                        (addedItem) =>
+                          addedItem.type === "existing" &&
+                          addedItem.entity === item.entity
+                      ) !== undefined
+                    }
+                    setMultiSelect={() => {
+                      isMultiSelect.current = true;
+                      console.log("multiSelect is " + isMultiSelect.current);
+                    }}
+                  />
                 );
               })}
             </Combobox.Options>
-            <div className="h-max grid grid-cols-[auto_min-content] p-4 ">
-              <h4>{props.selected.length} cards added</h4>
-              <ButtonLink content="DONE!" onClick={props.onClose} />
-            </div>
           </Combobox>
         </div>
       </Dialog>
@@ -134,73 +237,143 @@ export const FindOrCreate = (props: {
   );
 };
 
-export const FindOrCreateCard = (props: {
-  entity: string;
-  section: string;
-  positionKey: string;
-  open: boolean;
-  allowBlank: boolean;
-  onClose: () => void;
-  selected: string[];
-  lastPosition?: string;
-}) => {
-  let { mutate } = useMutations();
-  let decks = useIndex.aev("deck");
-  let titles = useIndex.aev("card/title").filter((f) => !!f.value);
-  let members = useIndex.aev("member/name");
-  let items = titles
-    .map((t) => {
-      return {
-        entity: t.entity,
-        display: t.value,
-        icon: !!decks.find((d) => t.entity === d.entity) ? (
-          <DeckSmall />
-        ) : (
-          <Card />
-        ),
-      };
-    })
-    .concat(
-      members.map((m) => {
-        return {
-          entity: m.entity,
-          display: m.value,
-          icon: <Member />,
-        };
-      })
-    );
-
+const CreateButton = (props: { value: string; inputExists: boolean }) => {
   return (
-    <FindOrCreate
-      allowBlank={props.allowBlank}
-      onClose={props.onClose}
-      open={props.open}
-      items={items}
-      selected={props.selected}
-      onSelect={async (e) => {
-        let position = generateKeyBetween(props.lastPosition || null, null);
-        let entity;
-
-        if (e.type === "create") {
-          entity = ulid();
-          if (e.name) {
-            await mutate("createCard", {
-              entityID: entity,
-              title: e.name,
-            });
-          }
-        } else {
-          entity = e.entity;
-        }
-
-        mutate("addCardToSection", {
-          cardEntity: entity,
-          parent: props.entity,
-          positions: { [props.positionKey]: position },
-          section: props.section,
-        });
+    <Combobox.Option
+      key={"create"}
+      value={"create"}
+      disabled={props.inputExists}
+    >
+      {({ active }) => {
+        return (
+          <SearchItem active={active}>
+            {!props.inputExists || props.value === "" ? (
+              <div
+                className={`py-2 w-full
+                          text-accent-blue font-bold 
+                          grid grid-cols-[min-content_auto] gap-2`}
+              >
+                <Add />
+                <div>
+                  {!props.value
+                    ? "Create a blank card"
+                    : `Create "${props.value}"`}
+                </div>
+              </div>
+            ) : (
+              <div
+                className={`py-2 w-full
+                          text-grey-55 font-bold 
+                          grid grid-cols-[min-content_auto] gap-2`}
+              >
+                <Add />
+                <div>"{props.value}" already exists</div>
+              </div>
+            )}
+          </SearchItem>
+        );
       }}
-    />
+    </Combobox.Option>
+  );
+};
+
+const SearchResult = (
+  props: Item & {
+    disabled: boolean;
+    added: boolean;
+    addItem: (s: string) => void;
+    setMultiSelect: () => void;
+  }
+) => {
+  let isLongPress = useRef(false);
+  let longPressTimer = useRef<number>();
+
+  const TriggerLongPress = () => {
+    isLongPress.current = false;
+
+    longPressTimer.current = window.setTimeout(() => {
+      isLongPress.current = true;
+      props.setMultiSelect();
+      props.addItem(props.entity);
+
+      console.log("delayed result! " + isLongPress.current);
+    }, 500);
+  };
+  return (
+    <Combobox.Option
+      key={props.entity}
+      value={props.entity}
+      disabled={props.disabled}
+    >
+      {({ active }) => {
+        return (
+          <SearchItem active={active}>
+            <style jsx>
+              {`
+                .searchResult:hover .searchResultEmptyCheck {
+                  display: block;
+                }
+              `}
+            </style>
+            <div
+              className={`searchResult select-none gap-2 grid grid-cols-[min-content_auto_min-content] ${
+                props.disabled
+                  ? " text-grey-80 cursor-default"
+                  : "cursor-pointer"
+              }`}
+              onClick={(e) => {
+                if (e.shiftKey) {
+                  props.setMultiSelect();
+                }
+                if (isLongPress.current) {
+                  e.preventDefault();
+                }
+              }}
+              // START LONGPRESS LOGIC
+              // If you LongPress or LongClick, you will trigger multiselect. Here, we start a timer for .5 seconds when the user clicks
+              onMouseDown={(e) => {
+                TriggerLongPress();
+              }}
+              onContextMenu={(e) => e.preventDefault()}
+              onTouchStart={() => {
+                TriggerLongPress();
+
+                console.log("touch");
+              }}
+              // If the user clicks for .5 seconds or more, then isMultiselect = true. Else, just regular click.
+              onMouseUp={(e) => {
+                window.clearTimeout(longPressTimer.current);
+
+                if (isLongPress.current === true) {
+                  console.log("longpressed!");
+                }
+              }}
+              onTouchEnd={(e) => {
+                window.clearTimeout(longPressTimer.current);
+
+                if (isLongPress.current === true) {
+                  console.log("notouch");
+                }
+              }}
+              //END LONGPRESS LOGIC
+            >
+              <div className="searchResultIcon mt-[1px]">{props.icon}</div>
+              <div className="searchResultName">{props.display}</div>
+              {props.disabled ? (
+                <Checkmark className="searchReultSelectedCheck text-grey-90 justify-self-end mt-[5px]" />
+              ) : props.added ? (
+                <Checkmark className="searchResultAddedCheck text-accent-blue mt-[5px]" />
+              ) : (
+                <div
+                  className="searchResultEmptyCheck w-4 h-4 mt-[5px] rounded-full border border-dashed text-grey-55 hover:text-accent-blue hover:border-2 sm:hidden"
+                  onClick={() => props.setMultiSelect()}
+                />
+              )}
+            </div>
+          </SearchItem>
+        );
+      }}
+    </Combobox.Option>
   );
 };
 

@@ -148,8 +148,11 @@ export const AddToSection = (props: {
       <FindOrCreate
         allowBlank={true}
         onClose={() => setOpen(false)}
+        //START OF ON SELECT LOGIC
         onSelect={async (d) => {
           if (!rep?.rep) return;
+          // if youre adding to a backlink section, then the entity is a string
+          // if youre creating a new deck
           if (props.backlink) {
             let entity: string;
 
@@ -248,6 +251,7 @@ export const AddToSection = (props: {
             });
           }
         }}
+        // END OF ONSELECT LOGIC
         selected={
           props.backlink
             ? alreadyIn.map((d) => d.entity)
