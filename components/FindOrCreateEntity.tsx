@@ -1,9 +1,5 @@
-import { cornersOfRectangle } from "@dnd-kit/core/dist/utilities/algorithms/helpers";
-import { arraySwap } from "@dnd-kit/sortable";
 import { Combobox, Dialog, Transition } from "@headlessui/react";
-import { type } from "os";
 import { useRef, useState } from "react";
-import { StringMappingType } from "typescript";
 import { ButtonLink, ButtonPrimary } from "./Buttons";
 import { Add, Checkmark, Cross } from "./Icons";
 import { Divider } from "./Layout";
@@ -80,10 +76,13 @@ export const FindOrCreate = (props: {
               // NOTE: clicking the checkbox, shift clicking, longpress/click on a search result sets state to multiselect.
               // if isMultiSelect = false then onselect and onclose that bish
               if (isMultiSelect.current === false) {
-                props.onSelect({ entity: optionValue, type: "existing" });
+                props.onSelect(
+                  optionValue === "create"
+                    ? { type: "create", name: input }
+                    : { entity: optionValue, type: "existing" }
+                );
                 props.onClose();
                 setAdded([]);
-                isMultiSelect.current = false;
                 return;
               }
 
