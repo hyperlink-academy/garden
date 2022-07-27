@@ -8,6 +8,7 @@ export const Door = (props: {
 }) => {
   let defaultDoor = useIndex.eav(props.entityID, "space/door/image");
   let uploadedDoor = useIndex.eav(props.entityID, "space/door/uploaded-image");
+  let spaceName = useIndex.eav(props.entityID, "space/name");
 
   let image = uploadedDoor
     ? `${WORKER_URL}/static/${uploadedDoor.value.id}`
@@ -20,6 +21,8 @@ export const Door = (props: {
 
   return (
     <svg
+      role="img"
+      aria-labelledby="titleid"
       xmlns="http://www.w3.org/2000/svg"
       width={props.width || "128"}
       height="auto"
@@ -28,6 +31,7 @@ export const Door = (props: {
       filter={props?.glow ? "url(#softGlow)" : ""}
       overflow="visible"
     >
+      <title id="titleid">Door to {spaceName?.value}</title>
       <defs>
         <style>
           {`.cls-1{fill:`}
