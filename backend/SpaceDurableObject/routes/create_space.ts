@@ -7,7 +7,7 @@ import { Env } from "..";
 
 export const create_space_route = makeRoute({
   route: "create_space",
-  input: z.object({ name: z.string(), token: z.string() }),
+  input: z.object({ name: z.string().trim(), token: z.string() }),
   handler: async (msg, env: Env) => {
     let fauna = new Client({
       secret: env.env.FAUNA_KEY,

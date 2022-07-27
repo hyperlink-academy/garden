@@ -108,7 +108,7 @@ const CreateSpace = (props: { studioSpaceID: string }) => {
                     `${WORKER_URL}/space/${props.studioSpaceID}`,
                     "create_space",
                     {
-                      name,
+                      name: name.trim(),
                       token: auth.session.token,
                     }
                   );
