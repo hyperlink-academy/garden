@@ -40,7 +40,7 @@ export const Activity = (props: { entity: string }) => {
     }
   }, [props.entity, !!inActivity, authorized]);
   return (
-    <div className="h-full flex flex-col gap-4">
+    <div className="h-full flex flex-col gap-4 pb-6">
       <div className=" max-w-3xl m-auto w-full pt-4  grid grid-cols-[auto_max-content] gap-4 grow-0">
         <h2>{name?.value}</h2>
         <Link href={`/s/${query.studio}/s/${query.space}/activity`}>
