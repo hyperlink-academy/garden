@@ -47,6 +47,20 @@ export const DoorSelector = (props: {
             </button>
           );
         })}
+      </div>
+      <div>
+        <p className="pb-2">Upload a custom image!</p>
+        <p className="text-sm pb-2">
+          Crop to 256 x 576 px. Try{" "}
+          <a
+            href="https://museo.app/"
+            className="text-accent-blue"
+            target="_blank"
+          >
+            Museuo
+          </a>{" "}
+          for inspiration :)
+        </p>
         <AddImage
           onUpload={(imageID) => {
             if (props.selected?.type === "uploaded")
