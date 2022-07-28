@@ -170,5 +170,10 @@ export async function graphqlServer(request: Request, ctx: Env) {
 export const slugify = (str: string) => {
   var specials =
     /[\u2000-\u206F\u2E00-\u2E7F\\'!"#$%&()*+,./:;<=>?@[\]^`{|}~’]/g;
-  return str.trim().replace(specials, "").replace(/\s/g, "_").toLowerCase();
+  return str
+    .trim()
+    .replace(specials, "")
+    .replace(/\s/g, "_")
+    .replace("-", "_")
+    .toLowerCase();
 };
