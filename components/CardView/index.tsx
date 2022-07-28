@@ -107,13 +107,6 @@ export const CardView = (props: {
     >
       {/* Backlinks are a sticky div that sits behind another div that contains the card and a big ol empty div. 
       The card and empty div scroll together above the backlinks.  */}
-      <Backlinks
-        entityID={props.entityID}
-        open={open}
-        onOpen={() => {
-          setOpen("backlink");
-        }}
-      />
       {/* The h calc here determines the height of the card, and therefore, how much of the backlinks will peek out underneath it. 
       Another calc on the empty div (className =  spacer) determines how much the card will peek in when the backlinks are revealed*/}
       <div
@@ -121,6 +114,7 @@ export const CardView = (props: {
         card
         h-[calc(100%-20px)]
         absolute
+        z-10
         left-0
         top-0
         right-0
@@ -199,6 +193,14 @@ export const CardView = (props: {
             : "Untitled"}
         </small> */}
       </div>
+
+      <Backlinks
+        entityID={props.entityID}
+        open={open}
+        onOpen={() => {
+          setOpen("backlink");
+        }}
+      />
       {/* This is a blank div that allows the card to slide up, revealing the backlinks underneath. 
       The calc controls how much the card will slide up. 
       Bigger number, more of the bottom of the card peeks in, Smaller number, less of it peeks in. */}
