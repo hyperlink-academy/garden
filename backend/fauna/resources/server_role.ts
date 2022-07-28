@@ -12,6 +12,7 @@ import { CreatePhysicalCardFunctionName } from "./functions/create_physical_card
 import { CreateFileUploadFunctionName } from "./functions/create_file_upload";
 import { deleteFileUploadFunctionName } from "./functions/delete_file_upload";
 import { deleteFileUploadsBySpaceFunctionName } from "./functions/delete_space_uploads";
+import { createSignupCodeFunctionName } from "./functions/create_signup_code";
 
 const Functions = [
   deleteSessionFunctionName,
@@ -26,6 +27,7 @@ const Functions = [
   CreateFileUploadFunctionName,
   deleteFileUploadFunctionName,
   deleteFileUploadsBySpaceFunctionName,
+  createSignupCodeFunctionName,
 ];
 const definition: RoleDefinition = {
   name: "server_role",
