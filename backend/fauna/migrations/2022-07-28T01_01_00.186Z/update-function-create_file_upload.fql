@@ -4,7 +4,7 @@ Update(Function("create_file_upload"), {
     "session": Call(Function("get_session_by_id"), {
       "id": Select("token", Var("a"))
     })
-  }], If(IsNull(Var("user")), {
+  }], If(IsNull(Var("session")), {
     "success": false
   }, {
     "success": true,

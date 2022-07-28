@@ -32,7 +32,7 @@ const definition: FunctionDefinition = {
           }),
         },
         q.If(
-          q.IsNull(q.Var("user")),
+          q.IsNull(q.Var("session")),
           { success: false },
           {
             success: true,
