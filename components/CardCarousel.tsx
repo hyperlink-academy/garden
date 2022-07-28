@@ -175,7 +175,9 @@ export const CardContainer: React.FC<{
       behavior: smooth ? "smooth" : "auto",
       inline: "center",
     });
-    ref.current.focus({ preventScroll: true });
+    if (!ref.current.contains(document.activeElement)) {
+      ref.current.focus({ preventScroll: true });
+    }
     smooth = false;
   }, [props.selected]);
   return (
