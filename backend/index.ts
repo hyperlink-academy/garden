@@ -1,6 +1,7 @@
 import { makeRouter } from "./lib/api";
 import { handleOptions } from "./lib/handleOptions";
 import { claim_card_route } from "./routes/claim_card";
+import { create_signup_code_route } from "./routes/create_signup_code";
 import { get_signup_token_route } from "./routes/get_signup_code";
 import { get_space_route } from "./routes/get_space";
 import { getStudioRoute } from "./routes/get_studio";
@@ -23,6 +24,7 @@ const Routes = [
   get_space_route,
   get_signup_token_route,
   claim_card_route,
+  create_signup_code_route,
 ];
 export type WorkerRoutes = typeof Routes;
 
