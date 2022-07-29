@@ -14,6 +14,7 @@ import { Member, MemberAdd } from "./Icons";
 import { Divider } from "./Layout";
 import { SmallCard } from "./SmallCard";
 import { useSmoker } from "./Smoke";
+import { Textarea } from "./Textarea";
 
 export const SpaceInfo = () => {
   let spaceName = useIndex.aev("this/name")[0];
@@ -99,9 +100,10 @@ const Bot = (props: { entity: string }) => {
   let { mutate, authorized } = useMutations();
   return (
     <div className="flex flex-row w-full gap-2">
-      <input
+      <Textarea
         placeholder="name"
         value={name?.value}
+        className="border-2 p-1 w-full"
         onChange={async (e) => {
           if (!authorized) return;
           await mutate("assertFact", {
@@ -112,8 +114,9 @@ const Bot = (props: { entity: string }) => {
           });
         }}
       />
-      <input
+      <Textarea
         placeholder="url"
+        className="border-2 p-1 w-full"
         value={url?.value}
         onChange={async (e) => {
           if (!authorized) return;
