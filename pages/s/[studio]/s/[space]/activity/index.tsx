@@ -139,8 +139,8 @@ const ActivityItem = (props: { entity: string }) => {
             }`}
             value={title?.value}
             placeholder="untitled activity"
-            onChange={(e) => {
-              mutate("assertFact", {
+            onChange={async (e) => {
+              await mutate("assertFact", {
                 entity: props.entity,
                 attribute: "activity/name",
                 value: e.currentTarget.value,
