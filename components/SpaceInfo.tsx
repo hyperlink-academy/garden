@@ -162,7 +162,7 @@ const Members = () => {
                 <SmallCard
                   key={m.entity}
                   entityID={m.entity}
-                  href={`/s/${studio}/s/${space}/a/space%2Fmember/${m.entity}`}
+                  href={`/s/${studio}/s/${space}/c/${m.entity}`}
                 />
               ))}
             </div>
