@@ -162,6 +162,16 @@ export const DefaultAttributes = {
     cardinality: "one",
     unique: false,
   },
+  "bot/name": {
+    type: "string",
+    cardinality: "one",
+    unique: true,
+  },
+  "bot/url": {
+    type: "string",
+    cardinality: "one",
+    unique: false,
+  },
 } as const;
 
 export const ShortCodes: { [k in keyof Attribute]?: string | undefined } = {

@@ -13,7 +13,7 @@ beforeAll(async () => {
 
 test("retracting a fact marks it as retracted", async () => {
   const storage = await getMiniflareDurableObjectStorage(id);
-  let fact_store = store(storage);
+  let fact_store = store(storage, { id: "" });
   let entity = ulid();
   await fact_store.assertFact({
     entity,
@@ -31,7 +31,7 @@ test("retracting a fact marks it as retracted", async () => {
 
 test("single cardinality asserts should only create one fact even with multiple competing asserts", async () => {
   const storage = await getMiniflareDurableObjectStorage(id);
-  let fact_store = store(storage);
+  let fact_store = store(storage, { id: "" });
 
   let entity = ulid();
   await Promise.all(
@@ -55,7 +55,7 @@ test("single cardinality asserts should only create one fact even with multiple 
 
 test("you can't assert a fact with an unknown attribute", async () => {
   const storage = await getMiniflareDurableObjectStorage(id);
-  let fact_store = store(storage);
+  let fact_store = store(storage, { id: "" });
 
   let entity = ulid();
   let result = await fact_store.assertFact({
@@ -76,7 +76,7 @@ test("you can't assert a fact with an unknown attribute", async () => {
 
 test("you can assert a fact if you create the attribute first", async () => {
   const storage = await getMiniflareDurableObjectStorage(id);
-  let fact_store = store(storage);
+  let fact_store = store(storage, { id: "" });
   let newAttrbuteName = "a-new-attribute" as "arbitrarySectionStringType";
 
   let attributeEntity = ulid();
@@ -106,7 +106,7 @@ test("you can assert a fact if you create the attribute first", async () => {
 
 test("You can't create multiple facts with the same value of a unique attribute", async () => {
   const storage = await getMiniflareDurableObjectStorage(id);
-  let fact_store = store(storage);
+  let fact_store = store(storage, { id: "" });
   let uniqueValue = "a unique value";
 
   let originalEntity = ulid();

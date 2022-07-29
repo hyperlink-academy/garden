@@ -37,7 +37,7 @@ export const push_route = makeRoute({
         data: { success: false, error: "Invalid session token" },
       } as const;
     let cachedStore = new CachedStorage(env.storage);
-    let fact_store = store(cachedStore);
+    let fact_store = store(cachedStore, { id: env.id });
 
     let isMember = await env.factStore.scanIndex.ave(
       "space/member",

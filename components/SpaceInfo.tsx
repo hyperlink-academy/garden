@@ -1,11 +1,12 @@
 import { Disclosure } from "@headlessui/react";
 import { spaceAPI } from "backend/lib/api";
 import { useAuth } from "hooks/useAuth";
-import { useIndex, useSpaceID } from "hooks/useReplicache";
+import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
+import { ulid } from "src/ulid";
 import useSWR from "swr";
 import { ButtonLink, ButtonPrimary } from "./Buttons";
 import { Drawer } from "./DeckList";
@@ -28,6 +29,7 @@ export const SpaceInfo = () => {
           <Description entity={spaceName?.entity} />
         </div>
         <Members />
+        <Bots />
         <Divider dark />
       </div>
     </>
@@ -37,6 +39,94 @@ export const SpaceInfo = () => {
 const Description = (props: { entity: string }) => {
   let description = useIndex.eav(props.entity, "this/description");
   return <p className="spaceDescription text-grey-35 ">{description?.value}</p>;
+};
+
+const Bots = () => {
+  let bots = useIndex.aev("bot/url");
+  let [toggle, setToggle] = useState<boolean | undefined>(undefined);
+  let { mutate, authorized } = useMutations();
+
+  return (
+    <div>
+      <style jsx>{`
+        @media (max-width: 360px) {
+          .membersCardList {
+            place-content: space-between;
+            gap: 1rem 0rem;
+          }
+        }
+      `}</style>
+
+      <Disclosure>
+        <button
+          className="membersList grid grid-cols-[max-content_max-content] gap-2 items-center font-bold"
+          onClick={() => setToggle(!toggle)}
+        >
+          <Member />
+          <p>Bots ({bots.length})</p>
+        </button>
+
+        <Drawer open={!!toggle}>
+          <div className="flex flex-col gap-4">
+            <div className="membersCardList flex flex-wrap gap-4">
+              {bots.map((b) => (
+                <Bot entity={b.entity} />
+              ))}
+            </div>
+            {!authorized ? null : (
+              <ButtonPrimary
+                content="Add Bot"
+                onClick={() => {
+                  mutate("assertFact", {
+                    entity: ulid(),
+                    value: "http://example.com",
+                    attribute: "bot/url",
+                    positions: {},
+                  });
+                }}
+              />
+            )}
+          </div>
+        </Drawer>
+      </Disclosure>
+    </div>
+  );
+};
+
+const Bot = (props: { entity: string }) => {
+  let name = useIndex.eav(props.entity, "bot/name");
+  let url = useIndex.eav(props.entity, "bot/url");
+  let { mutate, authorized } = useMutations();
+  return (
+    <div className="flex flex-row w-full gap-2">
+      <input
+        placeholder="name"
+        value={name?.value}
+        onChange={async (e) => {
+          if (!authorized) return;
+          await mutate("assertFact", {
+            entity: props.entity,
+            attribute: "bot/name",
+            value: e.currentTarget.value,
+            positions: {},
+          });
+        }}
+      />
+      <input
+        placeholder="url"
+        value={url?.value}
+        onChange={async (e) => {
+          if (!authorized) return;
+          await mutate("assertFact", {
+            entity: props.entity,
+            attribute: "bot/url",
+            value: e.currentTarget.value,
+            positions: {},
+          });
+        }}
+      />
+    </div>
+  );
 };
 
 const Members = () => {
@@ -72,7 +162,7 @@ const Members = () => {
                 <SmallCard
                   key={m.entity}
                   entityID={m.entity}
-                  href={`/s/${studio}/s/${space}/c/${m.entity}`}
+                  href={`/s/${studio}/s/${space}/a/space%2Fmember/${m.entity}`}
                 />
               ))}
             </div>

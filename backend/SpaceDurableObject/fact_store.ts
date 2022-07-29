@@ -24,7 +24,7 @@ export interface BasicStorage {
   put<T>(key: string, value: T): Promise<void>;
   delete(key: string, options?: DurableObjectPutOptions): Promise<boolean>;
 }
-export const store = (storage: BasicStorage) => {
+export const store = (storage: BasicStorage, ctx: { id: string }) => {
   async function getSchema(attribute: string): Promise<Schema | undefined> {
     let defaultAttribute = Attribute[attribute as keyof Attribute];
     if (defaultAttribute) return defaultAttribute;
@@ -132,6 +132,35 @@ export const store = (storage: BasicStorage) => {
         ...m,
         index,
       });
+
+      // CALL BOTS
+      // Get bots mentioned
+      // Lookup bot URL
+      // generate API key
+      // Send request to bot including: api key, message data, and SPACE_ID
+      let botsMentions = m.content.match(/\@\w*/g);
+      if (botsMentions && botsMentions[0]) {
+        let bot = botsMentions[0].slice(1);
+        let botName = await scanIndex.ave("bot/name", bot);
+        if (botName) {
+          let botURL = await scanIndex.eav(botName.entity, "bot/url");
+          if (botURL) {
+            try {
+              fetch(botURL.value, {
+                method: "POST",
+                headers: {
+                  "Content-type": "application/json",
+                },
+                body: JSON.stringify({
+                  message: m,
+                  spaceID: ctx.id,
+                }),
+              });
+            } catch (e) {}
+          }
+        }
+      }
+
       await storage.put("meta-latest-message", index);
       return { success: true };
     },

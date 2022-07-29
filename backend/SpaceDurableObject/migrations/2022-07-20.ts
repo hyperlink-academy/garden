@@ -5,7 +5,7 @@ import { indexes, store } from "../fact_store";
 export default {
   date: "2022-07-20",
   run: async (storage: DurableObjectStorage) => {
-    let fact_store = store(storage);
+    let fact_store = store(storage, { id: "" });
     let facts = [
       ...(
         await storage.list<Fact<any>>({

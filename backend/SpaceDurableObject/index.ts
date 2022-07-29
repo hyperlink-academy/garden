@@ -15,6 +15,7 @@ import { push_route } from "./routes/push";
 import { connect } from "./socket";
 import { handleFileUpload } from "./upload_file";
 import { migrations } from "./migrations";
+import { bot_mutation_route } from "./routes/bot_mutations";
 
 export type Env = {
   factStore: ReturnType<typeof store>;
@@ -35,6 +36,7 @@ let routes = [
   get_latest_message,
   join_route,
   delete_file_upload_route,
+  bot_mutation_route,
 ];
 export type SpaceRoutes = typeof routes;
 let router = makeRouter(routes);
@@ -90,7 +92,7 @@ export class SpaceDurableObject implements DurableObject {
           this.throttled = false;
         }, 100);
       },
-      factStore: store(this.state.storage),
+      factStore: store(this.state.storage, { id: this.state.id.toString() }),
     };
     switch (path[1]) {
       case "upload_file": {
