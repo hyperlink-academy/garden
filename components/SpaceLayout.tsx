@@ -257,10 +257,10 @@ const ChatIcon = () => {
   );
 
   return (
-    <div>
+    <div className="max-h-8">
       <ChatBubble width={32} height={32} />
       {lastSeen && latestMsg > lastSeen ? (
-        <div className="bg-accent-red absolute rounded-full top-1.5 left-10 w-3 h-3"></div>
+        <div className="bg-accent-red relative rounded-full -top-8 left-5 w-3 h-3"></div>
       ) : null}
     </div>
   );
