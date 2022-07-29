@@ -152,6 +152,7 @@ export const store = (storage: BasicStorage, ctx: { id: string }) => {
                   "Content-type": "application/json",
                 },
                 body: JSON.stringify({
+                  botEntity: botName.entity,
                   message: m,
                   spaceID: ctx.id,
                 }),
