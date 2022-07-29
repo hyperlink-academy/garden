@@ -114,7 +114,7 @@ export const CardView = (props: {
         card
         h-[calc(100%-20px)]
         absolute
-        z-10
+        !z-10
         left-0
         top-0
         right-0
