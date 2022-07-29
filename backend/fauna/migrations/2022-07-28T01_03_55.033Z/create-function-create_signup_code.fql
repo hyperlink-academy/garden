@@ -1,0 +1,18 @@
+CreateFunction({
+  "name": "create_signup_code",
+  "role": "server",
+  "body": Query(Lambda("a", Let([{
+    "indexEntry": Match(Index("signup_tokens_by_code"), [Select("code", Var("a"))])
+  }], If(Exists(Var("indexEntry")), {
+    "success": false
+  }, {
+    "success": true,
+    "data": Select("data", Create(Collection("signup_tokens"), {
+      "data": {
+        "used": false,
+        "code": Select("code", Var("a")),
+        "message": Select("message", Var("a"))
+      }
+    }))
+  }))))
+})
