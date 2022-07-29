@@ -262,6 +262,7 @@ export const MessageInput = (props: { id: string; topic: string }) => {
     mutate("postMessage", {
       id: ulid(),
       entity,
+      attachedCards,
       topic: props.topic,
       content: message,
       sender: session.session.username,
