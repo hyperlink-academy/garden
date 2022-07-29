@@ -17,6 +17,7 @@ const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL as string;
 export const SpaceProvider: React.FC<{ id: string }> = (props) => {
   let [rep, setRep] = useState<ReturnType<typeof makeReplicache>>();
+  const [reconnectSocket, setReconnect] = useState({});
   let socket = useRef<WebSocket>();
   useEffect(() => {
     if (!props.id || !rep) return;
@@ -27,12 +28,19 @@ export const SpaceProvider: React.FC<{ id: string }> = (props) => {
     return () => {
       socket.current?.close();
     };
-  }, [props.id, rep]);
+  }, [props.id, rep, reconnectSocket]);
 
   let { session } = useAuth();
   useEffect(() => {
     let rep = makeSpaceReplicache({
       id: props.id,
+      onPull: () => {
+        if (socket.current) {
+          if (socket.current.readyState > 1) {
+            setReconnect({});
+          }
+        }
+      },
       session: session.session?.studio,
       token: session.token,
     });
@@ -80,10 +88,12 @@ export const SpaceSpaceProvider: React.FC<{
 export const makeSpaceReplicache = ({
   id,
   session,
+  onPull,
   token,
 }: {
   id: string;
   session?: string;
+  onPull?: () => void;
   token?: string;
 }) =>
   makeReplicache({
@@ -99,6 +109,7 @@ export const makeSpaceReplicache = ({
       return { httpStatusCode: 200, errorMessage: "" };
     },
     puller: async (request) => {
+      onPull?.();
       let data: PullRequest = await request.json();
       let result = await spaceAPI(
         `${WORKER_URL}/space/${id}`,
