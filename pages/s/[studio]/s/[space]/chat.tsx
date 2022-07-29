@@ -204,6 +204,7 @@ const MessageData = (props: { entity: string }) => {
 export const MessageInput = (props: { id: string; topic: string }) => {
   let [message, setMessage] = useState("");
   let [attachedCards, setAttachedCards] = useState<string[]>([]);
+  let messages = useIndex.messages(props.topic);
   let { session } = useAuth();
   useEffect(() => {
     let storedMsg = localStorage.getItem(
@@ -331,12 +332,21 @@ export const MessageInput = (props: { id: string; topic: string }) => {
           placeholder="write a message"
           value={message}
           onKeyDown={(e) => {
+            console.log(e.key);
             if (e.key === "Enter") {
               if (e.shiftKey) {
                 return;
               }
               e.preventDefault();
               submit();
+            }
+            if (e.key === "ArrowUp" && !message) {
+              if (!session.session) return;
+              let last = messages
+                .reverse()
+                .find((f) => f.sender === session.session?.username);
+              if (last) setMessage(last.content);
+              if (last?.attachedCards) setAttachedCards(last.attachedCards);
             }
           }}
           onChange={(e) => setMessage(e.currentTarget.value)}
