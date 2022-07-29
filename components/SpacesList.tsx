@@ -136,7 +136,13 @@ const EditSpace = (props: { spaceID: string }) => {
             <DoorSelector
               selected={
                 uploadedDoor
-                  ? { type: "uploaded", value: uploadedDoor.value.id }
+                  ? {
+                      type: "uploaded",
+                      value:
+                        uploadedDoor.value.filetype === "image"
+                          ? uploadedDoor.value.id
+                          : uploadedDoor.value.url,
+                    }
                   : door
                   ? { type: "default", value: door.value }
                   : undefined

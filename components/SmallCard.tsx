@@ -110,7 +110,13 @@ export const SmallCard = (
       listeners={props.listeners}
       draggable={props.draggable}
       onDelete={props.onDelete}
-      image={image?.value.id}
+      image={
+        !image
+          ? undefined
+          : image.value.filetype === "image"
+          ? image.value.id
+          : image.value.url
+      }
     />
   );
 };

@@ -11,7 +11,9 @@ export const Door = (props: {
   let spaceName = useIndex.eav(props.entityID, "space/name");
 
   let image = uploadedDoor
-    ? `${WORKER_URL}/static/${uploadedDoor.value.id}`
+    ? uploadedDoor.value.filetype === "image"
+      ? `${WORKER_URL}/static/${uploadedDoor.value.id}`
+      : uploadedDoor.value.url
     : defaultDoor
     ? defaultDoor.value
     : "/doors/door-clouds-256.jpg";

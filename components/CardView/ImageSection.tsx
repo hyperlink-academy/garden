@@ -15,13 +15,18 @@ export const ImageSection = (props: { entity: string }) => {
       <div className="grid auto-rows-max justify-items-center gap-1">
         <img
           className="max-w-full   "
-          src={`${WORKER_URL}/static/${image.value.id}`}
+          src={
+            image.value.filetype === "image"
+              ? `${WORKER_URL}/static/${image.value.id}`
+              : image.value.url
+          }
         />
         <button
           className="text-grey-55 text-sm justify-self-center hover:text-accent-blue"
           onClick={() => {
             if (!image || !session.token) return;
             mutate("retractFact", { id: image.id });
+            if (image.value.filetype === "external_image") return;
             spaceAPI(`${WORKER_URL}/space/${spaceID}`, "delete_file_upload", {
               token: session.token,
               fileID: image.value.id,
