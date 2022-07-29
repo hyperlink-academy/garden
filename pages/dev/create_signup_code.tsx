@@ -60,7 +60,7 @@ function Page() {
             return "an error occured";
           case "success":
             return (
-              <a>{`https://hyperlink.garden/signup?signupCode=${status.code}`}</a>
+              <a>{`https://hyperlink.academy/signup?signupCode=${status.code}`}</a>
             );
         }
       })()}
