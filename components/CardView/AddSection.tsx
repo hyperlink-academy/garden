@@ -120,12 +120,17 @@ export const SelectSection = (props: {
     return f.display.toLocaleLowerCase().includes(input.toLocaleLowerCase());
   });
 
+  let inputExists = !!items.find(
+    (i) => i.display.toLocaleLowerCase() === input.toLocaleLowerCase()
+  );
+
   return (
     <Combobox
       value=""
       onChange={(optionValue: string) => {
         console.log(optionValue);
         if (optionValue === "create") {
+          if (inputExists) return;
           {
             input === ""
               ? props.onClickCreate()
@@ -137,7 +142,7 @@ export const SelectSection = (props: {
       as="div"
       className="                         
       h-fit max-h-[calc(100vh-160px)]
-      flex flex-col items-stretch overflow-y-scroll gap-3"
+      flex flex-col items-stretch gap-3"
     >
       <div className="mx-4 mt-4">
         <Combobox.Input
@@ -148,53 +153,63 @@ export const SelectSection = (props: {
         />
       </div>
       {/* I am aware the max height in the Combobox.Options is gross, but max-h-full does work and this is the best i could do D:*/}
-      <Combobox.Options
-        static
-        className="w-full  flex-col flex gap-2 h-min overflow-y-auto mb-4 "
-      >
-        <Combobox.Option
-          key={"create"}
-          value={"create"}
-          className="cursor-pointer"
+      <div className="overflow-y-scroll">
+        <Combobox.Options
+          static
+          className="w-full mb-4 flex-col flex gap-2 h-min"
         >
-          {({ active }) => {
+          <Combobox.Option
+            key={"create"}
+            value={"create"}
+            className="cursor-pointer"
+            disabled={inputExists}
+          >
+            {({ active }) => {
+              return (
+                <SearchItem active={active}>
+                  <div
+                    className={`grid grid-cols-[max-content_auto] gap-2 font-bold ${
+                      inputExists ? "text-grey-55" : "text-accent-blue"
+                    } `}
+                  >
+                    <Add />
+
+                    {inputExists
+                      ? `"${input}" already exists`
+                      : input === ""
+                      ? "Create New Section"
+                      : `Create "${input}" section`}
+                  </div>
+                </SearchItem>
+              );
+            }}
+          </Combobox.Option>
+          {items.map((item) => {
             return (
-              <SearchItem active={active}>
-                <div className="grid grid-cols-[max-content_auto] gap-2 font-bold text-accent-blue">
-                  <Add />
-                  {input === ""
-                    ? "Create New Section"
-                    : `Create "${input}" section`}
-                </div>
-              </SearchItem>
+              <>
+                <Combobox.Option
+                  key={item.value}
+                  value={item.value}
+                  className="cursor-pointer"
+                >
+                  {({ active }) => {
+                    return (
+                      <SearchItem active={active}>
+                        <div
+                          className={`gap-2 items-center grid grid-cols-[min-content_auto]`}
+                        >
+                          {item.icon}
+                          {item.display}
+                        </div>
+                      </SearchItem>
+                    );
+                  }}
+                </Combobox.Option>
+              </>
             );
-          }}
-        </Combobox.Option>
-        {items.map((item) => {
-          return (
-            <>
-              <Combobox.Option
-                key={item.value}
-                value={item.value}
-                className="cursor-pointer"
-              >
-                {({ active }) => {
-                  return (
-                    <SearchItem active={active}>
-                      <div
-                        className={`gap-2 items-center grid grid-cols-[min-content_auto]`}
-                      >
-                        {item.icon}
-                        {item.display}
-                      </div>
-                    </SearchItem>
-                  );
-                }}
-              </Combobox.Option>
-            </>
-          );
-        })}
-      </Combobox.Options>
+          })}
+        </Combobox.Options>
+      </div>
     </Combobox>
   );
 };
