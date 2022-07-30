@@ -50,7 +50,7 @@ export const SmallCardList = (props: {
         {items.map((c, index) => {
           let entity = props.backlink ? c.entity : c.value.value;
           let attribute = ShortCodes[props.attribute]
-            ? ShortCodes[props.attribute]
+            ? (ShortCodes[props.attribute] as string)
             : props.attribute.slice(8);
 
           return (
@@ -72,7 +72,7 @@ export const SmallCardList = (props: {
               key={c.id}
               href={`/s/${studio}/s/${space}/c/${props.deck}/${
                 props.backlink ? "b" : "a"
-              }/${attribute}/${entity}`}
+              }/${encodeURIComponent(attribute)}/${entity}`}
               entityID={entity}
               id={c.id}
             />
