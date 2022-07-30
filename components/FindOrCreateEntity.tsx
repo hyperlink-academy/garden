@@ -135,7 +135,7 @@ export const FindOrCreate = (props: {
 
           {/* if isMultiselect = true, take all the stuff in the added[] and display it at the top, with a submit button. If not, show nothing! */}
           {isMultiSelect.current === false ? (
-            <div className="mx-3 mt-1 mb-2">
+            <div className="mx-3 mt-2 mb-2">
               <small className="italic text-grey-55 hidden sm:block">
                 SHIFT + click to select multiple cards!
               </small>
@@ -146,7 +146,7 @@ export const FindOrCreate = (props: {
           ) : (
             <div className="addedList flex flex-col gap-2 mx-3 mt-2 mb-3">
               {addedItemsList === false ? null : (
-                <ul className="flex flex-col gap-2 p-3 lightBorder bg-bg-blue">
+                <ul className="flex flex-col gap-2 p-3 lightBorder bg-bg-blue no-scrollbar">
                   {added.length === 0 ? (
                     <div className="text-grey-55 italic ">
                       no cards selected yet!
@@ -215,7 +215,7 @@ export const FindOrCreate = (props: {
           <Divider />
           <Combobox.Options
             static
-            className="w-full pt-2 flex-col flex gap-2 h-min max-h-[calc(100vh-16rem)] overflow-y-auto"
+            className="w-full pt-2 flex-col flex gap-2 h-min overflow-y-auto"
           >
             {!input && !props.allowBlank ? null : (
               <CreateButton value={input} inputExists={!!inputExists} />
