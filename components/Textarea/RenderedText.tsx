@@ -12,6 +12,10 @@ export const RenderedText = forwardRef<
         ref={ref}
         {...{ ...props, value: undefined }}
         className={`${props.className} break-words`}
+        style={{
+          ...props.style,
+          wordBreak: "break-word", //this works better than tailwind 'break-words' for some reason!
+        }}
       >
         {props.text ? (
           // One day we should do proper parsing but for now a line-based approach works

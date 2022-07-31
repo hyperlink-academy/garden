@@ -243,7 +243,10 @@ export const CardBody = (props: {
       </span>
     );
   return (
-    <span className="w-full overflow-hidden h-full">
+    <span
+      className="w-full overflow-hidden h-full"
+      style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
+    >
       {!props.title ? (
         <small>
           <pre
