@@ -12,7 +12,7 @@ export const bot_mutation_route = makeRoute({
         z.object({
           cmd: z.literal("postMessage"),
           message: z.object({
-            entity: z.string(),
+            entity: z.optional(z.string()),
             topic: z.string(),
             sender: z.string(),
             content: z.string(),
