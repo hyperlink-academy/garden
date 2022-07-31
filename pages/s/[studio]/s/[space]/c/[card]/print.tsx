@@ -19,7 +19,7 @@ export default function PrintCardPage() {
           className="w-full whitespace-pre-wrap"
         />
         <p className="text-grey-55 italic pt-8">
-          {content?.value.trim().split(/\s+/).length} words
+          {content?.value.trim().split(/\s+/).length || 0} words
         </p>
       </div>
     </>
