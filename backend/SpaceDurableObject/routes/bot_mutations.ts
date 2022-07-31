@@ -45,11 +45,14 @@ export const bot_mutation_route = makeRoute({
       let mutation = msg.mutations[i];
       switch (mutation.cmd) {
         case "postMessage": {
-          await env.factStore.postMessage({
-            ...mutation.message,
-            ts: Date.now().toString(),
-            id: ulid(),
-          });
+          await env.factStore.postMessage(
+            {
+              ...mutation.message,
+              ts: Date.now().toString(),
+              id: ulid(),
+            },
+            { ignoreBots: true }
+          );
           break;
         }
         case "assertFact": {
