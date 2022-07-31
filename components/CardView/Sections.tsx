@@ -10,7 +10,7 @@ import {
   UpArrow,
 } from "components/Icons";
 import { MenuContainer, MenuItem } from "components/Layout";
-import { multipleReferenceSection, singleTextSection } from "data/Facts";
+import { Fact, multipleReferenceSection, singleTextSection } from "data/Facts";
 import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
 import { useRef, useState } from "react";
 import { sortByPosition, updatePositions } from "src/position_helpers";
@@ -65,19 +65,39 @@ const Section = (props: {
           factID={props.factID}
         />
       </div>
-      {type?.value === "string" ? (
-        <SingleTextSection
-          entityID={props.entityID}
-          section={singleTextSection(props.name)}
-        />
-      ) : type?.value === "reference" && cardinality?.value === "many" ? (
-        <MultipleReferenceSection
-          section={multipleReferenceSection(props.name)}
-          entityID={props.entityID}
-        />
-      ) : null}
+      <SectionByType
+        type={type?.value}
+        entityID={props.entityID}
+        section={props.name}
+      />
     </div>
   );
+};
+
+const SectionByType = (props: {
+  section: string;
+  entityID: string;
+  type: Fact<"type">["value"] | undefined;
+}) => {
+  if (!props.type) return null;
+  switch (props.type) {
+    case "string":
+      return (
+        <SingleTextSection
+          entityID={props.entityID}
+          section={singleTextSection(props.section)}
+        />
+      );
+    case "reference":
+      return (
+        <MultipleReferenceSection
+          entityID={props.entityID}
+          section={multipleReferenceSection(props.section)}
+        />
+      );
+    default:
+      return null;
+  }
 };
 
 export const SingleTextSection = (props: {
