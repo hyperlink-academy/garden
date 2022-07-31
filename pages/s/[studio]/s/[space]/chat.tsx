@@ -103,31 +103,27 @@ const Placeholder = (props: { spaceName: string }) => {
         You're exploring {props.spaceName} — welcome to the chat!
       </p>
       <ul className="pb-4">
-        <li>~Use this as a group chat</li>
-        <li>~Or as a log/journal/stream!</li>
-        <li>~Attach decks and cards</li>
-        <li>~Share what you're working on</li>
-        <li>
-          ~Converse with bots <em>(COMING SOON)</em>
-        </li>
+        <li>~ Use this as a group chat</li>
+        <li>~ Or as a log/journal/stream!</li>
+        <li>~ Attach decks and cards</li>
+        <li>~ Converse with bots</li>
       </ul>
       <p className="pb-4">
-        * This welcome note will disappear once you send the first message… *
+        <em>This note will disappear once you send the first message…</em>
       </p>
       {/* prettier-ignore */}
       <pre className="MessageContent whitespace-pre-wrap text-grey-35">
-{"       "}..--""|{"\n"}
-{"       "}|     |{"\n"}
-{"       "}| .---'{"\n"}
-{" "}(\-.--| |---------.{"\n"}
-/ \) \ | |          \{"\n"}
-|:.  | | |           |{"\n"}
-|:.  | |o|           |{"\n"}
-|:.  | `"`           |{"\n"}
-|:.  |_ __  __ _  __ /{"\n"}
-`""""`""|=`|"""""""`{"\n"}
-{"        "}|=_|{"\n"}
-{"    "}jgs |= |{"\n"}
+{/* NB: looks weird below b/c it renders as Quattro, not monospace! */}
+{/* also includes several thin spaces and hair spaces lmao */}
+{"  "}____________________________{"\n"}
+{" "}/--------------------------/|{"\n"}
+|  ====           *-* ~~~~~~         ||{"\n"}
+|  ====         {"\{     \}"}~~~~~~    ||{"\n"}
+|                  *-* ~~~~~~     ||{"\n"}
+|                                    ||{"\n"}
+|                ========           ||{"\n"}
+|                  ======          |/{"\n"}
+{" "}----------------------------{"\n"}
               </pre>
     </>
   );
