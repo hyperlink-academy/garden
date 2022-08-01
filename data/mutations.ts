@@ -24,6 +24,10 @@ export type MutationContext = {
       entity: string,
       attribute: A
     ) => Promise<CardinalityResult<A>>;
+    aev: <A extends keyof Attribute>(
+      attribute: A,
+      entity?: string
+    ) => Promise<Fact<A>[]>;
     ave: <A extends keyof UniqueFacts>(
       attribute: A,
       value: string

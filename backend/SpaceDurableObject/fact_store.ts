@@ -7,6 +7,8 @@ import { Lock } from "src/lock";
 export const indexes = {
   ea: (entity: string, attribute: string, factID: string) =>
     `ea-${entity}-${attribute}-${factID}`,
+  ae: (attribute: string, entity: string, factID: string) =>
+    `ae-${attribute}-${entity}-${factID}`,
   av: (attribute: string, value: string) => `av-${attribute}-${value}`,
   va: (
     v: { type: "reference"; value: string },
@@ -59,6 +61,9 @@ export const store = (storage: BasicStorage, ctx: { id: string }) => {
     if (existingFact) {
       storage.delete(indexes.factID(f.id));
       storage.delete(
+        indexes.ae(existingFact.attribute, existingFact.entity, existingFact.id)
+      );
+      storage.delete(
         indexes.ea(existingFact.entity, existingFact.attribute, f.id)
       );
       storage.delete(indexes.ti(existingFact.lastUpdated, f.id));
@@ -79,6 +84,7 @@ export const store = (storage: BasicStorage, ctx: { id: string }) => {
 
     storage.put(indexes.factID(f.id), f);
     storage.put(indexes.ea(f.entity, f.attribute, f.id), f);
+    storage.put(indexes.ae(f.attribute, f.entity, f.id), f);
     storage.put(indexes.ti(f.lastUpdated, f.id), f);
     if (schema.unique) {
       storage.put(indexes.av(f.attribute, f.value as string), f);
@@ -90,6 +96,16 @@ export const store = (storage: BasicStorage, ctx: { id: string }) => {
   };
 
   const scanIndex: MutationContext["scanIndex"] = {
+    aev: async (attribute, entity) => {
+      let results = [
+        ...(
+          await storage.list<Fact<typeof attribute>>({
+            prefix: `ae-${attribute}-${entity || ""}`,
+          })
+        ).values(),
+      ].filter((f) => !f.retracted);
+      return results;
+    },
     vae: async (entity, attribute) => {
       let results = [
         ...(

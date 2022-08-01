@@ -33,6 +33,17 @@ export let ReplicacheContext = createContext<{
 
 export const scanIndex = (tx: ReadTransaction) => {
   const q: MutationContext["scanIndex"] = {
+    aev: async (attribute, entity) => {
+      if (!attribute) return [];
+      let results = await tx
+        .scan({
+          indexName: "aev",
+          prefix: `${attribute}-${entity || ""}`,
+        })
+        .values()
+        .toArray();
+      return results as Fact<typeof attribute>[];
+    },
     eav: async (entity, attribute) => {
       let results = await tx
         .scan({
