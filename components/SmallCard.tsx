@@ -139,15 +139,15 @@ export const BaseSmallCard = (props: {
 
   // TESTING HIDDEN FEATURE - customizable card styles
   let bg_color_value = useIndex.eav(
-    props.entityID as string | null,
+    props.entityID || null,
     "section/hyperlink_bg_color" as "arbitrarySectionStringType"
   )?.value;
   let border_color_value = useIndex.eav(
-    props.entityID as string | null,
+    props.entityID || null,
     "section/hyperlink_border_color" as "arbitrarySectionStringType"
   )?.value;
   let border_width_value = useIndex.eav(
-    props.entityID as string | null,
+    props.entityID || null,
     "section/hyperlink_border_width" as "arbitrarySectionStringType"
   )?.value;
 
@@ -248,7 +248,7 @@ export const CardBody = (props: {
 }) => {
   // TESTING HIDDEN FEATURE - customizable card styles
   let text_color_value = useIndex.eav(
-    props.entityID as string | null,
+    props.entityID || null,
     "section/hyperlink_text_color" as "arbitrarySectionStringType"
   )?.value;
 
