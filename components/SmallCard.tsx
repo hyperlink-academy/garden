@@ -137,6 +137,20 @@ export const BaseSmallCard = (props: {
   let url = props.content ? isUrl(props.content) : false;
   let [focused, setFocused] = useState(false);
 
+  // TESTING HIDDEN FEATURE - customizable card styles
+  let bg_color_value = useIndex.eav(
+    props.entityID as string | null,
+    "section/hyperlink_bg_color" as "arbitrarySectionStringType"
+  )?.value;
+  let border_color_value = useIndex.eav(
+    props.entityID as string | null,
+    "section/hyperlink_border_color" as "arbitrarySectionStringType"
+  )?.value;
+  let border_width_value = useIndex.eav(
+    props.entityID as string | null,
+    "section/hyperlink_border_width" as "arbitrarySectionStringType"
+  )?.value;
+
   return (
     <div
       className={`w-[151px] h-24 touch-manipulation relative origin-center`}
@@ -164,6 +178,9 @@ export const BaseSmallCard = (props: {
           background: `${
             props.image ? `url(${WORKER_URL}/static/${props.image})` : ""
           }`,
+          backgroundColor: bg_color_value ? bg_color_value : undefined,
+          borderColor: border_color_value ? border_color_value : undefined,
+          borderWidth: border_width_value ? border_width_value : undefined,
         }}
       >
         <div
@@ -187,6 +204,7 @@ export const BaseSmallCard = (props: {
           <Link href={props.href}>
             <a className="flex flex-col w-full">
               <CardBody
+                entityID={props.entityID}
                 member={!!props.isMember}
                 content={props.content}
                 title={props.title}
@@ -221,12 +239,19 @@ export const BaseSmallCard = (props: {
 };
 
 export const CardBody = (props: {
+  entityID?: string;
   member?: boolean;
   content?: string;
   title?: string;
   href: string;
   image?: string;
 }) => {
+  // TESTING HIDDEN FEATURE - customizable card styles
+  let text_color_value = useIndex.eav(
+    props.entityID as string | null,
+    "section/hyperlink_text_color" as "arbitrarySectionStringType"
+  )?.value;
+
   if (props.member)
     return (
       <span className="w-full h-full">
@@ -262,6 +287,9 @@ export const CardBody = (props: {
           className={`normal-case leading-tight  text-ellipsis  ${
             !props.image ? "" : "rounded-[3px] px-1 bg-white/75"
           }`}
+          style={{
+            color: text_color_value ? text_color_value : undefined,
+          }}
         >
           {props.title}
         </h4>

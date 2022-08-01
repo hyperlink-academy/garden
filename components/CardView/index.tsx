@@ -75,6 +75,25 @@ export const CardView = (props: {
     }
   }, [open]);
 
+  // TESTING HIDDEN FEATURE - customizable card styles
+  // get sections at top level to check for style customizations
+  let text_color_value = useIndex.eav(
+    props.entityID,
+    "section/hyperlink_text_color" as "arbitrarySectionStringType"
+  )?.value;
+  let bg_color_value = useIndex.eav(
+    props.entityID,
+    "section/hyperlink_bg_color" as "arbitrarySectionStringType"
+  )?.value;
+  let border_color_value = useIndex.eav(
+    props.entityID,
+    "section/hyperlink_border_color" as "arbitrarySectionStringType"
+  )?.value;
+  let border_width_value = useIndex.eav(
+    props.entityID,
+    "section/hyperlink_border_width" as "arbitrarySectionStringType"
+  )?.value;
+
   return (
     <div
       ref={parentContainer}
@@ -127,6 +146,12 @@ export const CardView = (props: {
         `}
         onClick={() => {
           setOpen("card");
+        }}
+        style={{
+          color: text_color_value ? text_color_value : undefined,
+          backgroundColor: bg_color_value ? bg_color_value : undefined,
+          borderColor: border_color_value ? border_color_value : undefined,
+          borderWidth: border_width_value ? border_width_value : undefined,
         }}
       >
         {!session?.loggedIn || !memberName ? null : (

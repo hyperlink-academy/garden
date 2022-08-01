@@ -47,6 +47,13 @@ const Section = (props: {
   let cardinality = useIndex.eav(entity?.entity || null, "cardinality");
   let type = useIndex.eav(entity?.entity || null, "type");
   let [focused, setFocused] = useState(false);
+
+  let text_color_value = useIndex.eav(
+    props.entityID,
+    "section/hyperlink_text_color" as "arbitrarySectionStringType"
+  )?.value;
+  // console.log(`text color: ${text_color_value}`);
+
   return (
     <div className="textSection grid grid-auto-rows gap-2">
       <div
@@ -57,7 +64,13 @@ const Section = (props: {
         onBlur={() => setFocused(false)}
         className="grid grid-cols-[auto_min-content_min-content] gap-2 items-center h-6"
       >
-        <h4>{props.name}</h4>
+        <h4
+          style={{
+            color: text_color_value ? text_color_value : undefined,
+          }}
+        >
+          {props.name}
+        </h4>
         <SectionMoreOptionsMenu
           section={`section/${props.name}`}
           entityID={props.entityID}
