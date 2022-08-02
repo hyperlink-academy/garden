@@ -218,7 +218,20 @@ export const FindOrCreate = (props: {
             className="w-full pt-2 flex-col flex gap-2 h-min overflow-y-auto"
           >
             {!input && !props.allowBlank ? null : (
-              <CreateButton value={input} inputExists={!!inputExists} />
+              <CreateButton
+                value={input}
+                inputExists={!!inputExists}
+                setMultiSelect={() => {
+                  isMultiSelect.current = true;
+                }}
+                addItem={(value) => {
+                  if (
+                    added.find((f) => f.type === "create" && f.name === value)
+                  )
+                    return;
+                  setAdded([...added, { type: "create", name: value }]);
+                }}
+              />
             )}
             {items.map((item) => {
               return (
@@ -246,7 +259,6 @@ export const FindOrCreate = (props: {
                   }
                   setMultiSelect={() => {
                     isMultiSelect.current = true;
-                    console.log("multiSelect is " + isMultiSelect.current);
                   }}
                 />
               );
@@ -258,7 +270,12 @@ export const FindOrCreate = (props: {
   );
 };
 
-const CreateButton = (props: { value: string; inputExists: boolean }) => {
+const CreateButton = (props: {
+  value: string;
+  inputExists: boolean;
+  addItem: (value: string) => void;
+  setMultiSelect: () => void;
+}) => {
   return (
     <Combobox.Option
       key={"create"}
@@ -267,7 +284,11 @@ const CreateButton = (props: { value: string; inputExists: boolean }) => {
     >
       {({ active }) => {
         return (
-          <SearchItem active={active}>
+          <SearchItem
+            active={active}
+            onLongPress={() => props.addItem(props.value)}
+            setMultiSelect={props.setMultiSelect}
+          >
             {!props.inputExists || props.value === "" ? (
               <div
                 className={`py-2 w-full
@@ -307,20 +328,6 @@ const SearchResult = (
     setMultiSelect: () => void;
   }
 ) => {
-  let isLongPress = useRef(false);
-  let longPressTimer = useRef<number>();
-
-  const TriggerLongPress = () => {
-    isLongPress.current = false;
-
-    longPressTimer.current = window.setTimeout(() => {
-      isLongPress.current = true;
-      props.setMultiSelect();
-      props.addItem(props.entity);
-
-      console.log("delayed result! " + isLongPress.current);
-    }, 500);
-  };
   return (
     <Combobox.Option
       key={props.entity}
@@ -329,7 +336,11 @@ const SearchResult = (
     >
       {({ active }) => {
         return (
-          <SearchItem active={active}>
+          <SearchItem
+            active={active}
+            setMultiSelect={props.setMultiSelect}
+            onLongPress={() => props.addItem(props.entity)}
+          >
             <style jsx>
               {`
                 .searchResult:hover .searchResultEmptyCheck {
@@ -343,41 +354,6 @@ const SearchResult = (
                   ? " text-grey-80 cursor-default"
                   : "cursor-pointer"
               }`}
-              onClick={(e) => {
-                if (e.shiftKey) {
-                  props.setMultiSelect();
-                }
-                if (isLongPress.current) {
-                  e.preventDefault();
-                }
-              }}
-              // START LONGPRESS LOGIC
-              // If you LongPress or LongClick, you will trigger multiselect. Here, we start a timer for .5 seconds when the user clicks
-              onMouseDown={(e) => {
-                TriggerLongPress();
-              }}
-              onContextMenu={(e) => e.preventDefault()}
-              onTouchStart={() => {
-                TriggerLongPress();
-
-                console.log("touch");
-              }}
-              // If the user clicks for .5 seconds or more, then isMultiselect = true. Else, just regular click.
-              onMouseUp={(e) => {
-                window.clearTimeout(longPressTimer.current);
-
-                if (isLongPress.current === true) {
-                  console.log("longpressed!");
-                }
-              }}
-              onTouchEnd={(e) => {
-                window.clearTimeout(longPressTimer.current);
-
-                if (isLongPress.current === true) {
-                  console.log("notouch");
-                }
-              }}
-              //END LONGPRESS LOGIC
             >
               <div className="searchResultIcon mt-[1px]">{props.icon}</div>
               <div className="searchResultName">{props.display}</div>
@@ -402,9 +378,58 @@ const SearchResult = (
 const SearchItem: React.FC<{
   active: boolean;
   className?: string;
+  onLongPress: () => void;
+  setMultiSelect: () => void;
 }> = (props) => {
+  let isLongPress = useRef(false);
+  let longPressTimer = useRef<number>();
+
+  const TriggerLongPress = () => {
+    isLongPress.current = false;
+
+    longPressTimer.current = window.setTimeout(() => {
+      isLongPress.current = true;
+      props.setMultiSelect();
+      props.onLongPress();
+    }, 500);
+  };
   return (
     <div
+      onClick={(e) => {
+        if (e.shiftKey) {
+          props.setMultiSelect();
+        }
+        if (isLongPress.current) {
+          e.preventDefault();
+        }
+      }}
+      // START LONGPRESS LOGIC
+      // If you LongPress or LongClick, you will trigger multiselect. Here, we start a timer for .5 seconds when the user clicks
+      onMouseDown={() => {
+        TriggerLongPress();
+      }}
+      onContextMenu={(e) => e.preventDefault()}
+      onTouchStart={() => {
+        TriggerLongPress();
+
+        console.log("touch");
+      }}
+      // If the user clicks for .5 seconds or more, then isMultiselect = true. Else, just regular click.
+      onMouseUp={(e) => {
+        window.clearTimeout(longPressTimer.current);
+
+        if (isLongPress.current === true) {
+          console.log("longpressed!");
+        }
+      }}
+      onTouchEnd={(e) => {
+        window.clearTimeout(longPressTimer.current);
+
+        if (isLongPress.current === true) {
+          console.log("notouch");
+        }
+      }}
+      //END LONGPRESS LOGIC
       className={`w-full px-3 py-0.5 ${props.className || ""} ${
         props.active ? "bg-bg-blue" : ""
       }`}
