@@ -110,6 +110,7 @@ const CreateSpace = (props: { studioSpaceID: string }) => {
                     {
                       name: name.trim(),
                       token: auth.session.token,
+                      image: door,
                     }
                   );
                   setName("");

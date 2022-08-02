@@ -7,7 +7,16 @@ import { Env } from "..";
 
 export const create_space_route = makeRoute({
   route: "create_space",
-  input: z.object({ name: z.string().trim(), token: z.string() }),
+  input: z.object({
+    name: z.string().trim(),
+    token: z.string(),
+    image: z
+      .object({
+        type: z.union([z.literal("default"), z.literal("uploaded")]),
+        value: z.string(),
+      })
+      .optional(),
+  }),
   handler: async (msg, env: Env) => {
     let fauna = new Client({
       secret: env.env.FAUNA_KEY,
@@ -57,6 +66,19 @@ export const create_space_route = makeRoute({
         value: newSpace.toString(),
         positions: {},
       }),
+      msg.image?.type === "uploaded"
+        ? env.factStore.assertFact({
+            entity: newEntity,
+            attribute: "space/door/uploaded-image",
+            value: { type: "file", filetype: "image", id: msg.image.value },
+            positions: {},
+          })
+        : env.factStore.assertFact({
+            entity: newEntity,
+            attribute: "space/door/image",
+            value: msg.image?.value || "/doors/door-clouds-256.jpg",
+            positions: {},
+          }),
     ]);
     env.poke();
     return { data: { success: true } } as const;
