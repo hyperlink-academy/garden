@@ -1,39 +1,20 @@
-import { spaceAPI, workerAPI } from "backend/lib/api";
+import { spaceAPI } from "backend/lib/api";
 import { ButtonPrimary } from "components/Buttons";
 import { Member } from "components/Icons";
-import { SpaceProvider } from "components/ReplicacheProvider";
 import { BaseSmallCard } from "components/SmallCard";
 import { useAuth } from "hooks/useAuth";
-import { useIndex } from "hooks/useReplicache";
+import { useIndex, useSpaceID } from "hooks/useReplicache";
 import { useRouter } from "next/router";
 import { ulid } from "src/ulid";
 import { SVGProps, useState } from "react";
-import useSWR from "swr";
 import { LogInModal } from "components/LoginModal";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export default function JoinSpacePage() {
-  let router = useRouter();
-  let { data: id } = useSWR(
-    "/studio/" + router.query.studio + "/space/" + router.query.space,
-    () => {
-      let id = workerAPI(WORKER_URL, "get_space", {
-        studio: router.query.studio as string,
-        space: router.query.space as string,
-      });
-      return id;
-    },
-    { revalidateOnFocus: false }
-  );
-  if (!id) return <div>loading…</div>;
-  if (!id.success) return <div>404 - space not found!</div>;
-  return (
-    <SpaceProvider id={id.id}>
-      <JoinSpace id={id.id} />
-    </SpaceProvider>
-  );
+  return <JoinSpace />;
 }
-export function JoinSpace(props: { id: string }) {
+export function JoinSpace() {
+  let id = useSpaceID();
   let { session, rep } = useAuth();
   let router = useRouter();
   let code = router.query.code as string | undefined;
@@ -42,8 +23,8 @@ export function JoinSpace(props: { id: string }) {
   let [isOpen, setLogInModal] = useState(false);
 
   const onClick = async () => {
-    if (!session.token || !code || !rep || isMember) return;
-    let data = await spaceAPI(`${WORKER_URL}/space/${props.id}`, "join", {
+    if (!session.token || !code || !rep || isMember || !id) return;
+    let data = await spaceAPI(`${WORKER_URL}/space/${id}`, "join", {
       token: session.token,
       code,
     });
@@ -51,7 +32,7 @@ export function JoinSpace(props: { id: string }) {
       await rep.mutate.addSpace({
         studio: router.query.studio as string,
         name: router.query.space as string,
-        spaceID: props.id,
+        spaceID: id,
         entityID: ulid(),
       });
       router.push(`/s/${router.query.studio}/s/${router.query.space}`);

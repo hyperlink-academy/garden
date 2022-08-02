@@ -52,10 +52,10 @@ export const AuthProvider: React.FC = (props) => {
       value={{
         rep: rep || null,
         session: data,
-        login: async (data: { username: string; password: string }) => {
-          let token = localStorage.getItem("auth");
-          if (token) return { success: true, token: token, session: {} as any };
-          let res = await workerAPI(WORKER_URL, "login", data);
+        login: async (login_data: { username: string; password: string }) => {
+          if (data?.loggedIn)
+            return { success: true, token: data.token, session: data.session };
+          let res = await workerAPI(WORKER_URL, "login", login_data);
           if (res.success) {
             localStorage.setItem("auth", res.token);
             mutate({ loggedIn: true, session: res.session, token: res.token });
