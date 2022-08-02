@@ -47,6 +47,11 @@ export const DoorSelector = (props: {
             </button>
           );
         })}
+        {props.selected?.type === "uploaded" ? (
+          <DoorClippedImage
+            url={`${WORKER_URL}/static/${props.selected.value}`}
+          />
+        ) : null}
       </div>
       <div>
         <p className="pb-2">Upload a custom image!</p>
