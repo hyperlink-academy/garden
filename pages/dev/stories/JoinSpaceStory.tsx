@@ -1,7 +1,6 @@
 import { JoinSpace } from "pages/s/[studio]/s/[space]/join";
 import { ComponentViewer, Props } from "./index";
 export { getStaticProps } from "./index";
-import { SpaceInfo } from "components/SpaceInfo";
 import { spaceID } from "src/lorem";
 
 const stories = {
@@ -20,7 +19,7 @@ const stories = {
 const JoinSpaceStory = (props: Props) => {
   return (
     <ComponentViewer components={props.components} stories={stories}>
-      <JoinSpace id={""} />
+      <JoinSpace />
     </ComponentViewer>
   );
 };
