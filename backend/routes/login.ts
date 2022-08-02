@@ -42,7 +42,7 @@ export const LoginRoute = makeRoute({
       } as const;
 
     let session = await createSession(fauna, {
-      username: msg.username,
+      username: existingUser.username,
       userAgent: "",
       createdAt: Date.now().toString(),
       studio: existingUser.studio,

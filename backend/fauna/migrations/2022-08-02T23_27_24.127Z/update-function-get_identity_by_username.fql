@@ -1,0 +1,9 @@
+Update(Function("get_identity_by_username"), {
+  "role": "server",
+  "body": Query(Lambda("args", Let([{
+    "usernameIndexEntry": Match(Index("identities_by_username"), [Select("username", Var("args"))])
+  }, {
+    "indexEntry": If(Exists(Var("usernameIndexEntry")), Var("usernameIndexEntry"), Match(Index("identities_by_email"), [Select("username", Var("args"))]))
+  }], If(Exists(Var("indexEntry")), Select("data", Get(Var("indexEntry"))), null)))),
+  "data": null
+})

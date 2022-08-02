@@ -1,4 +1,5 @@
 import { Client, query as q } from "faunadb";
+import { IdentitiesByEmailIndexName } from "../identities_by_email_index";
 import { IdentitiesByUsernameIndexName } from "../identities_by_username_index";
 import { Identity } from "../identities_collection";
 
@@ -16,9 +17,16 @@ export default q.CreateFunction({
     q.Lambda((args) =>
       q.Let(
         {
-          indexEntry: q.Match(q.Index(IdentitiesByUsernameIndexName), [
+          usernameIndexEntry: q.Match(q.Index(IdentitiesByUsernameIndexName), [
             q.Select("username", args),
           ]),
+          indexEntry: q.If(
+            q.Exists(q.Var("usernameIndexEntry")),
+            q.Var("usernameIndexEntry"),
+            q.Match(q.Index(IdentitiesByEmailIndexName), [
+              q.Select("username", args),
+            ])
+          ),
         },
         q.If(
           q.Exists(q.Var("indexEntry")),
