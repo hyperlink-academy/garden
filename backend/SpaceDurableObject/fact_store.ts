@@ -86,7 +86,7 @@ export const store = (storage: BasicStorage, ctx: { id: string }) => {
     storage.put(indexes.ea(f.entity, f.attribute, f.id), f);
     storage.put(indexes.ae(f.attribute, f.entity, f.id), f);
     storage.put(indexes.ti(f.lastUpdated, f.id), f);
-    if (schema.unique) {
+    if (schema.unique && f.value) {
       storage.put(indexes.av(f.attribute, f.value as string), f);
     }
     if (schema.type === "reference") {
