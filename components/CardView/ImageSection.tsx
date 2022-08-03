@@ -6,7 +6,7 @@ const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 
 export const ImageSection = (props: { entity: string }) => {
   let { session } = useAuth();
-  let { mutate } = useMutations();
+  let { mutate, authorized } = useMutations();
   let spaceID = useSpaceID();
   let image = useIndex.eav(props.entity, "card/image");
   return (
@@ -21,22 +21,24 @@ export const ImageSection = (props: { entity: string }) => {
               : image.value.url
           }
         />
-        <button
-          className="text-grey-55 text-sm justify-self-center hover:text-accent-blue"
-          onClick={() => {
-            if (!image || !session.token) return;
-            mutate("retractFact", { id: image.id });
-            if (image.value.filetype === "external_image") return;
-            spaceAPI(`${WORKER_URL}/space/${spaceID}`, "delete_file_upload", {
-              token: session.token,
-              fileID: image.value.id,
-            });
-          }}
-        >
-          remove
-        </button>
+        {!authorized ? null : (
+          <button
+            className="text-grey-55 text-sm justify-self-center hover:text-accent-blue"
+            onClick={() => {
+              if (!image || !session.token) return;
+              mutate("retractFact", { id: image.id });
+              if (image.value.filetype === "external_image") return;
+              spaceAPI(`${WORKER_URL}/space/${spaceID}`, "delete_file_upload", {
+                token: session.token,
+                fileID: image.value.id,
+              });
+            }}
+          >
+            remove
+          </button>
+        )}
       </div>
-    ) : (
+    ) : !authorized ? null : (
       <AddImage
         onUpload={async (imageID) => {
           await mutate("assertFact", {
