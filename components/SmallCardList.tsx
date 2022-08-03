@@ -63,7 +63,7 @@ export const SmallCardList = (props: {
                 !authorized
                   ? undefined
                   : () => {
-                      mutate("removeCardFromSection", {
+                      mutate("retractFact", {
                         id: c.id,
                       });
                     }

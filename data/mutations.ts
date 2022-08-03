@@ -119,19 +119,6 @@ const updatePositions: Mutation<{
   }
 };
 
-const assertCardTitle: Mutation<{ cardEntity: string; title: string }> = async (
-  args,
-  ctx
-) => {
-  await ctx.assertFact({
-    entity: args.cardEntity,
-    attribute: "card/title",
-    value: args.title,
-    positions: {},
-  });
-  return;
-};
-
 const addCardToSection: Mutation<{
   cardEntity: string;
   parent: string;
@@ -152,10 +139,6 @@ const addCardToSection: Mutation<{
   });
 };
 
-const removeCardFromSection: Mutation<{ id: string }> = async (args, ctx) => {
-  await ctx.retractFact(args.id);
-};
-
 const createCard: Mutation<{ entityID: string; title: string }> = async (
   args,
   ctx
@@ -168,13 +151,11 @@ const createCard: Mutation<{ entityID: string; title: string }> = async (
   });
 };
 
-const assertFact: Mutation<
-  | Pick<Fact<keyof Attribute>, "attribute" | "entity" | "value" | "positions">
-  | Pick<
-      Fact<keyof Attribute>,
-      "attribute" | "entity" | "value" | "positions"
-    >[]
-> = async (args, ctx) => {
+type FactInput = Pick<
+  Fact<keyof Attribute>,
+  "attribute" | "entity" | "value" | "positions"
+>;
+const assertFact: Mutation<FactInput | FactInput[]> = async (args, ctx) => {
   await Promise.all(
     [args].flat().map((f) => {
       return ctx.assertFact({ ...f });
@@ -275,10 +256,8 @@ export const Mutations = {
   createCard,
   addSpace,
   updatePositions,
-  removeCardFromSection,
   addDeck,
   addCardToSection,
-  assertCardTitle,
   assertFact,
   retractFact,
   addSection,

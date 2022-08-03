@@ -42,7 +42,7 @@ export const SmallCardDragContext: React.FC = (props) => {
         if (over) {
           if (!active) return;
           if (over.id === "delete") {
-            mutate("removeCardFromSection", { id: active.id as string });
+            mutate("retractFact", { id: active.id as string });
             return;
           }
           let index = over.data.current?.index;

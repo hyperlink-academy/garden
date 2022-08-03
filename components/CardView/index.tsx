@@ -292,7 +292,7 @@ const CardMoreOptionsMenu = (props: {
               !authorized
                 ? undefined
                 : () => {
-                    mutate("removeCardFromSection", {
+                    mutate("retractFact", {
                       id: props?.referenceFactID as string,
                     });
                   }
