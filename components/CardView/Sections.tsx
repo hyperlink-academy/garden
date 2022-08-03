@@ -177,8 +177,13 @@ const SectionMoreOptionsMenu = (props: {
   entityID: string;
 }) => {
   let { mutate, authorized } = useMutations();
-  let facts = useIndex.eav(props.entityID, props.section as keyof Attribute);
-  let empty = Array.isArray(facts) ? facts.length === 0 : !facts;
+  let facts = useIndex.eav(props.entityID, props.section as keyof Attribute) as
+    | Fact<any>
+    | Fact<any>[]
+    | null;
+
+  let empty = Array.isArray(facts) ? facts.length === 0 : !facts?.value;
+
   let sections = useIndex
     .eav(props.entityID, "card/section")
     ?.sort(sortByPosition("eav"));
