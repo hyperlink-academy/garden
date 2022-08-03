@@ -19,6 +19,7 @@ import {
   FilterAttributes,
   ReferenceAttributes,
 } from "data/Attributes";
+import { UndoManager } from "@rocicorp/undo";
 
 export const Sections = (props: { entityID: string }) => {
   let sections = useIndex.eav(props.entityID, "card/section");
@@ -123,6 +124,7 @@ export const SingleTextSection = (props: {
   new?: boolean;
 }) => {
   let fact = useIndex.eav(props.entityID, props.section);
+  let [undoManager] = useState(new UndoManager());
   let { authorized, mutate } = useMutations();
 
   return (
@@ -132,8 +134,37 @@ export const SingleTextSection = (props: {
       placeholder="write something..."
       className="placeholder:italic bg-inherit w-full"
       spellCheck={false}
+      onKeyDown={(e) => {
+        if (e.key === "z" && e.ctrlKey) {
+          undoManager.undo();
+        }
+        if (e.key === "y" && e.ctrlKey) {
+          undoManager.redo();
+        }
+      }}
       value={(fact?.value as string) || ""}
       onChange={async (e) => {
+        let currentValue = fact?.value || "";
+        let nextValue = e.currentTarget.value;
+
+        undoManager.add({
+          undo: async () => {
+            await mutate("assertFact", {
+              entity: props.entityID,
+              attribute: props.section,
+              value: currentValue,
+              positions: fact?.positions || {},
+            });
+          },
+          redo: async () => {
+            await mutate("assertFact", {
+              entity: props.entityID,
+              attribute: props.section,
+              value: nextValue,
+              positions: fact?.positions || {},
+            });
+          },
+        });
         await mutate("assertFact", {
           entity: props.entityID,
           attribute: props.section,
