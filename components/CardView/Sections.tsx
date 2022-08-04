@@ -114,15 +114,19 @@ const SectionByType = (props: {
   }
 };
 
-export const SingleTextSection = (props: {
-  entityID: string;
-  section: keyof FilterAttributes<{
-    unique: any;
-    type: "string";
-    cardinality: "one";
-  }>;
-  new?: boolean;
-}) => {
+export const SingleTextSection = (
+  props: {
+    entityID: string;
+    section: keyof FilterAttributes<{
+      unique: any;
+      type: "string";
+      cardinality: "one";
+    }>;
+    focused?: boolean;
+    className?: string;
+    new?: boolean;
+  } & JSX.IntrinsicElements["textarea"]
+) => {
   let fact = useIndex.eav(props.entityID, props.section);
   let [undoManager] = useState(new UndoManager());
   let timeout = useRef<null | number>(null);
@@ -130,10 +134,14 @@ export const SingleTextSection = (props: {
 
   return (
     <Textarea
+      {...props}
       previewOnly={!authorized}
+      focused={props.focused}
       autoFocus={props.new}
-      placeholder="write something..."
-      className="placeholder:italic bg-inherit w-full"
+      placeholder={props.placeholder || "write something..."}
+      className={`placeholder:italic bg-inherit w-full ${
+        props.className || ""
+      }`}
       spellCheck={false}
       onKeyDown={(e) => {
         if (
@@ -148,6 +156,7 @@ export const SingleTextSection = (props: {
         ) {
           undoManager.redo();
         }
+        props.onKeyDown?.(e);
       }}
       value={(fact?.value as string) || ""}
       onChange={async (e) => {

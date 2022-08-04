@@ -2,7 +2,6 @@ import { Menu } from "@headlessui/react";
 
 import { MoreOptions, Delete, DeckSmall, Member } from "components/Icons";
 import { MenuContainer, MenuItem } from "components/Layout";
-import { Textarea } from "components/Textarea";
 import { useIndex, useMutations } from "hooks/useReplicache";
 import {
   MultipleReferenceSection,
@@ -182,7 +181,11 @@ export const CardView = (props: {
         >
           <div className="cardDefaultSection grid grid-auto-rows gap-3">
             <div className="cardHeader grid grid-cols-[auto_min-content] gap-2">
-              <Title entityID={props.entityID} />
+              <SingleTextSection
+                entityID={props.entityID}
+                className="text-xl font-bold bg-inherit"
+                section={"card/title"}
+              />
               <CardMoreOptionsMenu
                 entityID={props.entityID}
                 referenceFactID={props?.referenceFactID}
@@ -244,30 +247,6 @@ const DeckCardList = (props: { entityID: string }) => {
         section="deck/contains"
       />
     </div>
-  );
-};
-
-const Title = (props: { entityID: string }) => {
-  let cardTitle = useIndex.eav(props.entityID, "card/title");
-  let memberName = useIndex.eav(props.entityID, "member/name");
-  let title = memberName || cardTitle;
-  let { authorized, mutate } = useMutations();
-
-  return (
-    <Textarea
-      previewOnly={!authorized || !!memberName}
-      placeholder="Untitled"
-      className="text-xl font-bold bg-inherit"
-      value={title?.value || ""}
-      onChange={async (e) => {
-        await mutate("assertFact", {
-          entity: props.entityID,
-          attribute: "card/title",
-          value: e.currentTarget.value,
-          positions: title?.positions || {},
-        });
-      }}
-    />
   );
 };
 
