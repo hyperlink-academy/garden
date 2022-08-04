@@ -71,7 +71,7 @@ export const AddSection = (props: { cardEntity: string }) => {
                 setCreateInput(input);
               }}
               onClickCreate={() => setState("createNew")}
-              items={sections.map((s) => {
+              sections={sections.map((s) => {
                 let type = types.find((f) => f.entity === s.entity);
                 return {
                   value: s.entity,
@@ -110,12 +110,12 @@ export const AddSection = (props: { cardEntity: string }) => {
 export const SelectSection = (props: {
   onClickCreate: () => void;
   onClickCreateWithInput: (input: string) => void;
-  items: { display: string; value: string; icon?: React.ReactElement }[];
+  sections: { display: string; value: string; icon?: React.ReactElement }[];
   selected: string[];
   onSelect: (section: { entity: string }) => void;
 }) => {
   let [input, setInput] = useState("");
-  let items = props.items.filter((f) => {
+  let items = props.sections.filter((f) => {
     if (/[A-Z]/g.test(input)) return f.display.includes(input);
     return f.display.toLocaleLowerCase().includes(input.toLocaleLowerCase());
   });
@@ -219,7 +219,7 @@ const CreateSectionDialog = (props: {
   onClose: () => void;
   createInput?: string;
 }) => {
-  let [sectionName, setSectionName] = useState(props.createInput);
+  let [newSectionName, setNewSectionName] = useState(props.createInput);
   let [sectionType, setSectionType] = useState<"reference" | "string">();
   return (
     <>
@@ -228,9 +228,9 @@ const CreateSectionDialog = (props: {
           <h4>Section Name</h4>
           <input
             type="text"
-            value={props.createInput ? props.createInput : sectionName}
+            value={props.createInput ? props.createInput : newSectionName}
             aria-label="section name"
-            onChange={(e) => setSectionName(e.currentTarget.value)}
+            onChange={(e) => setNewSectionName(e.currentTarget.value)}
           />
         </div>
         <div className="sectionTypePicker grid grid-flow-row items-center w-full gap-1 ">
@@ -293,10 +293,10 @@ const CreateSectionDialog = (props: {
         <ButtonTertiary content="Nevermind" onClick={() => props.onClose()} />
         <ButtonPrimary
           content="Add Section"
-          disabled={!sectionName || !sectionType}
+          disabled={!newSectionName || !sectionType}
           onClick={async () => {
-            if (!sectionName || !sectionType) return;
-            props.onCreate({ name: sectionName, type: sectionType });
+            if (!newSectionName || !sectionType) return;
+            props.onCreate({ name: newSectionName, type: sectionType });
           }}
         />
       </div>
