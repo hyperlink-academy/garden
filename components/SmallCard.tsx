@@ -262,7 +262,10 @@ export const CardBody = (props: {
             <small>member</small>
           </div>
 
-          <div className="w-full bg-white rounded-md text-accent-red font-bold grid py-1 px-2 leading-tight text-ellipsis overflow-hidden">
+          <div
+            className="w-full bg-white rounded-md text-accent-red font-bold grid py-1 px-2 leading-tight text-ellipsis overflow-hidden"
+            style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
+          >
             <span className="self-end">{props.title}</span>
           </div>
         </div>
@@ -285,7 +288,7 @@ export const CardBody = (props: {
         </small>
       ) : (
         <h4
-          className={`normal-case leading-tight  text-ellipsis  ${
+          className={`normal-case leading-tight text-ellipsis  ${
             !props.image ? "" : "rounded-[3px] px-1 bg-white/75"
           }`}
           style={{
