@@ -136,10 +136,13 @@ export const SingleTextSection = (props: {
       className="placeholder:italic bg-inherit w-full"
       spellCheck={false}
       onKeyDown={(e) => {
-        if (e.key === "z" && e.ctrlKey) {
+        if ((e.key === "z" && e.ctrlKey) || (e.key === "z" && e.metaKey)) {
           undoManager.undo();
         }
-        if (e.key === "y" && e.ctrlKey) {
+        if (
+          (e.key === "y" && e.ctrlKey) ||
+          (e.key === "z" && e.metaKey && e.shiftKey)
+        ) {
           undoManager.redo();
         }
       }}
