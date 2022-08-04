@@ -10,7 +10,7 @@ import { ulid } from "src/ulid";
 import useSWR from "swr";
 import { ButtonLink, ButtonPrimary } from "./Buttons";
 import { Drawer } from "./DeckList";
-import { Member, MemberAdd } from "./Icons";
+import { Member, MemberAdd, BotIcon } from "./Icons";
 import { Divider } from "./Layout";
 import { SmallCard } from "./SmallCard";
 import { useSmoker } from "./Smoke";
@@ -29,8 +29,10 @@ export const SpaceInfo = () => {
           <h1>{spaceName?.value}</h1>
           <Description entity={spaceName?.entity} />
         </div>
-        <Members />
-        <Bots />
+        <div className="">
+          <Members />
+          <Bots />
+        </div>
         <Divider dark />
       </div>
     </>
@@ -63,7 +65,7 @@ const Bots = () => {
           className="membersList grid grid-cols-[max-content_max-content] gap-2 items-center font-bold"
           onClick={() => setToggle(!toggle)}
         >
-          <Member />
+          <BotIcon />
           <p>Bots ({bots.length})</p>
         </button>
 
@@ -151,7 +153,7 @@ const Members = () => {
 
       <Disclosure>
         <button
-          className="membersList grid grid-cols-[max-content_max-content] gap-2 items-center font-bold"
+          className="membersList grid grid-cols-[max-content_max-content] gap-2 items-center font-bold w-max"
           onClick={() => setToggle(!toggle)}
         >
           <Member />
