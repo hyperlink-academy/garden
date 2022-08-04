@@ -125,6 +125,7 @@ export const SingleTextSection = (props: {
 }) => {
   let fact = useIndex.eav(props.entityID, props.section);
   let [undoManager] = useState(new UndoManager());
+  let timeout = useRef<null | number>(null);
   let { authorized, mutate } = useMutations();
 
   return (
@@ -146,6 +147,12 @@ export const SingleTextSection = (props: {
       onChange={async (e) => {
         let currentValue = fact?.value || "";
         let nextValue = e.currentTarget.value;
+        if (!timeout.current) undoManager.startGroup();
+        else clearTimeout(timeout.current);
+        timeout.current = window.setTimeout(() => {
+          timeout.current = null;
+          undoManager.endGroup();
+        }, 200);
 
         undoManager.add({
           undo: async () => {
