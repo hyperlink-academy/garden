@@ -181,11 +181,7 @@ export const CardView = (props: {
         >
           <div className="cardDefaultSection grid grid-auto-rows gap-3">
             <div className="cardHeader grid grid-cols-[auto_min-content] gap-2">
-              <SingleTextSection
-                entityID={props.entityID}
-                className="text-xl font-bold bg-inherit"
-                section={"card/title"}
-              />
+              <Title entityID={props.entityID} />
               <CardMoreOptionsMenu
                 entityID={props.entityID}
                 referenceFactID={props?.referenceFactID}
@@ -234,6 +230,22 @@ export const CardView = (props: {
       Bigger number, more of the bottom of the card peeks in, Smaller number, less of it peeks in. */}
       <div className="spacer snap-end h-[calc(100%-48px)]" />
     </div>
+  );
+};
+
+const Title = (props: { entityID: string }) => {
+  let memberName = useIndex.eav(props.entityID, "member/name");
+  let botName = useIndex.eav(props.entityID, "bot/name");
+  let cardTitle = useIndex.eav(props.entityID, "card/title");
+  let titleFact = memberName || botName || cardTitle;
+  if (!titleFact) return null;
+  return (
+    <SingleTextSection
+      previewOnly={titleFact.attribute === "member/name"}
+      entityID={props.entityID}
+      className="text-xl font-bold bg-inherit"
+      section={titleFact?.attribute}
+    />
   );
 };
 

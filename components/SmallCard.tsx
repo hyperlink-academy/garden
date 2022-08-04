@@ -94,14 +94,15 @@ export const SmallCard = (
   let content = useIndex.eav(props.entityID, "card/content");
   let isDeck = useIndex.eav(props.entityID, "deck");
   let memberName = useIndex.eav(props.entityID, "member/name");
+  let botName = useIndex.eav(props.entityID, "bot/name");
   let image = useIndex.eav(props.entityID, "card/image");
 
-  let title = !!memberName ? memberName : cardTitle;
+  let titleFact = memberName || botName || cardTitle;
 
   return (
     <BaseSmallCard
       entityID={props.entityID}
-      title={title?.value || ""}
+      title={titleFact?.value || ""}
       content={content?.value || ""}
       isDeck={!!isDeck}
       href={props.href}

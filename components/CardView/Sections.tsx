@@ -123,6 +123,7 @@ export const SingleTextSection = (
       cardinality: "one";
     }>;
     focused?: boolean;
+    previewOnly?: boolean;
     className?: string;
     new?: boolean;
   } & JSX.IntrinsicElements["textarea"]
@@ -135,7 +136,7 @@ export const SingleTextSection = (
   return (
     <Textarea
       {...props}
-      previewOnly={!authorized}
+      previewOnly={props.previewOnly || !authorized}
       focused={props.focused}
       autoFocus={props.new}
       placeholder={props.placeholder || "write something..."}
