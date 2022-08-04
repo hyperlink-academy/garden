@@ -13,6 +13,7 @@ import { ulid } from "src/ulid";
 import { useRouter } from "next/router";
 import { SmallCardList } from "./SmallCardList";
 import { SingleTextSection } from "./CardView/Sections";
+import { StringLiteralType } from "typescript";
 
 export const DeckList = () => {
   let decks = useIndex.aev("deck").sort(sortByPosition("aev"));
@@ -179,7 +180,9 @@ const EmptyDeck = (props: { open: boolean }) => {
   );
 };
 
-export const Drawer: React.FC<{ open: boolean }> = (props) => {
+export const Drawer: React.FC<{ open: boolean; bump?: number | 0 }> = (
+  props
+) => {
   const [ref, { height: viewHeight }] = useMeasure();
   const previousState = usePrevious(props.open);
   const { height, arrowHeight } = useSpring({
@@ -225,7 +228,7 @@ export const Drawer: React.FC<{ open: boolean }> = (props) => {
                 height: "16px",
                 clipPath:
                   props.open && previousState === props.open
-                    ? `polygon(0 0, 0 100%, 34px 100%,  50px 0, 66px 100%, 100% 100%, 100% 0)`
+                    ? `polygon(0 0, 0 100%, calc(34px + ${props.bump}px) 100%,  calc(50px + ${props.bump}px) 0, calc(66px + ${props.bump}px) 100%, 100% 100%, 100% 0)`
                     : arrowHeight.to(
                         (h) =>
                           `polygon(0 0, 0 ${h}%, 34px ${h}%, 50px 0, 66px ${h}%, 100% ${h}%, 100% 0)`

@@ -1,5 +1,6 @@
-import { Disclosure } from "@headlessui/react";
+import { Disclosure, Tab } from "@headlessui/react";
 import { spaceAPI } from "backend/lib/api";
+import { Fact } from "data/Facts";
 import { useAuth } from "hooks/useAuth";
 import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
 import Head from "next/head";
@@ -10,7 +11,7 @@ import { ulid } from "src/ulid";
 import useSWR from "swr";
 import { ButtonLink, ButtonPrimary } from "./Buttons";
 import { Drawer } from "./DeckList";
-import { Member, MemberAdd, BotIcon } from "./Icons";
+import { Member, BotIcon, BotAdd } from "./Icons";
 import { Divider } from "./Layout";
 import { SmallCard } from "./SmallCard";
 import { useSmoker } from "./Smoke";
@@ -18,6 +19,12 @@ import { Textarea } from "./Textarea";
 
 export const SpaceInfo = () => {
   let spaceName = useIndex.aev("this/name")[0];
+  let bots = useIndex.aev("bot/url");
+  let members = useIndex.aev("space/member");
+  let [memberToggle, setMemberToggle] = useState<boolean | undefined>(
+    undefined
+  );
+  let [botToggle, setBotToggle] = useState<boolean | undefined>(undefined);
 
   return (
     <>
@@ -29,10 +36,53 @@ export const SpaceInfo = () => {
           <h1>{spaceName?.value}</h1>
           <Description entity={spaceName?.entity} />
         </div>
-        <div className="">
-          <Members />
-          <Bots />
-        </div>
+        <Tab.Group>
+          <Tab.List className={`flex gap-2`}>
+            <Tab>
+              <div
+                className="membersList grid grid-cols-[max-content_max-content] gap-2 items-center font-bold w-max"
+                onClick={() => {
+                  setBotToggle(false);
+                  setMemberToggle(!memberToggle);
+                  console.log("Bot:" + botToggle + "| Member:" + memberToggle);
+                }}
+              >
+                <Member />
+                <p>Members ({members.length})</p>
+              </div>
+            </Tab>
+            <Tab>
+              <div
+                className="membersList grid grid-cols-[max-content_max-content] gap-2 items-center font-bold"
+                onClick={() => {
+                  setMemberToggle(false);
+                  setBotToggle(!botToggle);
+                  console.log("Bot:" + botToggle + " | Member:" + memberToggle);
+                }}
+              >
+                <BotIcon />
+                <p>Bots ({bots.length})</p>
+              </div>
+            </Tab>
+          </Tab.List>
+          <Disclosure>
+            <Drawer
+              open={
+                botToggle === false && memberToggle === false ? false : true
+              }
+              bump={memberToggle === true ? 0 : 142}
+            >
+              <Tab.Panels>
+                <Tab.Panel>
+                  <Members />
+                </Tab.Panel>
+                <Tab.Panel>
+                  <Bots botList={bots} />
+                </Tab.Panel>
+              </Tab.Panels>
+            </Drawer>
+          </Disclosure>
+        </Tab.Group>
         <Divider dark />
       </div>
     </>
@@ -44,9 +94,7 @@ const Description = (props: { entity: string }) => {
   return <p className="spaceDescription text-grey-35 ">{description?.value}</p>;
 };
 
-const Bots = () => {
-  let bots = useIndex.aev("bot/url");
-  let [toggle, setToggle] = useState<boolean | undefined>(undefined);
+const Bots = (props: { botList: Fact<"bot/url">[] }) => {
   let { mutate, authorized } = useMutations();
 
   return (
@@ -60,38 +108,27 @@ const Bots = () => {
         }
       `}</style>
 
-      <Disclosure>
-        <button
-          className="membersList grid grid-cols-[max-content_max-content] gap-2 items-center font-bold"
-          onClick={() => setToggle(!toggle)}
-        >
-          <BotIcon />
-          <p>Bots ({bots.length})</p>
-        </button>
-
-        <Drawer open={!!toggle}>
-          <div className="flex flex-col gap-4">
-            <div className="membersCardList flex flex-wrap gap-4">
-              {bots.map((b) => (
-                <Bot entity={b.entity} />
-              ))}
-            </div>
-            {!authorized ? null : (
-              <ButtonPrimary
-                content="Add Bot"
-                onClick={() => {
-                  mutate("assertFact", {
-                    entity: ulid(),
-                    value: "http://example.com",
-                    attribute: "bot/url",
-                    positions: {},
-                  });
-                }}
-              />
-            )}
-          </div>
-        </Drawer>
-      </Disclosure>
+      <div className="flex flex-col gap-4">
+        <div className="membersCardList flex flex-wrap gap-4">
+          {props.botList.map((b) => (
+            <Bot entity={b.entity} />
+          ))}
+        </div>
+        {!authorized ? null : (
+          <ButtonLink
+            icon={<BotAdd />}
+            content="Add Bot!"
+            onClick={() => {
+              mutate("assertFact", {
+                entity: ulid(),
+                value: "http://example.com",
+                attribute: "bot/url",
+                positions: {},
+              });
+            }}
+          />
+        )}
+      </div>
     </div>
   );
 };
@@ -151,30 +188,18 @@ const Members = () => {
         }
       `}</style>
 
-      <Disclosure>
-        <button
-          className="membersList grid grid-cols-[max-content_max-content] gap-2 items-center font-bold w-max"
-          onClick={() => setToggle(!toggle)}
-        >
-          <Member />
-          <p>Members ({members.length})</p>
-        </button>
-
-        <Drawer open={!!toggle}>
-          <div className="flex flex-col gap-4">
-            <div className="membersCardList flex flex-wrap gap-4">
-              {members.map((m) => (
-                <SmallCard
-                  key={m.entity}
-                  entityID={m.entity}
-                  href={`/s/${studio}/s/${space}/c/${m.entity}`}
-                />
-              ))}
-            </div>
-            <Join />
-          </div>
-        </Drawer>
-      </Disclosure>
+      <div className="flex flex-col gap-4">
+        <div className="membersCardList flex flex-wrap gap-4">
+          {members.map((m) => (
+            <SmallCard
+              key={m.entity}
+              entityID={m.entity}
+              href={`/s/${studio}/s/${space}/c/${m.entity}`}
+            />
+          ))}
+        </div>
+        <Join />
+      </div>
     </div>
   );
 };
