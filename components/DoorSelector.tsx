@@ -62,7 +62,7 @@ export const DoorSelector = (props: {
             className="text-accent-blue"
             target="_blank"
           >
-            Museuo
+            Museo
           </a>{" "}
           for inspiration :)
         </p>
