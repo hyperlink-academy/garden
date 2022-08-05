@@ -122,7 +122,7 @@ export function Footer() {
                     x2="0"
                     y2="28"
                     stroke="#8C8C8C"
-                    stroke-linecap="round"
+                    strokeLinecap="round"
                   />
                 </svg>
               </div>
