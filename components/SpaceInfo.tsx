@@ -37,7 +37,7 @@ export const SpaceInfo = () => {
           <Description entity={spaceName?.entity} />
         </div>
         <div className="flex flex-row gap-2">
-          <div
+          <button
             className="membersList grid grid-cols-[max-content_max-content] gap-2 items-center font-bold w-max"
             onClick={() => {
               setState((s) => ({
@@ -48,8 +48,8 @@ export const SpaceInfo = () => {
           >
             <Member />
             <p>Members ({members.length})</p>
-          </div>
-          <div
+          </button>
+          <button
             className="membersList grid grid-cols-[max-content_max-content] gap-2 items-center font-bold"
             onClick={() => {
               setState((s) => ({
@@ -60,7 +60,7 @@ export const SpaceInfo = () => {
           >
             <BotIcon />
             <p>Bots ({bots.length})</p>
-          </div>
+          </button>
         </div>
         <div>
           <Disclosure>
