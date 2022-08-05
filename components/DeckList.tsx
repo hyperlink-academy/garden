@@ -180,19 +180,23 @@ const EmptyDeck = (props: { open: boolean }) => {
   );
 };
 
-export const Drawer: React.FC<{ open: boolean; bump?: number | 0 }> = (
-  props
-) => {
+export const Drawer: React.FC<{
+  open: boolean;
+  bump?: number;
+  skipAnimation?: boolean;
+}> = (props) => {
   const [ref, { height: viewHeight }] = useMeasure();
   const previousState = usePrevious(props.open);
   const { height, arrowHeight } = useSpring({
     config: { mass: 0.1, tension: 500, friction: 25 },
+    immediate: props.skipAnimation,
     from: { height: 0, opacity: 0, arrowHeight: 0 },
     to: {
       arrowHeight: props.open ? 100 : 0,
       height: props.open ? viewHeight : 0,
     },
   });
+  let bump = props.bump || 0;
 
   return (
     <animated.div
@@ -228,10 +232,22 @@ export const Drawer: React.FC<{ open: boolean; bump?: number | 0 }> = (
                 height: "16px",
                 clipPath:
                   props.open && previousState === props.open
-                    ? `polygon(0 0, 0 100%, calc(34px + ${props.bump}px) 100%,  calc(50px + ${props.bump}px) 0, calc(66px + ${props.bump}px) 100%, 100% 100%, 100% 0)`
+                    ? `polygon(0 0,
+                    0 100%,
+                    ${bump + 34}px 100%,
+                    ${bump + 50}px 0,
+                    ${bump + 66}px 100%,
+                    100% 100%,
+                    100% 0)`
                     : arrowHeight.to(
                         (h) =>
-                          `polygon(0 0, 0 ${h}%, 34px ${h}%, 50px 0, 66px ${h}%, 100% ${h}%, 100% 0)`
+                          `polygon(0 0,
+                          0 ${h}%,
+                          ${bump + 34}px ${h}%,
+                          ${bump + 50}px 0,
+                          ${bump + 66}px ${h}%,
+                          100% ${h}%,
+                          100% 0)`
                       ),
               }}
             />

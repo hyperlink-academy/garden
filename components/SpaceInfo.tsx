@@ -3,8 +3,8 @@ import { spaceAPI } from "backend/lib/api";
 import { Fact } from "data/Facts";
 import { useAuth } from "hooks/useAuth";
 import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
+import { usePrevious } from "hooks/utils";
 import Head from "next/head";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { ulid } from "src/ulid";
@@ -21,11 +21,11 @@ export const SpaceInfo = () => {
   let spaceName = useIndex.aev("this/name")[0];
   let bots = useIndex.aev("bot/url");
   let members = useIndex.aev("space/member");
-  let [memberToggle, setMemberToggle] = useState<boolean | undefined>(
-    undefined
-  );
-  let [botToggle, setBotToggle] = useState<boolean | undefined>(undefined);
-
+  let [state, setState] = useState({
+    open: false,
+    tab: "member" as "bot" | "member",
+  });
+  const previousState = usePrevious(state.open);
   return (
     <>
       <Head>
@@ -36,53 +36,51 @@ export const SpaceInfo = () => {
           <h1>{spaceName?.value}</h1>
           <Description entity={spaceName?.entity} />
         </div>
-        <Tab.Group>
-          <Tab.List className={`flex gap-2`}>
-            <Tab>
-              <div
-                className="membersList grid grid-cols-[max-content_max-content] gap-2 items-center font-bold w-max"
-                onClick={() => {
-                  setBotToggle(false);
-                  setMemberToggle(!memberToggle);
-                  console.log("Bot:" + botToggle + "| Member:" + memberToggle);
-                }}
-              >
-                <Member />
-                <p>Members ({members.length})</p>
-              </div>
-            </Tab>
-            <Tab>
-              <div
-                className="membersList grid grid-cols-[max-content_max-content] gap-2 items-center font-bold"
-                onClick={() => {
-                  setMemberToggle(false);
-                  setBotToggle(!botToggle);
-                  console.log("Bot:" + botToggle + " | Member:" + memberToggle);
-                }}
-              >
-                <BotIcon />
-                <p>Bots ({bots.length})</p>
-              </div>
-            </Tab>
-          </Tab.List>
+        <div className="flex flex-row gap-2">
+          <div
+            className="membersList grid grid-cols-[max-content_max-content] gap-2 items-center font-bold w-max"
+            onClick={() => {
+              setState((s) => ({
+                tab: "member",
+                open: !s.tab ? true : s.tab === "member" ? !s.open : true,
+              }));
+            }}
+          >
+            <Member />
+            <p>Members ({members.length})</p>
+          </div>
+          <div
+            className="membersList grid grid-cols-[max-content_max-content] gap-2 items-center font-bold"
+            onClick={() => {
+              setState((s) => ({
+                tab: "bot",
+                open: !s.tab ? true : s.tab === "bot" ? !s.open : true,
+              }));
+            }}
+          >
+            <BotIcon />
+            <p>Bots ({bots.length})</p>
+          </div>
+        </div>
+        <div>
           <Disclosure>
             <Drawer
-              open={
-                botToggle === false && memberToggle === false ? false : true
-              }
-              bump={memberToggle === true ? 0 : 142}
+              open={state.open && state.tab === "member"}
+              skipAnimation={state.open && previousState}
             >
-              <Tab.Panels>
-                <Tab.Panel>
-                  <Members />
-                </Tab.Panel>
-                <Tab.Panel>
-                  <Bots botList={bots} />
-                </Tab.Panel>
-              </Tab.Panels>
+              <Members />
             </Drawer>
           </Disclosure>
-        </Tab.Group>
+          <Disclosure>
+            <Drawer
+              bump={142}
+              open={state.open && state.tab === "bot"}
+              skipAnimation={state.open && previousState}
+            >
+              <Bots botList={bots} />
+            </Drawer>
+          </Disclosure>
+        </div>
         <Divider dark />
       </div>
     </>
@@ -207,7 +205,6 @@ const Members = () => {
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 const Join = () => {
   let { session } = useAuth();
-  let router = useRouter();
   let isMember = useIndex.ave("space/member", session.session?.studio);
   let smoker = useSmoker();
   const spaceID = useSpaceID();
