@@ -46,9 +46,19 @@ export function SortableSmallCard(
         transition,
       }
     : undefined;
+  // TESTING HIDDEN FEATURE - for card size + layout options! again, EXPERIMENTAL
+  let card_is_divider = useIndex.eav(
+    props.entityID || null,
+    "section/hyperlink_card_divider" as "arbitrarySectionStringType"
+  )?.value;
 
   return (
-    <div style={style} ref={setNodeRef}>
+    <div
+      style={style}
+      ref={setNodeRef}
+      className={`
+    ${card_is_divider == "true" ? "basis-full" : ""}`}
+    >
       {isDragging ? (
         <div
           className={`border-grey-80 border rounded-md w-[151px] h-24 bg-grey-90 relative`}
@@ -151,10 +161,39 @@ export const BaseSmallCard = (props: {
     props.entityID || null,
     "section/hyperlink_border_width" as "arbitrarySectionStringType"
   )?.value;
+  // similar, but for card size + layout options! again, EXPERIMENTAL
+  let card_is_2x = useIndex.eav(
+    props.entityID || null,
+    "section/hyperlink_card_2x" as "arbitrarySectionStringType"
+  )?.value;
+  let card_is_divider = useIndex.eav(
+    props.entityID || null,
+    "section/hyperlink_card_divider" as "arbitrarySectionStringType"
+  )?.value;
 
   return (
     <div
-      className={`w-[151px] h-24 touch-manipulation relative origin-center`}
+      className={`
+      ${
+        card_is_2x == "true"
+          ? "w-[318px]"
+          : card_is_divider == "true"
+          ? "w-full"
+          : "w-[151px]"
+      }
+      ${card_is_2x == "true" ? "h-48" : "h-24"}
+      ${
+        card_is_divider == "true"
+          ? !!props.isDeck || !!props.isMember
+            ? "h-[44px]"
+            : border_width_value
+            ? `h-[${36 + (2 * Number(border_width_value.slice(0, -2)) - 2)}px]`
+            : "h-[36px]"
+          : ""
+      }
+      touch-manipulation
+      relative
+      origin-center`}
       onPointerOver={(e) => {
         if (e.pointerType === "mouse") setFocused(true);
       }}
@@ -164,7 +203,19 @@ export const BaseSmallCard = (props: {
     >
       <div
         className={`
-        w-full h-24 
+        w-full
+        ${card_is_2x == "true" ? "h-48" : "h-24"}
+        ${
+          card_is_divider == "true"
+            ? !!props.isDeck || !!props.isMember
+              ? "h-[44px]"
+              : border_width_value
+              ? `h-[${
+                  36 + (2 * Number(border_width_value.slice(0, -2)) - 2)
+                }px]`
+              : "h-[36px]"
+            : ""
+        }
         overflow-hidden 
         relative
         !bg-cover
