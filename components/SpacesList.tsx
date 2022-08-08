@@ -3,16 +3,17 @@ import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
 import Link from "next/link";
 import { useRef, useState } from "react";
 import useSWR from "swr";
-import { ButtonLink, ButtonPrimary, ButtonTertiary } from "./Buttons";
+import { ButtonLink, ButtonPrimary } from "./Buttons";
 import { DoorSelector } from "components/DoorSelector";
 import { Door } from "./Doors";
-import { Settings, SettingsStudio } from "./Icons";
+import { SettingsStudio } from "./Icons";
 import { Modal } from "./Layout";
 import { prefetchSpaceId } from "./ReplicacheProvider";
 import { useAuth } from "hooks/useAuth";
+import { sortByPosition } from "src/position_helpers";
 
 export const SpaceList = () => {
-  let spaces = useIndex.aev("space/name");
+  let spaces = useIndex.aev("space/name").sort(sortByPosition("aev"));
   return (
     <div>
       <style jsx>{`
@@ -61,12 +62,6 @@ const Space = (props: { entity: string; name: string }) => {
     latestMessage && lastSeenMessage && lastSeenMessage?.value < latestMessage
       ? latestMessage - lastSeenMessage?.value
       : null;
-  // TEST
-  // console.log(showUnreads);
-  // let showUnreads = true;
-  // let unreadCount = 5;
-
-  // flex flex-col absolute items-center bottom-[82px] left-[132px] md:left-[144px]
 
   return (
     <div className="w-min flex flex-col gap-4">
@@ -97,7 +92,7 @@ const Space = (props: { entity: string; name: string }) => {
               <span className="bg-accent-red rounded-full w-2 h-2"></span>
             </div>
           ) : null}
-          {authorized ? <EditSpace spaceEntity={props.entity} /> : null}
+          <EditSpace spaceEntity={props.entity} />
         </div>
       </div>
 
@@ -120,11 +115,12 @@ const EditSpace = (props: { spaceEntity: string }) => {
   let { session } = useAuth();
   let door = useIndex.eav(props.spaceEntity, "space/door/image");
   let spaceID = useIndex.eav(props.spaceEntity, "space/id");
+  let studio = useIndex.eav(props.spaceEntity, "space/studio");
   let uploadedDoor = useIndex.eav(
     props.spaceEntity,
     "space/door/uploaded-image"
   );
-  if (authorized === false) {
+  if (authorized === false || session.session?.username !== studio?.value) {
     return null;
   } else
     return (
