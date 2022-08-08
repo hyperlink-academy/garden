@@ -3,8 +3,7 @@ import { Bindings } from "backend";
 import { Client } from "faunadb";
 import bcrypt from "bcryptjs";
 import { CreateNewIdentity } from "backend/fauna/resources/functions/create_identity";
-import { makeAPIClient, makeRoute } from "backend/lib/api";
-import { SpaceRoutes } from "backend/SpaceDurableObject";
+import { internalSpaceAPI, makeRoute } from "backend/lib/api";
 
 export const SignupRoute = makeRoute({
   route: "signup",
@@ -36,7 +35,7 @@ export const SignupRoute = makeRoute({
     }
 
     let stub = env.SPACES.get(newSpaceID);
-    let newSpace = makeAPIClient<SpaceRoutes>(stub.fetch.bind(stub));
+    let newSpace = internalSpaceAPI(stub);
     let res = await newSpace("http://internal", "claim", {
       name: msg.username,
       ownerID: newSpaceID.toString(),

@@ -9,6 +9,7 @@ import { Door } from "./Doors";
 import { Settings, SettingsStudio } from "./Icons";
 import { Modal } from "./Layout";
 import { prefetchSpaceId } from "./ReplicacheProvider";
+import { useAuth } from "hooks/useAuth";
 
 export const SpaceList = () => {
   let spaces = useIndex.aev("space/name");
@@ -96,7 +97,7 @@ const Space = (props: { entity: string; name: string }) => {
               <span className="bg-accent-red rounded-full w-2 h-2"></span>
             </div>
           ) : null}
-          {authorized ? <EditSpace spaceID={props.entity} /> : null}
+          {authorized ? <EditSpace spaceEntity={props.entity} /> : null}
         </div>
       </div>
 
@@ -113,11 +114,16 @@ const Space = (props: { entity: string; name: string }) => {
   );
 };
 
-const EditSpace = (props: { spaceID: string }) => {
+const EditSpace = (props: { spaceEntity: string }) => {
   let [open, setOpen] = useState(false);
   let { authorized, mutate } = useMutations();
-  let door = useIndex.eav(props.spaceID, "space/door/image");
-  let uploadedDoor = useIndex.eav(props.spaceID, "space/door/uploaded-image");
+  let { session } = useAuth();
+  let door = useIndex.eav(props.spaceEntity, "space/door/image");
+  let spaceID = useIndex.eav(props.spaceEntity, "space/id");
+  let uploadedDoor = useIndex.eav(
+    props.spaceEntity,
+    "space/door/uploaded-image"
+  );
   if (authorized === false) {
     return null;
   } else
@@ -148,24 +154,13 @@ const EditSpace = (props: { spaceID: string }) => {
                   : undefined
               }
               onSelect={async (s) => {
-                if (s.type === "default") {
-                  if (uploadedDoor)
-                    await mutate("retractFact", { id: uploadedDoor.id });
-                  await mutate("assertFact", {
-                    entity: props.spaceID as string,
-                    attribute: "space/door/image",
-                    value: s.value,
-                    positions: {},
-                  });
-                } else {
-                  if (door) await mutate("retractFact", { id: door.id });
-                  await mutate("assertFact", {
-                    entity: props.spaceID as string,
-                    attribute: "space/door/uploaded-image",
-                    value: { type: "file", id: s.value, filetype: "image" },
-                    positions: {},
-                  });
-                }
+                //Call SpaceAPI
+                if (!spaceID || !session.token) return;
+                await spaceAPI(
+                  `${WORKER_URL}/space/${spaceID.value}`,
+                  "update_self",
+                  { token: session.token, data: { image: s } }
+                );
               }}
             />
           </div>

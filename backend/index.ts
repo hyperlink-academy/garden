@@ -49,6 +49,11 @@ async function handleRequest(request: Request, env: Bindings) {
     let stub = env.SPACES.get(id);
     let newUrl = new URL(request.url);
     newUrl.pathname = "/" + path.slice(4).join("/");
+
+    if (path[4] === "internal_api")
+      return new Response("Internal only", { status: 401 });
+    newUrl.pathname = "/" + path.slice(4).join("/");
+
     let result = await stub.fetch(
       new Request(newUrl.toString(), new Request(request))
     );

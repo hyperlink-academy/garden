@@ -1,38 +1,45 @@
 import { WorkerRoutes } from "backend";
-import { SpaceRoutes } from "backend/SpaceDurableObject";
+import { PrivateSpaceRoutes, SpaceRoutes } from "backend/SpaceDurableObject";
 import { ZodObject, ZodRawShape, z } from "zod";
 
 type UnwrapPromise<T> = T extends Promise<infer U> ? U : T;
 
-export const workerAPI = makeAPIClient<WorkerRoutes>();
-export const spaceAPI = makeAPIClient<SpaceRoutes>();
-export const internalSpaceAPI = (stub:DurableObjectStub) => makeAPIClient<SpaceRoutes>(stub.fetch.bind(stub))
+export const workerAPI = makeAPIClient<WorkerRoutes>("api");
+export const spaceAPI = makeAPIClient<SpaceRoutes>("api");
+//Rename these,
+export const internalSpaceAPI = (stub: DurableObjectStub) =>
+  makeAPIClient<SpaceRoutes>("api", stub.fetch.bind(stub));
+export const privateSpaceAPI = (stub: DurableObjectStub) =>
+  makeAPIClient<PrivateSpaceRoutes>("internal_api", stub.fetch.bind(stub));
 
 export type ExtractResponse<
   T extends { handler: (...d: any[]) => Promise<{ data: any }> }
 > = UnwrapPromise<ReturnType<T["handler"]>>["data"];
-export function makeAPIClient<R extends Routes<any>>(f?: Fetcher["fetch"]) {
+export function makeAPIClient<R extends Routes<any>>(
+  basePath: string,
+  f?: Fetcher["fetch"]
+) {
   let fetcher = fetch;
   if (f) fetcher = f;
   return async <T extends R[number]["route"]>(
-      path: string,
-      route: T,
-      data: z.infer<Extract<R[number], { route: T }>["input"]>
-    ) => {
-      let result = await fetcher(path + "/api/" + route, {
-        body: JSON.stringify(data),
-        method: "POST",
-        headers: { "Content-type": "application/json" },
-      });
-      return result.json() as Promise<
-        UnwrapPromise<
-          ReturnType<Extract<R[number], { route: T }>["handler"]>
-        >["data"]
-      >;
-    }
+    path: string,
+    route: T,
+    data: z.infer<Extract<R[number], { route: T }>["input"]>
+  ) => {
+    let result = await fetcher(`${path}/${basePath}/${route}`, {
+      body: JSON.stringify(data),
+      method: "POST",
+      headers: { "Content-type": "application/json" },
+    });
+    return result.json() as Promise<
+      UnwrapPromise<
+        ReturnType<Extract<R[number], { route: T }>["handler"]>
+      >["data"]
+    >;
+  };
 }
 
-type Routes<Env> =  POSTRoute<string, any, any, Env>[];
+type Routes<Env> = POSTRoute<string, any, any, Env>[];
 export const makeRouter = <Env>(routes: Routes<Env>) => {
   return async (route: string, request: Request, env: Env) => {
     let status = 200;

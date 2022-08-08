@@ -16,6 +16,8 @@ import { connect } from "./socket";
 import { handleFileUpload } from "./upload_file";
 import { migrations } from "./migrations";
 import { bot_mutation_route } from "./routes/bot_mutations";
+import { update_local_space_data_route } from "./internal_routes/update_local_space_data";
+import { update_self_route } from "./routes/update_self";
 
 export type Env = {
   factStore: ReturnType<typeof store>;
@@ -37,9 +39,13 @@ let routes = [
   join_route,
   delete_file_upload_route,
   bot_mutation_route,
+  update_self_route,
 ];
+let private_routes = [update_local_space_data_route];
+export type PrivateSpaceRoutes = typeof private_routes;
 export type SpaceRoutes = typeof routes;
 let router = makeRouter(routes);
+let internalRouter = makeRouter(private_routes);
 
 export class SpaceDurableObject implements DurableObject {
   throttled = false;
@@ -103,6 +109,9 @@ export class SpaceDurableObject implements DurableObject {
       }
       case "api": {
         return router(path[2], request, ctx);
+      }
+      case "internal_api": {
+        return internalRouter(path[2], request, ctx);
       }
       case "graphql": {
         return graphqlServer(request, ctx);
