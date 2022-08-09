@@ -240,13 +240,12 @@ const Title = (props: { entityID: string }) => {
   let botName = useIndex.eav(props.entityID, "bot/name");
   let cardTitle = useIndex.eav(props.entityID, "card/title");
   let titleFact = memberName || botName || cardTitle;
-  if (!titleFact) return null;
   return (
     <SingleTextSection
-      previewOnly={titleFact.attribute === "member/name"}
+      previewOnly={titleFact?.attribute === "member/name"}
       entityID={props.entityID}
       className="text-xl font-bold bg-inherit"
-      section={titleFact?.attribute}
+      section={titleFact?.attribute || "card/title"}
     />
   );
 };
