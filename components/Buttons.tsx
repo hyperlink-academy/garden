@@ -1,8 +1,9 @@
 type ButtonProps = JSX.IntrinsicElements["button"];
 export function ButtonPrimary(
   props: {
-    content: string;
+    content: string | React.ReactElement;
     icon?: React.ReactElement;
+    destructive?: boolean;
   } & ButtonProps
 ) {
   return (
@@ -13,12 +14,22 @@ export function ButtonPrimary(
       py-1 px-2 m-0 
       box-border
       text-white font-bold
-      bg-accent-blue 
-      border rounded-md border-accent-blue 
+      ${
+        props.destructive
+          ? `
+          hover:text-accent-red hover:bg-white
+          bg-accent-red border-accent-red
+          active:text-accent-red active:bg-bg-red `
+          : `
+          hover:text-accent-blue hover:bg-bg-blue 
+          bg-accent-blue border-accent-blue
+          active:text-accent-blue active:bg-bg-blue 
+          `
+      }
+      border rounded-md  
       flex justify-center items-center gap-2 
       w-max
-      hover:text-accent-blue hover:bg-bg-blue 
-      active:text-accent-blue active:bg-bg-blue active:outline outline-offset-[-2px] active:outline-2 
+      active:outline outline-offset-[-2px] active:outline-2 
       disabled:bg-grey-90 disabled:border-grey-90 
       disabled:text-grey-80 disabled:hover:text-grey-80
       `}

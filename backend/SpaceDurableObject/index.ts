@@ -18,6 +18,7 @@ import { migrations } from "./migrations";
 import { bot_mutation_route } from "./routes/bot_mutations";
 import { update_local_space_data_route } from "./internal_routes/update_local_space_data";
 import { update_self_route } from "./routes/update_self";
+import { delete_self_route } from "./routes/delete_self";
 
 export type Env = {
   factStore: ReturnType<typeof store>;
@@ -40,6 +41,7 @@ let routes = [
   delete_file_upload_route,
   bot_mutation_route,
   update_self_route,
+  delete_self_route,
 ];
 let private_routes = [update_local_space_data_route];
 export type PrivateSpaceRoutes = typeof private_routes;

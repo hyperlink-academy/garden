@@ -8,6 +8,7 @@ export const update_local_space_data_route = makeRoute({
     spaceID: z.string(),
     data: z
       .object({
+        deleted: z.boolean(),
         image: z
           .object({
             type: z.union([z.literal("default"), z.literal("uploaded")]),
@@ -41,6 +42,15 @@ export const update_local_space_data_route = makeRoute({
         positions: {},
       });
     }
+
+    if (msg.data.deleted) {
+      let references = await env.factStore.scanIndex.vae(spaceFact.entity);
+      let facts = await env.factStore.scanIndex.eav(spaceFact.entity, null);
+      await Promise.all(
+        facts.concat(references).map((f) => env.factStore.retractFact(f.id))
+      );
+    }
+
     env.poke();
     return { data: { success: true } };
   },

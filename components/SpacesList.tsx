@@ -3,7 +3,7 @@ import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
 import Link from "next/link";
 import { useRef, useState } from "react";
 import useSWR from "swr";
-import { ButtonLink, ButtonPrimary } from "./Buttons";
+import { ButtonLink, ButtonPrimary, ButtonSecondary } from "./Buttons";
 import { DoorSelector } from "components/DoorSelector";
 import { Door } from "./Doors";
 import { SettingsStudio } from "./Icons";
@@ -11,6 +11,7 @@ import { Modal } from "./Layout";
 import { prefetchSpaceId } from "./ReplicacheProvider";
 import { useAuth } from "hooks/useAuth";
 import { sortByPosition } from "src/position_helpers";
+import { DotLoader } from "./DotLoader";
 
 export const SpaceList = () => {
   let spaces = useIndex.aev("space/name").sort(sortByPosition("aev"));
@@ -111,11 +112,12 @@ const Space = (props: { entity: string; name: string }) => {
 
 const EditSpace = (props: { spaceEntity: string }) => {
   let [open, setOpen] = useState(false);
-  let { authorized, mutate } = useMutations();
+  let { authorized } = useMutations();
   let { session } = useAuth();
   let door = useIndex.eav(props.spaceEntity, "space/door/image");
   let spaceID = useIndex.eav(props.spaceEntity, "space/id");
   let studio = useIndex.eav(props.spaceEntity, "space/studio");
+  let [mode, setMode] = useState<"normal" | "delete">("normal");
   let uploadedDoor = useIndex.eav(
     props.spaceEntity,
     "space/door/uploaded-image"
@@ -134,38 +136,106 @@ const EditSpace = (props: { spaceEntity: string }) => {
           />
         </a>
         <Modal open={open} onClose={() => setOpen(false)}>
-          <div className="flex flex-col">
-            <DoorSelector
-              selected={
-                uploadedDoor
-                  ? {
-                      type: "uploaded",
-                      value:
-                        uploadedDoor.value.filetype === "image"
-                          ? uploadedDoor.value.id
-                          : uploadedDoor.value.url,
-                    }
-                  : door
-                  ? { type: "default", value: door.value }
-                  : undefined
-              }
-              onSelect={async (s) => {
-                //Call SpaceAPI
-                if (!spaceID || !session.token) return;
-                await spaceAPI(
-                  `${WORKER_URL}/space/${spaceID.value}`,
-                  "update_self",
-                  { token: session.token, data: { image: s } }
-                );
-              }}
-            />
-          </div>
+          {mode === "normal" ? (
+            <>
+              <div className="flex flex-col">
+                <DoorSelector
+                  selected={
+                    uploadedDoor
+                      ? {
+                          type: "uploaded",
+                          value:
+                            uploadedDoor.value.filetype === "image"
+                              ? uploadedDoor.value.id
+                              : uploadedDoor.value.url,
+                        }
+                      : door
+                      ? { type: "default", value: door.value }
+                      : undefined
+                  }
+                  onSelect={async (s) => {
+                    //Call SpaceAPI
+                    if (!spaceID || !session.token) return;
+                    await spaceAPI(
+                      `${WORKER_URL}/space/${spaceID.value}`,
+                      "update_self",
+                      { token: session.token, data: { image: s } }
+                    );
+                  }}
+                />
+              </div>
 
+              <ButtonPrimary
+                content="Delete this Space"
+                destructive
+                onClick={() => setMode("delete")}
+              />
+            </>
+          ) : (
+            <>
+              {!spaceID ? null : (
+                <DeleteSpaceForm
+                  spaceEntity={props.spaceEntity}
+                  onCancel={() => setMode("normal")}
+                  onDelete={() => {
+                    setOpen(false);
+                  }}
+                />
+              )}
+            </>
+          )}
           {/* <ButtonTertiary content="Nevermind" onClick={() => setOpen(false)} /> */}
-          <div className="flex gap-4 place-self-center">
-            <ButtonPrimary content="Done!" onClick={() => setOpen(false)} />
-          </div>
         </Modal>
       </>
     );
+};
+
+const DeleteSpaceForm = (props: {
+  spaceEntity: string;
+  onCancel: () => void;
+  onDelete: () => void;
+}) => {
+  let [state, setState] = useState({ spaceName: "" });
+  let [status, setStatus] = useState<"normal" | "loading">("normal");
+  let { session } = useAuth();
+  let name = useIndex.eav(props.spaceEntity, "space/name");
+  let spaceID = useIndex.eav(props.spaceEntity, "space/id");
+  return (
+    <>
+      <div className="flex flex-col gap-1">
+        <p className="font-bold">Type the name of this space</p>
+        <input
+          className="w-full"
+          value={state.spaceName}
+          placeholder=""
+          onChange={(e) => setState({ spaceName: e.currentTarget.value })}
+        />
+        <div className="flex flex-row gap-2">
+          <ButtonSecondary
+            onClick={async () => {
+              props.onCancel();
+            }}
+            content="Cancel"
+          />
+          <ButtonPrimary
+            onClick={async () => {
+              if (name?.value !== state.spaceName) return;
+              if (!spaceID || !session.token) return;
+              setStatus("loading");
+              await spaceAPI(
+                `${WORKER_URL}/space/${spaceID.value}`,
+                "delete_self",
+                { token: session.token, name: state.spaceName }
+              );
+              setStatus("normal");
+              props.onDelete();
+            }}
+            destructive
+            disabled={name?.value !== state.spaceName}
+            content={status === "normal" ? "Delete" : <DotLoader />}
+          />
+        </div>
+      </div>
+    </>
+  );
 };
