@@ -9,7 +9,12 @@ export default () => {
     <>
       <CardTitle card={CardID} />
       <div className="pb-4 h-full">
-        <CardView entityID={CardID} />
+        <CardView
+          entityID={CardID}
+          onDelete={() => {
+            router.push(`/s/${router.query.studio}/s/${router.query.space}`);
+          }}
+        />
       </div>
     </>
   );

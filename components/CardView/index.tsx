@@ -41,6 +41,7 @@ const contentStyles = (args: { deck: boolean; member: boolean }) => {
 };
 export const CardView = (props: {
   entityID: string;
+  onDelete?: () => void;
   referenceFactID?: string;
 }) => {
   let isDeck = useIndex.eav(props.entityID, "deck");
@@ -183,6 +184,7 @@ export const CardView = (props: {
             <div className="cardHeader grid grid-cols-[auto_min-content] gap-2">
               <Title entityID={props.entityID} />
               <CardMoreOptionsMenu
+                onDelete={props.onDelete}
                 entityID={props.entityID}
                 referenceFactID={props?.referenceFactID}
               />
@@ -265,6 +267,7 @@ const DeckCardList = (props: { entityID: string }) => {
 const CardMoreOptionsMenu = (props: {
   entityID: string;
   referenceFactID?: string;
+  onDelete?: () => void;
 }) => {
   let { authorized, mutate } = useMutations();
   let memberName = useIndex.eav(props.entityID, "member/name");
@@ -307,6 +310,7 @@ const CardMoreOptionsMenu = (props: {
         <MenuItem
           onClick={() => {
             mutate("deleteEntity", { entity: props.entityID });
+            props.onDelete?.();
           }}
         >
           <p className="font-bold">Delete Card FOREVER</p>

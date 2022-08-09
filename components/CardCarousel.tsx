@@ -64,7 +64,16 @@ export const CardCarousel = (props: {
               selected={selectedChild === entity}
               key={entity}
             >
-              <CardView entityID={entity} referenceFactID={c.id} />
+              <CardView
+                entityID={entity}
+                referenceFactID={c.id}
+                onDelete={() => {
+                  if (props.cards.length === 1)
+                    router.push(
+                      `/s/${router.query.studio}/s/${router.query.space}`
+                    );
+                }}
+              />
             </CardContainer>
           );
         })}
