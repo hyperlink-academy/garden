@@ -215,7 +215,7 @@ export const FindOrCreate = (props: {
           <Divider />
           <Combobox.Options
             static
-            className="w-full pt-2 flex-col flex gap-2 h-min overflow-y-auto"
+            className="w-full pt-2 pb-2 flex-col flex gap-2 h-min overflow-y-auto"
           >
             {!input && !props.allowBlank ? null : (
               <CreateButton
