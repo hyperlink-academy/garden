@@ -3,7 +3,7 @@ import { Disclosure } from "@headlessui/react";
 import useMeasure from "react-use-measure";
 import { animated, SpringValue, useSpring } from "@react-spring/web";
 import { usePrevious } from "hooks/utils";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ButtonLink, ButtonTertiary } from "./Buttons";
 import Link from "next/link";
 import { DeckAdd, Settings } from "./Icons";
@@ -13,22 +13,25 @@ import { ulid } from "src/ulid";
 import { useRouter } from "next/router";
 import { SmallCardList } from "./SmallCardList";
 import { SingleTextSection } from "./CardView/Sections";
-import { StringLiteralType } from "typescript";
 
 export const DeckList = () => {
-  let decks = useIndex.aev("deck").sort(sortByPosition("aev"));
+  let homeEntity = useIndex.aev("home");
+  let decks = useIndex.eav(homeEntity[0]?.entity || null, "deck/contains");
 
   return (
     <div className="flex flex-col pt-6 pb-0">
-      {decks.map((d) => (
-        <Deck entity={d.entity} key={d.entity} />
+      {decks?.sort(sortByPosition("aev")).map((d) => (
+        <Deck entity={d.value.value} key={d.value.value} />
       ))}
-      <CreateDeck lastDeckPosition={decks[decks.length - 1]?.positions.aev} />
+      <CreateDeck lastDeckPosition={decks?.[decks.length - 1]?.positions.aev} />
     </div>
   );
 };
 
-const CreateDeck = (props: { lastDeckPosition?: string }) => {
+const CreateDeck = (props: {
+  lastDeckPosition?: string;
+  homeEntity?: string;
+}) => {
   let { authorized, mutate } = useMutations();
   if (authorized === false) {
     return null;
@@ -42,6 +45,7 @@ const CreateDeck = (props: { lastDeckPosition?: string }) => {
             let entity = ulid();
             mutate("addDeck", {
               newEntity: entity,
+              newHomeEntity: ulid(),
               name: "",
               position: generateKeyBetween(
                 props.lastDeckPosition || null,

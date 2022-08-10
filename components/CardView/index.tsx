@@ -1,6 +1,12 @@
 import { Menu } from "@headlessui/react";
 
-import { MoreOptions, Delete, DeckSmall, Member } from "components/Icons";
+import {
+  MoreOptions,
+  Delete,
+  DeckSmall,
+  Member,
+  CardAdd,
+} from "components/Icons";
 import { MenuContainer, MenuItem } from "components/Layout";
 import { useIndex, useMutations } from "hooks/useReplicache";
 import {
@@ -16,6 +22,7 @@ import { useAuth } from "hooks/useAuth";
 import { ImageSection } from "./ImageSection";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
+import { flag } from "data/Facts";
 
 const borderStyles = (args: { deck: boolean; member: boolean }) => {
   switch (true) {
@@ -193,7 +200,10 @@ export const CardView = (props: {
               entityID={props.entityID}
               section={"card/content"}
             />
-            <ImageSection entity={props.entityID} />
+            <div>
+              <ImageSection entity={props.entityID} />
+              {isDeck ? null : <MakeDeck entity={props.entityID} />}
+            </div>
           </div>
 
           {!isDeck ? null : <DeckCardList entityID={props.entityID} />}
@@ -235,6 +245,25 @@ export const CardView = (props: {
   );
 };
 
+const MakeDeck = (props: { entity: string }) => {
+  let { authorized, mutate } = useMutations();
+  if (!authorized) return null;
+  return (
+    <button
+      onClick={() => {
+        mutate("assertFact", {
+          entity: props.entity,
+          attribute: "deck",
+          value: flag(),
+          positions: {},
+        });
+      }}
+    >
+      <CardAdd className="text-grey-55 hover:text-accent-blue" />
+    </button>
+  );
+};
+
 const Title = (props: { entityID: string }) => {
   let memberName = useIndex.eav(props.entityID, "member/name");
   let botName = useIndex.eav(props.entityID, "bot/name");
@@ -254,7 +283,6 @@ const DeckCardList = (props: { entityID: string }) => {
   let cards = useIndex.eav(props.entityID, "deck/contains");
   return (
     <div>
-      <h3 className="pb-2">Cards ({cards?.length})</h3>
       <MultipleReferenceSection
         entityID={props.entityID}
         section="deck/contains"

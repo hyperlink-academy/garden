@@ -57,6 +57,11 @@ export const DefaultAttributes = {
     unique: false,
     cardinality: "one",
   },
+  home: {
+    type: "flag",
+    unique: false,
+    cardinality: "one",
+  },
   "card/image": {
     type: "file",
     unique: false,

@@ -1,5 +1,7 @@
+import { generateKeyBetween } from "src/fractional-indexing";
+import { sortByPosition } from "src/position_helpers";
 import { Attribute, ReferenceAttributes } from "./Attributes";
-import { Fact, ref } from "./Facts";
+import { Fact, flag, ref } from "./Facts";
 import { Message } from "./Messages";
 
 export type MutationContext = {
@@ -55,22 +57,52 @@ type Mutation<T> = (args: T, ctx: MutationContext) => Promise<void>;
 
 const addDeck: Mutation<{
   name: string;
+  newHomeEntity: string;
   newEntity: string;
   position: string;
 }> = async (args, ctx) => {
+  let homeFact = await ctx.scanIndex.aev("home");
+  let homeEntity = homeFact[0]?.entity || args.newHomeEntity;
+
+  let existingDecks = (
+    await ctx.scanIndex.eav(homeEntity, "deck/contains")
+  ).sort(sortByPosition("eav"));
+
   await Promise.all([
+    !homeFact[0]
+      ? ctx.assertFact({
+          entity: homeEntity,
+          attribute: "home",
+          value: flag(),
+          positions: {},
+        })
+      : undefined,
+    ctx.assertFact({
+      entity: homeEntity,
+      attribute: "deck/contains",
+      value: ref(args.newEntity),
+
+      positions: {
+        eav: generateKeyBetween(
+          existingDecks[existingDecks.length]?.positions?.eav || null,
+          null
+        ),
+      },
+    }),
     ctx.assertFact({
       entity: args.newEntity,
       attribute: "deck",
       value: { type: "flag" },
       positions: { aev: args.position },
     }),
-    ctx.assertFact({
-      entity: args.newEntity,
-      attribute: "card/title",
-      value: args.name,
-      positions: {},
-    }),
+    !args.name
+      ? undefined
+      : ctx.assertFact({
+          entity: args.newEntity,
+          attribute: "card/title",
+          value: args.name,
+          positions: {},
+        }),
   ]);
 };
 

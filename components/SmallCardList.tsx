@@ -175,6 +175,7 @@ export const AddToSection = (props: {
                 ]?.positions.aev;
                 mutate("addDeck", {
                   newEntity: entity,
+                  newHomeEntity: ulid(),
                   name: "",
                   position: generateKeyBetween(decksLastPosition || null, null),
                 });
