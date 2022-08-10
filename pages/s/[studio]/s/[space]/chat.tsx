@@ -272,7 +272,7 @@ export const MessageInput = (props: { id: string; topic: string }) => {
   return (
     // the message input is 16px and the rest of chat is 15px.
     // this is because on mobile, browsers will automatically zoom in if you click on form elements with font size less thn 16px
-    <div className="-mx-4 md:mx-0 px-4 md:px-0 pt-4 border-t text-base border-grey-80 gap-2">
+    <div className="-mx-4 md:mx-0 px-4 md:px-4 pt-4 pb-4 border-t text-base border-grey-80 gap-2 bg-white md:rounded-md">
       {/* ATTACHED CARDS IN MESSAGE INPUT */}
       <div
         className={`${
