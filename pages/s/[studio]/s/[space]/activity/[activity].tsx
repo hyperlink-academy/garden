@@ -55,7 +55,7 @@ export const Activity = (props: { entity: string }) => {
         h-full
         lightBorder
         bg-white
-        rounded-lg
+        rounded-md
         relative
 
         `}
