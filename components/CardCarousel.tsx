@@ -19,12 +19,15 @@ export const CardCarousel = (props: {
   cards: Fact<keyof ReferenceAttributes>[];
 }) => {
   let router = useRouter();
+
   let [selectedChild, setSelectedChild] = useState(router.query.child);
+  let [focusedChild, setFocusedChild] = useState(router.query.child);
+
   let { mutate, authorized } = useMutations();
   let Name = useIndex.eav(props.entityID, "card/title");
   const position = props.cards.findIndex((c) => {
     let entity = props.backlink ? c.entity : c.value.value;
-    return entity === selectedChild;
+    return entity === focusedChild;
   });
 
   return (
@@ -59,7 +62,7 @@ export const CardCarousel = (props: {
                   "",
                   newUrl
                 );
-                setSelectedChild(entity);
+                setFocusedChild(entity);
               }}
               selected={selectedChild === entity}
               key={entity}
@@ -88,6 +91,7 @@ export const CardCarousel = (props: {
             let entity = props.backlink ? card.entity : card.value.value;
             smooth = true;
             setSelectedChild(entity);
+            setFocusedChild(entity);
           }}
         />
         {!authorized || props.backlink ? null : (
@@ -163,7 +167,7 @@ export const CardContainer: React.FC<{
           timeout = window.setTimeout(() => {
             if (!e[0]?.isIntersecting) return;
             props.onFocus();
-          }, 200);
+          }, 1000);
         }
       },
       { root: null, rootMargin: "0px -50%", threshold: 0 }
@@ -174,20 +178,24 @@ export const CardContainer: React.FC<{
     return () => {
       if (node) observer.unobserve(node);
     };
-  }, [ref, props.selected]);
+  }, [ref]);
 
   useEffect(() => {
     if (!ref.current) return;
     if (!props.selected) return;
-    //@ts-ignore
-    ref.current?.scrollIntoView({
-      behavior: smooth ? "smooth" : "auto",
-      inline: "center",
-    });
+    let timeout = window.setTimeout(() => {
+      ref.current?.scrollIntoView({
+        behavior: smooth ? "smooth" : "auto",
+        inline: "center",
+      });
+      smooth = false;
+    }, 50);
     if (!ref.current.contains(document.activeElement)) {
       ref.current.focus({ preventScroll: true });
     }
-    smooth = false;
+    return () => {
+      window.clearTimeout(timeout);
+    };
   }, [props.selected]);
   return (
     <div
@@ -232,9 +240,10 @@ const CardCounter = (props: {
       >
         <LeftArrow />
       </button>
-      <div className="text-grey-35 font-bold grid content-center">{`${
-        props.position + 1
-      } / ${props.length}`}</div>
+      <div className="text-grey-35 font-bold grid content-center">{`${(
+        "0".repeat(props.length.toString().length) +
+        (props.position + 1)
+      ).slice(-1 * props.length.toString().length)} / ${props.length}`}</div>
       <button
         onClick={() => {
           if (props.position < props.length - 1)
