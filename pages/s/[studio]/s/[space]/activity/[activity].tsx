@@ -50,15 +50,7 @@ export const Activity = (props: { entity: string }) => {
       <Carousel>
         <CardContainer onFocus={() => {}} selected={false} key={"chat"}>
           <div
-            className={`
-        grow 
-        h-full
-        lightBorder
-        bg-white
-        rounded-md
-        relative
-
-        `}
+            className={`grow h-full bg-white rounded-lg relative border border-grey-80`}
           >
             <div className="absolute top-0 bottom-0 left-0 right-0 flex flex-col gap-4 h-full p-4">
               <Messages topic={props.entity} />
