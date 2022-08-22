@@ -42,6 +42,11 @@ export const SpaceLayout: React.FC = (props) => {
           }
         }
       `}</style>
+      <style jsx global>{`
+        body {
+          overflow-y: hidden;
+        }
+      `}</style>
       <div className="h-full pt-4 px-4 overflow-auto navPadding" ref={ref}>
         <SmallCardDragContext>{props.children}</SmallCardDragContext>
         <Footer />
