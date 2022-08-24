@@ -92,6 +92,11 @@ const BacklinkSection = (props: {
   attribute: keyof ReferenceAttributes;
 }) => {
   let backlinkedCards = useIndex.vae(props.entityID, props.attribute);
+  let homeEntity = useIndex.aev("home");
+  let cards =
+    props.attribute === "deck/contains"
+      ? backlinkedCards.filter((c) => c.entity !== homeEntity[0]?.entity)
+      : backlinkedCards;
 
   let title =
     props.attribute === "deck/contains" ? (
@@ -108,7 +113,7 @@ const BacklinkSection = (props: {
       <SmallCardList
         backlink={true}
         attribute={props.attribute}
-        cards={backlinkedCards || []}
+        cards={cards || []}
         deck={props.entityID}
         positionKey="vae"
       />
