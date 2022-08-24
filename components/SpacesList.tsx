@@ -122,7 +122,10 @@ const EditSpace = (props: { spaceEntity: string }) => {
     props.spaceEntity,
     "space/door/uploaded-image"
   );
-  if (authorized === false || session.session?.username !== studio?.value) {
+  if (
+    authorized === false ||
+    session.session?.username !== studio?.value.toLocaleLowerCase()
+  ) {
     return null;
   } else
     return (
