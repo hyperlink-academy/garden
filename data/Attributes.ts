@@ -82,6 +82,11 @@ export const DefaultAttributes = {
     unique: true,
     cardinality: "one",
   },
+  "card/position-in": {
+    type: "reference",
+    unique: false,
+    cardinality: "many",
+  },
   ["space/studio"]: {
     type: "string",
     unique: false,
