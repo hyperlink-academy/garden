@@ -30,6 +30,13 @@ type Value<A extends AttributeName> = Attribute[A] extends {
       string: string;
       number: number;
       boolean: boolean;
+      position: {
+        type: "position";
+        x: number;
+        y: number;
+        rotation: number;
+        size: "small" | "big";
+      };
       file:
         | {
             type: "file";

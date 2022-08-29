@@ -1,9 +1,4 @@
-import {
-  ReplicacheContext,
-  scanIndex,
-  useIndex,
-  useMutations,
-} from "hooks/useReplicache";
+import { useIndex, useMutations } from "hooks/useReplicache";
 import {
   DndContext,
   MouseSensor,
@@ -35,26 +30,31 @@ export const Desktop = () => {
       ]}
       onDragEnd={async ({ active, delta, over }) => {
         if (!homeEntity[0]) return;
-        if (!over)
+        if (!over || over.id === active.id)
           return await mutate("updatePositionInDesktop", {
-            entityID: active.id as string,
+            factID: active.id as string,
             parent: homeEntity[0].entity,
             dx: delta.x,
             dy: delta.y,
           });
-        if (over.id === active.id) return;
 
         await mutate("addToOrCreateDeck", {
-          child: active.id as string,
-          parent: over.id as string,
+          droppedCardPositionFact: active.id as string,
+          droppedCardEntity: active.data.current?.entityID,
+          targetCardPositionFact: over.id as string,
+          targetCardEntity: over.data.current?.entityID,
           desktop: homeEntity[0].entity,
         });
       }}
     >
-      <div>
+      <div
+        style={{ border: "1px solid", height: "1000px", width: "400px" }}
+        className="relative"
+      >
         {cards?.map((card) => (
           <DraggableCard
             key={card.id}
+            relationshipID={card.id}
             entityID={card.value.value}
             parent={homeEntity[0]?.entity}
           />
@@ -64,16 +64,20 @@ export const Desktop = () => {
   );
 };
 
-const DraggableCard = (props: { entityID: string; parent: string }) => {
-  let position = useIndex
-    .eav(props.entityID, "card/position-in")
-    ?.find((f) => f.value.value === props.parent);
+const DraggableCard = (props: {
+  entityID: string;
+  parent: string;
+  relationshipID: string;
+}) => {
+  let position = useIndex.eav(props.relationshipID, "card/position-in");
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({
-      id: props.entityID,
+      id: props.relationshipID,
+      data: { entityID: props.entityID },
     });
   let { setNodeRef: draggableRef, isOver } = useDroppable({
-    id: props.entityID,
+    id: props.relationshipID,
+    data: { entityID: props.entityID },
   });
   let refs = useCombinedRefs(setNodeRef, draggableRef);
 
@@ -86,14 +90,15 @@ const DraggableCard = (props: { entityID: string; parent: string }) => {
       style={{
         zIndex: isDragging ? 10 : undefined,
         transform: style,
-        top: (position?.positions.y || 0) + "px",
-        left: (position?.positions.x || 0) + "px",
+        top: (position?.value.y || 0) + "px",
+        left: (position?.value.x || 0) + "px",
       }}
       ref={refs}
-      className="touch-none relative w-min"
+      className="touch-none absolute w-min"
     >
       <SmallCard
         href=""
+        resizable
         listeners={listeners}
         attributes={attributes}
         draggable

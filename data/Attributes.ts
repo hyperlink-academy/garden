@@ -17,6 +17,7 @@ export const BaseAttributes = {
       "file",
       "string",
       "union",
+      "position",
       "reference",
       "boolean",
       "flag",
@@ -83,9 +84,14 @@ export const DefaultAttributes = {
     cardinality: "one",
   },
   "card/position-in": {
-    type: "reference",
+    type: "position",
     unique: false,
-    cardinality: "many",
+    cardinality: "one",
+  },
+  "card/size-in": {
+    type: "boolean",
+    unique: false,
+    cardinality: "one",
   },
   ["space/studio"]: {
     type: "string",

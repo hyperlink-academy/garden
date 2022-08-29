@@ -12,7 +12,7 @@ export type MutationContext = {
   ) => Promise<{ success: boolean }>;
   assertFact: <A extends keyof Attribute>(
     d: Pick<Fact<A>, "entity" | "attribute" | "value" | "positions">
-  ) => Promise<{ success: boolean }>;
+  ) => Promise<{ success: false } | { success: true; factID: string }>;
   updateFact: (
     id: string,
     data: Partial<Fact<any>>
@@ -141,83 +141,87 @@ const addSpace: Mutation<{
   ]);
 };
 const updatePositionInDesktop: Mutation<{
-  entityID: string;
   parent: string;
+  factID: string;
   dx: number;
   dy: number;
 }> = async (args, ctx) => {
-  let allPositionFacts = await ctx.scanIndex.eav(
-    args.entityID,
-    "card/position-in"
-  );
-  let positionFact = allPositionFacts.find(
-    (f) => f.value.value === args.parent
-  );
+  let positionFact = await ctx.scanIndex.eav(args.factID, "card/position-in");
   if (!positionFact) {
     await ctx.assertFact({
-      entity: args.entityID,
-      value: ref(args.parent),
+      entity: args.factID,
+      value: {
+        type: "position",
+        x: args.dx,
+        y: args.dy,
+        rotation: 0,
+        size: "small",
+      },
       attribute: "card/position-in",
-      positions: { x: args.dx.toString(), y: args.dy.toString() },
+      positions: {},
     });
   } else {
-    let x = parseInt(positionFact.positions.x || "0");
-    let y = parseInt(positionFact.positions.y || "0");
+    let x = positionFact.value.x;
+    let y = positionFact.value.y;
     await ctx.updateFact(positionFact.id, {
-      positions: { x: (x + args.dx).toString(), y: (y + args.dy).toString() },
+      value: { ...positionFact.value, x: x + args.dx, y: args.dy + y },
     });
   }
 };
+
 const addToOrCreateDeck: Mutation<{
-  parent: string;
-  child: string;
+  targetCardPositionFact: string;
+  targetCardEntity: string;
+  droppedCardPositionFact: string;
+  droppedCardEntity: string;
   desktop: string;
 }> = async (args, ctx) => {
-  let isDeck = await ctx.scanIndex.eav(args.parent, "deck");
+  let isDeck = await ctx.scanIndex.eav(args.targetCardEntity, "deck");
   let children = await ctx.scanIndex.eav(args.desktop, "deck/contains");
-  let deck = args.parent;
+  let deck = args.targetCardEntity;
 
   if (!isDeck) {
-    let allPositionFacts = await ctx.scanIndex.eav(
-      args.parent,
+    let targetCardPosition = await ctx.scanIndex.eav(
+      args.targetCardPositionFact,
       "card/position-in"
     );
-    let parentPosition = allPositionFacts.find(
-      (f) => f.value.value === args.desktop
-    );
-    let parentInDesktop = children.find((f) => f.value.value === args.parent);
 
-    console.log(parentInDesktop, parentPosition);
-    if (parentPosition) await ctx.retractFact(parentPosition.id);
-    if (parentInDesktop) await ctx.retractFact(parentInDesktop.id);
+    if (targetCardPosition) await ctx.retractFact(targetCardPosition.id);
+    await ctx.retractFact(args.targetCardPositionFact);
 
-    let deck = ulid();
+    deck = ulid();
     await ctx.assertFact({
       entity: deck,
       attribute: "deck",
       positions: {},
       value: { type: "flag" },
     });
-    await ctx.assertFact({
+    let result = await ctx.assertFact({
       entity: args.desktop,
       attribute: "deck/contains",
       positions: {},
       value: ref(deck),
     });
-    await ctx.assertFact({
-      entity: deck,
-      attribute: "card/position-in",
-      positions: {
-        x: parentPosition?.positions.x || "0",
-        y: parentPosition?.positions.y || "0",
-      },
-      value: ref(args.desktop),
-    });
+    if (result.success) {
+      console.log(targetCardPosition);
+      await ctx.assertFact({
+        entity: result.factID,
+        attribute: "card/position-in",
+        value: {
+          type: "position",
+          x: targetCardPosition?.value.x || 0,
+          y: targetCardPosition?.value.y || 0,
+          size: targetCardPosition?.value.size || "small",
+          rotation: targetCardPosition?.value.rotation || 0,
+        },
+        positions: {},
+      });
+    }
     let newPosition = generateKeyBetween(null, null);
     await ctx.assertFact({
       entity: deck,
       attribute: "deck/contains",
-      value: ref(args.parent),
+      value: ref(args.targetCardEntity),
       positions: { eav: newPosition },
     });
   }
@@ -230,19 +234,14 @@ const addToOrCreateDeck: Mutation<{
   await ctx.assertFact({
     entity: deck,
     attribute: "deck/contains",
-    value: ref(args.child),
+    value: ref(args.droppedCardEntity),
     positions: { eav: newPosition },
   });
 
-  let allPositionFacts = await ctx.scanIndex.eav(
-    args.child,
-    "card/position-in"
+  let childInDesktop = children.find(
+    (f) => f.value.value === args.droppedCardEntity
   );
-  let positionFact = allPositionFacts.find(
-    (f) => f.value.value === args.desktop
-  );
-  let childInDesktop = children.find((f) => f.value.value === args.child);
-  if (positionFact) await ctx.retractFact(positionFact?.id);
+  await ctx.retractFact(args.droppedCardPositionFact);
   if (childInDesktop) await ctx.retractFact(childInDesktop?.id);
   return;
 };

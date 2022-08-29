@@ -229,10 +229,12 @@ export const store = (storage: BasicStorage, ctx: { id: string }) => {
           // We might want to preserve positions of the existing fact as well
           if (existingFact) factID = existingFact.id;
         }
-        return await writeFactToStore(
+        let result = await writeFactToStore(
           { ...f, id: factID, lastUpdated, schema },
           schema
         );
+        if (result.success) return { success: true, factID };
+        return { success: false };
       });
     },
   };
