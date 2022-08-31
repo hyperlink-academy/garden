@@ -68,7 +68,7 @@ export const ComponentViewer: React.FC<{
   let keys = Object.keys(props.stories);
   let [story, setStory] = useState(keys[0]);
   let [bg, setBg] = useState(true);
-  let [authState, setAuthState] = useState<AuthState>("loggedOut");
+  let [authState, setAuthState] = useState<AuthState>("authorized");
 
   return (
     <AuthContext.Provider
