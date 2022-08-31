@@ -3,8 +3,14 @@ import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
 import { useIndex } from "hooks/useReplicache";
 import Link from "next/link";
 import { SingleTextSection } from "./CardView/Sections";
-import { Gripper } from "./Gripper";
-import { Member, RightArrow } from "./Icons";
+import { Gripper, GripperBG } from "./Gripper";
+import {
+  DragRotateHandle,
+  GoToPage,
+  MakeSmallHandle,
+  Member,
+  RightArrow,
+} from "./Icons";
 import { Handler, useDrag } from "@use-gesture/react";
 
 const borderStyles = (args: { isDeck: boolean; isMember: boolean }) => {
@@ -118,26 +124,24 @@ const SmallCardBody = (props: { entityID: string } & SharedProps) => {
 const BigCardBody = (props: { entityID: string } & SharedProps) => {
   let image = useIndex.eav(props.entityID, "card/image");
   let bind = useDrag(props.onRotateDrag ? props.onRotateDrag : () => {});
+  let sections = useIndex.eav(props.entityID, "card/section");
   return (
     <div
       className="w-full overflow-hidden h-full pr-3 pl-0 py-2 flex flex-row"
       style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
     >
-      <div className="pl-1 pr-2 overflow-hidden">
-        {props.onRotateDrag && (
-          <div {...bind()} className="touch-none">
-            r
+      <div className="pl-1 pr-2 overflow-hidden text-grey-80">
+        {props.dragHandleProps && (
+          <div className="h-full">
+            <GripperBG
+              {...props.dragHandleProps.attributes}
+              {...props.dragHandleProps.listeners}
+            />
           </div>
         )}
-        {props.dragHandleProps && (
-          <Gripper
-            {...props.dragHandleProps.attributes}
-            {...props.dragHandleProps.listeners}
-          />
-        )}
       </div>
-      <div className="flex flex-col gap-2 w-full">
-        <div className="grid grid-cols-[auto_max-content]">
+      <div className="grid grid-rows-[max-content_auto_max-content] w-full">
+        <div className="grid grid-cols-[auto_max-content] items-center">
           <SingleTextSection
             entityID={props.entityID}
             section="card/title"
@@ -145,16 +149,11 @@ const BigCardBody = (props: { entityID: string } & SharedProps) => {
               !image ? "" : "rounded-[3px] px-1 bg-white/75"
             }`}
           />
-          <div>
-            {props.onResize && (
-              <button onClick={() => props.onResize?.()}>smol</button>
-            )}
-            <Link href={props.href}>
-              <a className="text-accent-blue justify-end">
-                <RightArrow />
-              </a>
-            </Link>
-          </div>
+          <Link href={props.href}>
+            <a className="text-accent-blue justify-end ">
+              <GoToPage />
+            </a>
+          </Link>
         </div>
         <div>
           <SingleTextSection
@@ -164,6 +163,35 @@ const BigCardBody = (props: { entityID: string } & SharedProps) => {
               !image ? "" : "rounded-[3px] px-1 bg-white/75"
             } `}
           />
+        </div>
+        <div className="grid grid-cols-[auto_max-content_max-content] items-end  w-full gap-2 -mb-1 place-self-end text-grey-80 ">
+          {sections !== null && sections.length === 0 ? (
+            <small className="text-grey-55 hover:underline">
+              + no sections
+            </small>
+          ) : (
+            <small className="text-grey-55 hover:underline">
+              + {sections?.length} sections
+            </small>
+          )}
+          <div className="leading-3 ">
+            {props.onResize && (
+              <button
+                className="hover:text-accent-blue"
+                onClick={() => props.onResize?.()}
+              >
+                <MakeSmallHandle />
+              </button>
+            )}
+          </div>
+          {props.onRotateDrag && (
+            <div
+              {...bind()}
+              className="touch-none hover:text-accent-blue -mr-2"
+            >
+              <DragRotateHandle />
+            </div>
+          )}
         </div>
       </div>
     </div>
