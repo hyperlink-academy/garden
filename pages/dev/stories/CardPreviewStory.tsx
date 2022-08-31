@@ -7,8 +7,20 @@ const stories = {
   default: {
     entities: [
       { "card/title": "A deck!", deck: flag() },
-      { "card/title": "A card!", "card/content": "I am a card woo" },
+      { "card/title": "A card!", "card/content": "https://www.google.com" },
       { "member/name": "A member!" },
+      {
+        "card/title": "A card with sections",
+        "card/section": ["section/idk", "section/another"],
+      },
+      {
+        "card/title": "A card with an image",
+        "card/image": {
+          type: "file",
+          filetype: "external_image",
+          url: "https://m.media-amazon.com/images/M/MV5BMTgyOTQ4NjEzNF5BMl5BanBnXkFtZTgwODY1MTMyMDE@._V1_.jpg",
+        },
+      },
     ],
   },
 };

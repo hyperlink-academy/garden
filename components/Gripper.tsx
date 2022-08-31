@@ -1,6 +1,12 @@
 import { url } from "inspector";
 
 type SVGProps = JSX.IntrinsicElements["svg"];
+
+// We're not using Gripper anymore in favor of GripperBG.
+// Gripper has a default minimum height of 150pc because it inherits the height from whatever parent is put in.
+// But if the parent is responsive, then it doesn't know it's height. ANyway trust me it doesn't work.
+// We're keeping it since some old components still use it, but plan on removing it eventually
+
 export const Gripper = (props: SVGProps) => {
   return (
     <svg width="6" height="100%" className="min-h-2" {...props}>
@@ -21,6 +27,7 @@ export const Gripper = (props: SVGProps) => {
   );
 };
 
+// Here's the correct Gripper
 export const GripperBG = (props: JSX.IntrinsicElements["div"]) => {
   return (
     <div
