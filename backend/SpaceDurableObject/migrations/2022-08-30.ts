@@ -1,7 +1,7 @@
 import { store } from "../fact_store";
 
 export default {
-  date: "2022-08-30-2",
+  date: "2022-08-30-3",
   run: async (storage: DurableObjectStorage) => {
     let fact_store = store(storage, { id: "" });
     let home = await fact_store.scanIndex.aev("home");
@@ -23,5 +23,11 @@ export default {
         positions: {},
       });
     }
+    await fact_store.assertFact({
+      attribute: "canvas/height",
+      entity: home[0].entity,
+      positions: {},
+      value: decks.length * 300 + 100,
+    });
   },
 };

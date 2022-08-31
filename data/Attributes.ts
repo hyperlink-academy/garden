@@ -188,6 +188,11 @@ export const DefaultAttributes = {
     cardinality: "one",
     unique: false,
   },
+  "canvas/height": {
+    type: "number",
+    cardinality: "one",
+    unique: false,
+  },
 } as const;
 
 export const ShortCodes: { [k in keyof Attribute]?: string | undefined } = {
