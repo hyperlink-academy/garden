@@ -23,13 +23,22 @@ const CardPreviewStory = (props: Props) => {
               <CardPreview entityID={index.toString()} size="small" href="" />
               <CardPreview
                 entityID={index.toString()}
+                size="small"
+                href=""
+                onResize={() => {}}
+                onRotateDrag={() => {}}
+                dragHandleProps={{}}
+              />
+              <CardPreview entityID={index.toString()} size="big" href="" />
+
+              <CardPreview
+                entityID={index.toString()}
                 size="big"
                 href=""
                 onResize={() => {}}
                 onRotateDrag={() => {}}
                 dragHandleProps={{}}
               />
-              <div></div>
             </>
           );
         })}

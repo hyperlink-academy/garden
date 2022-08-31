@@ -7,6 +7,7 @@ import { Gripper, GripperBG } from "./Gripper";
 import {
   DragRotateHandle,
   GoToPage,
+  MakeBigHandle,
   MakeSmallHandle,
   Member,
   RightArrow,
@@ -72,50 +73,62 @@ const SmallCardBody = (props: { entityID: string } & SharedProps) => {
   let bind = useDrag(props.onRotateDrag ? props.onRotateDrag : () => {});
 
   return (
-    <div
-      className="w-full overflow-hidden h-full pr-3 pl-0 py-2 flex flex-row"
-      style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
-    >
-      <div className="pl-1 pr-2 overflow-hidden">
-        {props.onRotateDrag && (
-          <div {...bind()} className="touch-none">
-            r
-          </div>
-        )}
+    <div className="grid grid-cols-[max-content_auto] pr-3 pl-0 py-2 h-full">
+      <div className="gripper pl-1 pr-2 overflow-hidden text-grey-80">
         {props.dragHandleProps && (
-          <Gripper
+          <GripperBG
             {...props.dragHandleProps.attributes}
             {...props.dragHandleProps.listeners}
           />
         )}
       </div>
-      <Link href={props.href}>
-        <a>
-          {!title ? (
-            <small>
-              <pre
-                className={`whitespace-pre-wrap truncate leading-tight ${
+      <div
+        className="cardPreivewContentWrapper w-full overflow-hidden grid grid-rows-[max-content_auto_max-content] gap-2"
+        style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
+      >
+        {/* CardPreivewTitleOrContnet */}
+        <Link href={props.href}>
+          <a>
+            {!title ? (
+              <small>
+                <pre
+                  className={`whitespace-pre-wrap truncate leading-tight ${
+                    !image ? "" : "rounded-[3px] px-1 bg-white/75"
+                  } `}
+                >
+                  {content?.value}
+                </pre>
+              </small>
+            ) : (
+              <h4
+                className={`normal-case leading-tight text-ellipsis  ${
                   !image ? "" : "rounded-[3px] px-1 bg-white/75"
-                } `}
+                }`}
               >
-                {content?.value}
-              </pre>
-            </small>
-          ) : (
-            <h4
-              className={`normal-case leading-tight text-ellipsis  ${
-                !image ? "" : "rounded-[3px] px-1 bg-white/75"
-              }`}
-            >
-              {title?.value}
-            </h4>
+                {title?.value}
+              </h4>
+            )}
+          </a>
+        </Link>
+
+        {/* CardPreviewRotateAndResize */}
+        <div className="grid grid-cols-[auto_max-content] items-center text-right w-full gap-2 -mb-1 place-self-end text-grey-80 ">
+          <div className="leading-3 ">
+            {props.onResize && (
+              <button
+                className="hover:text-accent-blue"
+                onClick={() => props.onResize?.()}
+              >
+                <MakeBigHandle />
+              </button>
+            )}
+          </div>
+          {props.onRotateDrag && (
+            <div {...bind()} className="touch-none hover:text-accent-blue  ">
+              <DragRotateHandle />
+            </div>
           )}
-        </a>
-      </Link>
-      <div className="text-sm">
-        {props.onResize && (
-          <button onClick={() => props.onResize?.()}>b</button>
-        )}
+        </div>
       </div>
     </div>
   );
@@ -130,7 +143,8 @@ const BigCardBody = (props: { entityID: string } & SharedProps) => {
       className="w-full overflow-hidden h-full pr-3 pl-0 py-2 flex flex-row"
       style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
     >
-      <div className="pl-1 pr-2 overflow-hidden text-grey-80">
+      {/* Gripper  */}
+      <div className="pl-1 pr-2 text-grey-80">
         {props.dragHandleProps && (
           <div className="h-full">
             <GripperBG
@@ -140,7 +154,10 @@ const BigCardBody = (props: { entityID: string } & SharedProps) => {
           </div>
         )}
       </div>
+
+      {/* Card Preview Content Wrapper */}
       <div className="grid grid-rows-[max-content_auto_max-content] w-full">
+        {/* Card Preview Title */}
         <div className="grid grid-cols-[auto_max-content] items-center">
           <SingleTextSection
             entityID={props.entityID}
@@ -155,23 +172,27 @@ const BigCardBody = (props: { entityID: string } & SharedProps) => {
             </a>
           </Link>
         </div>
+
+        {/* Card Preview Default Content */}
         <div>
           <SingleTextSection
             entityID={props.entityID}
             section="card/content"
-            className={`whitespace-pre-wrap truncate leading-tight text-sm ${
+            className={`whitespace-pre-wrap truncate leading-tight text-sm pt-1 ${
               !image ? "" : "rounded-[3px] px-1 bg-white/75"
             } `}
           />
         </div>
-        <div className="grid grid-cols-[auto_max-content_max-content] items-end  w-full gap-2 -mb-1 place-self-end text-grey-80 ">
+
+        {/* Card Preview Resize and Rotate */}
+        <div className="grid grid-cols-[auto_max-content_max-content] items-center  w-full gap-2  pt-4 place-self-end text-grey-80 ">
           {sections !== null && sections.length === 0 ? (
-            <small className="text-grey-55 hover:underline">
-              + no sections
-            </small>
+            <small className=" hover:underline">+ no sections</small>
           ) : (
             <small className="text-grey-55 hover:underline">
-              + {sections?.length} sections
+              <Link href={props.href}>
+                <a>+ {sections?.length} sections</a>
+              </Link>
             </small>
           )}
           <div className="leading-3 ">
@@ -185,10 +206,7 @@ const BigCardBody = (props: { entityID: string } & SharedProps) => {
             )}
           </div>
           {props.onRotateDrag && (
-            <div
-              {...bind()}
-              className="touch-none hover:text-accent-blue -mr-2"
-            >
+            <div {...bind()} className="touch-none hover:text-accent-blue  ">
               <DragRotateHandle />
             </div>
           )}
