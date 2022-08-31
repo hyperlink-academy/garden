@@ -140,11 +140,14 @@ const addSpace: Mutation<{
     }),
   ]);
 };
+
 const updatePositionInDesktop: Mutation<{
   parent: string;
   factID: string;
+  size?: "big" | "small";
   dx: number;
   dy: number;
+  da: number;
 }> = async (args, ctx) => {
   let positionFact = await ctx.scanIndex.eav(args.factID, "card/position-in");
   if (!positionFact) {
@@ -154,8 +157,8 @@ const updatePositionInDesktop: Mutation<{
         type: "position",
         x: args.dx,
         y: args.dy,
-        rotation: 0,
-        size: "small",
+        rotation: args.da,
+        size: args.size || "small",
       },
       attribute: "card/position-in",
       positions: {},
@@ -163,8 +166,15 @@ const updatePositionInDesktop: Mutation<{
   } else {
     let x = positionFact.value.x;
     let y = positionFact.value.y;
+    let a = positionFact.value.rotation;
     await ctx.updateFact(positionFact.id, {
-      value: { ...positionFact.value, x: x + args.dx, y: args.dy + y },
+      value: {
+        ...positionFact.value,
+        x: x + args.dx,
+        y: args.dy + y,
+        rotation: a + args.da,
+        size: args.size || positionFact.value.size,
+      },
     });
   }
 };
