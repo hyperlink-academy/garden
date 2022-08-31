@@ -1,7 +1,7 @@
 import { store } from "../fact_store";
 
 export default {
-  date: "2022-08-30",
+  date: "2022-08-30-2",
   run: async (storage: DurableObjectStorage) => {
     let fact_store = store(storage, { id: "" });
     let home = await fact_store.scanIndex.aev("home");
@@ -11,7 +11,7 @@ export default {
 
     for (let i = 0; i < decks.length; i++) {
       await fact_store.assertFact({
-        entity: decks[0].id,
+        entity: decks[i].id,
         attribute: "card/position-in",
         value: {
           type: "position",
