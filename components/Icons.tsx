@@ -435,9 +435,9 @@ export const Delete = (props: SVGProps<SVGSVGElement>) => {
 export const UpArrow = (props: SVGProps<SVGSVGElement>) => {
   return (
     <svg
-      {...props}
       width="24"
       height="24"
+      {...props}
       viewBox="0 0 24 24"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -455,9 +455,9 @@ export const UpArrow = (props: SVGProps<SVGSVGElement>) => {
 export const DownArrow = (props: SVGProps<SVGSVGElement>) => {
   return (
     <svg
-      {...props}
       width="24"
       height="24"
+      {...props}
       viewBox="0 0 24 24"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -475,9 +475,9 @@ export const DownArrow = (props: SVGProps<SVGSVGElement>) => {
 export const LeftArrow = (props: SVGProps<SVGSVGElement>) => {
   return (
     <svg
-      {...props}
       width="24"
       height="24"
+      {...props}
       viewBox="0 0 24 24"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
