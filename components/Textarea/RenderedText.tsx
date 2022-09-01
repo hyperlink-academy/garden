@@ -38,8 +38,8 @@ export const RenderedText = forwardRef<
         ) : (
           <span
             className={`${
-              props.placeholderOnHover ? "opacity-0 hover:opacity-100" : ""
-            } !text-grey-80 italic`}
+              props.placeholderOnHover ? "opacity-0 hover:opacity-100 " : ""
+            } !text-grey-80 italic block w-full`}
           >
             {props.placeholder}
           </span>
