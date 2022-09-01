@@ -3,14 +3,19 @@ import Linkify from "linkify-react";
 
 export const RenderedText = forwardRef<
   HTMLPreElement,
-  { text: string } & JSX.IntrinsicElements["pre"]
+  { text: string; placeholderOnHover?: boolean } & JSX.IntrinsicElements["pre"]
 >((props, ref) => {
   return (
     <Linkify options={{ className: "text-accent-blue underline break-all" }}>
       <pre
         role="link"
         ref={ref}
-        {...{ ...props, value: undefined }}
+        {...{
+          ...props,
+          value: undefined,
+          previewOnly: undefined,
+          placeholderOnHover: undefined,
+        }}
         className={`${props.className} break-words`}
         style={{
           ...props.style,

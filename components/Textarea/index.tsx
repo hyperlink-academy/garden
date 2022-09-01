@@ -6,6 +6,7 @@ export const Textarea = (
   props: {
     previewOnly?: boolean;
     focused?: boolean;
+    placeholderOnHover?: boolean;
   } & JSX.IntrinsicElements["textarea"]
 ) => {
   let textarea = useRef<HTMLTextAreaElement | null>(null);

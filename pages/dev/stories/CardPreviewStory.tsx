@@ -19,7 +19,7 @@ const stories = {
           type: "file",
           filetype: "external_image",
           url: "https://m.media-amazon.com/images/M/MV5BMTgyOTQ4NjEzNF5BMl5BanBnXkFtZTgwODY1MTMyMDE@._V1_.jpg",
-        },
+        } as const,
       },
     ],
   },

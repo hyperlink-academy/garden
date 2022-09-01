@@ -125,6 +125,7 @@ export const SingleTextSection = (
     focused?: boolean;
     previewOnly?: boolean;
     className?: string;
+    placeholderOnHover?: boolean;
     new?: boolean;
   } & JSX.IntrinsicElements["textarea"]
 ) => {
