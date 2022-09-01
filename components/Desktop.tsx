@@ -151,8 +151,8 @@ const DraggableCard = (props: {
               !position
                 ? 0
                 : (
-                    Math.floor(position.value.rotation / (Math.PI / 12)) *
-                    (Math.PI / 12)
+                    Math.floor(position.value.rotation / (Math.PI / 24)) *
+                    (Math.PI / 24)
                   ).toFixed(2)
             }rad)`,
           }}
