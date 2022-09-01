@@ -141,6 +141,25 @@ const addSpace: Mutation<{
   ]);
 };
 
+const addCardToDesktop: Mutation<{
+  entity: string;
+  desktop: string;
+  position: { x: number; y: number; rotation: number; size: "big" | "small" };
+}> = async (args, ctx) => {
+  let id = await ctx.assertFact({
+    entity: args.desktop,
+    attribute: "deck/contains",
+    value: ref(args.entity),
+    positions: {},
+  });
+  if (!id.success) return;
+  await ctx.assertFact({
+    entity: id.factID,
+    attribute: "card/position-in",
+    value: { type: "position", ...args.position },
+    positions: {},
+  });
+};
 const updatePositionInDesktop: Mutation<{
   parent: string;
   factID: string;
@@ -410,5 +429,6 @@ export const Mutations = {
   retractFact,
   addSection,
   updatePositionInDesktop,
+  addCardToDesktop,
   addToOrCreateDeck,
 };
