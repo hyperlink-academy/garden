@@ -36,7 +36,13 @@ export const RenderedText = forwardRef<
             return <p key={key}>{t + "\n"}</p>;
           })
         ) : (
-          <span className="!text-grey-80 italic">{props.placeholder}</span>
+          <span
+            className={`${
+              props.placeholderOnHover ? "opacity-0 hover:opacity-100" : ""
+            } !text-grey-80 italic`}
+          >
+            {props.placeholder}
+          </span>
         )}
       </pre>
     </Linkify>

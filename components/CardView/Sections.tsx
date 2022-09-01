@@ -139,10 +139,9 @@ export const SingleTextSection = (
       previewOnly={props.previewOnly || !authorized}
       focused={props.focused}
       autoFocus={props.new}
+      placeholderOnHover={props.placeholderOnHover}
       placeholder={props.placeholder || "write something..."}
-      className={`placeholder:italic bg-inherit w-full ${
-        props.className || ""
-      }`}
+      className={`bg-inherit w-full ${props.className || ""}`}
       spellCheck={false}
       onKeyDown={(e) => {
         if (

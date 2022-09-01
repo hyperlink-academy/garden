@@ -80,7 +80,6 @@ const SmallCardBody = (props: { entityID: string } & SharedProps) => {
     ? `${WORKER_URL}/static/${image.value.id}`
     : image.value.url;
 
-  console.log(image);
   return (
     <div
       className="grid grid-cols-[max-content_auto] pr-3 pl-0 py-2 h-full !bg-cover !bg-center !bg-no-repeat"
@@ -201,6 +200,8 @@ const BigCardBody = (props: { entityID: string } & SharedProps) => {
           <SingleTextSection
             entityID={props.entityID}
             section="card/title"
+            placeholderOnHover={true}
+            placeholder="Untitled"
             className={`font-bold ${
               !image ? "" : "rounded-[3px] px-1 bg-white/75"
             }`}
@@ -223,6 +224,7 @@ const BigCardBody = (props: { entityID: string } & SharedProps) => {
           <SingleTextSection
             entityID={props.entityID}
             section="card/content"
+            placeholderOnHover={true}
             className={`whitespace-pre-wrap truncate leading-tight text-sm pt-1 ${
               !image ? "" : "rounded-[3px] px-1 bg-white/75"
             } `}
