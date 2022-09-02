@@ -112,7 +112,6 @@ const DraggableCard = (props: {
   let position = useIndex.eav(props.relationshipID, "card/position-in");
   let { mutate } = useMutations();
   let { query: q } = useRouter();
-  let ref = useRef<HTMLDivElement>(null);
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({
       id: props.relationshipID,
@@ -146,7 +145,6 @@ const DraggableCard = (props: {
         className="touch-none absolute w-min"
       >
         <div
-          ref={ref}
           style={{
             transform: `rotate(${
               !position
@@ -160,34 +158,21 @@ const DraggableCard = (props: {
         >
           <CardPreview
             href={`/s/${q.studio}/s/${q.space}/c/${props.entityID}`}
-            onRotateDrag={({ initial, xy, memo }) => {
-              if (!ref.current) return;
-              let rect = ref.current.getBoundingClientRect();
-              memo = memo || 0;
-
-              let originX = rect.x + rect.width / 2;
-              let originY = rect.y + rect.height / 2;
-
-              let angle = find_angle(
-                { x: initial[0], y: initial[1] },
-                { x: originX, y: originY },
-                { x: xy[0], y: xy[1] }
-              );
+            onRotateDrag={(da) => {
               mutate("updatePositionInDesktop", {
                 factID: props.relationshipID,
                 parent: props.parent,
                 dx: 0,
                 dy: 0,
-                da: angle - memo,
+                da,
               });
-              return angle;
             }}
             dragHandleProps={{ listeners, attributes }}
             size={position?.value.size || "small"}
-            onResize={async () => {
+            onResize={async (size) => {
               return await mutate("updatePositionInDesktop", {
                 factID: props.relationshipID,
-                size: position?.value.size === "big" ? "small" : "big",
+                size: size,
                 parent: props.parent,
                 dx: 0,
                 dy: 0,
@@ -282,12 +267,4 @@ export function useCombinedRefs<T>(
     },
     refs
   );
-}
-
-type P = { x: number; y: number };
-function find_angle(P2: P, P1: P, P3: P) {
-  if (P1.x === P3.x && P1.y === P3.y) return 0;
-  let a = Math.atan2(P3.y - P1.y, P3.x - P1.x);
-  let b = Math.atan2(P2.y - P1.y, P2.x - P1.x);
-  return a - b;
 }

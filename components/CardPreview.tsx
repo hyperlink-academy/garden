@@ -3,7 +3,7 @@ import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
 import { useIndex } from "hooks/useReplicache";
 import Link from "next/link";
 import { SingleTextSection } from "./CardView/Sections";
-import { Gripper, GripperBG } from "./Gripper";
+import { GripperBG } from "./Gripper";
 import {
   DragRotateHandle,
   ExternalLink,
@@ -11,10 +11,10 @@ import {
   MakeBigHandle,
   MakeSmallHandle,
   Member,
-  RightArrow,
 } from "./Icons";
-import { Handler, useDrag } from "@use-gesture/react";
+import { useDrag, usePinch } from "@use-gesture/react";
 import { isUrl } from "src/isUrl";
+import { useRef } from "react";
 
 const borderStyles = (args: { isDeck: boolean; isMember: boolean }) => {
   switch (true) {
@@ -32,12 +32,12 @@ const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 
 type SharedProps = {
   size: "big" | "small";
-  onRotateDrag?: Handler<"drag">;
+  onRotateDrag?: (da: number) => void;
   dragHandleProps?: {
     attributes?: DraggableAttributes;
     listeners?: SyntheticListenerMap;
   };
-  onResize?: () => void;
+  onResize?: (size: "big" | "small") => void;
   href: string;
 };
 
@@ -50,13 +50,7 @@ export const CardPreview = (
   let isMember = !!useIndex.eav(props.entityID, "member/name");
   let image = useIndex.eav(props.entityID, "card/image");
   return (
-    <div
-      style={{}}
-      className={`
-      grid grid-cols-[auto_max-content] items-end gap-1
-      group
-      ${props.size === "small" ? "w-[167px] h-24" : "w-[300px] h-fit"}`}
-    >
+    <RotateAndResize {...props}>
       <div className={`relative h-full ${borderStyles({ isDeck, isMember })}`}>
         {props.size === "small" ? (
           <SmallCardBody {...props} />
@@ -64,7 +58,76 @@ export const CardPreview = (
           <BigCardBody {...props} />
         )}
       </div>
-      <RotateAndResize {...props} />
+    </RotateAndResize>
+  );
+};
+
+export const RotateAndResize: React.FC<
+  Pick<SharedProps, "onResize" | "onRotateDrag" | "size">
+> = (props) => {
+  let ref = useRef<null | HTMLDivElement>(null);
+  let bindPinch = usePinch(
+    ({ da, memo, first }) => {
+      if (first) return [memo ? memo[0] : da[0], da[1]];
+      if (da[0] - memo[0] > 50) props.onResize?.("big");
+      if (memo[0] - da[0] > 50) props.onResize?.("small");
+      props.onRotateDrag?.((da[1] - memo[1]) * (Math.PI / 180));
+      return [memo ? memo[0] : da[0], da[1]];
+    },
+    { preventDefault: true, filterTaps: true }
+  );
+  let bind = useDrag(({ initial, xy, memo }) => {
+    if (!ref.current) return;
+    let rect = ref.current.getBoundingClientRect();
+    memo = memo || 0;
+
+    let originX = rect.x + rect.width / 2;
+    let originY = rect.y + rect.height / 2;
+
+    let angle = find_angle(
+      { x: initial[0], y: initial[1] },
+      { x: originX, y: originY },
+      { x: xy[0], y: xy[1] }
+    );
+    props.onRotateDrag?.(angle - memo);
+    return angle;
+  });
+
+  return (
+    <div
+      {...bindPinch()}
+      ref={ref}
+      style={{}}
+      className={`
+      touch-none
+      grid grid-cols-[auto_max-content] items-end gap-1
+      group
+      ${props.size === "small" ? "w-[167px] h-24" : "w-[300px] h-fit"}`}
+    >
+      {props.children}
+      <div
+        ref={ref}
+        className="text-grey-80 grid grid-rows-2 gap-1 pb-1 opacity-0 group-hover:opacity-100"
+      >
+        <div className="leading-3 ">
+          {props.onResize && (
+            <button
+              className="hover:text-accent-blue"
+              onClick={() =>
+                props.onResize?.(props.size === "big" ? "small" : "big")
+              }
+            >
+              {props.size === "big" ? <MakeSmallHandle /> : <MakeBigHandle />}
+            </button>
+          )}
+        </div>
+
+        {props.onRotateDrag && (
+          <div {...bind()} className="touch-none hover:text-accent-blue  ">
+            <DragRotateHandle />
+          </div>
+        )}
+      </div>
     </div>
   );
 };
@@ -77,7 +140,6 @@ const SmallCardBody = (props: { entityID: string } & SharedProps) => {
   let image = useIndex.eav(props.entityID, "card/image");
   let url = content?.value ? isUrl(content?.value) : false;
 
-  let bind = useDrag(props.onRotateDrag ? props.onRotateDrag : () => {});
   let imageUrl = !image
     ? undefined
     : image.value.filetype === "image"
@@ -149,22 +211,6 @@ const SmallCardBody = (props: { entityID: string } & SharedProps) => {
             ) : (
               <div />
             )}
-
-            {/* <div className="leading-3 ">
-              {props.onResize && (
-                <button
-                  className="hover:text-accent-blue "
-                  onClick={() => props.onResize?.()}
-                >
-                  <MakeBigHandle />
-                </button>
-              )}
-            </div>
-            {props.onRotateDrag && (
-              <div {...bind()} className="touch-none hover:text-accent-blue  ">
-                <DragRotateHandle />
-              </div>
-            )} */}
           </div>
         </div>
       ) : (
@@ -184,7 +230,6 @@ const SmallCardBody = (props: { entityID: string } & SharedProps) => {
 
 const BigCardBody = (props: { entityID: string } & SharedProps) => {
   let isMember = !!useIndex.eav(props.entityID, "member/name");
-  let bind = useDrag(props.onRotateDrag ? props.onRotateDrag : () => {});
   let sections = useIndex.eav(props.entityID, "card/section");
   let image = useIndex.eav(props.entityID, "card/image");
 
@@ -264,32 +309,10 @@ const BigCardBody = (props: { entityID: string } & SharedProps) => {
   );
 };
 
-export const RotateAndResize = (
-  props: {
-    entityID: string;
-  } & SharedProps
-) => {
-  let sections = useIndex.eav(props.entityID, "card/section");
-  let bind = useDrag(props.onRotateDrag ? props.onRotateDrag : () => {});
-
-  return (
-    <div className="text-grey-80 grid grid-rows-2 gap-1 pb-1 opacity-0 group-hover:opacity-100">
-      <div className="leading-3 ">
-        {props.onResize && (
-          <button
-            className="hover:text-accent-blue"
-            onClick={() => props.onResize?.()}
-          >
-            {props.size === "big" ? <MakeSmallHandle /> : <MakeBigHandle />}
-          </button>
-        )}
-      </div>
-
-      {props.onRotateDrag && (
-        <div {...bind()} className="touch-none hover:text-accent-blue  ">
-          <DragRotateHandle />
-        </div>
-      )}
-    </div>
-  );
-};
+type P = { x: number; y: number };
+function find_angle(P2: P, P1: P, P3: P) {
+  if (P1.x === P3.x && P1.y === P3.y) return 0;
+  let a = Math.atan2(P3.y - P1.y, P3.x - P1.x);
+  let b = Math.atan2(P2.y - P1.y, P2.x - P1.x);
+  return a - b;
+}
