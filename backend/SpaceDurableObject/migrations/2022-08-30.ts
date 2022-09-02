@@ -1,7 +1,7 @@
 import { store } from "../fact_store";
 
 export default {
-  date: "2022-08-30-3",
+  date: "2022-08-30-4",
   run: async (storage: DurableObjectStorage) => {
     let fact_store = store(storage, { id: "" });
     let home = await fact_store.scanIndex.aev("home");
@@ -17,7 +17,7 @@ export default {
           type: "position",
           rotation: 0,
           x: 10,
-          y: i * 300,
+          y: i * 100,
           size: "big",
         },
         positions: {},
@@ -27,7 +27,7 @@ export default {
       attribute: "canvas/height",
       entity: home[0].entity,
       positions: {},
-      value: decks.length * 300 + 100,
+      value: decks.length * 100 + 100,
     });
   },
 };
