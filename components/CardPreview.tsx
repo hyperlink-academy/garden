@@ -31,6 +31,7 @@ const borderStyles = (args: { isDeck: boolean; isMember: boolean }) => {
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 
 type SharedProps = {
+  size: "big" | "small";
   onRotateDrag?: Handler<"drag">;
   dragHandleProps?: {
     attributes?: DraggableAttributes;
@@ -43,7 +44,6 @@ type SharedProps = {
 export const CardPreview = (
   props: {
     entityID: string;
-    size: "big" | "small";
   } & SharedProps
 ) => {
   let isDeck = !!useIndex.eav(props.entityID, "deck");
@@ -52,9 +52,10 @@ export const CardPreview = (
   return (
     <div
       style={{}}
-      className={`${
-        props.size === "small" ? "w-[151px] h-24" : "w-[300px] h-fit"
-      }`}
+      className={`
+      grid grid-cols-[auto_max-content] items-end gap-1
+      group
+      ${props.size === "small" ? "w-[167px] h-24" : "w-[300px] h-fit"}`}
     >
       <div className={`relative h-full ${borderStyles({ isDeck, isMember })}`}>
         {props.size === "small" ? (
@@ -63,11 +64,14 @@ export const CardPreview = (
           <BigCardBody {...props} />
         )}
       </div>
+      <RotateAndResize {...props} />
     </div>
   );
 };
 
 const SmallCardBody = (props: { entityID: string } & SharedProps) => {
+  let isMember = !!useIndex.eav(props.entityID, "member/name");
+
   let title = useIndex.eav(props.entityID, "card/title");
   let content = useIndex.eav(props.entityID, "card/content");
   let image = useIndex.eav(props.entityID, "card/image");
@@ -95,77 +99,91 @@ const SmallCardBody = (props: { entityID: string } & SharedProps) => {
           />
         )}
       </div>
-      {/* Small Card Preview Content Wrapper */}
-      <div
-        className=" w-full h-full items-stretch overflow-hidden flex flex-col gap-2"
-        style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
-      >
-        {/* Small Card Preivew Title Or Contnet */}
-        <Link href={props.href}>
-          <a className="h-full overflow-hidden">
-            {!title || title?.value === "" ? (
-              <small>
-                <pre
-                  className={`whitespace-pre-wrap truncate leading-tight ${
+      {/* Small Card Preview Content Wrapper (is it default or member?) */}
+      {!isMember ? (
+        /* Default Content (Member Content Futher DOwn) */
+        <div
+          className=" w-full h-full items-stretch overflow-hidden flex flex-col gap-2"
+          style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
+        >
+          {/* Small Card Preivew Title Or Contnet */}
+          <Link href={props.href}>
+            <a className="h-full overflow-hidden">
+              {!title || title?.value === "" ? (
+                <small>
+                  <pre
+                    className={`whitespace-pre-wrap truncate leading-tight ${
+                      !image ? "" : "rounded-[3px] px-1 bg-white/75"
+                    } `}
+                  >
+                    {content?.value}
+                  </pre>
+                </small>
+              ) : (
+                <div
+                  className={`leading-tight text-ellipsis text-grey-35 font-bold  ${
                     !image ? "" : "rounded-[3px] px-1 bg-white/75"
-                  } `}
+                  }`}
                 >
-                  {content?.value}
-                </pre>
-              </small>
-            ) : (
-              <h4
-                className={`normal-case leading-tight text-ellipsis  ${
-                  !image ? "" : "rounded-[3px] px-1 bg-white/75"
-                }`}
-              >
-                {title?.value}
-              </h4>
-            )}
-          </a>
-        </Link>
-
-        {/* Small Card Preview External Link, Rotate, Resize */}
-        <div className="grid grid-cols-[auto_max-content_max-content] items-center text-right w-full gap-2 place-self-end text-grey-80 ">
-          {url ? (
-            <a
-              href={content?.value}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
-            >
-              <div className="text-accent-blue ">
-                <ExternalLink />
-              </div>
+                  {title?.value}
+                </div>
+              )}
             </a>
-          ) : (
-            <div />
-          )}
+          </Link>
 
-          <div className="leading-3 ">
-            {props.onResize && (
-              <button
-                className="hover:text-accent-blue "
-                onClick={() => props.onResize?.()}
+          {/* Small Card Preview External Link, Rotate, Resize */}
+          <div className="grid grid-cols-[auto_max-content_max-content] items-center text-right w-full gap-2 place-self-end text-grey-80 ">
+            {url ? (
+              <a
+                href={content?.value}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
               >
-                <MakeBigHandle />
-              </button>
+                <div className="text-accent-blue ">
+                  <ExternalLink />
+                </div>
+              </a>
+            ) : (
+              <div />
             )}
-          </div>
-          {props.onRotateDrag && (
-            <div {...bind()} className="touch-none hover:text-accent-blue  ">
-              <DragRotateHandle />
+
+            {/* <div className="leading-3 ">
+              {props.onResize && (
+                <button
+                  className="hover:text-accent-blue "
+                  onClick={() => props.onResize?.()}
+                >
+                  <MakeBigHandle />
+                </button>
+              )}
             </div>
-          )}
+            {props.onRotateDrag && (
+              <div {...bind()} className="touch-none hover:text-accent-blue  ">
+                <DragRotateHandle />
+              </div>
+            )} */}
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="h-full grid gap-1 grid-rows-[min-content,auto]">
+          <div className="grid grid-cols-[auto_max-content] items-end text-white">
+            <Member />
+            <small>member</small>
+          </div>
+          <div className="w-full bg-white rounded-md text-accent-red font-bold py-1 px-2 leading-tight  overflow-hidden">
+            PBBBBBT
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
 const BigCardBody = (props: { entityID: string } & SharedProps) => {
+  let isMember = !!useIndex.eav(props.entityID, "member/name");
   let bind = useDrag(props.onRotateDrag ? props.onRotateDrag : () => {});
   let sections = useIndex.eav(props.entityID, "card/section");
   let image = useIndex.eav(props.entityID, "card/image");
@@ -199,10 +217,10 @@ const BigCardBody = (props: { entityID: string } & SharedProps) => {
         <div className="grid grid-cols-[auto_max-content] items-center">
           <SingleTextSection
             entityID={props.entityID}
-            section="card/title"
+            section={isMember ? "member/name" : "card/title"}
             placeholderOnHover={true}
             placeholder="Untitled"
-            className={`font-bold ${
+            className={`font-bold text-md text-grey-35 ${
               !image ? "" : "rounded-[3px] px-1 bg-white/75"
             }`}
           />
@@ -232,33 +250,46 @@ const BigCardBody = (props: { entityID: string } & SharedProps) => {
         </div>
 
         {/* Big Card Preview Resize and Rotate */}
-        <div className="grid grid-cols-[auto_max-content_max-content] items-center  w-full gap-2  pt-4 place-self-end text-grey-80 ">
-          {sections !== null && sections.length === 0 ? (
-            <div />
-          ) : (
-            <small className="hover:text-accent-blue hover:underline">
-              <Link href={props.href}>
-                <a>+ {sections?.length} sections</a>
-              </Link>
-            </small>
-          )}
-          <div className="leading-3 ">
-            {props.onResize && (
-              <button
-                className="hover:text-accent-blue"
-                onClick={() => props.onResize?.()}
-              >
-                <MakeSmallHandle />
-              </button>
-            )}
-          </div>
-          {props.onRotateDrag && (
-            <div {...bind()} className="touch-none hover:text-accent-blue  ">
-              <DragRotateHandle />
-            </div>
-          )}
-        </div>
+        {sections !== null && sections.length === 0 ? (
+          <div />
+        ) : (
+          <small className="SectionCounter text-grey-80 hover:text-accent-blue hover:underline">
+            <Link href={props.href}>
+              <a>+ {sections?.length} sections</a>
+            </Link>
+          </small>
+        )}
       </div>
+    </div>
+  );
+};
+
+export const RotateAndResize = (
+  props: {
+    entityID: string;
+  } & SharedProps
+) => {
+  let sections = useIndex.eav(props.entityID, "card/section");
+  let bind = useDrag(props.onRotateDrag ? props.onRotateDrag : () => {});
+
+  return (
+    <div className="text-grey-80 grid grid-rows-2 gap-1 pb-1 opacity-0 group-hover:opacity-100">
+      <div className="leading-3 ">
+        {props.onResize && (
+          <button
+            className="hover:text-accent-blue"
+            onClick={() => props.onResize?.()}
+          >
+            {props.size === "big" ? <MakeSmallHandle /> : <MakeBigHandle />}
+          </button>
+        )}
+      </div>
+
+      {props.onRotateDrag && (
+        <div {...bind()} className="touch-none hover:text-accent-blue  ">
+          <DragRotateHandle />
+        </div>
+      )}
     </div>
   );
 };
