@@ -57,6 +57,7 @@ export const push_route = makeRoute({
 
     for (let i = 0; i < msg.mutations.length; i++) {
       let mutation = msg.mutations[i];
+      if (mutation.id <= lastMutationID) continue;
       lastMutationID = mutation.id;
       let name = mutation.name as keyof typeof Mutations;
       if (!Mutations[name]) {
