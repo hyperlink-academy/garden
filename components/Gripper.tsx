@@ -32,8 +32,11 @@ export const GripperBG = (props: JSX.IntrinsicElements["div"]) => {
   return (
     <div
       {...props}
-      className="h-full w-[6px] mask-repeat mask-repeat-[no-repeat_space]  bg-grey-80 hover:bg-grey-55"
-      style={{ maskImage: "url(/img/gripper.svg)" }}
+      className="h-full w-[6px] mask-repeat-[no-repeat_space]  bg-grey-80 hover:bg-grey-55"
+      style={{
+        WebkitMaskImage: "url(/img/gripper.svg)",
+        maskImage: "url(/img/gripper.svg)",
+      }}
     ></div>
   );
 };
