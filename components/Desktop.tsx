@@ -67,6 +67,7 @@ export const Desktop = () => {
     >
       <div
         onClick={(e) => {
+          if (e.currentTarget !== e.target) return;
           if (e.detail === 2) {
             let newCard = ulid();
             let parentRect = e.currentTarget.getBoundingClientRect();
