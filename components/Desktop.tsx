@@ -85,10 +85,10 @@ export const Desktop = () => {
         }}
         style={{
           zIndex: 1,
-          maxWidth: "600px",
+          maxWidth: "320px",
           height: `${height?.value || 800}px`,
         }}
-        className="relative border-r border-grey-90 text-sm"
+        className="relative text-sm"
       >
         {cards?.map((card) => (
           <DraggableCard
@@ -99,6 +99,7 @@ export const Desktop = () => {
           />
         ))}
         <ResizeCanvas canvasEntity={homeEntity[0]?.entity} />
+        {/* <HelpToast helpText={`double click/tap to create new`} /> */}
       </div>
     </DndContext>
   );
@@ -249,11 +250,21 @@ const ResizeCanvas = (props: { canvasEntity: string }) => {
             zIndex: "-1",
             opacity: "0.1",
             backgroundImage:
-              "repeating-linear-gradient(-45deg,transparent, transparent 5px, black 5px,black 8px) ",
+              "repeating-linear-gradient(-45deg,transparent, transparent 5px, black 5px, black 8px) ",
           }}
           className="absolute w-full h-[400px]"
         />
       )}
+    </div>
+  );
+};
+
+export const HelpToast = (props: { helpText: string }) => {
+  return (
+    <div className="flex fixed bottom-20 w-[320px] justify-center">
+      <div className="rounded-full text-grey-80 italic text-center px-2 py-1">
+        * {props.helpText} *
+      </div>
     </div>
   );
 };
