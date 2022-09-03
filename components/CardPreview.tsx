@@ -100,11 +100,15 @@ export const RotateAndResize: React.FC<
       style={{}}
       className={`
       touch-none
-      grid grid-cols-[auto_max-content] items-end gap-1
+      ${props.size === "small" ? "w-[167px] h-24" : "w-[300px] h-fit"}
+      flex items-end gap-1
       group
-      ${props.size === "small" ? "w-[167px] h-24" : "w-[300px] h-fit"}`}
+      
+      `}
     >
       {props.children}
+
+      {/* Rotate and Resize Handle */}
       <div
         ref={ref}
         className="text-grey-80 grid grid-rows-2 gap-1 pb-1 opacity-0 group-hover:opacity-100"
@@ -130,13 +134,14 @@ export const RotateAndResize: React.FC<
           </div>
         )}
       </div>
+      {/* End Rotate and Resize Handle */}
     </div>
   );
 };
 
 const SmallCardBody = (props: { entityID: string } & SharedProps) => {
   let isMember = !!useIndex.eav(props.entityID, "member/name");
-
+  let member = useIndex.eav(props.entityID, "member/name");
   let title = useIndex.eav(props.entityID, "card/title");
   let content = useIndex.eav(props.entityID, "card/content");
   let image = useIndex.eav(props.entityID, "card/image");
@@ -150,14 +155,13 @@ const SmallCardBody = (props: { entityID: string } & SharedProps) => {
 
   return (
     <div
-      className={`grid grid-cols-[max-content_auto] h-full !bg-cover !bg-center !bg-no-repeat ${
+      className={`w-full h-full grid grid-cols-[max-content_auto] !bg-cover !bg-center !bg-no-repeat ${
         isMember ? "pr-1 pl-0 pt-2 pb-1" : "pr-3 pl-0 py-2"
       }`}
       style={{
         background: imageUrl ? `url(${imageUrl})` : "",
       }}
     >
-      {}
       {props.dragHandleProps ? (
         <div
           className="gripper group pl-1 pr-2"
@@ -173,10 +177,10 @@ const SmallCardBody = (props: { entityID: string } & SharedProps) => {
       {!isMember ? (
         /* Default Content (Member Content Futher DOwn) */
         <div
-          className=" w-full h-full items-stretch overflow-hidden flex flex-col gap-2"
+          className="w-full h-full flex flex-col gap-2 items-stretch overflow-hidden"
           style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
         >
-          {/* Small Card Preivew Title Or Contnet */}
+          {/* Small Card Preivew Title Or Content */}
           <Link href={props.href}>
             <a className="h-full overflow-hidden">
               {!title || title?.value === "" ? (
@@ -201,34 +205,42 @@ const SmallCardBody = (props: { entityID: string } & SharedProps) => {
             </a>
           </Link>
 
-          {/* Small Card Preview External Link, Rotate, Resize */}
-          <div className="grid grid-cols-[auto_max-content_max-content] items-center text-right w-full gap-2 place-self-end text-grey-80 ">
-            {url ? (
-              <a
-                href={content?.value}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
-              >
-                <div className="text-accent-blue ">
-                  <ExternalLink />
-                </div>
-              </a>
-            ) : (
-              <div />
-            )}
-          </div>
+          {/* Small Card Preview External Link */}
+          {url ? (
+            <a
+              href={content?.value}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+            >
+              <div className="text-accent-blue ">
+                <ExternalLink />
+              </div>
+            </a>
+          ) : (
+            <div />
+          )}
         </div>
       ) : (
-        <div className="h-full grid gap-1 grid-rows-[min-content,auto]">
-          <div className="grid grid-cols-[auto_max-content] items-end text-white">
+        // END OF DEFAULT CARD CONTENT, START OF MEMBER CARD CONTENT
+        <div className="w-full h-full flex flex-col gap-2 items-stretch overflow-hidden">
+          <div className="grid grid-cols-[auto_max-content] items-end text-white ">
             <Member />
             <small>member</small>
           </div>
-          <div className="w-full bg-white rounded-md text-accent-red font-bold py-1 px-2 leading-tight  overflow-hidden">
-            PBBBBBT
+          <div
+            className={`
+            py-1 px-2 
+            grow
+            bg-white rounded-md 
+            text-accent-red font-bold leading-tight 
+            h-full overflow-y-hidden
+            flex items-end
+            `}
+          >
+            <p className="overflow-hidden">{member?.value}</p>
           </div>
         </div>
       )}
