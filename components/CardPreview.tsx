@@ -51,7 +51,9 @@ export const CardPreview = (
   let image = useIndex.eav(props.entityID, "card/image");
   return (
     <RotateAndResize {...props}>
-      <div className={`relative h-full ${borderStyles({ isDeck, isMember })}`}>
+      <div
+        className={`relative grow h-full ${borderStyles({ isDeck, isMember })}`}
+      >
         {props.size === "small" ? (
           <SmallCardBody {...props} />
         ) : (
