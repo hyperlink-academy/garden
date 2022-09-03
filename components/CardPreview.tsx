@@ -110,7 +110,7 @@ export const RotateAndResize: React.FC<
         className="text-grey-80 grid grid-rows-2 gap-1 pb-1 opacity-0 group-hover:opacity-100"
       >
         <div className="leading-3 ">
-          {props.onResize && (
+          {props.onResize ? (
             <button
               className="hover:text-accent-blue"
               onClick={() =>
@@ -119,6 +119,8 @@ export const RotateAndResize: React.FC<
             >
               {props.size === "big" ? <MakeSmallHandle /> : <MakeBigHandle />}
             </button>
+          ) : (
+            <div className="w-[12px]" />
           )}
         </div>
 
@@ -148,19 +150,25 @@ const SmallCardBody = (props: { entityID: string } & SharedProps) => {
 
   return (
     <div
-      className="grid grid-cols-[max-content_auto] pr-3 pl-0 py-2 h-full !bg-cover !bg-center !bg-no-repeat"
+      className={`grid grid-cols-[max-content_auto] h-full !bg-cover !bg-center !bg-no-repeat ${
+        isMember ? "pr-1 pl-0 pt-2 pb-1" : "pr-3 pl-0 py-2"
+      }`}
       style={{
         background: imageUrl ? `url(${imageUrl})` : "",
       }}
     >
-      <div className="gripper pl-1 pr-2 overflow-hidden text-grey-80">
-        {props.dragHandleProps && (
-          <GripperBG
-            {...props.dragHandleProps.attributes}
-            {...props.dragHandleProps.listeners}
-          />
-        )}
-      </div>
+      {}
+      {props.dragHandleProps ? (
+        <div
+          className="gripper group pl-1 pr-2"
+          {...props.dragHandleProps.attributes}
+          {...props.dragHandleProps.listeners}
+        >
+          <GripperBG />
+        </div>
+      ) : (
+        <div className={`${isMember ? "pl-1" : "pl-3"}`} />
+      )}
       {/* Small Card Preview Content Wrapper (is it default or member?) */}
       {!isMember ? (
         /* Default Content (Member Content Futher DOwn) */
@@ -246,13 +254,15 @@ const BigCardBody = (props: { entityID: string } & SharedProps) => {
     >
       {/* Gripper  */}
       <div className="pl-1 pr-2 text-grey-80">
-        {props.dragHandleProps && (
+        {props.dragHandleProps ? (
           <div className="h-full">
             <GripperBG
               {...props.dragHandleProps.attributes}
               {...props.dragHandleProps.listeners}
             />
           </div>
+        ) : (
+          <div />
         )}
       </div>
 
