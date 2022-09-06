@@ -70,7 +70,9 @@ export const SmallCardList = (props: {
               }
               draggable={authorized}
               key={c.id}
-              href={`/s/${studio}/s/${space}/c/${props.deck}/${
+              href={`/s/${encodeURIComponent(
+                studio as string
+              )}/s/${encodeURIComponent(space as string)}/c/${props.deck}/${
                 props.backlink ? "b" : "a"
               }/${encodeURIComponent(attribute)}/${entity}`}
               entityID={entity}

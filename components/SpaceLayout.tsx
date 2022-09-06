@@ -144,7 +144,9 @@ export function Footer() {
                     !r.includes("/activity") &&
                     !r.includes("/home")
                   }
-                  route={`/s/${router.query.studio}/s/${router.query.space}`}
+                  route={`/s/${encodeURIComponent(
+                    router.query.studio as string
+                  )}/s/${encodeURIComponent(router.query.space as string)}`}
                 >
                   <DeckLarge width={32} height={32} />
                 </FooterItem>
@@ -152,7 +154,11 @@ export function Footer() {
                 {/* CHAT */}
                 <FooterItem
                   active={(r) => r.endsWith("chat")}
-                  route={`/s/${router.query.studio}/s/${router.query.space}/chat`}
+                  route={`/s/${encodeURIComponent(
+                    router.query.studio as string
+                  )}/s/${encodeURIComponent(
+                    router.query.space as string
+                  )}/chat`}
                 >
                   <ChatIcon />
                 </FooterItem>
