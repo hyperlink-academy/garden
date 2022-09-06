@@ -73,41 +73,37 @@ export const PopupCardViewer: React.FC = (props) => {
           className="popUpModalWrapper lightBorder bg-white h-[calc(100vh-32px)] mt-[16px] "
         >
           <Dialog.Panel className="p-4 h-full flex flex-row gap-4">
-            {state.focused &&
-              (state.focused?.type === "desktop" ? (
-                // POP UP NEXT TO DESKTOP
-                <LinkContextProvider type="desktop">
+            {state.focused && (
+              <LinkContextProvider {...state.focused}>
+                {state.focused.type === "desktop" ? (
                   <div className="overflow-y-scroll no-scrollbar flex-shrink-0 w-[350px] snap-center">
                     <div className="px-4">
                       <SpaceInfo />
                     </div>
                     <Desktop />
                   </div>
-                  <CardView entityID={state.history[0]} />
-                </LinkContextProvider>
-              ) : (
-                // END POP UP NEXT TO DESKTOP
-
-                // POP UP NEXT TO CARD
-                <LinkContextProvider
-                  type="entity"
-                  entityID={state.focused.entityID}
-                >
-                  {/* original card */}
+                ) : (
                   <animated.div
                     className=" shrink-0 grow-0 w-[calc(100vw-32px)] max-w-xl"
                     style={SlideLeft}
                   >
                     <CardView entityID={state.focused.entityID} />
                   </animated.div>
+                )}
 
-                  {/* pop up card */}
-                  <div className="grow w-full max-w-xl">
-                    <CardView entityID={state.history[0]} />
-                  </div>
-                </LinkContextProvider>
-                //END POP UP NEXT TO CARD
-              ))}
+                {/* pop up card */}
+                <div className="grow w-full max-w-xl flex flex-col">
+                  <button
+                    onClick={() =>
+                      setState((s) => ({ ...s, history: s.history.slice(1) }))
+                    }
+                  >
+                    x
+                  </button>
+                  {state.history[0] && <CardView entityID={state.history[0]} />}
+                </div>
+              </LinkContextProvider>
+            )}
           </Dialog.Panel>
         </div>
       </Dialog>
