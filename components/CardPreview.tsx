@@ -15,6 +15,7 @@ import {
 import { useDrag, usePinch } from "@use-gesture/react";
 import { isUrl } from "src/isUrl";
 import { useRef } from "react";
+import { usePopupCardViewer } from "./PopupCardViewer";
 
 const borderStyles = (args: { isDeck: boolean; isMember: boolean }) => {
   switch (true) {
@@ -136,6 +137,7 @@ export const RotateAndResize: React.FC<
 
 const SmallCardBody = (props: { entityID: string } & SharedProps) => {
   let isMember = !!useIndex.eav(props.entityID, "member/name");
+  let { open } = usePopupCardViewer();
 
   let title = useIndex.eav(props.entityID, "card/title");
   let content = useIndex.eav(props.entityID, "card/content");
@@ -177,7 +179,10 @@ const SmallCardBody = (props: { entityID: string } & SharedProps) => {
           style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
         >
           {/* Small Card Preivew Title Or Contnet */}
-          <Link href={props.href}>
+          <div
+            onClick={() => open({ entityID: props.entityID })}
+            className="hover:cursor-pointer"
+          >
             <a className="h-full overflow-hidden">
               {!title || title?.value === "" ? (
                 <small>
@@ -199,7 +204,7 @@ const SmallCardBody = (props: { entityID: string } & SharedProps) => {
                 </div>
               )}
             </a>
-          </Link>
+          </div>
 
           {/* Small Card Preview External Link, Rotate, Resize */}
           <div className="grid grid-cols-[auto_max-content_max-content] items-center text-right w-full gap-2 place-self-end text-grey-80 ">
@@ -241,6 +246,8 @@ const BigCardBody = (props: { entityID: string } & SharedProps) => {
   let sections = useIndex.eav(props.entityID, "card/section");
   let image = useIndex.eav(props.entityID, "card/image");
 
+  let { open } = usePopupCardViewer();
+
   let imageUrl = !image
     ? undefined
     : image.value.filetype === "image"
@@ -279,11 +286,14 @@ const BigCardBody = (props: { entityID: string } & SharedProps) => {
               !image ? "" : "rounded-[3px] px-1 bg-white/75"
             }`}
           />
-          <Link href={props.href}>
+          <div
+            onClick={() => open({ entityID: props.entityID })}
+            className="hover:cursor-pointer"
+          >
             <a className="text-accent-blue justify-end ">
               <GoToPage />
             </a>
-          </Link>
+          </div>
         </div>
 
         {/* Big Card Preview Default Content */}

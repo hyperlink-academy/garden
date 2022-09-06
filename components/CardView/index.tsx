@@ -105,6 +105,7 @@ export const CardView = (props: {
     <div
       ref={parentContainer}
       className={`
+      w-full
         cardAndBacklink 
         max-w-3xl mx-auto
         h-full

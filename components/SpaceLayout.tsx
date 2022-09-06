@@ -30,26 +30,13 @@ export const SpaceLayout: React.FC = (props) => {
 
   return (
     <>
-      <style jsx>{`
-        @media print {
-          .navPadding {
-            height: auto;
-          }
-        }
-        @media (min-height: 500px) {
-          .navPadding {
-            padding-bottom: 64px;
-          }
-        }
-      `}</style>
       <style jsx global>{`
         body {
           overflow-y: hidden;
         }
       `}</style>
-      <div className="h-full pt-4 px-4 overflow-auto navPadding" ref={ref}>
+      <div className="h-full" ref={ref}>
         <SmallCardDragContext>{props.children}</SmallCardDragContext>
-        <Footer />
       </div>
     </>
   );
