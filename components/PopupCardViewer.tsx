@@ -56,23 +56,24 @@ export const PopupCardViewer: React.FC = (props) => {
         <div className="flex flex-row w-full h-full p-4">
           {state.focused &&
             (state.focused?.type === "desktop" ? (
-              <div className="overflow-y-scroll no-scrollbar flex-shrink-0 w-[350px] snap-center">
-                <LinkContextProvider type="desktop">
+              <LinkContextProvider type="desktop">
+                <div className="overflow-y-scroll no-scrollbar flex-shrink-0 w-[350px] snap-center">
                   <div className="px-4">
                     <SpaceInfo />
                   </div>
                   <Desktop />
-                </LinkContextProvider>
-              </div>
+                </div>
+                <CardView entityID={state.history[0]} />
+              </LinkContextProvider>
             ) : (
               <LinkContextProvider
                 type="entity"
                 entityID={state.focused.entityID}
               >
                 <CardView entityID={state.focused.entityID} />
+                <CardView entityID={state.history[0]} />
               </LinkContextProvider>
             ))}
-          {<CardView entityID={state.history[0]} />}
         </div>
       </Dialog>
     </PopupCardViewerContext.Provider>
