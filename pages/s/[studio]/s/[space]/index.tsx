@@ -22,7 +22,7 @@ function Page() {
     "01G5XAKYRBXC7Y292P4KHSEDG3",
   ]);
   return (
-    <div className="h-full flex flex-col items-stretch relative">
+    <div className="h-full flex flex-col items-stretch relative py-8">
       <div className="mx-auto h-full w-full flex flex-row gap-2 snap-x snap-mandatory overflow-x-scroll">
         <div className="overflow-y-scroll no-scrollbar flex-shrink-0 w-[350px] snap-center">
           <LinkContextProvider type="desktop">
