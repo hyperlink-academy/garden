@@ -1,6 +1,7 @@
 import { Menu } from "@headlessui/react";
 import { Textarea } from "components/Textarea";
 import { SmallCardList } from "components/SmallCardList";
+
 import {
   Close,
   DownArrow,
@@ -20,6 +21,7 @@ import {
   ReferenceAttributes,
 } from "data/Attributes";
 import { UndoManager } from "@rocicorp/undo";
+import { CardStack } from "components/CardStack";
 
 export const Sections = (props: { entityID: string }) => {
   let sections = useIndex.eav(props.entityID, "card/section");
@@ -211,15 +213,7 @@ export const MultipleReferenceSection = (props: {
   let [open, setOpen] = useState(false);
   return (
     <div className="flex flex-col gap-4">
-      <div className="">
-        {/* hack to remove extra space*/}
-        <SmallCardList
-          attribute={props.section}
-          cards={references || []}
-          deck={props.entityID}
-          positionKey="eav"
-        />
-      </div>
+      <CardStack cards={references?.map((c) => c.value.value) || []} />
     </div>
   );
 };
