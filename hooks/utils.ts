@@ -28,3 +28,12 @@ export function usePreserveScroll<T extends HTMLElement>() {
   }, [router.asPath, ref.current]);
   return { ref };
 }
+
+export function spacePath(
+  studio: string | string[] | undefined,
+  space: string | string[] | undefined
+) {
+  return `/s/${encodeURIComponent(studio as string)}/s/${encodeURIComponent(
+    space as string
+  )}`;
+}

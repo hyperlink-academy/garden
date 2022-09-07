@@ -12,6 +12,7 @@ import { prefetchSpaceId } from "./ReplicacheProvider";
 import { useAuth } from "hooks/useAuth";
 import { sortByPosition } from "src/position_helpers";
 import { DotLoader } from "./DotLoader";
+import { spacePath } from "hooks/utils";
 
 export const SpaceList = () => {
   let spaces = useIndex.aev("space/name").sort(sortByPosition("aev"));
@@ -81,7 +82,7 @@ const Space = (props: { entity: string; name: string }) => {
           prefetched.current = true;
         }}
       >
-        <Link href={`/s/${studio?.value}/s/${encodeURIComponent(props.name)}`}>
+        <Link href={`${spacePath(studio?.value, props.name)}`}>
           <a>
             <Door entityID={props.entity} glow={showUnreads} />
           </a>

@@ -5,6 +5,7 @@ import { flag } from "data/Facts";
 import { useAuth } from "hooks/useAuth";
 import { useInActivity } from "hooks/useInActivity";
 import { useIndex, useMutations } from "hooks/useReplicache";
+import { spacePath } from "hooks/utils";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -149,7 +150,9 @@ const ActivityItem = (props: { entity: string }) => {
             }}
           />
         )}
-        <Link href={`/s/${q.studio}/s/${q.space}/activity/${props.entity}`}>
+        <Link
+          href={`${spacePath(q.space, q.studio)})/activity/${props.entity}`}
+        >
           <a
             className={`justify-self-end ${
               isActive ? "text-accent-blue" : "text-grey-15"

@@ -13,7 +13,7 @@ export type Session = {
 export const CreateSession = (S: { [k in keyof Session]: Expr }) =>
   q.Create(q.Collection(SessionsCollectionName), {
     data: S,
-    ttl: q.TimeAdd(q.Now(), 7, "days"),
+    //ttl: q.TimeAdd(q.Now(), 7, "days"),
   });
 
 export default q.CreateCollection({

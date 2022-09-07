@@ -16,7 +16,7 @@ import {
 } from "./Sections";
 import { AddSection } from "./AddSection";
 import { Backlinks } from "./Backlinks";
-import { usePreserveScroll, usePrevious } from "hooks/utils";
+import { spacePath, usePreserveScroll, usePrevious } from "hooks/utils";
 import Link from "next/link";
 import { useAuth } from "hooks/useAuth";
 import { ImageSection } from "./ImageSection";
@@ -326,7 +326,9 @@ const CardMoreOptionsMenu = (props: {
         )}
 
         <MenuItem>
-          <Link href={`/s/${q.studio}/s/${q.space}/c/${props.entityID}/print`}>
+          <Link
+            href={`${spacePath(q.space, q.studio)}/c/${props.entityID}/print`}
+          >
             <a>Print</a>
           </Link>
         </MenuItem>

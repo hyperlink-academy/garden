@@ -22,6 +22,7 @@ import Link from "next/link";
 import { FindOrCreate } from "components/FindOrCreateEntity";
 import { SmallCard } from "components/SmallCard";
 import { RenderedText } from "components/Textarea/RenderedText";
+import { spacePath } from "hooks/utils";
 
 export default function ChatPage() {
   let id = useSpaceID();
@@ -158,7 +159,7 @@ const Message = (props: {
       <div className={`messageWrapper flex flex-col `}>
         {props.doubleSend ? null : (
           <div className=" messageHeader pb-.5 grid grid-cols-[auto_max-content]">
-            <Link href={`/s/${q.studio}/s/${q.space}/c/${member?.entity}`}>
+            <Link href={`${spacePath(q.studio, q.space)}/c/${member?.entity}`}>
               <a>
                 <div className={`messageSender font-bold `}>{props.sender}</div>
               </a>
