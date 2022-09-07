@@ -2,7 +2,7 @@ import { useIndex, useMutations } from "hooks/useReplicache";
 import { Disclosure } from "@headlessui/react";
 import useMeasure from "react-use-measure";
 import { animated, SpringValue, useSpring } from "@react-spring/web";
-import { usePrevious } from "hooks/utils";
+import { spacePath, usePrevious } from "hooks/utils";
 import { useState } from "react";
 import { ButtonLink, ButtonTertiary } from "./Buttons";
 import Link from "next/link";
@@ -86,7 +86,9 @@ const Deck = (props: { entity: string }) => {
           />
 
           <Link
-            href={`/s/${router.query.studio}/s/${router.query.space}/c/${props.entity}`}
+            href={`${spacePath(router.query.studio, router.query.space)}/c/${
+              props.entity
+            }`}
           >
             <a>
               <ButtonLink content="Deck Info" icon={<Settings />} />

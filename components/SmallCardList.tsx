@@ -7,6 +7,7 @@ import {
   useIndex,
   useMutations,
 } from "hooks/useReplicache";
+import { spacePath } from "hooks/utils";
 import { useRouter } from "next/router";
 import { useState, useContext } from "react";
 import { generateKeyBetween } from "src/fractional-indexing";
@@ -70,9 +71,7 @@ export const SmallCardList = (props: {
               }
               draggable={authorized}
               key={c.id}
-              href={`/s/${encodeURIComponent(
-                studio as string
-              )}/s/${encodeURIComponent(space as string)}/c/${props.deck}/${
+              href={`${spacePath(studio, space)}/c/${props.deck}/${
                 props.backlink ? "b" : "a"
               }/${encodeURIComponent(attribute)}/${entity}`}
               entityID={entity}

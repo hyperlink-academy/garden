@@ -4,6 +4,7 @@ import { CardAdd, LeftArrow, RightArrow, Shuffle } from "components/Icons";
 import { ReferenceAttributes, ShortCodes } from "data/Attributes";
 import { Fact } from "data/Facts";
 import { useIndex, useMutations } from "hooks/useReplicache";
+import { spacePath } from "hooks/utils";
 import Head from "next/head";
 import Link from "next/link";
 import Router, { useRouter } from "next/router";
@@ -35,7 +36,9 @@ export const CardCarousel = (props: {
       <div className="grid grid-flow-col items-center w-full px-1 pb-2">
         <h4 className="uppercase text-accent-blue font-bold max-w-3xl mx-auto w-full">
           <Link
-            href={`/s/${router.query.studio}/s/${router.query.space}/c/${props.entityID}`}
+            href={`${spacePath(router.query.studio, router.query.space)}/c/${
+              props.entityID
+            }`}
           >
             <a>{Name?.value} </a>
           </Link>

@@ -14,7 +14,7 @@ import { useContext, useState } from "react";
 import { Modal } from "components/Layout";
 import { LogInModal } from "./LoginModal";
 import { SmallCardDragContext } from "./DragContext";
-import { usePreserveScroll } from "hooks/utils";
+import { spacePath, usePreserveScroll } from "hooks/utils";
 import {
   ReplicacheContext,
   scanIndex,
@@ -144,9 +144,10 @@ export function Footer() {
                     !r.includes("/activity") &&
                     !r.includes("/home")
                   }
-                  route={`/s/${encodeURIComponent(
-                    router.query.studio as string
-                  )}/s/${encodeURIComponent(router.query.space as string)}`}
+                  route={`${spacePath(
+                    router.query.studio,
+                    router.query.space
+                  )}`}
                 >
                   <DeckLarge width={32} height={32} />
                 </FooterItem>
@@ -154,10 +155,9 @@ export function Footer() {
                 {/* CHAT */}
                 <FooterItem
                   active={(r) => r.endsWith("chat")}
-                  route={`/s/${encodeURIComponent(
-                    router.query.studio as string
-                  )}/s/${encodeURIComponent(
-                    router.query.space as string
+                  route={`${spacePath(
+                    router.query.studio,
+                    router.query.space
                   )}/chat`}
                 >
                   <ChatIcon />
