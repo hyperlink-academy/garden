@@ -1,5 +1,6 @@
 import { Dialog } from "@headlessui/react";
 import { animated, useSpring } from "@react-spring/web";
+import { useIndex } from "hooks/useReplicache";
 import { useContext, useState, createContext } from "react";
 import useMeasure from "react-use-measure";
 import { CardView } from "./CardView";
@@ -163,7 +164,52 @@ const RightCard = (props: {
           <button onClick={props.onClick}>{"<-"} back</button>
         )}
       </div>
+      <SearchBar />
       {props.entityID && <CardView entityID={props.entityID} />}
     </animated.div>
+  );
+};
+
+export const SearchBar = () => {
+  let [input, setInput] = useState("");
+  return (
+    <div>
+      <input value={input} onChange={(e) => setInput(e.currentTarget.value)} />
+      <Results searchTerm={input} />
+    </div>
+  );
+};
+
+const Results = (props: { searchTerm: string }) => {
+  let { open } = usePopupCardViewer();
+  let titles = useIndex
+    .aev(props.searchTerm ? "card/title" : null)
+    .filter((f) => !!f.value);
+  let items = titles
+    .map((t) => {
+      return {
+        entity: t.entity,
+        display: t.value,
+      };
+    })
+    .filter((f) => {
+      if (/[A-Z]/g.test(props.searchTerm))
+        return f.display.includes(props.searchTerm);
+      return f.display
+        .toLocaleLowerCase()
+        .includes(props.searchTerm.toLocaleLowerCase());
+    });
+  return (
+    <div>
+      {items.map((i) => (
+        <div
+          onClick={() => {
+            open({ entityID: i.entity });
+          }}
+        >
+          {i.display}
+        </div>
+      ))}
+    </div>
   );
 };
