@@ -1,6 +1,7 @@
 import { Dialog } from "@headlessui/react";
 import { animated, useSpring } from "@react-spring/web";
 import { useContext, useState, createContext } from "react";
+import useMeasure from "react-use-measure";
 import { CardView } from "./CardView";
 import { Desktop } from "./Desktop";
 import { SpaceInfo } from "./SpaceInfo";
@@ -27,16 +28,7 @@ export const PopupCardViewer: React.FC = (props) => {
     focused: undefined as undefined | LinkContextType,
   });
 
-  let SlideLeft = useSpring({
-    from: { x: 100 },
-    to: { x: 0 },
-    delay: 1200,
-  });
-
-  let SlideRight = useSpring({
-    to: { x: 0 },
-    from: { x: 100 },
-  });
+  const [refPanel, data] = useMeasure();
 
   return (
     <PopupCardViewerContext.Provider
@@ -70,9 +62,9 @@ export const PopupCardViewer: React.FC = (props) => {
             marginRight: "max(calc((100vw - 75rem)/2), 1rem)",
             marginLeft: "max(calc((100vw - 75rem)/2), 1rem)",
           }}
-          className="popUpModalWrapper lightBorder bg-white h-[calc(100vh-32px)] mt-[16px] "
+          className="popUpModalWrapper  h-[calc(100vh-32px)] mt-[16px] "
         >
-          <Dialog.Panel className="p-4 h-full flex flex-row gap-4">
+          <Dialog.Panel className="h-full flex flex-row" ref={refPanel}>
             {state.focused && (
               <LinkContextProvider {...state.focused}>
                 {state.focused.type === "desktop" ? (
@@ -83,25 +75,20 @@ export const PopupCardViewer: React.FC = (props) => {
                     <Desktop />
                   </div>
                 ) : (
-                  <animated.div
-                    className=" shrink-0 grow-0 w-[calc(100vw-32px)] max-w-xl"
-                    style={SlideLeft}
-                  >
-                    <CardView entityID={state.focused.entityID} />
-                  </animated.div>
+                  <LeftCard
+                    entityID={state.focused.entityID}
+                    PanelLeftX={data.left}
+                  />
                 )}
 
                 {/* pop up card */}
-                <div className="grow w-full max-w-xl flex flex-col">
-                  <button
-                    onClick={() =>
-                      setState((s) => ({ ...s, history: s.history.slice(1) }))
-                    }
-                  >
-                    x
-                  </button>
-                  {state.history[0] && <CardView entityID={state.history[0]} />}
-                </div>
+                <RightCard
+                  entityID={state.history[0]}
+                  PanelRightX={data.left}
+                  onClick={() =>
+                    setState((s) => ({ ...s, history: s.history.slice(1) }))
+                  }
+                />
               </LinkContextProvider>
             )}
           </Dialog.Panel>
@@ -126,3 +113,57 @@ export const usePopupCardViewer = () => {
 // 1. Origin card moves into modal (focused card is behind)
 
 // 2. Original card slides to Lefts and Focused card slides to the Right
+
+const LeftCard = (props: { entityID: string; PanelLeftX: number }) => {
+  const [refLeftCard, data] = useMeasure();
+
+  let TranslateX =
+    window.innerWidth / 2 - (props.PanelLeftX + 16 + data.width / 2);
+
+  let SlideLeft = useSpring({
+    from: { x: TranslateX },
+    to: { x: 0 },
+    delay: 200,
+  });
+
+  return (
+    <animated.div
+      className=" LeftPanel shrink-0 grow-0 w-[calc(100vw-32px)] max-w-xl z-20  bg-background border border-grey-80 p-4 rounded-tl-md rounded-bl-lg"
+      style={SlideLeft}
+      ref={refLeftCard}
+    >
+      <CardView entityID={props.entityID} />
+    </animated.div>
+  );
+};
+const RightCard = (props: {
+  entityID: string | undefined;
+  onClick: () => void;
+  PanelRightX: number;
+}) => {
+  const [refRightCard, data] = useMeasure();
+
+  let TranslateX =
+    props.PanelRightX + 16 + data.width / 2 - window.innerWidth / 2;
+
+  let SlideRight = useSpring({
+    from: { x: TranslateX },
+    to: { x: 0 },
+    delay: 200,
+  });
+
+  return (
+    <animated.div
+      className="grow w-full max-w-xl flex flex-col bg-grey-80 p-4 rounded-tr-md rounded-br-lg"
+      style={SlideRight}
+      ref={refRightCard}
+    >
+      <div className="flex">
+        {!props.entityID ? null : (
+          <button onClick={props.onClick}>{"<-"} back</button>
+        )}
+      </div>
+      {props.entityID && <CardView entityID={props.entityID} />}
+    </animated.div>
+  );
+};
