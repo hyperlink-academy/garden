@@ -103,7 +103,7 @@ export const RotateAndResize: React.FC<
       style={{}}
       className={`
       touch-none
-      ${props.size === "small" ? "w-[167px] h-24" : "w-[300px] h-fit"}
+      ${props.size === "small" ? "w-[167px] h-24" : "w-full h-fit"}
       flex items-end gap-1
       group
       
@@ -290,8 +290,8 @@ const BigCardBody = (props: { entityID: string } & SharedProps) => {
 
       {/* Big Card Preview Content Wrapper */}
       <div className="grid grid-rows-[max-content_auto_max-content] w-full">
-        {/* Big Card Preview Title */}
-        <div className="grid grid-cols-[auto_max-content] items-center">
+        {/* Big Card Preview Title and GoTo Button*/}
+        <div className="grid grid-cols-[auto_max-content] items-start">
           <SingleTextSection
             entityID={props.entityID}
             section={isMember ? "member/name" : "card/title"}
@@ -303,9 +303,9 @@ const BigCardBody = (props: { entityID: string } & SharedProps) => {
           />
           <div
             onClick={() => open({ entityID: props.entityID })}
-            className="hover:cursor-pointer"
+            className="hover:cursor-pointer pt-1"
           >
-            <a className="text-accent-blue justify-end ">
+            <a className="text-accent-blue ">
               <GoToPage />
             </a>
           </div>

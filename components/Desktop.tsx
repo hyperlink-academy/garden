@@ -133,6 +133,7 @@ const DraggableCard = (props: {
   let x = position?.value.x || 0;
   return (
     <>
+      {/* This handles the canvas position and card size*/}
       <div
         style={{
           zIndex: isDragging
@@ -141,10 +142,12 @@ const DraggableCard = (props: {
           transform: style,
           top: y + "px",
           left: x + "px",
+          width: position?.value.size === "big" ? "300px" : "fit-content",
         }}
         ref={refs}
-        className="touch-none absolute w-min"
+        className="touch-none absolute"
       >
+        {/* This handles the rotation */}
         <div
           style={{
             transform: `rotate(${
@@ -157,6 +160,7 @@ const DraggableCard = (props: {
             }rad)`,
           }}
         >
+          {/* This is the actual card and its buttons. It also handles size */}
           <CardPreview
             href={`/s/${q.studio}/s/${q.space}/c/${props.entityID}`}
             onRotateDrag={(da) => {

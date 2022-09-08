@@ -1,5 +1,5 @@
 import type { NextPage } from "next";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import * as Slider from "@radix-ui/react-slider";
 import { CardPreview } from "./CardPreview";
 import { useSpring, animated } from "@react-spring/web";
@@ -8,14 +8,14 @@ import { usePrevious } from "hooks/utils";
 import { useRouter } from "next/router";
 
 export const CardStack = (props: { cards: string[] }) => {
-  let [sliderPosition, setSliderPosition] = useState(-1);
-  let [expanded, setExpanded] = useState(false);
+  let [expandAll, setExpandAll] = useState(false);
+  let [focusedCardIndex, setFocusedCardIndex] = useState(-1);
 
   // what do i need. If the value of the slider is =<10 units smaller than the index * 10, then change the max-h of that container.
   return (
     <div>
-      <button onClick={() => setExpanded((e) => !e)}>
-        {expanded ? "collapse" : "expand"}
+      <button onClick={() => setExpandAll((e) => !e)}>
+        {expandAll ? "collapse" : "expand"}
       </button>
       <div className="">
         {props.cards.map((card, currentIndex) => (
@@ -24,20 +24,40 @@ export const CardStack = (props: { cards: string[] }) => {
             key={card}
             entity={card}
             currentIndex={currentIndex}
-            nextIndex={currentIndex + 1}
-            sliderPosition={sliderPosition}
-            onClick={() => {
-              setSliderPosition(currentIndex);
+            focused={currentIndex === focusedCardIndex}
+            nextIndex={
+              currentIndex === props.cards.length - 1 ? 0 : currentIndex + 1
+            }
+            onClick={(e) => {
+              currentIndex === focusedCardIndex
+                ? setFocusedCardIndex(-1)
+                : setFocusedCardIndex(currentIndex);
+
+              let element = e.currentTarget;
+              setTimeout(
+                // if parent is bottomed, do nothing. else:
+                () => {
+                  let offsetContainerTop =
+                    element.offsetTop - element.scrollTop;
+                  function getCardParent(
+                    node: HTMLElement | null
+                  ): HTMLElement | undefined {
+                    if (!node) return undefined;
+                    if (node.classList.contains("cardContent")) return node;
+                    return getCardParent(node.parentElement);
+                  }
+                  let cardParent = getCardParent(element.parentElement);
+
+                  if (!cardParent) return;
+
+                  cardParent.scrollTo({
+                    top: offsetContainerTop - 20,
+                    behavior: "smooth",
+                  });
+                },
+                410
+              );
             }}
-            active={
-              expanded ||
-              (sliderPosition - currentIndex < 1 &&
-                sliderPosition - currentIndex >= 0)
-            }
-            next={
-              currentIndex - sliderPosition < 1 &&
-              currentIndex - sliderPosition > 0
-            }
           />
         ))}
       </div>
@@ -49,34 +69,47 @@ const Card = (props: {
   entity: string;
   currentIndex: number;
   nextIndex?: number;
-  sliderPosition: number;
-  onClick: () => void;
-  active?: boolean;
+  onClick: (e: React.MouseEvent<HTMLDivElement>) => void;
+  focused?: boolean;
   last: boolean;
-  next?: boolean;
 }) => {
-  const [ref, { height: viewHeight }] = useMeasure();
-  const { height } = useSpring({
-    from: { height: 32 },
-    to: {
-      height: props.active ? viewHeight : 32,
-    },
+  const [ref, data] = useMeasure();
+
+  const CardHeightAnim = useSpring({
+    maxHeight: props.focused ? 480 : 40,
   });
 
   let { query: q } = useRouter();
+
   // console.log(props.active === true ? "height %:" + heightPercent : null)
   return (
     // if card is focused, then increase the height
     <animated.div
-      onClick={() => props.onClick()}
-      style={{
-        height: props.active || props.last ? "auto" : height,
-        overflow: "hidden",
-        marginBottom: props.active || props.last ? "16px" : "0",
+      onClick={(e) => {
+        props.onClick(e);
+        // console.log(data);
       }}
-      className={`cardWrapper`}
+      ref={ref}
+      style={
+        props.focused
+          ? {
+              overflow: "hidden",
+              ...CardHeightAnim,
+            }
+          : props.last
+          ? {
+              overflow: "hidden",
+              height: "auto",
+              maxHeight: "480px",
+            }
+          : {
+              overflow: "hidden",
+              ...CardHeightAnim,
+            }
+      }
+      className={`cardWrapper -mr-4`}
     >
-      <div ref={ref}>
+      <div className="mb-4">
         <CardPreview
           entityID={props.entity}
           size={"big"}
