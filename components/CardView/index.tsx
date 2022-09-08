@@ -6,8 +6,9 @@ import {
   DeckSmall,
   Member,
   CardAdd,
+  Print,
 } from "components/Icons";
-import { MenuContainer, MenuItem } from "components/Layout";
+import { Divider, MenuContainer, MenuItem } from "components/Layout";
 import { useIndex, useMutations } from "hooks/useReplicache";
 import {
   MultipleReferenceSection,
@@ -331,8 +332,11 @@ const CardMoreOptionsMenu = (props: {
           >
             <a>Print</a>
           </Link>
+          <Print />
         </MenuItem>
-        {/* <Divider /> */}
+        <div className="py-2">
+          <Divider />
+        </div>
 
         {/* TODO: wire up delete card (and add confirmation?) */}
         {/* TODO: check if deck card; if so display "Delete Deck…"  */}
@@ -343,8 +347,10 @@ const CardMoreOptionsMenu = (props: {
             props.onDelete?.();
           }}
         >
-          <p className="font-bold">Delete Card FOREVER</p>
-          <Delete />
+          <p className="font-bold text-accent-red">Delete FOREVER</p>
+          <div className="text-accent-red">
+            <Delete />
+          </div>
         </MenuItem>
       </MenuContainer>
     </Menu>

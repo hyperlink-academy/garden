@@ -75,6 +75,7 @@ export const MenuContainer: React.FC<{ className?: string }> = (props) => {
             right-0 
             z-40 
             w-max
+            py-2
             ${props.className}`}
       >
         {props.children}
@@ -91,7 +92,7 @@ export const MenuItem: React.FC<{
     <Menu.Item>
       {({ active }) => (
         <button
-          className={`px-3 py-4 flex items-center gap-2 justify-end ${
+          className={`px-3 py-1 flex items-center gap-2 justify-end ${
             active ? "bg-bg-blue" : ""
           } ${
             props?.disabled
