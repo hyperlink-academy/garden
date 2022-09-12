@@ -29,9 +29,7 @@ export const CardStack = (props: { cards: string[] }) => {
               currentIndex === props.cards.length - 1 ? 0 : currentIndex + 1
             }
             onClick={(e) => {
-              currentIndex === focusedCardIndex
-                ? setFocusedCardIndex(-1)
-                : setFocusedCardIndex(currentIndex);
+              setFocusedCardIndex(currentIndex);
 
               let element = e.currentTarget;
               setTimeout(
@@ -76,7 +74,7 @@ const Card = (props: {
   const [ref, data] = useMeasure();
 
   const CardHeightAnim = useSpring({
-    maxHeight: props.focused ? 480 : 40,
+    maxHeight: props.focused ? 480 : 48,
   });
 
   let { query: q } = useRouter();
@@ -91,9 +89,10 @@ const Card = (props: {
       }}
       ref={ref}
       style={
-        props.focused
+        props.focused && !props.last
           ? {
               overflow: "hidden",
+              marginBottom: "-12px",
               ...CardHeightAnim,
             }
           : props.last
@@ -104,6 +103,7 @@ const Card = (props: {
             }
           : {
               overflow: "hidden",
+              marginBottom: "-12px",
               ...CardHeightAnim,
             }
       }
