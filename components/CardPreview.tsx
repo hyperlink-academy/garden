@@ -103,7 +103,7 @@ export const RotateAndResize: React.FC<
       style={{}}
       className={`
       touch-none
-      ${props.size === "small" ? "w-[167px] h-24" : "w-full h-fit"}
+      ${props.size === "small" ? "w-[160px] h-24" : "w-full h-fit"}
       flex items-end gap-1
       group
       

@@ -19,7 +19,7 @@ export default function SpacePage() {
 
 function Page() {
   return (
-    <div className="overflow-y-scroll no-scrollbar flex-shrink-0 w-[350px] snap-center">
+    <div className="overflow-y-scroll no-scrollbar flex-shrink-0 w-[352px] snap-center">
       <LinkContextProvider type="desktop">
         <div className="px-4">
           <SpaceInfo />

@@ -16,6 +16,9 @@ import { ulid } from "src/ulid";
 import { DownArrow, UpArrow } from "./Icons";
 import { useRouter } from "next/router";
 
+const GRID_SIZE = 16;
+const snap = (x: number) => Math.ceil(x / GRID_SIZE) * GRID_SIZE;
+
 export const Desktop = () => {
   let homeEntity = useIndex.aev("home");
   let cards = useIndex.eav(homeEntity[0]?.entity || null, "deck/contains");
@@ -29,11 +32,14 @@ export const Desktop = () => {
     <DndContext
       sensors={sensors}
       modifiers={[
-        ({ transform }) => ({
-          ...transform,
-          x: Math.ceil(transform.x / 30) * 30,
-          y: Math.ceil(transform.y / 30) * 30,
-        }),
+        (args) => {
+          let { transform } = args;
+          return {
+            ...transform,
+            x: snap(transform.x),
+            y: snap(transform.y),
+          };
+        },
         restrictToParentElement,
       ]}
       collisionDetection={customCollisionDetection}
@@ -139,9 +145,9 @@ const DraggableCard = (props: {
             ? 100000
             : Math.floor(y / 10) * 100 + Math.floor(x / 10),
           transform: style,
-          top: y + "px",
-          left: x + "px",
-          width: position?.value.size === "big" ? "300px" : "fit-content",
+          top: snap(y) + "px",
+          left: snap(x) + "px",
+          width: position?.value.size === "big" ? "288px" : "fit-content",
         }}
         ref={refs}
         className="touch-none absolute"
