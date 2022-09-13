@@ -294,6 +294,7 @@ const BigCardBody = (props: { entityID: string } & SharedProps) => {
         <div className="grid grid-cols-[auto_max-content] items-start">
           <SingleTextSection
             entityID={props.entityID}
+            previewOnly={isMember}
             section={isMember ? "member/name" : "card/title"}
             placeholderOnHover={true}
             placeholder="Untitled"
