@@ -330,6 +330,25 @@ export const Add = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
+export const AddTiny = (props: SVGProps<SVGSVGElement>) => {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M8 0C3.58172 0 0 3.58172 0 8C0 12.4183 3.58172 16 8 16C12.4183 16 16 12.4183 16 8C16 3.58172 12.4183 0 8 0ZM8 2.5C8.41421 2.5 8.75 2.83579 8.75 3.25V7.25H12.75C13.1642 7.25 13.5 7.58579 13.5 8C13.5 8.41421 13.1642 8.75 12.75 8.75H8.75V12.75C8.75 13.1642 8.41421 13.5 8 13.5C7.58579 13.5 7.25 13.1642 7.25 12.75V8.75H3.25C2.83579 8.75 2.5 8.41421 2.5 8C2.5 7.58579 2.83579 7.25 3.25 7.25H7.25V3.25C7.25 2.83579 7.58579 2.5 8 2.5Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+};
+
 export const Settings = (props: SVGProps<SVGSVGElement>) => {
   return (
     <svg
