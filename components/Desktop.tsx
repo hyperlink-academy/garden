@@ -85,7 +85,6 @@ export const Desktop = () => {
         }}
         style={{
           zIndex: 1,
-          maxWidth: "320px",
           height: `${height?.value || 800}px`,
         }}
         className="relative text-sm"
