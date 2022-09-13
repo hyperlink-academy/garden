@@ -140,12 +140,12 @@ export const Carousel: React.FC = (props) => {
         h-full `}
     >
       <div
-        style={{ width: "max(calc((100vw - 48rem) / 2), 1rem)" }}
+        style={{ width: "max(calc((100vw - 46rem) / 2), 1rem)" }}
         className={`flex-shrink-0`}
       />
       {props.children}
       <div
-        style={{ width: "max(calc((100vw - 48rem) / 2), 1rem)" }}
+        style={{ width: "max(calc((100vw - 46rem) / 2), 1rem)" }}
         className={`flex-shrink-0`}
       />
     </div>

@@ -3,8 +3,9 @@ import { spaceAPI } from "backend/lib/api";
 import { Fact } from "data/Facts";
 import { useAuth } from "hooks/useAuth";
 import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
-import { usePrevious } from "hooks/utils";
+import { spacePath, usePrevious } from "hooks/utils";
 import Head from "next/head";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { ulid } from "src/ulid";
@@ -25,6 +26,8 @@ export const SpaceInfo = () => {
     open: false,
     tab: "member" as "bot" | "member",
   });
+  let { query } = useRouter();
+
   const previousState = usePrevious(state.open);
   return (
     <>
@@ -33,7 +36,14 @@ export const SpaceInfo = () => {
       </Head>
       <div className="spaceInfo grid auto-rows-max gap-3 pb-4 pt-6">
         <div className="spaceNameDescription">
-          <h1>{spaceName?.value}</h1>
+          <div className="flex gap-2">
+            <h1 className="grow">{spaceName?.value}</h1>
+            <Link href={`${spacePath(query.studio, query.space)}/highlights`}>
+              <a>
+                <button className="rounded-full bg-test-pink h-[28px] w-[28px] shrink pt-1" />
+              </a>
+            </Link>
+          </div>
           <Description entity={spaceName?.entity} />
         </div>
         <div className="flex flex-row gap-2">

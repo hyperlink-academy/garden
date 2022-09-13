@@ -7,6 +7,8 @@ import {
   Member,
   CardAdd,
   Print,
+  ExpandTiny,
+  CollapseTiny,
 } from "components/Icons";
 import { Divider, MenuContainer, MenuItem } from "components/Layout";
 import { useIndex, useMutations } from "hooks/useReplicache";
@@ -24,6 +26,8 @@ import { ImageSection } from "./ImageSection";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import { flag } from "data/Facts";
+import { ButtonPrimary } from "components/Buttons";
+import { hasProps } from "@react-spring/core/dist/declarations/src/helpers";
 
 const borderStyles = (args: { deck: boolean; member: boolean }) => {
   switch (true) {
@@ -58,6 +62,8 @@ export const CardView = (props: {
   let { ref } = usePreserveScroll<HTMLDivElement>();
   let { session } = useAuth();
   let [open, setOpen] = useState<"card" | "backlink">("card");
+  let [highlightDropdown, setHighlightDropdown] = useState(false);
+
   let previousOpen = usePrevious(open);
   useEffect(() => {
     if (!parentContainer.current) return;
@@ -190,13 +196,34 @@ export const CardView = (props: {
             `}
         >
           <div className="cardDefaultSection grid grid-auto-rows gap-3">
-            <div className="cardHeader grid grid-cols-[auto_min-content] gap-2">
+            <div className="cardHeader grid grid-cols-[auto_max-content_max-content] gap-2">
               <Title entityID={props.entityID} />
-              <CardMoreOptionsMenu
-                onDelete={props.onDelete}
-                entityID={props.entityID}
-                referenceFactID={props?.referenceFactID}
-              />
+              <div className="-mt-1">
+                <button
+                  className="cardHighlighter rounded-full bg-test-pink h-[28px] w-[28px]"
+                  onClick={() => {
+                    setHighlightDropdown(!highlightDropdown);
+                    console.log(highlightDropdown);
+                  }}
+                />
+                {highlightDropdown ? (
+                  <HighlightDropdown
+                    onSubmit={() => {
+                      setHighlightDropdown(false);
+                      console.log(highlightDropdown);
+                    }}
+                  />
+                ) : (
+                  ""
+                )}
+              </div>
+              <div className="">
+                <CardMoreOptionsMenu
+                  onDelete={props.onDelete}
+                  entityID={props.entityID}
+                  referenceFactID={props?.referenceFactID}
+                />
+              </div>
             </div>
             <SingleTextSection
               entityID={props.entityID}
@@ -305,7 +332,7 @@ const CardMoreOptionsMenu = (props: {
 
   return !authorized || !!memberName ? null : (
     <Menu as="div" className="relative">
-      <Menu.Button>
+      <Menu.Button className={`pt-[6px]`}>
         <MoreOptions />
       </Menu.Button>
       <MenuContainer>
@@ -354,5 +381,88 @@ const CardMoreOptionsMenu = (props: {
         </MenuItem>
       </MenuContainer>
     </Menu>
+  );
+};
+
+const HighlightDropdown = (props: { onSubmit: () => void }) => {
+  let [highlightHelp, setHighlightHelp] = useState(false);
+  let [highlightAdvancedOptions, setHighlightAdvancedOptions] = useState(false);
+
+  return (
+    <div className="absolute top-16 right-4 left-8 rounded-md p-3 bg-white lightBorder flex flex-col gap-3">
+      <div className="flex flex-col gap-2">
+        <b>add a note (optional)</b>
+        <textarea rows={4} className="lightBorder resize-none w-full p-3" />
+      </div>
+      <div className="flex flex-col gap-2">
+        <div
+          className="flex gap-2 items-center"
+          onClick={() => setHighlightAdvancedOptions(!highlightAdvancedOptions)}
+        >
+          {!highlightAdvancedOptions ? (
+            <>
+              <b>more options</b>
+              <ExpandTiny />
+            </>
+          ) : (
+            <>
+              <b>hide options</b>
+              <CollapseTiny />
+            </>
+          )}
+        </div>
+        {highlightAdvancedOptions ? (
+          <>
+            <p>
+              trigger in{" "}
+              <input
+                type="number"
+                min={0}
+                id="highlightDelay"
+                className="w-16 py-1 px-2 border-grey-90"
+              />{" "}
+              days.
+            </p>
+            <p>
+              fade after{" "}
+              <input
+                type="number"
+                min={1}
+                id="highlightfade"
+                className=" w-16 py-1 px-2 border-grey-90"
+              />{" "}
+              days.
+            </p>
+          </>
+        ) : (
+          " "
+        )}
+      </div>
+      <div className="flex justify-between items-end text-accent-blue">
+        <small onClick={() => setHighlightHelp(!highlightHelp)}>
+          {!highlightHelp ? "What's this?" : "Gotcha!"}
+        </small>
+
+        <ButtonPrimary
+          content="Submit"
+          onClick={() => {
+            props.onSubmit();
+          }}
+        />
+      </div>
+      {highlightHelp ? (
+        <div className="lightBorder bg-background p-3 -mt-1">
+          <small>
+            <b>Use a highlight to draw attention to this card.</b>
+            <br />
+            It'll be added to the highlight reel on the desktop with your note
+            where everyone can see it. <br />
+            Highlights fade after 24 hours!
+          </small>
+        </div>
+      ) : (
+        ""
+      )}
+    </div>
   );
 };
