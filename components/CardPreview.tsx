@@ -16,6 +16,7 @@ import { useDrag, usePinch } from "@use-gesture/react";
 import { isUrl } from "src/isUrl";
 import { useRef } from "react";
 import { usePopupCardViewer } from "./PopupCardViewer";
+import { Divider } from "./Layout";
 
 const borderStyles = (args: { isDeck: boolean; isMember: boolean }) => {
   switch (true) {
@@ -291,40 +292,45 @@ const BigCardBody = (props: { entityID: string } & SharedProps) => {
       {/* Big Card Preview Content Wrapper */}
       <div className="grid grid-rows-[max-content_auto_max-content] w-full">
         {/* Big Card Preview Title and GoTo Button*/}
-        <div className="grid grid-cols-[auto_max-content] items-start">
+        <div className={`flex gap-2 items-start`}>
           <SingleTextSection
             entityID={props.entityID}
             previewOnly={isMember}
             section={isMember ? "member/name" : "card/title"}
             placeholderOnHover={true}
             placeholder="Untitled"
-            className={`font-bold text-md text-grey-35 ${
-              !image ? "" : "rounded-[3px] px-1 bg-white/75"
-            }`}
+            className={`font-bold text-md grow ${
+              isMember ? "text-white" : "text-grey-35"
+            } ${!image ? "" : "rounded-[3px] px-1 bg-white/75"}`}
           />
+          {isMember ? <div className="shrink-0 text-white">member</div> : ""}
           <div
             onClick={() => open({ entityID: props.entityID })}
             className="hover:cursor-pointer pt-1"
           >
-            <a className="text-accent-blue ">
+            <a className={`${isMember ? "text-white" : "text-accent-blue"}`}>
               <GoToPage />
             </a>
           </div>
         </div>
 
         {/* Big Card Preview Default Content */}
-        <div>
+        <div
+          className={`${
+            isMember ? "bg-white rounded-md p-2 pb-0 text-accent-red mt-1" : ""
+          }`}
+        >
           {!image ? null : (
             <img
               src={`${imageUrl}`}
-              className="py-1 max-w-full max-h-[400px]"
+              className="py-2 px-1  max-w-full max-h-[600px]"
             />
           )}
           <SingleTextSection
             entityID={props.entityID}
             section="card/content"
             placeholderOnHover={true}
-            className={`whitespace-pre-wrap truncate leading-tight text-sm pt-1 ${
+            className={`whitespace-pre-wrap truncate leading-tight  pt-1 pb-3 ${
               !image ? "" : "rounded-[3px] px-1 bg-white/75"
             } `}
           />
@@ -334,7 +340,7 @@ const BigCardBody = (props: { entityID: string } & SharedProps) => {
         {sections !== null && sections.length === 0 ? (
           <div />
         ) : (
-          <small className="SectionCounter text-grey-80 hover:text-accent-blue hover:underline">
+          <small className="SectionCounter text-grey-80 hover:text-accent-blue hover:underline pb-1">
             <Link href={props.href}>
               <a>+ {sections?.length} sections</a>
             </Link>

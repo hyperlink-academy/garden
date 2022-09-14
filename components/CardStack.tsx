@@ -7,12 +7,6 @@ import useMeasure from "react-use-measure";
 import { usePrevious } from "hooks/utils";
 import { useRouter } from "next/router";
 import { Add, AddTiny } from "./Icons";
-import {
-  ButtonLink,
-  ButtonPrimary,
-  ButtonSecondary,
-  ButtonTertiary,
-} from "./Buttons";
 
 export const CardStack = (props: { cards: string[] }) => {
   let [expandAll, setExpandAll] = useState(false);
@@ -27,16 +21,15 @@ export const CardStack = (props: { cards: string[] }) => {
           cardStackNewCard 
           w-full h-12 
           grid grid-cols-[auto_max-content] gap-2 
-          border  border-accent-blue rounded-lg 
-          text-accent-blue font-bold
-          hover:bg-bg-blue hover:border-2 
+          border border-dashed border-grey-80 hover:border-accent-blue rounded-lg 
+          text-grey-55 hover:text-accent-blue font-bold
           ${
             expandAll || props.cards.length === 0
               ? "items-center justify-center mb-4"
-              : "pt-1 pl-4 pr-3 -mb-4 hover:pl-[15px] hover:pr-[11px] hover:pt-[3px]"
+              : "pt-1 pl-4 pr-3 -mb-4"
           }`}
         >
-          Add Card!{" "}
+          Add Card
           <div className="h-6 pt-1">
             <AddTiny />
           </div>
@@ -79,13 +72,20 @@ export const CardStack = (props: { cards: string[] }) => {
           />
         ))}
       </div>
-      {props.cards.length === 0 ? null : (
-        <div className="relative flex flex-col w-8">
-          <div className="sticky top-0 -8 z-20 mb-14 mt-1 rotate-90">
-            <ButtonLink
-              content={expandAll ? "collapse" : "expand"}
-              onClick={() => setExpandAll((e) => !e)}
-            />
+      {props.cards.length === 0 ? (
+        <div className="w-6" />
+      ) : (
+        <div className="relative flex flex-col w-6">
+          <div className="sticky top-0 -8 z-20 mb-14 mt-2 rotate-90">
+            <button
+              onClick={() => {
+                setExpandAll((e) => !e);
+                setFocusedCardIndex(-1);
+              }}
+              className="font-bold text-grey-55 hover:text-accent-blue text-sm"
+            >
+              {expandAll ? "collapse" : "expand"}
+            </button>
           </div>
           <div className="grow" />
         </div>
@@ -120,11 +120,11 @@ const Card = (props: {
       ref={ref}
       style={
         props.expandAll
-          ? {}
+          ? { marginBottom: "12px" }
           : props.focused && !props.last
           ? {
               overflow: "hidden",
-              marginBottom: "-12px",
+              marginBottom: "12px",
               ...CardHeightAnim,
             }
           : props.last
@@ -141,8 +141,8 @@ const Card = (props: {
       }
       className={`cardWrapper -mr-4`}
     >
-      <div className="mb-4">
-        <Careview
+      <div className="">
+        <CardPreview
           entityID={props.entity}
           size={"big"}
           href={`/s/${q.studio}/s/${q.space}/c/${props.entity}`}

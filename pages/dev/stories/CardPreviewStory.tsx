@@ -8,7 +8,10 @@ const stories = {
     entities: [
       { "card/title": "A deck!", deck: flag() },
       { "card/title": "A card!", "card/content": "https://www.google.com" },
-      { "member/name": "A member!" },
+      {
+        "member/name": "celine",
+        "card/content": "hello my name is celine and I love cake",
+      },
       {
         "card/title": "A card with sections",
         "card/section": ["section/idk", "section/another"],
