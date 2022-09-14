@@ -1,8 +1,15 @@
 import { useContext, useState, createContext, useRef, useEffect } from "react";
 import { CardView } from "./CardView";
-import { GoBackToPage, SearchOrCommand } from "./Icons";
-import { useIndex } from "hooks/useReplicache";
-import { ButtonPrimary, ButtonSecondary } from "./Buttons";
+import {
+  DeckSmall,
+  GoBackToPage,
+  Member,
+  SearchOrCommand,
+  Card as CardIcon,
+} from "./Icons";
+import { useIndex, useMutations } from "hooks/useReplicache";
+import { ulid } from "src/ulid";
+import { FindOrCreate } from "./FindOrCreateEntity";
 
 let PopupCardViewerContext = createContext({
   open: (_args: { focused: LinkContextType; entityID: string }) => {},
@@ -27,7 +34,10 @@ export const PopupCardViewer: React.FC = (props) => {
 
   let ref = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
-    ref.current?.scrollIntoView({ behavior: "smooth" });
+    if (!state.history[0]) return;
+    setTimeout(() => {
+      ref.current?.scrollIntoView({ behavior: "smooth" });
+    }, 50);
   }, [state.history[0]]);
 
   let prevCardTitle = useIndex.eav(state.history[1], "card/title");
@@ -37,6 +47,7 @@ export const PopupCardViewer: React.FC = (props) => {
       value={{
         open: (args) =>
           setState((s) => {
+            if (s.history[0] === args.entityID) return s;
             let history = [args.entityID, ...s.history];
             return {
               ...s,
@@ -85,15 +96,7 @@ export const PopupCardViewer: React.FC = (props) => {
                     </p>
                   </div>
                 </button>
-                <div className="flex items-center">
-                  <div className="lightborder px-3 py-1 italic bg-white border border-grey-80 rounded-l-md text-grey-80">
-                    {" "}
-                    find or create a card...
-                  </div>
-                  <div className="text-accent-blue bg-bg-blue border border-accent-blue  rounded-r-md px-3 py-1">
-                    <SearchOrCommand />
-                  </div>
-                </div>
+                <FindOrCreateBar />
               </div>
               <CardView entityID={state.history[0]} />
             </>
@@ -101,6 +104,76 @@ export const PopupCardViewer: React.FC = (props) => {
         </div>
       </div>
     </PopupCardViewerContext.Provider>
+  );
+};
+
+const FindOrCreateBar = () => {
+  let [open, setOpen] = useState(false);
+  let { open: openCard } = usePopupCardViewer();
+  let titles = useIndex
+    .aev(open ? "card/title" : null)
+    .filter((f) => !!f.value);
+  let members = useIndex.aev("member/name");
+  const decks = useIndex.aev(open ? "deck" : null);
+  let items = titles
+    .map((t) => {
+      return {
+        entity: t.entity,
+        display: t.value,
+        icon: !!decks.find((d) => t.entity === d.entity) ? (
+          <DeckSmall />
+        ) : (
+          <CardIcon />
+        ),
+      };
+    })
+    .concat(
+      members.map((m) => {
+        return {
+          entity: m.entity,
+          display: m.value,
+          icon: <Member />,
+        };
+      })
+    );
+
+  let { authorized, mutate } = useMutations();
+  return (
+    <>
+      <button className="flex items-center" onClick={() => setOpen(true)}>
+        <div className="lightborder px-3 py-1 italic bg-white border border-grey-80 rounded-l-md text-grey-80">
+          {" "}
+          find or create a card...
+        </div>
+        <div className="text-accent-blue bg-bg-blue border border-accent-blue  rounded-r-md px-3 py-1">
+          <SearchOrCommand />
+        </div>
+      </button>
+      <FindOrCreate
+        allowBlank={true}
+        onClose={() => setOpen(false)}
+        //START OF ON SELECT LOGIC
+        onSelect={async (d) => {
+          let entity;
+          if (d.type === "create") {
+            entity = ulid();
+            if (d.name) {
+              await mutate("createCard", {
+                entityID: entity,
+                title: d.name,
+              });
+            }
+          } else {
+            entity = d.entity;
+          }
+          openCard({ entityID: entity });
+        }}
+        // END OF ONSELECT LOGIC
+        selected={[]}
+        open={open}
+        items={items}
+      />
+    </>
   );
 };
 
