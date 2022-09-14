@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import { AddTiny } from "./Icons";
 import { ReferenceAttributes } from "data/Attributes";
 import { SortableContext, useSortable } from "@dnd-kit/sortable";
+import useMeasure from "react-use-measure";
 
 export type StackData = {
   parent: string;
@@ -51,7 +52,7 @@ export const CardStack = (props: { cards: string[] } & StackData) => {
               key={card}
               entity={card}
               currentIndex={currentIndex}
-              focused={currentIndex === focusedCardIndex}
+              focused={expandAll || currentIndex === focusedCardIndex}
               nextIndex={
                 currentIndex === props.cards.length - 1 ? 0 : currentIndex + 1
               }
@@ -119,8 +120,9 @@ const Card = (
     last: boolean;
   } & StackData
 ) => {
+  let [ref, { height }] = useMeasure();
   const CardHeightAnim = useSpring({
-    maxHeight: props.focused ? 480 : 48,
+    maxHeight: props.focused ? (props.expandAll ? height : 480) : 48,
   });
 
   let data = {
@@ -130,11 +132,17 @@ const Card = (
     positionKey: props.positionKey,
   };
   let { query: q } = useRouter();
-  const { attributes, listeners, setNodeRef, transition, transform } =
-    useSortable({
-      id: props.entity,
-      data,
-    });
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transition,
+    transform,
+    isDragging,
+  } = useSortable({
+    id: props.entity,
+    data,
+  });
 
   const style = {
     transform: transform
@@ -155,29 +163,20 @@ const Card = (
         }}
         ref={setNodeRef}
         style={
-          props.expandAll
-            ? { marginBottom: "12px" }
-            : props.focused && !props.last
+          !props.last
             ? {
                 overflow: "hidden",
-                marginBottom: "12px",
+                marginBottom: props.focused ? "12px" : "-12px",
                 ...CardHeightAnim,
-              }
-            : props.last
-            ? {
-                overflow: "hidden",
-                height: "auto",
-                maxHeight: "480px",
               }
             : {
                 overflow: "hidden",
-                marginBottom: "-12px",
-                ...CardHeightAnim,
+                height: "auto",
               }
         }
         className={`cardWrapper -mr-4`}
       >
-        <div className="">
+        <div ref={ref} className="">
           <CardPreview
             dragHandleProps={{ listeners, attributes }}
             entityID={props.entity}
