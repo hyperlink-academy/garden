@@ -73,3 +73,37 @@ function sortCollisionsDesc(
 ) {
   return b - a;
 }
+
+export const cardStackCollisionDetection: CollisionDetection = ({
+  collisionRect,
+  droppableRects,
+  droppableContainers,
+}) => {
+  const collisions: CollisionDescriptor[] = [];
+  for (const droppableContainer of droppableContainers) {
+    const { id } = droppableContainer;
+    const rect = droppableRects.get(id);
+
+    let draggingRect = { ...collisionRect, height: 1 };
+    if (rect) {
+      const [intersectionRatio, targetRatio] = getIntersectionRatio(
+        rect,
+        draggingRect
+      );
+
+      if (intersectionRatio > 0) {
+        collisions.push({
+          id,
+          data: {
+            droppableContainer,
+            value: intersectionRatio,
+            targetRatio,
+            top: rect.top,
+          },
+        });
+      }
+    }
+  }
+
+  return collisions.sort((a, b) => b.data.top - a.data.top);
+};

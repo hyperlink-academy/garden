@@ -1,25 +1,22 @@
 import {
   Active,
-  closestCenter,
   DndContext,
   DragOverlay,
   MouseSensor,
   TouchSensor,
-  useDroppable,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { ReferenceAttributes } from "data/Attributes";
 import {
   ReplicacheContext,
   scanIndex,
   useMutations,
 } from "hooks/useReplicache";
 import { useContext, useState } from "react";
-import { createPortal } from "react-dom";
-import { animated, useTransition } from "@react-spring/web";
 import { sortByPosition, updatePositions } from "src/position_helpers";
-import { SmallCard } from "./SmallCard";
+import { CardPreview } from "./CardPreview";
+import { cardStackCollisionDetection } from "src/customCollisionDetection";
+import { StackData } from "./CardStack";
 
 export const SmallCardDragContext: React.FC = (props) => {
   let [activeCard, setActiveCard] = useState<Active | null>(null);
@@ -30,102 +27,65 @@ export const SmallCardDragContext: React.FC = (props) => {
   let rep = useContext(ReplicacheContext);
   return (
     <DndContext
-      collisionDetection={closestCenter}
+      collisionDetection={cardStackCollisionDetection}
       sensors={sensors}
+      modifiers={[
+        (args) => {
+          let { transform } = args;
+          return {
+            ...transform,
+          };
+        },
+      ]}
       onDragStart={({ active }) => {
         setActiveCard(active);
       }}
       onDragEnd={async (data) => {
         let { over, active } = data;
-        setActiveCard(null);
-        if (!rep?.rep) return;
-        if (over) {
-          if (!active) return;
-          if (over.id === "delete") {
-            mutate("retractFact", { id: active.id as string });
-            return;
-          }
-          let index = over.data.current?.index;
-          let currentIndex: number | undefined = active.data.current?.index;
-          let parent: string | undefined = over.data.current?.parent;
-          let section: keyof ReferenceAttributes | undefined =
-            over.data.current?.section;
-          let positionKey: string | undefined = over.data.current?.positionKey;
+        if (!over || !rep?.rep) return;
+        let overData = over.data.current as StackData & { entityID: string };
+        let activeData = active.data.current as StackData & {
+          entityID: string;
+        };
+        console.log(overData);
+        let siblings = (
+          await rep.rep.query((tx) => {
+            return scanIndex(tx).eav(overData.parent, overData.attribute);
+          })
+        ).sort(sortByPosition(overData.positionKey));
 
-          if (
-            index === undefined ||
-            currentIndex === undefined ||
-            !positionKey ||
-            !parent ||
-            !section
-          )
-            return;
-
-          let siblings = (
-            await rep.rep.query((tx) => {
-              if (!parent || !section) return [];
-              return scanIndex(tx).eav(parent, section);
-            })
-          ).sort(sortByPosition(positionKey));
-          let newPositions = updatePositions(positionKey, siblings, [
-            [active.id as string, currentIndex < index ? index : index - 1],
-          ]);
-          await mutate("updatePositions", {
-            positionKey: positionKey,
-            newPositions,
-          });
-        }
+        let currentIndex = siblings.findIndex(
+          (f) => f.value.value === activeData.entityID
+        );
+        let newIndex = siblings.findIndex(
+          (f) => f.value.value === overData.entityID
+        );
+        let newPositions = updatePositions(overData.positionKey, siblings, [
+          [
+            siblings[currentIndex].id,
+            currentIndex < newIndex ? newIndex : newIndex - 1,
+          ],
+        ]);
+        console.log(siblings);
+        console.log(newPositions);
+        mutate("updatePositions", {
+          positionKey: overData.positionKey,
+          newPositions,
+        });
       }}
     >
       {props.children}
-      <DragOverlay dropAnimation={null}>
-        {activeCard ? (
-          <SmallCard
-            entityID={activeCard.data.current?.entityID}
-            href=""
-            draggable={true}
-          />
-        ) : null}
+      <DragOverlay>
+        {activeCard && (
+          <div className="touch-none pointer-events-none">
+            <CardPreview
+              href=""
+              entityID={activeCard.data.current?.entityID}
+              size={"big"}
+            />
+          </div>
+        )}
       </DragOverlay>
-      {<DeleteZone display={!!activeCard} />}
     </DndContext>
-  );
-};
-
-const DeleteZone = (props: { display: boolean }) => {
-  let { setNodeRef, isOver } = useDroppable({ id: "delete" });
-  let transition = useTransition(props.display, {
-    config: { mass: 0.1, tension: 500, friction: 25 },
-    from: { width: 0 },
-    enter: { width: 32 },
-    update: { width: isOver ? 64 : 32 },
-    leave: { width: 0 },
-    delay: 100,
-    reverse: props.display,
-  });
-  return transition(
-    (a, show) =>
-      show &&
-      createPortal(
-        <animated.div
-          className="rounded-md"
-          style={{
-            writingMode: "vertical-lr",
-            position: "fixed",
-            height: "calc(100vh - 256px)",
-            right: 0,
-            zIndex: 50,
-            width: a.width.to((w) => `${w}px`),
-            top: "96px",
-            background: "lightgrey",
-            textAlign: "center",
-            verticalAlign: "bottom",
-            overflow: "hidden",
-          }}
-        >
-          <div ref={setNodeRef}>Drag here to delete</div>
-        </animated.div>,
-        document.body
-      )
   );
 };

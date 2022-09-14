@@ -213,7 +213,15 @@ export const MultipleReferenceSection = (props: {
   let [open, setOpen] = useState(false);
   return (
     <div className="flex flex-col gap-4">
-      <CardStack cards={references?.map((c) => c.value.value) || []} />
+      <CardStack
+        positionKey="eav"
+        cards={
+          references?.sort(sortByPosition("eav")).map((c) => c.value.value) ||
+          []
+        }
+        parent={props.entityID}
+        attribute={props.section}
+      />
     </div>
   );
 };

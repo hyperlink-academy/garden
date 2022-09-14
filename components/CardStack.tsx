@@ -1,14 +1,19 @@
-import type { NextPage } from "next";
-import React, { useEffect, useRef, useState } from "react";
-import * as Slider from "@radix-ui/react-slider";
+import { useState } from "react";
 import { CardPreview } from "./CardPreview";
 import { useSpring, animated } from "@react-spring/web";
-import useMeasure from "react-use-measure";
-import { usePrevious } from "hooks/utils";
 import { useRouter } from "next/router";
-import { Add, AddTiny } from "./Icons";
+import { AddTiny } from "./Icons";
+import { ReferenceAttributes } from "data/Attributes";
+import { SortableContext, useSortable } from "@dnd-kit/sortable";
 
-export const CardStack = (props: { cards: string[] }) => {
+export type StackData = {
+  parent: string;
+  attribute: keyof ReferenceAttributes;
+  positionKey: string;
+  backlink?: boolean;
+};
+
+export const CardStack = (props: { cards: string[] } & StackData) => {
   let [expandAll, setExpandAll] = useState(false);
   let [focusedCardIndex, setFocusedCardIndex] = useState(-1);
 
@@ -34,43 +39,52 @@ export const CardStack = (props: { cards: string[] }) => {
             <AddTiny />
           </div>
         </div>
-        {props.cards.map((card, currentIndex) => (
-          <Card
-            key={card}
-            entity={card}
-            last={currentIndex === props.cards.length - 1}
-            focused={currentIndex === focusedCardIndex}
-            expandAll={expandAll}
-            onClick={(e) => {
-              setFocusedCardIndex(currentIndex);
+        <SortableContext items={props.cards}>
+          {props.cards.map((card, currentIndex) => (
+            <Card
+              expandAll={expandAll}
+              parent={props.parent}
+              attribute={props.attribute}
+              backlink={props.backlink}
+              positionKey={props.positionKey}
+              last={currentIndex === props.cards.length - 1}
+              key={card}
+              entity={card}
+              currentIndex={currentIndex}
+              focused={currentIndex === focusedCardIndex}
+              nextIndex={
+                currentIndex === props.cards.length - 1 ? 0 : currentIndex + 1
+              }
+              onClick={(e) => {
+                setFocusedCardIndex(currentIndex);
+                let element = e.currentTarget;
+                setTimeout(
+                  // if parent is bottomed, do nothing. else:
+                  () => {
+                    let offsetContainerTop =
+                      element.offsetTop - element.scrollTop;
+                    function getCardParent(
+                      node: HTMLElement | null
+                    ): HTMLElement | undefined {
+                      if (!node) return undefined;
+                      if (node.classList.contains("cardContent")) return node;
+                      return getCardParent(node.parentElement);
+                    }
+                    let cardParent = getCardParent(element.parentElement);
 
-              let element = e.currentTarget;
-              setTimeout(
-                // if parent is bottomed, do nothing. else:
-                () => {
-                  let offsetContainerTop =
-                    element.offsetTop - element.scrollTop;
-                  function getCardParent(
-                    node: HTMLElement | null
-                  ): HTMLElement | undefined {
-                    if (!node) return undefined;
-                    if (node.classList.contains("cardContent")) return node;
-                    return getCardParent(node.parentElement);
-                  }
-                  let cardParent = getCardParent(element.parentElement);
+                    if (!cardParent) return;
 
-                  if (!cardParent) return;
-
-                  cardParent.scrollTo({
-                    top: offsetContainerTop - 20,
-                    behavior: "smooth",
-                  });
-                },
-                410
-              );
-            }}
-          />
-        ))}
+                    cardParent.scrollTo({
+                      top: offsetContainerTop - 20,
+                      behavior: "smooth",
+                    });
+                  },
+                  410
+                );
+              }}
+            />
+          ))}
+        </SortableContext>
       </div>
       {props.cards.length === 0 ? (
         <div className="w-4 sm:w-6" />
@@ -94,60 +108,84 @@ export const CardStack = (props: { cards: string[] }) => {
   );
 };
 
-const Card = (props: {
-  entity: string;
-  onClick: (e: React.MouseEvent<HTMLDivElement>) => void;
-  focused?: boolean;
-  last: boolean;
-  expandAll: boolean;
-}) => {
-  const [ref, data] = useMeasure();
-
+const Card = (
+  props: {
+    entity: string;
+    currentIndex: number;
+    nextIndex?: number;
+    onClick: (e: React.MouseEvent<HTMLDivElement>) => void;
+    focused?: boolean;
+    expandAll: boolean;
+    last: boolean;
+  } & StackData
+) => {
   const CardHeightAnim = useSpring({
     maxHeight: props.focused ? 480 : 48,
   });
 
+  let data = {
+    entityID: props.entity,
+    parent: props.parent,
+    attribute: props.attribute,
+    positionKey: props.positionKey,
+  };
   let { query: q } = useRouter();
+  const { attributes, listeners, setNodeRef, transition, transform } =
+    useSortable({
+      id: props.entity,
+      data,
+    });
+
+  const style = {
+    transform: transform
+      ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
+      : undefined,
+    transition,
+  };
 
   // console.log(props.active === true ? "height %:" + heightPercent : null)
   return (
     // if card is focused, then increase the height
-    <animated.div
-      onClick={(e) => {
-        props.onClick(e);
-        // console.log(data);
-      }}
-      ref={ref}
-      style={
-        props.expandAll
-          ? { marginBottom: "12px" }
-          : props.focused && !props.last
-          ? {
-              overflow: "hidden",
-              marginBottom: "12px",
-              ...CardHeightAnim,
-            }
-          : props.last
-          ? {
-              overflow: "hidden",
-              height: "auto",
-              maxHeight: "480px",
-            }
-          : {
-              overflow: "hidden",
-              marginBottom: "-12px",
-              ...CardHeightAnim,
-            }
-      }
-      className={`cardWrapper -mr-4`}
-    >
-      <div className="">
-        <CardPreview
-          entityID={props.entity}
-          size={"big"}
-          href={`/s/${q.studio}/s/${q.space}/c/${props.entity}`}
-        />
-      </div>
-    </animated.div>
+
+    <div style={style}>
+      <animated.div
+        onClick={(e) => {
+          props.onClick(e);
+          // console.log(data);
+        }}
+        ref={setNodeRef}
+        style={
+          props.expandAll
+            ? { marginBottom: "12px" }
+            : props.focused && !props.last
+            ? {
+                overflow: "hidden",
+                marginBottom: "12px",
+                ...CardHeightAnim,
+              }
+            : props.last
+            ? {
+                overflow: "hidden",
+                height: "auto",
+                maxHeight: "480px",
+              }
+            : {
+                overflow: "hidden",
+                marginBottom: "-12px",
+                ...CardHeightAnim,
+              }
+        }
+        className={`cardWrapper -mr-4`}
+      >
+        <div className="">
+          <CardPreview
+            dragHandleProps={{ listeners, attributes }}
+            entityID={props.entity}
+            size={"big"}
+            href={`/s/${q.studio}/s/${q.space}/c/${props.entity}`}
+          />
+        </div>
+      </animated.div>
+    </div>
   );
 };
