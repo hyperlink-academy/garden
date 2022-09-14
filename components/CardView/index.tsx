@@ -1,4 +1,4 @@
-import { Menu } from "@headlessui/react";
+import { Menu, Transition } from "@headlessui/react";
 
 import {
   MoreOptions,
@@ -23,7 +23,7 @@ import { spacePath, usePreserveScroll, usePrevious } from "hooks/utils";
 import Link from "next/link";
 import { useAuth } from "hooks/useAuth";
 import { ImageSection } from "./ImageSection";
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import { flag } from "data/Facts";
 import { ButtonPrimary } from "components/Buttons";
@@ -198,7 +198,7 @@ export const CardView = (props: {
           <div className="cardDefaultSection grid grid-auto-rows gap-3">
             <div className="cardHeader grid grid-cols-[auto_max-content_max-content] gap-2">
               <Title entityID={props.entityID} />
-              <div className="-mt-1">
+              <div>
                 <button
                   className="cardHighlighter rounded-full bg-test-pink h-[28px] w-[28px]"
                   onClick={() => {
@@ -206,16 +206,13 @@ export const CardView = (props: {
                     console.log(highlightDropdown);
                   }}
                 />
-                {highlightDropdown ? (
-                  <HighlightDropdown
-                    onSubmit={() => {
-                      setHighlightDropdown(false);
-                      console.log(highlightDropdown);
-                    }}
-                  />
-                ) : (
-                  ""
-                )}
+                <HighlightDropdown
+                  open={highlightDropdown}
+                  onSubmit={() => {
+                    setHighlightDropdown(false);
+                    console.log(highlightDropdown);
+                  }}
+                />
               </div>
               <div className="">
                 <CardMoreOptionsMenu
@@ -384,12 +381,36 @@ const CardMoreOptionsMenu = (props: {
   );
 };
 
-const HighlightDropdown = (props: { onSubmit: () => void }) => {
+const HighlightDropdown = (props: { open: boolean; onSubmit: () => void }) => {
   let [highlightHelp, setHighlightHelp] = useState(false);
   let [highlightAdvancedOptions, setHighlightAdvancedOptions] = useState(false);
 
   return (
-    <div className="absolute top-16 right-4 left-8 rounded-md p-3 bg-white lightBorder flex flex-col gap-3">
+    // styled to match MenuContainer
+    <Transition
+      show={props.open}
+      enter="transition ease-out duration-100"
+      enterFrom="transform opacity-0 scale-95"
+      enterTo="transform opacity-100 scale-100"
+      leave="transition ease-in duration-75"
+      leaveFrom="transform opacity-100 scale-100"
+      leaveTo="transform opacity-0 scale-95"
+      className="
+          absolute
+          top-16 right-4 left-8
+          p-3 
+          bg-white
+          lightBorder
+          flex flex-col
+          gap-3
+          shadow-drop
+          justify-items-end 
+          text-right 
+          origin-top-right 
+          z-40 
+          
+          py-2"
+    >
       <div className="flex flex-col gap-2">
         <b>add a note (optional)</b>
         <textarea rows={4} className="lightBorder resize-none w-full p-3" />
@@ -463,6 +484,6 @@ const HighlightDropdown = (props: { onSubmit: () => void }) => {
       ) : (
         ""
       )}
-    </div>
+    </Transition>
   );
 };
