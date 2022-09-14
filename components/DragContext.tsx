@@ -47,18 +47,23 @@ export const SmallCardDragContext: React.FC = (props) => {
         let activeData = active.data.current as StackData & {
           entityID: string;
         };
-        console.log(overData);
         let siblings = (
           await rep.rep.query((tx) => {
+            if (overData.backlink)
+              return scanIndex(tx).vae(overData.parent, overData.attribute);
             return scanIndex(tx).eav(overData.parent, overData.attribute);
           })
         ).sort(sortByPosition(overData.positionKey));
 
+        console.log(siblings);
         let currentIndex = siblings.findIndex(
-          (f) => f.value.value === activeData.entityID
+          (f) =>
+            (overData.backlink ? f.entity : f.value.value) ===
+            activeData.entityID
         );
         let newIndex = siblings.findIndex(
-          (f) => f.value.value === overData.entityID
+          (f) =>
+            (overData.backlink ? f.entity : f.value.value) === overData.entityID
         );
         let newPositions = updatePositions(overData.positionKey, siblings, [
           [
@@ -66,7 +71,6 @@ export const SmallCardDragContext: React.FC = (props) => {
             currentIndex < newIndex ? newIndex : newIndex - 1,
           ],
         ]);
-        console.log(siblings);
         console.log(newPositions);
         mutate("updatePositions", {
           positionKey: overData.positionKey,

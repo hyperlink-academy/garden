@@ -1,8 +1,10 @@
+import { CardStack } from "components/CardStack";
 import { CollapseTiny } from "components/Icons";
 import { SmallCardList } from "components/SmallCardList";
 import { ReferenceAttributes } from "data/Attributes";
 import { useIndex } from "hooks/useReplicache";
 import ChatPage from "pages/s/[studio]/s/[space]/chat";
+import { sortByPosition } from "src/position_helpers";
 
 export const Backlinks = (props: {
   entityID: string;
@@ -109,13 +111,14 @@ const BacklinkSection = (props: {
     );
   return (
     <div className="flex flex-col gap-2">
+      {props.entityID}
       <p className="font-bold text-grey-55">{title}</p>
-      <SmallCardList
-        backlink={true}
-        attribute={props.attribute}
-        cards={cards || []}
-        deck={props.entityID}
+      <CardStack
+        parent={props.entityID}
+        cards={cards.sort(sortByPosition("vae")).map((f) => f.entity)}
+        backlink
         positionKey="vae"
+        attribute={props.attribute}
       />
     </div>
   );

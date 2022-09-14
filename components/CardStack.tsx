@@ -29,7 +29,6 @@ export const CardStack = (props: { cards: string[] } & StackData) => {
   let [expandAll, setExpandAll] = useState(false);
   let [focusedCardIndex, setFocusedCardIndex] = useState(-1);
 
-  // what do i need. If the value of the slider is =<10 units smaller than the index * 10, then change the max-h of that container.
   return (
     <div className="relative flex gap-2 w-full">
       <div className="grow">
@@ -126,6 +125,7 @@ const Card = (
   });
 
   let data = {
+    backlink: props.backlink,
     entityID: props.entity,
     parent: props.parent,
     attribute: props.attribute,
