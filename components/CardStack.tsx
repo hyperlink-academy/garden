@@ -34,7 +34,6 @@ export const CardStack = (props: { cards: string[] } & StackData) => {
       <div className="grow">
         <AddCard
           expanded={expandAll || props.cards.length === 0}
-          location="top"
           parent={props.parent}
           attribute={props.attribute}
           backlink={props.backlink}
@@ -91,7 +90,7 @@ export const CardStack = (props: { cards: string[] } & StackData) => {
         ) : (
           <AddCard
             expanded={expandAll || props.cards.length === 0}
-            location="bottom"
+            end
             parent={props.parent}
             attribute={props.attribute}
             backlink={props.backlink}
@@ -202,9 +201,7 @@ const Card = (
   );
 };
 
-const AddCard = (
-  props: { expanded: boolean; location: string } & StackData
-) => {
+const AddCard = (props: { expanded: boolean; end: boolean } & StackData) => {
   let [open, setOpen] = useState(false);
   let titles = useIndex
     .aev(open ? "card/title" : null)
@@ -254,21 +251,16 @@ const AddCard = (
           grid grid-cols-[auto_max-content] 
           border border-dashed border-grey-80 hover:border-accent-blue rounded-lg 
           text-grey-55 hover:text-accent-blue font-bold
+          justify-end
 
           ${
-            props.location == "top"
+            !props.end
               ? props.expanded
                 ? "gap-2 items-center justify-center mb-4"
                 : "pt-1 pl-4 pr-3 -mb-4"
-              : "justify-end"
-          }
-          ${
-            // MAYBE: always show larger view (same as expanded 'top') - ???
-            props.location == "bottom"
-              ? props.expanded
-                ? "gap-2 items-center justify-center mt-4"
-                : "-mt-4 pt-[18px] pl-4 pr-3"
-              : "justify-end"
+              : props.expanded
+              ? "gap-2 items-center justify-center mt-4"
+              : "-mt-4 pt-[18px] pl-4 pr-3"
           }
           `}
       >
@@ -285,9 +277,8 @@ const AddCard = (
           if (!rep?.rep) return;
           // if youre adding to a backlink section, then the entity is a string
           // if youre creating a new deck
+          let entity: string;
           if (props.backlink) {
-            let entity: string;
-
             if (d.type === "create") {
               entity = ulid();
               if (props.attribute === "deck/contains") {
@@ -322,9 +313,6 @@ const AddCard = (
               entity = d.entity;
             }
 
-            let cards = await rep.rep.query((tx) => {
-              return scanIndex(tx).eav(entity, props.attribute);
-            });
             if (props.attribute !== "deck/contains") {
               let existingSections = await rep.rep.query((tx) =>
                 scanIndex(tx).eav(entity, "card/section")
@@ -343,44 +331,67 @@ const AddCard = (
                 });
               }
             }
-            let lastPosition = cards.sort(sortByPosition("eav"))[
-              cards.length - 1
-            ]?.positions.eav;
+          } else {
+            if (d.type === "create") {
+              entity = ulid();
+              if (d.name) {
+                await mutate("createCard", {
+                  entityID: entity,
+                  title: d.name,
+                });
+              }
+            } else {
+              entity = d.entity;
+            }
+          }
+
+          let position;
+          let positionKey = props.backlink ? "vae" : "eav";
+
+          let siblings =
+            (await rep.rep.query((tx) => {
+              if (props.backlink)
+                return scanIndex(tx).vae(props.parent, props.attribute);
+              return scanIndex(tx).eav(props.parent, props.attribute);
+            })) || [];
+
+          if (props.end || props.backlink) {
+            let lastPosition = siblings.sort(sortByPosition(positionKey))[
+              siblings.length - 1
+            ]?.positions[positionKey];
+            position = generateKeyBetween(lastPosition || null, null);
+          } else {
+            let firstPosition = siblings.sort(sortByPosition(positionKey))[0]
+              ?.positions[positionKey];
+            position = generateKeyBetween(null, firstPosition || null);
+          }
+
+          if (props.backlink) {
+            let parentCards = await rep.rep.query((tx) => {
+              return scanIndex(tx).eav(entity, props.attribute);
+            });
+            let lastPosition = parentCards.sort(sortByPosition("eav"))[
+              parentCards.length - 1
+            ]?.positions["eav"];
+            let eav = generateKeyBetween(lastPosition || null, null);
             await mutate("addCardToSection", {
               cardEntity: props.parent,
               parent: entity,
               section: props.attribute,
               positions: {
-                eav: generateKeyBetween(lastPosition || null, null),
+                eav,
+                vae: position,
               },
             });
             return;
           }
 
-          let cards = await rep.rep.query((tx) => {
-            return scanIndex(tx).eav(props.parent, props.attribute);
-          });
-          let lastPosition = cards.sort(sortByPosition("eav"))[cards.length - 1]
-            ?.positions.eav;
-
-          let entity;
-          if (d.type === "create") {
-            entity = ulid();
-            if (d.name) {
-              await mutate("createCard", {
-                entityID: entity,
-                title: d.name,
-              });
-            }
-          } else {
-            entity = d.entity;
-          }
           await mutate("addCardToSection", {
             cardEntity: entity,
             parent: props.parent,
             section: props.attribute,
             positions: {
-              eav: generateKeyBetween(lastPosition || null, null),
+              eav: position,
             },
           });
         }}
