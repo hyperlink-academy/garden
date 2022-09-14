@@ -1,6 +1,6 @@
 import { DraggableAttributes } from "@dnd-kit/core";
 import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
-import { useIndex } from "hooks/useReplicache";
+import { useIndex, useMutations } from "hooks/useReplicache";
 import Link from "next/link";
 import { SingleTextSection } from "./CardView/Sections";
 import { GripperBG } from "./Gripper";
@@ -16,7 +16,6 @@ import { useDrag, usePinch } from "@use-gesture/react";
 import { isUrl } from "src/isUrl";
 import { useRef } from "react";
 import { usePopupCardViewer } from "./PopupCardViewer";
-import { Divider } from "./Layout";
 
 const borderStyles = (args: { isDeck: boolean; isMember: boolean }) => {
   switch (true) {
@@ -51,6 +50,7 @@ export const CardPreview = (
   let isDeck = !!useIndex.eav(props.entityID, "deck");
   let isMember = !!useIndex.eav(props.entityID, "member/name");
   let image = useIndex.eav(props.entityID, "card/image");
+
   return (
     <RotateAndResize {...props}>
       <div
@@ -96,6 +96,7 @@ export const RotateAndResize: React.FC<
     props.onRotateDrag?.(angle - memo);
     return angle;
   });
+  let { authorized } = useMutations();
 
   return (
     <div
@@ -113,12 +114,13 @@ export const RotateAndResize: React.FC<
       {props.children}
 
       {/* Rotate and Resize Handle */}
+
       <div
         ref={ref}
         className="text-grey-80 grid grid-rows-2 gap-1 pb-1 opacity-0 group-hover:opacity-100"
       >
         <div className="leading-3 ">
-          {props.onResize ? (
+          {authorized && props.onResize ? (
             <button
               className="hover:text-accent-blue"
               onClick={() =>
@@ -132,7 +134,7 @@ export const RotateAndResize: React.FC<
           )}
         </div>
 
-        {props.onRotateDrag && (
+        {authorized && props.onRotateDrag && (
           <div {...bind()} className="touch-none hover:text-accent-blue  ">
             <DragRotateHandle />
           </div>
@@ -146,6 +148,7 @@ export const RotateAndResize: React.FC<
 const SmallCardBody = (props: { entityID: string } & SharedProps) => {
   let isMember = !!useIndex.eav(props.entityID, "member/name");
   let { open } = usePopupCardViewer();
+  let { authorized } = useMutations();
 
   let member = useIndex.eav(props.entityID, "member/name");
   let title = useIndex.eav(props.entityID, "card/title");
@@ -168,7 +171,7 @@ const SmallCardBody = (props: { entityID: string } & SharedProps) => {
         background: imageUrl ? `url(${imageUrl})` : "",
       }}
     >
-      {props.dragHandleProps ? (
+      {authorized && props.dragHandleProps ? (
         <div
           className="gripper group pl-1 pr-2"
           {...props.dragHandleProps.attributes}
@@ -261,6 +264,7 @@ const BigCardBody = (props: { entityID: string } & SharedProps) => {
   let isMember = !!useIndex.eav(props.entityID, "member/name");
   let sections = useIndex.eav(props.entityID, "card/section");
   let image = useIndex.eav(props.entityID, "card/image");
+  let { authorized } = useMutations();
 
   let { open } = usePopupCardViewer();
 
@@ -277,7 +281,7 @@ const BigCardBody = (props: { entityID: string } & SharedProps) => {
     >
       {/* Gripper  */}
       <div className="pl-1 pr-2 text-grey-80">
-        {props.dragHandleProps ? (
+        {authorized && props.dragHandleProps ? (
           <div className="h-full">
             <GripperBG
               {...props.dragHandleProps.attributes}

@@ -209,7 +209,7 @@ const ResizeCanvas = (props: { canvasEntity: string }) => {
     >
       {authorized && (
         <button
-          className="flex flex-row text-grey-80 items-center hover:text-accent-blue"
+          className="flex flex-row z-[9999999999] text-grey-80 items-center hover:text-accent-blue"
           onClick={() => {
             mutate("assertFact", {
               entity: props.canvasEntity,
@@ -232,7 +232,7 @@ const ResizeCanvas = (props: { canvasEntity: string }) => {
         <button
           onMouseEnter={() => setHoveringLess(true)}
           onMouseLeave={() => setHoveringLess(false)}
-          className="flex flex-row text-grey-80 items-center hover:text-accent-red"
+          className="flex flex-row z-[9999999999] text-grey-80 items-center hover:text-accent-red"
           onClick={() => {
             mutate("assertFact", {
               entity: props.canvasEntity,
