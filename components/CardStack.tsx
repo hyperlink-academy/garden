@@ -34,6 +34,7 @@ export const CardStack = (props: { cards: string[] } & StackData) => {
       <div className="grow">
         <AddCard
           expanded={expandAll || props.cards.length === 0}
+          location="top"
           parent={props.parent}
           attribute={props.attribute}
           backlink={props.backlink}
@@ -85,6 +86,18 @@ export const CardStack = (props: { cards: string[] } & StackData) => {
             />
           ))}
         </SortableContext>
+        {props.cards.length === 0 ? (
+          ""
+        ) : (
+          <AddCard
+            expanded={expandAll || props.cards.length === 0}
+            location="bottom"
+            parent={props.parent}
+            attribute={props.attribute}
+            backlink={props.backlink}
+            positionKey={props.positionKey}
+          />
+        )}
       </div>
       {props.cards.length === 0 ? (
         <div className="w-4 sm:w-6" />
@@ -189,7 +202,9 @@ const Card = (
   );
 };
 
-const AddCard = (props: { expanded: boolean } & StackData) => {
+const AddCard = (
+  props: { expanded: boolean; location: string } & StackData
+) => {
   let [open, setOpen] = useState(false);
   let titles = useIndex
     .aev(open ? "card/title" : null)
@@ -236,16 +251,28 @@ const AddCard = (props: { expanded: boolean } & StackData) => {
         className={`
           cardStackNewCard 
           w-full h-12 
-          grid grid-cols-[auto_max-content] gap-2 
+          grid grid-cols-[auto_max-content] 
           border border-dashed border-grey-80 hover:border-accent-blue rounded-lg 
           text-grey-55 hover:text-accent-blue font-bold
+
           ${
-            props.expanded
-              ? "items-center justify-center mb-4"
-              : "pt-1 pl-4 pr-3 -mb-4"
-          }`}
+            props.location == "top"
+              ? props.expanded
+                ? "gap-2 items-center justify-center mb-4"
+                : "pt-1 pl-4 pr-3 -mb-4"
+              : "justify-end"
+          }
+          ${
+            // MAYBE: always show larger view (same as expanded 'top') - ???
+            props.location == "bottom"
+              ? props.expanded
+                ? "gap-2 items-center justify-center mt-4"
+                : "-mt-4 pt-[18px] pl-4 pr-3"
+              : "justify-end"
+          }
+          `}
       >
-        Add Card
+        {props.expanded ? "Add Card" : ""}
         <div className="h-6 pt-1">
           <AddTiny />
         </div>
