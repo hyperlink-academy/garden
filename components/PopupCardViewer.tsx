@@ -41,12 +41,26 @@ export const PopupCardViewer: React.FC = (props) => {
           }),
       }}
     >
-      <div className="mx-auto h-full w-full flex flex-row gap-2 snap-x snap-mandatory overflow-x-scroll">
+      <div
+        className={`
+        pageWrapper 
+        pr-2 pl-[calc((100vw-352px)/2)] sm:px-8 
+        h-full w-full 
+        flex flex-row gap-8 
+        snap-x snap-mandatory overflow-x-scroll 
+        sm:justify-center`}
+      >
         {props.children}
 
         <div
           ref={ref}
-          className={`h-full w-[calc(100%-32px)] max-w-3xl snap-center flex-shrink-0 pb-1.5 focus:outline-none py-1 pr-2 touch-pan-x flex flex-col items-stretch`}
+          className={`cardWrapper 
+          h-full w-[calc(100vw-16px)] max-w-3xl 
+          pt-2 pb-4 sm:pt-4 sm:pb-8 
+          shrink-0 sm:shrink        
+          focus:outline-none
+          snap-center touch-pan-x 
+          flex flex-col items-stretch`}
         >
           {state.history[0] && (
             <>

@@ -317,7 +317,9 @@ const BigCardBody = (props: { entityID: string } & SharedProps) => {
         {/* Big Card Preview Default Content */}
         <div
           className={`${
-            isMember ? "bg-white rounded-md p-2 pb-0 text-accent-red mt-1" : ""
+            isMember
+              ? "bg-white rounded-md p-2 pb-0 text-accent-red mt-1 mb-2"
+              : ""
           }`}
         >
           {!image ? null : (
@@ -330,7 +332,7 @@ const BigCardBody = (props: { entityID: string } & SharedProps) => {
             entityID={props.entityID}
             section="card/content"
             placeholderOnHover={true}
-            className={`whitespace-pre-wrap truncate leading-tight  pt-1 pb-3 ${
+            className={`whitespace-pre-wrap truncate leading-tight pt-1 pb-3 ${
               !image ? "" : "rounded-[3px] px-1 bg-white/75"
             } `}
           />
@@ -340,7 +342,7 @@ const BigCardBody = (props: { entityID: string } & SharedProps) => {
         {sections !== null && sections.length === 0 ? (
           <div />
         ) : (
-          <small className="SectionCounter text-grey-80 hover:text-accent-blue hover:underline pb-1">
+          <small className="SectionCounter text-grey-80 hover:text-accent-blue hover:underline pb-1 ">
             <Link href={props.href}>
               <a>+ {sections?.length} sections</a>
             </Link>

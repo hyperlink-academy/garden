@@ -46,9 +46,9 @@ const contentStyles = (args: { deck: boolean; member: boolean }) => {
     case args.member:
       return `bg-white rounded-md ml-2 mr-2 mb-2 mt-0 px-3 pt-3 pb-6`;
     case args.deck:
-      return `px-4 py-6`;
+      return `px-3 py-4 sm:px-4 sm:py-6`;
     default:
-      return `px-4 py-6`;
+      return `px-3 py-4  sm:px-4 sm:py-6`;
   }
 };
 export const CardView = (props: {

@@ -73,9 +73,9 @@ export const CardStack = (props: { cards: string[] }) => {
         ))}
       </div>
       {props.cards.length === 0 ? (
-        <div className="w-6" />
+        <div className="w-4 sm:w-6" />
       ) : (
-        <div className="relative flex flex-col w-6">
+        <div className="relative flex flex-col w-4 sm:w-6">
           <div className="sticky top-0 -8 z-20 mb-14 mt-2 rotate-90">
             <button
               onClick={() => {
