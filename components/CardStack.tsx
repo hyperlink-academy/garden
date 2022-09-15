@@ -201,7 +201,7 @@ const Card = (
   );
 };
 
-const AddCard = (props: { expanded: boolean; end: boolean } & StackData) => {
+const AddCard = (props: { expanded: boolean; end?: boolean } & StackData) => {
   let [open, setOpen] = useState(false);
   let titles = useIndex
     .aev(open ? "card/title" : null)
