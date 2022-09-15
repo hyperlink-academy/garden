@@ -8,7 +8,7 @@ import { useMemo, useState } from "react";
 export default function HighlightPage() {
   let router = useRouter();
   let time = useMemo(() => {
-    Date.now() - 24 * 60 * 60 * 1000;
+    return Date.now() - 24 * 60 * 60 * 1000;
   }, []);
 
   let cards = useIndex.at("highlight/time", time);
