@@ -25,10 +25,10 @@ import { useAuth } from "hooks/useAuth";
 import { ImageSection } from "./ImageSection";
 import { Fragment, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
-import { flag } from "data/Facts";
+import { flag, ref } from "data/Facts";
 import { ButtonPrimary } from "components/Buttons";
-import { hasProps } from "@react-spring/core/dist/declarations/src/helpers";
 import { Textarea } from "components/Textarea";
+import { ulid } from "src/ulid";
 
 const borderStyles = (args: { deck: boolean; member: boolean }) => {
   switch (true) {
@@ -63,7 +63,6 @@ export const CardView = (props: {
   let { ref } = usePreserveScroll<HTMLDivElement>();
   let { session } = useAuth();
   let [open, setOpen] = useState<"card" | "backlink">("card");
-  let [highlightDropdown, setHighlightDropdown] = useState(false);
 
   let previousOpen = usePrevious(open);
   useEffect(() => {
@@ -199,20 +198,7 @@ export const CardView = (props: {
           <div className="cardDefaultSection grid grid-auto-rows gap-3">
             <div className="cardHeader grid grid-cols-[auto_max-content_max-content] gap-2">
               <Title entityID={props.entityID} />
-              <div>
-                <button
-                  className="cardHighlighter rounded-full bg-test-pink h-[28px] w-[28px]"
-                  onClick={() => {
-                    setHighlightDropdown(!highlightDropdown);
-                  }}
-                />
-                <HighlightDropdown
-                  open={highlightDropdown}
-                  onSubmit={() => {
-                    setHighlightDropdown(false);
-                  }}
-                />
-              </div>
+              <HighlightDropdown entityID={props.entityID} />
               <div className="">
                 <CardMoreOptionsMenu
                   onDelete={props.onDelete}
@@ -238,21 +224,6 @@ export const CardView = (props: {
           <AddSection cardEntity={props.entityID} />
         </div>
         {/* END CARD CONTENT */}
-
-        {/* THE NAME OF THE CARD SHOWS AT THE VERY BOTTOM IF BACKLINKS ARE OPEN */}
-        {/* <small
-          className={` font-bold ${
-            !memberName ? "text-grey-35" : "text-white"
-          } px-4 pb-1 transition-opacity ${
-            open === "card" ? "hidden" : "block"
-          }`}
-        >
-          {!!cardTitle
-            ? cardTitle.value
-            : !!memberName
-            ? memberName.value
-            : "Untitled"}
-        </small> */}
       </div>
 
       <Backlinks
@@ -380,24 +351,31 @@ const CardMoreOptionsMenu = (props: {
   );
 };
 
-const HighlightDropdown = (props: { open: boolean; onSubmit: () => void }) => {
+const HighlightDropdown = (props: { entityID: string }) => {
+  let [open, setOpen] = useState(false);
   let [highlightHelp, setHighlightHelp] = useState(false);
-  let [highlightAdvancedOptions, setHighlightAdvancedOptions] = useState(false);
-
-  const [message, setMessage] = useState("");
-  const maxChars = 280;
+  let [note, setNote] = useState("");
+  let { authorized, mutate, memberEntity } = useMutations();
 
   return (
-    // styled to match MenuContainer
-    <Transition
-      show={props.open}
-      enter="transition ease-out duration-100"
-      enterFrom="transform opacity-0 scale-95"
-      enterTo="transform opacity-100 scale-100"
-      leave="transition ease-in duration-75"
-      leaveFrom="transform opacity-100 scale-100"
-      leaveTo="transform opacity-0 scale-95"
-      className="
+    <>
+      {authorized && (
+        <button
+          className="cardHighlighter rounded-full bg-test-pink h-[28px] w-[28px]"
+          onClick={() => {
+            setOpen(!open);
+          }}
+        />
+      )}
+      <Transition
+        show={open}
+        enter="transition ease-out duration-100"
+        enterFrom="transform opacity-0 scale-95"
+        enterTo="transform opacity-100 scale-100"
+        leave="transition ease-in duration-75"
+        leaveFrom="transform opacity-100 scale-100"
+        leaveTo="transform opacity-0 scale-95"
+        className="
           absolute
           top-16 right-4 left-4
           px-4 py-4
@@ -410,86 +388,76 @@ const HighlightDropdown = (props: { open: boolean; onSubmit: () => void }) => {
           text-right
           origin-top-right 
           z-40"
-    >
-      <div className="flex flex-col gap-2">
-        <Textarea
-          maxChars={maxChars}
-          placeholder="add a note (optional)"
-          className="lightBorder resize-none w-full p-3 text-left"
-          value={message}
-          onChange={(e) => setMessage(e.currentTarget.value)}
-        />
-      </div>
-      <div className="flex flex-col gap-2">
-        <div
-          className="flex gap-2 items-center"
-          onClick={() => setHighlightAdvancedOptions(!highlightAdvancedOptions)}
-        >
-          {!highlightAdvancedOptions ? (
-            <>
-              <b>more options</b>
-              <ExpandTiny />
-            </>
-          ) : (
-            <>
-              <b>hide options</b>
-              <CollapseTiny />
-            </>
-          )}
-        </div>
-        {highlightAdvancedOptions ? (
-          <>
-            <p>
-              trigger in{" "}
-              <input
-                type="number"
-                min={0}
-                id="highlightDelay"
-                className="w-16 py-1 px-2 border-grey-90"
-              />{" "}
-              days.
-            </p>
-            <p>
-              fade after{" "}
-              <input
-                type="number"
-                min={1}
-                id="highlightfade"
-                className=" w-16 py-1 px-2 border-grey-90"
-              />{" "}
-              days.
-            </p>
-          </>
-        ) : (
-          " "
-        )}
-      </div>
-      <div className="flex justify-between items-end text-accent-blue">
-        <small onClick={() => setHighlightHelp(!highlightHelp)}>
-          {!highlightHelp ? "What's this?" : "Gotcha!"}
-        </small>
-
-        <ButtonPrimary
-          content="Submit"
-          disabled={message.length > maxChars}
-          onClick={() => {
-            props.onSubmit();
-          }}
-        />
-      </div>
-      {highlightHelp ? (
-        <div className="lightBorder bg-background p-3 -mt-1">
-          <small>
-            <b>Use a highlight to draw attention to this card.</b>
-            <br />
-            It'll be added to the highlight reel on the desktop with your note
-            where everyone can see it. <br />
-            Highlights fade after 24 hours!
+      >
+        <div className="flex flex-col gap-2">
+          <Textarea
+            placeholder="add a note (optional)"
+            className="lightBorder resize-none w-full p-3 text-left"
+            value={note}
+            onChange={(e) => setNote(e.currentTarget.value)}
+          />
+          <small className="text-right justify-self-end">
+            <span className={note.length > 280 ? "text-accent-red" : ""}>
+              {note.length}
+            </span>
+            /{280}
           </small>
         </div>
-      ) : (
-        ""
-      )}
-    </Transition>
+        <div className="flex justify-between items-end text-accent-blue">
+          <small onClick={() => setHighlightHelp(!highlightHelp)}>
+            {!highlightHelp ? "What's this?" : "Gotcha!"}
+          </small>
+
+          <ButtonPrimary
+            content="Submit"
+            onClick={async () => {
+              if (!memberEntity) return;
+              let entity = ulid();
+              await mutate("assertFact", [
+                {
+                  entity,
+                  positions: {},
+                  attribute: "highlight/time",
+                  value: { type: "unix_seconds", value: Date.now().toString() },
+                },
+
+                {
+                  entity,
+                  positions: {},
+                  attribute: "highlight/card",
+                  value: ref(props.entityID),
+                },
+                {
+                  entity,
+                  positions: {},
+                  attribute: "highlight/by",
+                  value: ref(memberEntity),
+                },
+              ]);
+              if (note) {
+                await mutate("assertFact", {
+                  entity,
+                  attribute: "highlight/note",
+                  value: note,
+                  positions: {},
+                });
+              }
+              setOpen(false);
+            }}
+          />
+        </div>
+        {highlightHelp ? (
+          <div className="lightBorder bg-background p-3 -mt-1">
+            <small>
+              <b>Use a highlight to draw attention to this card.</b>
+              <br />
+              It'll be added to the highlight reel on the desktop with your note
+              where everyone can see it. <br />
+              Highlights fade after 24 hours!
+            </small>
+          </div>
+        ) : null}
+      </Transition>
+    </>
   );
 };

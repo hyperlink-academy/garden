@@ -318,10 +318,12 @@ const createCard: Mutation<{ entityID: string; title: string }> = async (
   });
 };
 
-type FactInput = Pick<
-  Fact<keyof Attribute>,
-  "attribute" | "entity" | "value" | "positions"
->;
+type FactInput = {
+  [A in keyof Attribute]: Pick<
+    Fact<A>,
+    "attribute" | "entity" | "value" | "positions"
+  >;
+}[keyof Attribute];
 const assertFact: Mutation<FactInput | FactInput[]> = async (args, ctx) => {
   await Promise.all(
     [args].flat().map((f) => {
