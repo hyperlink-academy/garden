@@ -7,6 +7,7 @@ export const Textarea = (
     previewOnly?: boolean;
     focused?: boolean;
     placeholderOnHover?: boolean;
+    maxChars?: number;
   } & JSX.IntrinsicElements["textarea"]
 ) => {
   let textarea = useRef<HTMLTextAreaElement | null>(null);
@@ -29,60 +30,93 @@ export const Textarea = (
 
   if ((!focused || props.previewOnly) && typeof props.value === "string") {
     return (
-      <RenderedText
-        {...(props as JSX.IntrinsicElements["pre"])}
-        text={props.value}
-        ref={previewElement}
-        tabIndex={0}
-        style={{
-          ...props.style,
-          whiteSpace: "pre-wrap",
-          fontFamily: "inherit",
-          width: "100%",
-        }}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
+      <>
+        <RenderedText
+          {...(props as JSX.IntrinsicElements["pre"])}
+          text={props.value}
+          ref={previewElement}
+          tabIndex={0}
+          style={{
+            ...props.style,
+            whiteSpace: "pre-wrap",
+            fontFamily: "inherit",
+            width: "100%",
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              if (e.isDefaultPrevented()) return;
+              if (props.previewOnly) return;
+              setFocused(true);
+              if (typeof props.value === "string")
+                setInitialCursor(props.value?.length);
+            }
+          }}
+          onClick={(e) => {
             if (e.isDefaultPrevented()) return;
             if (props.previewOnly) return;
+            if (props.value) {
+              let range = window.getSelection()?.getRangeAt(0);
+              if (!range || !previewElement.current) return;
+              range.setStart(previewElement.current, 0);
+              setInitialCursor(range.toString().length);
+            }
             setFocused(true);
-            if (typeof props.value === "string")
-              setInitialCursor(props.value?.length);
-          }
-        }}
-        onClick={(e) => {
-          if (e.isDefaultPrevented()) return;
-          if (props.previewOnly) return;
-          if (props.value) {
-            let range = window.getSelection()?.getRangeAt(0);
-            if (!range || !previewElement.current) return;
-            range.setStart(previewElement.current, 0);
-            setInitialCursor(range.toString().length);
-          }
-          setFocused(true);
-        }}
-      />
+          }}
+        />
+        {props.maxChars != undefined ? (
+          <small className="text-right justify-self-end">
+            <span
+              className={
+                props.value.length > props.maxChars ? "text-accent-red" : ""
+              }
+            >
+              {props.value.length}
+            </span>
+            /{props.maxChars}
+          </small>
+        ) : (
+          ""
+        )}
+      </>
     );
   }
   return (
-    <AutosizeTextarea
-      {...props}
-      onKeyDown={(e) => {
-        if (e.key === "Escape") e.currentTarget.blur();
-        props.onKeyDown?.(e);
-      }}
-      onChange={async (e) => {
-        if (!props.onChange) return;
-        let start = e.currentTarget.selectionStart,
-          end = e.currentTarget.selectionEnd;
-        await Promise.all([props.onChange(e)]);
-        textarea.current?.setSelectionRange(start, end);
-      }}
-      onBlur={(e) => {
-        setFocused(false);
-        setInitialCursor(null);
-        props.onBlur?.(e);
-      }}
-      ref={textarea}
-    />
+    <>
+      <AutosizeTextarea
+        {...props}
+        onKeyDown={(e) => {
+          if (e.key === "Escape") e.currentTarget.blur();
+          props.onKeyDown?.(e);
+        }}
+        onChange={async (e) => {
+          if (!props.onChange) return;
+          let start = e.currentTarget.selectionStart,
+            end = e.currentTarget.selectionEnd;
+          await Promise.all([props.onChange(e)]);
+          textarea.current?.setSelectionRange(start, end);
+        }}
+        onBlur={(e) => {
+          setFocused(false);
+          setInitialCursor(null);
+          props.onBlur?.(e);
+        }}
+        ref={textarea}
+      />
+
+      {props.maxChars != undefined ? (
+        <small className="text-right justify-self-end">
+          <span
+            className={
+              props.value?.length > props.maxChars ? "text-accent-red" : ""
+            }
+          >
+            {props.value?.length}
+          </span>
+          /{props.maxChars}
+        </small>
+      ) : (
+        ""
+      )}
+    </>
   );
 };

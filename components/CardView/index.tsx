@@ -28,6 +28,7 @@ import { useRouter } from "next/router";
 import { flag } from "data/Facts";
 import { ButtonPrimary } from "components/Buttons";
 import { hasProps } from "@react-spring/core/dist/declarations/src/helpers";
+import { Textarea } from "components/Textarea";
 
 const borderStyles = (args: { deck: boolean; member: boolean }) => {
   switch (true) {
@@ -203,14 +204,12 @@ export const CardView = (props: {
                   className="cardHighlighter rounded-full bg-test-pink h-[28px] w-[28px]"
                   onClick={() => {
                     setHighlightDropdown(!highlightDropdown);
-                    console.log(highlightDropdown);
                   }}
                 />
                 <HighlightDropdown
                   open={highlightDropdown}
                   onSubmit={() => {
                     setHighlightDropdown(false);
-                    console.log(highlightDropdown);
                   }}
                 />
               </div>
@@ -385,6 +384,9 @@ const HighlightDropdown = (props: { open: boolean; onSubmit: () => void }) => {
   let [highlightHelp, setHighlightHelp] = useState(false);
   let [highlightAdvancedOptions, setHighlightAdvancedOptions] = useState(false);
 
+  const [message, setMessage] = useState("");
+  const maxChars = 280;
+
   return (
     // styled to match MenuContainer
     <Transition
@@ -397,23 +399,26 @@ const HighlightDropdown = (props: { open: boolean; onSubmit: () => void }) => {
       leaveTo="transform opacity-0 scale-95"
       className="
           absolute
-          top-16 right-4 left-8
-          p-3 
+          top-16 right-4 left-4
+          px-4 py-4
           bg-white
           lightBorder
           flex flex-col
           gap-3
           shadow-drop
           justify-items-end 
-          text-right 
+          text-right
           origin-top-right 
-          z-40 
-          
-          py-2"
+          z-40"
     >
       <div className="flex flex-col gap-2">
-        <b>add a note (optional)</b>
-        <textarea rows={4} className="lightBorder resize-none w-full p-3" />
+        <Textarea
+          maxChars={maxChars}
+          placeholder="add a note (optional)"
+          className="lightBorder resize-none w-full p-3 text-left"
+          value={message}
+          onChange={(e) => setMessage(e.currentTarget.value)}
+        />
       </div>
       <div className="flex flex-col gap-2">
         <div
@@ -466,6 +471,7 @@ const HighlightDropdown = (props: { open: boolean; onSubmit: () => void }) => {
 
         <ButtonPrimary
           content="Submit"
+          disabled={message.length > maxChars}
           onClick={() => {
             props.onSubmit();
           }}
