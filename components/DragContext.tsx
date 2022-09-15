@@ -4,6 +4,7 @@ import {
   DragOverlay,
   MouseSensor,
   TouchSensor,
+  useDroppable,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
@@ -17,6 +18,8 @@ import { sortByPosition, updatePositions } from "src/position_helpers";
 import { CardPreview } from "./CardPreview";
 import { cardStackCollisionDetection } from "src/customCollisionDetection";
 import { StackData } from "./CardStack";
+import { animated, useTransition } from "@react-spring/web";
+import { createPortal } from "react-dom";
 
 export const SmallCardDragContext: React.FC = (props) => {
   let [activeCard, setActiveCard] = useState<Active | null>(null);
@@ -46,7 +49,12 @@ export const SmallCardDragContext: React.FC = (props) => {
         let overData = over.data.current as StackData & { entityID: string };
         let activeData = active.data.current as StackData & {
           entityID: string;
+          factID: string;
         };
+        if (over.id === "delete") {
+          mutate("retractFact", { id: activeData.factID });
+          return;
+        }
         let siblings = (
           await rep.rep.query((tx) => {
             if (overData.backlink)
@@ -90,6 +98,45 @@ export const SmallCardDragContext: React.FC = (props) => {
           </div>
         )}
       </DragOverlay>
+      <DeleteZone display={!!activeCard} />
     </DndContext>
+  );
+};
+
+const DeleteZone = (props: { display: boolean }) => {
+  let { setNodeRef, isOver } = useDroppable({ id: "delete" });
+  let transition = useTransition(props.display, {
+    config: { mass: 0.1, tension: 500, friction: 25 },
+    from: { width: 0 },
+    enter: { width: 32 },
+    update: { width: isOver ? 64 : 32 },
+    leave: { width: 0 },
+    delay: 100,
+    reverse: props.display,
+  });
+  return transition(
+    (a, show) =>
+      show &&
+      createPortal(
+        <animated.div
+          className="rounded-md"
+          style={{
+            writingMode: "vertical-lr",
+            position: "fixed",
+            height: "calc(100vh - 256px)",
+            right: 0,
+            zIndex: 50,
+            width: a.width.to((w) => `${w}px`),
+            top: "96px",
+            background: "lightgrey",
+            textAlign: "center",
+            verticalAlign: "bottom",
+            overflow: "hidden",
+          }}
+        >
+          <div ref={setNodeRef}>Drag here to delete</div>
+        </animated.div>,
+        document.body
+      )
   );
 };

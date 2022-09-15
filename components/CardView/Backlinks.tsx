@@ -113,7 +113,7 @@ const BacklinkSection = (props: {
       <p className="font-bold text-grey-55">{title}</p>
       <CardStack
         parent={props.entityID}
-        cards={cards.sort(sortByPosition("vae")).map((f) => f.entity)}
+        cards={cards.sort(sortByPosition("vae"))}
         backlink
         positionKey="vae"
         attribute={props.attribute}

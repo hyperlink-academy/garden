@@ -215,10 +215,7 @@ export const MultipleReferenceSection = (props: {
     <div className="flex flex-col gap-4">
       <CardStack
         positionKey="eav"
-        cards={
-          references?.sort(sortByPosition("eav")).map((c) => c.value.value) ||
-          []
-        }
+        cards={references?.sort(sortByPosition("eav")) || []}
         parent={props.entityID}
         attribute={props.section}
       />

@@ -25,7 +25,9 @@ export type StackData = {
   backlink?: boolean;
 };
 
-export const CardStack = (props: { cards: string[] } & StackData) => {
+export const CardStack = (
+  props: { cards: Fact<keyof ReferenceAttributes>[] } & StackData
+) => {
   let [expandAll, setExpandAll] = useState(false);
   let [focusedCardIndex, setFocusedCardIndex] = useState(-1);
 
@@ -42,14 +44,15 @@ export const CardStack = (props: { cards: string[] } & StackData) => {
         <SortableContext items={props.cards}>
           {props.cards.map((card, currentIndex) => (
             <Card
+              factID={card.id}
               expandAll={expandAll}
               parent={props.parent}
               attribute={props.attribute}
               backlink={props.backlink}
               positionKey={props.positionKey}
               last={currentIndex === props.cards.length - 1}
-              key={card}
-              entity={card}
+              key={card.id}
+              entity={props.backlink ? card.entity : card.value.value}
               currentIndex={currentIndex}
               focused={expandAll || currentIndex === focusedCardIndex}
               nextIndex={
@@ -124,6 +127,7 @@ const Card = (
   props: {
     entity: string;
     currentIndex: number;
+    factID: string;
     nextIndex?: number;
     onClick: (e: React.MouseEvent<HTMLDivElement>) => void;
     focused?: boolean;
@@ -139,6 +143,7 @@ const Card = (
   let data = {
     backlink: props.backlink,
     entityID: props.entity,
+    factID: props.factID,
     parent: props.parent,
     attribute: props.attribute,
     positionKey: props.positionKey,
