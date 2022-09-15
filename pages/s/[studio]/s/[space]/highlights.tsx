@@ -2,11 +2,13 @@ import { Carousel } from "components/CardCarousel";
 import { CardView } from "components/CardView";
 import { CrossLarge, HighlightNote } from "components/Icons";
 import { useIndex } from "hooks/useReplicache";
+import { spacePath } from "hooks/utils";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
 
 export default function HighlightPage() {
-  let router = useRouter();
+  let { query: q } = useRouter();
   let time = useMemo(() => {
     return Date.now() - 24 * 60 * 60 * 1000;
   }, []);
@@ -15,7 +17,6 @@ export default function HighlightPage() {
 
   return (
     // TODO for Jared :
-    // - wire up the close button to take you back to where you where
     // - If you click a link in the card, the new card will open on top of the original one with a back button to go down the stack
     // - Depending on read state the highlight note will have a different visual style. You can change the state too se the different versions
     // - the note will always show the name and time of the highlighter. if there is a user note that will show too
@@ -24,7 +25,11 @@ export default function HighlightPage() {
     <div className="highlightCarousel h-full grow flex flex-col gap-4 items-stretch relative py-6">
       <div className="highlightHeader w-[calc(100%-32px)] max-w-3xl mx-auto flex gap-2">
         <h2 className="grow">Highlights</h2>
-        <CrossLarge />
+        <Link href={spacePath(q.studio, q.space)}>
+          <a>
+            <CrossLarge />
+          </a>
+        </Link>
       </div>
 
       <Carousel>
