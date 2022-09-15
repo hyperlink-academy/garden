@@ -15,6 +15,7 @@ export const BaseAttributes = {
     cardinality: "one",
     "union/value": [
       "file",
+      "timestamp",
       "string",
       "union",
       "position",
@@ -183,6 +184,13 @@ export const DefaultAttributes = {
     cardinality: "one",
     unique: true,
   },
+  "highlight/time": {
+    type: "timestamp",
+    cardinality: "one",
+    unique: false,
+  },
+  "highlight/by": { type: "reference", cardinality: "one", unique: false },
+  "highlight/note": { type: "string", cardinality: "one", unique: false },
   "bot/url": {
     type: "string",
     cardinality: "one",
