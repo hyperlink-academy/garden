@@ -1,12 +1,9 @@
 import { Carousel } from "components/CardCarousel";
 import { CardView } from "components/CardView";
 import { CrossLarge, HighlightNote } from "components/Icons";
-import { AttributeFromShortCode, ReferenceAttributes } from "data/Attributes";
-import { multipleReferenceSection } from "data/Facts";
 import { useIndex } from "hooks/useReplicache";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { sortByPosition } from "src/position_helpers";
 
 export default function HighlightPage() {
   let router = useRouter();
@@ -37,9 +34,7 @@ export default function HighlightPage() {
 }
 
 let HighlightedItem = (props: { entityID: string }) => {
-  let [read, setRead] = useState(false);
   let [noteOpen, setNoteOpen] = useState(true);
-  let note = useIndex.eav(props.entityID, "highlight/note");
   let card = useIndex.eav(props.entityID, "highlight/card");
 
   return (
@@ -48,8 +43,30 @@ let HighlightedItem = (props: { entityID: string }) => {
       className={`highlightCard h-full w-[calc(100%-32px)] flex flex-col relative max-w-3xl snap-center flex-shrink-0 pb-1.5 focus:outline-none `}
     >
       {noteOpen ? (
-        <div
-          className={` 
+        <Note entityID={props.entityID} onClose={() => setNoteOpen(false)} />
+      ) : (
+        <button
+          onClick={() => setNoteOpen(true)}
+          className="absolute z-20 bottom-12 right-5 rounded-full flex mr-2 h-8 w-8 bg-bg-blue text-accent-blue lightBorder items-center justify-center"
+        >
+          <HighlightNote />
+        </button>
+      )}
+
+      {card && <CardView entityID={card?.value.value} />}
+    </div>
+  );
+};
+
+let Note = (props: { entityID: string; onClose: () => void }) => {
+  let note = useIndex.eav(props.entityID, "highlight/note");
+  let time = useIndex.eav(props.entityID, "highlight/time");
+  let member = useIndex.eav(props.entityID, "highlight/by");
+  let memberName = useIndex.eav(member?.value.value || null, "member/name");
+  let [read, setRead] = useState(false);
+  return (
+    <div
+      className={` 
                     hightlightNoteExpanded 
                     absolute z-20
                      bottom-10 left-0 right-0 
@@ -58,34 +75,36 @@ let HighlightedItem = (props: { entityID: string }) => {
                     rounded-md 
                     lightBorder
                     ${read ? "bg-test-pink" : "bg-bg-blue"}`}
+    >
+      <div className="flex items-center">
+        <p className="grow text-grey-35">
+          <span className="font-bold">{memberName?.value}</span>{" "}
+          {time && (
+            <span className="italic">
+              {timeSince(Date.now() - parseInt(time.value.value))}
+            </span>
+          )}
+        </p>
+        <button
+          className="rounded-full flex w-8 text-accent-blue items-center justify-center"
+          onClick={() => props.onClose()}
         >
-          <div className="flex items-center">
-            <p className="grow text-grey-35">
-              <span className="font-bold">celine</span>{" "}
-              <span className="italic">23 hours ago</span>
-            </p>
-            <div
-              className="rounded-full flex w-8 text-accent-blue items-center justify-center"
-              onClick={() => setNoteOpen(false)}
-            >
-              <HighlightNote />
-            </div>
-            <div className="pt-1"></div>
-          </div>
-          <p className="leading-tight">{note?.value}</p>
-        </div>
-      ) : (
-        <div className="absolute z-20 bottom-12 right-5">
-          <div
-            className={`highlightNoteCollapsed rounded-full flex mr-2 h-8 w-8 bg-bg-blue text-accent-blue lightBorder items-center justify-center`}
-            onClick={() => setNoteOpen(true)}
-          >
-            <HighlightNote />
-          </div>
-        </div>
-      )}
-
-      {card && <CardView entityID={card?.value.value} />}
+          <HighlightNote />
+        </button>
+      </div>
+      <p className="leading-tight">{note?.value}</p>
     </div>
   );
 };
+
+function timeSince(ms: number) {
+  let minutes = Math.floor(ms / 1000 / 60);
+  if (minutes === 0) return "Now";
+  if (minutes < 60) {
+    return `${minutes} minutes ago`;
+  }
+  let hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} hours ago`;
+  let days = Math.floor(hours / 24);
+  return `${days} days ago`;
+}
