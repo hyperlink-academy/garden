@@ -184,6 +184,11 @@ export const DefaultAttributes = {
     cardinality: "one",
     unique: true,
   },
+  "highlight/card": {
+    type: "reference",
+    cardinality: "one",
+    unique: false,
+  },
   "highlight/time": {
     type: "timestamp",
     cardinality: "one",
