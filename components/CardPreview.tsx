@@ -347,9 +347,9 @@ const BigCardBody = (props: { entityID: string } & SharedProps) => {
           <div />
         ) : (
           <small className="SectionCounter text-grey-80 hover:text-accent-blue hover:underline pb-1 ">
-            <Link href={props.href}>
-              <a>+ {sections?.length} sections</a>
-            </Link>
+            <a onClick={() => open({ entityID: props.entityID })}>
+              + {sections?.length} sections
+            </a>
           </small>
         )}
       </div>
