@@ -1,9 +1,9 @@
 import { Combobox, Dialog, Transition } from "@headlessui/react";
+import { useIndex } from "hooks/useReplicache";
 import { useRef, useState } from "react";
-import { ButtonLink, ButtonPrimary } from "./Buttons";
-import { Add, Card, Checkmark, Cross } from "./Icons";
+import { ButtonPrimary } from "./Buttons";
+import { Add, Card, Checkmark, Cross, DeckSmall, Member } from "./Icons";
 import { Divider } from "./Layout";
-import { SmallCard } from "./SmallCard";
 
 // Can I adapt this to work for section names as well?
 // They are a single select
@@ -437,4 +437,33 @@ const SearchItem: React.FC<{
       {props.children}
     </div>
   );
+};
+
+export const useAllItems = (open: boolean) => {
+  let titles = useIndex
+    .aev(open ? "card/title" : null)
+    .filter((f) => !!f.value);
+  let members = useIndex.aev("member/name");
+  const decks = useIndex.aev(open ? "deck" : null);
+  return titles
+    .map((t) => {
+      return {
+        entity: t.entity,
+        display: t.value,
+        icon: !!decks.find((d) => t.entity === d.entity) ? (
+          <DeckSmall />
+        ) : (
+          <Card />
+        ),
+      };
+    })
+    .concat(
+      members.map((m) => {
+        return {
+          entity: m.entity,
+          display: m.value,
+          icon: <Member />,
+        };
+      })
+    );
 };

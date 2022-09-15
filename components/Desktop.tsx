@@ -15,6 +15,7 @@ import { restrictToParentElement } from "@dnd-kit/modifiers";
 import { ulid } from "src/ulid";
 import { DownArrow, UpArrow } from "./Icons";
 import { useRouter } from "next/router";
+import { FindOrCreate, useAllItems } from "./FindOrCreateEntity";
 
 const GRID_SIZE = 16;
 const snap = (x: number) => Math.ceil(x / GRID_SIZE) * GRID_SIZE;
@@ -27,6 +28,9 @@ export const Desktop = () => {
   const touchSensor = useSensor(TouchSensor, {});
   const sensors = useSensors(mouseSensor, touchSensor);
   let { mutate } = useMutations();
+  let [createCard, setCreateCard] = useState<null | { x: number; y: number }>(
+    null
+  );
 
   return (
     <DndContext
@@ -71,22 +75,21 @@ export const Desktop = () => {
         });
       }}
     >
+      <AddCard
+        position={createCard}
+        onClose={() => setCreateCard(null)}
+        desktopEntity={homeEntity[0]?.entity}
+      />
       <div
         onClick={(e) => {
           if (e.currentTarget !== e.target) return;
           if (e.detail === 2) {
-            let newCard = ulid();
             let parentRect = e.currentTarget.getBoundingClientRect();
-            mutate("addCardToDesktop", {
-              entity: newCard,
-              desktop: homeEntity[0]?.entity,
-              position: {
-                rotation: 0,
-                size: "small",
-                x: e.clientX - parentRect.left,
-                y: e.clientY - parentRect.top,
-              },
+            setCreateCard({
+              x: e.clientX - parentRect.left,
+              y: e.clientY - parentRect.top,
             });
+            let newCard = ulid();
           }
         }}
         style={{
@@ -265,6 +268,50 @@ const ResizeCanvas = (props: { canvasEntity: string }) => {
         />
       )}
     </div>
+  );
+};
+
+const AddCard = (props: {
+  onClose: () => void;
+  desktopEntity: string;
+  position: null | { x: number; y: number };
+}) => {
+  let items = useAllItems(!!props.position);
+  let { authorized, mutate } = useMutations();
+  return (
+    <FindOrCreate
+      items={items}
+      open={!!props.position}
+      allowBlank={true}
+      onClose={() => props.onClose()}
+      onSelect={async (d) => {
+        if (!props.position) return;
+        let entity;
+        if (d.type === "create") {
+          entity = ulid();
+          if (d.name) {
+            await mutate("createCard", {
+              entityID: entity,
+              title: d.name,
+            });
+          }
+        } else {
+          entity = d.entity;
+        }
+
+        mutate("addCardToDesktop", {
+          entity,
+          desktop: props.desktopEntity,
+          position: {
+            rotation: 0,
+            size: "small",
+            x: props.position.x,
+            y: props.position.y,
+          },
+        });
+      }}
+      selected={[]}
+    />
   );
 };
 

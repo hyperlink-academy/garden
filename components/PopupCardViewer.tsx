@@ -9,7 +9,7 @@ import {
 } from "./Icons";
 import { useIndex, useMutations } from "hooks/useReplicache";
 import { ulid } from "src/ulid";
-import { FindOrCreate } from "./FindOrCreateEntity";
+import { FindOrCreate, useAllItems } from "./FindOrCreateEntity";
 
 let PopupCardViewerContext = createContext({
   open: (_args: { focused: LinkContextType; entityID: string }) => {},
@@ -110,32 +110,7 @@ export const PopupCardViewer: React.FC = (props) => {
 const FindOrCreateBar = () => {
   let [open, setOpen] = useState(false);
   let { open: openCard } = usePopupCardViewer();
-  let titles = useIndex
-    .aev(open ? "card/title" : null)
-    .filter((f) => !!f.value);
-  let members = useIndex.aev("member/name");
-  const decks = useIndex.aev(open ? "deck" : null);
-  let items = titles
-    .map((t) => {
-      return {
-        entity: t.entity,
-        display: t.value,
-        icon: !!decks.find((d) => t.entity === d.entity) ? (
-          <DeckSmall />
-        ) : (
-          <CardIcon />
-        ),
-      };
-    })
-    .concat(
-      members.map((m) => {
-        return {
-          entity: m.entity,
-          display: m.value,
-          icon: <Member />,
-        };
-      })
-    );
+  let items = useAllItems(open);
 
   let { authorized, mutate } = useMutations();
   return (
