@@ -3,12 +3,15 @@ import { CardView } from "components/CardView";
 import { CrossLarge, HighlightNote } from "components/Icons";
 import { useIndex } from "hooks/useReplicache";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 export default function HighlightPage() {
   let router = useRouter();
+  let time = useMemo(() => {
+    Date.now() - 24 * 60 * 60 * 1000;
+  }, []);
 
-  let cards = useIndex.at("highlight/time");
+  let cards = useIndex.at("highlight/time", time);
 
   return (
     // TODO for Jared :
