@@ -24,8 +24,7 @@ export const Backlinks = (props: {
 
   // TODO: remove when we add proper chat and activity backlinks
   sections = sections.filter(
-    (section) =>
-      section !== "message/attachedCard" && section !== "activity/hand-contains"
+    (section) => section === "deck/contains" || section.startsWith("section/")
   );
 
   return sections.length > 0 ? (
