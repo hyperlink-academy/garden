@@ -17,6 +17,7 @@ import { ulid } from "src/ulid";
 import { sortByPosition } from "src/position_helpers";
 import { Fact } from "data/Facts";
 import { generateKeyBetween } from "src/fractional-indexing";
+import { useSortableCard } from "./DragContext";
 
 export type StackData = {
   parent: string;
@@ -41,7 +42,7 @@ export const CardStack = (
           backlink={props.backlink}
           positionKey={props.positionKey}
         />
-        <SortableContext items={props.cards}>
+        <SortableContext items={props.cards.map((c) => c.id)}>
           {props.cards.map((card, currentIndex) => (
             <Card
               factID={card.id}
@@ -156,8 +157,8 @@ const Card = (
     transition,
     transform,
     isDragging,
-  } = useSortable({
-    id: props.entity,
+  } = useSortableCard({
+    id: props.factID,
     data,
   });
 

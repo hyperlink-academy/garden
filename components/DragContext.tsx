@@ -20,6 +20,7 @@ import { cardStackCollisionDetection } from "src/customCollisionDetection";
 import { StackData } from "./CardStack";
 import { animated, useTransition } from "@react-spring/web";
 import { createPortal } from "react-dom";
+import { useSortable } from "@dnd-kit/sortable";
 
 export const SmallCardDragContext: React.FC = (props) => {
   let [activeCard, setActiveCard] = useState<Active | null>(null);
@@ -45,12 +46,12 @@ export const SmallCardDragContext: React.FC = (props) => {
       }}
       onDragEnd={async (data) => {
         let { over, active } = data;
+        setActiveCard(null);
         if (!over || !rep?.rep) return;
-        let overData = over.data.current as StackData & { entityID: string };
-        let activeData = active.data.current as StackData & {
-          entityID: string;
-          factID: string;
-        };
+        if (!active.data.current || !over.data.current) return;
+        let overData = over.data.current as Data;
+        let activeData = active.data.current as Data;
+
         if (over.id === "delete") {
           mutate("retractFact", { id: activeData.factID });
           return;
@@ -102,6 +103,13 @@ export const SmallCardDragContext: React.FC = (props) => {
     </DndContext>
   );
 };
+
+type Data = StackData & {
+  entityID: string;
+  factID: string;
+};
+export const useSortableCard = (c: { id: string; data: Data }) =>
+  useSortable(c);
 
 const DeleteZone = (props: { display: boolean }) => {
   let { setNodeRef, isOver } = useDroppable({ id: "delete" });
