@@ -1,10 +1,11 @@
 import { latestMigration } from "backend/SpaceDurableObject/migrations";
 import {
   Attribute,
+  FilterAttributes,
   ReferenceAttributes,
   UniqueAttributes,
 } from "data/Attributes";
-import { Fact, ReferenceType, Schema } from "data/Facts";
+import { Fact, ReferenceType, Schema, TimestampeType } from "data/Facts";
 import { Message } from "data/Messages";
 import { CardinalityResult, MutationContext, Mutations } from "data/mutations";
 import { createContext, useContext } from "react";
@@ -108,6 +109,10 @@ export function MessageWithIndexes(m: Message) {
 
 export function FactWithIndexes<A extends keyof Attribute>(f: Fact<A>) {
   let indexes = {
+    at:
+      f.schema.type === `timestamp`
+        ? `${f.attribute}-${(f.value as TimestampeType).value}`
+        : undefined,
     eav: `${f.entity}-${f.attribute}-${f.id}`,
     aev: `${f.attribute}-${f.entity}-${f.id}`,
     ave: f.schema.unique ? `${f.attribute}-${f.value}` : undefined,
@@ -191,11 +196,36 @@ export const makeReplicache = (args: {
   rep.createIndex({ name: "aev", jsonPointer: "/indexes/aev" });
   rep.createIndex({ name: "ave", jsonPointer: "/indexes/ave" });
   rep.createIndex({ name: "vae", jsonPointer: "/indexes/vae" });
+  rep.createIndex({ name: "at", jsonPointer: "/indexes/at" });
   rep.createIndex({ name: "messages", jsonPointer: "/indexes/messages" });
   return rep;
 };
 
 export const useIndex = {
+  at<
+    A extends keyof FilterAttributes<{
+      type: "timestamp";
+      unique: any;
+      cardinality: any;
+    }>
+  >(attribute: A, start?: string): Fact<A>[] {
+    let rep = useContext(ReplicacheContext);
+    return useSubscribe(
+      rep?.rep,
+      async (tx) => {
+        let results = await tx
+          .scan({
+            indexName: "at",
+            prefix: `${attribute}-${start || ""}`,
+          })
+          .values()
+          .toArray();
+        return results as Fact<A>[];
+      },
+      [],
+      [attribute, rep, start]
+    );
+  },
   eav<A extends keyof Attribute>(
     entity: string | null,
     attribute: A

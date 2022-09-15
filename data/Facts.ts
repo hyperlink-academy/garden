@@ -27,6 +27,7 @@ type Value<A extends AttributeName> = Attribute[A] extends {
   ? Attribute[A]["union/value"][number]
   : {
       union: never;
+      timestamp: TimestampeType;
       string: string;
       number: number;
       boolean: boolean;
@@ -55,6 +56,10 @@ type Value<A extends AttributeName> = Attribute[A] extends {
     }[Attribute[A]["type"]];
 
 export type ReferenceType = { type: "reference"; value: string };
+export type TimestampeType = {
+  type: "unix_seconds";
+  value: string;
+};
 
 export const ref = (ref: string) => {
   return { type: "reference", value: ref } as const;
