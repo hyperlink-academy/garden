@@ -111,7 +111,6 @@ const BacklinkSection = (props: {
     );
   return (
     <div className="flex flex-col gap-2">
-      {props.entityID}
       <p className="font-bold text-grey-55">{title}</p>
       <CardStack
         parent={props.entityID}
