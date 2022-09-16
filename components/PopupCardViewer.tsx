@@ -87,7 +87,27 @@ export const PopupCardViewer: React.FC = (props) => {
                 <button
                   className="CardViewerBackButton overflow-clip"
                   onClick={() => {
-                    setState((s) => ({ ...s, history: s.history.slice(1) }));
+                    if (state.history.length == 1) {
+                      // if on last card, scroll back to desktop
+                      setTimeout(() => {
+                        const desktop = document.querySelector(".Desktop");
+                        desktop?.scrollIntoView({
+                          behavior: "smooth",
+                          block: "start",
+                        });
+                      }, 50);
+                      // if narrow width, add delay so card doesn't blip out mid-scroll
+                      let delay = 0;
+                      if (width < 640) delay = 500;
+                      setTimeout(() => {
+                        setState((s) => ({
+                          ...s,
+                          history: s.history.slice(1),
+                        }));
+                      }, delay);
+                    } else {
+                      setState((s) => ({ ...s, history: s.history.slice(1) }));
+                    }
                   }}
                 >
                   <div className="grid grid-cols-[max-content_auto] gap-3 items-center place-items-start text-grey-55">
