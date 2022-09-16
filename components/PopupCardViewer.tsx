@@ -10,6 +10,7 @@ import {
 import { useIndex, useMutations } from "hooks/useReplicache";
 import { ulid } from "src/ulid";
 import { FindOrCreate, useAllItems } from "./FindOrCreateEntity";
+import useWindowDimensions from "hooks/useWindowDimensions";
 
 let PopupCardViewerContext = createContext({
   open: (_args: { focused: LinkContextType; entityID: string }) => {},
@@ -41,6 +42,8 @@ export const PopupCardViewer: React.FC = (props) => {
   }, [state.history[0]]);
 
   let prevCardTitle = useIndex.eav(state.history[1], "card/title");
+
+  const { height, width } = useWindowDimensions();
 
   return (
     <PopupCardViewerContext.Provider
@@ -80,7 +83,7 @@ export const PopupCardViewer: React.FC = (props) => {
         >
           {state.history[0] && (
             <>
-              <div className="cardViewerHeader grid grid-cols-[auto_max-content] items-end gap-4 ">
+              <div className="cardViewerHeader grid grid-cols-[auto_max-content] items-center gap-4 ">
                 <button
                   className="CardViewerBackButton overflow-clip"
                   onClick={() => {
@@ -91,8 +94,12 @@ export const PopupCardViewer: React.FC = (props) => {
                     <GoBackToPage />{" "}
                     <p className="truncate whitespace-nowrap">
                       {state.history.length >= 2
-                        ? `Back to ${prevCardTitle?.value}`
-                        : "Clear Stack"}{" "}
+                        ? width > 1000
+                          ? `Back to ${prevCardTitle?.value}`
+                          : "Back"
+                        : width > 1000
+                        ? "Clear Stack"
+                        : "Clear"}
                     </p>
                   </div>
                 </button>
