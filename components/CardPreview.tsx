@@ -108,8 +108,7 @@ export const RotateAndResize: React.FC<
       className={`
       touch-none
       ${props.size === "small" ? "w-[160px] h-24" : "w-full"}
-      flex gap-1
-      items-stretch
+      grid grid-cols-[auto_min-content] gap-1
       group
       `}
     >
@@ -117,48 +116,43 @@ export const RotateAndResize: React.FC<
 
       {/* Rotate and Resize Handle */}
 
-      {authorized && (
-        <div
-          ref={ref}
-          className="h-full text-grey-80 flex flex-col justify-between gap-1 pb-1 opacity-0 group-hover:opacity-100"
+      <div
+        ref={ref}
+        className="text-grey-80 flex flex-col justify-between gap-1 pb-1 opacity-0 group-hover:opacity-100"
+      >
+        <button
+          className="hover:text-accent-blue pt-1"
+          onClick={() => {
+            if (!props.factID) return;
+            mutate("retractFact", { id: props.factID });
+          }}
         >
-          <button
-            className="hover:text-accent-blue"
-            onClick={() => {
-              if (!props.factID) return;
-              mutate("retractFact", { id: props.factID });
-            }}
-          >
-            <Cross height={12} width={12} />
-          </button>
-          <div>
-            <div className="leading-3 ">
-              {props.onResize ? (
-                <button
-                  className="hover:text-accent-blue"
-                  onClick={() =>
-                    props.onResize?.(props.size === "big" ? "small" : "big")
-                  }
-                >
-                  {props.size === "big" ? (
-                    <MakeSmallHandle />
-                  ) : (
-                    <MakeBigHandle />
-                  )}
-                </button>
-              ) : (
-                <div className="w-[12px]" />
-              )}
-            </div>
-
-            {props.onRotateDrag && (
-              <div {...bind()} className="touch-none hover:text-accent-blue  ">
-                <DragRotateHandle />
-              </div>
+          <Cross width={12} height={12} />
+        </button>
+        <div>
+          <div className="leading-3 ">
+            {authorized && props.onResize ? (
+              <button
+                className="hover:text-accent-blue"
+                onClick={() =>
+                  props.onResize?.(props.size === "big" ? "small" : "big")
+                }
+              >
+                {props.size === "big" ? <MakeSmallHandle /> : <MakeBigHandle />}
+              </button>
+            ) : (
+              <div className="w-[12px]" />
             )}
           </div>
+
+          {authorized && props.onRotateDrag && (
+            <div {...bind()} className="touch-none hover:text-accent-blue  ">
+              <DragRotateHandle />
+            </div>
+          )}
         </div>
-      )}
+      </div>
+      {/* End Rotate and Resize Handle */}
     </div>
   );
 };
