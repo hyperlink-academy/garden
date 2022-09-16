@@ -5,6 +5,7 @@ import Link from "next/link";
 import { SingleTextSection } from "./CardView/Sections";
 import { GripperBG } from "./Gripper";
 import {
+  Cross,
   DragRotateHandle,
   ExternalLink,
   GoToPage,
@@ -34,6 +35,7 @@ const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 type SharedProps = {
   size: "big" | "small";
   onRotateDrag?: (da: number) => void;
+  factID?: string;
   dragHandleProps?: {
     attributes?: DraggableAttributes;
     listeners?: SyntheticListenerMap;
@@ -67,7 +69,7 @@ export const CardPreview = (
 };
 
 export const RotateAndResize: React.FC<
-  Pick<SharedProps, "onResize" | "onRotateDrag" | "size">
+  Pick<SharedProps, "onResize" | "onRotateDrag" | "size" | "factID">
 > = (props) => {
   let ref = useRef<null | HTMLDivElement>(null);
   let bindPinch = usePinch(
@@ -96,7 +98,7 @@ export const RotateAndResize: React.FC<
     props.onRotateDrag?.(angle - memo);
     return angle;
   });
-  let { authorized } = useMutations();
+  let { authorized, mutate } = useMutations();
 
   return (
     <div
@@ -105,42 +107,58 @@ export const RotateAndResize: React.FC<
       style={{}}
       className={`
       touch-none
-      ${props.size === "small" ? "w-[160px] h-24" : "w-full h-fit"}
-      flex items-end gap-1
+      ${props.size === "small" ? "w-[160px] h-24" : "w-full"}
+      flex gap-1
+      items-stretch
       group
-      
       `}
     >
       {props.children}
 
       {/* Rotate and Resize Handle */}
 
-      <div
-        ref={ref}
-        className="text-grey-80 grid grid-rows-2 gap-1 pb-1 opacity-0 group-hover:opacity-100"
-      >
-        <div className="leading-3 ">
-          {authorized && props.onResize ? (
-            <button
-              className="hover:text-accent-blue"
-              onClick={() =>
-                props.onResize?.(props.size === "big" ? "small" : "big")
-              }
-            >
-              {props.size === "big" ? <MakeSmallHandle /> : <MakeBigHandle />}
-            </button>
-          ) : (
-            <div className="w-[12px]" />
-          )}
-        </div>
+      {authorized && (
+        <div
+          ref={ref}
+          className="h-full text-grey-80 flex flex-col justify-between gap-1 pb-1 opacity-0 group-hover:opacity-100"
+        >
+          <button
+            className="hover:text-accent-blue"
+            onClick={() => {
+              if (!props.factID) return;
+              mutate("retractFact", { id: props.factID });
+            }}
+          >
+            <Cross height={12} width={12} />
+          </button>
+          <div>
+            <div className="leading-3 ">
+              {props.onResize ? (
+                <button
+                  className="hover:text-accent-blue"
+                  onClick={() =>
+                    props.onResize?.(props.size === "big" ? "small" : "big")
+                  }
+                >
+                  {props.size === "big" ? (
+                    <MakeSmallHandle />
+                  ) : (
+                    <MakeBigHandle />
+                  )}
+                </button>
+              ) : (
+                <div className="w-[12px]" />
+              )}
+            </div>
 
-        {authorized && props.onRotateDrag && (
-          <div {...bind()} className="touch-none hover:text-accent-blue  ">
-            <DragRotateHandle />
+            {props.onRotateDrag && (
+              <div {...bind()} className="touch-none hover:text-accent-blue  ">
+                <DragRotateHandle />
+              </div>
+            )}
           </div>
-        )}
-      </div>
-      {/* End Rotate and Resize Handle */}
+        </div>
+      )}
     </div>
   );
 };

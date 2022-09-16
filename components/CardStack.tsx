@@ -196,6 +196,7 @@ const Card = (
       >
         <div ref={ref} className="">
           <CardPreview
+            factID={props.factID}
             dragHandleProps={{ listeners, attributes }}
             entityID={props.entity}
             size={"big"}
