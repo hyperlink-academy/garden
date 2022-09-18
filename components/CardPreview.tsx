@@ -106,7 +106,6 @@ export const RotateAndResize: React.FC<
       ref={ref}
       style={{}}
       className={`
-      touch-none
       ${props.size === "small" ? "w-[160px] h-24" : "w-full"}
       grid grid-cols-[auto_min-content] gap-1
       group
