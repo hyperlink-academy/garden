@@ -1,11 +1,11 @@
 import { Carousel } from "components/CardCarousel";
 import { CardView } from "components/CardView";
 import { CrossLarge, HighlightNote } from "components/Icons";
-import { useIndex } from "hooks/useReplicache";
+import { useIndex, useMutations } from "hooks/useReplicache";
 import { spacePath } from "hooks/utils";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 export default function HighlightPage() {
   let { query: q } = useRouter();
@@ -41,17 +41,62 @@ export default function HighlightPage() {
   );
 }
 
+let useReadState = (entity: string) => {
+  let { memberEntity, mutate } = useMutations();
+  // A highlight is an entity. For every person who has read it we want to store
+  // a ref fact,
+  let readStates = useIndex.eav(entity, "highlight/read-by");
+  let ref = useRef<HTMLDivElement | null>(null);
+
+  let read = !!readStates?.find((f) => f.value.value === memberEntity);
+  console.log(read);
+  useEffect(() => {
+    if (!memberEntity) return;
+    if (read) return;
+    let node = ref.current;
+    let timeout: number | undefined = undefined;
+    let observer = new IntersectionObserver(
+      (e) => {
+        if (!e[0]?.isIntersecting && timeout) clearTimeout(timeout);
+        if (e[0]?.isIntersecting) {
+          timeout = window.setTimeout(() => {
+            if (!memberEntity) return;
+            mutate("assertFact", {
+              entity,
+              attribute: "highlight/read-by",
+              value: { type: "reference", value: memberEntity },
+              positions: {},
+            });
+          }, 1000);
+        }
+      },
+      { root: null, rootMargin: "0px -50%", threshold: 0 }
+    );
+    if (node) observer.observe(node);
+    return () => {
+      if (node) observer.unobserve(node);
+    };
+  }, [read, ref, memberEntity]);
+  return [ref, read] as const;
+};
+
 let HighlightedItem = (props: { entityID: string }) => {
   let [noteOpen, setNoteOpen] = useState(true);
   let card = useIndex.eav(props.entityID, "highlight/card");
+  let [ref, read] = useReadState(props.entityID);
 
   return (
     <div
+      ref={ref}
       tabIndex={0}
       className={`highlightCard h-full w-[calc(100%-32px)] flex flex-col relative max-w-3xl snap-center flex-shrink-0 pb-1.5 focus:outline-none `}
     >
       {noteOpen ? (
-        <Note entityID={props.entityID} onClose={() => setNoteOpen(false)} />
+        <Note
+          entityID={props.entityID}
+          onClose={() => setNoteOpen(false)}
+          read={read}
+        />
       ) : (
         <button
           onClick={() => setNoteOpen(true)}
@@ -66,12 +111,15 @@ let HighlightedItem = (props: { entityID: string }) => {
   );
 };
 
-let Note = (props: { entityID: string; onClose: () => void }) => {
+let Note = (props: {
+  entityID: string;
+  onClose: () => void;
+  read: boolean;
+}) => {
   let note = useIndex.eav(props.entityID, "highlight/note");
   let time = useIndex.eav(props.entityID, "highlight/time");
   let member = useIndex.eav(props.entityID, "highlight/by");
   let memberName = useIndex.eav(member?.value.value || null, "member/name");
-  let [read, setRead] = useState(false);
   return (
     <div
       className={` 
@@ -82,7 +130,7 @@ let Note = (props: { entityID: string; onClose: () => void }) => {
                     flex flex-col gap-1
                     rounded-md 
                     lightBorder
-                    ${read ? "bg-test-pink" : "bg-bg-blue"}`}
+                    ${props.read ? "bg-test-pink" : "bg-bg-blue"}`}
     >
       <div className="flex items-center">
         <p className="grow text-grey-35">
