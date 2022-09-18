@@ -125,7 +125,7 @@ export const PopupCardViewer: React.FC = (props) => {
                 </button>
                 <FindOrCreateBar />
               </div>
-              <CardView entityID={state.history[0]} />
+              <CardView entityID={state.history[0]} key={state.history[0]} />
             </>
           )}
         </div>
