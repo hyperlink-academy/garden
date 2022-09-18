@@ -112,7 +112,7 @@ export const CardStack = (
                 setExpandAll((e) => !e);
                 setFocusedCardIndex(-1);
               }}
-              className="font-bold text-grey-55 hover:text-accent-blue text-sm"
+              className="font-bold text-grey-55 hover:text-accent-blue text-sm relative -top-2"
             >
               {expandAll ? "collapse" : "expand"}
             </button>

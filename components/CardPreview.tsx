@@ -117,10 +117,10 @@ export const RotateAndResize: React.FC<
 
       <div
         ref={ref}
-        className="text-grey-80 flex flex-col justify-between gap-1 pb-1 opacity-0 group-hover:opacity-100"
+        className="text-grey-80 flex flex-col justify-between gap-1 pb-1 opacity-0 group-hover:opacity-100 z-50"
       >
         <button
-          className="hover:text-accent-blue pt-1"
+          className="hover:text-accent-blue pt-1 z-50"
           onClick={() => {
             if (!props.factID) return;
             mutate("retractFact", { id: props.factID });
