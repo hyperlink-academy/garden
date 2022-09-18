@@ -184,6 +184,11 @@ export const DefaultAttributes = {
     cardinality: "one",
     unique: true,
   },
+  "highlight/read-by": {
+    type: "reference",
+    unique: false,
+    cardinality: "many",
+  },
   "highlight/card": {
     type: "reference",
     cardinality: "one",
