@@ -232,7 +232,7 @@ export const CardView = (props: {
             />
             <div>
               <ImageSection entity={props.entityID} />
-              {isDeck ? null : <MakeDeck entity={props.entityID} />}
+              <MakeDeck entity={props.entityID} />
             </div>
           </div>
 
@@ -262,19 +262,31 @@ export const CardView = (props: {
 
 const MakeDeck = (props: { entity: string }) => {
   let { authorized, mutate } = useMutations();
+  let cards = useIndex.eav(props.entity, "deck/contains");
+  let isDeck = useIndex.eav(props.entity, "deck");
+
+  if (cards && cards.length > 0) return null;
   if (!authorized) return null;
   return (
     <button
       onClick={() => {
-        mutate("assertFact", {
-          entity: props.entity,
-          attribute: "deck",
-          value: flag(),
-          positions: {},
-        });
+        if (isDeck) mutate("retractFact", { id: isDeck.id });
+        else
+          mutate("assertFact", {
+            entity: props.entity,
+            attribute: "deck",
+            value: flag(),
+            positions: {},
+          });
       }}
     >
-      <CardAdd className="text-grey-55 hover:text-accent-blue" />
+      <CardAdd
+        className={
+          isDeck
+            ? `text-accent-blue hover:text-grey-55`
+            : `text-grey-55 hover:text-accent-blue`
+        }
+      />
     </button>
   );
 };
