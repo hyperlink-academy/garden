@@ -6,6 +6,11 @@ const nextConfig = {
   async redirects() {
     return [
       {
+        source: "/sso",
+        destination: "https://year-one.hyperlink.academy/sso",
+        permanent: false,
+      },
+      {
         source: "/courses/:path*",
         destination: "https://year-one.hyperlink.academy/courses/:path*",
         permanent: false,
