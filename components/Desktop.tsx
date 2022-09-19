@@ -16,6 +16,7 @@ import { ulid } from "src/ulid";
 import { DownArrow, UpArrow } from "./Icons";
 import { useRouter } from "next/router";
 import { FindOrCreate, useAllItems } from "./FindOrCreateEntity";
+import { relative } from "path";
 
 const GRID_SIZE = 16;
 const snap = (x: number) => Math.ceil(x / GRID_SIZE) * GRID_SIZE;
@@ -94,19 +95,27 @@ export const Desktop = () => {
         }}
         style={{
           zIndex: 1,
-          height: `${height?.value || 800}px`,
+          height: "100%",
         }}
-        className="relative text-sm"
+        className=" text-sm "
       >
-        {cards?.map((card) => (
-          <DraggableCard
-            key={card.id}
-            relationshipID={card.id}
-            entityID={card.value.value}
-            parent={homeEntity[0]?.entity}
-          />
-        ))}
-        <ResizeCanvas canvasEntity={homeEntity[0]?.entity} />
+        <div
+          style={{
+            zIndex: 1,
+            height: `${height?.value || 800}px`,
+            position: "relative",
+          }}
+        >
+          {cards?.map((card) => (
+            <DraggableCard
+              key={card.id}
+              relationshipID={card.id}
+              entityID={card.value.value}
+              parent={homeEntity[0]?.entity}
+            />
+          ))}
+          <ResizeCanvas canvasEntity={homeEntity[0]?.entity} />
+        </div>
         {/* <HelpToast helpText={`double click/tap to create new`} /> */}
       </div>
     </DndContext>
@@ -209,7 +218,7 @@ const ResizeCanvas = (props: { canvasEntity: string }) => {
   return (
     <div
       style={{ bottom: 16 }}
-      className="absolute flex flex-row gap-4 w-full justify-between px-4"
+      className="absolute bottom-0 flex flex-row gap-4 w-full justify-between px-4"
     >
       {authorized && (
         <button

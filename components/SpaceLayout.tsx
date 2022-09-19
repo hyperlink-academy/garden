@@ -32,7 +32,6 @@ export const SpaceLayout: React.FC = (props) => {
     <>
       <style jsx global>{`
         body {
-          overflow-y: hidden;
         }
       `}</style>
       <div className="h-full" ref={ref}>
