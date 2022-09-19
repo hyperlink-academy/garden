@@ -81,7 +81,7 @@ export const PopupCardViewer: React.FC = (props) => {
             </>
           ) : (
             <>
-              <div className="cardViewerHeader grid items-center gap-4 justify-end">
+              <div className="cardViewerHeader grid items-center gap-4 justify-end justify-items-end">
                 <FindOrCreateBar />
                 <EmptyState />
               </div>
@@ -157,7 +157,7 @@ const BackButton = (props: {
       {...longPressProps}
       className="CardViewerBackButton overflow-clip"
       onClick={() => {
-        if (history.length == 1) {
+        if (props.history.length === 1) {
           // if on last card, scroll back to desktop
           setTimeout(() => {
             const desktop = document.querySelector(".Desktop");
