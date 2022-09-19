@@ -465,5 +465,6 @@ export const useAllItems = (open: boolean) => {
           icon: <Member />,
         };
       })
-    );
+    )
+    .reverse();
 };
