@@ -81,24 +81,21 @@ export const Desktop = () => {
         desktopEntity={homeEntity[0]?.entity}
       />
       <div
-        onClick={(e) => {
-          if (e.currentTarget !== e.target) return;
-          if (e.detail === 2) {
-            let parentRect = e.currentTarget.getBoundingClientRect();
-            setCreateCard({
-              x: e.clientX - parentRect.left,
-              y: e.clientY - parentRect.top,
-            });
-            let newCard = ulid();
-          }
-        }}
         style={{
-          zIndex: 1,
           height: "100%",
         }}
-        className=" text-sm "
       >
         <div
+          onClick={(e) => {
+            if (e.currentTarget !== e.target) return;
+            if (e.detail === 2) {
+              let parentRect = e.currentTarget.getBoundingClientRect();
+              setCreateCard({
+                x: e.clientX - parentRect.left,
+                y: e.clientY - parentRect.top,
+              });
+            }
+          }}
           style={{
             zIndex: 1,
             height: `${height?.value || 800}px`,
@@ -314,8 +311,8 @@ const AddCard = (props: {
           position: {
             rotation: 0,
             size: "big",
-            x: props.position.x,
-            y: props.position.y,
+            x: props.position.x - 128,
+            y: props.position.y - 42,
           },
         });
       }}
