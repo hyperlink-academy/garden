@@ -109,26 +109,8 @@ export const CardView = (props: {
     "section/hyperlink_border_width" as "arbitrarySectionStringType"
   )?.value;
 
-  // animate adding new card to right viewer pane
-  const { xyz, opacity, scale } = useSpring({
-    config: {
-      mass: 0.1,
-      tension: 150,
-      friction: 30,
-      easing: easings.easeOutQuint,
-    },
-    from: {
-      xyz: [-50, 0, 0],
-      opacity: 0,
-    },
-    to: {
-      xyz: [0, 0, 0],
-      opacity: 1,
-    },
-  });
-
   return (
-    <animated.div
+    <div
       ref={parentContainer}
       className={`
       w-full
@@ -256,7 +238,7 @@ export const CardView = (props: {
       The calc controls how much the card will slide up. 
       Bigger number, more of the bottom of the card peeks in, Smaller number, less of it peeks in. */}
       <div className="spacer snap-end h-[calc(100%-48px)]" />
-    </animated.div>
+    </div>
   );
 };
 
