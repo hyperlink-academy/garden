@@ -16,7 +16,6 @@ import { ulid } from "src/ulid";
 import { DownArrow, UpArrow } from "./Icons";
 import { useRouter } from "next/router";
 import { FindOrCreate, useAllItems } from "./FindOrCreateEntity";
-import { relative } from "path";
 
 const GRID_SIZE = 16;
 const snap = (x: number) => Math.ceil(x / GRID_SIZE) * GRID_SIZE;

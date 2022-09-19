@@ -24,6 +24,7 @@ function Page() {
       Desktop 
       overflow-y-scroll overflow-x-hidden 
       no-scrollbar 
+      snap-center
       flex-shrink-0 
       w-[352px] h-[100vh] 
       flex flex-col gap-0
