@@ -77,7 +77,11 @@ export const PopupCardViewer: React.FC = (props) => {
                 <BackButton history={history} setHistory={setHistory} />
                 <FindOrCreateBar />
               </div>
-              <CardView entityID={history[0]} key={history[0]} />
+              <CardView
+                entityID={history[0]}
+                key={history[0]}
+                onDelete={() => setHistory((s) => s.slice(1))}
+              />
             </>
           ) : (
             <>
