@@ -120,25 +120,16 @@ export const CardView = (props: {
     from: {
       xyz: [-50, 0, 0],
       opacity: 0,
-      scale: 0.975,
     },
     to: {
       xyz: [0, 0, 0],
       opacity: 1,
-      scale: 1,
     },
   });
 
   return (
     <animated.div
       ref={parentContainer}
-      style={{
-        transform: xyz.to(
-          (x: any, y: any, z: any) => `translate3d(${x}px, ${y}px, ${z}px)`
-        ),
-        opacity: opacity,
-        scale: scale,
-      }}
       className={`
       w-full
         cardAndBacklink 
