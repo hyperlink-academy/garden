@@ -101,6 +101,7 @@ export const Desktop = () => {
             height: `${height?.value || 800}px`,
             position: "relative",
           }}
+          className="text-sm"
         >
           {cards?.map((card) => (
             <DraggableCard
