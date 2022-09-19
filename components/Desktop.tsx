@@ -55,7 +55,7 @@ export const Desktop = () => {
         if (!homeEntity[0]) return;
         if (
           !over ||
-          overCollision?.data?.targetRatio < 0.95 ||
+          overCollision?.data?.targetRatio < 0.75 ||
           over.id === active.id
         )
           return await mutate("updatePositionInDesktop", {
@@ -305,7 +305,7 @@ const AddCard = (props: {
           desktop: props.desktopEntity,
           position: {
             rotation: 0,
-            size: "small",
+            size: "big",
             x: props.position.x,
             y: props.position.y,
           },
