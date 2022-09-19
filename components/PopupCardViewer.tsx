@@ -12,6 +12,7 @@ import { useIndex, useMutations } from "hooks/useReplicache";
 import { ulid } from "src/ulid";
 import { FindOrCreate, useAllItems } from "./FindOrCreateEntity";
 import useWindowDimensions from "hooks/useWindowDimensions";
+import { useLongPress } from "hooks/useLongPress";
 
 let PopupCardViewerContext = createContext({
   open: (_args: { focused: LinkContextType; entityID: string }) => {},
@@ -29,35 +30,23 @@ export const LinkContextProvider: React.FC<LinkContextType> = (props) => {
 };
 
 export const PopupCardViewer: React.FC = (props) => {
-  let [state, setState] = useState({
-    history: [] as string[],
-    focused: undefined as undefined | LinkContextType,
-  });
+  let [history, setHistory] = useState([] as string[]);
 
   let ref = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
-    if (!state.history[0]) return;
+    if (!history[0]) return;
     setTimeout(() => {
       ref.current?.scrollIntoView({ behavior: "smooth" });
     }, 50);
-  }, [state.history[0]]);
-
-  let prevCardTitle = useIndex.eav(state.history[1], "card/title");
-
-  const { height, width } = useWindowDimensions();
+  }, [history[0]]);
 
   return (
     <PopupCardViewerContext.Provider
       value={{
         open: (args) =>
-          setState((s) => {
-            if (s.history[0] === args.entityID) return s;
-            let history = [args.entityID, ...s.history];
-            return {
-              ...s,
-              history,
-              focused: args.focused,
-            };
+          setHistory((h) => {
+            if (h[0] === args.entityID) return h;
+            return [args.entityID, ...h];
           }),
       }}
     >
@@ -82,60 +71,33 @@ export const PopupCardViewer: React.FC = (props) => {
           snap-center touch-pan-x 
           flex flex-col gap-3 items-stretch`}
         >
-          {state.history[0] ? (
+          {history[0] ? (
             <>
               <div className="cardViewerHeader grid grid-cols-[auto_max-content] items-center gap-4 ">
-                <button
-                  className="CardViewerBackButton overflow-clip"
-                  onClick={() => {
-                    if (state.history.length == 1) {
-                      // if on last card, scroll back to desktop
-                      setTimeout(() => {
-                        const desktop = document.querySelector(".Desktop");
-                        desktop?.scrollIntoView({
-                          behavior: "smooth",
-                          block: "start",
-                        });
-                      }, 50);
-                      // if narrow width, add delay so card doesn't blip out mid-scroll
-                      let delay = 0;
-                      if (width < 640) delay = 500;
-                      setTimeout(() => {
-                        setState((s) => ({
-                          ...s,
-                          history: s.history.slice(1),
-                        }));
-                      }, delay);
-                    } else {
-                      setState((s) => ({ ...s, history: s.history.slice(1) }));
-                    }
-                  }}
-                >
-                  <div className="grid grid-cols-[max-content_auto] gap-3 items-center place-items-start text-grey-55">
-                    <GoBackToPage />{" "}
-                    <p className="truncate whitespace-nowrap">
-                      {state.history.length >= 2
-                        ? width > 1000
-                          ? `Back to ${prevCardTitle?.value}`
-                          : "Back"
-                        : width > 1000
-                        ? "Clear Stack"
-                        : "Clear"}
-                    </p>
-                  </div>
-                </button>
+                <BackButton history={history} setHistory={setHistory} />
                 <FindOrCreateBar />
               </div>
-              <CardView entityID={state.history[0]} key={state.history[0]} />
+              <CardView entityID={history[0]} key={history[0]} />
             </>
           ) : (
             <>
               <div className="cardViewerHeader grid items-center gap-4 justify-end">
                 <FindOrCreateBar />
+                <EmptyState />
               </div>
               {/* merged various nested card wrappers */}
-              <div
-                className={`
+            </>
+          )}
+        </div>
+      </div>
+    </PopupCardViewerContext.Provider>
+  );
+};
+
+const EmptyState = () => {
+  return (
+    <div
+      className={`
                 w-full
                 max-w-3xl mx-auto
                 overflow-y-scroll       
@@ -147,45 +109,87 @@ export const PopupCardViewer: React.FC = (props) => {
                 flex flex-col gap-6
                 p-4
                 `}
-              >
-                <h3>Welcome!</h3>
-                <p>
-                  To the <strong>left</strong> is the <strong>Desktop</strong>,
-                  a canvas for working with cards.
-                </p>
-                <ul className="list-disc list-outside ml-4">
-                  <li>
-                    Double click to add a card — regular cards, decks, or chat
-                    cards
-                  </li>
-                  <li>Move, rotate, and resize cards</li>
-                  <li>
-                    Drag a card into a deck, or on top of another card to make a
-                    new deck
-                  </li>
-                </ul>
-                <p>
-                  Here on the <strong>right</strong> is your{" "}
-                  <strong>Card Viewer</strong>.
-                </p>
-                <ul className="list-disc list-outside ml-4">
-                  <li>To open cards, click from the Desktop or search above</li>
-                  <li>Cards will stack temporarily as you browse</li>
-                </ul>
-                <p>
-                  Above the Desktop, view <strong>Space info</strong> and{" "}
-                  <strong>Highlights</strong>.
-                </p>
-                <p>
-                  Click the same icon on any card to add a{" "}
-                  <strong>new Highlight</strong> for others to see.
-                </p>
-              </div>
-            </>
-          )}
-        </div>
+    >
+      <h3>Welcome!</h3>
+      <p>
+        To the <strong>left</strong> is the <strong>Desktop</strong>, a canvas
+        for working with cards.
+      </p>
+      <ul className="list-disc list-outside ml-4">
+        <li>
+          Double click to add a card — regular cards, decks, or chat cards
+        </li>
+        <li>Move, rotate, and resize cards</li>
+        <li>
+          Drag a card into a deck, or on top of another card to make a new deck
+        </li>
+      </ul>
+      <p>
+        Here on the <strong>right</strong> is your <strong>Card Viewer</strong>.
+      </p>
+      <ul className="list-disc list-outside ml-4">
+        <li>To open cards, click from the Desktop or search above</li>
+        <li>Cards will stack temporarily as you browse</li>
+      </ul>
+      <p>
+        Above the Desktop, view <strong>Space info</strong> and{" "}
+        <strong>Highlights</strong>.
+      </p>
+      <p>
+        Click the same icon on any card to add a <strong>new Highlight</strong>{" "}
+        for others to see.
+      </p>
+    </div>
+  );
+};
+
+const BackButton = (props: {
+  history: string[];
+  setHistory: React.Dispatch<React.SetStateAction<string[]>>;
+}) => {
+  let prevCardTitle = useIndex.eav(props.history[1], "card/title");
+  const { width } = useWindowDimensions();
+  let longPressProps = useLongPress(() => {
+    props.setHistory([]);
+  });
+  return (
+    <button
+      {...longPressProps}
+      className="CardViewerBackButton overflow-clip"
+      onClick={() => {
+        if (history.length == 1) {
+          // if on last card, scroll back to desktop
+          setTimeout(() => {
+            const desktop = document.querySelector(".Desktop");
+            desktop?.scrollIntoView({
+              behavior: "smooth",
+              block: "start",
+            });
+          }, 50);
+          // if narrow width, add delay so card doesn't blip out mid-scroll
+          let delay = 0;
+          if (width < 640) delay = 500;
+          setTimeout(() => {
+            props.setHistory((h) => h.slice(1));
+          }, delay);
+        } else {
+          props.setHistory((s) => s.slice(1));
+        }
+      }}
+    >
+      <div className="grid grid-cols-[max-content_auto] gap-3 items-center place-items-start text-grey-55">
+        <GoBackToPage />{" "}
+        <p className="truncate whitespace-nowrap">
+          {props.history.length >= 2
+            ? width > 1000
+              ? `Back to ${prevCardTitle?.value}`
+              : "Back"
+            : width > 1000
+            ? "Clear Stack"
+            : "Clear"}
+        </p>
       </div>
-    </PopupCardViewerContext.Provider>
+    </button>
   );
 };
 
