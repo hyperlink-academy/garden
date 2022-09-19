@@ -29,6 +29,7 @@ import { flag, ref } from "data/Facts";
 import { ButtonPrimary } from "components/Buttons";
 import { Textarea } from "components/Textarea";
 import { ulid } from "src/ulid";
+import { animated, easings, useSpring } from "@react-spring/web";
 
 const borderStyles = (args: { deck: boolean; member: boolean }) => {
   switch (true) {
@@ -108,9 +109,36 @@ export const CardView = (props: {
     "section/hyperlink_border_width" as "arbitrarySectionStringType"
   )?.value;
 
+  // animate adding new card to right viewer pane
+  const { xyz, opacity, scale } = useSpring({
+    config: {
+      mass: 0.1,
+      tension: 150,
+      friction: 30,
+      easing: easings.easeOutQuint,
+    },
+    from: {
+      xyz: [-50, 0, 0],
+      opacity: 0,
+      scale: 0.975,
+    },
+    to: {
+      xyz: [0, 0, 0],
+      opacity: 1,
+      scale: 1,
+    },
+  });
+
   return (
-    <div
+    <animated.div
       ref={parentContainer}
+      style={{
+        transform: xyz.to(
+          (x: any, y: any, z: any) => `translate3d(${x}px, ${y}px, ${z}px)`
+        ),
+        opacity: opacity,
+        scale: scale,
+      }}
       className={`
       w-full
         cardAndBacklink 
@@ -237,7 +265,7 @@ export const CardView = (props: {
       The calc controls how much the card will slide up. 
       Bigger number, more of the bottom of the card peeks in, Smaller number, less of it peeks in. */}
       <div className="spacer snap-end h-[calc(100%-48px)]" />
-    </div>
+    </animated.div>
   );
 };
 
