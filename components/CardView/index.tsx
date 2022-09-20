@@ -1,4 +1,4 @@
-import { Menu, Transition } from "@headlessui/react";
+import { Menu, Popover, Transition } from "@headlessui/react";
 
 import {
   MoreOptions,
@@ -111,8 +111,7 @@ export const CardView = (props: {
     props.entityID,
     "section/hyperlink_border_width" as "arbitrarySectionStringType"
   )?.value;
-
-  if (isChat) return <ChatCard entityID={props.entityID} {...props} />;
+  if (isChat) return <ChatCard {...props} />;
 
   return (
     <div
@@ -403,23 +402,16 @@ const CardMoreOptionsMenu = (props: {
 };
 
 const HighlightDropdown = (props: { entityID: string }) => {
-  let [open, setOpen] = useState(false);
   let [highlightHelp, setHighlightHelp] = useState(false);
   let [note, setNote] = useState("");
   let { authorized, mutate, memberEntity } = useMutations();
 
   return (
-    <>
+    <Popover>
       {authorized && (
-        <button
-          className="cardHighlighter rounded-full bg-test-pink h-[28px] w-[28px]"
-          onClick={() => {
-            setOpen(!open);
-          }}
-        />
+        <Popover.Button className="cardHighlighter rounded-full bg-test-pink h-[28px] w-[28px]" />
       )}
       <Transition
-        show={open}
         enter="transition ease-out duration-100"
         enterFrom="transform opacity-0 scale-95"
         enterTo="transform opacity-100 scale-100"
@@ -440,75 +432,81 @@ const HighlightDropdown = (props: { entityID: string }) => {
           origin-top-right 
           z-40"
       >
-        <div className="flex flex-col gap-2">
-          <Textarea
-            placeholder="add a note (optional)"
-            className="lightBorder resize-none w-full p-3 text-left"
-            value={note}
-            onChange={(e) => setNote(e.currentTarget.value)}
-          />
-          <small className="text-right justify-self-end">
-            <span className={note.length > 280 ? "text-accent-red" : ""}>
-              {note.length}
-            </span>
-            /{280}
-          </small>
-        </div>
-        <div className="flex justify-between items-end text-accent-blue">
-          <small onClick={() => setHighlightHelp(!highlightHelp)}>
-            {!highlightHelp ? "What's this?" : "Gotcha!"}
-          </small>
-
-          <ButtonPrimary
-            content="Submit"
-            onClick={async () => {
-              if (!memberEntity) return;
-              let entity = ulid();
-              await mutate("assertFact", [
-                {
-                  entity,
-                  positions: {},
-                  attribute: "highlight/time",
-                  value: { type: "unix_seconds", value: Date.now().toString() },
-                },
-
-                {
-                  entity,
-                  positions: {},
-                  attribute: "highlight/card",
-                  value: ref(props.entityID),
-                },
-                {
-                  entity,
-                  positions: {},
-                  attribute: "highlight/by",
-                  value: ref(memberEntity),
-                },
-              ]);
-              if (note) {
-                await mutate("assertFact", {
-                  entity,
-                  attribute: "highlight/note",
-                  value: note,
-                  positions: {},
-                });
-              }
-              setOpen(false);
-            }}
-          />
-        </div>
-        {highlightHelp ? (
-          <div className="lightBorder bg-background p-3 -mt-1">
-            <small>
-              <b>Use a highlight to draw attention to this card.</b>
-              <br />
-              It'll be added to the highlight reel on the desktop with your note
-              where everyone can see it. <br />
-              Highlights fade after 24 hours!
+        <Popover.Panel>
+          <div className="flex flex-col gap-2">
+            <Textarea
+              placeholder="add a note (optional)"
+              className="lightBorder resize-none w-full p-3 text-left"
+              value={note}
+              onChange={(e) => setNote(e.currentTarget.value)}
+            />
+            <small className="text-right justify-self-end">
+              <span className={note.length > 280 ? "text-accent-red" : ""}>
+                {note.length}
+              </span>
+              /{280}
             </small>
           </div>
-        ) : null}
+          <div className="flex justify-between items-end text-accent-blue">
+            <small onClick={() => setHighlightHelp(!highlightHelp)}>
+              {!highlightHelp ? "What's this?" : "Gotcha!"}
+            </small>
+
+            <ButtonPrimary
+              disabled={note.length > 280}
+              content="Submit"
+              onClick={async () => {
+                if (!memberEntity || note.length > 280) return;
+                let entity = ulid();
+                await mutate("assertFact", [
+                  {
+                    entity,
+                    positions: {},
+                    attribute: "highlight/time",
+                    value: {
+                      type: "unix_seconds",
+                      value: Date.now().toString(),
+                    },
+                  },
+
+                  {
+                    entity,
+                    positions: {},
+                    attribute: "highlight/card",
+                    value: ref(props.entityID),
+                  },
+                  {
+                    entity,
+                    positions: {},
+                    attribute: "highlight/by",
+                    value: ref(memberEntity),
+                  },
+                ]);
+                if (note) {
+                  await mutate("assertFact", {
+                    entity,
+                    attribute: "highlight/note",
+                    value: note,
+                    positions: {},
+                  });
+                }
+                setOpen(false);
+              }}
+            />
+          </div>
+          {highlightHelp ? (
+            <div className="lightBorder bg-background p-3 -mt-1">
+              <small>
+                <b>Use a highlight to draw attention to this card.</b>
+                <br />
+                It'll be added to the highlight reel on the desktop with your
+                note where everyone can see it. <br />
+                Highlights fade after 24 hours!
+              </small>
+            </div>
+          ) : null}
+        </Popover.Panel>
       </Transition>
-    </>
+    </Popover>
   );
 };
