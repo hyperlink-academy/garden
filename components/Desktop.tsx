@@ -8,7 +8,7 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CardPreview } from "./CardPreview";
 import { customCollisionDetection } from "src/customCollisionDetection";
 import { restrictToParentElement } from "@dnd-kit/modifiers";
@@ -88,8 +88,21 @@ export const Desktop = () => {
         <div
           onClick={(e) => {
             if (e.currentTarget !== e.target) return;
+            let parentRect = e.currentTarget.getBoundingClientRect();
+            if (e.ctrlKey) {
+              mutate("addCardToDesktop", {
+                entity: ulid(),
+                factID: ulid(),
+                desktop: homeEntity[0].entity,
+                position: {
+                  rotation: 0,
+                  size: "big",
+                  x: Math.max(e.clientX - parentRect.left - 128, 0),
+                  y: Math.max(e.clientY - parentRect.top - 42, 0),
+                },
+              });
+            }
             if (e.detail === 2) {
-              let parentRect = e.currentTarget.getBoundingClientRect();
               setCreateCard({
                 x: e.clientX - parentRect.left,
                 y: e.clientY - parentRect.top,
@@ -316,6 +329,7 @@ const AddCard = (props: {
 
         mutate("addCardToDesktop", {
           entity,
+          factID: ulid(),
           desktop: props.desktopEntity,
           position: {
             rotation: 0,
