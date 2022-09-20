@@ -138,7 +138,9 @@ const Card = (
 ) => {
   let [ref, { height }] = useMeasure();
   const CardHeightAnim = useSpring({
-    maxHeight: props.focused ? (props.expandAll ? height : 480) : 48,
+    config: { mass: 0.1, tension: 500, friction: 25 },
+    maxHeight: props.focused ? (props.expandAll ? height : 492) : 48,
+    marginBottom: props.focused ? 12 : -12,
   });
 
   let data = {
@@ -184,7 +186,6 @@ const Card = (
           !props.last
             ? {
                 overflow: "hidden",
-                marginBottom: props.focused ? "12px" : "-12px",
                 ...CardHeightAnim,
               }
             : {
