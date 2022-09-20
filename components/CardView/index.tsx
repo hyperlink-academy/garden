@@ -110,7 +110,7 @@ export const CardView = (props: {
     props.entityID,
     "section/hyperlink_border_width" as "arbitrarySectionStringType"
   )?.value;
-  if (isChat) return <ChatCard entityID={props.entityID} />;
+  if (isChat) return <ChatCard entityID={props.entityID} {...props} />;
 
   return (
     <div
@@ -245,13 +245,27 @@ export const CardView = (props: {
   );
 };
 
-const ChatCard = (props: { entityID: string }) => {
+const ChatCard = (props: {
+  entityID: string;
+  onDelete?: () => void;
+  referenceFactID?: string;
+}) => {
   return (
     <div
       className={`grow h-full bg-white rounded-lg relative border border-grey-80`}
     >
       <div className="absolute top-0 bottom-0 left-0 right-0 flex flex-col gap-4 h-full p-4">
-        <Title entityID={props.entityID} />
+        <div className="cardHeader grid grid-cols-[auto_max-content_max-content] gap-2">
+          <Title entityID={props.entityID} />
+          <HighlightDropdown entityID={props.entityID} />
+          <div className="">
+            <CardMoreOptionsMenu
+              onDelete={props.onDelete}
+              entityID={props.entityID}
+              referenceFactID={props?.referenceFactID}
+            />
+          </div>
+        </div>
         <Messages topic={props.entityID} />
         <MessageInput id={props.entityID} topic={props.entityID} />
       </div>
