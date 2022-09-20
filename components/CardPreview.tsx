@@ -186,7 +186,8 @@ const SmallCardBody = (props: { entityID: string } & SharedProps) => {
 
   return (
     <div
-      className={`w-full h-full grid grid-cols-[max-content_auto] !bg-cover !bg-center !bg-no-repeat ${
+      onClick={() => open({ entityID: props.entityID })}
+      className={`w-full h-full grid grid-cols-[max-content_auto] !bg-cover !bg-center !bg-no-repeat hover:cursor-pointer ${
         isMember ? "pr-1 pl-0 pt-2 pb-1" : "pr-3 pl-0 py-2"
       }`}
       style={{
@@ -212,32 +213,27 @@ const SmallCardBody = (props: { entityID: string } & SharedProps) => {
           style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
         >
           {/* Small Card Preivew Title Or Contnet */}
-          <div
-            onClick={() => open({ entityID: props.entityID })}
-            className="hover:cursor-pointer"
-          >
-            <a className="h-full overflow-hidden">
-              {!title || title?.value === "" ? (
-                <small>
-                  <pre
-                    className={`whitespace-pre-wrap truncate leading-tight ${
-                      !image ? "" : "rounded-[3px] px-1 bg-white/75"
-                    } `}
-                  >
-                    {content?.value}
-                  </pre>
-                </small>
-              ) : (
-                <div
-                  className={`leading-tight text-ellipsis text-grey-35 font-bold  ${
+          <a className="h-full overflow-hidden">
+            {!title || title?.value === "" ? (
+              <small>
+                <pre
+                  className={`whitespace-pre-wrap truncate leading-tight ${
                     !image ? "" : "rounded-[3px] px-1 bg-white/75"
-                  }`}
+                  } `}
                 >
-                  {title?.value}
-                </div>
-              )}
-            </a>
-          </div>
+                  {content?.value}
+                </pre>
+              </small>
+            ) : (
+              <div
+                className={`leading-tight text-ellipsis text-grey-35 font-bold  ${
+                  !image ? "" : "rounded-[3px] px-1 bg-white/75"
+                }`}
+              >
+                {title?.value}
+              </div>
+            )}
+          </a>
 
           {/* Small Card Preview External Link */}
           {url ? (
