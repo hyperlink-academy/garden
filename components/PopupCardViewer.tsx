@@ -42,9 +42,12 @@ export const PopupCardViewer: React.FC = (props) => {
             if (h[0] === args.entityID) return h;
             return [args.entityID, ...h];
           });
-          ref.current?.scrollTo({
-            left: ref.current.clientWidth,
-            behavior: "smooth",
+          window.setTimeout(() => {
+            ref.current?.scrollTo({
+              left: ref.current?.clientWidth,
+              behavior: "smooth",
+            }),
+              50;
           });
         },
       }}
