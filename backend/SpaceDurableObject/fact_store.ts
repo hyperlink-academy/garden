@@ -220,7 +220,7 @@ export const store = (storage: BasicStorage, ctx: { id: string }) => {
         let schema = await getSchema(f.attribute);
         if (!schema)
           return { success: false, error: "Invalid attribute" } as const;
-        let factID = ulid();
+        let factID = f.factID || ulid();
         let lastUpdated = Date.now().toString();
         if (schema.cardinality === "one") {
           let existingFact = (await scanIndex.eav(f.entity, f.attribute)) as

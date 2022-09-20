@@ -166,7 +166,7 @@ let mutators: ReplicacheMutators = Object.keys(Mutations).reduce((acc, k) => {
             newID = existingFact.id;
           }
         }
-        if (!newID) newID = ulid();
+        if (!newID) newID = fact.factID || ulid();
         let data = FactWithIndexes({ id: newID, ...fact, lastUpdated, schema });
         await tx.put(newID, data);
         return { success: true, factID: newID };
