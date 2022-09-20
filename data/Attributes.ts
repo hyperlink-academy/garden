@@ -59,6 +59,11 @@ export const DefaultAttributes = {
     unique: false,
     cardinality: "one",
   },
+  chat: {
+    type: "flag",
+    unique: false,
+    cardinality: "one",
+  },
   home: {
     type: "flag",
     unique: false,
