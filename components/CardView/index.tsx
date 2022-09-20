@@ -452,7 +452,8 @@ const HighlightDropdown = (props: { entityID: string }) => {
               {!highlightHelp ? "What's this?" : "Gotcha!"}
             </small>
 
-            <ButtonPrimary
+            <Popover.Button
+              as={ButtonPrimary}
               disabled={note.length > 280}
               content="Submit"
               onClick={async () => {
@@ -490,7 +491,6 @@ const HighlightDropdown = (props: { entityID: string }) => {
                     positions: {},
                   });
                 }
-                setOpen(false);
               }}
             />
           </div>
