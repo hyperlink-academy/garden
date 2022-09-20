@@ -45,9 +45,6 @@ body {
   font-family: "Quattro";
 }
 
-body {
-}
-
 #__next {
   height: 100%;
 }
@@ -171,11 +168,25 @@ input {
   bottom: 0;
 }
 
-/* 
-.deckBorderContent {
-  margin: -19px;
-  @apply rounded-lg;
-} */
+.chatCardBorder {
+  z-index: 0;
+  padding-left: 4px;
+  padding-bottom: 12px;
+}
+
+.chatCardBorder::before {
+  content: "";
+  z-index: -1;
+  border-image-source: url(/cardBorders/chatCardBorder.svg);
+  border-image-slice: 40% fill;
+  border-width: 40px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
 /* END GLOBAL STYLING */
 
 * {

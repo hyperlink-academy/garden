@@ -18,13 +18,19 @@ import { isUrl } from "src/isUrl";
 import { useRef } from "react";
 import { usePopupCardViewer } from "./PopupCardViewer";
 
-const borderStyles = (args: { isDeck: boolean; isMember: boolean }) => {
+const borderStyles = (args: {
+  isDeck: boolean;
+  isMember: boolean;
+  isChat: boolean;
+}) => {
   switch (true) {
     //border styles found in global.css
     case args.isMember:
       return "memberCardBorder";
     case args.isDeck:
       return "deckCardBorder";
+    case args.isChat:
+      return "chatCardBorder";
     default:
       return "defaultCardBorder";
   }
@@ -51,12 +57,17 @@ export const CardPreview = (
 ) => {
   let isDeck = !!useIndex.eav(props.entityID, "deck");
   let isMember = !!useIndex.eav(props.entityID, "member/name");
+  let isChat = !!useIndex.eav(props.entityID, "chat");
   let image = useIndex.eav(props.entityID, "card/image");
 
   return (
     <RotateAndResize {...props}>
       <div
-        className={`relative grow h-full ${borderStyles({ isDeck, isMember })}`}
+        className={`relative grow h-full ${borderStyles({
+          isDeck,
+          isMember,
+          isChat,
+        })}`}
       >
         {props.size === "small" ? (
           <SmallCardBody {...props} />
