@@ -1,4 +1,5 @@
 import { makeRoute } from "backend/lib/api";
+import { flag } from "data/Facts";
 import { ulid } from "src/ulid";
 import { z } from "zod";
 import { Env } from "..";
@@ -20,7 +21,14 @@ export const claimRoute = makeRoute({
     let thisEntity = ulid();
     if (creator) return { data: { success: false } };
     let memberEntity = ulid();
+    let homeEntity = ulid();
     await Promise.all([
+      env.factStore.assertFact({
+        entity: homeEntity,
+        attribute: "home",
+        value: flag(),
+        positions: {},
+      }),
       env.factStore.assertFact({
         entity: memberEntity,
         attribute: "space/member",
