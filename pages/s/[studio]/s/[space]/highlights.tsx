@@ -33,9 +33,11 @@ export default function HighlightPage() {
       </div>
 
       <Carousel>
-        {cards.map(({ entity }) => (
-          <HighlightedItem entityID={entity} />
-        ))}
+        {cards.length > 0 ? (
+          cards.map(({ entity }) => <HighlightedItem entityID={entity} />)
+        ) : (
+          <EmptyState />
+        )}
       </Carousel>
     </div>
   );
@@ -164,3 +166,50 @@ function timeSince(ms: number) {
   let days = Math.floor(hours / 24);
   return `${days} days ago`;
 }
+
+const EmptyState = () => {
+  return (
+    <div
+      className={`
+                w-full
+                max-w-3xl mx-auto
+                overflow-y-scroll       
+                relative
+                no-scrollbar
+                snap-y snap-mandatory snap-start
+                border border-dashed border-grey-80 rounded-lg
+                text-grey-35
+                flex flex-col gap-6
+                p-4
+                `}
+    >
+      <h3>No new highlights in this Space!</h3>
+      <p>
+        When you <strong>Highlight</strong> cards, they show for all members for{" "}
+        <strong>24 hrs</strong> — then disappear.
+      </p>
+      <p>
+        To <strong>make a Highlight</strong>, click the icon on any card, and
+        optionally add a note.
+      </p>
+      <p>Use Highlights to focus attention on meaningful things:</p>
+      <ul className="list-disc list-outside ml-4">
+        <li>New cards…or members!</li>
+        <li>Things that need feedback</li>
+        <li>Important chat convos</li>
+        <li>Next "moves" for the group</li>
+      </ul>
+      <p>
+        Once you've seen a Highlight, it'll be marked (just for you) as read.
+      </p>
+
+      <p>
+        Since Highlights are ephemeral, act fast: treat them as prompts, respond
+        via cards or chat, make new Highlights.
+      </p>
+      <p>
+        <strong>Let's play the infinite game</strong>.
+      </p>
+    </div>
+  );
+};
