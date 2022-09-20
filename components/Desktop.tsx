@@ -73,6 +73,7 @@ export const Desktop = () => {
             let parentRect = e.currentTarget.getBoundingClientRect();
             mutate("addCardToDesktop", {
               entity: newCard,
+              factID: ulid(),
               desktop: homeEntity[0]?.entity,
               position: {
                 rotation: 0,
