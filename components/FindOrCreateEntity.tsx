@@ -335,7 +335,7 @@ const CreateButton = (props: {
         }}
       </Combobox.Option>
       <Combobox.Option
-        key={"create"}
+        key={"create-chat"}
         value={{
           type: "create",
           cardType: "chat",
