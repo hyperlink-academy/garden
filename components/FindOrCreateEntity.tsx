@@ -2,7 +2,15 @@ import { Combobox, Dialog, Transition } from "@headlessui/react";
 import { useIndex } from "hooks/useReplicache";
 import { useRef, useState } from "react";
 import { ButtonPrimary } from "./Buttons";
-import { Add, Card, Checkmark, Cross, DeckSmall, Member } from "./Icons";
+import {
+  Add,
+  Card,
+  ChatBubble,
+  Checkmark,
+  Cross,
+  DeckSmall,
+  Member,
+} from "./Icons";
 import { Divider } from "./Layout";
 
 // Can I adapt this to work for section names as well?
@@ -17,7 +25,7 @@ import { Divider } from "./Layout";
 type Item = { display: string; entity: string; icon?: React.ReactElement };
 type AddedItem =
   | { entity: string; type: "existing" }
-  | { name: string; type: "create" };
+  | { name: string; type: "create"; cardType: "card" | "chat" };
 
 export const FindOrCreate = (props: {
   allowBlank: boolean;
@@ -62,31 +70,32 @@ export const FindOrCreate = (props: {
         <Dialog.Overlay className="overlay" />
 
         <Combobox
-          value={isMultiSelect ? added : ""}
-          onChange={(optionValue: string) => {
-            let findAddedItem = added.find(
-              (addedItem) =>
-                addedItem.type === "existing" &&
-                addedItem.entity === optionValue
-            );
-
+          value={null}
+          onChange={(optionValue: AddedItem) => {
             // if the item is already in the deck, don't do anything
-            if (props.selected.includes(optionValue)) return;
+            if (
+              optionValue?.type === "existing"
+                ? props.selected.includes(optionValue.entity)
+                : props.selected.includes(optionValue.name)
+            )
+              return;
 
             // NOTE: clicking the checkbox, shift clicking, longpress/click on a search result sets state to multiselect.
             // if isMultiSelect = false then onselect and onclose that bish
             if (isMultiSelect.current === false) {
-              props.onSelect(
-                optionValue === "create"
-                  ? { type: "create", name: input }
-                  : { entity: optionValue, type: "existing" }
-              );
+              props.onSelect(optionValue);
               props.onClose();
               setAdded([]);
               return;
             }
 
             // if isMultiSelect is true, and if the item is already added, then remove from added[],
+            let findAddedItem = added.find(
+              (f) =>
+                f.type === "existing" &&
+                optionValue.type === "existing" &&
+                f.entity === optionValue.entity
+            );
             if (findAddedItem !== undefined) {
               let addedItemIndex = added.indexOf(findAddedItem);
               added.splice(addedItemIndex, 1);
@@ -94,12 +103,7 @@ export const FindOrCreate = (props: {
               return;
             }
 
-            setAdded([
-              ...added,
-              optionValue === "create"
-                ? { name: input, type: "create" }
-                : { entity: optionValue, type: "existing" },
-            ]);
+            setAdded([...added, optionValue]);
           }}
           as="div"
           className={`
@@ -229,7 +233,10 @@ export const FindOrCreate = (props: {
                     added.find((f) => f.type === "create" && f.name === value)
                   )
                     return;
-                  setAdded([...added, { type: "create", name: value }]);
+                  setAdded([
+                    ...added,
+                    { type: "create", name: value, cardType: "card" },
+                  ]);
                 }}
               />
             )}
@@ -276,12 +283,13 @@ const CreateButton = (props: {
   addItem: (value: string) => void;
   setMultiSelect: () => void;
 }) => {
+  let value: AddedItem = {
+    type: "create",
+    cardType: "card",
+    name: props.value,
+  };
   return (
-    <Combobox.Option
-      key={"create"}
-      value={"create"}
-      disabled={props.inputExists}
-    >
+    <Combobox.Option key={"create"} value={value} disabled={props.inputExists}>
       {({ active }) => {
         return (
           <SearchItem
@@ -293,15 +301,20 @@ const CreateButton = (props: {
               <div
                 className={`py-2 w-full
                           text-accent-blue font-bold 
-                          grid grid-cols-[min-content_auto] gap-2
+                          flex flex-row justify-between
                           cursor-pointer`}
               >
-                <Add />
-                <div>
-                  {!props.value
-                    ? "Create a blank card"
-                    : `Create "${props.value}"`}
+                <div className="flex flex-row gap-2">
+                  <Add />
+                  <div>
+                    {!props.value
+                      ? "Create a blank card"
+                      : `Create "${props.value}"`}
+                  </div>
                 </div>
+                <button>
+                  <ChatBubble height={24} width={24} />
+                </button>
               </div>
             ) : (
               <div
@@ -328,12 +341,9 @@ const SearchResult = (
     setMultiSelect: () => void;
   }
 ) => {
+  let value: AddedItem = { type: "existing", entity: props.entity };
   return (
-    <Combobox.Option
-      key={props.entity}
-      value={props.entity}
-      disabled={props.disabled}
-    >
+    <Combobox.Option key={props.entity} value={value} disabled={props.disabled}>
       {({ active }) => {
         return (
           <SearchItem
