@@ -214,7 +214,7 @@ export const MessageInput = (props: { id: string; topic: string }) => {
   // STATE OF MESSAGE INPUT IF NOT LOGGED IN
   if (!authorized) {
     return (
-      <div className=" text-grey-55 italic border-t border-grey-80 -mx-4 md:mx-0 px-4 pt-2 pb-2">
+      <div className=" text-grey-55 italic border-t border-grey-80 -mx-3 md:mx-0 px-4 pt-2 pb-2">
         <div className="bg-grey-90 p-2 rounded-md">
           Log in to send a message!
         </div>
@@ -267,7 +267,7 @@ export const MessageInput = (props: { id: string; topic: string }) => {
   return (
     // the message input is 16px and the rest of chat is 15px.
     // this is because on mobile, browsers will automatically zoom in if you click on form elements with font size less thn 16px
-    <div className="-mx-4 md:mx-0 px-4 md:px-4 pt-4 pb-4 border-t text-base border-grey-80 gap-2  rounded-none">
+    <div className="-mx-3 md:mx-0 px-4 md:px-4 pt-4 pb-4 border-t text-base border-grey-80 gap-2  rounded-none">
       {/* ATTACHED CARDS IN MESSAGE INPUT */}
       <div
         className={`${

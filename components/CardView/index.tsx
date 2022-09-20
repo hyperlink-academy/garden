@@ -257,7 +257,7 @@ const ChatCard = (props: {
   return (
     <div className={`chatCardWrapper grow h-full relative`}>
       <div className="chatCardBackground absolute top-0 bottom-0 left-0 right-0 chatCardBorder">
-        <div className="chatCardContent flex flex-col overflow-scroll h-full px-3 pt-4 sm:px-4 sm:pt-6 pb-1">
+        <div className="chatCardContent flex flex-col  h-full px-3 pt-4 sm:px-4 sm:pt-6 pb-1">
           <div className="cardHeader grid grid-cols-[auto_max-content_max-content] gap-2">
             <div className="pb-2">
               <Title entityID={props.entityID} />
