@@ -33,24 +33,24 @@ export const PopupCardViewer: React.FC = (props) => {
   let [history, setHistory] = useState([] as string[]);
 
   let ref = useRef<HTMLDivElement | null>(null);
-  useEffect(() => {
-    if (!history[0]) return;
-    setTimeout(() => {
-      ref.current?.scrollIntoView({ behavior: "smooth" });
-    }, 50);
-  }, [history[0]]);
 
   return (
     <PopupCardViewerContext.Provider
       value={{
-        open: (args) =>
+        open: (args) => {
           setHistory((h) => {
             if (h[0] === args.entityID) return h;
             return [args.entityID, ...h];
-          }),
+          });
+          ref.current?.scrollTo({
+            left: ref.current.clientWidth,
+            behavior: "smooth",
+          });
+        },
       }}
     >
       <div
+        ref={ref}
         className={`
         pageWrapper 
         pr-2 pl-[calc((100vw-352px)/2)] sm:px-8 
@@ -62,7 +62,6 @@ export const PopupCardViewer: React.FC = (props) => {
         {props.children}
 
         <div
-          ref={ref}
           className={`cardViewerWrapper 
           h-full w-[calc(100vw-16px)] max-w-3xl 
           pt-2 pb-4 sm:pt-4 sm:pb-8 
