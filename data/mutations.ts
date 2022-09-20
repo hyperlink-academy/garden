@@ -145,10 +145,12 @@ const addSpace: Mutation<{
 
 const addCardToDesktop: Mutation<{
   entity: string;
+  factID: string;
   desktop: string;
   position: { x: number; y: number; rotation: number; size: "big" | "small" };
 }> = async (args, ctx) => {
   let id = await ctx.assertFact({
+    factID: args.factID,
     entity: args.desktop,
     attribute: "deck/contains",
     value: ref(args.entity),
