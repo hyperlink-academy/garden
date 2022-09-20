@@ -1,6 +1,8 @@
 import { Carousel } from "components/CardCarousel";
 import { CardView } from "components/CardView";
 import { CrossLarge, HighlightNote } from "components/Icons";
+import { Textarea } from "components/Textarea";
+import { RenderedText } from "components/Textarea/RenderedText";
 import { useIndex, useMutations } from "hooks/useReplicache";
 import { spacePath } from "hooks/utils";
 import Link from "next/link";
@@ -150,7 +152,7 @@ let Note = (props: {
           <HighlightNote />
         </button>
       </div>
-      <p className="leading-tight">{note?.value}</p>
+      <Textarea value={note?.value || ""} previewOnly />
     </div>
   );
 };
