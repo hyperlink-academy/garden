@@ -320,8 +320,8 @@ const AddCard = (props: {
           position: {
             rotation: 0,
             size: "big",
-            x: props.position.x - 128,
-            y: props.position.y - 42,
+            x: Math.max(props.position.x - 128, 0),
+            y: Math.max(props.position.y - 42, 0),
           },
         });
       }}
