@@ -289,47 +289,69 @@ const CreateButton = (props: {
     name: props.value,
   };
   return (
-    <Combobox.Option key={"create"} value={value} disabled={props.inputExists}>
-      {({ active }) => {
-        return (
-          <SearchItem
-            active={active}
-            onLongPress={() => props.addItem(props.value)}
-            setMultiSelect={props.setMultiSelect}
-          >
-            {!props.inputExists || props.value === "" ? (
-              <div
-                className={`py-2 w-full
+    <div className="flex flex-row">
+      <Combobox.Option
+        key={"create"}
+        value={value}
+        className="flex-grow"
+        disabled={props.inputExists}
+      >
+        {({ active }) => {
+          return (
+            <SearchItem
+              active={active}
+              onLongPress={() => props.addItem(props.value)}
+              setMultiSelect={props.setMultiSelect}
+            >
+              {!props.inputExists || props.value === "" ? (
+                <div
+                  className={`py-2 w-full
                           text-accent-blue font-bold 
                           flex flex-row justify-between
+                          flex-grow
                           cursor-pointer`}
-              >
-                <div className="flex flex-row gap-2">
-                  <Add />
-                  <div>
-                    {!props.value
-                      ? "Create a blank card"
-                      : `Create "${props.value}"`}
+                >
+                  <div className="flex flex-row gap-2">
+                    <Add />
+                    <div>
+                      {!props.value
+                        ? "Create a blank card"
+                        : `Create "${props.value}"`}
+                    </div>
                   </div>
                 </div>
-                <button>
-                  <ChatBubble height={24} width={24} />
-                </button>
-              </div>
-            ) : (
-              <div
-                className={`py-2 w-full
+              ) : (
+                <div
+                  className={`py-2 w-full
                           text-grey-55 font-bold 
                           grid grid-cols-[min-content_auto] gap-2`}
-              >
-                <Add />
-                <div>"{props.value}" already exists</div>
-              </div>
-            )}
-          </SearchItem>
-        );
-      }}
-    </Combobox.Option>
+                >
+                  <Add />
+                  <div>"{props.value}" already exists</div>
+                </div>
+              )}
+            </SearchItem>
+          );
+        }}
+      </Combobox.Option>
+      <Combobox.Option
+        key={"create"}
+        value={{
+          type: "create",
+          cardType: "chat",
+          name: props.value,
+        }}
+        disabled={props.inputExists}
+      >
+        {({ active }) => {
+          return (
+            <div className={`h-full flex ${active ? "bg-bg-blue" : ""}`}>
+              <ChatBubble height={24} width={24} className={`self-center`} />
+            </div>
+          );
+        }}
+      </Combobox.Option>
+    </div>
   );
 };
 
@@ -440,7 +462,7 @@ const SearchItem: React.FC<{
         }
       }}
       //END LONGPRESS LOGIC
-      className={`w-full px-3 py-0.5 ${props.className || ""} ${
+      className={`w-full flex-grow px-3 py-0.5 ${props.className || ""} ${
         props.active ? "bg-bg-blue" : ""
       }`}
     >

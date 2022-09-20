@@ -329,7 +329,6 @@ export const MessageInput = (props: { id: string; topic: string }) => {
           placeholder="write a message"
           value={message}
           onKeyDown={(e) => {
-            console.log(e.key);
             if (e.key === "Enter") {
               if (e.shiftKey) {
                 return;

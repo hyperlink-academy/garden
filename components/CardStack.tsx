@@ -285,70 +285,64 @@ const AddCard = (props: { expanded: boolean; end?: boolean } & StackData) => {
           // if youre adding to a backlink section, then the entity is a string
           // if youre creating a new deck
           let entity: string;
-          if (props.backlink) {
-            if (d.type === "create") {
-              entity = ulid();
-              if (props.attribute === "deck/contains") {
-                let decks = await rep.rep.query(async (tx) => {
-                  let results = await tx
-                    .scan({
-                      indexName: "aev",
-                      prefix: `deck-`,
-                    })
-                    .values()
-                    .toArray();
-                  return results as Fact<"deck">[];
-                });
-
-                let decksLastPosition = decks.sort(sortByPosition("aev"))[
-                  decks.length - 1
-                ]?.positions.aev;
-                mutate("addDeck", {
-                  newEntity: entity,
-                  newHomeEntity: ulid(),
-                  name: "",
-                  position: generateKeyBetween(decksLastPosition || null, null),
-                });
-              }
-              if (d.name) {
-                await mutate("createCard", {
-                  entityID: entity,
-                  title: d.name,
-                });
-              }
-            } else {
-              entity = d.entity;
+          if (d.type === "existing") entity = d.entity;
+          else {
+            entity = ulid();
+            if (d.cardType === "chat") {
+              await mutate("assertFact", {
+                entity,
+                attribute: "chat",
+                value: { type: "flag" },
+                positions: {},
+              });
+            }
+            if (d.name) {
+              await mutate("createCard", {
+                entityID: entity,
+                title: d.name,
+              });
             }
 
-            if (props.attribute !== "deck/contains") {
-              let existingSections = await rep.rep.query((tx) =>
-                scanIndex(tx).eav(entity, "card/section")
-              );
-              if (
-                !existingSections.find(
-                  (f) => f.value === props.attribute.slice(8)
-                )
-              ) {
-                await mutate("addSection", {
-                  newSectionEntity: ulid(),
-                  sectionName: props.attribute.slice(8),
-                  type: "reference",
-                  cardEntity: entity,
-                  positions: "",
-                });
-              }
+            if (props.backlink && props.attribute === "deck/contains") {
+              let decks = await rep.rep.query(async (tx) => {
+                let results = await tx
+                  .scan({
+                    indexName: "aev",
+                    prefix: `deck-`,
+                  })
+                  .values()
+                  .toArray();
+                return results as Fact<"deck">[];
+              });
+
+              let decksLastPosition = decks.sort(sortByPosition("aev"))[
+                decks.length - 1
+              ]?.positions.aev;
+              mutate("addDeck", {
+                newEntity: entity,
+                newHomeEntity: ulid(),
+                name: "",
+                position: generateKeyBetween(decksLastPosition || null, null),
+              });
             }
-          } else {
-            if (d.type === "create") {
-              entity = ulid();
-              if (d.name) {
-                await mutate("createCard", {
-                  entityID: entity,
-                  title: d.name,
-                });
-              }
-            } else {
-              entity = d.entity;
+          }
+
+          if (props.backlink && props.attribute !== "deck/contains") {
+            let existingSections = await rep.rep.query((tx) =>
+              scanIndex(tx).eav(entity, "card/section")
+            );
+            if (
+              !existingSections.find(
+                (f) => f.value === props.attribute.slice(8)
+              )
+            ) {
+              await mutate("addSection", {
+                newSectionEntity: ulid(),
+                sectionName: props.attribute.slice(8),
+                type: "reference",
+                cardEntity: entity,
+                positions: "",
+              });
             }
           }
 

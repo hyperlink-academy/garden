@@ -30,6 +30,7 @@ import { ButtonPrimary } from "components/Buttons";
 import { Textarea } from "components/Textarea";
 import { ulid } from "src/ulid";
 import { animated, easings, useSpring } from "@react-spring/web";
+import { MessageInput, Messages } from "pages/s/[studio]/s/[space]/chat";
 
 const borderStyles = (args: { deck: boolean; member: boolean }) => {
   switch (true) {
@@ -59,6 +60,7 @@ export const CardView = (props: {
   referenceFactID?: string;
 }) => {
   let isDeck = useIndex.eav(props.entityID, "deck");
+  let isChat = useIndex.eav(props.entityID, "chat");
   let memberName = useIndex.eav(props.entityID, "member/name");
   let parentContainer = useRef<HTMLDivElement>(null);
   let { ref } = usePreserveScroll<HTMLDivElement>();
@@ -108,6 +110,7 @@ export const CardView = (props: {
     props.entityID,
     "section/hyperlink_border_width" as "arbitrarySectionStringType"
   )?.value;
+  if (isChat) return <ChatCard entityID={props.entityID} />;
 
   return (
     <div
@@ -238,6 +241,20 @@ export const CardView = (props: {
       The calc controls how much the card will slide up. 
       Bigger number, more of the bottom of the card peeks in, Smaller number, less of it peeks in. */}
       <div className="spacer snap-end h-[calc(100%-48px)]" />
+    </div>
+  );
+};
+
+const ChatCard = (props: { entityID: string }) => {
+  return (
+    <div
+      className={`grow h-full bg-white rounded-lg relative border border-grey-80`}
+    >
+      <div className="absolute top-0 bottom-0 left-0 right-0 flex flex-col gap-4 h-full p-4">
+        <Title entityID={props.entityID} />
+        <Messages topic={props.entityID} />
+        <MessageInput id={props.entityID} topic={props.entityID} />
+      </div>
     </div>
   );
 };
