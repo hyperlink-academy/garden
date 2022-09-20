@@ -39,6 +39,7 @@ const borderStyles = (args: { deck: boolean; member: boolean }) => {
       return `memberCardBorder`;
     case args.deck:
       return `deckCardBorder`;
+
     default:
       return `defaultCardBorder`;
   }
@@ -51,7 +52,7 @@ const contentStyles = (args: { deck: boolean; member: boolean }) => {
     case args.deck:
       return `px-3 py-4 sm:px-4 sm:py-6`;
     default:
-      return `px-3 py-4  sm:px-4 sm:py-6`;
+      return `px-3 py-4 sm:px-4 sm:py-6`;
   }
 };
 export const CardView = (props: {
@@ -110,6 +111,7 @@ export const CardView = (props: {
     props.entityID,
     "section/hyperlink_border_width" as "arbitrarySectionStringType"
   )?.value;
+
   if (isChat) return <ChatCard entityID={props.entityID} {...props} />;
 
   return (
@@ -196,7 +198,10 @@ export const CardView = (props: {
             no-scrollbar
             w-auto
             h-full
-            ${contentStyles({ deck: !!isDeck, member: !!memberName })}
+            ${contentStyles({
+              deck: !!isDeck,
+              member: !!memberName,
+            })}
             `}
         >
           <div className="cardDefaultSection grid grid-auto-rows gap-3">
@@ -251,23 +256,25 @@ const ChatCard = (props: {
   referenceFactID?: string;
 }) => {
   return (
-    <div
-      className={`grow h-full bg-white rounded-lg relative border border-grey-80`}
-    >
-      <div className="absolute top-0 bottom-0 left-0 right-0 flex flex-col gap-4 h-full p-4">
-        <div className="cardHeader grid grid-cols-[auto_max-content_max-content] gap-2">
-          <Title entityID={props.entityID} />
-          <HighlightDropdown entityID={props.entityID} />
-          <div className="">
-            <CardMoreOptionsMenu
-              onDelete={props.onDelete}
-              entityID={props.entityID}
-              referenceFactID={props?.referenceFactID}
-            />
+    <div className={`chatCardWrapper grow h-full relative`}>
+      <div className="chatCardBackground absolute top-0 bottom-0 left-0 right-0 chatCardBorder">
+        <div className="chatCardContent flex flex-col overflow-scroll h-full px-3 pt-4 sm:px-4 sm:pt-6 pb-1">
+          <div className="cardHeader grid grid-cols-[auto_max-content_max-content] gap-2">
+            <div className="pb-2">
+              <Title entityID={props.entityID} />
+            </div>
+            <HighlightDropdown entityID={props.entityID} />
+            <div className="">
+              <CardMoreOptionsMenu
+                onDelete={props.onDelete}
+                entityID={props.entityID}
+                referenceFactID={props?.referenceFactID}
+              />
+            </div>
           </div>
+          <Messages topic={props.entityID} />
+          <MessageInput id={props.entityID} topic={props.entityID} />
         </div>
-        <Messages topic={props.entityID} />
-        <MessageInput id={props.entityID} topic={props.entityID} />
       </div>
     </div>
   );

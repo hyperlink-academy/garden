@@ -143,28 +143,21 @@ const Message = (props: {
   return (
     <div
       className={`grid grid-cols-[max-content_auto] gap-2 sm:gap-3 ${
-        props.doubleSend ? "pt-3 sm:pt-4" : "pt-5 sm:pt-6 "
+        props.doubleSend ? "pt-2" : "pt-4 sm:pt-5 "
       }`}
     >
-      <style jsx>
-        {`
-          .messageHeader:hover .messageInfo {
-            display: block;
-          }
-        `}
-      </style>
       <div className={`h-6 w-6 mt-.5 `}>
         {props.doubleSend ? null : <Member />}
       </div>
-      <div className={`messageWrapper flex flex-col `}>
+      <div className={`messageWrapper flex flex-col group`}>
         {props.doubleSend ? null : (
-          <div className=" messageHeader pb-.5 grid grid-cols-[auto_max-content]">
+          <div className=" messageHeader pb-1 grid grid-cols-[auto_max-content]">
             <Link href={`${spacePath(q.studio, q.space)}/c/${member?.entity}`}>
               <a>
                 <div className={`messageSender font-bold `}>{props.sender}</div>
               </a>
             </Link>
-            <div className="messageInfo hidden italic text-grey-80">
+            <div className="messageInfo hidden group-hover:block italic text-grey-80">
               {new Date(parseInt(props.ts)).toLocaleDateString()}
             </div>
           </div>
@@ -184,7 +177,7 @@ const MessageData = (props: { entity: string }) => {
   let attachedCards = useIndex.eav(props.entity, "message/attachedCard") || [];
 
   return (
-    <div className="flex flex-wrap gap-2 pt-3">
+    <div className="flex flex-wrap gap-2 pt-2 pb-1">
       {attachedCards?.map((e) => {
         return (
           <SmallCard
@@ -236,6 +229,7 @@ export const MessageInput = (props: { id: string; topic: string }) => {
       (!message && attachedCards.length === 0)
     )
       return;
+
     let messageId = ulid();
     let entity: string | undefined;
     if (attachedCards.length > 0) {
@@ -273,7 +267,7 @@ export const MessageInput = (props: { id: string; topic: string }) => {
   return (
     // the message input is 16px and the rest of chat is 15px.
     // this is because on mobile, browsers will automatically zoom in if you click on form elements with font size less thn 16px
-    <div className="-mx-4 md:mx-0 px-4 md:px-4 pt-4 pb-4 border-t text-base border-grey-80 gap-2 bg-white md:rounded-md">
+    <div className="-mx-4 md:mx-0 px-4 md:px-4 pt-4 pb-4 border-t text-base border-grey-80 gap-2  rounded-none">
       {/* ATTACHED CARDS IN MESSAGE INPUT */}
       <div
         className={`${
@@ -310,7 +304,7 @@ export const MessageInput = (props: { id: string; topic: string }) => {
             onSelect={(e) => setAttachedCards((a) => [...a, e])}
           />
           <button
-            className={`${message ? "text-accent-blue" : "text-grey-55"}`}
+            className="text-accent-blue"
             onClick={(e) => {
               e.preventDefault;
               if (!authorized || !session.session || !message) return;
