@@ -200,6 +200,9 @@ const DraggableCard = (props: {
                 da,
               });
             }}
+            onDelete={() => {
+              mutate("retractFact", { id: props.relationshipID });
+            }}
             dragHandleProps={{ listeners, attributes }}
             size={position?.value.size || "small"}
             onResize={async (size) => {

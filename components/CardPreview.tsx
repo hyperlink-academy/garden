@@ -41,6 +41,7 @@ const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 type SharedProps = {
   size: "big" | "small";
   onRotateDrag?: (da: number) => void;
+  onDelete?: () => void;
   factID?: string;
   dragHandleProps?: {
     attributes?: DraggableAttributes;
@@ -80,7 +81,10 @@ export const CardPreview = (
 };
 
 export const RotateAndResize: React.FC<
-  Pick<SharedProps, "onResize" | "onRotateDrag" | "size" | "factID">
+  Pick<
+    SharedProps,
+    "onResize" | "onRotateDrag" | "size" | "factID" | "onDelete"
+  >
 > = (props) => {
   let ref = useRef<null | HTMLDivElement>(null);
   let bindPinch = usePinch(
@@ -109,7 +113,7 @@ export const RotateAndResize: React.FC<
     props.onRotateDrag?.(angle - memo);
     return angle;
   });
-  let { authorized, mutate } = useMutations();
+  let { authorized } = useMutations();
 
   return (
     <div
@@ -130,15 +134,16 @@ export const RotateAndResize: React.FC<
         ref={ref}
         className="text-grey-80 flex flex-col justify-between gap-1 pb-1 opacity-0 group-hover:opacity-100 z-50"
       >
-        <button
-          className="hover:text-accent-blue pt-1 z-50"
-          onClick={() => {
-            if (!props.factID) return;
-            mutate("retractFact", { id: props.factID });
-          }}
-        >
-          <Cross width={12} height={12} />
-        </button>
+        {props.onDelete ? (
+          <button
+            className="hover:text-accent-blue pt-1 z-50"
+            onClick={() => {
+              props.onDelete?.();
+            }}
+          >
+            <Cross width={12} height={12} />
+          </button>
+        ) : null}
         <div>
           <div className="leading-3 ">
             {authorized && props.onResize ? (
