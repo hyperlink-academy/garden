@@ -1,11 +1,13 @@
 import { Combobox, Dialog, Transition } from "@headlessui/react";
 import { useIndex } from "hooks/useReplicache";
 import { useRef, useState } from "react";
+import { boolean } from "zod";
 import { ButtonPrimary } from "./Buttons";
 import {
   Add,
   Card,
   ChatBubble,
+  ChatBubbleSmall,
   Checkmark,
   Cross,
   DeckSmall,
@@ -116,161 +118,174 @@ export const FindOrCreate = (props: {
               bg-white shadow-drop border border-grey-80 rounded-md
               `}
         >
-          <Combobox.Input
-            value={input}
-            className="mx-3 mt-4"
-            placeholder="find or create cards..."
-            onKeyDown={(e: React.KeyboardEvent) => {
-              //HeadlessUI handles keyboard nav from here!!
+          {({ activeOption }) => (
+            <>
+              <Combobox.Input
+                value={input}
+                className="mx-3 mt-4"
+                placeholder="find or create cards..."
+                onKeyDown={(e: React.KeyboardEvent) => {
+                  //HeadlessUI handles keyboard nav from here!!
 
-              if (e.key === "Escape") {
-                props.onClose();
-                setAdded([]);
-                isMultiSelect.current = false;
-              }
-
-              if (e.key === "Enter" && e.shiftKey) {
-                console.log("trying to multiselect");
-                isMultiSelect.current = true;
-              }
-            }}
-            onChange={(e) => setInput(e.currentTarget.value)}
-          />
-
-          {/* if isMultiselect = true, take all the stuff in the added[] and display it at the top, with a submit button. If not, show nothing! */}
-          {isMultiSelect.current === false ? (
-            <div className="mx-3 mt-2 mb-2">
-              <small className="italic text-grey-55 hidden sm:block">
-                SHIFT + click to select multiple cards!
-              </small>
-              <small className="italic text-grey-55  sm:hidden ">
-                longpress to select multiple cards!
-              </small>
-            </div>
-          ) : (
-            <div className="addedList flex flex-col gap-2 mx-3 mt-2 mb-3">
-              {addedItemsList === false ? null : (
-                <ul className="flex flex-col gap-2 p-3 lightBorder bg-bg-blue no-scrollbar">
-                  {added.length === 0 ? (
-                    <div className="text-grey-55 italic ">
-                      no cards selected yet!
-                    </div>
-                  ) : (
-                    added.map((addedItem) => (
-                      <li className="addedListItem grid grid-cols-[max-content_auto_max-content] gap-2 ">
-                        <div className="pt-[1px]">
-                          {addedItem.type === "create" ? (
-                            <Card />
-                          ) : (
-                            props.items.find(
-                              (item) =>
-                                addedItem.type === "existing" &&
-                                item.entity === addedItem.entity
-                            )?.icon
-                          )}
-                        </div>
-                        <div>
-                          {addedItem.type === "create" && addedItem.name !== ""
-                            ? addedItem.name
-                            : addedItem.type === "create" &&
-                              addedItem.name === ""
-                            ? "New Untitled Card"
-                            : props.items.find(
-                                (item) =>
-                                  addedItem.type === "existing" &&
-                                  item.entity === addedItem.entity
-                              )?.display}
-                        </div>
-                        <button
-                          className=""
-                          onClick={() => {
-                            added.splice(added.indexOf(addedItem), 1);
-                            setAdded([...added]);
-                          }}
-                        >
-                          <Cross />
-                        </button>
-                      </li>
-                    ))
-                  )}
-                </ul>
-              )}
-              <div className="addedListActions grid grid-cols-[auto_max-content] items-center">
-                <button
-                  className="text-left text-grey-55 hover:text-accent-blue"
-                  onClick={() => {
-                    setAddedItemsList(!addedItemsList);
-                  }}
-                >
-                  {addedItemsList === true ? "hide" : "show"}
-                </button>
-                <ButtonPrimary
-                  content={`Add ${added.length} Cards!`}
-                  onClick={() => {
-                    added.map((addedItem) => props.onSelect(addedItem));
+                  if (e.key === "Escape") {
                     props.onClose();
                     setAdded([]);
                     isMultiSelect.current = false;
-                  }}
-                />
-              </div>
-            </div>
-          )}
-          <Divider />
-          <Combobox.Options
-            static
-            className="w-full pt-2 pb-2 flex-col flex gap-2 h-min overflow-y-auto"
-          >
-            {!input && !props.allowBlank ? null : (
-              <CreateButton
-                value={input}
-                inputExists={!!inputExists}
-                setMultiSelect={() => {
-                  isMultiSelect.current = true;
-                }}
-                addItem={(value) => {
-                  if (
-                    added.find((f) => f.type === "create" && f.name === value)
-                  )
-                    return;
-                  setAdded([
-                    ...added,
-                    { type: "create", name: value, cardType: "card" },
-                  ]);
-                }}
-              />
-            )}
-            {items.map((item) => {
-              return (
-                <SearchResult
-                  {...item}
-                  addItem={(optionValue) => {
-                    if (
-                      added.find(
-                        (f) => f.type === "existing" && f.entity === optionValue
-                      )
-                    )
-                      return;
-                    setAdded([
-                      ...added,
-                      { type: "existing", entity: optionValue },
-                    ]);
-                  }}
-                  disabled={props.selected.includes(item.entity)}
-                  added={
-                    added.find(
-                      (addedItem) =>
-                        addedItem.type === "existing" &&
-                        addedItem.entity === item.entity
-                    ) !== undefined
                   }
-                  setMultiSelect={() => {
+
+                  if (e.key === "Enter" && e.shiftKey) {
+                    console.log("trying to multiselect");
                     isMultiSelect.current = true;
-                  }}
-                />
-              );
-            })}
-          </Combobox.Options>
+                  }
+                }}
+                onChange={(e) => setInput(e.currentTarget.value)}
+              />
+
+              {/* if isMultiselect = true, take all the stuff in the added[] and display it at the top, with a submit button. If not, show nothing! */}
+              {isMultiSelect.current === false ? (
+                <div className="mx-3 mt-2 mb-2">
+                  <small className="italic text-grey-55 hidden sm:block">
+                    SHIFT + click to select multiple cards!
+                  </small>
+                  <small className="italic text-grey-55  sm:hidden ">
+                    longpress to select multiple cards!
+                  </small>
+                </div>
+              ) : (
+                <div className="addedList flex flex-col gap-2 mx-3 mt-2 mb-3">
+                  {addedItemsList === false ? null : (
+                    <ul className="flex flex-col gap-2 p-3 lightBorder bg-bg-blue no-scrollbar">
+                      {added.length === 0 ? (
+                        <div className="text-grey-55 italic ">
+                          no cards selected yet!
+                        </div>
+                      ) : (
+                        added.map((addedItem) => (
+                          <li className="addedListItem grid grid-cols-[max-content_auto_max-content] gap-2 ">
+                            <div className="pt-[1px]">
+                              {addedItem.type === "create" ? (
+                                <Card />
+                              ) : (
+                                props.items.find(
+                                  (item) =>
+                                    addedItem.type === "existing" &&
+                                    item.entity === addedItem.entity
+                                )?.icon
+                              )}
+                            </div>
+                            <div>
+                              {addedItem.type === "create" &&
+                              addedItem.name !== ""
+                                ? addedItem.name
+                                : addedItem.type === "create" &&
+                                  addedItem.name === ""
+                                ? "New Untitled Card"
+                                : props.items.find(
+                                    (item) =>
+                                      addedItem.type === "existing" &&
+                                      item.entity === addedItem.entity
+                                  )?.display}
+                            </div>
+                            <button
+                              className=""
+                              onClick={() => {
+                                added.splice(added.indexOf(addedItem), 1);
+                                setAdded([...added]);
+                              }}
+                            >
+                              <Cross />
+                            </button>
+                          </li>
+                        ))
+                      )}
+                    </ul>
+                  )}
+                  <div className="addedListActions grid grid-cols-[auto_max-content] items-center">
+                    <button
+                      className="text-left text-grey-55 hover:text-accent-blue"
+                      onClick={() => {
+                        setAddedItemsList(!addedItemsList);
+                      }}
+                    >
+                      {addedItemsList === true ? "hide" : "show"}
+                    </button>
+                    <ButtonPrimary
+                      content={`Add ${added.length} Cards!`}
+                      onClick={() => {
+                        added.map((addedItem) => props.onSelect(addedItem));
+                        props.onClose();
+                        setAdded([]);
+                        isMultiSelect.current = false;
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
+              <Divider />
+              <Combobox.Options
+                static
+                className="w-full pt-2 pb-2 flex-col flex gap-2 h-min overflow-y-auto"
+              >
+                {!input && !props.allowBlank ? null : (
+                  <CreateButton
+                    value={input}
+                    activeOption={
+                      activeOption?.type === "create"
+                        ? activeOption.cardType
+                        : activeOption?.entity
+                    }
+                    inputExists={!!inputExists}
+                    setMultiSelect={() => {
+                      isMultiSelect.current = true;
+                    }}
+                    addItem={(value) => {
+                      if (
+                        added.find(
+                          (f) => f.type === "create" && f.name === value
+                        )
+                      )
+                        return;
+                      setAdded([
+                        ...added,
+                        { type: "create", name: value, cardType: "card" },
+                      ]);
+                    }}
+                  />
+                )}
+                {items.map((item) => {
+                  return (
+                    <SearchResult
+                      {...item}
+                      addItem={(optionValue) => {
+                        if (
+                          added.find(
+                            (f) =>
+                              f.type === "existing" && f.entity === optionValue
+                          )
+                        )
+                          return;
+                        setAdded([
+                          ...added,
+                          { type: "existing", entity: optionValue },
+                        ]);
+                      }}
+                      disabled={props.selected.includes(item.entity)}
+                      added={
+                        added.find(
+                          (addedItem) =>
+                            addedItem.type === "existing" &&
+                            addedItem.entity === item.entity
+                        ) !== undefined
+                      }
+                      setMultiSelect={() => {
+                        isMultiSelect.current = true;
+                      }}
+                    />
+                  );
+                })}
+              </Combobox.Options>
+            </>
+          )}
         </Combobox>
       </Dialog>
     </Transition>
@@ -279,6 +294,7 @@ export const FindOrCreate = (props: {
 
 const CreateButton = (props: {
   value: string;
+  activeOption?: string;
   inputExists: boolean;
   addItem: (value: string) => void;
   setMultiSelect: () => void;
@@ -288,8 +304,9 @@ const CreateButton = (props: {
     cardType: "card",
     name: props.value,
   };
+
   return (
-    <div className="flex flex-row">
+    <div className="flex flex-row ">
       <Combobox.Option
         key={"create"}
         value={value}
@@ -302,10 +319,13 @@ const CreateButton = (props: {
               active={active}
               onLongPress={() => props.addItem(props.value)}
               setMultiSelect={props.setMultiSelect}
+              className={`w-full flex-grow px-3 py-0.5 ${
+                active || props.activeOption === "chat" ? "bg-bg-blue" : ""
+              }`}
             >
               {!props.inputExists || props.value === "" ? (
                 <div
-                  className={`py-2 w-full
+                  className={`py-1 w-full
                           text-accent-blue font-bold 
                           flex flex-row justify-between
                           flex-grow
@@ -315,14 +335,18 @@ const CreateButton = (props: {
                     <Add />
                     <div>
                       {!props.value
-                        ? "Create a blank card"
-                        : `Create "${props.value}"`}
+                        ? `Create a blank ${
+                            props.activeOption === "chat" ? "chat" : "card"
+                          }`
+                        : `Create "${props.value}" ${
+                            props.activeOption === "chat" ? "chat" : ""
+                          }`}
                     </div>
                   </div>
                 </div>
               ) : (
                 <div
-                  className={`py-2 w-full
+                  className={`py-1 w-full
                           text-grey-55 font-bold 
                           grid grid-cols-[min-content_auto] gap-2`}
                 >
@@ -345,8 +369,14 @@ const CreateButton = (props: {
       >
         {({ active }) => {
           return (
-            <div className={`h-full flex ${active ? "bg-bg-blue" : ""}`}>
-              <ChatBubble height={24} width={24} className={`self-center`} />
+            <div
+              className={`p-1 rounded-md absolute right-3 mt-0.5 ${
+                active
+                  ? "bg-accent-blue text-white cursor-pointer"
+                  : "text-accent-blue"
+              } ${props.inputExists ? " text-grey-55 " : ""}`}
+            >
+              <ChatBubbleSmall className={``} />
             </div>
           );
         }}
