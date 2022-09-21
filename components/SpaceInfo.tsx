@@ -2,12 +2,19 @@ import { Disclosure, Tab } from "@headlessui/react";
 import { spaceAPI } from "backend/lib/api";
 import { Fact } from "data/Facts";
 import { useAuth } from "hooks/useAuth";
-import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
+import {
+  ReplicacheContext,
+  scanIndex,
+  useIndex,
+  useMutations,
+  useSpaceID,
+} from "hooks/useReplicache";
 import { spacePath, usePrevious } from "hooks/utils";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React, { useContext, useMemo, useState } from "react";
+import { useSubscribe } from "replicache-react";
 import { ulid } from "src/ulid";
 import useSWR from "swr";
 import { ButtonLink, ButtonPrimary } from "./Buttons";
@@ -26,7 +33,6 @@ export const SpaceInfo = () => {
     open: false,
     tab: "member" as "bot" | "member",
   });
-  let { query } = useRouter();
 
   const previousState = usePrevious(state.open);
   return (
@@ -38,11 +44,7 @@ export const SpaceInfo = () => {
         <div className="spaceNameDescription">
           <div className="flex gap-2">
             <h1 className="grow">{spaceName?.value}</h1>
-            <Link href={`${spacePath(query.studio, query.space)}/highlights`}>
-              <a>
-                <button className="rounded-full bg-test-pink h-[28px] w-[28px] shrink pt-1" />
-              </a>
-            </Link>
+            <HighlightsButton />
           </div>
           <Description entity={spaceName?.entity} />
         </div>
@@ -94,6 +96,51 @@ export const SpaceInfo = () => {
         <Divider dark />
       </div>
     </>
+  );
+};
+
+const HighlightsButton = () => {
+  let { query } = useRouter();
+  let rep = useContext(ReplicacheContext);
+  let { memberEntity, mutate } = useMutations();
+  let time = useMemo(() => {
+    return Date.now() - 24 * 60 * 60 * 1000;
+  }, []);
+  let unreads = useSubscribe(
+    rep?.rep,
+    async (tx) => {
+      if (!memberEntity) return 0;
+      let results = (await tx
+        .scan({
+          indexName: "at",
+          prefix: `highlight/time-`,
+          start: { key: `highlight/time-${time}` },
+        })
+        .values()
+        .toArray()) as Fact<"highlight/time">[];
+      let resultsWithReadStates = await Promise.all(
+        results.map(async (r) => {
+          let read = await scanIndex(tx).eav(r.entity, "highlight/read-by");
+          return read.map((r) => r.value.value);
+        })
+      );
+      return resultsWithReadStates.filter(
+        (f) => memberEntity && !f.includes(memberEntity)
+      ).length;
+    },
+    0,
+    [memberEntity, time]
+  );
+  return (
+    <Link href={`${spacePath(query.studio, query.space)}/highlights`}>
+      <a>
+        <button
+          className={`rounded-full h-[28px] w-[28px] shrink pt-1 ${
+            unreads > 0 ? "bg-test-pink" : "bg-grey-35"
+          }`}
+        />
+      </a>
+    </Link>
   );
 };
 

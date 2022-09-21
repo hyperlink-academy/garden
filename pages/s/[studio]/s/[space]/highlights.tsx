@@ -53,7 +53,6 @@ let useReadState = (entity: string) => {
   let ref = useRef<HTMLDivElement | null>(null);
 
   let read = !!readStates?.find((f) => f.value.value === memberEntity);
-  console.log(read);
   useEffect(() => {
     if (!memberEntity) return;
     if (read) return;
