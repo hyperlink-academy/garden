@@ -135,7 +135,7 @@ export const Carousel: React.FC = (props) => {
       style={{}}
       className={`
         overflow-x-scroll snap-x snap-mandatory
-        flex gap-2 -mx-4 
+        flex gap-2
         no-scrollbar 
         h-full `}
     >

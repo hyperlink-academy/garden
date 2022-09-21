@@ -68,7 +68,7 @@ export const Messages = (props: { topic: string }) => {
   return (
     <React.Fragment>
       <div className=" h-full overflow-y-auto overflow-x-hidden pb-6 flex flex-col-reverse ">
-        <div className=" flex flex-col">
+        <div className=" flex flex-col pr-2">
           {/* if no messages, show welcome placeholder */}
           {messages.length == 0 ? (
             <Placeholder spaceName={spaceName?.value} />
