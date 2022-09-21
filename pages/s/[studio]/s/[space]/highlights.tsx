@@ -1,6 +1,7 @@
 import { Carousel } from "components/CardCarousel";
 import { CardView } from "components/CardView";
 import { CrossLarge, HighlightNote } from "components/Icons";
+import { InlineCardViewer, PopupCardViewer } from "components/PopupCardViewer";
 import { Textarea } from "components/Textarea";
 import { RenderedText } from "components/Textarea/RenderedText";
 import { useIndex, useMutations } from "hooks/useReplicache";
@@ -89,28 +90,30 @@ let HighlightedItem = (props: { entityID: string }) => {
   let [ref, read] = useReadState(props.entityID);
 
   return (
-    <div
-      ref={ref}
-      tabIndex={0}
-      className={`highlightCard h-full w-[calc(100%-32px)] flex flex-col relative max-w-3xl snap-center flex-shrink-0 pb-1.5 focus:outline-none `}
-    >
-      {noteOpen ? (
-        <Note
-          entityID={props.entityID}
-          onClose={() => setNoteOpen(false)}
-          read={read}
-        />
-      ) : (
-        <button
-          onClick={() => setNoteOpen(true)}
-          className="absolute z-20 bottom-12 right-5 rounded-full flex mr-2 h-8 w-8 bg-bg-blue text-accent-blue lightBorder items-center justify-center"
-        >
-          <HighlightNote />
-        </button>
-      )}
+    <InlineCardViewer>
+      <div
+        ref={ref}
+        tabIndex={0}
+        className={`highlightCard h-full w-[calc(100%-32px)] flex flex-col relative max-w-3xl snap-center flex-shrink-0 pb-1.5 focus:outline-none `}
+      >
+        {noteOpen ? (
+          <Note
+            entityID={props.entityID}
+            onClose={() => setNoteOpen(false)}
+            read={read}
+          />
+        ) : (
+          <button
+            onClick={() => setNoteOpen(true)}
+            className="absolute z-20 bottom-12 right-5 rounded-full flex mr-2 h-8 w-8 bg-bg-blue text-accent-blue lightBorder items-center justify-center"
+          >
+            <HighlightNote />
+          </button>
+        )}
 
-      {card && <CardView entityID={card?.value.value} />}
-    </div>
+        {card && <CardView entityID={card?.value.value} />}
+      </div>
+    </InlineCardViewer>
   );
 };
 

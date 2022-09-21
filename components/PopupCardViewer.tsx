@@ -99,6 +99,47 @@ export const PopupCardViewer: React.FC = (props) => {
     </PopupCardViewerContext.Provider>
   );
 };
+export const InlineCardViewer: React.FC = (props) => {
+  let [history, setHistory] = useState([] as string[]);
+
+  let ref = useRef<HTMLDivElement | null>(null);
+
+  return (
+    <PopupCardViewerContext.Provider
+      value={{
+        open: (args) => {
+          setHistory((h) => {
+            if (h[0] === args.entityID) return h;
+            return [args.entityID, ...h];
+          });
+        },
+      }}
+    >
+      <>
+        {props.children}
+
+        {history[0] ? (
+          <div
+            ref={ref}
+            key={history[0]}
+            tabIndex={0}
+            className={`highlightCard h-full w-[calc(100%-32px)] flex flex-col relative max-w-3xl snap-center flex-shrink-0 pb-1.5 focus:outline-none `}
+          >
+            <div className="cardViewerHeader grid grid-cols-[auto_max-content] items-center gap-4 ">
+              <BackButton history={history} setHistory={setHistory} />
+            </div>
+            <CardView
+              entityID={history[0]}
+              onDelete={() => setHistory((s) => s.slice(1))}
+            />
+          </div>
+        ) : (
+          <></>
+        )}
+      </>
+    </PopupCardViewerContext.Provider>
+  );
+};
 
 const EmptyState = () => {
   return (

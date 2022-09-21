@@ -62,29 +62,31 @@ export const CardStack = (
               onClick={(e) => {
                 setFocusedCardIndex(currentIndex);
                 let element = e.currentTarget;
-                setTimeout(
-                  // if parent is bottomed, do nothing. else:
-                  () => {
-                    let offsetContainerTop =
-                      element.offsetTop - element.scrollTop;
-                    function getCardParent(
-                      node: HTMLElement | null
-                    ): HTMLElement | undefined {
-                      if (!node) return undefined;
-                      if (node.classList.contains("cardContent")) return node;
-                      return getCardParent(node.parentElement);
-                    }
-                    let cardParent = getCardParent(element.parentElement);
-
-                    if (!cardParent) return;
-
-                    cardParent.scrollTo({
-                      top: offsetContainerTop - 20,
-                      behavior: "smooth",
-                    });
-                  },
-                  410
-                );
+                //Commented out for now because it messes w/ scroll state when
+                //following links!
+                // setTimeout(
+                //   // if parent is bottomed, do nothing. else:
+                //   () => {
+                //     let offsetContainerTop =
+                //       element.offsetTop - element.scrollTop;
+                //     function getCardParent(
+                //       node: HTMLElement | null
+                //     ): HTMLElement | undefined {
+                //       if (!node) return undefined;
+                //       if (node.classList.contains("cardContent")) return node;
+                //       return getCardParent(node.parentElement);
+                //     }
+                //     let cardParent = getCardParent(element.parentElement);
+                //
+                //     if (!cardParent) return;
+                //
+                //     cardParent.scrollTo({
+                //       top: offsetContainerTop - 20,
+                //       behavior: "smooth",
+                //     });
+                //   },
+                //   410
+                // );
               }}
             />
           ))}
