@@ -19,7 +19,13 @@ import { ulid } from "src/ulid";
 import useSWR from "swr";
 import { ButtonLink, ButtonPrimary } from "./Buttons";
 import { Drawer } from "./DeckList";
-import { Member, BotIcon, BotAdd } from "./Icons";
+import {
+  Member,
+  BotIcon,
+  BotAdd,
+  HighlightLampOff,
+  HighlightLampOn,
+} from "./Icons";
 import { Divider } from "./Layout";
 import { SmallCard } from "./SmallCard";
 import { useSmoker } from "./Smoke";
@@ -134,11 +140,9 @@ const HighlightsButton = () => {
   return (
     <Link href={`${spacePath(query.studio, query.space)}/highlights`}>
       <a>
-        <button
-          className={`rounded-full h-[28px] w-[28px] shrink pt-1 ${
-            unreads > 0 ? "bg-test-pink" : "bg-grey-35"
-          }`}
-        />
+        <button>
+          {unreads > 0 ? <HighlightLampOn /> : <HighlightLampOff />}
+        </button>
       </a>
     </Link>
   );
