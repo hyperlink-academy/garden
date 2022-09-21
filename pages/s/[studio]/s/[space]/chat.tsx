@@ -23,6 +23,7 @@ import { FindOrCreate } from "components/FindOrCreateEntity";
 import { SmallCard } from "components/SmallCard";
 import { RenderedText } from "components/Textarea/RenderedText";
 import { spacePath } from "hooks/utils";
+import { CardPreview } from "components/CardPreview";
 
 export default function ChatPage() {
   let id = useSpaceID();
@@ -180,10 +181,11 @@ const MessageData = (props: { entity: string }) => {
     <div className="flex flex-wrap gap-2 pt-2 pb-1">
       {attachedCards?.map((e) => {
         return (
-          <SmallCard
+          <CardPreview
+            size={"small"}
             entityID={e.value.value}
             key={e.id}
-            href={`/s/${studio}/s/${space}/c/${e.value.value}`}
+            href={``}
           />
         );
       })}
