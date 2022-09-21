@@ -59,7 +59,7 @@ export const PopupCardViewer: React.FC = (props) => {
         pr-2 pl-[calc((100vw-352px)/2)] sm:px-8 
         h-full w-full 
         flex flex-row gap-8 
-        snap-x snap-mandatory overflow-x-scroll 
+        snap-x snap-mandatory overflow-x-auto
         sm:justify-center`}
       >
         {props.children}
