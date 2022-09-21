@@ -319,7 +319,7 @@ const CreateButton = (props: {
               active={active}
               onLongPress={() => props.addItem(props.value)}
               setMultiSelect={props.setMultiSelect}
-              className={`w-full flex-grow px-3 py-0.5 ${
+              className={`w-full flex-grow ${
                 active || props.activeOption === "chat" ? "bg-bg-blue" : ""
               }`}
             >
@@ -369,15 +369,18 @@ const CreateButton = (props: {
       >
         {({ active }) => {
           return (
-            <div
-              className={`p-1 rounded-md absolute right-3 mt-0.5 ${
+            <SearchItem
+              active={active}
+              onLongPress={() => props.addItem(props.value)}
+              setMultiSelect={props.setMultiSelect}
+              className={`!p-1 w-fit rounded-md absolute right-3 mt-0.5 ${
                 active
-                  ? "bg-accent-blue text-white cursor-pointer"
+                  ? "!bg-accent-blue text-white cursor-pointer"
                   : "text-accent-blue"
               } ${props.inputExists ? " text-grey-55 " : ""}`}
             >
               <ChatBubbleSmall className={``} />
-            </div>
+            </SearchItem>
           );
         }}
       </Combobox.Option>
@@ -492,7 +495,7 @@ const SearchItem: React.FC<{
         }
       }}
       //END LONGPRESS LOGIC
-      className={`w-full flex-grow px-3 py-0.5 ${props.className || ""} ${
+      className={`w-full px-3 py-0.5 ${props.className || ""} ${
         props.active ? "bg-bg-blue" : ""
       }`}
     >

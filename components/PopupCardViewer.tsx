@@ -207,12 +207,12 @@ const FindOrCreateBar = () => {
   let { authorized, mutate } = useMutations();
   return (
     <>
-      <button className="flex items-center" onClick={() => setOpen(true)}>
-        <div className="lightborder px-3 py-1 italic bg-white border border-grey-80 rounded-l-md text-grey-80">
+      <button className="flex items-center group" onClick={() => setOpen(true)}>
+        <div className="px-3 py-1 italic bg-white border border-grey-80 border-r-0 rounded-l-md text-grey-80">
           {" "}
           find or create a card...
         </div>
-        <div className="text-accent-blue bg-bg-blue border border-accent-blue  rounded-r-md px-3 py-1">
+        <div className="text-accent-blue bg-bg-blue border border-accent-blue rounded-r-md px-3 py-1 group-hover:bg-accent-blue group-hover:text-white">
           <SearchOrCommand />
         </div>
       </button>
