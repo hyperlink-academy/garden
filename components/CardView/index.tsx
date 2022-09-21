@@ -9,6 +9,8 @@ import {
   Print,
   ExpandTiny,
   CollapseTiny,
+  HighlightLampOn,
+  HighlightLampOff,
 } from "components/Icons";
 import { Divider, MenuContainer, MenuItem } from "components/Layout";
 import { useIndex, useMutations } from "hooks/useReplicache";
@@ -405,11 +407,14 @@ const HighlightDropdown = (props: { entityID: string }) => {
   let [highlightHelp, setHighlightHelp] = useState(false);
   let [note, setNote] = useState("");
   let { authorized, mutate, memberEntity } = useMutations();
+  let highlight = useIndex.eav(props.entityID, "highlight/card");
 
   return (
     <Popover>
       {authorized && (
-        <Popover.Button className="cardHighlighter rounded-full bg-test-pink h-[28px] w-[28px]" />
+        <Popover.Button className="cardHighlightButton">
+          {highlight ? <HighlightLampOn /> : <HighlightLampOff />}
+        </Popover.Button>
       )}
       <Transition
         enter="transition ease-out duration-100"

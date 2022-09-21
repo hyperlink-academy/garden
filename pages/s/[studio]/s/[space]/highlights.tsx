@@ -9,6 +9,7 @@ import { spacePath } from "hooks/utils";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useRef, useState } from "react";
+import useMeasure from "react-use-measure";
 
 export default function HighlightPage() {
   let { query: q } = useRouter();
@@ -17,7 +18,7 @@ export default function HighlightPage() {
   }, []);
 
   let cards = useIndex.at("highlight/time", time).reverse();
-
+  let [cardWidthRef, { width: cardWidth }] = useMeasure();
   return (
     // TODO for Jared :
     // - If you click a link in the card, the new card will open on top of the original one with a back button to go down the stack
@@ -26,7 +27,10 @@ export default function HighlightPage() {
     // -everything bg-test pink is gonna be in the fun processing bg so wait for that lol
 
     <div className="highlightCarousel h-full grow flex flex-col gap-4 items-stretch relative py-6">
-      <div className="highlightHeader w-[calc(100%-32px)] max-w-3xl mx-auto flex gap-2">
+      <div
+        className="highlightHeader w-[calc(100%-32px)] max-w-3xl mx-auto flex gap-2"
+        ref={cardWidthRef}
+      >
         <h2 className="grow">Highlights</h2>
         <Link href={spacePath(q.studio, q.space)}>
           <a>
@@ -35,7 +39,7 @@ export default function HighlightPage() {
         </Link>
       </div>
 
-      <Carousel>
+      <Carousel cardWidth={cardWidth}>
         {cards.length > 0 ? (
           cards.map(({ entity }) => <HighlightedItem entityID={entity} />)
         ) : (
@@ -105,7 +109,11 @@ let HighlightedItem = (props: { entityID: string }) => {
         ) : (
           <button
             onClick={() => setNoteOpen(true)}
-            className="absolute z-20 bottom-12 right-5 rounded-full flex mr-2 h-8 w-8 bg-bg-blue text-accent-blue lightBorder items-center justify-center"
+            className={`absolute z-20 bottom-16 right-5 rounded-md flex mr-2 h-8 w-8 items-center justify-center shadow-drop ${
+              read
+                ? "bg-grey-90 lightBorder text-grey-55"
+                : " bg-bg-blue text-accent-blue border border-accent-blue"
+            }`}
           >
             <HighlightNote />
           </button>
@@ -131,12 +139,17 @@ let Note = (props: {
       className={` 
                     hightlightNoteExpanded 
                     absolute z-20
-                     bottom-10 left-0 right-0 
+                     bottom-8 left-0 right-0 
                     mx-4 p-3 
                     flex flex-col gap-1
                     rounded-md 
                     lightBorder
-                    ${props.read ? "bg-test-pink" : "bg-bg-blue"}`}
+                    shadow-drop
+                    ${
+                      props.read
+                        ? "bg-grey-90 text-grey-35 border-grey-80"
+                        : "bg-bg-blue border-accent-blue"
+                    }`}
     >
       <div className="flex items-center">
         <p className="grow text-grey-35">
