@@ -15,7 +15,7 @@ export default function HighlightPage() {
     return Date.now() - 24 * 60 * 60 * 1000;
   }, []);
 
-  let cards = useIndex.at("highlight/time", time);
+  let cards = useIndex.at("highlight/time", time).reverse();
 
   return (
     // TODO for Jared :
