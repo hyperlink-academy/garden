@@ -299,7 +299,9 @@ const BigCardBody = (props: { entityID: string } & SharedProps) => {
 
   return (
     <div
-      className="w-full overflow-hidden h-full pr-3 pl-0 py-2 flex flex-row"
+      className={`w-full overflow-hidden h-full flex flex-row pl-0  ${
+        isMember ? "py-2 pr-2" : "py-2 pr-3"
+      }`}
       style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
     >
       {/* Gripper  */}
@@ -344,9 +346,7 @@ const BigCardBody = (props: { entityID: string } & SharedProps) => {
         {/* Big Card Preview Default Content */}
         <div
           className={`${
-            isMember
-              ? "bg-white rounded-md p-2 pb-0 text-accent-red mt-1 mb-2"
-              : ""
+            isMember ? "bg-white rounded-md p-2 pt-1 text-accent-red mt-1" : ""
           }`}
         >
           {!image ? null : (
@@ -359,7 +359,7 @@ const BigCardBody = (props: { entityID: string } & SharedProps) => {
             entityID={props.entityID}
             section="card/content"
             placeholderOnHover={true}
-            className={`whitespace-pre-wrap truncate leading-tight pt-1 pb-3 ${
+            className={`whitespace-pre-wrap truncate leading-tight pt-1  ${
               !image ? "" : "rounded-[3px] px-1 bg-white/75"
             } `}
           />
@@ -369,7 +369,11 @@ const BigCardBody = (props: { entityID: string } & SharedProps) => {
         {sections !== null && sections.length === 0 ? (
           <div />
         ) : (
-          <small className="SectionCounter text-grey-80 hover:text-accent-blue hover:underline pb-1 ">
+          <small
+            className={`SectionCounter text-grey-80 ${
+              isMember ? "hover:text-white" : "hover:text-accent-blue"
+            } hover:underline pb-1 pt-2 `}
+          >
             <a onClick={() => open({ entityID: props.entityID })}>
               + {sections?.length} sections
             </a>
