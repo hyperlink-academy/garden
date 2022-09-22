@@ -130,8 +130,7 @@ export const CardCarousel = (props: {
     </div>
   );
 };
-export const Carousel: React.FC<{ cardWidth: number }> = (props) => {
-  console.log(props.cardWidth);
+export const Carousel: React.FC = (props) => {
   return (
     <div
       style={{}}
@@ -143,14 +142,14 @@ export const Carousel: React.FC<{ cardWidth: number }> = (props) => {
     >
       <div
         style={{
-          width: `max(((100vw - ${props.cardWidth}px - 16px) / 2), .5rem)`,
+          width: `max(((100vw - 46rem - 16px) / 2), .5rem)`,
         }}
         className={`carouselSpacer flex-shrink-0`}
       />
       {props.children}
       <div
         style={{
-          width: `max(((100vw - ${props.cardWidth}px - 16px ) / 2), 0.5rem)`,
+          width: `max(((100vw - 46rem - 16px ) / 2), 0.5rem)`,
         }}
         className={`carouselSpacer flex-shrink-0`}
       />

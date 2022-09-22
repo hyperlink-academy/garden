@@ -1,15 +1,13 @@
 import { Carousel } from "components/CardCarousel";
 import { CardView } from "components/CardView";
 import { CrossLarge, HighlightNote } from "components/Icons";
-import { InlineCardViewer, PopupCardViewer } from "components/PopupCardViewer";
+import { InlineCardViewer } from "components/PopupCardViewer";
 import { Textarea } from "components/Textarea";
-import { RenderedText } from "components/Textarea/RenderedText";
 import { useIndex, useMutations } from "hooks/useReplicache";
 import { spacePath } from "hooks/utils";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import useMeasure from "react-use-measure";
 
 export default function HighlightPage() {
   let { query: q } = useRouter();
@@ -18,7 +16,6 @@ export default function HighlightPage() {
   }, []);
 
   let cards = useIndex.at("highlight/time", time).reverse();
-  let [cardWidthRef, { width: cardWidth }] = useMeasure();
   return (
     // TODO for Jared :
     // - If you click a link in the card, the new card will open on top of the original one with a back button to go down the stack
@@ -27,10 +24,7 @@ export default function HighlightPage() {
     // -everything bg-test pink is gonna be in the fun processing bg so wait for that lol
 
     <div className="highlightCarousel h-full grow flex flex-col gap-4 items-stretch relative py-6">
-      <div
-        className="highlightHeader w-[calc(100%-32px)] max-w-3xl mx-auto flex gap-2"
-        ref={cardWidthRef}
-      >
+      <div className="highlightHeader w-[calc(100%-32px)] max-w-3xl mx-auto flex gap-2">
         <h2 className="grow">Highlights</h2>
         <Link href={spacePath(q.studio, q.space)}>
           <a>
@@ -39,7 +33,7 @@ export default function HighlightPage() {
         </Link>
       </div>
 
-      <Carousel cardWidth={cardWidth}>
+      <Carousel>
         {cards.length > 0 ? (
           cards.map(({ entity }) => <HighlightedItem entityID={entity} />)
         ) : (
