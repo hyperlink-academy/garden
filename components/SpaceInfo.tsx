@@ -18,6 +18,7 @@ import { useSubscribe } from "replicache-react";
 import { ulid } from "src/ulid";
 import useSWR from "swr";
 import { ButtonLink, ButtonPrimary } from "./Buttons";
+import { CardPreview } from "./CardPreview";
 import { Drawer } from "./DeckList";
 import {
   Member,
@@ -250,7 +251,8 @@ const Members = () => {
       <div className="flex flex-col gap-4">
         <div className="membersCardList flex flex-wrap gap-4">
           {members.map((m) => (
-            <SmallCard
+            <CardPreview
+              size={"small"}
               key={m.entity}
               entityID={m.entity}
               href={`/s/${studio}/s/${space}/c/${m.entity}`}
