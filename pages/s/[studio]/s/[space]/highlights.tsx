@@ -98,7 +98,7 @@ let HighlightedItem = (props: { entityID: string }) => {
       <div
         ref={ref}
         tabIndex={0}
-        className={`highlightCard h-full w-[calc(100%-32px)] flex flex-col relative max-w-3xl snap-center flex-shrink-0 pb-1.5 focus:outline-none `}
+        className={`highlightCard h-full w-[calc(100%-32px)] flex flex-col relative max-w-3xl snap-center flex-shrink-0 focus:outline-none `}
       >
         {noteOpen ? (
           <Note
