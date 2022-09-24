@@ -210,7 +210,7 @@ export const MessageInput = (props: { id: string; topic: string }) => {
       message
     );
   }, [message]);
-  let { authorized, mutate } = useMutations();
+  let { authorized, mutate, memberEntity } = useMutations();
   let [inputFocused, setInputFocused] = useState(false);
 
   // STATE OF MESSAGE INPUT IF NOT LOGGED IN
@@ -253,9 +253,11 @@ export const MessageInput = (props: { id: string; topic: string }) => {
         )
       );
     }
+    if (!memberEntity) return;
     mutate("postMessage", {
       id: ulid(),
       entity,
+      member: memberEntity,
       attachedCards,
       topic: props.topic,
       content: message,

@@ -17,6 +17,7 @@ import { useDrag, usePinch } from "@use-gesture/react";
 import { isUrl } from "src/isUrl";
 import { useRef } from "react";
 import { usePopupCardViewer } from "./PopupCardViewer";
+import { useReadState } from "hooks/useReadState";
 
 const borderStyles = (args: {
   isDeck: boolean;
@@ -170,19 +171,6 @@ export const RotateAndResize: React.FC<
       {/* End Rotate and Resize Handle */}
     </div>
   );
-};
-
-let useReadState = (entity: string) => {
-  let { memberEntity } = useMutations();
-  // A highlight is an entity. For every person who has read it we want to store
-  // a ref fact,
-  let latest = useIndex.eav(entity, "chat/last-message");
-  let readStates = useIndex.eav(
-    latest ? memberEntity : null,
-    "last-read-message"
-  );
-  let read = readStates?.find((f) => f.value.chat === entity);
-  return !read || !latest || read.value.message === latest.value;
 };
 
 const SmallCardBody = (props: { entityID: string } & SharedProps) => {

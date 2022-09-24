@@ -358,8 +358,24 @@ const retractFact: Mutation<{ id: string }> = async (args, ctx) => {
   await ctx.retractFact(args.id);
 };
 
-const postMessage: Mutation<Message> = async (args, ctx) => {
+const postMessage: Mutation<Message & { member: string }> = async (
+  args,
+  ctx
+) => {
   let latestMessage = await ctx.scanIndex.eav(args.topic, "chat/last-message");
+
+  let readStates = await ctx.scanIndex.eav(args.member, "last-read-message");
+  let read = readStates?.find((f) => f.value.chat === args.topic);
+  let value = { chat: args.topic, message: (latestMessage?.value || 0) + 1 };
+  if (read) await ctx.updateFact(read.id, { value });
+  else
+    await ctx.assertFact({
+      entity: args.member,
+      attribute: "last-read-message",
+      value,
+      positions: {},
+    });
+
   await ctx.assertFact({
     entity: args.topic,
     attribute: "chat/last-message",
