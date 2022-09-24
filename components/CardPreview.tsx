@@ -172,8 +172,22 @@ export const RotateAndResize: React.FC<
   );
 };
 
+let useReadState = (entity: string) => {
+  let { memberEntity } = useMutations();
+  // A highlight is an entity. For every person who has read it we want to store
+  // a ref fact,
+  let latest = useIndex.eav(entity, "chat/last-message");
+  let readStates = useIndex.eav(
+    latest ? memberEntity : null,
+    "last-read-message"
+  );
+  let read = readStates?.find((f) => f.value.chat === entity);
+  return !read || !latest || read.value.message === latest.value;
+};
+
 const SmallCardBody = (props: { entityID: string } & SharedProps) => {
   let isMember = !!useIndex.eav(props.entityID, "member/name");
+  let read = useReadState(props.entityID);
   let { open } = usePopupCardViewer();
   let { authorized } = useMutations();
 
@@ -238,6 +252,9 @@ const SmallCardBody = (props: { entityID: string } & SharedProps) => {
                 {title?.value}
               </div>
             )}
+            {!read ? (
+              <div className="rounded-full bg-accent-red w-1 h-1" />
+            ) : null}
           </a>
 
           {/* Small Card Preview External Link */}

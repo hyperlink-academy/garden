@@ -15,6 +15,7 @@ export const BaseAttributes = {
     cardinality: "one",
     "union/value": [
       "file",
+      "last-read-message",
       "timestamp",
       "string",
       "union",
@@ -63,6 +64,11 @@ export const DefaultAttributes = {
     type: "flag",
     unique: false,
     cardinality: "one",
+  },
+  "chat/last-message": {
+    cardinality: "one",
+    unique: false,
+    type: "number",
   },
   home: {
     type: "flag",
@@ -214,6 +220,11 @@ export const DefaultAttributes = {
   "canvas/height": {
     type: "number",
     cardinality: "one",
+    unique: false,
+  },
+  "last-read-message": {
+    type: "last-read-message",
+    cardinality: "many",
     unique: false,
   },
 } as const;

@@ -256,6 +256,11 @@ const ChatCard = (props: {
   onDelete?: () => void;
   referenceFactID?: string;
 }) => {
+  let { memberEntity, mutate } = useMutations();
+  useEffect(() => {
+    if (memberEntity)
+      mutate("updateReadState", { member: memberEntity, chat: props.entityID });
+  }, [memberEntity]);
   return (
     <div className={`chatCardWrapper grow h-full relative`}>
       <div className="chatCardBackground absolute top-0 bottom-0 left-0 right-0 chatCardBorder">

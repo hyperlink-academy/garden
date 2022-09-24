@@ -31,6 +31,10 @@ type Value<A extends AttributeName> = Attribute[A] extends {
       string: string;
       number: number;
       boolean: boolean;
+      "last-read-message": {
+        chat: string;
+        message: number;
+      };
       position: {
         type: "position";
         x: number;

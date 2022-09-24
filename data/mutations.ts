@@ -290,6 +290,24 @@ const updatePositions: Mutation<{
   }
 };
 
+const updateReadState: Mutation<{ member: string; chat: string }> = async (
+  args,
+  ctx
+) => {
+  let readStates = await ctx.scanIndex.eav(args.member, "last-read-message");
+  let read = readStates?.find((f) => f.value.chat === args.chat);
+  let latest = await ctx.scanIndex.eav(args.chat, "chat/last-message");
+  let value = { chat: args.chat, message: latest?.value || 0 };
+  if (read) await ctx.updateFact(read.id, { value });
+  else
+    await ctx.assertFact({
+      entity: args.member,
+      attribute: "last-read-message",
+      value,
+      positions: {},
+    });
+};
+
 const addCardToSection: Mutation<{
   cardEntity: string;
   parent: string;
@@ -341,6 +359,13 @@ const retractFact: Mutation<{ id: string }> = async (args, ctx) => {
 };
 
 const postMessage: Mutation<Message> = async (args, ctx) => {
+  let latestMessage = await ctx.scanIndex.eav(args.topic, "chat/last-message");
+  await ctx.assertFact({
+    entity: args.topic,
+    attribute: "chat/last-message",
+    value: (latestMessage?.value || 0) + 1,
+    positions: {},
+  });
   await ctx.postMessage(args);
 };
 
@@ -429,6 +454,7 @@ export const Mutations = {
   createCard,
   addSpace,
   updatePositions,
+  updateReadState,
   addDeck,
   addCardToSection,
   assertFact,
