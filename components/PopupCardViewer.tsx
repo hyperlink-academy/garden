@@ -196,12 +196,12 @@ const BackButton = (props: {
 }) => {
   let prevCardTitle = useIndex.eav(props.history[1], "card/title");
   const { width } = useWindowDimensions();
-  let longPressProps = useLongPress(() => {
+  let { handlers } = useLongPress(() => {
     props.setHistory([]);
   });
   return (
     <button
-      {...longPressProps}
+      {...handlers}
       className="CardViewerBackButton overflow-clip"
       onClick={() => {
         if (props.history.length === 1) {
