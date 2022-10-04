@@ -19,7 +19,7 @@ import {
 } from "components/Icons";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { FindOrCreate } from "components/FindOrCreateEntity";
+import { FindOrCreate, useAllItems } from "components/FindOrCreateEntity";
 import { SmallCard } from "components/SmallCard";
 import { RenderedText } from "components/Textarea/RenderedText";
 import { spacePath } from "hooks/utils";
@@ -352,12 +352,15 @@ export const MessageInput = (props: { id: string; topic: string }) => {
 
 const AttachedCard = (props: { entityID: string; remove: () => void }) => {
   let title = useIndex.eav(props.entityID, "card/title");
+  let memberName = useIndex.eav(props.entityID, "member/name");
   let isDeck = useIndex.eav(props.entityID, "deck");
 
   return (
     <div className="grid grid-cols-[max-content_auto_max-content] place-items-start gap-2 hover:bg-bg-blue py-1 px-2 -mx-2 rounded-md">
-      <div className="pt-0.5">{isDeck ? <DeckSmall /> : <Card />}</div>
-      {title?.value}{" "}
+      <div className="pt-0.5">
+        {!!memberName ? <Member /> : isDeck ? <DeckSmall /> : <Card />}
+      </div>
+      {memberName?.value || title?.value}
       <button className="text-grey-55 pt-1" onClick={() => props.remove()}>
         <Cross />
       </button>
@@ -371,19 +374,7 @@ const FindOrCreateCard = (props: {
 }) => {
   let [open, setOpen] = useState(false);
   let { mutate } = useMutations();
-  let decks = useIndex.aev("deck");
-  let titles = useIndex.aev("card/title");
-  let items = titles.map((t) => {
-    return {
-      entity: t.entity,
-      display: t.value,
-      icon: !!decks.find((d) => t.entity === d.entity) ? (
-        <DeckSmall />
-      ) : (
-        <Card />
-      ),
-    };
-  });
+  let items = useAllItems(open);
 
   return (
     <>
