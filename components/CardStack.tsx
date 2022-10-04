@@ -36,8 +36,8 @@ export const CardStack = (
   let [focusedCardIndex, setFocusedCardIndex] = useState(-1);
 
   return (
-    <div className="relative flex gap-2 w-full">
-      <div className="grow">
+    <div className="relative grid gap-2 w-full grid-cols-[auto,16px]">
+      <div>
         <AddCard
           expanded={expandAll || props.cards.length === 0}
           parent={props.parent}
@@ -107,10 +107,8 @@ export const CardStack = (
           />
         )}
       </div>
-      {props.cards.length === 0 ? (
-        <div className="w-4 sm:w-6" />
-      ) : (
-        <div className="relative flex flex-col w-4 sm:w-6">
+      {props.cards.length === 0 ? null : (
+        <div className="relative flex flex-col">
           <div className="sticky top-0 -8 z-20 mb-14 mt-2 rotate-90">
             <button
               onClick={() => {
@@ -122,7 +120,6 @@ export const CardStack = (
               {expandAll ? "collapse" : "expand"}
             </button>
           </div>
-          <div className="grow" />
         </div>
       )}
     </div>

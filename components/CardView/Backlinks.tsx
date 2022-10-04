@@ -41,7 +41,6 @@ export const Backlinks = (props: {
       h-full
       rounded-lg
       bg-[#FFF2D8]
-      w-[97%]
       mx-auto
       grid grid-rows-[auto_max-content]
       
@@ -59,8 +58,7 @@ export const Backlinks = (props: {
       >
         <h3 className="font-bold text-grey-35">References</h3>
         <ul
-          className={` 
-            ${props.open === "backlink" ? " " : "pointer-events-none"}
+          className={`${props.open === "backlink" ? " " : "pointer-events-none"}
             flex flex-col gap-4 `}
         >
           {sections.map((s) => {
