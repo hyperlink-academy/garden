@@ -1,13 +1,6 @@
 import { useContext, useState, createContext, useRef, useEffect } from "react";
 import { CardView } from "./CardView";
-import {
-  DeckSmall,
-  GoBackToPage,
-  Member,
-  SearchOrCommand,
-  Card as CardIcon,
-  RightArrow,
-} from "./Icons";
+import { GoBackToPage, SearchOrCommand } from "./Icons";
 import { useIndex, useMutations } from "hooks/useReplicache";
 import { ulid } from "src/ulid";
 import { FindOrCreate, useAllItems } from "./FindOrCreateEntity";
@@ -76,7 +69,16 @@ export const PopupCardViewer: React.FC = (props) => {
           {history[0] ? (
             <>
               <div className="cardViewerHeader grid grid-cols-[auto_max-content] items-center gap-4 ">
-                <BackButton history={history} setHistory={setHistory} />
+                <BackButton
+                  history={history}
+                  setHistory={setHistory}
+                  onFinalClose={() => {
+                    ref.current?.scrollTo({
+                      left: 0,
+                      behavior: "smooth",
+                    });
+                  }}
+                />
                 <FindOrCreateBar />
               </div>
               <CardView
@@ -126,7 +128,11 @@ export const InlineCardViewer: React.FC = (props) => {
             className={`highlightCard h-full w-[calc(100%-32px)] flex flex-col relative max-w-3xl snap-center flex-shrink-0 pb-1.5 focus:outline-none `}
           >
             <div className="cardViewerHeader grid grid-cols-[auto_max-content] items-center gap-4 ">
-              <BackButton history={history} setHistory={setHistory} />
+              <BackButton
+                history={history}
+                setHistory={setHistory}
+                onFinalClose={() => {}}
+              />
             </div>
             <CardView
               entityID={history[0]}
@@ -192,6 +198,7 @@ const EmptyState = () => {
 
 const BackButton = (props: {
   history: string[];
+  onFinalClose: () => void;
   setHistory: React.Dispatch<React.SetStateAction<string[]>>;
 }) => {
   let prevCardTitle = useIndex.eav(props.history[1], "card/title");
@@ -206,13 +213,7 @@ const BackButton = (props: {
       onClick={() => {
         if (props.history.length === 1) {
           // if on last card, scroll back to desktop
-          setTimeout(() => {
-            const desktop = document.querySelector(".Desktop");
-            desktop?.scrollIntoView({
-              behavior: "smooth",
-              block: "start",
-            });
-          }, 50);
+          props.onFinalClose();
           // if narrow width, add delay so card doesn't blip out mid-scroll
           let delay = 0;
           if (width < 640) delay = 500;
