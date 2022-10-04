@@ -1,6 +1,6 @@
 import {
   Active,
-  closestCenter,
+  closestCorners,
   DndContext,
   DragOverlay,
   MouseSensor,
@@ -33,7 +33,7 @@ export const SmallCardDragContext: React.FC = (props) => {
   let rep = useContext(ReplicacheContext);
   return (
     <DndContext
-      collisionDetection={closestCenter}
+      collisionDetection={closestCorners}
       sensors={sensors}
       modifiers={[
         (args) => {
