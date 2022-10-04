@@ -201,7 +201,10 @@ const BackButton = (props: {
   onFinalClose: () => void;
   setHistory: React.Dispatch<React.SetStateAction<string[]>>;
 }) => {
-  let prevCardTitle = useIndex.eav(props.history[1], "card/title");
+  let prevCardTitle = useIndex.eav(props.history[1], "card/title")?.value;
+  let prevCardMemberName = useIndex.eav(props.history[1], "member/name")?.value;
+  let prevCardBotName = useIndex.eav(props.history[1], "bot/name")?.value;
+
   const { width } = useWindowDimensions();
   let { handlers } = useLongPress(() => {
     props.setHistory([]);
@@ -230,11 +233,13 @@ const BackButton = (props: {
         <p className="truncate whitespace-nowrap">
           {props.history.length >= 2
             ? width > 1000
-              ? `Back to ${prevCardTitle?.value}`
+              ? `Back to ${
+                  prevCardTitle || prevCardMemberName || prevCardBotName
+                }`
               : "Back"
             : width > 1000
             ? "Clear Stack"
-            : "Clear"}
+            : "Back"}
         </p>
       </div>
     </button>
