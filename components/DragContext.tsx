@@ -1,5 +1,6 @@
 import {
   Active,
+  closestCenter,
   DndContext,
   DragOverlay,
   MouseSensor,
@@ -15,27 +16,24 @@ import {
 } from "hooks/useReplicache";
 import { useContext, useState } from "react";
 import { sortByPosition, updatePositions } from "src/position_helpers";
-import { CardPreview } from "./CardPreview";
-import { cardStackCollisionDetection } from "src/customCollisionDetection";
 import { StackData } from "./CardStack";
 import { animated, useTransition } from "@react-spring/web";
 import { createPortal } from "react-dom";
 import { useSortable } from "@dnd-kit/sortable";
 import { useAtom, atom } from "jotai";
+import { CardMedium } from "./Icons";
 
-let draggingOverDeleteAtom = atom(false);
 export const SmallCardDragContext: React.FC = (props) => {
   let [activeCard, setActiveCard] = useState<Active | null>(null);
   const mouseSensor = useSensor(MouseSensor, {});
   const touchSensor = useSensor(TouchSensor, {});
   const sensors = useSensors(mouseSensor, touchSensor);
-  let [, setDraggingOverDelete] = useAtom(draggingOverDeleteAtom);
 
   let { mutate } = useMutations();
   let rep = useContext(ReplicacheContext);
   return (
     <DndContext
-      collisionDetection={cardStackCollisionDetection}
+      collisionDetection={closestCenter}
       sensors={sensors}
       modifiers={[
         (args) => {
@@ -47,12 +45,8 @@ export const SmallCardDragContext: React.FC = (props) => {
       ]}
       onDragStart={({ active }) => {
         setActiveCard(active);
-        setDraggingOverDelete(false);
       }}
-      onDragOver={({ over }) => {
-        if (over?.id === "delete") setDraggingOverDelete(true);
-        else setDraggingOverDelete(false);
-      }}
+      onDragOver={({}) => {}}
       onDragEnd={async (data) => {
         let { over, active } = data;
         setActiveCard(null);
@@ -103,14 +97,13 @@ export const SmallCardDragContext: React.FC = (props) => {
 };
 
 const DragOverlayCard = (props: { entityID?: string }) => {
-  let [draggingOverDelete] = useAtom(draggingOverDeleteAtom);
   return (
-    <DragOverlay dropAnimation={draggingOverDelete ? null : undefined}>
-      {props.entityID && (
-        <div className="touch-none pointer-events-none">
-          <CardPreview href="" entityID={props.entityID} size={"big"} />
+    <DragOverlay dropAnimation={null}>
+      {props.entityID ? (
+        <div className="relative top-2">
+          <CardMedium />
         </div>
-      )}
+      ) : null}
     </DragOverlay>
   );
 };

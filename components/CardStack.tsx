@@ -4,7 +4,7 @@ import { useSpring, animated } from "@react-spring/web";
 import { useRouter } from "next/router";
 import { AddTiny, DeckSmall, Card as CardIcon, Member } from "./Icons";
 import { ReferenceAttributes } from "data/Attributes";
-import { SortableContext, useSortable } from "@dnd-kit/sortable";
+import { SortableContext } from "@dnd-kit/sortable";
 import useMeasure from "react-use-measure";
 import {
   ReplicacheContext,
@@ -33,11 +33,11 @@ export const CardStack = (
   props: { cards: Fact<keyof ReferenceAttributes>[] } & StackData
 ) => {
   let [expandAll, setExpandAll] = useState(false);
-  let [focusedCardIndex, setFocusedCardIndex] = useState(-1);
+  let [focusedCardId, setFocusedCardIndex] = useState<null | string>(null);
 
   return (
     <div className="relative grid gap-2 w-full grid-cols-[auto,16px]">
-      <div>
+      <div className="relative">
         <AddCard
           expanded={expandAll || props.cards.length === 0}
           parent={props.parent}
@@ -58,12 +58,12 @@ export const CardStack = (
               key={card.id}
               entity={props.backlink ? card.entity : card.value.value}
               currentIndex={currentIndex}
-              focused={expandAll || currentIndex === focusedCardIndex}
+              focused={expandAll || card.id === focusedCardId}
               nextIndex={
                 currentIndex === props.cards.length - 1 ? 0 : currentIndex + 1
               }
               onClick={(e) => {
-                setFocusedCardIndex(currentIndex);
+                setFocusedCardIndex(card.id);
                 let element = e.currentTarget;
                 //Commented out for now because it messes w/ scroll state when
                 //following links!
@@ -113,7 +113,7 @@ export const CardStack = (
             <button
               onClick={() => {
                 setExpandAll((e) => !e);
-                setFocusedCardIndex(-1);
+                setFocusedCardIndex(null);
               }}
               className="font-bold text-grey-55 hover:text-accent-blue text-sm relative -top-2"
             >
@@ -139,11 +139,6 @@ const Card = (
   } & StackData
 ) => {
   let [ref, { height }] = useMeasure();
-  const CardHeightAnim = useSpring({
-    config: { mass: 0.1, tension: 500, friction: 25 },
-    maxHeight: props.focused ? (props.expandAll ? height : 492) : 48,
-    marginBottom: props.focused ? 12 : -12,
-  });
 
   let data = {
     backlink: props.backlink,
@@ -167,7 +162,15 @@ const Card = (
     data,
   });
 
+  let focused = props.focused && !isDragging;
+  const CardHeightAnim = useSpring({
+    config: { mass: 0.1, tension: 500, friction: 25 },
+    maxHeight: focused ? (props.expandAll ? height : 492) : 48,
+    marginBottom: focused ? 12 : -12,
+  });
+
   const style = {
+    zIndex: !isDragging ? undefined : 100,
     transform: transform
       ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
       : undefined,
@@ -178,7 +181,7 @@ const Card = (
   return (
     // if card is focused, then increase the height
 
-    <div style={style}>
+    <div style={style} className="relative">
       <animated.div
         onClick={(e) => {
           props.onClick(e);

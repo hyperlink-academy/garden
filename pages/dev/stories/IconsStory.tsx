@@ -7,7 +7,10 @@ const IconsStory = (props: Props) => {
     <ComponentViewer {...props} stories={{}}>
       <div className="flex flex-wrap gap-4">
         {Object.values(Icons).map((Icon, index) => (
-          <Icon key={index} />
+          <svg width="64" height="64">
+            <title>{Icon.name}</title>
+            <Icon key={index} />
+          </svg>
         ))}
       </div>
     </ComponentViewer>

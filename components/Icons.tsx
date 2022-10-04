@@ -247,6 +247,37 @@ export const Card = (props: SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
+export const CardMedium = (props: SVGProps<SVGSVGElement>) => (
+  <svg
+    width="33"
+    height="32"
+    viewBox="0 0 33 32"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    {...props}
+  >
+    <rect
+      x="4.43637"
+      y="13.3701"
+      width="19.7237"
+      height="12.5658"
+      rx="2.125"
+      transform="rotate(-8.98758 4.43637 13.3701)"
+      stroke="#272727"
+      stroke-width="1.75"
+    />
+    <rect
+      x="5.66736"
+      y="9.57178"
+      width="21.4737"
+      height="14.3158"
+      rx="2"
+      transform="rotate(-8.98758 5.66736 9.57178)"
+      fill="#272727"
+    />
+  </svg>
+);
+
 export const CardAdd = (props: SVGProps<SVGSVGElement>) => {
   return (
     <svg
