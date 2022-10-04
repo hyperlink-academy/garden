@@ -49,9 +49,9 @@ export const PopupCardViewer: React.FC = (props) => {
         ref={ref}
         className={`
         pageWrapper 
-        pr-2 pl-[calc((100vw-352px)/2)] sm:px-8 
+        pl-2 after:content-[""] after:h-full after:w-2 after:block after:shrink-0
         h-full w-full 
-        flex flex-row gap-8 
+        flex flex-row gap-4 sm:gap-8 
         snap-x snap-mandatory overflow-x-auto
         sm:justify-center`}
       >
@@ -68,6 +68,7 @@ export const PopupCardViewer: React.FC = (props) => {
         >
           {history[0] ? (
             <>
+<<<<<<< Updated upstream
               <div className="cardViewerHeader grid grid-cols-[auto_max-content] items-center gap-4 ">
                 <BackButton
                   history={history}
@@ -79,6 +80,10 @@ export const PopupCardViewer: React.FC = (props) => {
                     });
                   }}
                 />
+=======
+              <div className="cardViewerHeader grid grid-cols-[auto_max-content] items-center gap-4">
+                <BackButton history={history} setHistory={setHistory} />
+>>>>>>> Stashed changes
                 <FindOrCreateBar />
               </div>
               <CardView
