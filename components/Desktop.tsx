@@ -1,4 +1,9 @@
-import { useIndex, useMutations } from "hooks/useReplicache";
+import {
+  ReplicacheContext,
+  scanIndex,
+  useIndex,
+  useMutations,
+} from "hooks/useReplicache";
 import {
   DndContext,
   MouseSensor,
@@ -8,7 +13,7 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { CardPreview } from "./CardPreview";
 import { customCollisionDetection } from "src/customCollisionDetection";
 import { restrictToParentElement } from "@dnd-kit/modifiers";
@@ -16,6 +21,7 @@ import { ulid } from "src/ulid";
 import { DownArrow, UpArrow } from "./Icons";
 import { useRouter } from "next/router";
 import { FindOrCreate, useAllItems } from "./FindOrCreateEntity";
+import { useSubscribe } from "replicache-react";
 
 const GRID_SIZE = 16;
 const snap = (x: number) => Math.ceil(x / GRID_SIZE) * GRID_SIZE;
@@ -23,7 +29,7 @@ const snap = (x: number) => Math.ceil(x / GRID_SIZE) * GRID_SIZE;
 export const Desktop = () => {
   let homeEntity = useIndex.aev("home");
   let cards = useIndex.eav(homeEntity[0]?.entity || null, "deck/contains");
-  let height = useIndex.eav(homeEntity[0]?.entity || null, "canvas/height");
+  let height = useHeight(homeEntity[0]?.entity);
   const mouseSensor = useSensor(MouseSensor, {});
   const touchSensor = useSensor(TouchSensor, {});
   const sensors = useSensors(mouseSensor, touchSensor);
@@ -31,6 +37,9 @@ export const Desktop = () => {
   let [createCard, setCreateCard] = useState<null | { x: number; y: number }>(
     null
   );
+  let [draggingHeight, setDraggingHeight] = useState(0);
+
+  //if what we are dragging's y position + something, exceeds the current height, increase it.
 
   return (
     <DndContext
@@ -47,8 +56,16 @@ export const Desktop = () => {
         restrictToParentElement,
       ]}
       collisionDetection={customCollisionDetection}
+      onDragMove={({ delta, active }) => {
+        let position: { y: number } = active.data.current?.position;
+        if (!position) return;
+        let h = height;
+        if (position.y + delta.y + 200 > h)
+          setDraggingHeight(position.y + delta.y + 200);
+      }}
       onDragEnd={async (props) => {
         let { active, delta, over, collisions } = props;
+        setDraggingHeight(0);
         let overCollision = collisions?.find(
           (c) => c.data?.droppableContainer.id === over?.id
         );
@@ -111,7 +128,7 @@ export const Desktop = () => {
           }}
           style={{
             zIndex: 1,
-            height: `${height?.value || 800}px`,
+            height: `${draggingHeight > height ? draggingHeight : height}px`,
             position: "relative",
           }}
           className="text-sm"
@@ -124,11 +141,28 @@ export const Desktop = () => {
               parent={homeEntity[0]?.entity}
             />
           ))}
-          <ResizeCanvas canvasEntity={homeEntity[0]?.entity} />
         </div>
         {/* <HelpToast helpText={`double click/tap to create new`} /> */}
       </div>
     </DndContext>
+  );
+};
+
+let useHeight = (entity: string) => {
+  let rep = useContext(ReplicacheContext);
+  return useSubscribe(
+    rep?.rep,
+    async (tx) => {
+      let cards = await scanIndex(tx).eav(entity, "deck/contains");
+      return await cards.reduce(async (acc, card) => {
+        let position = await scanIndex(tx).eav(card.id, "card/position-in");
+        if (position && position.value.y + 200 > (await acc))
+          return position.value.y + 200;
+        return acc;
+      }, Promise.resolve(800));
+    },
+    800,
+    []
   );
 };
 
@@ -143,7 +177,7 @@ const DraggableCard = (props: {
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({
       id: props.relationshipID,
-      data: { entityID: props.entityID },
+      data: { entityID: props.entityID, position: position?.value },
     });
   let { setNodeRef: draggableRef } = useDroppable({
     id: props.relationshipID,
@@ -223,84 +257,13 @@ const DraggableCard = (props: {
   );
 };
 
-const ResizeCanvas = (props: { canvasEntity: string }) => {
-  let height = useIndex.eav(props.canvasEntity, "canvas/height");
-  let { authorized, mutate } = useMutations();
-  let [hoveringLess, setHoveringLess] = useState(false);
-  useEffect(() => setHoveringLess(false), [(height?.value || 0) > 800]);
-  return (
-    <div
-      style={{ bottom: 16 }}
-      className="absolute bottom-0 flex flex-row gap-4 w-full justify-between px-4"
-    >
-      {authorized && (
-        <button
-          className="flex flex-row z-[9999999999] text-grey-80 items-center hover:text-accent-blue"
-          onClick={() => {
-            mutate("assertFact", {
-              entity: props.canvasEntity,
-              attribute: "canvas/height",
-              positions: {},
-              value: (height?.value || 800) + 400,
-            });
-          }}
-        >
-          <DownArrow className="-mx-0.5" height="18" width="18" />
-          <DownArrow className="-mx-0.5" height="18" width="18" />
-          <DownArrow className="-ml-0.5 mr-1" height="18" width="18" />
-          more
-          <DownArrow className="ml-1 -mr-0.5" height="18" width="18" />
-          <DownArrow className="-mx-0.5" height="18" width="18" />
-          <DownArrow className="-mx-0.5" height="18" width="18" />
-        </button>
-      )}
-      {height && height?.value > 800 && authorized && (
-        <button
-          onMouseEnter={() => setHoveringLess(true)}
-          onMouseLeave={() => setHoveringLess(false)}
-          className="flex flex-row z-[9999999999] text-grey-80 items-center hover:text-accent-red"
-          onClick={() => {
-            mutate("assertFact", {
-              entity: props.canvasEntity,
-              attribute: "canvas/height",
-              positions: {},
-              value: (height?.value || 800) - 400,
-            });
-          }}
-        >
-          <UpArrow className="ml-1 -mx-0.5" height={"18"} width={"18"} />
-          <UpArrow className="-mx-0.5" height={"18"} width={"18"} />
-          <UpArrow className="-ml-0.5 mr-1" height={"18"} width={"18"} />
-          less
-          <UpArrow className="-mr-0.5" height={"18"} width={"18"} />
-          <UpArrow className="-mx-0.5" height={"18"} width={"18"} />
-          <UpArrow className="-mx-0.5" height={"18"} width={"18"} />
-        </button>
-      )}
-      {hoveringLess && (
-        <div
-          style={{
-            top: "-368px",
-            left: "-16px",
-            zIndex: "-1",
-            opacity: "0.1",
-            backgroundImage:
-              "repeating-linear-gradient(-45deg,transparent, transparent 5px, black 5px, black 8px) ",
-          }}
-          className="absolute w-full h-[400px]"
-        />
-      )}
-    </div>
-  );
-};
-
 const AddCard = (props: {
   onClose: () => void;
   desktopEntity: string;
   position: null | { x: number; y: number };
 }) => {
   let items = useAllItems(!!props.position);
-  let { authorized, mutate } = useMutations();
+  let { mutate } = useMutations();
   return (
     <FindOrCreate
       items={items}
