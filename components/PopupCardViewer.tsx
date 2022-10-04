@@ -68,7 +68,6 @@ export const PopupCardViewer: React.FC = (props) => {
         >
           {history[0] ? (
             <>
-<<<<<<< Updated upstream
               <div className="cardViewerHeader grid grid-cols-[auto_max-content] items-center gap-4 ">
                 <BackButton
                   history={history}
@@ -80,10 +79,6 @@ export const PopupCardViewer: React.FC = (props) => {
                     });
                   }}
                 />
-=======
-              <div className="cardViewerHeader grid grid-cols-[auto_max-content] items-center gap-4">
-                <BackButton history={history} setHistory={setHistory} />
->>>>>>> Stashed changes
                 <FindOrCreateBar />
               </div>
               <CardView
@@ -242,8 +237,6 @@ const BackButton = (props: {
                   prevCardTitle || prevCardMemberName || prevCardBotName
                 }`
               : "Back"
-            : width > 1000
-            ? "Clear Stack"
             : "Back"}
         </p>
       </div>
