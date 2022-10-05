@@ -195,8 +195,7 @@ const Card = (
             : {
                 overflow: "hidden",
                 ...CardHeightAnim,
-                // height: "auto",
-                // height: 256,
+                maxHeight: 128,
               }
         }
         className={`cardWrapper -mr-4`}
