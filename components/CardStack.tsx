@@ -165,19 +165,18 @@ const Card = (
   let focused = props.focused && !isDragging;
   const CardHeightAnim = useSpring({
     config: { mass: 0.1, tension: 500, friction: 25 },
-    maxHeight: focused ? (props.expandAll ? height : 492) : 48,
+    maxHeight: focused ? (props.expandAll ? height : 256) : 52,
     marginBottom: focused ? 12 : -12,
   });
 
   const style = {
-    zIndex: !isDragging ? undefined : 100,
+    zIndex: !isDragging ? undefined : 256,
     transform: transform
       ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
       : undefined,
     transition,
   };
 
-  // console.log(props.active === true ? "height %:" + heightPercent : null)
   return (
     // if card is focused, then increase the height
 
@@ -185,7 +184,6 @@ const Card = (
       <animated.div
         onClick={(e) => {
           props.onClick(e);
-          // console.log(data);
         }}
         ref={setNodeRef}
         style={
@@ -196,7 +194,9 @@ const Card = (
               }
             : {
                 overflow: "hidden",
-                height: "auto",
+                ...CardHeightAnim,
+                // height: "auto",
+                // height: 256,
               }
         }
         className={`cardWrapper -mr-4`}
@@ -280,10 +280,10 @@ const AddCard = (props: { expanded: boolean; end?: boolean } & StackData) => {
             !props.end
               ? props.expanded
                 ? "gap-2 items-center justify-center mb-4"
-                : "pt-1 pl-4 pr-3 -mb-4"
+                : "pt-2 pl-4 pr-3 -mb-2"
               : props.expanded
               ? "gap-2 items-center justify-center mt-4"
-              : "-mt-4 pt-[18px] pl-4 pr-3"
+              : "mt-3 pt-3 pl-4 pr-3"
           }
           `}
       >
