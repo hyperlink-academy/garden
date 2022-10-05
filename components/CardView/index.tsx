@@ -13,7 +13,7 @@ import {
   HighlightLampOff,
 } from "components/Icons";
 import { Divider, MenuContainer, MenuItem } from "components/Layout";
-import { useIndex, useMutations } from "hooks/useReplicache";
+import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
 import {
   MultipleReferenceSection,
   Sections,
@@ -31,9 +31,9 @@ import { flag, ref } from "data/Facts";
 import { ButtonPrimary } from "components/Buttons";
 import { Textarea } from "components/Textarea";
 import { ulid } from "src/ulid";
-import { animated, easings, useSpring } from "@react-spring/web";
 import { MessageInput, Messages } from "pages/s/[studio]/s/[space]/chat";
 
+const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 const borderStyles = (args: { deck: boolean; member: boolean }) => {
   switch (true) {
     //styles can be found is global.css
@@ -217,10 +217,7 @@ export const CardView = (props: {
                 />
               </div>
             </div>
-            <SingleTextSection
-              entityID={props.entityID}
-              section={"card/content"}
-            />
+            <DefaultTextSection entityID={props.entityID} />
             <div>
               <ImageSection entity={props.entityID} />
               <MakeDeck entity={props.entityID} />
@@ -248,6 +245,42 @@ export const CardView = (props: {
       Bigger number, more of the bottom of the card peeks in, Smaller number, less of it peeks in. */}
       <div className="spacer snap-end h-[calc(100%-48px)]" />
     </div>
+  );
+};
+
+const DefaultTextSection = (props: { entityID: string }) => {
+  let { session } = useAuth();
+  let { mutate } = useMutations();
+  let spaceID = useSpaceID();
+  return (
+    <SingleTextSection
+      onPaste={async (e) => {
+        let items = e.clipboardData.items;
+        if (!items[0].type.includes("image") || !session.session) return;
+        let image = items[0].getAsFile();
+        if (!image) return;
+
+        let res = await fetch(`${WORKER_URL}/space/${spaceID}/upload_file`, {
+          headers: {
+            "X-Authorization": session.session.id,
+          },
+          method: "POST",
+          body: image,
+        });
+        let data = (await res.json()) as
+          | { success: false }
+          | { success: true; data: { id: string } };
+        if (!data.success) return;
+        await mutate("assertFact", {
+          entity: props.entityID,
+          attribute: "card/image",
+          value: { type: "file", id: data.data.id, filetype: "image" },
+          positions: {},
+        });
+      }}
+      entityID={props.entityID}
+      section={"card/content"}
+    />
   );
 };
 
