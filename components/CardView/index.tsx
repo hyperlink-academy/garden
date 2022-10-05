@@ -254,6 +254,7 @@ const DefaultTextSection = (props: { entityID: string }) => {
   let spaceID = useSpaceID();
   return (
     <SingleTextSection
+      id={`${props.entityID}-default-text-section}`}
       onPaste={async (e) => {
         let items = e.clipboardData.items;
         if (!items[0].type.includes("image") || !session.session) return;
@@ -357,6 +358,13 @@ const Title = (props: { entityID: string }) => {
   let titleFact = memberName || botName || cardTitle;
   return (
     <SingleTextSection
+      onKeyPress={(e) => {
+        if (e.key === "Enter") {
+          let className = `${props.entityID}-default-text-section}`;
+          let element = document.getElementById(className);
+          element?.focus();
+        }
+      }}
       previewOnly={titleFact?.attribute === "member/name"}
       entityID={props.entityID}
       className="text-xl font-bold bg-inherit"

@@ -338,34 +338,15 @@ const BigCardBody = (props: { entityID: string } & SharedProps) => {
         {/* Big Card Preview Title and GoTo Button*/}
         <div className={`flex gap-2 items-start`}>
           <SingleTextSection
-            onPaste={async (e) => {
-              let items = e.clipboardData.items;
-              if (!items[0].type.includes("image") || !session.session) return;
-              let image = items[0].getAsFile();
-              if (!image) return;
-
-              let res = await fetch(
-                `${WORKER_URL}/space/${spaceID}/upload_file`,
-                {
-                  headers: {
-                    "X-Authorization": session.session.id,
-                  },
-                  method: "POST",
-                  body: image,
-                }
-              );
-              let data = (await res.json()) as
-                | { success: false }
-                | { success: true; data: { id: string } };
-              if (!data.success) return;
-              await mutate("assertFact", {
-                entity: props.entityID,
-                attribute: "card/image",
-                value: { type: "file", id: data.data.id, filetype: "image" },
-                positions: {},
-              });
-            }}
             entityID={props.entityID}
+            onKeyPress={(e) => {
+              if (e.key === "Enter") {
+                let element = document.getElementById(
+                  `${props.entityID}-${props.factID}-text-section`
+                );
+                element?.focus();
+              }
+            }}
             previewOnly={isMember}
             section={isMember ? "member/name" : "card/title"}
             placeholderOnHover={true}
@@ -398,7 +379,35 @@ const BigCardBody = (props: { entityID: string } & SharedProps) => {
             />
           )}
           <SingleTextSection
+            id={`${props.entityID}-${props.factID}-text-section`}
             entityID={props.entityID}
+            onPaste={async (e) => {
+              let items = e.clipboardData.items;
+              if (!items[0].type.includes("image") || !session.session) return;
+              let image = items[0].getAsFile();
+              if (!image) return;
+
+              let res = await fetch(
+                `${WORKER_URL}/space/${spaceID}/upload_file`,
+                {
+                  headers: {
+                    "X-Authorization": session.session.id,
+                  },
+                  method: "POST",
+                  body: image,
+                }
+              );
+              let data = (await res.json()) as
+                | { success: false }
+                | { success: true; data: { id: string } };
+              if (!data.success) return;
+              await mutate("assertFact", {
+                entity: props.entityID,
+                attribute: "card/image",
+                value: { type: "file", id: data.data.id, filetype: "image" },
+                positions: {},
+              });
+            }}
             section="card/content"
             placeholderOnHover={true}
             className={`whitespace-pre-wrap truncate leading-tight pt-1  ${

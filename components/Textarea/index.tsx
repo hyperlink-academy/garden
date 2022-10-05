@@ -40,6 +40,9 @@ export const Textarea = (
           fontFamily: "inherit",
           width: "100%",
         }}
+        onFocus={() => {
+          setFocused(true);
+        }}
         onKeyDown={(e) => {
           if (e.key === "Enter") {
             if (e.isDefaultPrevented()) return;
