@@ -1,6 +1,6 @@
 import { DraggableAttributes } from "@dnd-kit/core";
 import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
-import { useIndex, useMutations } from "hooks/useReplicache";
+import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
 import Link from "next/link";
 import { SingleTextSection } from "./CardView/Sections";
 import { GripperBG } from "./Gripper";
@@ -18,6 +18,7 @@ import { isUrl } from "src/isUrl";
 import { useRef } from "react";
 import { usePopupCardViewer } from "./PopupCardViewer";
 import { useReadState } from "hooks/useReadState";
+import { useAuth } from "hooks/useAuth";
 
 const borderStyles = (args: {
   isDeck: boolean;
@@ -296,6 +297,9 @@ const SmallCardBody = (props: { entityID: string } & SharedProps) => {
 
 const BigCardBody = (props: { entityID: string } & SharedProps) => {
   let isMember = !!useIndex.eav(props.entityID, "member/name");
+  let { session } = useAuth();
+  let { mutate } = useMutations();
+  let spaceID = useSpaceID();
   let sections = useIndex.eav(props.entityID, "card/section");
   let image = useIndex.eav(props.entityID, "card/image");
   let { authorized } = useMutations();
@@ -334,6 +338,33 @@ const BigCardBody = (props: { entityID: string } & SharedProps) => {
         {/* Big Card Preview Title and GoTo Button*/}
         <div className={`flex gap-2 items-start`}>
           <SingleTextSection
+            onPaste={async (e) => {
+              let items = e.clipboardData.items;
+              if (!items[0].type.includes("image") || !session.session) return;
+              let image = items[0].getAsFile();
+              if (!image) return;
+
+              let res = await fetch(
+                `${WORKER_URL}/space/${spaceID}/upload_file`,
+                {
+                  headers: {
+                    "X-Authorization": session.session.id,
+                  },
+                  method: "POST",
+                  body: image,
+                }
+              );
+              let data = (await res.json()) as
+                | { success: false }
+                | { success: true; data: { id: string } };
+              if (!data.success) return;
+              await mutate("assertFact", {
+                entity: props.entityID,
+                attribute: "card/image",
+                value: { type: "file", id: data.data.id, filetype: "image" },
+                positions: {},
+              });
+            }}
             entityID={props.entityID}
             previewOnly={isMember}
             section={isMember ? "member/name" : "card/title"}
