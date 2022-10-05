@@ -11,6 +11,7 @@ export const Textarea = (
 ) => {
   let textarea = useRef<HTMLTextAreaElement | null>(null);
   let previewElement = useRef<HTMLPreElement | null>(null);
+  let ignoreFocus = useRef(false);
 
   let [initialCursor, setInitialCursor] = useState<number | null>(null);
   let [focused, setFocused] = useState(false);
@@ -41,7 +42,8 @@ export const Textarea = (
           width: "100%",
         }}
         onFocus={() => {
-          setFocused(true);
+          if (!ignoreFocus.current) setFocused(true);
+          ignoreFocus.current = false;
         }}
         onKeyDown={(e) => {
           if (e.key === "Enter") {
@@ -51,6 +53,12 @@ export const Textarea = (
             if (typeof props.value === "string")
               setInitialCursor(props.value?.length);
           }
+        }}
+        onTouchStart={() => {
+          ignoreFocus.current = true;
+        }}
+        onMouseDown={() => {
+          ignoreFocus.current = true;
         }}
         onClick={(e) => {
           if (e.isDefaultPrevented()) return;
