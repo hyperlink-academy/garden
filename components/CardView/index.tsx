@@ -215,10 +215,7 @@ export const CardView = (props: {
                 />
               </div>
             </div>
-            <SingleTextSection
-              entityID={props.entityID}
-              section={"card/content"}
-            />
+            <DefaultTextSection entityID={props.entityID} />
 
             <div className="pb-2">
               <ImageSection entity={props.entityID} />

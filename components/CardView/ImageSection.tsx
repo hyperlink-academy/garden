@@ -69,28 +69,7 @@ export const AddImage: React.FC<{ onUpload: (imageID: string) => void }> = (
   let spaceID = useSpaceID();
 
   return (
-    <label
-      className="inline-block w-max text-grey-55 hover:text-accent-blue "
-      onPaste={async (e) => {
-        let items = e.clipboardData.items;
-        if (!items[0].type.includes("image") || !session.session) return;
-        let image = items[0].getAsFile();
-        if (!image) return;
-
-        let res = await fetch(`${WORKER_URL}/space/${spaceID}/upload_file`, {
-          headers: {
-            "X-Authorization": session.session.id,
-          },
-          method: "POST",
-          body: image,
-        });
-        let data = (await res.json()) as
-          | { success: false }
-          | { success: true; data: { id: string } };
-        if (!data.success) return;
-        props.onUpload(data.data.id);
-      }}
-    >
+    <label className="inline-block w-max text-grey-55 hover:text-accent-blue ">
       {props.children}
       <input
         type="file"
