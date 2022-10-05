@@ -55,7 +55,7 @@ export const customCollisionDetection: CollisionDetection = ({
         collisionRect
       );
 
-      if (intersectionRatio > 0) {
+      if (intersectionRatio > 0.5 || targetRatio > 0.5) {
         collisions.push({
           id,
           data: { droppableContainer, value: intersectionRatio, targetRatio },

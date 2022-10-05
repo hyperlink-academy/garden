@@ -13,12 +13,11 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import { CardPreview } from "./CardPreview";
 import { customCollisionDetection } from "src/customCollisionDetection";
 import { restrictToParentElement } from "@dnd-kit/modifiers";
 import { ulid } from "src/ulid";
-import { DownArrow, UpArrow } from "./Icons";
 import { useRouter } from "next/router";
 import { FindOrCreate, useAllItems } from "./FindOrCreateEntity";
 import { useSubscribe } from "replicache-react";
@@ -70,11 +69,7 @@ export const Desktop = () => {
           (c) => c.data?.droppableContainer.id === over?.id
         );
         if (!homeEntity[0]) return;
-        if (
-          !over ||
-          overCollision?.data?.targetRatio < 0.75 ||
-          over.id === active.id
-        )
+        if (!over || !overCollision || over.id === active.id)
           return await mutate("updatePositionInDesktop", {
             factID: active.id as string,
             parent: homeEntity[0].entity,
@@ -179,7 +174,7 @@ const DraggableCard = (props: {
       id: props.relationshipID,
       data: { entityID: props.entityID, position: position?.value },
     });
-  let { setNodeRef: draggableRef } = useDroppable({
+  let { setNodeRef: draggableRef, isOver } = useDroppable({
     id: props.relationshipID,
     disabled: isDragging,
     data: { entityID: props.entityID },
@@ -210,6 +205,7 @@ const DraggableCard = (props: {
       >
         {/* This handles the rotation */}
         <div
+          className={`${isOver ? "border-2" : ""}`}
           style={{
             transform: `rotate(${
               !position
