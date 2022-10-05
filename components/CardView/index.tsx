@@ -7,8 +7,6 @@ import {
   Member,
   CardAdd,
   Print,
-  ExpandTiny,
-  CollapseTiny,
   HighlightLampOn,
   HighlightLampOff,
 } from "components/Icons";
@@ -24,7 +22,7 @@ import { Backlinks } from "./Backlinks";
 import { spacePath, usePreserveScroll, usePrevious } from "hooks/utils";
 import Link from "next/link";
 import { useAuth } from "hooks/useAuth";
-import { ImageSection } from "./ImageSection";
+import { MakeImage, ImageSection } from "./ImageSection";
 import { Fragment, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import { flag, ref } from "data/Facts";
@@ -217,14 +215,21 @@ export const CardView = (props: {
                 />
               </div>
             </div>
-            <DefaultTextSection entityID={props.entityID} />
-            <div>
+            <SingleTextSection
+              entityID={props.entityID}
+              section={"card/content"}
+            />
+
+            <div className="pb-2">
               <ImageSection entity={props.entityID} />
+            </div>
+            {!isDeck ? null : <DeckCardList entityID={props.entityID} />}
+
+            <div className="flex gap-2 pt-2">
+              <MakeImage entity={props.entityID} />
               <MakeDeck entity={props.entityID} />
             </div>
           </div>
-
-          {!isDeck ? null : <DeckCardList entityID={props.entityID} />}
 
           <Sections entityID={props.entityID} />
 
@@ -327,17 +332,15 @@ const MakeDeck = (props: { entity: string }) => {
 
   if (cards && cards.length > 0) return null;
   if (!authorized) return null;
-  return (
+  return isDeck ? null : (
     <button
       onClick={() => {
-        if (isDeck) mutate("retractFact", { id: isDeck.id });
-        else
-          mutate("assertFact", {
-            entity: props.entity,
-            attribute: "deck",
-            value: flag(),
-            positions: {},
-          });
+        mutate("assertFact", {
+          entity: props.entity,
+          attribute: "deck",
+          value: flag(),
+          positions: {},
+        });
       }}
     >
       <CardAdd
@@ -374,13 +377,26 @@ const Title = (props: { entityID: string }) => {
 };
 
 const DeckCardList = (props: { entityID: string }) => {
+  let { authorized, mutate } = useMutations();
+
   let cards = useIndex.eav(props.entityID, "deck/contains");
+  let deck = useIndex.eav(props.entityID, "deck");
   return (
-    <div>
+    <div className="flex flex-col justify-center">
       <MultipleReferenceSection
         entityID={props.entityID}
         section="deck/contains"
       />
+      {cards?.length === 0 && authorized ? (
+        <small
+          className="text-grey-55 hover:text-accent-blue w-full text-center"
+          onClick={() => (deck ? mutate("retractFact", { id: deck.id }) : null)}
+        >
+          remove card attacher
+        </small>
+      ) : (
+        ""
+      )}
     </div>
   );
 };

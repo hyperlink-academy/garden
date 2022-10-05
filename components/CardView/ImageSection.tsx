@@ -4,6 +4,26 @@ import { spaceAPI } from "backend/lib/api";
 import { SectionImageAdd } from "components/Icons";
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 
+export const MakeImage = (props: { entity: string }) => {
+  let { mutate, authorized } = useMutations();
+  let image = useIndex.eav(props.entity, "card/image");
+
+  return !authorized || image ? null : (
+    <AddImage
+      onUpload={async (imageID) => {
+        await mutate("assertFact", {
+          entity: props.entity,
+          attribute: "card/image",
+          value: { type: "file", id: imageID, filetype: "image" },
+          positions: {},
+        });
+      }}
+    >
+      <SectionImageAdd />
+    </AddImage>
+  );
+};
+
 export const ImageSection = (props: { entity: string }) => {
   let { session } = useAuth();
   let { mutate, authorized } = useMutations();
@@ -14,7 +34,7 @@ export const ImageSection = (props: { entity: string }) => {
     image ? (
       <div className="grid auto-rows-max justify-items-center gap-1">
         <img
-          className="max-w-full   "
+          className="max-w-full"
           src={
             image.value.filetype === "image"
               ? `${WORKER_URL}/static/${image.value.id}`
@@ -38,20 +58,7 @@ export const ImageSection = (props: { entity: string }) => {
           </button>
         )}
       </div>
-    ) : !authorized ? null : (
-      <AddImage
-        onUpload={async (imageID) => {
-          await mutate("assertFact", {
-            entity: props.entity,
-            attribute: "card/image",
-            value: { type: "file", id: imageID, filetype: "image" },
-            positions: {},
-          });
-        }}
-      >
-        <SectionImageAdd />
-      </AddImage>
-    )
+    ) : null
   );
 };
 
@@ -62,7 +69,28 @@ export const AddImage: React.FC<{ onUpload: (imageID: string) => void }> = (
   let spaceID = useSpaceID();
 
   return (
-    <label className="inline-block w-max text-grey-55 hover:text-accent-blue pt-2">
+    <label
+      className="inline-block w-max text-grey-55 hover:text-accent-blue "
+      onPaste={async (e) => {
+        let items = e.clipboardData.items;
+        if (!items[0].type.includes("image") || !session.session) return;
+        let image = items[0].getAsFile();
+        if (!image) return;
+
+        let res = await fetch(`${WORKER_URL}/space/${spaceID}/upload_file`, {
+          headers: {
+            "X-Authorization": session.session.id,
+          },
+          method: "POST",
+          body: image,
+        });
+        let data = (await res.json()) as
+          | { success: false }
+          | { success: true; data: { id: string } };
+        if (!data.success) return;
+        props.onUpload(data.data.id);
+      }}
+    >
       {props.children}
       <input
         type="file"
