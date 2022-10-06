@@ -51,6 +51,7 @@ type SharedProps = {
   };
   onResize?: (size: "big" | "small") => void;
   href: string;
+  isOver?: boolean;
 };
 
 export const CardPreview = (
@@ -70,7 +71,9 @@ export const CardPreview = (
           isDeck,
           isMember,
           isChat,
-        })}`}
+        })} ${
+          props.isOver ? "rounded-[24px] shadow-[0_0_16px_0_#cccccc]" : ""
+        }`}
       >
         {props.size === "small" ? (
           <SmallCardBody {...props} />

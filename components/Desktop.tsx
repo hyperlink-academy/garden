@@ -205,7 +205,7 @@ const DraggableCard = (props: {
       >
         {/* This handles the rotation */}
         <div
-          className={`${isOver ? "border-2" : ""}`}
+          className={`${isOver ? "scale-105" : ""}`}
           style={{
             transform: `rotate(${
               !position
@@ -214,7 +214,7 @@ const DraggableCard = (props: {
                     Math.floor(position.value.rotation / (Math.PI / 24)) *
                     (Math.PI / 24)
                   ).toFixed(2)
-            }rad)`,
+            }rad) ${isOver ? "scale(1.05)" : ""}`,
           }}
         >
           {/* This is the actual card and its buttons. It also handles size */}
@@ -245,6 +245,7 @@ const DraggableCard = (props: {
                 da: 0,
               });
             }}
+            isOver={isOver}
             {...props}
           />
         </div>
