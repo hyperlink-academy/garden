@@ -157,7 +157,7 @@ let useHeight = (entity: string) => {
       }, Promise.resolve(800));
     },
     800,
-    []
+    [entity]
   );
 };
 
