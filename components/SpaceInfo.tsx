@@ -50,7 +50,12 @@ export const SpaceInfo = () => {
       <div className="spaceInfo grid auto-rows-max gap-3 pb-4 pt-6">
         <div className="spaceNameDescription">
           <div className="flex gap-2">
-            <h1 className="grow">{spaceName?.value}</h1>
+            <h1
+              className="grow"
+              style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
+            >
+              {spaceName?.value}
+            </h1>
             <HighlightsButton />
           </div>
           <Description entity={spaceName?.entity} />
