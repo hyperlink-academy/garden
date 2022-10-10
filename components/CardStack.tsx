@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import React, { useContext, useState } from "react";
 import { CardPreview } from "./CardPreview";
 import { useSpring, animated } from "@react-spring/web";
 import { useRouter } from "next/router";
@@ -64,6 +64,7 @@ export const CardStack = (
               }
               onClick={(e) => {
                 setFocusedCardIndex(card.id);
+                console.log(focusedCardId);
                 let element = e.currentTarget;
                 //Commented out for now because it messes w/ scroll state when
                 //following links!
@@ -163,9 +164,10 @@ const Card = (
   });
 
   let focused = props.focused && !isDragging;
+  // console.log(focused);
   const CardHeightAnim = useSpring({
     config: { mass: 0.1, tension: 500, friction: 25 },
-    maxHeight: focused ? (props.expandAll ? height : 256) : 52,
+    maxHeight: focused ? height : 52,
     marginBottom: focused ? 12 : -12,
   });
 
@@ -195,7 +197,8 @@ const Card = (
             : {
                 overflow: "hidden",
                 ...CardHeightAnim,
-                maxHeight: 128,
+                // maxHeight: 128,
+                // maxHeight: height,
               }
         }
         className={`cardWrapper -mr-4`}
