@@ -45,6 +45,13 @@ export default function App({ Component, pageProps }: AppProps) {
 const SharedProviders: React.FC = (props) => {
   return (
     <SmokeProvider>
+      <Head>
+        <meta
+          name="viewport"
+          content="minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, user-scalable=no, viewport-fit=cover"
+        />
+      </Head>
+
       <AuthProvider>
         <SWRCache>{props.children}</SWRCache>
       </AuthProvider>
