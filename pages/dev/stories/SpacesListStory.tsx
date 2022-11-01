@@ -1,4 +1,5 @@
 import { SpaceList } from "components/SpacesList";
+import { useIndex } from "hooks/useReplicache";
 import { ComponentViewer, Props, Stories } from ".";
 export { getStaticProps } from ".";
 
@@ -24,9 +25,14 @@ const stories: Stories = {
 const SpacesListStory = (props: Props) => {
   return (
     <ComponentViewer components={props.components} stories={stories}>
-      <SpaceList />
+      <List />
     </ComponentViewer>
   );
+};
+
+const List = () => {
+  let spaces = useIndex.aev("space/name");
+  return <SpaceList spaces={spaces} />;
 };
 SpacesListStory.metadata = {
   name: "Spaces List",

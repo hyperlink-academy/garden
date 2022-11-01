@@ -11,12 +11,11 @@ export const update_self_route = makeRoute({
     token: z.string(),
     data: z
       .object({
-        image: z
-          .object({
-            type: z.union([z.literal("default"), z.literal("uploaded")]),
-            value: z.string(),
-          })
-          .optional(),
+        completed: z.boolean(),
+        image: z.object({
+          type: z.union([z.literal("default"), z.literal("uploaded")]),
+          value: z.string(),
+        }),
       })
       .partial(),
   }),
@@ -39,7 +38,7 @@ export const update_self_route = makeRoute({
       return { data: { success: false, error: "No this entity" } } as const;
 
     if (msg.data.image) {
-      env.factStore.assertFact({
+      await env.factStore.assertFact({
         entity: thisEntity.entity,
         attribute: "space/door/uploaded-image",
 
@@ -58,6 +57,14 @@ export const update_self_route = makeRoute({
         positions: {},
       });
     }
+    if (msg.data.completed !== undefined) {
+      await env.factStore.assertFact({
+        entity: thisEntity.entity,
+        attribute: "space/completed",
+        value: msg.data.completed,
+        positions: {},
+      });
+    }
 
     //CALL MEMBERS
     let members = await env.factStore.scanIndex.aev("space/member");
@@ -69,7 +76,7 @@ export const update_self_route = makeRoute({
         "update_local_space_data",
         {
           spaceID: env.id,
-          data: { image: msg.data.image },
+          data: { image: msg.data.image, completed: msg.data.completed },
         }
       );
     }

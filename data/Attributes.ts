@@ -105,6 +105,11 @@ export const DefaultAttributes = {
     unique: false,
     cardinality: "one",
   },
+  "space/completed": {
+    type: "boolean",
+    unique: false,
+    cardinality: "one",
+  },
   ["space/studio"]: {
     type: "string",
     unique: false,

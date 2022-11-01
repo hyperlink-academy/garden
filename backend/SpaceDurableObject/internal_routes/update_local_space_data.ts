@@ -9,6 +9,7 @@ export const update_local_space_data_route = makeRoute({
     data: z
       .object({
         deleted: z.boolean(),
+        completed: z.boolean(),
         image: z
           .object({
             type: z.union([z.literal("default"), z.literal("uploaded")]),
@@ -39,6 +40,15 @@ export const update_local_space_data_route = makeRoute({
                 filetype: "external_image",
                 url: msg.data.image.value,
               },
+        positions: {},
+      });
+    }
+
+    if (msg.data.completed !== undefined) {
+      await env.factStore.assertFact({
+        entity: spaceFact.entity,
+        attribute: "space/completed",
+        value: msg.data.completed,
         positions: {},
       });
     }

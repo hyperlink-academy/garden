@@ -16,12 +16,14 @@ import { GetStaticPropsContext, InferGetStaticPropsType } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useContext, useState } from "react";
+import { sortByPosition } from "src/position_helpers";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 type Props = InferGetStaticPropsType<typeof getStaticProps>;
 export default function StudioPage(props: Props) {
   if (props.notFound) return <div>404 - studio not found!</div>;
   if (!props.id) return <div>loading </div>;
+
   return (
     <SpaceProvider id={props.id}>
       <div className="grid grid-flow-row gap-8 my-6">
@@ -29,12 +31,25 @@ export default function StudioPage(props: Props) {
           <StudioName />
           <Logout />
         </div>
-        <SpaceList />
+        <List />
         <CreateSpace studioSpaceID={props.id} />
       </div>
     </SpaceProvider>
   );
 }
+const List = () => {
+  let spaces = useIndex.aev("space/name").sort(sortByPosition("aev"));
+  let completedSpaces = useIndex
+    .aev("space/completed")
+    .sort(sortByPosition("aev"));
+  return (
+    <SpaceList
+      spaces={spaces.filter(
+        (f) => !completedSpaces.find((c) => c.entity === f.entity && c.value)
+      )}
+    />
+  );
+};
 
 const StudioName = () => {
   let name = useIndex.aev("this/name", "")[0];
