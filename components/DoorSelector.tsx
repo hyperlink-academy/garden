@@ -43,7 +43,7 @@ export const DoorSelector = (props: {
                 props.onSelect({ type: "default", value: f });
               }}
             >
-              <DoorClippedImage url={f} />
+              <DoorClippedImage url={f} width="64" />
             </button>
           );
         })}

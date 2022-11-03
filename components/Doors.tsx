@@ -138,11 +138,11 @@ const OuterFrameClipPath = (
   </clipPath>
 );
 
-export const DoorClippedImage = (props: { url: string }) => {
+export const DoorClippedImage = (props: { url: string; width?: string }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width={"128"}
+      width={props.width || "128"}
       height="auto"
       viewBox="0 0 256 576"
       className="flex-none -scale-x-100"
