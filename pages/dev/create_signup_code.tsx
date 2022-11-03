@@ -21,12 +21,7 @@ function Page() {
     | { status: "success"; code: string }
   >({ status: "normal" });
   let { session } = useAuth();
-  if (!session.loggedIn)
-    return (
-      <Link href="/login">
-        <a>login</a>
-      </Link>
-    );
+  if (!session.loggedIn) return <Link href="/login">login</Link>;
   return (
     <div className="max-w-3xl py-16 mx-auto p-4 flex flex-col gap-3">
       <h1>Generate a signup code</h1>

@@ -41,7 +41,7 @@ export const CardCarousel = (props: {
               props.entityID
             }`}
           >
-            <a>{Name?.value} </a>
+            {Name?.value}
           </Link>
           <span className="text-grey-35">
             {ShortCodes[props.section as keyof ReferenceAttributes] ||

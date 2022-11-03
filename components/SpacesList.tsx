@@ -82,9 +82,7 @@ const Space = (props: { entity: string; name: string }) => {
         }}
       >
         <Link href={`${spacePath(studio?.value, props.name)}`}>
-          <a>
-            <Door entityID={props.entity} glow={showUnreads} />
-          </a>
+          <Door entityID={props.entity} glow={showUnreads} />
         </Link>
         <div className="flex flex-col gap-4 w-[20px] pb-[92px]">
           {showUnreads ? (

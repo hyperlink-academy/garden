@@ -157,10 +157,10 @@ const LoginBar = () => {
         </>
       ) : (
         <Link href={`/s/${session.session.username}`}>
-          <a className="justify-self-start flex items-center gap-2">
+          <div className="justify-self-start flex items-center gap-2">
             <ExitDoor />
             <span>Visit my Studio</span>
-          </a>
+          </div>
         </Link>
       )}
     </div>
@@ -192,10 +192,10 @@ const LoginBox = () => {
         </div>
       ) : (
         <Link href={`/s/${session.session.username}`}>
-          <a className="justify-self-start flex items-center gap-2">
+          <div className="justify-self-start flex items-center gap-2">
             <ExitDoor />
             <span>Visit my Studio</span>
-          </a>
+          </div>
         </Link>
       )}
     </div>

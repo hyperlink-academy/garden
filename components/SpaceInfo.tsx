@@ -145,11 +145,9 @@ const HighlightsButton = () => {
   );
   return (
     <Link href={`${spacePath(query.studio, query.space)}/highlights`}>
-      <a>
-        <button>
-          {unreads > 0 ? <HighlightLampOn /> : <HighlightLampOff />}
-        </button>
-      </a>
+      <button>
+        {unreads > 0 ? <HighlightLampOn /> : <HighlightLampOff />}
+      </button>
     </Link>
   );
 };

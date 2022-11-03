@@ -179,9 +179,7 @@ export const CardView = (props: {
             <div className="grid grid-cols-[auto_max-content] items-end text-white px-2 pt-2 pb-1">
               <Member />
               <Link href={`/s/${memberName?.value}`}>
-                <a className="justify-self-start">
-                  <small>visit studio</small>
-                </a>
+                <small className="justify-self-start">visit studio</small>
               </Link>
             </div>
           </>
@@ -435,7 +433,7 @@ const CardMoreOptionsMenu = (props: {
           <Link
             href={`${spacePath(q.space, q.studio)}/c/${props.entityID}/print`}
           >
-            <a>Print</a>
+            Print
           </Link>
           <Print />
         </MenuItem>

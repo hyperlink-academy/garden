@@ -154,9 +154,7 @@ const Message = (props: {
         {props.doubleSend ? null : (
           <div className=" messageHeader pb-1 grid grid-cols-[auto_max-content]">
             <Link href={`${spacePath(q.studio, q.space)}/c/${member?.entity}`}>
-              <a>
-                <div className={`messageSender font-bold `}>{props.sender}</div>
-              </a>
+              <div className={`messageSender font-bold `}>{props.sender}</div>
             </Link>
             <div className="messageInfo hidden group-hover:block italic text-grey-80">
               {new Date(parseInt(props.ts)).toLocaleDateString()}

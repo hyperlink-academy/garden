@@ -64,7 +64,7 @@ let SWRCache: React.FC = (props) => {
     <SWRConfig
       value={{
         provider: (cache) => {
-          const localMap = new Map(
+          const localMap = new Map<any, any>(
             JSON.parse(localStorage.getItem("app-cache") || "[]")
           );
           window.addEventListener("beforeunload", () => {
@@ -73,6 +73,7 @@ let SWRCache: React.FC = (props) => {
           });
 
           return {
+            keys: cache.keys,
             get(key: string) {
               if (key.startsWith("persist")) return localMap.get(key);
               return cache.get(key);

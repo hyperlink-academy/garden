@@ -27,9 +27,7 @@ export default function HighlightPage() {
       <div className="highlightHeader w-[calc(100%-32px)] max-w-3xl mx-auto flex gap-2">
         <h2 className="grow">Highlights</h2>
         <Link href={spacePath(q.studio, q.space)}>
-          <a>
-            <CrossLarge />
-          </a>
+          <CrossLarge />
         </Link>
       </div>
 

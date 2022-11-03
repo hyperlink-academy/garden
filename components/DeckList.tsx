@@ -90,9 +90,7 @@ const Deck = (props: { entity: string }) => {
               props.entity
             }`}
           >
-            <a>
-              <ButtonLink content="Deck Info" icon={<Settings />} />
-            </a>
+            <ButtonLink content="Deck Info" icon={<Settings />} />
           </Link>
         </div>
       </Drawer>

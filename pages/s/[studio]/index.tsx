@@ -35,9 +35,7 @@ export default function StudioPage(props: Props) {
             <Logout />
           </div>
           <Link href={`/s/${query.studio}/history`}>
-            <a>
-              <ButtonLink content="history" />
-            </a>
+            <ButtonLink content="history" />
           </Link>
         </div>
         <List />

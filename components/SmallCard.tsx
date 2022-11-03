@@ -254,7 +254,7 @@ export const BaseSmallCard = (props: {
           )}
 
           <Link href={props.href}>
-            <a className="flex flex-col w-full">
+            <span className="flex flex-col w-full">
               <CardBody
                 entityID={props.entityID}
                 member={!!props.isMember}
@@ -277,7 +277,7 @@ export const BaseSmallCard = (props: {
                   </div>
                 </a>
               ) : null}
-            </a>
+            </span>
           </Link>
         </div>
       </div>

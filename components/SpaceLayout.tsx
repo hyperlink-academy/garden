@@ -93,9 +93,9 @@ export function Footer() {
                 </>
               ) : (
                 <Link href={`/s/${session.session.username}`}>
-                  <a className="justify-self-start flex items-center">
+                  <div className="justify-self-start flex items-center">
                     <ExitDoor />
-                  </a>
+                  </div>
                 </Link>
               )}
 
@@ -177,7 +177,7 @@ const Activity = () => {
         !inActivity ? "" : `/${inActivity.value.value}`
       }`}
     >
-      <a
+      <span
         className={`px-0.5 md:px-1 grid grid-flow-col ${
           !selected
             ? ""
@@ -196,7 +196,7 @@ const Activity = () => {
         <span className="col-start-1 row-start-1">
           <ActivityBlocks />
         </span>
-      </a>
+      </span>
     </Link>
   );
 };
@@ -209,7 +209,7 @@ const FooterItem: React.FC<{
   let selected = props.active(router.asPath);
   return (
     <Link href={props.route}>
-      <a
+      <span
         className={`px-0.5 md:px-1 ${
           !selected
             ? ""
@@ -217,7 +217,7 @@ const FooterItem: React.FC<{
         }`}
       >
         {props.children}
-      </a>
+      </span>
     </Link>
   );
 };

@@ -45,7 +45,7 @@ export const Activity = (props: { entity: string }) => {
       <div className=" max-w-3xl m-auto w-full pt-4  grid grid-cols-[auto_max-content] gap-4 grow-0">
         <h2>{name?.value}</h2>
         <Link href={`${spacePath(query.studio, query.space)}/activity`}>
-          <a className="text-right text-accent-red pt-0.5">Exit</a>
+          <span className="text-right text-accent-red pt-0.5">Exit</span>
         </Link>
       </div>
       <Carousel>

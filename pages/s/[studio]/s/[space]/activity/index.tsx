@@ -153,13 +153,13 @@ const ActivityItem = (props: { entity: string }) => {
         <Link
           href={`${spacePath(q.space, q.studio)})/activity/${props.entity}`}
         >
-          <a
+          <span
             className={`justify-self-end ${
               isActive ? "text-accent-blue" : "text-grey-15"
             }`}
           >
             <RightArrow />
-          </a>
+          </span>
         </Link>
       </div>
     </div>

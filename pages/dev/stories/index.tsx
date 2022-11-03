@@ -283,9 +283,7 @@ const PageSidebar = (props: { pages: Props["components"] }) => {
                       : "text-grey-55  hover:text-accent-blue "
                   }`}
                     >
-                      <Link href={c.path}>
-                        <a>{c.metadata.name}</a>
-                      </Link>
+                      <Link href={c.path}>{c.metadata.name}</Link>
                     </div>
                   </li>
                 );

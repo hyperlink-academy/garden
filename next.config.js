@@ -3,6 +3,7 @@
  */
 const nextConfig = {
   /* config options here */
+  reactStrictMode: true,
   async redirects() {
     return [
       {

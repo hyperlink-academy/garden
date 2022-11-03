@@ -184,20 +184,21 @@ export const makeReplicache = (args: {
 }) => {
   let rep = new Replicache({
     licenseKey: "l381074b8d5224dabaef869802421225a",
-    schemaVersion: latestMigration,
     name: args.name,
     pushDelay: 500,
     pusher: args.pusher,
     puller: args.puller,
     mutators: mutators,
     logLevel: "error",
+    indexes: {
+      eav: { jsonPointer: "/indexes/eav", allowEmpty: true },
+      aev: { jsonPointer: "/indexes/aev", allowEmpty: true },
+      ave: { jsonPointer: "/indexes/ave", allowEmpty: true },
+      vae: { jsonPointer: "/indexes/vae", allowEmpty: true },
+      at: { jsonPointer: "/indexes/at", allowEmpty: true },
+      messages: { jsonPointer: "/indexes/messages", allowEmpty: true },
+    },
   });
-  rep.createIndex({ name: "eav", jsonPointer: "/indexes/eav" });
-  rep.createIndex({ name: "aev", jsonPointer: "/indexes/aev" });
-  rep.createIndex({ name: "ave", jsonPointer: "/indexes/ave" });
-  rep.createIndex({ name: "vae", jsonPointer: "/indexes/vae" });
-  rep.createIndex({ name: "at", jsonPointer: "/indexes/at" });
-  rep.createIndex({ name: "messages", jsonPointer: "/indexes/messages" });
   return rep;
 };
 
