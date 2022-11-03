@@ -6,6 +6,7 @@ import { useAuth } from "hooks/useAuth";
 import { ReplicacheContext, scanIndex, useIndex } from "hooks/useReplicache";
 import { GetStaticPropsContext, InferGetStaticPropsType } from "next";
 import Head from "next/head";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { useContext } from "react";
 import { useSubscribe } from "replicache-react";
@@ -13,15 +14,23 @@ import { useSubscribe } from "replicache-react";
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 type Props = InferGetStaticPropsType<typeof getStaticProps>;
 export default function StudioPage(props: Props) {
+  let { query } = useRouter();
   if (props.notFound) return <div>404 - studio not found!</div>;
   if (!props.id) return <div>loading </div>;
 
   return (
     <SpaceProvider id={props.id}>
       <div className="grid grid-flow-row gap-8 my-6">
-        <div className="flex justify-between">
-          <StudioName />
-          <Logout />
+        <div className="flex flex-col gap-2">
+          <div className="flex justify-between">
+            <StudioName />
+            <Logout />
+          </div>
+          <Link href={`/s/${query.studio}`}>
+            <a>
+              <ButtonLink content="active" />
+            </a>
+          </Link>
         </div>
       </div>
       <List />
