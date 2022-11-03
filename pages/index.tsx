@@ -239,7 +239,6 @@ const DoorInactive = (props: { width?: string; image?: string }) => {
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width={props.width || "128"}
-      height="auto"
       viewBox="0 0 256 576"
       className="flex-none -scale-x-100 m-auto"
       // className="flex-none m-auto"

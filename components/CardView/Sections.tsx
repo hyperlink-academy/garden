@@ -138,9 +138,8 @@ export const SingleTextSection = (
 
   return (
     <Textarea
-      {...props}
-      previewOnly={props.previewOnly || !authorized}
       focused={props.focused}
+      previewOnly={props.previewOnly || !authorized}
       autoFocus={props.new}
       placeholderOnHover={props.placeholderOnHover}
       placeholder={props.placeholder || "write something..."}

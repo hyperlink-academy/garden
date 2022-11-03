@@ -10,12 +10,7 @@ export const RenderedText = forwardRef<
       <pre
         role="link"
         ref={ref}
-        {...{
-          ...props,
-          value: undefined,
-          previewOnly: undefined,
-          placeholderOnHover: undefined,
-        }}
+        {...props}
         className={`${props.className} break-words`}
         style={{
           ...props.style,

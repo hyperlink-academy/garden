@@ -9,15 +9,13 @@ const AutosizeTextarea = forwardRef<HTMLTextAreaElement, Props>(
     let textarea = useRef<HTMLTextAreaElement | null>(null);
     useImperativeHandle(ref, () => textarea.current as HTMLTextAreaElement);
 
-    let passDownProps = { ...props };
-
     return (
       <div
         className={`grow-wrap ${props.className}`}
         data-replicated-value={props.value}
         style={props.style}
       >
-        <textarea rows={1} {...passDownProps} ref={textarea} />
+        <textarea rows={1} {...props} ref={textarea} />
         <style jsx>
           {`
             .grow-wrap {

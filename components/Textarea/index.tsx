@@ -21,6 +21,11 @@ export const Textarea = (
     }
   }, [props.focused]);
 
+  let newProps = { ...props };
+  delete newProps.previewOnly;
+  delete newProps.focused;
+  delete newProps.placeholderOnHover;
+
   useEffect(() => {
     if (!focused || !textarea.current) return;
     if (textarea.current === document.activeElement) return;
@@ -31,7 +36,7 @@ export const Textarea = (
   if ((!focused || props.previewOnly) && typeof props.value === "string") {
     return (
       <RenderedText
-        {...(props as JSX.IntrinsicElements["pre"])}
+        {...(newProps as JSX.IntrinsicElements["pre"])}
         text={props.value}
         ref={previewElement}
         tabIndex={0}
@@ -76,7 +81,7 @@ export const Textarea = (
   }
   return (
     <AutosizeTextarea
-      {...props}
+      {...newProps}
       onKeyDown={(e) => {
         if (e.key === "Escape") e.currentTarget.blur();
         props.onKeyDown?.(e);
