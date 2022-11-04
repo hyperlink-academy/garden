@@ -1,18 +1,10 @@
 import { Menu } from "@headlessui/react";
 import { Textarea } from "components/Textarea";
-import { SmallCardList } from "components/SmallCardList";
 
-import {
-  Close,
-  DownArrow,
-  MoreOptions,
-  SectionLinkedCard,
-  SectionText,
-  UpArrow,
-} from "components/Icons";
+import { Close, DownArrow, MoreOptions, UpArrow } from "components/Icons";
 import { MenuContainer, MenuItem } from "components/Layout";
 import { Fact, multipleReferenceSection, singleTextSection } from "data/Facts";
-import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
+import { useIndex, useMutations } from "hooks/useReplicache";
 import { useRef, useState } from "react";
 import { sortByPosition, updatePositions } from "src/position_helpers";
 import {

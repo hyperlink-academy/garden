@@ -20,7 +20,6 @@ import {
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { FindOrCreate, useAllItems } from "components/FindOrCreateEntity";
-import { SmallCard } from "components/SmallCard";
 import { RenderedText } from "components/Textarea/RenderedText";
 import { spacePath } from "hooks/utils";
 import { CardPreview } from "components/CardPreview";
@@ -115,18 +114,18 @@ const Placeholder = (props: { spaceName: string }) => {
       </p>
       {/* prettier-ignore */}
       <pre className="MessageContent whitespace-pre-wrap text-grey-35">
-{/* NB: looks weird below b/c it renders as Quattro, not monospace! */}
-{/* also includes several thin spaces and hair spaces lmao */}
-{"  "}____________________________{"\n"}
-{" "}/--------------------------/|{"\n"}
-|  ====           *-* ~~~~~~         ||{"\n"}
-|  ====         {"\{     \}"}~~~~~~    ||{"\n"}
-|                  *-* ~~~~~~     ||{"\n"}
-|                                    ||{"\n"}
-|                ========           ||{"\n"}
-|                  ======          |/{"\n"}
-{" "}----------------------------{"\n"}
-              </pre>
+        {/* NB: looks weird below b/c it renders as Quattro, not monospace! */}
+        {/* also includes several thin spaces and hair spaces lmao */}
+        {"  "}____________________________{"\n"}
+        {" "}/--------------------------/|{"\n"}
+        |  ====           *-* ~~~~~~         ||{"\n"}
+        |  ====         {"\{     \}"}~~~~~~    ||{"\n"}
+        |                  *-* ~~~~~~     ||{"\n"}
+        |                                    ||{"\n"}
+        |                ========           ||{"\n"}
+        |                  ======          |/{"\n"}
+        {" "}----------------------------{"\n"}
+      </pre>
     </>
   );
 };

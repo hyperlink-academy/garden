@@ -1,9 +1,7 @@
 import { CardStack } from "components/CardStack";
 import { CollapseTiny } from "components/Icons";
-import { SmallCardList } from "components/SmallCardList";
 import { ReferenceAttributes } from "data/Attributes";
 import { useIndex } from "hooks/useReplicache";
-import ChatPage from "pages/s/[studio]/s/[space]/chat";
 import { sortByPosition } from "src/position_helpers";
 
 export const Backlinks = (props: {

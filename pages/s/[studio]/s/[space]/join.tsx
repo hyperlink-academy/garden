@@ -1,7 +1,7 @@
 import { spaceAPI } from "backend/lib/api";
 import { ButtonPrimary } from "components/Buttons";
 import { Member } from "components/Icons";
-import { BaseSmallCard } from "components/SmallCard";
+import { BaseSmallCard } from "components/CardPreview";
 import { useAuth } from "hooks/useAuth";
 import { useIndex, useSpaceID } from "hooks/useReplicache";
 import { useRouter } from "next/router";
@@ -49,13 +49,15 @@ export function JoinSpace() {
           <p>A new membership card is waiting for you!</p>
         </div>
         <div className="relative">
-          <div className="p-5">
-            <BaseSmallCard
-              isMember
-              title={session.session?.username}
-              href="/"
-              content=""
-            />
+          <div className="p-5 w-[160px]">
+            <div className={`relative grow h-full memberCardBorder `}>
+              <BaseSmallCard
+                isMember
+                read={false}
+                memberName={session.session?.username}
+                content=""
+              />
+            </div>
           </div>
           <div className="absolute top-0 -left-3">
             <WelcomeSparkle />

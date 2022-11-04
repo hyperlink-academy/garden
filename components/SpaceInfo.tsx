@@ -19,7 +19,7 @@ import { ulid } from "src/ulid";
 import useSWR from "swr";
 import { ButtonLink, ButtonPrimary } from "./Buttons";
 import { CardPreview } from "./CardPreview";
-import { Drawer } from "./DeckList";
+import { Drawer } from "./Drawer";
 import {
   Member,
   BotIcon,
@@ -28,7 +28,6 @@ import {
   HighlightLampOn,
 } from "./Icons";
 import { Divider } from "./Layout";
-import { SmallCard } from "./SmallCard";
 import { useSmoker } from "./Smoke";
 import { Textarea } from "./Textarea";
 

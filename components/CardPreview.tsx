@@ -1,7 +1,6 @@
 import { DraggableAttributes } from "@dnd-kit/core";
 import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
 import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
-import Link from "next/link";
 import { SingleTextSection } from "./CardView/Sections";
 import { GripperBG } from "./Gripper";
 import {
@@ -193,7 +192,6 @@ const SmallCardBody = (props: { entityID: string } & SharedProps) => {
   let title = useIndex.eav(props.entityID, "card/title");
   let content = useIndex.eav(props.entityID, "card/content");
   let image = useIndex.eav(props.entityID, "card/image");
-  let url = content?.value ? isUrl(content?.value) : false;
 
   let imageUrl = !image
     ? undefined
@@ -202,13 +200,40 @@ const SmallCardBody = (props: { entityID: string } & SharedProps) => {
     : image.value.url;
 
   return (
+    <BaseSmallCard
+      title={title?.value}
+      content={content?.value}
+      imageUrl={imageUrl}
+      isMember={isMember}
+      read={read}
+      memberName={member?.value}
+    />
+  );
+};
+
+export const BaseSmallCard = (
+  props: {
+    title?: string;
+    image?: string;
+    memberName?: string;
+    content?: string;
+    isMember: boolean;
+    imageUrl?: string;
+    entityID?: string;
+    read: boolean;
+  } & Omit<SharedProps, "size" | "href">
+) => {
+  let url = props.content ? isUrl(props.content) : false;
+  let { authorized } = useMutations();
+  let { open } = usePopupCardViewer();
+  return (
     <div
-      onClick={() => open({ entityID: props.entityID })}
+      onClick={() => props.entityID && open({ entityID: props.entityID })}
       className={`w-full h-full grid grid-cols-[max-content_auto] !bg-cover !bg-center !bg-no-repeat hover:cursor-pointer ${
-        isMember ? "pr-1 pl-0 pt-2 pb-1" : "pr-3 pl-0 py-2"
+        props.isMember ? "pr-1 pl-0 pt-2 pb-1" : "pr-3 pl-0 py-2"
       }`}
       style={{
-        background: imageUrl ? `url(${imageUrl})` : "",
+        background: props.imageUrl ? `url(${props.imageUrl})` : "",
       }}
     >
       {authorized && props.dragHandleProps ? (
@@ -220,10 +245,10 @@ const SmallCardBody = (props: { entityID: string } & SharedProps) => {
           <GripperBG />
         </div>
       ) : (
-        <div className={`${isMember ? "pl-1" : "pl-3"}`} />
+        <div className={`${props.isMember ? "pl-1" : "pl-3"}`} />
       )}
       {/* Small Card Preview Content Wrapper (is it default or member?) */}
-      {!isMember ? (
+      {!props.isMember ? (
         /* Default Content (Member Content Futher DOwn) */
         <div
           className="w-full h-full flex flex-col gap-2 items-stretch overflow-hidden"
@@ -231,26 +256,26 @@ const SmallCardBody = (props: { entityID: string } & SharedProps) => {
         >
           {/* Small Card Preivew Title Or Contnet */}
           <a className="h-full overflow-hidden">
-            {!title || title?.value === "" ? (
+            {!props.title ? (
               <small>
                 <pre
                   className={`whitespace-pre-wrap truncate leading-tight ${
-                    !image ? "" : "rounded-[3px] px-1 bg-white/75"
+                    !props.image ? "" : "rounded-[3px] px-1 bg-white/75"
                   } `}
                 >
-                  {content?.value}
+                  {props?.content}
                 </pre>
               </small>
             ) : (
               <div
                 className={`leading-tight text-ellipsis text-grey-35 font-bold  ${
-                  !image ? "" : "rounded-[3px] px-1 bg-white/75"
+                  !props.image ? "" : "rounded-[3px] px-1 bg-white/75"
                 }`}
               >
-                {title?.value}
+                {props.title}
               </div>
             )}
-            {!read ? (
+            {!props.read ? (
               <div className="rounded-full bg-accent-red w-1 h-1" />
             ) : null}
           </a>
@@ -258,7 +283,7 @@ const SmallCardBody = (props: { entityID: string } & SharedProps) => {
           {/* Small Card Preview External Link */}
           {url ? (
             <a
-              href={content?.value}
+              href={props.content}
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => {
@@ -290,7 +315,7 @@ const SmallCardBody = (props: { entityID: string } & SharedProps) => {
             flex items-end
             `}
           >
-            <p className="overflow-hidden">{member?.value}</p>
+            <p className="overflow-hidden">{props.memberName}</p>
           </div>
         </div>
       )}
@@ -301,11 +326,10 @@ const SmallCardBody = (props: { entityID: string } & SharedProps) => {
 const BigCardBody = (props: { entityID: string } & SharedProps) => {
   let isMember = !!useIndex.eav(props.entityID, "member/name");
   let { session } = useAuth();
-  let { mutate } = useMutations();
   let spaceID = useSpaceID();
   let sections = useIndex.eav(props.entityID, "card/section");
   let image = useIndex.eav(props.entityID, "card/image");
-  let { authorized } = useMutations();
+  let { mutate, authorized } = useMutations();
 
   let { open } = usePopupCardViewer();
 
