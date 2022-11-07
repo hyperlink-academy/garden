@@ -201,6 +201,7 @@ const SmallCardBody = (props: { entityID: string } & SharedProps) => {
 
   return (
     <BaseSmallCard
+      {...props}
       title={title?.value}
       content={content?.value}
       imageUrl={imageUrl}
