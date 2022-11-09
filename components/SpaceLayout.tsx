@@ -14,7 +14,7 @@ import { useContext, useState } from "react";
 import { Modal } from "components/Layout";
 import { LogInModal } from "./LoginModal";
 import { SmallCardDragContext } from "./DragContext";
-import { spacePath, usePreserveScroll } from "hooks/utils";
+import { spacePath } from "hooks/utils";
 import {
   ReplicacheContext,
   scanIndex,
@@ -40,9 +40,11 @@ export const SpaceLayout: React.FC = (props) => {
                 <ExitDoor className="text-white" />
               </Link>
             )}
-            <Link href={`${spacePath(query.studio, query.space)}`}>
-              <span className="text-white mx-auto">{spaceName?.value}</span>
-            </Link>
+            <span className="text-white mx-auto">
+              <Link href={`${spacePath(query.studio, query.space)}`}>
+                {spaceName?.value}
+              </Link>
+            </span>
           </div>
         </Link>
         <SmallCardDragContext>{props.children}</SmallCardDragContext>

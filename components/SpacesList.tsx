@@ -39,7 +39,6 @@ const Space = (props: { entity: string; name: string }) => {
   let studio = useIndex.eav(props.entity, "space/studio");
   let spaceID = useIndex.eav(props.entity, "space/id");
   let lastSeenMessage = useIndex.eav(props.entity, "space/lastSeenMessage");
-  let { authorized } = useMutations();
   let prefetched = useRef(false);
 
   let { data: latestMessage } = useSWR(
