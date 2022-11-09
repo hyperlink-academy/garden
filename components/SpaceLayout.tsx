@@ -26,15 +26,25 @@ import { Message } from "data/Messages";
 import { useInActivity } from "hooks/useInActivity";
 
 export const SpaceLayout: React.FC = (props) => {
-  let { ref } = usePreserveScroll<HTMLDivElement>();
+  let spaceName = useIndex.aev("this/name")[0];
+  let { session } = useAuth();
+  let { query } = useRouter();
 
   return (
     <>
-      <style jsx global>{`
-        body {
-        }
-      `}</style>
-      <div className="h-full" ref={ref}>
+      <div className="h-full">
+        <Link href={`${spacePath(query.studio, query.space)}/highlights`}>
+          <div className="w-full bg-accent-blue mb-2 flex flex-row p-1 justify-between">
+            {!session.session ? null : (
+              <Link href={`/s/${session.session.username}`}>
+                <ExitDoor className="text-white" />
+              </Link>
+            )}
+            <Link href={`${spacePath(query.studio, query.space)}`}>
+              <span className="text-white mx-auto">{spaceName?.value}</span>
+            </Link>
+          </div>
+        </Link>
         <SmallCardDragContext>{props.children}</SmallCardDragContext>
       </div>
     </>

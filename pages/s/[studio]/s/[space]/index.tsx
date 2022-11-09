@@ -2,12 +2,7 @@ import {
   PopupCardViewer,
   LinkContextProvider,
 } from "components/PopupCardViewer";
-import { CardView } from "components/CardView";
 import { Desktop } from "components/Desktop";
-import { SpaceInfo } from "components/SpaceInfo";
-import { useState } from "react";
-import useMeasure from "react-use-measure";
-import { useDroppable } from "@dnd-kit/core";
 
 export default function SpacePage() {
   return (
@@ -31,7 +26,6 @@ function Page() {
       `}
     >
       <LinkContextProvider type="desktop">
-        <SpaceInfo />
         <Desktop />
       </LinkContextProvider>
     </div>
