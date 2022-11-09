@@ -21,7 +21,7 @@ function Page() {
       no-scrollbar 
       snap-center
       flex-shrink-0 
-      w-[352px] h-full
+     h-full
       flex flex-col gap-0
       `}
     >

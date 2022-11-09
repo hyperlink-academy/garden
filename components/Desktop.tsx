@@ -92,52 +92,50 @@ export const Desktop = () => {
         onClose={() => setCreateCard(null)}
         desktopEntity={homeEntity[0]?.entity}
       />
-      <div
-        style={{
-          height: "100%",
-        }}
-      >
-        <div
-          onClick={(e) => {
-            if (e.currentTarget !== e.target) return;
-            let parentRect = e.currentTarget.getBoundingClientRect();
-            if (e.ctrlKey) {
-              mutate("addCardToDesktop", {
-                entity: ulid(),
-                factID: ulid(),
-                desktop: homeEntity[0].entity,
-                position: {
-                  rotation: 0,
-                  size: "big",
-                  x: Math.max(e.clientX - parentRect.left - 128, 0),
-                  y: Math.max(e.clientY - parentRect.top - 42, 0),
-                },
-              });
-            }
-            if (e.detail === 2) {
-              setCreateCard({
-                x: e.clientX - parentRect.left,
-                y: e.clientY - parentRect.top,
-              });
-            }
-          }}
-          style={{
-            zIndex: 1,
-            height: `${draggingHeight > height ? draggingHeight : height}px`,
-            position: "relative",
-          }}
-          className="text-sm"
-        >
-          {cards?.map((card) => (
-            <DraggableCard
-              key={card.id}
-              relationshipID={card.id}
-              entityID={card.value.value}
-              parent={homeEntity[0]?.entity}
-            />
-          ))}
+      <div className=" h-full w-[352px] relative">
+        <div className=" desktopBackground">
+          <div
+            onClick={(e) => {
+              if (e.currentTarget !== e.target) return;
+              let parentRect = e.currentTarget.getBoundingClientRect();
+              if (e.ctrlKey) {
+                mutate("addCardToDesktop", {
+                  entity: ulid(),
+                  factID: ulid(),
+                  desktop: homeEntity[0].entity,
+                  position: {
+                    rotation: 0,
+                    size: "big",
+                    x: Math.max(e.clientX - parentRect.left - 128, 0),
+                    y: Math.max(e.clientY - parentRect.top - 42, 0),
+                  },
+                });
+              }
+              if (e.detail === 2) {
+                setCreateCard({
+                  x: e.clientX - parentRect.left,
+                  y: e.clientY - parentRect.top,
+                });
+              }
+            }}
+            style={{
+              zIndex: 1,
+              height: `${draggingHeight > height ? draggingHeight : height}px`,
+              position: "relative",
+            }}
+            className="text-sm"
+          >
+            {cards?.map((card) => (
+              <DraggableCard
+                key={card.id}
+                relationshipID={card.id}
+                entityID={card.value.value}
+                parent={homeEntity[0]?.entity}
+              />
+            ))}
+          </div>
+          {/* <HelpToast helpText={`double click/tap to create new`} /> */}
         </div>
-        {/* <HelpToast helpText={`double click/tap to create new`} /> */}
       </div>
     </DndContext>
   );

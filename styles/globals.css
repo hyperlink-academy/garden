@@ -187,6 +187,24 @@ input {
   bottom: 0;
 }
 
+.desktopBackground {
+  z-index: 0;
+}
+
+.desktopBackground:before {
+  content: "";
+
+  border-image: url(/img/desktopBackground.svg);
+  border-image-repeat: round;
+  border-image-slice: 37.5% fill;
+  border-width: 48px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
 /* END GLOBAL STYLING */
 
 * {
