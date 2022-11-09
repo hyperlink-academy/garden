@@ -294,7 +294,7 @@ const AddCard = (props: {
           desktop: props.desktopEntity,
           position: {
             rotation: 0,
-            size: "big",
+            size: "small",
             x: Math.max(props.position.x - 128, 0),
             y: Math.max(props.position.y - 42, 0),
           },
