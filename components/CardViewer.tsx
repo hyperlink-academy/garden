@@ -7,7 +7,7 @@ import { FindOrCreate, useAllItems } from "./FindOrCreateEntity";
 import useWindowDimensions from "hooks/useWindowDimensions";
 import { useLongPress } from "hooks/useLongPress";
 
-let PopupCardViewerContext = createContext({
+let CardViewerContext = createContext({
   open: (_args: { focused: LinkContextType; entityID: string }) => {},
 });
 
@@ -22,13 +22,13 @@ export const LinkContextProvider: React.FC<LinkContextType> = (props) => {
   );
 };
 
-export const PopupCardViewer: React.FC = (props) => {
+export const CardViewer: React.FC = (props) => {
   let [history, setHistory] = useState([] as string[]);
 
   let ref = useRef<HTMLDivElement | null>(null);
 
   return (
-    <PopupCardViewerContext.Provider
+    <CardViewerContext.Provider
       value={{
         open: (args) => {
           setHistory((h) => {
@@ -66,9 +66,9 @@ export const PopupCardViewer: React.FC = (props) => {
           snap-center touch-pan-x 
           flex flex-col gap-3 items-stretch`}
         >
-          {history[0] ? (
-            <>
-              <div className="cardViewerHeader grid grid-cols-[auto_max-content] items-center gap-4 ">
+          <>
+            <div className="cardViewerHeader grid grid-cols-[auto_max-content] items-center gap-4 ">
+              {history[0] && (
                 <BackButton
                   history={history}
                   setHistory={setHistory}
@@ -79,26 +79,22 @@ export const PopupCardViewer: React.FC = (props) => {
                     });
                   }}
                 />
-                <FindOrCreateBar />
-              </div>
+              )}
+              <FindOrCreateBar />
+            </div>
+            {history[0] ? (
               <CardView
                 entityID={history[0]}
                 key={history[0]}
                 onDelete={() => setHistory((s) => s.slice(1))}
               />
-            </>
-          ) : (
-            <>
-              <div className="cardViewerHeader grid items-center gap-4 justify-end justify-items-end">
-                <FindOrCreateBar />
-                <EmptyState />
-              </div>
-              {/* merged various nested card wrappers */}
-            </>
-          )}
+            ) : (
+              <EmptyState />
+            )}
+          </>
         </div>
       </div>
-    </PopupCardViewerContext.Provider>
+    </CardViewerContext.Provider>
   );
 };
 export const InlineCardViewer: React.FC = (props) => {
@@ -107,7 +103,7 @@ export const InlineCardViewer: React.FC = (props) => {
   let ref = useRef<HTMLDivElement | null>(null);
 
   return (
-    <PopupCardViewerContext.Provider
+    <CardViewerContext.Provider
       value={{
         open: (args) => {
           setHistory((h) => {
@@ -143,7 +139,7 @@ export const InlineCardViewer: React.FC = (props) => {
           <></>
         )}
       </>
-    </PopupCardViewerContext.Provider>
+    </CardViewerContext.Provider>
   );
 };
 
@@ -246,7 +242,7 @@ const BackButton = (props: {
 
 const FindOrCreateBar = () => {
   let [open, setOpen] = useState(false);
-  let { open: openCard } = usePopupCardViewer();
+  let { open: openCard } = useCardViewer();
   let items = useAllItems(open);
 
   let { authorized, mutate } = useMutations();
@@ -298,8 +294,8 @@ const FindOrCreateBar = () => {
   );
 };
 
-export const usePopupCardViewer = () => {
-  let cardPreview = useContext(PopupCardViewerContext);
+export const useCardViewer = () => {
+  let cardPreview = useContext(CardViewerContext);
   let link = useContext(LinkContext);
   return {
     open: (args: { entityID: string }) => {

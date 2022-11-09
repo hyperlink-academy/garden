@@ -15,7 +15,7 @@ import {
 import { useDrag, usePinch } from "@use-gesture/react";
 import { isUrl } from "src/isUrl";
 import { useRef } from "react";
-import { usePopupCardViewer } from "./PopupCardViewer";
+import { useCardViewer } from "./CardViewer";
 import { useReadState } from "hooks/useReadState";
 import { useAuth } from "hooks/useAuth";
 
@@ -185,7 +185,7 @@ export const RotateAndResize: React.FC<
 const SmallCardBody = (props: { entityID: string } & SharedProps) => {
   let isMember = !!useIndex.eav(props.entityID, "member/name");
   let read = useReadState(props.entityID);
-  let { open } = usePopupCardViewer();
+  let { open } = useCardViewer();
   let { authorized } = useMutations();
 
   let member = useIndex.eav(props.entityID, "member/name");
@@ -226,7 +226,7 @@ export const BaseSmallCard = (
 ) => {
   let url = props.content ? isUrl(props.content) : false;
   let { authorized } = useMutations();
-  let { open } = usePopupCardViewer();
+  let { open } = useCardViewer();
   return (
     <div
       onClick={() => props.entityID && open({ entityID: props.entityID })}
@@ -332,7 +332,7 @@ const BigCardBody = (props: { entityID: string } & SharedProps) => {
   let image = useIndex.eav(props.entityID, "card/image");
   let { mutate, authorized } = useMutations();
 
-  let { open } = usePopupCardViewer();
+  let { open } = useCardViewer();
 
   let imageUrl = !image
     ? undefined

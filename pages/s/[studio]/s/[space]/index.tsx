@@ -1,14 +1,11 @@
-import {
-  PopupCardViewer,
-  LinkContextProvider,
-} from "components/PopupCardViewer";
+import { CardViewer, LinkContextProvider } from "components/CardViewer";
 import { Desktop } from "components/Desktop";
 
 export default function SpacePage() {
   return (
-    <PopupCardViewer>
+    <CardViewer>
       <Page />
-    </PopupCardViewer>
+    </CardViewer>
   );
 }
 

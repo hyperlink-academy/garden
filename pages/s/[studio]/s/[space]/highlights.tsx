@@ -1,7 +1,7 @@
 import { Carousel } from "components/CardCarousel";
 import { CardView } from "components/CardView";
 import { CrossLarge, HighlightNote } from "components/Icons";
-import { InlineCardViewer } from "components/PopupCardViewer";
+import { InlineCardViewer } from "components/CardViewer";
 import { Textarea } from "components/Textarea";
 import { useIndex, useMutations } from "hooks/useReplicache";
 import { spacePath } from "hooks/utils";
