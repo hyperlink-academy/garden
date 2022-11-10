@@ -1,87 +1,61 @@
-import { useRef,useState,useEffect } from 'react';
 import {
-  createBufferInfoFromArrays,
-  createProgramInfo,
   drawBufferInfo,
   resizeCanvasToDisplaySize,
   setBuffersAndAttributes,
-  setUniforms,
+  setUniforms
 } from 'twgl.js';
 
-import {baseVertexShaderSource, colorFragmentShaderSource} from './twgl-shaders-test.js'
+import { useEffect, useRef, useState } from 'react'; 
+import { getUniforms as getColorUniforms, initProgram as initColorProgram} from './ColorPass';
+import { getUniforms as getPatternUniforms, initProgram as initPatternProgram} from './PatternPass';
 
-const useRequestAnimationFrame = (callback: Function) => {
-  const requestRef = useRef() as any;
-  const [previousTime, setTime] = useState(0.);
+export const Canvas: React.FC = () => {
+  const canvasRef = useRef();
+  const [context, setContext] = useState < WebGLRenderingContext| null>();
+  const [size, setSize] = useState({ w: 0, h: 0 });
+  const onCanvasLoaded = () => {
+    const gl = context;
+    if (gl == null) return;
+  
+    //Init Programs
+    const colorPass = initColorProgram(gl);
+    const patternPass = initPatternProgram(gl);
+    
 
-  const animate = (time: number) => {
-    if (previousTime) callback(time - previousTime);
-    setTime(time);
-    requestRef.current = requestAnimationFrame(animate);
+    function render(time: number) {
+      if (!gl?.canvas) return;
+
+      resizeCanvasToDisplaySize(gl.canvas as HTMLCanvasElement);
+      gl.viewport(0, 0, size.w,size.h);
+
+      
+      const uniforms = getColorUniforms(time, gl.canvas);
+      gl.useProgram(colorPass.programInfo.program);
+      setBuffersAndAttributes(gl, colorPass.programInfo, colorPass.bufferInfo);
+      setUniforms(colorPass.programInfo, uniforms);
+      drawBufferInfo(gl, colorPass.bufferInfo);
+
+
+      requestAnimationFrame(render);
+    }
+    requestAnimationFrame(render);
   };
 
   useEffect(() => {
-    requestRef.current = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(requestRef.current);
-  }, [previousTime]);
+    if (!canvasRef.current) return;
+    const element = canvasRef.current as HTMLCanvasElement;
+
+    let params = { alpha: true, depth: false, stencil: false, antialias: true, preserveDrawingBuffer: false };
+
+    let gl = element.getContext('webgl2', params);
+    let isWebGL2 = !!gl;
+    if (!isWebGL2){ gl = element.getContext('webgl', params) || element.getContext('experimental-webgl', params); }
+
+    setContext(gl);
+    setSize({w: gl.canvas.width, h: gl.canvas.height});
+    onCanvasLoaded();
+  },[canvasRef.current])
+
+
+  return <canvas width={window.innerWidth} height={'200px'}  ref={canvasRef} />;
 };
-
-
-export function Canvas() {
-  const [count, setCount] = useState(0.);
-  const [buffer, setBuffer] = useState();
-  const [programData, setProgramData] = useState<any>();
-
-  const canvasRef = useRef();
-
-  const render = (time: number) => {
-    if (!canvasRef.current) return;
-    const element = canvasRef.current as HTMLCanvasElement;
-    const gl = element.getContext('webgl');
-
-    if (!gl?.canvas) return;
-
-    resizeCanvasToDisplaySize(gl.canvas as HTMLCanvasElement);
-    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-
-    const uniforms = {
-      time: time * 0.001,
-      resolution: [gl.canvas.width, gl.canvas.height],
-    };
-
-    gl.useProgram(programData.program);
-    setBuffersAndAttributes(gl, programData, buffer);
-    setUniforms(programData, uniforms);
-    drawBufferInfo(gl, programData);
-  }
-
-
-  useEffect(() => {
-    if (!canvasRef.current) return;
-    const element = canvasRef.current as HTMLCanvasElement;
-    const gl = element.getContext('webgl');
-
-    if (gl == null) return;
-
-    setProgramData(createProgramInfo(gl, [
-      baseVertexShaderSource,
-      colorFragmentShaderSource,
-    ]));
-
-    const arrays = {
-      position: [-1, -1, 0, 1, -1, 0, -1, 1, 0, -1, 1, 0, 1, -1, 0, 1, 1, 0],
-    };
-    const buffersFromArray = createBufferInfoFromArrays(gl, arrays) as any;
-    setBuffer(buffersFromArray);
-    
-  }, [canvasRef.current]);
-    
-
-
-  useRequestAnimationFrame((deltaTime: number) => {
-    setCount((prevCount: number) => (prevCount + deltaTime * 0.01) % 500);
-    if (programData) { render(count); }
-  });
-
-  return <canvas style={{width:'700px'}} ref={canvasRef} />;
-}
