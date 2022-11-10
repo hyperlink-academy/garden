@@ -6,12 +6,11 @@ import {
 const data = require('../example.json');
 
 const parseColor = (color: { r: number, g: number, b: number, a: number }) => {
-    console.log(color )
     return [color.r, color.g, color.b, color.a];
     
 };
 
-export const getUniforms = (time: number, canvas: HTMLCanvasElement, tex) => {
+export const getUniforms = (time: number, canvas: HTMLCanvasElement, textures : {texture: any, light: any, pattern: any}) => {
 
     return {
         time: time * 0.001,
@@ -25,9 +24,9 @@ export const getUniforms = (time: number, canvas: HTMLCanvasElement, tex) => {
         toggleLayerOne: data['layerOne'],
         toggleLayerTwo: data['layerTwo'],
         resolution: [canvas.width, canvas.height],
-        texTexture: tex,
-        texShape: tex,
-        texPattern: tex
+        texTexture: textures.texture,
+        texShape: textures.light,
+        texPattern: textures.pattern
     }
 };
 

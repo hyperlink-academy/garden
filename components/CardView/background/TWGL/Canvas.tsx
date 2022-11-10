@@ -6,30 +6,39 @@ import {
 } from 'twgl.js';
 
 import { useEffect, useRef, useState } from 'react'; 
-import { getUniforms as getColorUniforms, initProgram as initColorProgram} from './ColorPass';
+import { getUniforms as getColorUniforms, initProgram as initColorProgram } from './ColorPass';
+import { getUniforms as getLightUniforms, initPrograms as initLightPrograms} from './LightPass';
 import { getUniforms as getPatternUniforms, initProgram as initPatternProgram} from './PatternPass';
 import { createFBO } from './WebGLHelper'
-
+const data = require('../example.json');
 
 export const Canvas: React.FC = () => {
   const canvasRef = useRef();
   const [context, setContext] = useState < WebGLRenderingContext| null>();
   const [size, setSize] = useState({ w: 0, h: 0 });
+
   const onCanvasLoaded = () => {
     const gl = context;
     if (gl == null) return;
+   
+    //Init Programs&Buffers - Layer 0
+    const firstPasses = initLightPrograms(gl);
+    const firstPass = data['shadow'] ? firstPasses.shadow : firstPasses.light;
     const buffer0 = createFBO(gl);
+    const p0 = firstPass.programInfo.program;
 
-    //Init Programs
-    const colorPass = initColorProgram(gl);
+    //Init Programs&Buffers - Layer 1
     const patternPass = initPatternProgram(gl);
 
-    const p0 = patternPass.programInfo.program;
-    const p1 = colorPass.programInfo.program;
+    //Init Programs&Buffers - Layer 2
+
+    //Init Programs&Buffers - Final
+    const colorPass = initColorProgram(gl);
+    const p3 = colorPass.programInfo.program;
    
     function render(time: number) {
       if (!gl?.canvas) return;
-      var uniforms;
+      var uniforms; var alluniforms;
       resizeCanvasToDisplaySize(gl.canvas as HTMLCanvasElement);
    
 
@@ -37,19 +46,24 @@ export const Canvas: React.FC = () => {
       gl.useProgram(p0);
       gl.bindFramebuffer(gl.FRAMEBUFFER, buffer0.fbo);
       //Update attributes & uniforms
-      uniforms = getPatternUniforms(time, gl.canvas);
-      setBuffersAndAttributes(gl, patternPass.programInfo, patternPass.bufferInfo);
-      setUniforms(patternPass.programInfo, uniforms);
+      alluniforms = getLightUniforms(time, gl.canvas);
+      uniforms = data['shadow'] ? alluniforms.shadow : alluniforms.light;
+      setBuffersAndAttributes(gl, firstPass.programInfo, firstPass.bufferInfo);
+      setUniforms(firstPass.programInfo, uniforms);
       // Save it to buffer0 
-      drawBufferInfo(gl, patternPass.bufferInfo);
+      drawBufferInfo(gl, firstPass.bufferInfo);
 
       //Clean 
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
       gl.viewport(0, 0, size.w, size.h);
 
       // Apply P1 and render to canvas
-      gl.useProgram(p1);
-      uniforms = getColorUniforms(time, gl.canvas, buffer0.texture);
+      gl.useProgram(p3);
+      uniforms = getColorUniforms(time, gl.canvas, {
+        light: buffer0.texture,
+        pattern: buffer0.texture,
+        texture: buffer0.texture
+      });
       setBuffersAndAttributes(gl, colorPass.programInfo, colorPass.bufferInfo);
       setUniforms(colorPass.programInfo, uniforms);
       
