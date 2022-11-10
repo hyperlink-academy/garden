@@ -87,8 +87,8 @@ export const Canvas: React.FC = () => {
       gl.useProgram(p2);
       gl.bindFramebuffer(gl.FRAMEBUFFER, buffer2.fbo);
       //Update attributes & uniforms
-      alluniforms = getTextureUniforms(time, gl.canvas, buffer1.texture);
-       uniforms = data['diether'] ? alluniforms.diether : alluniforms.moire;
+      alluniforms = getTextureUniforms(time, gl.canvas, buffer1.texture );
+      uniforms = data['diether'] ? alluniforms.diether : alluniforms.moire;
       setBuffersAndAttributes(gl, thirdPass.programInfo, thirdPass.bufferInfo);
       setUniforms(thirdPass.programInfo, uniforms);
       //Render

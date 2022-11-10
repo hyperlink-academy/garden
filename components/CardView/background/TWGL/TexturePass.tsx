@@ -4,12 +4,18 @@ import {
 } from 'twgl.js';
 const data = require('../example.json');
 
-export const getUniforms = (time: number, canvas: HTMLCanvasElement, texIn :WebGLTexture | null) => ({
+export const getUniforms = (time: number, canvas: HTMLCanvasElement, texIn : WebGLTexture ) => ({
     diether: {
         time: time * 0.001,
         invert: data['texture-invert'],
         texIn: texIn,
-        flip: data['texture-flip'],
+        flip: data['texture-flipY'],
+        u_threshold:  [
+            0., 12., 3., 15.,
+            8., 4., 11., 7.,
+            2., 14., 1., 5.,
+            10., 6., 9., 5
+        ]
     },
     moire: {
         freqX: data['moire-freqX'],
@@ -19,7 +25,7 @@ export const getUniforms = (time: number, canvas: HTMLCanvasElement, texIn :WebG
         time: time * 0.001,
         invert: data['texture-invert'],
         texIn: texIn,
-        flip: data['texture-flip'],
+        flip: data['texture-flipY'],
         polar: data['moire-polar'],
     }
     
@@ -40,7 +46,6 @@ varying vec2 vUv;
 uniform sampler2D texIn;
 uniform float invert;
 uniform float flip;
-
 uniform float u_threshold[16];
 
 void main()
