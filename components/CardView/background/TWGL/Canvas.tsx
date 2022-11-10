@@ -8,6 +8,8 @@ import {
 import { useEffect, useRef, useState } from 'react'; 
 import { getUniforms as getColorUniforms, initProgram as initColorProgram} from './ColorPass';
 import { getUniforms as getPatternUniforms, initProgram as initPatternProgram} from './PatternPass';
+import { createFBO } from './WebGLHelper'
+
 
 export const Canvas: React.FC = () => {
   const canvasRef = useRef();
@@ -16,25 +18,42 @@ export const Canvas: React.FC = () => {
   const onCanvasLoaded = () => {
     const gl = context;
     if (gl == null) return;
-  
+    const buffer0 = createFBO(gl);
+
     //Init Programs
     const colorPass = initColorProgram(gl);
     const patternPass = initPatternProgram(gl);
-    
 
+    const p0 = patternPass.programInfo.program;
+    const p1 = colorPass.programInfo.program;
+   
     function render(time: number) {
       if (!gl?.canvas) return;
-
+      var uniforms;
       resizeCanvasToDisplaySize(gl.canvas as HTMLCanvasElement);
-      gl.viewport(0, 0, size.w,size.h);
+   
 
-      
-      const uniforms = getColorUniforms(time, gl.canvas);
-      gl.useProgram(colorPass.programInfo.program);
+      // Apply P0 and save it in buffer0. Texture is already bind to it
+      gl.useProgram(p0);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, buffer0.fbo);
+      //Update attributes & uniforms
+      uniforms = getPatternUniforms(time, gl.canvas);
+      setBuffersAndAttributes(gl, patternPass.programInfo, patternPass.bufferInfo);
+      setUniforms(patternPass.programInfo, uniforms);
+      // Save it to buffer0 
+      drawBufferInfo(gl, patternPass.bufferInfo);
+
+      //Clean 
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      gl.viewport(0, 0, size.w, size.h);
+
+      // Apply P1 and render to canvas
+      gl.useProgram(p1);
+      uniforms = getColorUniforms(time, gl.canvas, buffer0.texture);
       setBuffersAndAttributes(gl, colorPass.programInfo, colorPass.bufferInfo);
       setUniforms(colorPass.programInfo, uniforms);
+      
       drawBufferInfo(gl, colorPass.bufferInfo);
-
 
       requestAnimationFrame(render);
     }
