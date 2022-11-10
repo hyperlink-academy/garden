@@ -9,6 +9,9 @@ import { useEffect, useRef, useState } from 'react';
 import { getUniforms as getColorUniforms, initProgram as initColorProgram } from './ColorPass';
 import { getUniforms as getLightUniforms, initPrograms as initLightPrograms} from './LightPass';
 import { getUniforms as getPatternUniforms, initPrograms as initPatternPrograms} from './PatternPass';
+import { getUniforms as getTextureUniforms, initPrograms as initTexturePrograms} from './TexturePass';
+
+
 import { createFBO } from './WebGLHelper'
 const data = require('../example.json');
 
@@ -34,6 +37,10 @@ export const Canvas: React.FC = () => {
     const p1 = secondPass.programInfo.program;
 
     //Init Programs&Buffers - Layer 2
+    const thirdPasses = initTexturePrograms(gl);
+    const thirdPass = data['diether'] ? thirdPasses.diether : thirdPasses.moire;
+    const buffer2 = createFBO(gl,0);
+    const p2 = thirdPass.programInfo.program;
 
     //Init Programs&Buffers - Final
     const colorPass = initColorProgram(gl);
@@ -74,14 +81,29 @@ export const Canvas: React.FC = () => {
       //Clean 
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
       gl.viewport(0, 0, size.w, size.h);
-      
+
+       //----------------------------------
+      // Apply P2 and save it in buffer2
+      gl.useProgram(p2);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, buffer2.fbo);
+      //Update attributes & uniforms
+      alluniforms = getTextureUniforms(time, gl.canvas, buffer1.texture);
+       uniforms = data['diether'] ? alluniforms.diether : alluniforms.moire;
+      setBuffersAndAttributes(gl, thirdPass.programInfo, thirdPass.bufferInfo);
+      setUniforms(thirdPass.programInfo, uniforms);
+      //Render
+      drawBufferInfo(gl, thirdPass.bufferInfo);
+      //Clean 
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      gl.viewport(0, 0, size.w, size.h);
+
       //----------------------------------
       // Apply P3 and render to canvas
       gl.useProgram(p3);
       uniforms = getColorUniforms(time, gl.canvas, {
         light: buffer0.texture,
         pattern: buffer1.texture,
-        texture: buffer1.texture
+        texture: buffer2.texture
       });
       setBuffersAndAttributes(gl, colorPass.programInfo, colorPass.bufferInfo);
       setUniforms(colorPass.programInfo, uniforms);
