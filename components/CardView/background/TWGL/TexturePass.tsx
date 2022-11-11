@@ -113,8 +113,8 @@ void main()
         uv=getPolar();
     }
     
-    vec4 oscX=cos(uv.xxxx*freqX+time);
-    vec4 oscY=cos(uv.yyyy*freqY+time);
+    vec4 oscX=cos(uv.xxxx*freqX+time*0.5);
+    vec4 oscY=cos(uv.yyyy*freqY+time*0.5);
     vec4 pattern=texture2D(texIn,uvN);
     
     vec4 outColor=mix(pattern,oscX,pattern*amountX);
