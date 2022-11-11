@@ -7,7 +7,7 @@ export const getUniforms = (time: number, canvas: HTMLCanvasElement) => {
     light: {
         time: time * data['time'],
         peak: data['light-peak'],
-        intensity: data['light-intesity'],
+        intensity: data['light-intensity'],
         resolution: [canvas.width, canvas.height]
     },
     shadow: {
