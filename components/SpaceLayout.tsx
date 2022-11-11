@@ -10,7 +10,7 @@ import {
   Studio,
 } from "./Icons";
 import { ButtonLink } from "./Buttons";
-import { useContext, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import { Modal } from "components/Layout";
 import { LogInModal } from "./LoginModal";
 import { SmallCardDragContext } from "./DragContext";
@@ -19,22 +19,34 @@ import {
   ReplicacheContext,
   scanIndex,
   useIndex,
+  useMutations,
   useSpaceID,
 } from "hooks/useReplicache";
 import { useSubscribe } from "replicache-react";
 import { Message } from "data/Messages";
 import { useInActivity } from "hooks/useInActivity";
+import Head from "next/head";
+import { Fact } from "data/Facts";
+import { Join } from "./SpaceInfo";
 
 export const SpaceLayout: React.FC = (props) => {
   let spaceName = useIndex.aev("this/name")[0];
+  let unreads = useUnreads();
   let { session } = useAuth();
   let { query } = useRouter();
 
   return (
     <>
-      <div className="h-full">
+      <Head>
+        <title key="title">{spaceName?.value}</title>
+      </Head>
+      <div className="flex flex-col h-full items-stretch">
         <Link href={`${spacePath(query.studio, query.space)}/highlights`}>
-          <div className="w-full bg-accent-blue mb-2 flex flex-row p-1 justify-between">
+          <div
+            className={`w-full bg-accent-blue flex flex-row justify-between ${
+              unreads > 0 ? "bg-accent-blue" : "bg-grey-35"
+            }`}
+          >
             {!session.session ? null : (
               <Link href={`/s/${session.session.username}`}>
                 <ExitDoor className="text-white" />
@@ -45,9 +57,14 @@ export const SpaceLayout: React.FC = (props) => {
                 {spaceName?.value}
               </Link>
             </span>
+            <span className="text-white">
+              <Join />
+            </span>
           </div>
         </Link>
-        <SmallCardDragContext>{props.children}</SmallCardDragContext>
+        <div className="h-full grow flex items-stretch relative">
+          <SmallCardDragContext>{props.children}</SmallCardDragContext>
+        </div>
       </div>
     </>
   );
@@ -351,5 +368,38 @@ const Home = () => {
     >
       <Studio width={32} height={32} />
     </FooterItem>
+  );
+};
+
+let useUnreads = () => {
+  let rep = useContext(ReplicacheContext);
+  let { memberEntity } = useMutations();
+  let time = useMemo(() => {
+    return Date.now() - 24 * 60 * 60 * 1000;
+  }, []);
+  return useSubscribe(
+    rep?.rep,
+    async (tx) => {
+      if (!memberEntity) return 0;
+      let results = (await tx
+        .scan({
+          indexName: "at",
+          prefix: `highlight/time-`,
+          start: { key: `highlight/time-${time}` },
+        })
+        .values()
+        .toArray()) as Fact<"highlight/time">[];
+      let resultsWithReadStates = await Promise.all(
+        results.map(async (r) => {
+          let read = await scanIndex(tx).eav(r.entity, "highlight/read-by");
+          return read.map((r) => r.value.value);
+        })
+      );
+      return resultsWithReadStates.filter(
+        (f) => memberEntity && !f.includes(memberEntity)
+      ).length;
+    },
+    0,
+    [memberEntity, time]
   );
 };

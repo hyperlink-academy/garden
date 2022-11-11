@@ -268,7 +268,7 @@ const Members = () => {
 };
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
-const Join = () => {
+export const Join = () => {
   let { session } = useAuth();
   let isMember = useIndex.ave("space/member", session.session?.studio);
   let smoker = useSmoker();
@@ -298,27 +298,11 @@ const Join = () => {
 
   if (isMember && inviteLink) {
     return (
-      <div className="self-start flex flex-col gap-2 lightBorder w-full p-4 place-items-center">
-        <p className="font-bold">
-          Copy and share this invite link to add new members!
-        </p>
-        <div className="flex flex-row gap-2 w-full">
-          <input
-            readOnly
-            value={inviteLink}
-            className="bg-grey-90 text-grey-55 w-full"
-          />
-          <ButtonPrimary onClick={getShareLink} content="Copy!" />
-        </div>
-      </div>
+      <>
+        <input readOnly value={inviteLink} className="hidden" />
+        <button onClick={getShareLink}> share link</button>
+      </>
     );
   }
-  return (
-    <div className="text-grey-55 italic">
-      <p className="pb-1">
-        Members can make edits to the space and send chat messages.{" "}
-      </p>
-      <p> You need an invite to become one!</p>
-    </div>
-  );
+  return null;
 };
