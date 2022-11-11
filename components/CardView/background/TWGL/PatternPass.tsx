@@ -6,7 +6,7 @@ export const getUniforms = (time: number, canvas: HTMLCanvasElement) => ({
         time: time * data['time'],
         resolution: [canvas.width, canvas.height],
         invert: data['pattern-invert'],
-        zoom: data['grid-zoom'],
+        zoom: data['pattern-zoom'],
         perspective: data['grid-perspective'],
         wavysky: data['grid-wavysky'],
         wavyhorizon: data['grid-wavyhorizon'],
@@ -16,12 +16,12 @@ export const getUniforms = (time: number, canvas: HTMLCanvasElement) => ({
     },
     caustics: {
         time: time * data['time'],
-        zoom: data['caustic-zoom'],
+        zoom: data['pattern-zoom'],
         brightness: data['caustic-brightness'],
         contrast: data['caustic-contrast'],
         blur: data['caustic-blur'],
         lumaSelection: data['caustic-lumaSelection'],
-        invert: data['caustic-inver'],
+        invert: data['pattern-invert'],
         resolution: [canvas.width, canvas.height]
     }
     
@@ -46,7 +46,7 @@ vec2 uvN(){return (gl_FragCoord.xy / resolution);}
 vec2 uv(){return (gl_FragCoord.xy / resolution * 2.0 -1.0) * vec2(resolution.x/resolution.y, 1.0);}
 
 float grid(vec2 pitch,float t1,float t2){
-    vec2 coord=gl_FragCoord.xy*0.2;
+    vec2 coord=gl_FragCoord.xy*0.7*(1.-zoom);
     return float((mod(coord.x,pitch[0])<t1||
     mod(coord.y,pitch[1])<t2));
 }
@@ -55,7 +55,7 @@ void main()
 {
     vec2 uvN=uvN(); vec2 uv=uv();
 
-    vec2 pos=uv*mix(.5,10.,perspective); // missing perpective 
+    vec2 pos=uv*mix(.5,10.,perspective);
     vec2 pos2=pos;
     
     vec4 color=vec4(1.);vec4 colorOut=vec4(0.);
@@ -69,7 +69,6 @@ void main()
         pitch=vec2(mix(1.,100.,grounddensity)-pos2.y*10.+cos(pos.y*10.)*.2,20.+horizon*3.);
         float g=grid(pitch,thicknessGround[0],thicknessGround[1]);
         colorOut+=mix(g,1.-g,invert);
-
         
     }else{
         pitch=vec2(
@@ -77,7 +76,6 @@ void main()
             40.*uvN.y+cos((uvN.x)*mix(30.,100.,wavysky)+time)*3.*uv.y);
             float g=grid(pitch,thicknessSky[0],thicknessSky[1]);
             colorOut+=mix(1.-g,g,invert);
-        
         }
         
         gl_FragColor=vec4(colorOut.rgb,1.);
@@ -189,9 +187,9 @@ vec4 bccNoiseDerivatives_ImproveXYPlanes(vec3 X){
 
 void main()
 {
-    vec2 uvN=uvN();
-    vec2 uv=uv();
-    
+    vec2 uvN = uvN();
+    vec2 uv = uvN;
+
     uv*=mix(.1,5.,1.-zoom);
     
     vec3 X=vec3(uv,mod(time,578.)*.3);
@@ -205,9 +203,10 @@ void main()
     
     vec3 col=mix(vec3(0.,.0,.0),vec3(1.,1.,1.),brightness+contrast*value);
     
-    col=smoothstep(lumaSelection,lumaSelection+blur,col);
-    
-    gl_FragColor=vec4(mix(col,1.-col,invert),1.);
+     col=smoothstep(lumaSelection,lumaSelection+blur,col);
+
+    vec3 outColor = mix(col,1.-col,invert);
+    gl_FragColor=vec4(outColor,1.);
 }
 `
 

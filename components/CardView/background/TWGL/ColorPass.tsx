@@ -19,7 +19,7 @@ export const getUniforms = (time: number, canvas: HTMLCanvasElement, textures : 
         layerOne: parseColor(data['layerOne-color']),
         layerTwo: parseColor(data['layerTwo-color']),
         off: [data['layers-offset'].x,data['layers-offset'].y], 
-        mode: data['layer-mode'],
+        mode: data['layers-mode'] || 0,
         toggleLayerZero: data['layerZero'],
         toggleLayerOne: data['layerOne'],
         toggleLayerTwo: data['layerTwo'],
