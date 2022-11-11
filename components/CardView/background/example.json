@@ -1,5 +1,5 @@
 {
-    "time": 0.5434782608695652,
+    "time": 0.001,
     "shadow": true,
     "light": false,
     "shadow-p": 2.0652173913043477,
@@ -21,7 +21,7 @@
     "grid-grounddensity": 0,
     "grid-thicknessSky": {
         "x": 2.4,
-        "y": 2.09
+        "y": 2.2
     },
     "grid-thicknessGround": {
         "x": 1,
