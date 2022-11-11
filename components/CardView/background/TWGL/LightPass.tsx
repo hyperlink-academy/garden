@@ -1,37 +1,33 @@
-import {
-    createProgramInfo,
-    primitives
-} from 'twgl.js';
-const data = require('../example.json');
 
-export const getUniforms = (time: number, canvas: HTMLCanvasElement) => ({
+import  { initProgram, data } from './common'
+
+export const getUniforms = (time: number, canvas: HTMLCanvasElement) => {
+   
+    return {
     light: {
-        time: time * 0.001,
+        time: time * data['time'],
         peak: data['light-peak'],
-        intensity: data['light-intesity']
+        intensity: data['light-intesity'],
+        resolution: [canvas.width, canvas.height]
     },
     shadow: {
         p: data['shadow-p'],
         r: data['shadow-r'],
-        border: data['shadow-border']
+        border: data['shadow-border'],
+        resolution: [canvas.width, canvas.height]
     }
     
-});
-
-const baseVertexShaderSource = `attribute vec4 position;
-    attribute vec2 texcoord;
-    varying vec2 vUv;
-
-    void main() {
-        vUv = texcoord;
-        gl_Position = position;
-}`
+}};
 
 const lightFragmentShaderSource = `precision mediump float;
 varying vec2 vUv;
 uniform float time;
 uniform float peak;
 uniform float intensity;
+uniform vec2 resolution;
+
+vec2 uvN(){return (gl_FragCoord.xy / resolution);}
+vec2 uv(){return (gl_FragCoord.xy / resolution * 2.0 -1.0) * vec2(resolution.x/resolution.y, 1.0);}
 
 #define PI 3.1415926
 
@@ -51,7 +47,7 @@ float scale){
 
 void main() {
     //Offset uv so that center is 0,0 and edges are -1,1
-    vec2 uv=(vUv-vec2(.5))*2.;
+    vec2 uv=uv();
     uv.x+=cos(dot(uv,uv)+time*.5);
     vec3 outColor=vec3(0.);
     
@@ -74,7 +70,13 @@ const shadowFragmentShaderSource = `precision mediump float;
     uniform float p;
     uniform float r;
     uniform float border;
+    uniform vec2 resolution;
     #define PI 3.1415926
+
+    vec2 uvN(){return (gl_FragCoord.xy / resolution);}
+    vec2 uv(){return (gl_FragCoord.xy / resolution * 2.0 -1.0) * vec2(resolution.x/resolution.y, 1.0);}
+
+
 
     float distance_p(vec2 pos,float p){
         float d=pow(abs(pos.x),p)+pow(abs(pos.y),p);
@@ -84,27 +86,12 @@ const shadowFragmentShaderSource = `precision mediump float;
 
     void main()
     {
-        //Offset uv so that center is 0,0 and edges are -1,1
-        vec2 uv=(vUv-vec2(.5))*2.;vec3 outColor;
+        vec2 uv=uv();vec3 outColor;
         outColor+=smoothstep(0.,border,1.-distance_p(uv,p)-r);
         
         gl_FragColor=vec4(outColor,1.);
     }`
 
-const initProgram = (gl: WebGLRenderingContext, fragmentSource: string) => {
-   
-    const programInfo = createProgramInfo(gl, [
-        baseVertexShaderSource,
-        fragmentSource
-      ]);
-    
-    var bufferInfo = primitives.createXYQuadBufferInfo(gl);
- 
-    return {
-        programInfo,
-        bufferInfo
-      }
-}
 
 export const initPrograms = (gl: WebGLRenderingContext) => {
 

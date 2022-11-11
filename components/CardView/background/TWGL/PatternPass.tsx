@@ -1,12 +1,9 @@
-import {
-    createProgramInfo,
-    primitives
-} from 'twgl.js';
-const data = require('../example.json');
+import  { initProgram ,data } from './common'
+
 
 export const getUniforms = (time: number, canvas: HTMLCanvasElement) => ({
     grid: {
-        time: time * 0.001,
+        time: time * data['time'],
         resolution: [canvas.width, canvas.height],
         invert: data['pattern-invert'],
         zoom: data['grid-zoom'],
@@ -15,35 +12,26 @@ export const getUniforms = (time: number, canvas: HTMLCanvasElement) => ({
         wavyhorizon: data['grid-wavyhorizon'],
         grounddensity:data['grid-grounddensity'],
         thicknessSky: [data['grid-thicknessSky'].x,data['grid-thicknessSky'].y] ,
-        thicknessGround: [data['grid-thicknessGround'].x,data['grid-thicknessGround'].y]
+        thicknessGround: [data['grid-thicknessGround'].x, data['grid-thicknessGround'].y],
     },
     caustics: {
-        time: time * 0.01,
+        time: time * data['time'],
         zoom: data['caustic-zoom'],
         brightness: data['caustic-brightness'],
         contrast: data['caustic-contrast'],
         blur: data['caustic-blur'],
         lumaSelection: data['caustic-lumaSelection'],
-        invert: data['caustic-inver']
+        invert: data['caustic-inver'],
+        resolution: [canvas.width, canvas.height]
     }
     
 });
-
-const baseVertexShaderSource = `attribute vec4 position;
-    attribute vec2 texcoord;
-    varying vec2 vUv;
-
-    void main() {
-        vUv = texcoord;
-        gl_Position = position;
-}`
 
 const gridFragmentShaderSource = `precision mediump float;
 
 varying vec2 vUv;
 
 uniform float time;
-uniform vec2 resolution;
 uniform float invert;
 uniform float zoom;
 uniform float perspective;
@@ -52,17 +40,21 @@ uniform float wavyhorizon;
 uniform float grounddensity;
 uniform vec2 thicknessSky;
 uniform vec2 thicknessGround;
+uniform vec2 resolution;
+
+vec2 uvN(){return (gl_FragCoord.xy / resolution);}
+vec2 uv(){return (gl_FragCoord.xy / resolution * 2.0 -1.0) * vec2(resolution.x/resolution.y, 1.0);}
 
 float grid(vec2 pitch,float t1,float t2){
-    vec2 coord=vUv*resolution*0.2;
+    vec2 coord=gl_FragCoord.xy*0.2;
     return float((mod(coord.x,pitch[0])<t1||
     mod(coord.y,pitch[1])<t2));
 }
 
 void main()
 {
-    vec2 uvN=vUv;
-    vec2 uv=uvN*2.-1.;
+    vec2 uvN=uvN(); vec2 uv=uv();
+
     vec2 pos=uv*mix(.5,10.,perspective); // missing perpective 
     vec2 pos2=pos;
     
@@ -98,7 +90,6 @@ precision mediump float;
 #endif
 precision mediump int;
 
-
 varying vec2 vUv;
 uniform float time;
 uniform float zoom;
@@ -107,6 +98,11 @@ uniform float contrast;
 uniform float blur;
 uniform float lumaSelection;
 uniform float invert;
+uniform vec2 resolution;
+
+vec2 uvN(){return (gl_FragCoord.xy / resolution);}
+vec2 uv(){return (gl_FragCoord.xy / resolution * 2.0 -1.0) * vec2(resolution.x/resolution.y, 1.0);}
+
 
 float distance_p(vec3 pos,float p){
     float d=pow(abs(pos.x),p)+pow(abs(pos.y),p)+pow(abs(pos.z),p);
@@ -193,8 +189,8 @@ vec4 bccNoiseDerivatives_ImproveXYPlanes(vec3 X){
 
 void main()
 {
-    vec2 uvN=vUv;
-    vec2 uv=vUv*2.-1.;
+    vec2 uvN=uvN();
+    vec2 uv=uv();
     
     uv*=mix(.1,5.,1.-zoom);
     
@@ -214,21 +210,6 @@ void main()
     gl_FragColor=vec4(mix(col,1.-col,invert),1.);
 }
 `
-
-const initProgram = (gl: WebGLRenderingContext, fragmentSource: string) => {
-   
-    const programInfo = createProgramInfo(gl, [
-        baseVertexShaderSource,
-        fragmentSource
-      ]);
-    
-    var bufferInfo = primitives.createXYQuadBufferInfo(gl);
- 
-    return {
-        programInfo,
-        bufferInfo
-      }
-}
 
 export const initPrograms = (gl: WebGLRenderingContext) => {
 

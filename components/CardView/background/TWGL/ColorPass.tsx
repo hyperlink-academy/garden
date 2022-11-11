@@ -13,7 +13,7 @@ const parseColor = (color: { r: number, g: number, b: number, a: number }) => {
 export const getUniforms = (time: number, canvas: HTMLCanvasElement, textures : {texture: any, light: any, pattern: any}) => {
 
     return {
-        time: time * 0.001,
+        time: time * data['time'],
         background: parseColor(data['background-color']),
         layerZero: parseColor(data['layerZero-color']),
         layerOne: parseColor(data['layerOne-color']),
@@ -62,6 +62,9 @@ uniform bool toggleLayerOne;
 uniform bool toggleLayerTwo;
 uniform int mode;
 
+vec2 uvN(){return (gl_FragCoord.xy / resolution);}
+vec2 uv(){return (gl_FragCoord.xy / resolution * 2.0 -1.0) * vec2(resolution.x/resolution.y, 1.0);}
+
 vec2 symmetry(vec2 v){
     if(v.x<0.){
         v.x=abs(v.x);
@@ -80,7 +83,7 @@ vec2 symmetry(vec2 v){
   
 void main()
 {
-    vec2 uvN=vUv;
+    vec2 uvN=uvN();
     vec4 shape=texture2D(texShape,uvN*1.);
     vec4 pattern=texture2D(texPattern,uvN);
     vec4 prev=texture2D(texTexture,uvN);

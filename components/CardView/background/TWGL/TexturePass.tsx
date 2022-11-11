@@ -1,12 +1,8 @@
-import {
-    createProgramInfo,
-    primitives
-} from 'twgl.js';
-const data = require('../example.json');
+import  { initProgram ,data } from './common'
 
 export const getUniforms = (time: number, canvas: HTMLCanvasElement, texIn : WebGLTexture ) => ({
     diether: {
-        time: time * 0.001,
+        time: time * data['time'],
         invert: data['texture-invert'],
         texIn: texIn,
         flip: data['texture-flipY'],
@@ -15,30 +11,23 @@ export const getUniforms = (time: number, canvas: HTMLCanvasElement, texIn : Web
             8., 4., 11., 7.,
             2., 14., 1., 5.,
             10., 6., 9., 5
-        ]
+        ],
+        resolution: [canvas.width, canvas.height]
     },
     moire: {
         freqX: data['moire-freqX'],
         freqY: data['moire-freqY'],
         amountX: data['moire-amountX'],
         amountY: data['moire-amountY'],
-        time: time * 0.001,
+        time: time * data['time'],
         invert: data['texture-invert'],
         texIn: texIn,
         flip: data['texture-flipY'],
         polar: data['moire-polar'],
+        resolution: [canvas.width, canvas.height]
     }
     
 });
-
-const baseVertexShaderSource = `attribute vec4 position;
-    attribute vec2 texcoord;
-    varying vec2 vUv;
-
-    void main() {
-        vUv = texcoord;
-        gl_Position = position;
-}`
 
 const dietherFragmentShaderSource = `precision mediump float;
 
@@ -47,10 +36,14 @@ uniform sampler2D texIn;
 uniform float invert;
 uniform float flip;
 uniform float u_threshold[16];
+uniform vec2 resolution;
+
+vec2 uvN(){return (gl_FragCoord.xy / resolution);}
+vec2 uv(){return (gl_FragCoord.xy / resolution * 2.0 -1.0) * vec2(resolution.x/resolution.y, 1.0);}
 
 void main()
 {
-    vec2 clip=vUv;
+    vec2 clip=uvN();
     clip.y=mix(clip.y,1.-clip.y,flip);
     
     // Normalized pixel coordinates (from 0 to 1)
@@ -101,6 +94,11 @@ uniform float invert;
 uniform sampler2D texIn;
 uniform float flip;
 uniform bool polar;
+uniform vec2 resolution;
+
+vec2 uvN(){return (gl_FragCoord.xy / resolution);}
+vec2 uv(){return (gl_FragCoord.xy / resolution * 2.0 -1.0) * vec2(resolution.x/resolution.y, 1.0);}
+
 
 vec2 getPolar(){
     vec2 pos=vUv*2.-1.;
@@ -108,11 +106,9 @@ vec2 getPolar(){
 }
 void main()
 {
-    vec2 uvN=vUv;
+    vec2 uvN=uvN(); vec2 uv=uv();
     uvN.y=mix(uvN.y,1.-uvN.y,flip);
-    
-    vec2 uv=vUv*2.-1.;
-    
+
     if(polar){
         uv=getPolar();
     }
@@ -128,21 +124,6 @@ void main()
     
     
 }`
-
-const initProgram = (gl: WebGLRenderingContext, fragmentSource: string) => {
-   
-    const programInfo = createProgramInfo(gl, [
-        baseVertexShaderSource,
-        fragmentSource
-      ]);
-    
-    var bufferInfo = primitives.createXYQuadBufferInfo(gl);
- 
-    return {
-        programInfo,
-        bufferInfo
-      }
-}
 
 export const initPrograms = (gl: WebGLRenderingContext) => {
 
