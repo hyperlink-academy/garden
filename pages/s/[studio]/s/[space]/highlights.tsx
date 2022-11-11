@@ -1,6 +1,6 @@
 import { Carousel } from "components/CardCarousel";
 import { CardView } from "components/CardView";
-import { CrossLarge, HighlightNote } from "components/Icons";
+import { Checkmark, CrossLarge, HighlightNote } from "components/Icons";
 import { InlineCardViewer } from "components/CardViewer";
 import { Textarea } from "components/Textarea";
 import { useIndex, useMutations } from "hooks/useReplicache";
@@ -15,7 +15,7 @@ export default function HighlightPage() {
     return Date.now() - 24 * 60 * 60 * 1000;
   }, []);
 
-  let cards = useIndex.at("highlight/time", time).reverse();
+  let cards = useIndex.at("highlight/time", time);
   return (
     // TODO for Jared :
     // - If you click a link in the card, the new card will open on top of the original one with a back button to go down the stack
@@ -47,71 +47,41 @@ let useReadState = (entity: string) => {
   // A highlight is an entity. For every person who has read it we want to store
   // a ref fact,
   let readStates = useIndex.eav(entity, "highlight/read-by");
-  let ref = useRef<HTMLDivElement | null>(null);
-
   let read = !!readStates?.find((f) => f.value.value === memberEntity);
-  useEffect(() => {
-    if (!memberEntity) return;
-    if (read) return;
-    let node = ref.current;
-    let timeout: number | undefined = undefined;
-    let observer = new IntersectionObserver(
-      (e) => {
-        if (!e[0]?.isIntersecting && timeout) clearTimeout(timeout);
-        if (e[0]?.isIntersecting) {
-          timeout = window.setTimeout(() => {
-            if (!memberEntity) return;
-            mutate("assertFact", {
-              entity,
-              attribute: "highlight/read-by",
-              value: { type: "reference", value: memberEntity },
-              positions: {},
-            });
-          }, 1000);
-        }
-      },
-      { root: null, rootMargin: "0px -50%", threshold: 0 }
-    );
-    if (node) observer.observe(node);
-    return () => {
-      if (node) observer.unobserve(node);
-    };
-  }, [read, ref, memberEntity]);
-  return [ref, read] as const;
+  return read;
 };
 
 let HighlightedItem = (props: { entityID: string }) => {
-  let [noteOpen, setNoteOpen] = useState(true);
-  let card = useIndex.eav(props.entityID, "highlight/card");
-  let [ref, read] = useReadState(props.entityID);
+  let { memberEntity, mutate, authorized } = useMutations();
+  let read = useReadState(props.entityID);
+  if (read) return null;
 
   return (
     <InlineCardViewer>
       <div
-        ref={ref}
         tabIndex={0}
         className={`highlightCard h-full w-[calc(100%-32px)] flex flex-col relative max-w-3xl snap-center flex-shrink-0 focus:outline-none `}
       >
-        {noteOpen ? (
-          <Note
-            entityID={props.entityID}
-            onClose={() => setNoteOpen(false)}
-            read={read}
-          />
-        ) : (
+        {authorized && (
           <button
-            onClick={() => setNoteOpen(true)}
-            className={`absolute z-20 bottom-16 right-5 rounded-md flex mr-2 h-8 w-8 items-center justify-center shadow-drop ${
-              read
-                ? "bg-grey-90 lightBorder text-grey-55"
-                : " bg-bg-blue text-accent-blue border border-accent-blue"
-            }`}
+            onClick={() => {
+              if (!memberEntity) return;
+              mutate("assertFact", {
+                entity: props.entityID,
+                attribute: "highlight/read-by",
+                value: { type: "reference", value: memberEntity },
+                positions: {},
+              });
+            }}
+            className={`absolute z-20 bottom-16 left-5 rounded-md flex mr-2 h-8 w-8 items-center justify-center shadow-drop 
+                 bg-bg-blue text-accent-blue border border-accent-blue
+                 `}
           >
-            <HighlightNote />
+            <Checkmark />
           </button>
         )}
 
-        {card && <CardView entityID={card?.value.value} />}
+        {<CardView entityID={props.entityID} />}
       </div>
     </InlineCardViewer>
   );

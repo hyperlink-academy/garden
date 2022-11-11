@@ -334,6 +334,15 @@ const createCard: Mutation<{ entityID: string; title: string }> = async (
 ) => {
   await ctx.assertFact({
     entity: args.entityID,
+    attribute: "highlight/time",
+    value: {
+      type: "unix_seconds",
+      value: Date.now().toString(),
+    },
+    positions: {},
+  });
+  await ctx.assertFact({
+    entity: args.entityID,
     attribute: "card/title",
     value: args.title,
     positions: {},
