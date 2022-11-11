@@ -29,7 +29,7 @@ const borderStyles = (args: {
     case args.isMember:
       return "memberCardBorder";
     case args.isDeck:
-      return "deckCardBorder";
+      return "defaultCardBorder";
     case args.isChat:
       return "chatCardBorder";
     default:

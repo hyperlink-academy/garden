@@ -38,7 +38,7 @@ const borderStyles = (args: { deck: boolean; member: boolean }) => {
     case args.member:
       return `memberCardBorder`;
     case args.deck:
-      return `deckCardBorder`;
+      return `defaultCardBorder`;
 
     default:
       return `defaultCardBorder`;
