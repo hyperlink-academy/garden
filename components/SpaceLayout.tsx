@@ -8,8 +8,9 @@ import {
   ExitDoor,
   ActivityBlocks,
   Studio,
+  Settings,
 } from "./Icons";
-import { ButtonLink } from "./Buttons";
+import { ButtonLink, ButtonPrimary, ButtonSecondary } from "./Buttons";
 import { useContext, useMemo, useState } from "react";
 import { Modal } from "components/Layout";
 import { LogInModal } from "./LoginModal";
@@ -28,6 +29,8 @@ import { useInActivity } from "hooks/useInActivity";
 import Head from "next/head";
 import { Fact } from "data/Facts";
 import { Join } from "./SpaceInfo";
+import { Disclosure } from "@headlessui/react";
+import { Drawer } from "./Drawer";
 
 export const SpaceLayout: React.FC = (props) => {
   let spaceName = useIndex.aev("this/name")[0];
@@ -41,27 +44,52 @@ export const SpaceLayout: React.FC = (props) => {
         <title key="title">{spaceName?.value}</title>
       </Head>
       <div className="flex flex-col h-full items-stretch">
-        <Link href={`${spacePath(query.studio, query.space)}/highlights`}>
-          <div
-            className={`w-full bg-accent-blue flex flex-row justify-between ${
-              unreads > 0 ? "bg-accent-blue" : "bg-grey-35"
-            }`}
-          >
-            {!session.session ? null : (
-              <Link href={`/s/${session.session.username}`}>
-                <ExitDoor className="text-white" />
-              </Link>
-            )}
-            <span className="text-white mx-auto">
-              <Link href={`${spacePath(query.studio, query.space)}`}>
-                {spaceName?.value}
-              </Link>
-            </span>
-            <span className="text-white">
-              <Join />
-            </span>
-          </div>
-        </Link>
+        {/* HEADER START */}
+        <div className="mb-4">
+          <Disclosure>
+            <div
+              className={`w-full flex flex-row justify-between h-[64px] gap-4 p-2  ${
+                unreads > 0 ? "bg-accent-blue" : "bg-grey-35"
+              }`}
+            >
+              {!session.session ? null : (
+                <span className="self-center">
+                  <Link href={`/s/${session.session.username}`}>
+                    <ButtonSecondary
+                      content={"studio"}
+                      icon={<ExitDoor />}
+                    ></ButtonSecondary>
+                  </Link>
+                </span>
+              )}
+              <span className="text-white mx-auto self-center">
+                <Link href={`${spacePath(query.studio, query.space)}`}>
+                  {spaceName?.value}
+                </Link>
+
+                <Disclosure.Button className="text-white ml-2 absolute">
+                  <Settings />
+                </Disclosure.Button>
+              </span>
+
+              <span className="self-center">
+                <Link
+                  href={`${spacePath(query.studio, query.space)}/highlights`}
+                >
+                  <ButtonSecondary content={"highlights"}></ButtonSecondary>
+                </Link>
+              </span>
+            </div>
+
+            <Disclosure.Panel>
+              <div className="bg-white flex flex-row justify-between p-2 border border-accent-blue rounded-b-md">
+                <Join />
+              </div>
+            </Disclosure.Panel>
+          </Disclosure>
+        </div>
+        {/* HEADER END */}
+
         <div className="h-full grow flex items-stretch relative">
           <SmallCardDragContext>{props.children}</SmallCardDragContext>
         </div>
