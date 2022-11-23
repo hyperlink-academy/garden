@@ -1,7 +1,7 @@
 import { spaceAPI } from "backend/lib/api";
 import { ButtonPrimary } from "components/Buttons";
 import { Member } from "components/Icons";
-import { BaseSmallCard } from "components/CardPreview";
+import { BaseSmallCard } from "components/CardPreview/SmallCard";
 import { useAuth } from "hooks/useAuth";
 import { useIndex, useSpaceID } from "hooks/useReplicache";
 import { useRouter } from "next/router";
