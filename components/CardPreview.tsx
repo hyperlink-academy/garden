@@ -15,9 +15,9 @@ import {
 import { useDrag, usePinch } from "@use-gesture/react";
 import { isUrl } from "src/isUrl";
 import { useRef } from "react";
-import { useCardViewer } from "./CardViewer";
 import { useReadState } from "hooks/useReadState";
 import { useAuth } from "hooks/useAuth";
+import { useCardViewer } from "pages/s/[studio]/s/[space]";
 
 const borderStyles = (args: {
   isDeck: boolean;

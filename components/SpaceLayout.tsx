@@ -32,9 +32,9 @@ export const SpaceLayout: React.FC = (props) => {
       <Head>
         <title key="title">{spaceName?.value}</title>
       </Head>
-      <div className="flex flex-col h-full items-stretch">
+      <div className="pageWrapper flex flex-col gap-4 h-screen items-stretch">
         {/* HEADER START */}
-        <div className="mb-4">
+        <div className="pageHeader shrink-0">
           <Disclosure>
             <div
               className={`w-full flex flex-row justify-between h-[64px] gap-4 p-2  ${
@@ -79,7 +79,7 @@ export const SpaceLayout: React.FC = (props) => {
         </div>
         {/* HEADER END */}
 
-        <div className="h-full grow flex items-stretch relative">
+        <div className="pageContent h-[calc(100vh-80px)] grow relative flex items-stretch">
           <SmallCardDragContext>{props.children}</SmallCardDragContext>
         </div>
       </div>
