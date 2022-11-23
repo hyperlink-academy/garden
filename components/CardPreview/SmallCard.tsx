@@ -1,8 +1,8 @@
+import { useCardViewer } from "components/CardViewerContext";
 import { GripperBG } from "components/Gripper";
 import { ExternalLink, Member } from "components/Icons";
 import { useReadState } from "hooks/useReadState";
 import { useIndex, useMutations } from "hooks/useReplicache";
-import { useCardViewer } from "pages/s/[studio]/s/[space]";
 import { isUrl } from "src/isUrl";
 import { Props } from "./index";
 

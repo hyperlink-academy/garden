@@ -1,4 +1,4 @@
-import { useContext, useState, useRef } from "react";
+import { useState, useRef } from "react";
 import { CardView } from "components/CardView";
 import { GoBackToPage, SearchOrCommand } from "components/Icons";
 import { useIndex, useMutations } from "hooks/useReplicache";
@@ -7,11 +7,7 @@ import { FindOrCreate, useAllItems } from "components/FindOrCreateEntity";
 import useWindowDimensions from "hooks/useWindowDimensions";
 import { useLongPress } from "hooks/useLongPress";
 import { Desktop } from "components/Desktop";
-import {
-  CardViewerContext,
-  LinkContext,
-  LinkContextProvider,
-} from "components/ContextProvider";
+import { CardViewerContext, useCardViewer } from "components/CardViewerContext";
 
 export default function SpacePage() {
   let [history, setHistory] = useState([] as string[]);
@@ -60,9 +56,7 @@ export default function SpacePage() {
           flex flex-col gap-0
           `}
         >
-          <LinkContextProvider type="desktop">
-            <Desktop />
-          </LinkContextProvider>
+          <Desktop />
         </div>
 
         <div
@@ -300,14 +294,4 @@ const FindOrCreateBar = () => {
       />
     </>
   );
-};
-
-export const useCardViewer = () => {
-  let cardPreview = useContext(CardViewerContext);
-  let link = useContext(LinkContext);
-  return {
-    open: (args: { entityID: string }) => {
-      cardPreview.open({ focused: link, entityID: args.entityID });
-    },
-  };
 };

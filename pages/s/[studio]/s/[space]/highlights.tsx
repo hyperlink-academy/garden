@@ -1,13 +1,14 @@
 import { Carousel } from "components/CardCarousel";
 import { CardView } from "components/CardView";
+import { CardViewerContext } from "components/CardViewerContext";
 import { Checkmark, CrossLarge, HighlightNote } from "components/Icons";
 import { Textarea } from "components/Textarea";
 import { useIndex, useMutations } from "hooks/useReplicache";
 import { spacePath } from "hooks/utils";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { InlineCardViewer } from ".";
+import { useMemo, useRef, useState } from "react";
+import { BackButton } from ".";
 
 export default function HighlightPage() {
   let { query: q } = useRouter();
@@ -190,5 +191,51 @@ const EmptyState = () => {
         <strong>Let's play the infinite game</strong>.
       </p>
     </div>
+  );
+};
+
+const InlineCardViewer: React.FC = (props) => {
+  let [history, setHistory] = useState([] as string[]);
+
+  let ref = useRef<HTMLDivElement | null>(null);
+
+  return (
+    <CardViewerContext.Provider
+      value={{
+        open: (args) => {
+          setHistory((h) => {
+            if (h[0] === args.entityID) return h;
+            return [args.entityID, ...h];
+          });
+        },
+      }}
+    >
+      <>
+        {props.children}
+
+        {history[0] ? (
+          <div
+            ref={ref}
+            key={history[0]}
+            tabIndex={0}
+            className={`highlightCard h-full w-[calc(100%-32px)] flex flex-col relative max-w-3xl snap-center flex-shrink-0 pb-1.5 focus:outline-none `}
+          >
+            <div className="cardViewerHeader grid grid-cols-[auto_max-content] items-center gap-4 ">
+              <BackButton
+                history={history}
+                setHistory={setHistory}
+                onFinalClose={() => {}}
+              />
+            </div>
+            <CardView
+              entityID={history[0]}
+              onDelete={() => setHistory((s) => s.slice(1))}
+            />
+          </div>
+        ) : (
+          <></>
+        )}
+      </>
+    </CardViewerContext.Provider>
   );
 };

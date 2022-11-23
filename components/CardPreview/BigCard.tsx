@@ -1,9 +1,9 @@
 import { SingleTextSection } from "components/CardView/Sections";
+import { useCardViewer } from "components/CardViewerContext";
 import { GripperBG } from "components/Gripper";
 import { GoToPage } from "components/Icons";
 import { useAuth } from "hooks/useAuth";
 import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
-import { useCardViewer } from "pages/s/[studio]/s/[space]";
 import { Props } from "./index";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
