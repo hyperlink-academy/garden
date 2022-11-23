@@ -39,7 +39,7 @@ export const SpaceLayout: React.FC = (props) => {
             <div
               className={`
                 max-w-6xl h-12 mx-auto sm:px-4 px-2
-                grid grid-cols-[max-content_auto_max-content] gap-4 items-center 
+                grid grid-cols-[max-content_auto_max-content]  items-center gap-2
                 before:content-[''] before:absolute before:w-[100vw] before:h-12 before:left-0 ${
                   unreads > 0 ? "before:bg-accent-blue" : "before:bg-grey-35"
                 }`}
@@ -47,8 +47,8 @@ export const SpaceLayout: React.FC = (props) => {
               {!session.session ? (
                 <div />
               ) : (
-                <div className="self-center z-10">
-                  <Link href={`$/s/{session.session.username}`}>
+                <div className="z-10">
+                  <Link href={`/s/${session.session.username}`}>
                     <ButtonSecondary
                       content={"studio"}
                       icon={<ExitDoor />}
@@ -56,17 +56,17 @@ export const SpaceLayout: React.FC = (props) => {
                   </Link>
                 </div>
               )}
-              <div className="text-white font-bold mx-auto self-center grow z-10">
+              <div className="text-white font-bold mx-auto text-center flex gap-2 grow z-10">
                 <Link href={`${spacePath(query.studio, query.space)}`}>
                   {spaceName?.value}
                 </Link>
 
-                <Disclosure.Button className="text-white ml-2 absolute">
+                <Disclosure.Button className="text-white">
                   <Settings />
                 </Disclosure.Button>
               </div>
 
-              <div className="self-center z-10">
+              <div className="z-10">
                 <Link
                   href={`${spacePath(query.studio, query.space)}/highlights`}
                 >
