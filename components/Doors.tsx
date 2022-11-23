@@ -27,7 +27,6 @@ export const Door = (props: {
       aria-labelledby="titleid"
       xmlns="http://www.w3.org/2000/svg"
       width={props.width || "128"}
-      height="auto"
       viewBox="0 0 256 576"
       className="flex-none -scale-x-100"
       filter={props?.glow ? "url(#softGlow)" : ""}
