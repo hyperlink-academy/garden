@@ -34,12 +34,11 @@ export const SpaceLayout: React.FC = (props) => {
       </Head>
       <div className="pageWrapper flex flex-col sm:gap-4 gap-2 h-screen items-stretch justify-items-center overflow-hidden">
         {/* HEADER START */}
-        <div className="pageHeader shrink-0 sm:px-4 sm:pb-4 px-2 pb-2">
+        <div className="pageHeader shrink-0 sm:pb-4 pb-2">
           <Disclosure>
             <div
               className={`
-                max-w-6xl h-12 mx-auto sm:px-4 px-2 
-                sm:w-[calc(100vw-32px)] w-[calc(100vw-16px)] 
+                max-w-6xl h-12 mx-auto sm:px-4 px-2
                 grid grid-cols-[max-content_auto_max-content] gap-4 items-center 
                 before:content-[''] before:absolute before:w-[100vw] before:h-12 before:left-0 ${
                   unreads > 0 ? "before:bg-accent-blue" : "before:bg-grey-35"

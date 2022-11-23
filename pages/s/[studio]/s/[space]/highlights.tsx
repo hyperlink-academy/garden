@@ -1,13 +1,13 @@
 import { Carousel } from "components/CardCarousel";
 import { CardView } from "components/CardView";
 import { Checkmark, CrossLarge, HighlightNote } from "components/Icons";
-import { InlineCardViewer } from "components/CardViewer";
 import { Textarea } from "components/Textarea";
 import { useIndex, useMutations } from "hooks/useReplicache";
 import { spacePath } from "hooks/utils";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { InlineCardViewer } from ".";
 
 export default function HighlightPage() {
   let { query: q } = useRouter();
