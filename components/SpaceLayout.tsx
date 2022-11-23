@@ -89,7 +89,6 @@ export const SpaceLayout: React.FC = (props) => {
           pageContent 
           h-[calc(100vh-80px)] w-full max-w-6xl 
           sm:px-4 px-2 mx-auto
-          overflow-x-scroll
           grow 
           relative 
           flex items-stretch `}
