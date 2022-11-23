@@ -1,4 +1,3 @@
-import { latestMigration } from "backend/SpaceDurableObject/migrations";
 import {
   Attribute,
   FilterAttributes,
