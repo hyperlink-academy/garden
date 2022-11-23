@@ -32,26 +32,32 @@ export const SpaceLayout: React.FC = (props) => {
       <Head>
         <title key="title">{spaceName?.value}</title>
       </Head>
-      <div className="pageWrapper flex flex-col gap-4 h-screen items-stretch">
+      <div className="pageWrapper flex flex-col sm:gap-4 gap-2 h-screen items-stretch justify-items-center overflow-hidden">
         {/* HEADER START */}
-        <div className="pageHeader shrink-0">
+        <div className="pageHeader shrink-0 sm:px-4 sm:pb-4 px-2 pb-2">
           <Disclosure>
             <div
-              className={`w-full flex flex-row justify-between h-[64px] gap-4 p-2  ${
-                unreads > 0 ? "bg-accent-blue" : "bg-grey-35"
-              }`}
+              className={`
+                max-w-6xl h-12 mx-auto sm:px-4 px-2 
+                sm:w-[calc(100vw-32px)] w-[calc(100vw-16px)] 
+                grid grid-cols-[max-content_auto_max-content] gap-4 items-center 
+                before:content-[''] before:absolute before:w-[100vw] before:h-12 before:left-0 ${
+                  unreads > 0 ? "before:bg-accent-blue" : "before:bg-grey-35"
+                }`}
             >
-              {!session.session ? null : (
-                <span className="self-center">
-                  <Link href={`/s/${session.session.username}`}>
+              {!session.session ? (
+                <div />
+              ) : (
+                <div className="self-center z-10">
+                  <Link href={`$/s/{session.session.username}`}>
                     <ButtonSecondary
                       content={"studio"}
                       icon={<ExitDoor />}
                     ></ButtonSecondary>
                   </Link>
-                </span>
+                </div>
               )}
-              <span className="text-white mx-auto self-center">
+              <div className="text-white font-bold mx-auto self-center grow z-10">
                 <Link href={`${spacePath(query.studio, query.space)}`}>
                   {spaceName?.value}
                 </Link>
@@ -59,15 +65,15 @@ export const SpaceLayout: React.FC = (props) => {
                 <Disclosure.Button className="text-white ml-2 absolute">
                   <Settings />
                 </Disclosure.Button>
-              </span>
+              </div>
 
-              <span className="self-center">
+              <div className="self-center z-10">
                 <Link
                   href={`${spacePath(query.studio, query.space)}/highlights`}
                 >
                   <ButtonSecondary content={"highlights"}></ButtonSecondary>
                 </Link>
-              </span>
+              </div>
             </div>
 
             <Disclosure.Panel>
@@ -79,7 +85,16 @@ export const SpaceLayout: React.FC = (props) => {
         </div>
         {/* HEADER END */}
 
-        <div className="pageContent h-[calc(100vh-80px)] grow relative flex items-stretch">
+        <div
+          className={`
+          pageContent 
+          h-[calc(100vh-80px)] w-full max-w-6xl 
+          sm:px-4 px-2 mx-auto
+          overflow-x-scroll
+          grow 
+          relative 
+          flex items-stretch `}
+        >
           <SmallCardDragContext>{props.children}</SmallCardDragContext>
         </div>
       </div>

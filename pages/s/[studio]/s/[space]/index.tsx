@@ -44,8 +44,10 @@ export default function SpacePage() {
         flex flex-row items-stretch gap-4 sm:gap-8 
         sm:justify-center
         snap-x snap-mandatory overflow-x-scroll
-        after:content-[""] after:h-full after:w-2 after:block after:shrink-0
 `}
+        // you need to add this to the contentSplitLayout class if you are going to scroll across more than 2 panes
+        // it prevents the last pane from sticking to the end
+        // after:content-[""] after:h-full after:w-2 after:block after:shrink-0
       >
         <div
           className={`
@@ -66,14 +68,14 @@ export default function SpacePage() {
         <div
           className={`cardViewerWrapper 
           h-full w-[calc(100vw-16px)] max-w-3xl 
-          pt-2 pb-4 sm:pt-4 sm:pb-8 
+           pb-4  sm:pb-8 
           shrink-0 sm:shrink        
           focus:outline-none
           snap-center touch-pan-x 
           flex flex-col gap-3 items-stretch`}
         >
           <div className="cardViewerHeader grid grid-cols-[auto_max-content] items-center gap-4 ">
-            {history[0] && (
+            {history[0] ? (
               <BackButton
                 history={history}
                 setHistory={setHistory}
@@ -84,6 +86,8 @@ export default function SpacePage() {
                   });
                 }}
               />
+            ) : (
+              <div />
             )}
             <FindOrCreateBar />
           </div>
@@ -152,7 +156,7 @@ const EmptyState = () => {
     <div
       className={`
                 w-full
-                max-w-3xl mx-auto
+                max-w-3xl
                 overflow-y-scroll       
                 relative
                 no-scrollbar

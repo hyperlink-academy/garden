@@ -92,7 +92,7 @@ export const Desktop = () => {
         onClose={() => setCreateCard(null)}
         desktopEntity={homeEntity[0]?.entity}
       />
-      <div className="w-[352px] flex flex-col gap-0 items-stretch relative">
+      <div className="w-[352px] flex flex-col gap-0 items-stretch relative sm:mb-8 mb-4">
         <div className="desktopBackground absolute w-full h-full" />
         <div
           onClick={(e) => {
