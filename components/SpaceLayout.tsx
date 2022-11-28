@@ -47,12 +47,9 @@ export const SpaceLayout: React.FC = (props) => {
               {!session.session ? (
                 <div />
               ) : (
-                <div className="z-10">
+                <div className="z-10 bg-white py-1 px-2 rounded-md text-accent-blue hover:bg-bg-blue">
                   <Link href={`/s/${session.session.username}`}>
-                    <ButtonSecondary
-                      content={"studio"}
-                      icon={<ExitDoor />}
-                    ></ButtonSecondary>
+                    <ExitDoor />
                   </Link>
                 </div>
               )}
