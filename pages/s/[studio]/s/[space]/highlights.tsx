@@ -1,22 +1,15 @@
-import { Carousel } from "components/CardCarousel";
+import { ButtonPrimary } from "components/Buttons";
 import { CardView } from "components/CardView";
 import { CardViewerContext } from "components/CardViewerContext";
-import { Checkmark, CrossLarge, HighlightNote } from "components/Icons";
-import { Textarea } from "components/Textarea";
-import { useIndex, useMutations } from "hooks/useReplicache";
-import { spacePath } from "hooks/utils";
-import Link from "next/link";
-import { useRouter } from "next/router";
-import { useMemo, useRef, useState } from "react";
+import { Checkmark } from "components/Icons";
+import { useNextHighlight } from "hooks/useNextHighlight";
+import { useMutations } from "hooks/useReplicache";
+import { useRef, useState } from "react";
 import { BackButton } from ".";
 
 export default function HighlightPage() {
-  let { query: q } = useRouter();
-  let time = useMemo(() => {
-    return Date.now() - 24 * 60 * 60 * 1000;
-  }, []);
-
-  let cards = useIndex.at("highlight/time", time);
+  let { memberEntity, mutate } = useMutations();
+  let highlights = useNextHighlight();
   return (
     // TODO for Jared :
     // - If you click a link in the card, the new card will open on top of the original one with a back button to go down the stack
@@ -24,44 +17,41 @@ export default function HighlightPage() {
     // - the note will always show the name and time of the highlighter. if there is a user note that will show too
     // -everything bg-test pink is gonna be in the fun processing bg so wait for that lol
 
-    <div className="highlightCarousel h-full grow flex flex-col gap-4 items-stretch relative py-6">
-      <div className="highlightHeader w-[calc(100%-32px)] max-w-3xl mx-auto flex gap-2">
-        <h2 className="grow">Highlights</h2>
-        <Link href={spacePath(q.studio, q.space)}>
-          <CrossLarge />
-        </Link>
-      </div>
-
-      <Carousel>
-        {cards.length > 0 ? (
-          cards.map(({ entity }) => <HighlightedItem entityID={entity} />)
-        ) : (
-          <EmptyState />
-        )}
-      </Carousel>
+    <div className="highlightCarousel h-full grow flex items-stretch flex-col gap-2">
+      {!memberEntity ? (
+        <EmptyState />
+      ) : (
+        highlights && (
+          <>
+            <HighlightedItem entityID={highlights.current.entity} />
+            <div className="pb-2">
+              <ButtonPrimary
+                content="Next"
+                onClick={async () => {
+                  if (!memberEntity || !highlights) return;
+                  await mutate("assertFact", {
+                    entity: memberEntity,
+                    value: highlights.current.value,
+                    attribute: "member/last-read-highlight",
+                    positions: {},
+                  });
+                }}
+              />
+            </div>
+          </>
+        )
+      )}
     </div>
   );
 }
 
-let useReadState = (entity: string) => {
-  let { memberEntity, mutate } = useMutations();
-  // A highlight is an entity. For every person who has read it we want to store
-  // a ref fact,
-  let readStates = useIndex.eav(entity, "highlight/read-by");
-  let read = !!readStates?.find((f) => f.value.value === memberEntity);
-  return read;
-};
-
 let HighlightedItem = (props: { entityID: string }) => {
   let { memberEntity, mutate, authorized } = useMutations();
-  let read = useReadState(props.entityID);
-  if (read) return null;
-
   return (
     <InlineCardViewer>
       <div
         tabIndex={0}
-        className={`highlightCard h-full w-[calc(100%-32px)] flex flex-col relative max-w-3xl snap-center flex-shrink-0 focus:outline-none `}
+        className={`highlightCard h-full w-full flex flex-col relative max-w-3xl snap-center focus:outline-none `}
       >
         {authorized && (
           <button
@@ -85,53 +75,6 @@ let HighlightedItem = (props: { entityID: string }) => {
         {<CardView entityID={props.entityID} />}
       </div>
     </InlineCardViewer>
-  );
-};
-
-let Note = (props: {
-  entityID: string;
-  onClose: () => void;
-  read: boolean;
-}) => {
-  let note = useIndex.eav(props.entityID, "highlight/note");
-  let time = useIndex.eav(props.entityID, "highlight/time");
-  let member = useIndex.eav(props.entityID, "highlight/by");
-  let memberName = useIndex.eav(member?.value.value || null, "member/name");
-  return (
-    <div
-      className={` 
-                    hightlightNoteExpanded 
-                    absolute z-20
-                     bottom-8 left-0 right-0 
-                    mx-4 p-3 
-                    flex flex-col gap-1
-                    rounded-md 
-                    lightBorder
-                    shadow-drop
-                    ${
-                      props.read
-                        ? "bg-grey-90 text-grey-35 border-grey-80"
-                        : "bg-bg-blue border-accent-blue"
-                    }`}
-    >
-      <div className="flex items-center">
-        <p className="grow text-grey-35">
-          <span className="font-bold">{memberName?.value}</span>{" "}
-          {time && (
-            <span className="italic">
-              {timeSince(Date.now() - parseInt(time.value.value))}
-            </span>
-          )}
-        </p>
-        <button
-          className="rounded-full flex w-8 text-accent-blue items-center justify-center"
-          onClick={() => props.onClose()}
-        >
-          <HighlightNote />
-        </button>
-      </div>
-      <Textarea value={note?.value || ""} previewOnly />
-    </div>
   );
 };
 

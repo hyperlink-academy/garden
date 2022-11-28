@@ -150,6 +150,11 @@ export const DefaultAttributes = {
     unique: false,
     cardinality: "one",
   },
+  "member/last-read-highlight": {
+    type: "timestamp",
+    cardinality: "one",
+    unique: false,
+  },
   "member/name": {
     unique: true,
     type: "string",

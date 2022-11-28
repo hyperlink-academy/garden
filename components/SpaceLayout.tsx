@@ -2,29 +2,20 @@ import { useAuth } from "hooks/useAuth";
 import Link from "next/link";
 import useSWR from "swr";
 import { useRouter } from "next/router";
-import { ExitDoor, MemberAdd, Settings } from "./Icons";
-import { ButtonLink, ButtonSecondary } from "./Buttons";
-import { useContext, useMemo } from "react";
+import { ExitDoor, MemberAdd } from "./Icons";
 import { SmallCardDragContext } from "./DragContext";
 import { spacePath } from "hooks/utils";
-import {
-  ReplicacheContext,
-  scanIndex,
-  useIndex,
-  useMutations,
-  useSpaceID,
-} from "hooks/useReplicache";
-import { useSubscribe } from "replicache-react";
+import { useIndex, useSpaceID } from "hooks/useReplicache";
 import Head from "next/head";
-import { Fact } from "data/Facts";
 import { Disclosure } from "@headlessui/react";
 import { useSmoker } from "./Smoke";
 import { spaceAPI } from "backend/lib/api";
 import { Divider } from "./Layout";
+import { useNextHighlight } from "hooks/useNextHighlight";
 
 export const SpaceLayout: React.FC = (props) => {
   let spaceName = useIndex.aev("this/name")[0];
-  let unreads = useUnreads();
+  let highlight = useNextHighlight();
   let { session } = useAuth();
   let { query } = useRouter();
 
@@ -41,7 +32,7 @@ export const SpaceLayout: React.FC = (props) => {
               className={`
                 max-w-6xl mx-auto sm:px-4 px-2 
                 before:content-[''] before:absolute before:w-[100vw] before:h-14 before:left-0 ${
-                  unreads > 0 ? "before:bg-accent-blue" : "before:bg-grey-35"
+                  highlight ? "before:bg-accent-blue" : "before:bg-grey-35"
                 }`}
             >
               <div className="grid grid-cols-[max-content_auto_max-content]  items-end gap-2 pt-3">
@@ -155,37 +146,4 @@ export const Join = () => {
     );
   }
   return null;
-};
-
-let useUnreads = () => {
-  let rep = useContext(ReplicacheContext);
-  let { memberEntity } = useMutations();
-  let time = useMemo(() => {
-    return Date.now() - 24 * 60 * 60 * 1000;
-  }, []);
-  return useSubscribe(
-    rep?.rep,
-    async (tx) => {
-      if (!memberEntity) return 0;
-      let results = (await tx
-        .scan({
-          indexName: "at",
-          prefix: `highlight/time-`,
-          start: { key: `highlight/time-${time}` },
-        })
-        .values()
-        .toArray()) as Fact<"highlight/time">[];
-      let resultsWithReadStates = await Promise.all(
-        results.map(async (r) => {
-          let read = await scanIndex(tx).eav(r.entity, "highlight/read-by");
-          return read.map((r) => r.value.value);
-        })
-      );
-      return resultsWithReadStates.filter(
-        (f) => memberEntity && !f.includes(memberEntity)
-      ).length;
-    },
-    0,
-    [memberEntity, time]
-  );
 };
