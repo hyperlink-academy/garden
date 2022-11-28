@@ -4,7 +4,7 @@ import React, { Fragment } from "react";
 export const Divider = (props: { dark?: boolean }) => {
   return (
     <div
-      className={`border-t  w-full ${
+      className={`border-t border-l w-full ${
         props.dark ? `border-grey-55` : `border-grey-80`
       }`}
     ></div>

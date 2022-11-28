@@ -92,6 +92,7 @@ export function ButtonTertiary(
 export function ButtonLink(
   props: {
     content: string;
+    onDark?: false | boolean;
     icon?: React.ReactElement;
   } & ButtonProps
 ) {
@@ -99,8 +100,10 @@ export function ButtonLink(
     <button
       {...props}
       {...{ content: undefined, icon: undefined }}
-      className="m-0 text-accent-blue font-bold flex
-  justify-center items-center gap-2 w-max disabled:text-grey-80"
+      className={`m-0 ${
+        props.onDark ? "text-white" : "text-accent-blue"
+      } font-bold flex
+  justify-center items-center gap-2 w-max disabled:text-grey-80`}
     >
       {props.icon ? <span className="">{props.icon}</span> : null}
       <span className="">{props.content}</span>

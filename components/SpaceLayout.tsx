@@ -2,8 +2,8 @@ import { useAuth } from "hooks/useAuth";
 import Link from "next/link";
 import useSWR from "swr";
 import { useRouter } from "next/router";
-import { ExitDoor, Settings } from "./Icons";
-import { ButtonSecondary } from "./Buttons";
+import { ExitDoor, MemberAdd, Settings } from "./Icons";
+import { ButtonLink, ButtonSecondary } from "./Buttons";
 import { useContext, useMemo } from "react";
 import { SmallCardDragContext } from "./DragContext";
 import { spacePath } from "hooks/utils";
@@ -20,6 +20,7 @@ import { Fact } from "data/Facts";
 import { Disclosure } from "@headlessui/react";
 import { useSmoker } from "./Smoke";
 import { spaceAPI } from "backend/lib/api";
+import { Divider } from "./Layout";
 
 export const SpaceLayout: React.FC = (props) => {
   let spaceName = useIndex.aev("this/name")[0];
@@ -38,37 +39,52 @@ export const SpaceLayout: React.FC = (props) => {
           <Disclosure>
             <div
               className={`
-                max-w-6xl h-12 mx-auto sm:px-4 px-2
-                grid grid-cols-[max-content_auto_max-content]  items-center gap-2
-                before:content-[''] before:absolute before:w-[100vw] before:h-12 before:left-0 ${
+                max-w-6xl mx-auto sm:px-4 px-2 
+                before:content-[''] before:absolute before:w-[100vw] before:h-14 before:left-0 ${
                   unreads > 0 ? "before:bg-accent-blue" : "before:bg-grey-35"
                 }`}
             >
-              {!session.session ? (
-                <div />
-              ) : (
-                <div className="z-10 bg-white py-1 px-2 rounded-md text-accent-blue hover:bg-bg-blue">
-                  <Link href={`/s/${session.session.username}`}>
-                    <ExitDoor />
-                  </Link>
+              <div className="grid grid-cols-[max-content_auto_max-content]  items-end gap-2 pt-3">
+                {!session.session ? (
+                  <div className="w-20" />
+                ) : (
+                  <div className="z-10 w-20 ">
+                    <Link href={`/s/${session.session.username}`}>
+                      <div className="py-1 px-2 w-fit rounded-md text-accent-blue bg-white hover:bg-bg-blue">
+                        <ExitDoor />
+                      </div>
+                    </Link>
+                  </div>
+                )}
+                <div className="text-white font-bold mx-auto text-center flex gap-2 grow z-10">
+                  <h2>{spaceName?.value} </h2>
+                  {window.location.href.endsWith("/highlights") ? (
+                    <Link href={`${spacePath(query.studio, query.space)}`}>
+                      <h4 className="font-normal"> See Highlight </h4>
+                    </Link>
+                  ) : (
+                    <Link
+                      href={`${spacePath(
+                        query.studio,
+                        query.space
+                      )}/highlights`}
+                    >
+                      <div className="flex gap-4">
+                        <div className="bg-white text-accent-blue rounded-md py-1 px-2">
+                          Desktop
+                        </div>
+                        <Divider />
+                        <div>Highlight</div>
+                      </div>
+                    </Link>
+                  )}
                 </div>
-              )}
-              <div className="text-white font-bold mx-auto text-center flex gap-2 grow z-10">
-                <Link href={`${spacePath(query.studio, query.space)}`}>
-                  {spaceName?.value}
-                </Link>
 
-                <Disclosure.Button className="text-white">
-                  <Settings />
-                </Disclosure.Button>
-              </div>
-
-              <div className="z-10">
-                <Link
-                  href={`${spacePath(query.studio, query.space)}/highlights`}
-                >
-                  <ButtonSecondary content={"highlights"}></ButtonSecondary>
-                </Link>
+                <div className="z-10 w-20">
+                  <div className="float-right text-white">
+                    <MemberAdd />
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -95,6 +111,10 @@ export const SpaceLayout: React.FC = (props) => {
       </div>
     </>
   );
+};
+
+const SettingsPanel = () => {
+  return <div>hello</div>;
 };
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
