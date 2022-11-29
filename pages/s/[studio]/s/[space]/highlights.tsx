@@ -1,6 +1,6 @@
 import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
 import { CardView } from "components/CardView";
-import { CardViewerContext } from "components/CardViewerContext";
+import { CardViewerContext, useCardViewer } from "components/CardViewerContext";
 import { flag } from "data/Facts";
 import { useNextHighlight } from "hooks/useNextHighlight";
 import {
@@ -32,13 +32,19 @@ export default function HighlightPage() {
         <EmptyState />
       ) : (
         highlights && (
-          <>
-            <HighlightedItem entityID={highlights.current.entity} />
-            <div className="pb-2 flex flex-row justify-between">
-              <ButtonPrimary onClick={nextCard} content={"Next"} />
-              <AddReply highlightedCard={highlights.current.entity} />
-            </div>
-          </>
+          <div
+            className={`highlightCard h-full w-full flex flex-row relative snap-center gap-2`}
+          >
+            <InlineCardViewer>
+              <div className="w-full max-w-xl flex flex-col items-stretch gap-2">
+                <CardView entityID={highlights.current.entity} />
+                <div className="pb-2 flex flex-row justify-between">
+                  <ButtonPrimary onClick={nextCard} content={"Next"} />
+                  <AddReply highlightedCard={highlights.current.entity} />
+                </div>
+              </div>
+            </InlineCardViewer>
+          </div>
         )
       )}
     </div>
@@ -48,6 +54,7 @@ export default function HighlightPage() {
 const AddReply = (props: { highlightedCard: string }) => {
   let rep = useContext(ReplicacheContext);
   let { memberEntity, mutate } = useMutations();
+  let { open } = useCardViewer();
   return (
     <ButtonSecondary
       content={"Add Reply"}
@@ -74,6 +81,7 @@ const AddReply = (props: { highlightedCard: string }) => {
             positions: {},
           });
         }
+        await mutate("createCard", { entityID: newEntity, title: "" });
         await mutate("addCardToSection", {
           cardEntity: newEntity,
           parent: props.highlightedCard,
@@ -82,21 +90,9 @@ const AddReply = (props: { highlightedCard: string }) => {
             eav: position,
           },
         });
+        open({ entityID: newEntity });
       }}
     />
-  );
-};
-
-let HighlightedItem = (props: { entityID: string }) => {
-  return (
-    <div
-      tabIndex={0}
-      className={`highlightCard h-full w-full flex flex-row relative snap-center gap-2`}
-    >
-      <InlineCardViewer>
-        {<CardView entityID={props.entityID} />}
-      </InlineCardViewer>
-    </div>
   );
 };
 
