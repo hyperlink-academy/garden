@@ -91,7 +91,7 @@ let HighlightedItem = (props: { entityID: string }) => {
   return (
     <div
       tabIndex={0}
-      className={`highlightCard h-full w-full flex flex-row relative max-w-3xl snap-center`}
+      className={`highlightCard h-full w-full flex flex-row relative snap-center gap-2`}
     >
       <InlineCardViewer>
         {<CardView entityID={props.entityID} />}
@@ -183,7 +183,7 @@ const InlineCardViewer: React.FC = (props) => {
             ref={ref}
             key={history[0]}
             tabIndex={0}
-            className={`highlightCard h-full w-[calc(100%-32px)] flex flex-col relative max-w-3xl snap-center flex-shrink-0 pb-1.5 focus:outline-none `}
+            className={`highlightCard h-full w-full flex flex-col relative max-w-xl snap-center flex-shrink-0 pb-1.5 focus:outline-none`}
           >
             <div className="cardViewerHeader grid grid-cols-[auto_max-content] items-center gap-4 ">
               <BackButton
