@@ -1,17 +1,19 @@
 import { Fact } from "data/Facts";
 import { useContext } from "react";
 import { useSubscribe } from "replicache-react";
-import { ReplicacheContext, useIndex, useMutations } from "./useReplicache";
+import { ReplicacheContext, scanIndex, useMutations } from "./useReplicache";
 
 export const useNextHighlight = () => {
   let { memberEntity } = useMutations();
-  let lastRead = useIndex.eav(memberEntity, "member/last-read-highlight");
   let rep = useContext(ReplicacheContext);
   return useSubscribe(
     rep?.rep,
     async (tx) => {
       if (!memberEntity) return null;
-      let lastReadTime: Fact<"highlight/time"> | undefined | null;
+      let lastRead = await scanIndex(tx).eav(
+        memberEntity,
+        "member/last-read-highlight"
+      );
       let unreadHighlights = tx
         .scan({
           indexName: "at",
@@ -32,6 +34,6 @@ export const useNextHighlight = () => {
         };
     },
     null,
-    [lastRead, memberEntity]
+    [memberEntity]
   );
 };
