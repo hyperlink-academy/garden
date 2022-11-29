@@ -38,13 +38,15 @@ export const CardStack = (
   return (
     <div className="relative gap-4 w-full flex">
       <div className="relative grow">
-        <AddCard
-          expanded={expandAll || props.cards.length === 0}
-          parent={props.parent}
-          attribute={props.attribute}
-          backlink={props.backlink}
-          positionKey={props.positionKey}
-        />
+        {!props.backlink && (
+          <AddCard
+            expanded={expandAll || props.cards.length === 0}
+            parent={props.parent}
+            attribute={props.attribute}
+            backlink={props.backlink}
+            positionKey={props.positionKey}
+          />
+        )}
         <SortableContext items={props.cards.map((c) => c.id)}>
           {props.cards.map((card, currentIndex) => (
             <Card
@@ -95,18 +97,18 @@ export const CardStack = (
             />
           ))}
         </SortableContext>
-        {props.cards.length === 0 ? (
-          ""
-        ) : (
-          <AddCard
-            expanded={expandAll || props.cards.length === 0}
-            end
-            parent={props.parent}
-            attribute={props.attribute}
-            backlink={props.backlink}
-            positionKey={props.positionKey}
-          />
-        )}
+        {props.cards.length === 0
+          ? ""
+          : !props.backlink && (
+              <AddCard
+                expanded={expandAll || props.cards.length === 0}
+                end
+                parent={props.parent}
+                attribute={props.attribute}
+                backlink={props.backlink}
+                positionKey={props.positionKey}
+              />
+            )}
       </div>
       {props.cards.length === 0 ? null : (
         <div className="cardStackCollapseExpand relative shrink-0 w-4">

@@ -58,35 +58,8 @@ export const CardView = (props: {
   let isDeck = useIndex.eav(props.entityID, "deck");
   let isChat = useIndex.eav(props.entityID, "chat");
   let memberName = useIndex.eav(props.entityID, "member/name");
-  let parentContainer = useRef<HTMLDivElement>(null);
   let { ref } = usePreserveScroll<HTMLDivElement>();
   let { session } = useAuth();
-  let [open, setOpen] = useState<"card" | "backlink">("card");
-
-  let previousOpen = usePrevious(open);
-  useEffect(() => {
-    if (!parentContainer.current) return;
-    let parent = parentContainer.current;
-    let backlinks = parent.children[0];
-    let card = parent.children[2];
-    if (open === "card" && previousOpen === "backlink") {
-      parent.scrollTo({
-        left: 0,
-        top: 0,
-        behavior: "smooth",
-      });
-    }
-    if (open === "backlink" && previousOpen === "card") {
-      let bottomedScrollPosition =
-        backlinks.clientHeight - (parent.clientHeight - card.clientHeight);
-      parent.scrollTo({
-        left: 0,
-        top: bottomedScrollPosition,
-        behavior: "smooth",
-      });
-      (backlinks as HTMLElement).focus();
-    }
-  }, [open]);
 
   // TESTING HIDDEN FEATURE - customizable card styles
   // get sections at top level to check for style customizations
@@ -110,82 +83,43 @@ export const CardView = (props: {
 
   return (
     <div
-      ref={parentContainer}
       className={`
-      w-full
-        cardAndBacklink 
-        max-w-3xl mx-auto
-        h-full
         overflow-y-scroll       
         relative
         no-scrollbar
         snap-y snap-mandatory
-        `}
-      onScroll={(e) => {
-        let wrapperContentHeight = e.currentTarget.scrollHeight;
-        let wrapperHeight = e.currentTarget.clientHeight;
-
-        let bottomedScrollPosition = wrapperContentHeight - wrapperHeight;
-
-        if (e.currentTarget.scrollTop < 1) {
-          setOpen("card");
-          return;
-        }
-        if (
-          e.currentTarget.scrollTop <= bottomedScrollPosition &&
-          e.currentTarget.scrollTop >= bottomedScrollPosition - 1
-        ) {
-          setOpen("backlink");
-        }
-      }}
-    >
-      {/* Backlinks are a sticky div that sits behind another div that contains the card and a big ol empty div. 
-      The card and empty div scroll together above the backlinks.  */}
-      {/* The h calc here determines the height of the card, and therefore, how much of the backlinks will peek out underneath it. 
-      Another calc on the empty div (className =  spacer) determines how much the card will peek in when the backlinks are revealed*/}
-      <div
-        className={`
         card
-        h-[calc(100%-20px)]
-        absolute
-        !z-10
-        left-0
-        top-0
-        right-0
-        snap-start
+        max-w-3xl mx-auto
+        w-full h-full
         flex flex-col gap-0
         ${borderStyles({
           deck: !!isDeck,
           member: !!memberName,
         })}
         `}
-        onClick={() => {
-          setOpen("card");
-        }}
-        style={{
-          color: text_color_value ? text_color_value : undefined,
-          backgroundColor: bg_color_value ? bg_color_value : undefined,
-          borderColor: border_color_value ? border_color_value : undefined,
-          borderWidth: border_width_value ? border_width_value : undefined,
-        }}
-      >
-        {!session?.loggedIn || !memberName ? null : (
-          <>
-            <div className="grid grid-cols-[auto_max-content] items-end text-white px-2 pt-2 pb-1">
-              <Member />
-              <Link href={`/s/${memberName?.value}`}>
-                <small className="justify-self-start">visit studio</small>
-              </Link>
-            </div>
-          </>
-        )}
+      style={{
+        color: text_color_value ? text_color_value : undefined,
+        backgroundColor: bg_color_value ? bg_color_value : undefined,
+        borderColor: border_color_value ? border_color_value : undefined,
+        borderWidth: border_width_value ? border_width_value : undefined,
+      }}
+    >
+      {!session?.loggedIn || !memberName ? null : (
+        <>
+          <div className="grid grid-cols-[auto_max-content] items-end text-white px-2 pt-2 pb-1">
+            <Member />
+            <Link href={`/s/${memberName?.value}`}>
+              <small className="justify-self-start">visit studio</small>
+            </Link>
+          </div>
+        </>
+      )}
 
-        {/* CARD CONTENT HERE */}
-        <div
-          ref={ref}
-          className={`
+      {/* CARD CONTENT HERE */}
+      <div
+        ref={ref}
+        className={`
             cardContent
-        ${open === "card" ? "overflow-y-auto" : "overflow-y-hidden"}
             flex flex-col gap-6          
             no-scrollbar
             w-auto
@@ -195,49 +129,37 @@ export const CardView = (props: {
               member: !!memberName,
             })}
             `}
-        >
-          <div className="cardDefaultSection grid grid-auto-rows gap-3">
-            <div className="cardHeader grid grid-cols-[auto_max-content_max-content] gap-2">
-              <Title entityID={props.entityID} />
-              <div className="">
-                <CardMoreOptionsMenu
-                  onDelete={props.onDelete}
-                  entityID={props.entityID}
-                  referenceFactID={props?.referenceFactID}
-                />
-              </div>
-            </div>
-            <DefaultTextSection entityID={props.entityID} />
-
-            <div className="pb-2">
-              <ImageSection entity={props.entityID} />
-            </div>
-            {!isDeck ? null : <DeckCardList entityID={props.entityID} />}
-
-            <div className="flex gap-2 pt-2">
-              <MakeImage entity={props.entityID} />
-              <MakeDeck entity={props.entityID} />
+      >
+        <div className="cardDefaultSection grid grid-auto-rows gap-3">
+          <div className="cardHeader grid grid-cols-[auto_max-content_max-content] gap-2">
+            <Title entityID={props.entityID} />
+            <div className="">
+              <CardMoreOptionsMenu
+                onDelete={props.onDelete}
+                entityID={props.entityID}
+                referenceFactID={props?.referenceFactID}
+              />
             </div>
           </div>
+          <Backlinks entityID={props.entityID} />
+          <DefaultTextSection entityID={props.entityID} />
 
-          <Sections entityID={props.entityID} />
+          <div className="pb-2">
+            <ImageSection entity={props.entityID} />
+          </div>
+          {!isDeck ? null : <DeckCardList entityID={props.entityID} />}
 
-          <AddSection cardEntity={props.entityID} />
+          <div className="flex gap-2 pt-2">
+            <MakeImage entity={props.entityID} />
+            <MakeDeck entity={props.entityID} />
+          </div>
         </div>
-        {/* END CARD CONTENT */}
-      </div>
 
-      <Backlinks
-        entityID={props.entityID}
-        open={open}
-        onOpen={() => {
-          setOpen("backlink");
-        }}
-      />
-      {/* This is a blank div that allows the card to slide up, revealing the backlinks underneath. 
-      The calc controls how much the card will slide up. 
-      Bigger number, more of the bottom of the card peeks in, Smaller number, less of it peeks in. */}
-      <div className="spacer snap-end h-[calc(100%-48px)]" />
+        <Sections entityID={props.entityID} />
+
+        <AddSection cardEntity={props.entityID} />
+      </div>
+      {/* END CARD CONTENT */}
     </div>
   );
 };

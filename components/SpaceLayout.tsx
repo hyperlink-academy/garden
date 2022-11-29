@@ -2,18 +2,17 @@ import { useAuth } from "hooks/useAuth";
 import Link from "next/link";
 import useSWR from "swr";
 import { useRouter } from "next/router";
-import { ExitDoor, ExpandTiny, Member, MemberAdd } from "./Icons";
+import { ExitDoor, Member } from "./Icons";
 import { SmallCardDragContext } from "./DragContext";
 import { spacePath } from "hooks/utils";
 import { useIndex, useSpaceID } from "hooks/useReplicache";
 import Head from "next/head";
-import { Disclosure } from "@headlessui/react";
 import { useSmoker } from "./Smoke";
 import { spaceAPI } from "backend/lib/api";
 import { Divider, Modal } from "./Layout";
 import { useNextHighlight } from "hooks/useNextHighlight";
 import { useState } from "react";
-import { ButtonPrimary, ButtonSecondary } from "./Buttons";
+import { ButtonSecondary } from "./Buttons";
 import { LogInModal } from "./LoginModal";
 
 export const SpaceLayout: React.FC = (props) => {
