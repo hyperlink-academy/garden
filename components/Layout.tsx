@@ -15,7 +15,7 @@ export const FloatingContainer: React.FC<{ className?: string }> = (props) => {
   return (
     <div
       className={`
-        px-6 py-8
+        px-4 py-4
         border border-grey-80 rounded-md 
         shadow-drop
         bg-white
@@ -44,11 +44,11 @@ export const Modal: React.FC<{ open: boolean; onClose: () => void }> = (
               max-w-md
               overflow-auto
               max-h-[calc(100%-32px)]
-              w-[calc(100%-56px)]
+              w-[calc(100%-32px)]
               `}
       >
         {props.children}
-      </FloatingContainer>{" "}
+      </FloatingContainer>
     </Dialog>
   );
 };
