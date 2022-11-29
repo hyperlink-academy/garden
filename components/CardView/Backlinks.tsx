@@ -1,119 +1,81 @@
+import { Disclosure, Transition } from "@headlessui/react";
+import { useSpring, animated } from "@react-spring/web";
 import { CardStack } from "components/CardStack";
-import { CollapseTiny } from "components/Icons";
-import { ReferenceAttributes } from "data/Attributes";
+import { ExpandTiny } from "components/Icons";
 import { useIndex } from "hooks/useReplicache";
+import { usePrevious } from "hooks/utils";
+import useMeasure from "react-use-measure";
 import { sortByPosition } from "src/position_helpers";
 
-export const Backlinks = (props: {
-  entityID: string;
-  open?: string;
-  onOpen: () => void;
-}) => {
-  let backlinks = useIndex.vae(props.entityID);
-  let sections = Object.keys(
-    backlinks.reduce(
-      (acc, c) => {
-        acc[c.attribute] = true;
-        return acc;
-      },
-      { "deck/contains": true } as { [k in string]: boolean }
-    )
-  ) as (keyof ReferenceAttributes)[];
-
-  // TODO: remove when we add proper chat and activity backlinks
-  sections = sections.filter(
-    (section) => section === "deck/contains" || section.startsWith("section/")
-  );
-
-  return sections.length > 0 ? (
-    <div
-      className={`
-      backlinkWrapper
-      focus:outline-none
-      px-4 
-      sticky
-      top-0
-      left-0
-      right-0
-      z-0
-      h-full
-      rounded-lg
-      bg-[#FFF2D8]
-      mx-auto
-      grid grid-rows-[auto_max-content]
-      
-      `}
-      tabIndex={0}
-      onClick={() => {
-        props.onOpen();
-      }}
-    >
-      <div
-        className={`backlinks  
-        pt-12 py-4 flex flex-col gap-3 h-full overflow-y-scroll no-scrollbar
-     
-        `}
-      >
-        <h3 className="font-bold text-grey-35">References</h3>
-        <ul
-          className={`${props.open === "backlink" ? " " : "pointer-events-none"}
-            flex flex-col gap-4 `}
-        >
-          {sections.map((s) => {
-            return (
-              <BacklinkSection
-                entityID={props.entityID}
-                attribute={s}
-                key={s}
+export const Backlinks = (props: { entityID: string }) => {
+  let backlinks = useIndex.vae(props.entityID, "deck/contains");
+  let homeEntity = useIndex.aev("home");
+  let cards = backlinks
+    .filter((c) => c.entity !== homeEntity[0]?.entity)
+    .sort(sortByPosition("vae"));
+  if (cards.length === 0) return null;
+  return (
+    <Disclosure>
+      {({ open }) => (
+        <div className="bg-bg-blue rounded-md px-4 py-2">
+          <Disclosure.Button className="w-full flex flex-row justify-between">
+            <h4 className="font-bold text-grey-35">
+              {cards.length} Related {cards.length === 1 ? "Card" : "Cards"}
+            </h4>
+            <DropdownArrow open={open} />
+          </Disclosure.Button>
+          <Drawer open={open}>
+            <Disclosure.Panel static>
+              <CardStack
+                parent={props.entityID}
+                cards={cards}
+                backlink
+                positionKey="vae"
+                attribute={"deck/contains"}
               />
-            );
-          })}
-        </ul>
-      </div>
-      <div
-        className={` text-grey-55 flex gap-2 items-center justify-end overflow-hidden transition-all duration-75 ${
-          props.open === "backlink" ? "h-0" : "h-max pb-0.5 pt-1 "
-        } `}
-      >
-        <p className="text-[12px]">references</p>
-        <div className="pt-0.5">
-          <CollapseTiny />
+            </Disclosure.Panel>
+          </Drawer>
         </div>
-      </div>
-    </div>
-  ) : null;
+      )}
+    </Disclosure>
+  );
 };
 
-const BacklinkSection = (props: {
-  entityID: string;
-  attribute: keyof ReferenceAttributes;
-}) => {
-  let backlinkedCards = useIndex.vae(props.entityID, props.attribute);
-  let homeEntity = useIndex.aev("home");
-  let cards =
-    props.attribute === "deck/contains"
-      ? backlinkedCards.filter((c) => c.entity !== homeEntity[0]?.entity)
-      : backlinkedCards;
-
-  let title =
-    props.attribute === "deck/contains" ? (
-      "Decks"
-    ) : (
-      <>
-        <span className="font-bold">{props.attribute.slice(8)}</span>
-        <span className="font-normal"> section of</span>
-      </>
-    );
+const DropdownArrow = (props: { open: boolean }) => {
+  let { r } = useSpring({
+    config: { mass: 0.1, tension: 500, friction: 25 },
+    r: !props.open ? 90 : 0,
+  });
   return (
-    <div className="flex flex-col gap-2">
-      <p className="font-bold text-grey-55">{title}</p>
-      <CardStack
-        parent={props.entityID}
-        cards={cards.sort(sortByPosition("vae"))}
-        backlink
-        positionKey="vae"
-        attribute={props.attribute}
-      />
-    </div>
+    <animated.div
+      className="self-center"
+      style={{ transform: r.to((d) => `rotateZ(${d}deg)`) }}
+    >
+      <ExpandTiny />
+    </animated.div>
+  );
+};
+
+export const Drawer: React.FC<{
+  open: boolean;
+}> = (props) => {
+  const [ref, { height: innerHeight }] = useMeasure();
+  const previousState = usePrevious(props.open);
+  const { height } = useSpring({
+    config: { mass: 0.1, tension: 500, friction: 25 },
+    height: props.open ? innerHeight : 0,
+  });
+
+  return (
+    <animated.div
+      style={{
+        height: props.open && previousState === props.open ? "auto" : height,
+        overflow: "hidden",
+      }}
+    >
+      <Disclosure.Panel static ref={ref} className="pt-2 text-sm">
+        {props.children}
+      </Disclosure.Panel>
+    </animated.div>
   );
 };

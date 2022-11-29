@@ -107,19 +107,21 @@ export function MessageWithIndexes(m: Message) {
 }
 
 export function FactWithIndexes<A extends keyof Attribute>(f: Fact<A>) {
-  let indexes = {
-    at:
-      f.schema.type === `timestamp`
-        ? `${f.attribute}-${(f.value as TimestampeType).value}`
-        : undefined,
+  let indexes: {
+    eav: string;
+    aev: string;
+    at?: string;
+    ave?: string;
+    vae?: string;
+  } = {
     eav: `${f.entity}-${f.attribute}-${f.id}`,
     aev: `${f.attribute}-${f.entity}-${f.id}`,
-    ave: f.schema.unique ? `${f.attribute}-${f.value}` : undefined,
-    vae:
-      f.schema.type === `reference`
-        ? `${(f.value as ReferenceType).value}-${f.attribute}`
-        : undefined,
   };
+  if (f.schema.unique) indexes.ave = `${f.attribute}-${f.value}`;
+  if (f.schema.type === "reference")
+    indexes.vae = `${(f.value as ReferenceType).value}-${f.attribute}`;
+  if (f.schema.type === "timestamp")
+    indexes.at = `${f.attribute}-${(f.value as TimestampeType).value}-${f.id}`;
   return { ...f, indexes };
 }
 
@@ -183,6 +185,7 @@ export const makeReplicache = (args: {
 }) => {
   let rep = new Replicache({
     licenseKey: "l381074b8d5224dabaef869802421225a",
+    schemaVersion: "1.0.1",
     name: args.name,
     pushDelay: 500,
     pusher: args.pusher,

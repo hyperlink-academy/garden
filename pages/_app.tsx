@@ -1,6 +1,7 @@
 import "styles/globals.css";
 import type { AppProps } from "next/app";
 import React from "react";
+import { Analytics } from "@vercel/analytics/react";
 import { AuthProvider } from "hooks/useAuth";
 import { useRouter } from "next/router";
 import { SpaceSpaceProvider } from "components/ReplicacheProvider";
@@ -51,10 +52,10 @@ const SharedProviders: React.FC = (props) => {
           content="minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, user-scalable=no, viewport-fit=cover"
         />
       </Head>
-
       <AuthProvider>
         <SWRCache>{props.children}</SWRCache>
       </AuthProvider>
+      <Analytics />
     </SmokeProvider>
   );
 };
