@@ -1,14 +1,31 @@
-import { ButtonPrimary } from "components/Buttons";
+import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
 import { CardView } from "components/CardView";
 import { CardViewerContext } from "components/CardViewerContext";
+import { flag } from "data/Facts";
 import { useNextHighlight } from "hooks/useNextHighlight";
-import { useMutations } from "hooks/useReplicache";
-import { useRef, useState } from "react";
+import {
+  ReplicacheContext,
+  scanIndex,
+  useMutations,
+} from "hooks/useReplicache";
+import { useContext, useRef, useState } from "react";
+import { generateKeyBetween } from "src/fractional-indexing";
+import { sortByPosition } from "src/position_helpers";
+import { ulid } from "src/ulid";
 import { BackButton } from ".";
 
 export default function HighlightPage() {
   let { memberEntity, mutate } = useMutations();
   let highlights = useNextHighlight();
+  let nextCard = () => {
+    if (!memberEntity || !highlights) return;
+    mutate("assertFact", {
+      entity: memberEntity,
+      value: highlights.current.value.value + "-" + highlights.current.id,
+      attribute: "member/last-read-highlight",
+      positions: {},
+    });
+  };
   return (
     <div className="highlightCarousel h-full grow flex items-stretch flex-col gap-2">
       {!memberEntity || !highlights ? (
@@ -17,22 +34,9 @@ export default function HighlightPage() {
         highlights && (
           <>
             <HighlightedItem entityID={highlights.current.entity} />
-            <div className="pb-2">
-              <ButtonPrimary
-                content={"Next"}
-                onClick={async () => {
-                  if (!memberEntity || !highlights) return;
-                  await mutate("assertFact", {
-                    entity: memberEntity,
-                    value:
-                      highlights.current.value.value +
-                      "-" +
-                      highlights.current.id,
-                    attribute: "member/last-read-highlight",
-                    positions: {},
-                  });
-                }}
-              />
+            <div className="pb-2 flex flex-row justify-between">
+              <ButtonPrimary onClick={nextCard} content={"Next"} />
+              <AddReply highlightedCard={highlights.current.entity} />
             </div>
           </>
         )
@@ -41,16 +45,58 @@ export default function HighlightPage() {
   );
 }
 
+const AddReply = (props: { highlightedCard: string }) => {
+  let rep = useContext(ReplicacheContext);
+  let { memberEntity, mutate } = useMutations();
+  return (
+    <ButtonSecondary
+      content={"Add Reply"}
+      onClick={async () => {
+        if (!memberEntity || !rep?.rep) return;
+        let siblings = await rep.rep.query((tx) =>
+          scanIndex(tx).eav(props.highlightedCard, "deck/contains")
+        );
+
+        let lastPosition = siblings.sort(sortByPosition("eav"))[
+          siblings.length - 1
+        ]?.positions["eav"];
+        let position = generateKeyBetween(lastPosition || null, null);
+
+        let newEntity = ulid();
+        let isDeck = await rep.rep.query((tx) =>
+          scanIndex(tx).eav(props.highlightedCard, "deck")
+        );
+        if (!isDeck) {
+          await mutate("assertFact", {
+            entity: props.highlightedCard,
+            attribute: "deck",
+            value: flag(),
+            positions: {},
+          });
+        }
+        await mutate("addCardToSection", {
+          cardEntity: newEntity,
+          parent: props.highlightedCard,
+          section: "deck/contains",
+          positions: {
+            eav: position,
+          },
+        });
+      }}
+    />
+  );
+};
+
 let HighlightedItem = (props: { entityID: string }) => {
   return (
-    <InlineCardViewer>
-      <div
-        tabIndex={0}
-        className={`highlightCard h-full w-full flex flex-col relative max-w-3xl snap-center focus:outline-none `}
-      >
+    <div
+      tabIndex={0}
+      className={`highlightCard h-full w-full flex flex-row relative max-w-3xl snap-center`}
+    >
+      <InlineCardViewer>
         {<CardView entityID={props.entityID} />}
-      </div>
-    </InlineCardViewer>
+      </InlineCardViewer>
+    </div>
   );
 };
 
