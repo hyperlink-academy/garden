@@ -11,12 +11,14 @@ export const useNextHighlight = () => {
     rep?.rep,
     async (tx) => {
       if (!memberEntity) return null;
+      let lastReadTime: Fact<"highlight/time"> | undefined | null;
       let unreadHighlights = tx
         .scan({
           indexName: "at",
+          prefix: `highlight/time`,
           start: {
             exclusive: true,
-            key: [`highlight/time-${lastRead?.value.value || ""}`],
+            key: [`highlight/time-${lastRead?.value || ""}`],
           },
         })
         .values();

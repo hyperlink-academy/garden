@@ -1,7 +1,6 @@
 import { ButtonPrimary } from "components/Buttons";
 import { CardView } from "components/CardView";
 import { CardViewerContext } from "components/CardViewerContext";
-import { Checkmark } from "components/Icons";
 import { useNextHighlight } from "hooks/useNextHighlight";
 import { useMutations } from "hooks/useReplicache";
 import { useRef, useState } from "react";
@@ -11,14 +10,8 @@ export default function HighlightPage() {
   let { memberEntity, mutate } = useMutations();
   let highlights = useNextHighlight();
   return (
-    // TODO for Jared :
-    // - If you click a link in the card, the new card will open on top of the original one with a back button to go down the stack
-    // - Depending on read state the highlight note will have a different visual style. You can change the state too se the different versions
-    // - the note will always show the name and time of the highlighter. if there is a user note that will show too
-    // -everything bg-test pink is gonna be in the fun processing bg so wait for that lol
-
     <div className="highlightCarousel h-full grow flex items-stretch flex-col gap-2">
-      {!memberEntity ? (
+      {!memberEntity || !highlights ? (
         <EmptyState />
       ) : (
         highlights && (
@@ -26,12 +19,15 @@ export default function HighlightPage() {
             <HighlightedItem entityID={highlights.current.entity} />
             <div className="pb-2">
               <ButtonPrimary
-                content="Next"
+                content={"Next"}
                 onClick={async () => {
                   if (!memberEntity || !highlights) return;
                   await mutate("assertFact", {
                     entity: memberEntity,
-                    value: highlights.current.value,
+                    value:
+                      highlights.current.value.value +
+                      "-" +
+                      highlights.current.id,
                     attribute: "member/last-read-highlight",
                     positions: {},
                   });
@@ -46,32 +42,12 @@ export default function HighlightPage() {
 }
 
 let HighlightedItem = (props: { entityID: string }) => {
-  let { memberEntity, mutate, authorized } = useMutations();
   return (
     <InlineCardViewer>
       <div
         tabIndex={0}
         className={`highlightCard h-full w-full flex flex-col relative max-w-3xl snap-center focus:outline-none `}
       >
-        {authorized && (
-          <button
-            onClick={() => {
-              if (!memberEntity) return;
-              mutate("assertFact", {
-                entity: props.entityID,
-                attribute: "highlight/read-by",
-                value: { type: "reference", value: memberEntity },
-                positions: {},
-              });
-            }}
-            className={`absolute z-20 bottom-16 left-5 rounded-md flex mr-2 h-8 w-8 items-center justify-center shadow-drop 
-                 bg-bg-blue text-accent-blue border border-accent-blue
-                 `}
-          >
-            <Checkmark />
-          </button>
-        )}
-
         {<CardView entityID={props.entityID} />}
       </div>
     </InlineCardViewer>

@@ -151,7 +151,7 @@ export const DefaultAttributes = {
     cardinality: "one",
   },
   "member/last-read-highlight": {
-    type: "timestamp",
+    type: "string",
     cardinality: "one",
     unique: false,
   },
