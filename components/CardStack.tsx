@@ -112,7 +112,7 @@ export const CardStack = (
       </div>
       {props.cards.length === 0 ? null : (
         <div className="cardStackCollapseExpand relative shrink-0 w-4">
-          <div className="sticky top-0 z-20 mt-2 mb-12 pt-3 rotate-90">
+          <div className="sticky top-0 z-20 mt-2 mb-12 pt-3 whitespace-nowrap rotate-90">
             <button
               onClick={() => {
                 setExpandAll((e) => !e);
@@ -212,6 +212,7 @@ const Card = (
             onDelete={() => {
               mutate("retractFact", { id: props.factID });
             }}
+            showRelated={props.backlink}
             entityID={props.entity}
             size={"big"}
             href={`/s/${q.studio}/s/${q.space}/c/${props.entity}`}

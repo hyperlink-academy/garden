@@ -1,3 +1,4 @@
+import { Backlinks } from "components/CardView/Backlinks";
 import { SingleTextSection } from "components/CardView/Sections";
 import { useCardViewer } from "components/CardViewerContext";
 import { GripperBG } from "components/Gripper";
@@ -76,6 +77,7 @@ export const BigCardBody = (props: { entityID: string } & Props) => {
             </a>
           </div>
         </div>
+        {props.showRelated && <Backlinks entityID={props.entityID} />}
 
         {/* Big Card Preview Default Content */}
         <div
