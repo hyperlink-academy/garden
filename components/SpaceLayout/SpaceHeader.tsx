@@ -2,18 +2,18 @@ import { useAuth } from "hooks/useAuth";
 import Link from "next/link";
 import useSWR from "swr";
 import { useRouter } from "next/router";
-import { Cross, ExitDoor, HighlightNote, Member, MemberAdd } from "./Icons";
+import { Cross, ExitDoor, HighlightNote, Member, MemberAdd } from "../Icons";
 import { spacePath } from "hooks/utils";
 import { useIndex, useSpaceID } from "hooks/useReplicache";
-import { Divider, Modal } from "./Layout";
+import { Divider, Modal } from "../Layout";
 import { useNextHighlight } from "hooks/useNextHighlight";
 import { useState } from "react";
-import { ButtonLink, ButtonPrimary, ButtonSecondary } from "./Buttons";
-import { LogInModal } from "./LoginModal";
+import { ButtonLink, ButtonPrimary, ButtonSecondary } from "../Buttons";
+import { LogInModal } from "../LoginModal";
 import { spaceAPI } from "backend/lib/api";
-import { useSmoker } from "./Smoke";
+import { useSmoker } from "../Smoke";
 
-export const Header: React.FC = (props) => {
+export const SpaceHeader: React.FC = (props) => {
   let { session } = useAuth();
   let { query, pathname } = useRouter();
 
@@ -60,7 +60,7 @@ export const Header: React.FC = (props) => {
             {spaceName?.value}
           </p>
           <Modal open={settingsOpen} onClose={() => setSettingsOpen(false)}>
-            <Settings />
+            <Settings onClose={() => setSettingsOpen(false)} />
           </Modal>
           {/* END SPACE NAME */}
 
@@ -125,7 +125,7 @@ export const Header: React.FC = (props) => {
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 
-const Settings = () => {
+const Settings = (props: { onClose: () => void }) => {
   let { session } = useAuth();
   let isMember = useIndex.ave("space/member", session.session?.studio);
   let smoker = useSmoker();
@@ -159,7 +159,9 @@ const Settings = () => {
         <div className="flex justify-between items-center">
           <h3>Space Settings</h3>
 
-          <Cross />
+          <button onClick={props.onClose}>
+            <Cross />
+          </button>
         </div>
         <div className="flex flex-col gap-2">
           <h4>Members</h4>
