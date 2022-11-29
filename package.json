@@ -30,6 +30,7 @@
     "@react-spring/web": "^9.5.0",
     "@rocicorp/undo": "^0.2.0",
     "@use-gesture/react": "^10.2.18",
+    "@vercel/analytics": "^0.1.5",
     "bcryptjs": "^2.4.3",
     "cookie": "^0.4.2",
     "eslint-config-next": "^13.0.1",
