@@ -1,4 +1,4 @@
-import { Menu, Popover, Transition } from "@headlessui/react";
+import { Menu } from "@headlessui/react";
 
 import {
   MoreOptions,
@@ -7,8 +7,6 @@ import {
   Member,
   CardAdd,
   Print,
-  HighlightLampOn,
-  HighlightLampOff,
 } from "components/Icons";
 import { Divider, MenuContainer, MenuItem } from "components/Layout";
 import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
@@ -23,12 +21,9 @@ import { spacePath, usePreserveScroll, usePrevious } from "hooks/utils";
 import Link from "next/link";
 import { useAuth } from "hooks/useAuth";
 import { MakeImage, ImageSection } from "./ImageSection";
-import { Fragment, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
-import { flag, ref } from "data/Facts";
-import { ButtonPrimary } from "components/Buttons";
-import { Textarea } from "components/Textarea";
-import { ulid } from "src/ulid";
+import { flag } from "data/Facts";
 import { MessageInput, Messages } from "pages/s/[studio]/s/[space]/chat";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
@@ -204,7 +199,6 @@ export const CardView = (props: {
           <div className="cardDefaultSection grid grid-auto-rows gap-3">
             <div className="cardHeader grid grid-cols-[auto_max-content_max-content] gap-2">
               <Title entityID={props.entityID} />
-              <HighlightDropdown entityID={props.entityID} />
               <div className="">
                 <CardMoreOptionsMenu
                   onDelete={props.onDelete}
@@ -303,7 +297,6 @@ const ChatCard = (props: {
             <div className="pb-2">
               <Title entityID={props.entityID} />
             </div>
-            <HighlightDropdown entityID={props.entityID} />
             <div className="">
               <CardMoreOptionsMenu
                 onDelete={props.onDelete}
@@ -457,118 +450,5 @@ const CardMoreOptionsMenu = (props: {
         </MenuItem>
       </MenuContainer>
     </Menu>
-  );
-};
-
-const HighlightDropdown = (props: { entityID: string }) => {
-  let [highlightHelp, setHighlightHelp] = useState(false);
-  let [note, setNote] = useState("");
-  let { authorized, mutate, memberEntity } = useMutations();
-  let highlight = useIndex.eav(props.entityID, "highlight/card");
-
-  return (
-    <Popover>
-      {authorized && (
-        <Popover.Button className="cardHighlightButton">
-          {highlight ? <HighlightLampOn /> : <HighlightLampOff />}
-        </Popover.Button>
-      )}
-      <Transition
-        enter="transition ease-out duration-100"
-        enterFrom="transform opacity-0 scale-95"
-        enterTo="transform opacity-100 scale-100"
-        leave="transition ease-in duration-75"
-        leaveFrom="transform opacity-100 scale-100"
-        leaveTo="transform opacity-0 scale-95"
-        className="
-          absolute
-          top-16 right-4 left-4
-          px-4 py-4
-          bg-white
-          lightBorder
-          flex flex-col
-          gap-3
-          shadow-drop
-          justify-items-end 
-          text-right
-          origin-top-right 
-          z-40"
-      >
-        <Popover.Panel>
-          <div className="flex flex-col gap-2">
-            <Textarea
-              placeholder="add a note (optional)"
-              className="lightBorder resize-none w-full p-3 text-left"
-              value={note}
-              onChange={(e) => setNote(e.currentTarget.value)}
-            />
-            <small className="text-right justify-self-end">
-              <span className={note.length > 280 ? "text-accent-red" : ""}>
-                {note.length}
-              </span>
-              /{280}
-            </small>
-          </div>
-          <div className="flex justify-between items-end text-accent-blue">
-            <small onClick={() => setHighlightHelp(!highlightHelp)}>
-              {!highlightHelp ? "What's this?" : "Gotcha!"}
-            </small>
-
-            <Popover.Button
-              as={ButtonPrimary}
-              disabled={note.length > 280}
-              content="Submit"
-              onClick={async () => {
-                if (!memberEntity || note.length > 280) return;
-                let entity = ulid();
-                await mutate("assertFact", [
-                  {
-                    entity,
-                    positions: {},
-                    attribute: "highlight/time",
-                    value: {
-                      type: "unix_seconds",
-                      value: Date.now().toString(),
-                    },
-                  },
-
-                  {
-                    entity,
-                    positions: {},
-                    attribute: "highlight/card",
-                    value: ref(props.entityID),
-                  },
-                  {
-                    entity,
-                    positions: {},
-                    attribute: "highlight/by",
-                    value: ref(memberEntity),
-                  },
-                ]);
-                if (note) {
-                  await mutate("assertFact", {
-                    entity,
-                    attribute: "highlight/note",
-                    value: note,
-                    positions: {},
-                  });
-                }
-              }}
-            />
-          </div>
-          {highlightHelp ? (
-            <div className="lightBorder bg-background p-3 -mt-1">
-              <small>
-                <b>Use a highlight to draw attention to this card.</b>
-                <br />
-                It'll be added to the highlight reel on the desktop with your
-                note where everyone can see it. <br />
-                Highlights fade after 24 hours!
-              </small>
-            </div>
-          ) : null}
-        </Popover.Panel>
-      </Transition>
-    </Popover>
   );
 };
