@@ -9,6 +9,7 @@ import { SpaceLayout } from "components/SpaceLayout";
 import Head from "next/head";
 import { SmokeProvider } from "components/Smoke";
 import { SWRConfig } from "swr";
+import { StudioLayout } from "components/StudioLayout";
 
 export default function App({ Component, pageProps }: AppProps) {
   let router = useRouter();
@@ -31,6 +32,15 @@ export default function App({ Component, pageProps }: AppProps) {
             <Component {...pageProps} />
           </SpaceLayout>
         </SpaceSpaceProvider>
+      </SharedProviders>
+    );
+  }
+  if (router.pathname.startsWith("/s/[studio]")) {
+    return (
+      <SharedProviders>
+        <StudioLayout {...pageProps}>
+          <Component {...pageProps} />
+        </StudioLayout>
       </SharedProviders>
     );
   }

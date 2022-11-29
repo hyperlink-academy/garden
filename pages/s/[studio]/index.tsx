@@ -1,47 +1,31 @@
 import { spaceAPI, workerAPI } from "backend/lib/api";
 import {
   ButtonSecondary,
-  ButtonLink,
   ButtonTertiary,
   ButtonPrimary,
 } from "components/Buttons";
 import { Door, DoorSelector } from "components/DoorSelector";
 import { SpaceNew } from "components/Icons";
 import { Modal } from "components/Layout";
-import { SpaceProvider } from "components/ReplicacheProvider";
 import { SpaceList } from "components/SpacesList";
+import { StudioLayout } from "components/StudioLayout";
 import { useAuth } from "hooks/useAuth";
 import { ReplicacheContext, useIndex, useMutations } from "hooks/useReplicache";
 import { GetStaticPropsContext, InferGetStaticPropsType } from "next";
-import Head from "next/head";
-import Link from "next/link";
-import { useRouter } from "next/router";
 import { useContext, useState } from "react";
 import { sortByPosition } from "src/position_helpers";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 type Props = InferGetStaticPropsType<typeof getStaticProps>;
 export default function StudioPage(props: Props) {
-  let { query } = useRouter();
   if (props.notFound) return <div>404 - studio not found!</div>;
   if (!props.id) return <div>loading </div>;
 
   return (
-    <SpaceProvider id={props.id}>
-      <div className="grid grid-flow-row gap-8 my-6">
-        <div className="flex flex-col gap-2">
-          <div className="flex justify-between">
-            <StudioName />
-            <Logout />
-          </div>
-          <Link href={`/s/${query.studio}/history`}>
-            <ButtonLink content="history" />
-          </Link>
-        </div>
-        <List />
-        <CreateSpace studioSpaceID={props.id} />
-      </div>
-    </SpaceProvider>
+    <>
+      <List />
+      <CreateSpace studioSpaceID={props.id} />
+    </>
   );
 }
 const List = () => {
@@ -56,31 +40,6 @@ const List = () => {
       )}
     />
   );
-};
-
-const StudioName = () => {
-  let name = useIndex.aev("this/name", "")[0];
-  if (!name) return null;
-  return (
-    <>
-      <Head>
-        <title key="title">{name?.value}'s studio</title>
-      </Head>
-      <div>
-        <h1>{name?.value}'s studio</h1>
-      </div>
-    </>
-  );
-};
-
-const Logout = () => {
-  let { session, logout } = useAuth();
-  let router = useRouter();
-  return session.session?.username === router.query.studio ? (
-    <div className="self-center">
-      <ButtonLink content="logout" onClick={() => logout()} />
-    </div>
-  ) : null;
 };
 
 const CreateSpace = (props: { studioSpaceID: string }) => {

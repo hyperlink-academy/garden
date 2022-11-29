@@ -1,39 +1,17 @@
 import { workerAPI } from "backend/lib/api";
-import { ButtonLink } from "components/Buttons";
-import { SpaceProvider } from "components/ReplicacheProvider";
 import { SpaceList } from "components/SpacesList";
-import { useAuth } from "hooks/useAuth";
-import { ReplicacheContext, scanIndex, useIndex } from "hooks/useReplicache";
+import { ReplicacheContext, scanIndex } from "hooks/useReplicache";
 import { GetStaticPropsContext, InferGetStaticPropsType } from "next";
-import Head from "next/head";
-import Link from "next/link";
-import { useRouter } from "next/router";
 import { useContext } from "react";
 import { useSubscribe } from "replicache-react";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 type Props = InferGetStaticPropsType<typeof getStaticProps>;
 export default function StudioPage(props: Props) {
-  let { query } = useRouter();
   if (props.notFound) return <div>404 - studio not found!</div>;
   if (!props.id) return <div>loading </div>;
 
-  return (
-    <SpaceProvider id={props.id}>
-      <div className="grid grid-flow-row gap-8 my-6">
-        <div className="flex flex-col gap-2">
-          <div className="flex justify-between">
-            <StudioName />
-            <Logout />
-          </div>
-          <Link href={`/s/${query.studio}`}>
-            <ButtonLink content="active" />
-          </Link>
-        </div>
-      </div>
-      <List />
-    </SpaceProvider>
-  );
+  return <List />;
 }
 
 const List = () => {
@@ -56,30 +34,6 @@ const List = () => {
   );
 
   return <SpaceList spaces={spaces} />;
-};
-const StudioName = () => {
-  let name = useIndex.aev("this/name", "")[0];
-  if (!name) return null;
-  return (
-    <>
-      <Head>
-        <title key="title">{name?.value}'s studio</title>
-      </Head>
-      <div>
-        <h1>{name?.value}'s studio</h1>
-      </div>
-    </>
-  );
-};
-
-const Logout = () => {
-  let { session, logout } = useAuth();
-  let router = useRouter();
-  return session.session?.username === router.query.studio ? (
-    <div className="self-center">
-      <ButtonLink content="logout" onClick={() => logout()} />
-    </div>
-  ) : null;
 };
 
 export async function getStaticPaths() {
