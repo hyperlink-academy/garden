@@ -17,11 +17,11 @@ import {
 } from "./Sections";
 import { AddSection } from "./AddSection";
 import { Backlinks } from "./Backlinks";
-import { spacePath, usePreserveScroll, usePrevious } from "hooks/utils";
+import { spacePath, usePreserveScroll } from "hooks/utils";
 import Link from "next/link";
 import { useAuth } from "hooks/useAuth";
 import { MakeImage, ImageSection } from "./ImageSection";
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { flag } from "data/Facts";
 import { MessageInput, Messages } from "pages/s/[studio]/s/[space]/chat";
@@ -147,11 +147,10 @@ export const CardView = (props: {
           <div className="pb-2">
             <ImageSection entity={props.entityID} />
           </div>
-          {!isDeck ? null : <DeckCardList entityID={props.entityID} />}
+          <DeckCardList entityID={props.entityID} />
 
           <div className="flex gap-2 pt-2">
             <MakeImage entity={props.entityID} />
-            <MakeDeck entity={props.entityID} />
           </div>
         </div>
 
@@ -287,26 +286,12 @@ const Title = (props: { entityID: string }) => {
 };
 
 const DeckCardList = (props: { entityID: string }) => {
-  let { authorized, mutate } = useMutations();
-
-  let cards = useIndex.eav(props.entityID, "deck/contains");
-  let deck = useIndex.eav(props.entityID, "deck");
   return (
     <div className="flex flex-col justify-center">
       <MultipleReferenceSection
         entityID={props.entityID}
         section="deck/contains"
       />
-      {cards?.length === 0 && authorized ? (
-        <small
-          className="text-grey-55 hover:text-accent-blue w-full text-center"
-          onClick={() => (deck ? mutate("retractFact", { id: deck.id }) : null)}
-        >
-          remove card attacher
-        </small>
-      ) : (
-        ""
-      )}
     </div>
   );
 };

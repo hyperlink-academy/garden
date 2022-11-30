@@ -203,61 +203,14 @@ const updatePositionInDesktop: Mutation<{
 };
 
 const addToOrCreateDeck: Mutation<{
-  targetCardPositionFact: string;
   targetCardEntity: string;
   droppedCardPositionFact: string;
   droppedCardEntity: string;
   desktop: string;
 }> = async (args, ctx) => {
-  let isDeck = await ctx.scanIndex.eav(args.targetCardEntity, "deck");
+  // This now just adds a reference to a card since all cards are kinda decks
   let children = await ctx.scanIndex.eav(args.desktop, "deck/contains");
   let deck = args.targetCardEntity;
-
-  if (!isDeck) {
-    let targetCardPosition = await ctx.scanIndex.eav(
-      args.targetCardPositionFact,
-      "card/position-in"
-    );
-
-    if (targetCardPosition) await ctx.retractFact(targetCardPosition.id);
-    await ctx.retractFact(args.targetCardPositionFact);
-
-    deck = ulid();
-    await ctx.assertFact({
-      entity: deck,
-      attribute: "deck",
-      positions: {},
-      value: { type: "flag" },
-    });
-    let result = await ctx.assertFact({
-      entity: args.desktop,
-      attribute: "deck/contains",
-      positions: {},
-      value: ref(deck),
-    });
-    if (result.success) {
-      console.log(targetCardPosition);
-      await ctx.assertFact({
-        entity: result.factID,
-        attribute: "card/position-in",
-        value: {
-          type: "position",
-          x: targetCardPosition?.value.x || 0,
-          y: targetCardPosition?.value.y || 0,
-          size: targetCardPosition?.value.size || "small",
-          rotation: targetCardPosition?.value.rotation || 0,
-        },
-        positions: {},
-      });
-    }
-    let newPosition = generateKeyBetween(null, null);
-    await ctx.assertFact({
-      entity: deck,
-      attribute: "deck/contains",
-      value: ref(args.targetCardEntity),
-      positions: { eav: newPosition },
-    });
-  }
 
   let existingCards = await ctx.scanIndex.eav(deck, "deck/contains");
   let lastChild = existingCards.sort(sortByPosition("eav"))[
