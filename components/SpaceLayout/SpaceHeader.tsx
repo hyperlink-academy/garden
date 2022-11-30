@@ -2,26 +2,25 @@ import { useAuth } from "hooks/useAuth";
 import Link from "next/link";
 import useSWR from "swr";
 import { useRouter } from "next/router";
-import { Cross, ExitDoor, HighlightNote, Member, MemberAdd } from "../Icons";
+import { ExitDoor, HighlightNote } from "../Icons";
 import { spacePath } from "hooks/utils";
 import { useIndex, useSpaceID } from "hooks/useReplicache";
-import { Divider, Modal } from "../Layout";
 import { useNextHighlight } from "hooks/useNextHighlight";
 import { useState } from "react";
 import { ButtonLink, ButtonPrimary, ButtonSecondary } from "../Buttons";
 import { LogInModal } from "../LoginModal";
 import { spaceAPI } from "backend/lib/api";
 import { useSmoker } from "../Smoke";
+import { Popover } from "@headlessui/react";
+import { animated, useSpring } from "@react-spring/web";
+import useMeasure from "react-use-measure";
+import { Divider, Modal } from "components/Layout";
+import { BaseSmallCard } from "components/CardPreview/SmallCard";
 
-export const SpaceHeader: React.FC = (props) => {
+export const SpaceHeader: React.FC = () => {
   let { session } = useAuth();
-  let { query, pathname } = useRouter();
 
-  let spaceName = useIndex.aev("this/name")[0];
   let newHighlightAvailable = useNextHighlight();
-  let isHighlightPage = pathname.endsWith("/highlights");
-  let [settingsOpen, setSettingsOpen] = useState(false);
-  let [logInOpen, setLogInOpen] = useState(false);
 
   return (
     <div className="pageHeader shrink-0 pb-2 text-white">
@@ -36,96 +35,142 @@ export const SpaceHeader: React.FC = (props) => {
           }`}
       >
         <div className="headerContent flex gap-4 pt-3">
-          {/* EXIT SPACE */}
-          {!session.session ? (
-            <div className="shink-0" />
-          ) : (
-            <div className="shrink-0 z-10 headerBackToStudio">
-              <Link href={`/s/${session.session.username}`}>
-                <div className="pt-1">
-                  <ExitDoor />
-                </div>
-              </Link>
-            </div>
-          )}
-          {/* END EXIT SPACE */}
-
-          {/* SPACE NAME */}
-          <p
-            className="headerSpaceName z-10 pt-1 font-bold grow truncate"
-            onClick={() => {
-              !session.session ? null : setSettingsOpen(!settingsOpen);
-            }}
-          >
-            {spaceName?.value}
-          </p>
-          <Modal open={settingsOpen} onClose={() => setSettingsOpen(false)}>
-            <Settings onClose={() => setSettingsOpen(false)} />
-          </Modal>
-          {/* END SPACE NAME */}
-
-          {/* DESKTOP HIGHLIGHT SWITCHER || LOG IN*/}
+          <BackToStudio studio={session.session?.username} />
+          <SpaceName />
           <div className="z-10 shrink-0 flex gap-4">
-            {!session.session ? (
-              <>
-                <ButtonSecondary
-                  content="Log In"
-                  onClick={() => setLogInOpen(!logInOpen)}
-                />
-
-                <LogInModal
-                  isOpen={logInOpen}
-                  onClose={() => setLogInOpen(false)}
-                />
-              </>
-            ) : (
-              <>
-                <div
-                  className={`${
-                    newHighlightAvailable ? "text-accent-blue" : "text-grey-35"
-                  } flex gap-2 `}
-                >
-                  <div
-                    className={`${
-                      isHighlightPage
-                        ? `bg-transparent border border-transparent hover:border hover:border-white text-white `
-                        : `bg-background text-inherit font-bold`
-                    } rounded-t-md rounded-b-none pt-1 pb-3 px-2`}
-                  >
-                    <Link href={`${spacePath(query.studio, query.space)}`}>
-                      Desktop
-                    </Link>
-                  </div>
-                  <div
-                    className={`${
-                      isHighlightPage
-                        ? `bg-background text-inherit font-bold`
-                        : `bg-transparent border border-transparent hover:border hover:border-white text-white `
-                    } rounded-t-md rounded-b-none  pt-1 pb-3  px-2`}
-                  >
-                    <Link
-                      href={`${spacePath(
-                        query.studio,
-                        query.space
-                      )}/highlights`}
-                    >
-                      <HighlightNote />
-                    </Link>
-                  </div>
-                </div>
-              </>
-            )}
+            {!session.session ? <Login /> : <DesktopHighlightSwitcher />}
           </div>
-          {/* END INVITE LINK + DESKTOP HIGHLIGHT SWITCHER || LOG IN*/}
         </div>
       </div>
     </div>
   );
 };
 
+const SpaceName = () => {
+  return (
+    <Popover className="w-full">
+      {({ open }) => <SpaceNameContent open={open} />}
+    </Popover>
+  );
+};
+
+const SpaceNameContent = (props: { open: boolean }) => {
+  let spaceName = useIndex.aev("this/name")[0];
+  let [ref, { width }] = useMeasure();
+  const [drawerRef, { height: innerHeight }] = useMeasure();
+
+  let { minWidth, height } = useSpring({
+    config: { mass: 0.1, tension: 500, friction: 25 },
+    minWidth: props.open ? 256 : 0,
+    height: props.open ? innerHeight : 0,
+  });
+  return (
+    <animated.div
+      style={{
+        minWidth: minWidth,
+      }}
+      ref={ref}
+      className={`headerSpaceName z-10 pt-1 font-bold grow pb-0.5 relative max-w-md`}
+    >
+      <animated.div
+        style={{
+          width,
+        }}
+        className={`absolute rounded-md hover:border-2 hover:bg-bg-blue hover:text-accent-blue px-2 overflow-hidden bg-accent-blue border-accent-blue ${
+          props.open ? "bg-bg-blue text-accent-blue border-2" : ""
+        }`}
+      >
+        <Popover.Button
+          className={`${props.open ? "" : "truncate"} font-bold outline-none`}
+          style={{
+            width: "inherit",
+            minWidth: props.open ? "256px" : undefined,
+          }}
+        >
+          {spaceName?.value}
+        </Popover.Button>
+        <animated.div
+          style={{
+            height: height,
+            overflow: "hidden",
+          }}
+        >
+          <div ref={drawerRef} className="pb-2">
+            <Settings />
+          </div>
+        </animated.div>
+      </animated.div>
+    </animated.div>
+  );
+};
+
+const BackToStudio = (props: { studio?: string }) => {
+  if (!props.studio) return <div className="shrink-0" />;
+
+  return (
+    <div className="shrink-0 z-10 headerBackToStudio">
+      <Link href={`/s/${props.studio}`}>
+        <div className="pt-1">
+          <ExitDoor />
+        </div>
+      </Link>
+    </div>
+  );
+};
+
+const DesktopHighlightSwitcher = () => {
+  let { query, pathname } = useRouter();
+  let newHighlightAvailable = useNextHighlight();
+  let isHighlightPage = pathname.endsWith("/highlights");
+  return (
+    <>
+      <div
+        className={`${
+          newHighlightAvailable ? "text-accent-blue" : "text-grey-35"
+        } flex gap-2 `}
+      >
+        <div
+          className={`${
+            isHighlightPage
+              ? `bg-transparent border border-transparent hover:border hover:border-white text-white `
+              : `bg-background text-inherit font-bold`
+          } rounded-t-md rounded-b-none pt-1 pb-3 px-2`}
+        >
+          <Link href={`${spacePath(query.studio, query.space)}`}>Desktop</Link>
+        </div>
+        <div
+          className={`${
+            isHighlightPage
+              ? `bg-background text-inherit font-bold`
+              : `bg-transparent border border-transparent hover:border hover:border-white text-white `
+          } rounded-t-md rounded-b-none  pt-1 pb-3  px-2`}
+        >
+          <Link href={`${spacePath(query.studio, query.space)}/highlights`}>
+            <HighlightNote />
+          </Link>
+        </div>
+      </div>
+    </>
+  );
+};
+
+const Login = () => {
+  let [logInOpen, setLogInOpen] = useState(false);
+  return (
+    <>
+      <ButtonSecondary
+        content="Log In"
+        onClick={() => setLogInOpen(!logInOpen)}
+      />
+
+      <LogInModal isOpen={logInOpen} onClose={() => setLogInOpen(false)} />
+    </>
+  );
+};
+
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 
-const Settings = (props: { onClose: () => void }) => {
+const Settings = () => {
   let { session } = useAuth();
   let isMember = useIndex.ave("space/member", session.session?.studio);
   let smoker = useSmoker();
@@ -153,55 +198,50 @@ const Settings = (props: { onClose: () => void }) => {
     smoker({ position: { x: e.clientX, y: e.clientY }, text: "copied!" });
   };
 
-  if (inviteLink) {
-    return (
-      <div className="flex flex-col gap-4">
-        <div className="flex justify-between items-center">
-          <h3>Space Settings</h3>
+  return (
+    <div className="flex flex-col gap-2 pt-2">
+      <Divider />
+      <MembersModal />
+      <ButtonSecondary
+        onClick={(e) => getShareLink(e)}
+        content={"Copy Invite Link"}
+      />
+      <input
+        style={{ display: "none" }}
+        className="grow"
+        readOnly
+        value={inviteLink}
+        onClick={getShareLink}
+      />
+    </div>
+  );
+};
 
-          <button onClick={props.onClose}>
-            <Cross />
-          </button>
-        </div>
-        <div className="flex flex-col gap-2">
-          <h4>Members</h4>
-          <ul>
-            <li className="flex gap-2">
-              <Member /> brendan
-            </li>
-            <li className="flex gap-2">
-              <Member /> jared
-            </li>
-            <li className="flex gap-2">
-              <Member /> celine
-            </li>
-          </ul>
-          <div className="flex flex-col gap-2 text-center bg-bg-blue rounded-md border border-grey-80 p-4 mt-2">
-            <p className="font-bold text-small text-grey-35 ">
-              Share this link to invite new members!
-            </p>
-            <div className="w-full flex flex-col gap-2">
-              <input
-                className="grow"
-                readOnly
-                value={inviteLink}
-                onClick={getShareLink}
-              />
-              <div className="mx-auto h-full">
-                <ButtonSecondary onClick={getShareLink} content="Copy Link" />
+const MembersModal = () => {
+  let [open, setOpen] = useState(false);
+  let members = useIndex.aev("member/name");
+  return (
+    <>
+      <ButtonSecondary content={"See Members"} onClick={() => setOpen(true)} />
+      <Modal open={open} onClose={() => setOpen(false)}>
+        <h2>Members</h2>
+        <div className="flex flex-wrap gap-2 h-full">
+          {members.map((m) => (
+            <Link href={`/s/${encodeURIComponent(m.value)}`}>
+              <div className="w-[160px]">
+                <div className={`relative grow h-full memberCardBorder `}>
+                  <BaseSmallCard
+                    isMember
+                    read={false}
+                    memberName={m.value}
+                    content=""
+                  />
+                </div>
               </div>
-            </div>
-          </div>
+            </Link>
+          ))}
         </div>
-        <Divider />
-        <div className="flex flex-col gap-2 justify-between">
-          Remove yourself permanently from this space?
-          <div className="">
-            <ButtonPrimary destructive content="Leave Space Forever" />
-          </div>
-        </div>
-      </div>
-    );
-  }
-  return null;
+      </Modal>
+    </>
+  );
 };
