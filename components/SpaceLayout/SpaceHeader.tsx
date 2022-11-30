@@ -7,7 +7,7 @@ import { spacePath } from "hooks/utils";
 import { useIndex, useSpaceID } from "hooks/useReplicache";
 import { useNextHighlight } from "hooks/useNextHighlight";
 import { useState } from "react";
-import { ButtonLink, ButtonPrimary, ButtonSecondary } from "../Buttons";
+import { ButtonSecondary } from "../Buttons";
 import { LogInModal } from "../LoginModal";
 import { spaceAPI } from "backend/lib/api";
 import { useSmoker } from "../Smoke";
@@ -36,7 +36,7 @@ export const SpaceHeader: React.FC = () => {
       >
         <div className="headerContent flex gap-4 pt-3">
           <BackToStudio studio={session.session?.username} />
-          <SpaceName />
+          <SpaceName newHighlight={!!newHighlightAvailable} />
           <div className="z-10 shrink-0 flex gap-4">
             {!session.session ? <Login /> : <DesktopHighlightSwitcher />}
           </div>
@@ -46,15 +46,17 @@ export const SpaceHeader: React.FC = () => {
   );
 };
 
-const SpaceName = () => {
+const SpaceName = (props: { newHighlight: boolean }) => {
   return (
     <Popover className="w-full">
-      {({ open }) => <SpaceNameContent open={open} />}
+      {({ open }) => (
+        <SpaceNameContent open={open} newHighlight={props.newHighlight} />
+      )}
     </Popover>
   );
 };
 
-const SpaceNameContent = (props: { open: boolean }) => {
+const SpaceNameContent = (props: { open: boolean; newHighlight: boolean }) => {
   let spaceName = useIndex.aev("this/name")[0];
   let [ref, { width }] = useMeasure();
   const [drawerRef, { height: innerHeight }] = useMeasure();
@@ -76,15 +78,21 @@ const SpaceNameContent = (props: { open: boolean }) => {
         style={{
           width,
         }}
-        className={`absolute rounded-md hover:border-2 hover:bg-bg-blue hover:text-accent-blue px-2 overflow-hidden bg-accent-blue border-accent-blue ${
-          props.open ? "bg-bg-blue text-accent-blue border-2" : ""
+        className={`border-accent-blue absolute rounded-md hover:border-2 hover:bg-bg-blue hover:text-accent-blue px-2 overflow-hidden ${
+          props.open
+            ? "bg-bg-blue text-accent-blue border-2"
+            : props.newHighlight
+            ? "bg-accent-blue"
+            : "bg-grey-35"
         }`}
       >
         <Popover.Button
-          className={`${props.open ? "" : "truncate"} font-bold outline-none`}
+          as="div"
+          className={`${
+            props.open ? "" : "truncate"
+          } font-bold outline-none hover:cursor-pointer`}
           style={{
-            width: "inherit",
-            minWidth: props.open ? "256px" : undefined,
+            minWidth: props.open ? "240px" : undefined,
           }}
         >
           {spaceName?.value}
