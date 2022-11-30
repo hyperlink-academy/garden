@@ -81,7 +81,6 @@ export const Desktop = () => {
         await mutate("addToOrCreateDeck", {
           droppedCardPositionFact: active.id as string,
           droppedCardEntity: active.data.current?.entityID,
-          targetCardPositionFact: over.id as string,
           targetCardEntity: over.data.current?.entityID,
           desktop: homeEntity[0].entity,
         });
