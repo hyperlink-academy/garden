@@ -24,13 +24,16 @@ export const useNextHighlight = () => {
           },
         })
         .values();
-      let currentHighlight = (await unreadHighlights.next()).value as
-        | Fact<"highlight/time">
-        | undefined;
-      if (!currentHighlight) return null;
+      let currentHighlight = (await unreadHighlights.next()) as {
+        value: Fact<"highlight/time"> | undefined;
+        done: boolean;
+      };
+      let next = await unreadHighlights.next();
+      if (!currentHighlight.value) return null;
       else
         return {
-          current: currentHighlight,
+          current: currentHighlight.value,
+          done: !!next.done,
         };
     },
     null,

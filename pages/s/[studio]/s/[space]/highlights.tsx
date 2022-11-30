@@ -39,7 +39,10 @@ export default function HighlightPage() {
               <div className="w-full max-w-xl flex flex-col items-stretch gap-2">
                 <CardView entityID={highlights.current.entity} />
                 <div className="pb-2 flex flex-row justify-between">
-                  <ButtonPrimary onClick={nextCard} content={"Next"} />
+                  <ButtonPrimary
+                    onClick={nextCard}
+                    content={highlights.done ? "Done" : "Next"}
+                  />
                   <AddReply highlightedCard={highlights.current.entity} />
                 </div>
               </div>
