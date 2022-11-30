@@ -1,6 +1,10 @@
 import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
 import { CardView } from "components/CardView";
-import { CardViewerContext, useCardViewer } from "components/CardViewerContext";
+import {
+  CardViewerContext,
+  CardViewerLayout,
+  useCardViewer,
+} from "components/CardViewerContext";
 import { flag } from "data/Facts";
 import { useNextHighlight } from "hooks/useNextHighlight";
 import {
@@ -26,31 +30,31 @@ export default function HighlightPage() {
       positions: {},
     });
   };
-  return (
-    <div className="highlightCarousel h-full grow flex items-stretch flex-col gap-2">
-      {!memberEntity || !highlights ? (
-        <EmptyState />
-      ) : (
-        highlights && (
-          <div
-            className={`highlightCard h-full w-full flex flex-row relative snap-center gap-2`}
-          >
-            <InlineCardViewer>
-              <div className="w-full max-w-xl flex flex-col items-stretch gap-2">
-                <CardView entityID={highlights.current.entity} />
-                <div className="pb-2 flex flex-row justify-between">
-                  <ButtonPrimary
-                    onClick={nextCard}
-                    content={highlights.done ? "Done" : "Next"}
-                  />
-                  <AddReply highlightedCard={highlights.current.entity} />
-                </div>
-              </div>
-            </InlineCardViewer>
+  return !memberEntity || !highlights ? (
+    <EmptyState />
+  ) : (
+    highlights && (
+      <CardViewerLayout>
+        <div
+          className={`cardViewerWrapper 
+          h-full w-[calc(100vw-16px)] max-w-xl 
+           pb-4  md:pb-8 
+          shrink-0 md:shrink        
+          focus:outline-none
+          snap-center touch-pan-x 
+          flex flex-col gap-3 items-stretch`}
+        >
+          <CardView entityID={highlights.current.entity} />
+          <div className="pb-2 flex flex-row justify-between">
+            <ButtonPrimary
+              onClick={nextCard}
+              content={highlights.done ? "Done" : "Next"}
+            />
+            <AddReply highlightedCard={highlights.current.entity} />
           </div>
-        )
-      )}
-    </div>
+        </div>
+      </CardViewerLayout>
+    )
   );
 }
 
