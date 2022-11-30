@@ -11,6 +11,7 @@ export const SpaceLayout: React.FC = (props) => {
     <>
       <Head>
         <title key="title">{spaceName?.value}</title>
+        <meta name="theme-color" content="#0000FF" />
       </Head>
       <div className="pageWrapper flex flex-col sm:gap-4 gap-2 h-screen items-stretch justify-items-center overflow-hidden">
         <SpaceHeader />
