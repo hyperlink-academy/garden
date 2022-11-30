@@ -84,14 +84,13 @@ export const CardView = (props: {
   return (
     <div
       className={`
-        overflow-y-scroll       
-        relative
-        no-scrollbar
-        snap-y snap-mandatory
         card
+        relative
+        overflow-y-scroll       
+        no-scrollbar
         max-w-3xl mx-auto
         w-full h-full
-        flex flex-col gap-0
+        flex flex-col items-stretch
         ${borderStyles({
           deck: !!isDeck,
           member: !!memberName,
@@ -106,7 +105,7 @@ export const CardView = (props: {
     >
       {!session?.loggedIn || !memberName ? null : (
         <>
-          <div className="grid grid-cols-[auto_max-content] items-end text-white px-2 pt-2 pb-1">
+          <div className="grid grid-cols-[auto_max-content] shrink-0 items-end text-white px-2 pt-2 pb-1">
             <Member />
             <Link href={`/s/${memberName?.value}`}>
               <small className="justify-self-start">visit studio</small>
@@ -122,8 +121,9 @@ export const CardView = (props: {
             cardContent
             flex flex-col gap-6          
             no-scrollbar
-            w-auto
             h-full
+            grow
+            overflow-scroll
             ${contentStyles({
               deck: !!isDeck,
               member: !!memberName,

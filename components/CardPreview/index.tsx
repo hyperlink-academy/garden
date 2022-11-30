@@ -57,13 +57,13 @@ export const CardPreview = (
   return (
     <RotateAndResize {...props}>
       <div
-        className={`relative grow h-full ${borderStyles({
-          isDeck,
-          isMember,
-          isChat,
-        })} ${
-          props.isOver ? "rounded-[24px] shadow-[0_0_16px_0_#cccccc]" : ""
-        }`}
+        className={`cardPreviewBorder relative grow overflow-hidden ${borderStyles(
+          {
+            isDeck,
+            isMember,
+            isChat,
+          }
+        )} ${props.isOver ? "rounded-[24px] shadow-[0_0_16px_0_#cccccc]" : ""}`}
       >
         {props.size === "small" ? (
           <SmallCardBody {...props} />
@@ -113,8 +113,10 @@ export const RotateAndResize: React.FC<
       ref={ref}
       style={{}}
       className={`
-      ${props.size === "small" ? "w-[160px] min-h-[6rem]" : "w-full"}
-      grid grid-cols-[auto_min-content] gap-1
+      cardPreviewWrapper
+      ${props.size === "small" ? "w-[160px] h-[6rem]" : "w-full"}
+      grid grid-cols-[auto_min-content] gap-1 
+      h-full
       group
       `}
     >

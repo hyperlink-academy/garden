@@ -26,13 +26,13 @@ export const BigCardBody = (props: { entityID: string } & Props) => {
 
   return (
     <div
-      className={`w-full overflow-hidden h-full flex flex-row pl-0  ${
+      className={`CardPreivewContent grow overflow-hidden h-full flex flex-row pl-0  ${
         isMember ? "py-2 pr-2" : "py-2 pr-3"
       }`}
       style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
     >
       {/* Gripper  */}
-      <div className="pl-1 pr-2 text-grey-80">
+      <div className="cardPreviewGripper pl-1 pr-2 text-grey-80">
         {authorized && props.dragHandleProps ? (
           <div className="h-full">
             <GripperBG
@@ -46,9 +46,9 @@ export const BigCardBody = (props: { entityID: string } & Props) => {
       </div>
 
       {/* Big Card Preview Content Wrapper */}
-      <div className="grid grid-rows-[max-content_auto_max-content] w-full">
+      <div className="cardPreview flex flex-col w-full">
         {/* Big Card Preview Title and GoTo Button*/}
-        <div className={`flex gap-2 items-start`}>
+        <div className={`cardPreviewHeader flex gap-2`}>
           <SingleTextSection
             entityID={props.entityID}
             onKeyPress={(e) => {
@@ -63,14 +63,14 @@ export const BigCardBody = (props: { entityID: string } & Props) => {
             section={isMember ? "member/name" : "card/title"}
             placeholderOnHover={true}
             placeholder="Untitled"
-            className={`font-bold text-md grow ${
+            className={`cardPreviewTitle font-bold text-md grow ${
               isMember ? "text-white" : "text-grey-35"
             } ${!image ? "" : "rounded-[3px] px-1 bg-white/75"}`}
           />
           {isMember ? <div className="shrink-0 text-white">member</div> : ""}
           <div
             onClick={() => open({ entityID: props.entityID })}
-            className="hover:cursor-pointer pt-1"
+            className="cardPreviewGoTo hover:cursor-pointer pt-1"
           >
             <a className={`${isMember ? "text-white" : "text-accent-blue"}`}>
               <GoToPage />
@@ -81,7 +81,7 @@ export const BigCardBody = (props: { entityID: string } & Props) => {
 
         {/* Big Card Preview Default Content */}
         <div
-          className={`${
+          className={` cardPreviewDefaultContent ${
             isMember ? "bg-white rounded-md p-2 pt-1 text-accent-red mt-1" : ""
           }`}
         >
@@ -123,26 +123,11 @@ export const BigCardBody = (props: { entityID: string } & Props) => {
             }}
             section="card/content"
             placeholderOnHover={true}
-            className={`whitespace-pre-wrap truncate leading-tight pt-1  ${
+            className={`cardPreviewDefaultTextContent whitespace-pre-wrap truncate leading-tight pt-1  ${
               !image ? "" : "rounded-[3px] px-1 bg-white/75"
             } `}
           />
         </div>
-
-        {/* Big Card Preview Resize and Rotate */}
-        {sections !== null && sections.length === 0 ? (
-          <div />
-        ) : (
-          <small
-            className={`SectionCounter text-grey-80 ${
-              isMember ? "hover:text-white" : "hover:text-accent-blue"
-            } hover:underline pb-1 pt-2 `}
-          >
-            <a onClick={() => open({ entityID: props.entityID })}>
-              + {sections?.length} sections
-            </a>
-          </small>
-        )}
       </div>
     </div>
   );

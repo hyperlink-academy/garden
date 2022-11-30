@@ -190,6 +190,7 @@ const Card = (
           props.onClick(e);
         }}
         ref={setNodeRef}
+        className={`-mr-4`}
         style={
           !props.last
             ? {
@@ -203,9 +204,8 @@ const Card = (
                 // maxHeight: height,
               }
         }
-        className={`cardWrapper -mr-4`}
       >
-        <div ref={ref} className="">
+        <div ref={ref} className="w-full">
           <CardPreview
             factID={props.factID}
             dragHandleProps={{ listeners, attributes }}
