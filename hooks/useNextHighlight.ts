@@ -28,13 +28,25 @@ export const useNextHighlight = () => {
         value: Fact<"highlight/time"> | undefined;
         done: boolean;
       };
-      let next = await unreadHighlights.next();
-      if (!currentHighlight.value) return null;
-      else
+      while (currentHighlight.value) {
+        let next = (await unreadHighlights.next()) as {
+          value: Fact<"highlight/time"> | undefined;
+          done: boolean;
+        };
+        let creator = await scanIndex(tx).eav(
+          currentHighlight.value.entity,
+          "card/created-by"
+        );
+        if (creator && creator.value.value == memberEntity) {
+          currentHighlight = next;
+          break;
+        }
         return {
           current: currentHighlight.value,
           done: !!next.done,
         };
+      }
+      return null;
     },
     null,
     [memberEntity]
