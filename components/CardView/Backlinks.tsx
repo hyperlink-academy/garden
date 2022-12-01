@@ -1,13 +1,17 @@
 import { Disclosure, Transition } from "@headlessui/react";
 import { useSpring, animated } from "@react-spring/web";
-import { CardStack } from "components/CardStack";
+import { CardPreview } from "components/CardPreview";
 import { ExpandTiny } from "components/Icons";
 import { useIndex } from "hooks/useReplicache";
 import { usePrevious } from "hooks/utils";
 import useMeasure from "react-use-measure";
+import { useRouter } from "next/router";
+
 import { sortByPosition } from "src/position_helpers";
 
 export const Backlinks = (props: { entityID: string }) => {
+  let { query } = useRouter();
+
   let backlinks = useIndex.vae(props.entityID, "deck/contains");
   let homeEntity = useIndex.aev("home");
   let cards = backlinks
@@ -15,29 +19,41 @@ export const Backlinks = (props: { entityID: string }) => {
     .sort(sortByPosition("vae"));
   if (cards.length === 0) return null;
   return (
-    <Disclosure>
-      {({ open }) => (
-        <div className="bg-bg-blue rounded-md px-4 py-2">
-          <Disclosure.Button className="w-full flex flex-row justify-between">
-            <h4 className="font-bold text-grey-35">
-              {cards.length} Related {cards.length === 1 ? "Card" : "Cards"}
-            </h4>
-            <DropdownArrow open={open} />
-          </Disclosure.Button>
-          <Drawer open={open}>
-            <Disclosure.Panel static>
-              <CardStack
-                parent={props.entityID}
-                cards={cards}
-                backlink
-                positionKey="vae"
-                attribute={"deck/contains"}
-              />
-            </Disclosure.Panel>
-          </Drawer>
-        </div>
-      )}
-    </Disclosure>
+    <div className="h-10 ">
+      <CardPreview
+        entityID={props.entityID}
+        size={"big"}
+        href={`/s/${query.studio}/s/${query.space}/c/${props.entityID}`}
+      />
+    </div>
+
+    // <Disclosure>
+    //   {({ open }) => (
+    //     <div
+    //       className="bg-bg-blue rounded-md px-3 py-1 sm:px-4 sm:py-2 border border-grey-80
+    //     "
+    //     >
+    //       <Disclosure.Button className="w-full flex flex-row justify-between">
+    //         <h4 className="font-bold text-grey-35">
+    //           Responding to {cards.length}{" "}
+    //           {cards.length === 1 ? "Card" : "Cards"}
+    //         </h4>
+    //         <DropdownArrow open={open} />
+    //       </Disclosure.Button>
+    //       <Drawer open={open}>
+    //         <Disclosure.Panel static>
+    //           <CardStack
+    //             parent={props.entityID}
+    //             cards={cards}
+    //             backlink
+    //             positionKey="vae"
+    //             attribute={"deck/contains"}
+    //           />
+    //         </Disclosure.Panel>
+    //       </Drawer>
+    //     </div>
+    //   )}
+    // </Disclosure>
   );
 };
 

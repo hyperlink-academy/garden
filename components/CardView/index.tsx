@@ -82,9 +82,13 @@ export const CardView = (props: {
   if (isChat) return <ChatCard {...props} />;
 
   return (
-    <div
-      className={`
+    <div className="flex flex-col items-stretch h-full">
+      <Backlinks entityID={props.entityID} />
+      <div className="mr-4 h-3 border-r border-r-1 border-dashed border-r-grey-55" />
+      <div
+        className={`
         card
+        grow
         relative
         overflow-y-scroll       
         no-scrollbar
@@ -96,28 +100,28 @@ export const CardView = (props: {
           member: !!memberName,
         })}
         `}
-      style={{
-        color: text_color_value ? text_color_value : undefined,
-        backgroundColor: bg_color_value ? bg_color_value : undefined,
-        borderColor: border_color_value ? border_color_value : undefined,
-        borderWidth: border_width_value ? border_width_value : undefined,
-      }}
-    >
-      {!session?.loggedIn || !memberName ? null : (
-        <>
-          <div className="grid grid-cols-[auto_max-content] shrink-0 items-end text-white px-2 pt-2 pb-1">
-            <Member />
-            <Link href={`/s/${memberName?.value}`}>
-              <small className="justify-self-start">visit studio</small>
-            </Link>
-          </div>
-        </>
-      )}
+        style={{
+          color: text_color_value ? text_color_value : undefined,
+          backgroundColor: bg_color_value ? bg_color_value : undefined,
+          borderColor: border_color_value ? border_color_value : undefined,
+          borderWidth: border_width_value ? border_width_value : undefined,
+        }}
+      >
+        {!session?.loggedIn || !memberName ? null : (
+          <>
+            <div className="grid grid-cols-[auto_max-content] shrink-0 items-end text-white px-2 pt-2 pb-1">
+              <Member />
+              <Link href={`/s/${memberName?.value}`}>
+                <small className="justify-self-start">visit studio</small>
+              </Link>
+            </div>
+          </>
+        )}
 
-      {/* CARD CONTENT HERE */}
-      <div
-        ref={ref}
-        className={`
+        {/* CARD CONTENT HERE */}
+        <div
+          ref={ref}
+          className={`
             cardContent
             flex flex-col gap-6          
             no-scrollbar
@@ -129,36 +133,36 @@ export const CardView = (props: {
               member: !!memberName,
             })}
             `}
-      >
-        <div className="cardDefaultSection grid grid-auto-rows gap-3">
-          <div className="cardHeader grid grid-cols-[auto_max-content_max-content] gap-2">
-            <Title entityID={props.entityID} />
-            <div className="">
-              <CardMoreOptionsMenu
-                onDelete={props.onDelete}
-                entityID={props.entityID}
-                referenceFactID={props?.referenceFactID}
-              />
+        >
+          <div className="cardDefaultSection grid grid-auto-rows gap-3">
+            <div className="cardHeader grid grid-cols-[auto_max-content_max-content] gap-2">
+              <Title entityID={props.entityID} />
+              <div className="">
+                <CardMoreOptionsMenu
+                  onDelete={props.onDelete}
+                  entityID={props.entityID}
+                  referenceFactID={props?.referenceFactID}
+                />
+              </div>
+            </div>
+            <DefaultTextSection entityID={props.entityID} />
+
+            <div className="pb-2">
+              <ImageSection entity={props.entityID} />
+            </div>
+            <DeckCardList entityID={props.entityID} />
+
+            <div className="flex gap-2 pt-2">
+              <MakeImage entity={props.entityID} />
             </div>
           </div>
-          <Backlinks entityID={props.entityID} />
-          <DefaultTextSection entityID={props.entityID} />
 
-          <div className="pb-2">
-            <ImageSection entity={props.entityID} />
-          </div>
-          <DeckCardList entityID={props.entityID} />
+          <Sections entityID={props.entityID} />
 
-          <div className="flex gap-2 pt-2">
-            <MakeImage entity={props.entityID} />
-          </div>
+          <AddSection cardEntity={props.entityID} />
         </div>
-
-        <Sections entityID={props.entityID} />
-
-        <AddSection cardEntity={props.entityID} />
+        {/* END CARD CONTENT */}
       </div>
-      {/* END CARD CONTENT */}
     </div>
   );
 };
