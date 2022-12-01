@@ -162,7 +162,7 @@ const FindOrCreateBar = () => {
   let { open: openCard } = useCardViewer();
   let items = useAllItems(open);
 
-  let { authorized, mutate } = useMutations();
+  let { authorized, mutate, memberEntity } = useMutations();
   return (
     <>
       <button className="flex items-center group" onClick={() => setOpen(true)}>
@@ -179,6 +179,7 @@ const FindOrCreateBar = () => {
         onClose={() => setOpen(false)}
         //START OF ON SELECT LOGIC
         onSelect={async (d) => {
+          if (!memberEntity) return;
           let entity;
           if (d.type === "create") {
             entity = ulid();
@@ -195,6 +196,7 @@ const FindOrCreateBar = () => {
               await mutate("createCard", {
                 entityID: entity,
                 title: d.name,
+                memberEntity,
               });
             }
           } else {

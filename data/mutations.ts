@@ -281,10 +281,17 @@ const addCardToSection: Mutation<{
   });
 };
 
-const createCard: Mutation<{ entityID: string; title: string }> = async (
-  args,
-  ctx
-) => {
+const createCard: Mutation<{
+  entityID: string;
+  title: string;
+  memberEntity: string;
+}> = async (args, ctx) => {
+  await ctx.assertFact({
+    entity: args.entityID,
+    attribute: "card/created-by",
+    value: ref(args.memberEntity),
+    positions: {},
+  });
   await ctx.assertFact({
     entity: args.entityID,
     attribute: "highlight/time",

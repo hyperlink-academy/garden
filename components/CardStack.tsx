@@ -264,7 +264,7 @@ const AddCard = (props: { expanded: boolean; end?: boolean } & StackData) => {
   const alreadyInEAV = useIndex.eav(props.parent, props.attribute);
 
   let rep = useContext(ReplicacheContext);
-  let { authorized, mutate } = useMutations();
+  let { authorized, mutate, memberEntity } = useMutations();
   if (!authorized) return null;
   return (
     <>
@@ -300,7 +300,7 @@ const AddCard = (props: { expanded: boolean; end?: boolean } & StackData) => {
         onClose={() => setOpen(false)}
         //START OF ON SELECT LOGIC
         onSelect={async (d) => {
-          if (!rep?.rep) return;
+          if (!rep?.rep || !memberEntity) return;
           // if youre adding to a backlink section, then the entity is a string
           // if youre creating a new deck
           let entity: string;
@@ -315,12 +315,11 @@ const AddCard = (props: { expanded: boolean; end?: boolean } & StackData) => {
                 positions: {},
               });
             }
-            if (d.name) {
-              await mutate("createCard", {
-                entityID: entity,
-                title: d.name,
-              });
-            }
+            await mutate("createCard", {
+              entityID: entity,
+              title: d.name,
+              memberEntity,
+            });
           }
           create(entity, props, rep.rep, mutate);
         }}

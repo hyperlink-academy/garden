@@ -87,7 +87,11 @@ const AddReply = (props: { highlightedCard: string }) => {
             positions: {},
           });
         }
-        await mutate("createCard", { entityID: newEntity, title: "" });
+        await mutate("createCard", {
+          entityID: newEntity,
+          title: "",
+          memberEntity,
+        });
         await mutate("addCardToSection", {
           cardEntity: newEntity,
           parent: props.highlightedCard,

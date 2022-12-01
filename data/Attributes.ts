@@ -105,6 +105,11 @@ export const DefaultAttributes = {
     unique: false,
     cardinality: "one",
   },
+  "card/created-by": {
+    type: "reference",
+    unique: false,
+    cardinality: "one",
+  },
   "space/completed": {
     type: "boolean",
     unique: false,

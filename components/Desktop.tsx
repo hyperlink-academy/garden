@@ -255,7 +255,7 @@ const AddCard = (props: {
   position: null | { x: number; y: number };
 }) => {
   let items = useAllItems(!!props.position);
-  let { mutate } = useMutations();
+  let { mutate, memberEntity } = useMutations();
   return (
     <FindOrCreate
       items={items}
@@ -263,7 +263,7 @@ const AddCard = (props: {
       allowBlank={true}
       onClose={() => props.onClose()}
       onSelect={async (d) => {
-        if (!props.position) return;
+        if (!props.position || !memberEntity) return;
         let entity;
         if (d.type === "create") {
           entity = ulid();
@@ -275,12 +275,11 @@ const AddCard = (props: {
               positions: {},
             });
           }
-          if (d.name) {
-            await mutate("createCard", {
-              entityID: entity,
-              title: d.name,
-            });
-          }
+          await mutate("createCard", {
+            entityID: entity,
+            title: d.name,
+            memberEntity,
+          });
         } else {
           entity = d.entity;
         }

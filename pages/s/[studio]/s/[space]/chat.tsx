@@ -364,7 +364,7 @@ const FindOrCreateCard = (props: {
   selected: string[];
 }) => {
   let [open, setOpen] = useState(false);
-  let { mutate } = useMutations();
+  let { mutate, memberEntity } = useMutations();
   let items = useAllItems(open);
 
   return (
@@ -379,12 +379,14 @@ const FindOrCreateCard = (props: {
         items={items}
         selected={props.selected}
         onSelect={async (e) => {
+          if (!memberEntity) return;
           let entity;
           if (e.type === "create") {
             entity = ulid();
             await mutate("createCard", {
               entityID: entity,
               title: e.name,
+              memberEntity,
             });
           } else {
             entity = e.entity;
