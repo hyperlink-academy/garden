@@ -40,7 +40,6 @@ export type Props = {
     listeners?: SyntheticListenerMap;
   };
   onResize?: (size: "big" | "small") => void;
-  href: string;
   showRelated?: boolean;
   isOver?: boolean;
 };

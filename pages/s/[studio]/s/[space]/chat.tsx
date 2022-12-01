@@ -171,19 +171,13 @@ const Message = (props: {
 };
 
 const MessageData = (props: { entity: string }) => {
-  let { studio, space } = useRouter().query;
   let attachedCards = useIndex.eav(props.entity, "message/attachedCard") || [];
 
   return (
     <div className="flex flex-wrap gap-2 pt-2 pb-1">
       {attachedCards?.map((e) => {
         return (
-          <CardPreview
-            size={"small"}
-            entityID={e.value.value}
-            key={e.id}
-            href={``}
-          />
+          <CardPreview size={"small"} entityID={e.value.value} key={e.id} />
         );
       })}
     </div>

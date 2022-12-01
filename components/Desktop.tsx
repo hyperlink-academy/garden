@@ -216,7 +216,6 @@ const DraggableCard = (props: {
           {/* This is the actual card and its buttons. It also handles size */}
           <CardPreview
             factID={props.relationshipID}
-            href={`/s/${q.studio}/s/${q.space}/c/${props.entityID}`}
             onRotateDrag={(da) => {
               mutate("updatePositionInDesktop", {
                 factID: props.relationshipID,

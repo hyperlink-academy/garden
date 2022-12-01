@@ -151,7 +151,6 @@ const Card = (
     attribute: props.attribute,
     positionKey: props.positionKey,
   };
-  let { query: q } = useRouter();
   let { mutate } = useMutations();
   const {
     attributes,
@@ -215,7 +214,6 @@ const Card = (
             showRelated={props.backlink}
             entityID={props.entity}
             size={"big"}
-            href={`/s/${q.studio}/s/${q.space}/c/${props.entity}`}
           />
         </div>
       </animated.div>

@@ -16,7 +16,6 @@ import { useContext, useRef, useState } from "react";
 import { generateKeyBetween } from "src/fractional-indexing";
 import { sortByPosition } from "src/position_helpers";
 import { ulid } from "src/ulid";
-import { BackButton } from ".";
 
 export default function HighlightPage() {
   let { memberEntity, mutate } = useMutations();
@@ -34,7 +33,7 @@ export default function HighlightPage() {
     <EmptyState />
   ) : (
     highlights && (
-      <CardViewerLayout>
+      <CardViewerLayout EmptyState={null}>
         <div
           className={`cardViewerWrapper 
           h-full w-[calc(100vw-16px)] max-w-xl 
@@ -159,51 +158,5 @@ const EmptyState = () => {
         <strong>Let's play the infinite game</strong>.
       </p>
     </div>
-  );
-};
-
-const InlineCardViewer: React.FC = (props) => {
-  let [history, setHistory] = useState([] as string[]);
-
-  let ref = useRef<HTMLDivElement | null>(null);
-
-  return (
-    <CardViewerContext.Provider
-      value={{
-        open: (args) => {
-          setHistory((h) => {
-            if (h[0] === args.entityID) return h;
-            return [args.entityID, ...h];
-          });
-        },
-      }}
-    >
-      <>
-        {props.children}
-
-        {history[0] ? (
-          <div
-            ref={ref}
-            key={history[0]}
-            tabIndex={0}
-            className={`highlightCard h-full w-full flex flex-col relative max-w-xl snap-center flex-shrink-0 pb-1.5 focus:outline-none`}
-          >
-            <div className="cardViewerHeader grid grid-cols-[auto_max-content] items-center gap-4 ">
-              <BackButton
-                history={history}
-                setHistory={setHistory}
-                onFinalClose={() => {}}
-              />
-            </div>
-            <CardView
-              entityID={history[0]}
-              onDelete={() => setHistory((s) => s.slice(1))}
-            />
-          </div>
-        ) : (
-          <></>
-        )}
-      </>
-    </CardViewerContext.Provider>
   );
 };

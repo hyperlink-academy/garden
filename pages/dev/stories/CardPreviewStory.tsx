@@ -35,21 +35,19 @@ const CardPreviewStory = (props: Props) => {
         {stories.default.entities.map((_c, index) => {
           return (
             <>
-              <CardPreview entityID={index.toString()} size="small" href="" />
+              <CardPreview entityID={index.toString()} size="small" />
               <CardPreview
                 entityID={index.toString()}
                 size="small"
-                href=""
                 onResize={() => {}}
                 onRotateDrag={() => {}}
                 dragHandleProps={{}}
               />
-              <CardPreview entityID={index.toString()} size="big" href="" />
+              <CardPreview entityID={index.toString()} size="big" />
 
               <CardPreview
                 entityID={index.toString()}
                 size="big"
-                href=""
                 onResize={() => {}}
                 onRotateDrag={() => {}}
                 dragHandleProps={{}}
