@@ -1,9 +1,4 @@
-import {
-    createProgramInfo,
-    primitives
-} from 'twgl.js';
-
-const data = require('../example.json');
+import  { initProgram ,data } from './common'
 
 const parseColor = (color: { r: number, g: number, b: number, a: number }) => {
     return [color.r, color.g, color.b, color.a];
@@ -31,16 +26,6 @@ export const getUniforms = (time: number, canvas: HTMLCanvasElement, textures : 
 };
 
 
-
-const baseVertexShaderSource = `attribute vec4 position;
-    attribute vec2 texcoord;
-    varying vec2 vUv;
-
-    void main() {
-        vUv = texcoord;
-        gl_Position = position;
-}`
-
 const colorFragmentShaderSource = `precision mediump float;
 varying vec2 vUv;
 uniform vec2 resolution;
@@ -66,18 +51,10 @@ vec2 uvN(){return (gl_FragCoord.xy / resolution);}
 vec2 uv(){return (gl_FragCoord.xy / resolution * 2.0 -1.0) * vec2(resolution.x/resolution.y, 1.0);}
 
 vec2 symmetry(vec2 v){
-    if(v.x<0.){
-        v.x=abs(v.x);
-    }
-    if(v.y<0.){
-        v.y=abs(v.y);
-    }
-    if(v.x>1.){
-        v.x=1.-fract(v.x);
-    }
-    if(v.y>1.){
-        v.y=1.-fract(v.y);
-    }
+    v.x=abs(v.x)*float(v.x<0.);
+    v.x+=(1.-fract(v.x))*float(v.x>1.);
+    v.y=abs(v.y)*float(v.y<0.);
+    v.y+=1.-fract(v.y)*float(v.y>1.);
     return v;
 }
   
@@ -88,18 +65,15 @@ void main()
     vec4 pattern=texture2D(texPattern,uvN);
     vec4 prev=texture2D(texTexture,uvN);
     vec4 prev2;
-    if(mode==2){
-        prev2=texture2D(texTexture,symmetry(uvN+off));
-    }
-    if(mode==1){
-        prev2=texture2D(texTexture,fract(uvN+off));
-    }
-    if(mode==0){
-        vec2 v=uvN+off;
-        float inside=float(v.x>0.)*float(v.y>0.)*float(v.x<=1.)*float(v.y<=1.);
-        prev2=texture2D(texTexture,v)*inside;
-    }
+  
+    prev2+=texture2D(texTexture,symmetry(uvN+off))*float(mode==2);
     
+    prev2+=texture2D(texTexture,fract(uvN+off))*float(mode==1);
+    
+    vec2 v=uvN+off;
+    float inside=float(v.x>0.)*float(v.y>0.)*float(v.x<=1.)*float(v.y<=1.);
+    prev2+=texture2D(texTexture,v)*inside*float(mode==0);
+
     vec4 outColor=background;
     
     outColor=mix(outColor,layerZero,shape*1.5*float(toggleLayerZero));
@@ -109,18 +83,8 @@ void main()
     gl_FragColor=outColor;
 }`
 
-export const initProgram = (gl: WebGLRenderingContext) => {
 
-    const programInfo = createProgramInfo(gl, [
-        baseVertexShaderSource,
-        colorFragmentShaderSource
-      ]);
-      
-    
-    var bufferInfo = primitives.createXYQuadBufferInfo(gl);
- 
-    return {
-        programInfo,
-        bufferInfo
-      }
+
+export const init = (gl: WebGLRenderingContext) => {
+    return initProgram(gl, colorFragmentShaderSource);
 }

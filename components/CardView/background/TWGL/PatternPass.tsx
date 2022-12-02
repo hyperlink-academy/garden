@@ -1,30 +1,31 @@
-import  { initProgram ,data } from './common'
-
+import { initProgram, data } from "./common";
 
 export const getUniforms = (time: number, canvas: HTMLCanvasElement) => ({
-    grid: {
-        time: time * data['time'],
-        resolution: [canvas.width, canvas.height],
-        invert: data['pattern-invert'],
-        zoom: data['pattern-zoom'],
-        perspective: data['grid-perspective'],
-        wavysky: data['grid-wavysky'],
-        wavyhorizon: data['grid-wavyhorizon'],
-        grounddensity:data['grid-grounddensity'],
-        thicknessSky: [data['grid-thicknessSky'].x,data['grid-thicknessSky'].y] ,
-        thicknessGround: [data['grid-thicknessGround'].x, data['grid-thicknessGround'].y],
-    },
-    caustics: {
-        time: time * data['time'],
-        zoom: data['pattern-zoom'],
-        brightness: data['caustic-brightness'],
-        contrast: data['caustic-contrast'],
-        blur: data['caustic-blur'],
-        lumaSelection: data['caustic-lumaSelection'],
-        invert: data['pattern-invert'],
-        resolution: [canvas.width, canvas.height]
-    }
-    
+  grid: {
+    time: time * data["time"],
+    resolution: [canvas.width, canvas.height],
+    invert: data["pattern-invert"],
+    zoom: data["pattern-zoom"],
+    perspective: data["grid-perspective"],
+    wavysky: data["grid-wavysky"],
+    wavyhorizon: data["grid-wavyhorizon"],
+    grounddensity: data["grid-grounddensity"],
+    thicknessSky: [data["grid-thicknessSky"].x, data["grid-thicknessSky"].y],
+    thicknessGround: [
+      data["grid-thicknessGround"].x,
+      data["grid-thicknessGround"].y,
+    ],
+  },
+  caustics: {
+    time: time * data["time"],
+    zoom: data["pattern-zoom"],
+    brightness: data["caustic-brightness"],
+    contrast: data["caustic-contrast"],
+    blur: data["caustic-blur"],
+    lumaSelection: data["caustic-lumaSelection"],
+    invert: data["pattern-invert"],
+    resolution: [canvas.width, canvas.height],
+  },
 });
 
 const gridFragmentShaderSource = `precision mediump float;
@@ -79,7 +80,7 @@ void main()
         }
         
         gl_FragColor=vec4(colorOut.rgb,1.);
-    }`
+    }`;
 
 const causticsFragmentShaderSource = `#ifdef GL_FRAGMENT_PRECISION_HIGH
 precision highp float;
@@ -208,15 +209,14 @@ void main()
     vec3 outColor = mix(col,1.-col,invert);
     gl_FragColor=vec4(outColor,1.);
 }
-`
+`;
 
 export const initPrograms = (gl: WebGLRenderingContext) => {
+  const grid = initProgram(gl, gridFragmentShaderSource);
+  const caustics = initProgram(gl, causticsFragmentShaderSource);
 
-    const grid = initProgram(gl, gridFragmentShaderSource);
-    const caustics = initProgram(gl, causticsFragmentShaderSource);
-
-    return {
-        grid,
-        caustics
-    }
-}
+  return {
+    grid,
+    caustics,
+  };
+};

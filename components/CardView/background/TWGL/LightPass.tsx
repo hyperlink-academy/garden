@@ -1,23 +1,21 @@
-
-import  { initProgram, data } from './common'
+import { initProgram, data } from "./common";
 
 export const getUniforms = (time: number, canvas: HTMLCanvasElement) => {
-   
-    return {
+  return {
     light: {
-        time: time * data['time'],
-        peak: data['light-peak'],
-        intensity: data['light-intensity'],
-        resolution: [canvas.width, canvas.height]
+      time: time * data["time"],
+      peak: data["light-peak"],
+      intensity: data["light-intensity"],
+      resolution: [canvas.width, canvas.height],
     },
     shadow: {
-        p: data['shadow-p'],
-        r: data['shadow-r'],
-        border: data['shadow-border'],
-        resolution: [canvas.width, canvas.height]
-    }
-    
-}};
+      p: data["shadow-p"],
+      r: data["shadow-r"],
+      border: data["shadow-border"],
+      resolution: [canvas.width, canvas.height],
+    },
+  };
+};
 
 const lightFragmentShaderSource = `precision mediump float;
 varying vec2 vUv;
@@ -62,7 +60,7 @@ void main() {
         outColor.b+=s;
         
         gl_FragColor=vec4(outColor,1.);
-}`
+}`;
 
 const shadowFragmentShaderSource = `precision mediump float;
     varying vec2 vUv;
@@ -90,16 +88,15 @@ const shadowFragmentShaderSource = `precision mediump float;
         outColor+=smoothstep(0.,border,1.-distance_p(uv,p)-r);
         
         gl_FragColor=vec4(outColor,1.);
-    }`
-
+    }`;
 
 export const initPrograms = (gl: WebGLRenderingContext) => {
+  const light = initProgram(gl, lightFragmentShaderSource);
 
-    const light = initProgram(gl, lightFragmentShaderSource);
-    const shadow = initProgram(gl, shadowFragmentShaderSource);
+  const shadow = initProgram(gl, shadowFragmentShaderSource);
 
-    return {
-        light,
-        shadow
-    }
-}
+  return {
+    light,
+    shadow,
+  };
+};

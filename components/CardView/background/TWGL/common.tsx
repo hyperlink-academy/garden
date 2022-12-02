@@ -1,10 +1,26 @@
 import {
     createProgramInfo,
-    primitives
+    primitives,
+    drawBufferInfo,
+    setBuffersAndAttributes,
+    setUniforms
 } from 'twgl.js';
-export const data = require('../example.json'); 
 
-function createTexture(gl: WebGLRenderingContext, texWidth: number, texHeight: number) {
+export const data = require('../configuration-multicolor-dither-wavy-grid.json'); 
+
+export type Pass = {
+    programInfo: any, //TODO: Check types of createProgramInfo
+}   
+export type BufferInfo = {
+    fbo: WebGLFramebuffer| null,
+    texture:  WebGLTexture | null,
+} 
+
+export type Context = WebGL2RenderingContext | WebGLRenderingContext;
+
+
+
+function createTexture(gl: Context, texWidth: number, texHeight: number) {
     var texture = gl.createTexture();
      gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, texWidth, texHeight, 0,
@@ -17,7 +33,7 @@ function createTexture(gl: WebGLRenderingContext, texWidth: number, texHeight: n
     return texture;
  }
 
-export function createFBO(gl: WebGLRenderingContext, w: number, h: number) {
+export function createFBO(gl: Context, w: number, h: number) {
     const texture = createTexture(gl,w,h); 
     // Create and bind the framebuffer
     const fbo = gl.createFramebuffer();
@@ -31,7 +47,8 @@ export function createFBO(gl: WebGLRenderingContext, w: number, h: number) {
     
 }
 
-export const initProgram = (gl: WebGLRenderingContext, fragmentSource: string) => {
+export const initProgram = (gl: Context, fragmentSource: string) => {
+
     const baseVertexShaderSource = `attribute vec4 position;
     attribute vec2 texcoord;
     varying vec2 vUv;
@@ -44,8 +61,8 @@ export const initProgram = (gl: WebGLRenderingContext, fragmentSource: string) =
     const programInfo = createProgramInfo(gl, [
         baseVertexShaderSource,
         fragmentSource
-      ]);
-    
+    ]);
+   
       var bufferInfo = primitives.createXYQuadBufferInfo(gl);
  
  
@@ -53,4 +70,28 @@ export const initProgram = (gl: WebGLRenderingContext, fragmentSource: string) =
         programInfo,
         bufferInfo
       }
+}
+
+
+export const applyProgramAndRenderToBuffer= function(
+    gl: Context,
+    buffer: BufferInfo,
+    uniforms: any,
+    pass: Pass
+) {
+    const program = pass.programInfo.program as WebGLProgram;
+    const canvas = gl.canvas;
+    //Bind context to program to use
+    gl.useProgram(program);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, buffer.fbo);
+    //Update attributes & uniforms
+   
+    setBuffersAndAttributes(gl, pass.programInfo, pass.bufferInfo);
+    setUniforms(pass.programInfo, uniforms);
+    //Render
+    drawBufferInfo(gl, pass.bufferInfo);
+
+    //Clean 
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.viewport(0, 0, canvas.width, canvas.height); 
 }
