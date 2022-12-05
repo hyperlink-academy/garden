@@ -155,6 +155,11 @@ export const DefaultAttributes = {
     unique: false,
     cardinality: "one",
   },
+  "member/inbox": {
+    type: "reference",
+    cardinality: "many",
+    unique: false,
+  },
   "member/last-read-highlight": {
     type: "string",
     cardinality: "one",
@@ -210,23 +215,11 @@ export const DefaultAttributes = {
     cardinality: "one",
     unique: true,
   },
-  "highlight/read-by": {
-    type: "reference",
-    unique: false,
-    cardinality: "many",
-  },
-  "highlight/card": {
-    type: "reference",
-    cardinality: "one",
-    unique: false,
-  },
   "highlight/time": {
     type: "timestamp",
     cardinality: "one",
     unique: false,
   },
-  "highlight/by": { type: "reference", cardinality: "one", unique: false },
-  "highlight/note": { type: "string", cardinality: "one", unique: false },
   "bot/url": {
     type: "string",
     cardinality: "one",
