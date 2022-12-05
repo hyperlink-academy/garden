@@ -3,16 +3,6 @@
  */
 const nextConfig = {
   /* config options here */
-  webpack: {
-    module: {
-      loaders: [
-          {
-              test: /\.glsl$/,
-              loader: 'webpack-glsl-loader'
-          }
-      ]
-  }
-  },
   reactStrictMode: true,
   async redirects() {
     return [
