@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import { ExitDoor, HighlightNote } from "../Icons";
 import { spacePath } from "hooks/utils";
 import { useIndex, useSpaceID } from "hooks/useReplicache";
-import { useNextHighlight } from "hooks/useNextHighlight";
+import { useInboxState } from "hooks/useInboxState";
 import { useState } from "react";
 import { ButtonSecondary } from "../Buttons";
 import { LogInModal } from "../LoginModal";
@@ -20,7 +20,7 @@ import { BaseSmallCard } from "components/CardPreview/SmallCard";
 export const SpaceHeader: React.FC = () => {
   let { session } = useAuth();
 
-  let newHighlightAvailable = useNextHighlight();
+  let newHighlightAvailable = useInboxState();
 
   return (
     <div className="pageHeader shrink-0 pb-2 text-white">
@@ -128,7 +128,7 @@ const BackToStudio = (props: { studio?: string }) => {
 
 const DesktopHighlightSwitcher = () => {
   let { query, pathname } = useRouter();
-  let newHighlightAvailable = useNextHighlight();
+  let newHighlightAvailable = useInboxState();
   let isHighlightPage = pathname.endsWith("/highlights");
   return (
     <>

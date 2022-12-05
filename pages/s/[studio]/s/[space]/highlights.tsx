@@ -1,63 +1,76 @@
-import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
-import { CardView } from "components/CardView";
-import {
-  CardViewerContext,
-  CardViewerLayout,
-  useCardViewer,
-} from "components/CardViewerContext";
+import { ButtonSecondary } from "components/Buttons";
+import { CardPreview } from "components/CardPreview";
+import { CardViewerLayout, useCardViewer } from "components/CardViewerContext";
+import { RemoveCard } from "components/Icons";
 import { flag } from "data/Facts";
-import { useNextHighlight } from "hooks/useNextHighlight";
 import {
   ReplicacheContext,
   scanIndex,
+  useIndex,
   useMutations,
 } from "hooks/useReplicache";
-import { useContext, useRef, useState } from "react";
+import { useContext, useEffect } from "react";
 import { generateKeyBetween } from "src/fractional-indexing";
 import { sortByPosition } from "src/position_helpers";
 import { ulid } from "src/ulid";
 
 export default function HighlightPage() {
   let { memberEntity, mutate } = useMutations();
-  let highlights = useNextHighlight();
-  let nextCard = () => {
-    if (!memberEntity || !highlights) return;
-    mutate("assertFact", {
-      entity: memberEntity,
-      value: highlights.current.value.value + "-" + highlights.current.id,
-      attribute: "member/last-read-highlight",
-      positions: {},
-    });
-  };
-  return !memberEntity || !highlights ? (
+  let inbox = useIndex.eav(memberEntity, "member/inbox");
+  let latest = useIndex.eav(memberEntity, "member/last-read-highlight");
+  useEffect(() => {
+    if (!memberEntity) return;
+    let latestInInbox = inbox?.sort((a, b) =>
+      a.lastUpdated < b.lastUpdated ? 1 : -1
+    )[0];
+    if (
+      latestInInbox &&
+      (!latest || latestInInbox.lastUpdated > latest?.value)
+    ) {
+      mutate("assertFact", {
+        entity: memberEntity,
+        value: latestInInbox.lastUpdated,
+        attribute: "member/last-read-highlight",
+        positions: {},
+      });
+    }
+  }, [memberEntity, inbox, latest]);
+  return !memberEntity ? (
     <EmptyState />
   ) : (
-    highlights && (
-      <CardViewerLayout EmptyState={null}>
-        <div
-          className={`cardViewerWrapper 
+    <CardViewerLayout EmptyState={null}>
+      <div
+        className={`cardViewerWrapper 
           h-full w-[calc(100vw-16px)] max-w-xl 
            pb-4  md:pb-8 
-          shrink-0 md:shrink        
           focus:outline-none
           snap-center touch-pan-x 
-          flex flex-col gap-3 items-stretch`}
-        >
-          <CardView entityID={highlights.current.entity} />
-          <div className="pb-2 flex flex-row justify-between">
-            <ButtonPrimary
-              onClick={nextCard}
-              content={highlights.done ? "Done" : "Next"}
-            />
-            <AddReply highlightedCard={highlights.current.entity} />
-          </div>
-        </div>
-      </CardViewerLayout>
-    )
+          flex flex-col gap-3`}
+      >
+        {inbox?.map((f) => {
+          return (
+            <div className="flex flex-col gap-2">
+              <CardPreview entityID={f.value.value} size={"big"} />
+              <div className="flex flex-row justify-between">
+                <button
+                  onClick={() => {
+                    if (!memberEntity) return;
+                    mutate("retractFact", { id: f.id });
+                  }}
+                >
+                  <RemoveCard />
+                </button>
+                <AddReply cardEntity={f.value.value} />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </CardViewerLayout>
   );
 }
 
-const AddReply = (props: { highlightedCard: string }) => {
+const AddReply = (props: { cardEntity: string }) => {
   let rep = useContext(ReplicacheContext);
   let { memberEntity, mutate } = useMutations();
   let { open } = useCardViewer();
@@ -67,7 +80,7 @@ const AddReply = (props: { highlightedCard: string }) => {
       onClick={async () => {
         if (!memberEntity || !rep?.rep) return;
         let siblings = await rep.rep.query((tx) =>
-          scanIndex(tx).eav(props.highlightedCard, "deck/contains")
+          scanIndex(tx).eav(props.cardEntity, "deck/contains")
         );
 
         let lastPosition = siblings.sort(sortByPosition("eav"))[
@@ -77,11 +90,11 @@ const AddReply = (props: { highlightedCard: string }) => {
 
         let newEntity = ulid();
         let isDeck = await rep.rep.query((tx) =>
-          scanIndex(tx).eav(props.highlightedCard, "deck")
+          scanIndex(tx).eav(props.cardEntity, "deck")
         );
         if (!isDeck) {
           await mutate("assertFact", {
-            entity: props.highlightedCard,
+            entity: props.cardEntity,
             attribute: "deck",
             value: flag(),
             positions: {},
@@ -94,7 +107,7 @@ const AddReply = (props: { highlightedCard: string }) => {
         });
         await mutate("addCardToSection", {
           cardEntity: newEntity,
-          parent: props.highlightedCard,
+          parent: props.cardEntity,
           section: "deck/contains",
           positions: {
             eav: position,
