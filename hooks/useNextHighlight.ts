@@ -39,7 +39,7 @@ export const useNextHighlight = () => {
         );
         if (creator && creator.value.value == memberEntity) {
           currentHighlight = next;
-          break;
+          continue;
         }
         return {
           current: currentHighlight.value,
