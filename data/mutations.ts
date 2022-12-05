@@ -292,15 +292,17 @@ const createCard: Mutation<{
     value: ref(args.memberEntity),
     positions: {},
   });
-  await ctx.assertFact({
-    entity: args.entityID,
-    attribute: "highlight/time",
-    value: {
-      type: "unix_seconds",
-      value: Date.now().toString(),
-    },
-    positions: {},
-  });
+  let members = await ctx.scanIndex.aev("member/name");
+  for (let member of members) {
+    if (member.entity !== args.memberEntity) {
+      await ctx.assertFact({
+        entity: member.entity,
+        attribute: "member/inbox",
+        value: ref(args.entityID),
+        positions: {},
+      });
+    }
+  }
   await ctx.assertFact({
     entity: args.entityID,
     attribute: "card/title",
