@@ -16,39 +16,43 @@ export const Backlinks = (props: { entityID: string }) => {
   let { mutate } = useMutations();
   if (cards.length === 0) return null;
   return (
-    <Disclosure>
-      {({ open }) => (
-        <div className="bg-bg-blue rounded-md px-4 py-2">
-          <Disclosure.Button className="w-full flex flex-row justify-between outline-none">
-            <h4 className="font-bold text-grey-35">
-              {cards.length} Related {cards.length === 1 ? "Card" : "Cards"}
-            </h4>
-            <DropdownArrow open={open} />
-          </Disclosure.Button>
-          <Drawer open={open}>
-            <Disclosure.Panel static>
-              {open && (
-                <div className="flex flex-col gap-2">
-                  {cards.map((c) => {
-                    return (
-                      <CardPreview
-                        factID={c.id}
-                        onDelete={() => {
-                          mutate("retractFact", { id: c.id });
-                        }}
-                        showRelated={true}
-                        entityID={c.entity}
-                        size={"big"}
-                      />
-                    );
-                  })}
-                </div>
-              )}
-            </Disclosure.Panel>
-          </Drawer>
-        </div>
-      )}
-    </Disclosure>
+    <div className="grid grid-cols-[auto_max-content] gap-0">
+      <Disclosure>
+        {({ open }) => (
+          <div className="bg-bg-blue border border-grey-90 rounded-md px-4 py-2 mb-3">
+            <Disclosure.Button className="w-full flex flex-row justify-between outline-none text-grey-55">
+              <h4 className="font-bold text-grey-55">
+                Responding to {cards.length}{" "}
+                {cards.length === 1 ? "Card" : "Cards"}
+              </h4>
+              <DropdownArrow open={open} />
+            </Disclosure.Button>
+            <Drawer open={open}>
+              <Disclosure.Panel static>
+                {open && (
+                  <div className="flex flex-col gap-2">
+                    {cards.map((c) => {
+                      return (
+                        <CardPreview
+                          factID={c.id}
+                          onDelete={() => {
+                            mutate("retractFact", { id: c.id });
+                          }}
+                          showRelated={true}
+                          entityID={c.entity}
+                          size={"big"}
+                        />
+                      );
+                    })}
+                  </div>
+                )}
+              </Disclosure.Panel>
+            </Drawer>
+          </div>
+        )}
+      </Disclosure>
+      <div className=" mr-3 h-8 w-3 rounded-tr-md border-t border-t-1 border-r border-r-1 border-dashed border-r-grey-55 self-end " />
+    </div>
   );
 };
 

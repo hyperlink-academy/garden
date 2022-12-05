@@ -84,7 +84,6 @@ export const CardView = (props: {
   return (
     <div className="flex flex-col items-stretch h-full">
       <Backlinks entityID={props.entityID} />
-      <div className="mr-4 h-3 border-r border-r-1 border-dashed border-r-grey-55" />
       <div
         className={`
         card
