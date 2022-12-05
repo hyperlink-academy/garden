@@ -290,7 +290,7 @@ const AddCard = (props: { expanded: boolean; end?: boolean } & StackData) => {
           }
           `}
       >
-        {props.expanded ? "Add Card" : ""}
+        {props.expanded ? "Attach Card" : ""}
         <div className="h-6 pt-1">
           <AddTiny />
         </div>
