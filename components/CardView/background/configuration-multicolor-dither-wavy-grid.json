@@ -1,0 +1,76 @@
+{
+    "time": 0.001,
+    "canvas-width": 500,
+    "canvas-height": 500,
+    "container-width": 500,
+    "container-height": 500,
+    "quality": 1,
+    "shadow": false,
+    "light": true,
+    "shadow-p": 2.0652173913043477,
+    "shadow-r": -0.4782608695652174,
+    "shadow-border": 1.5,
+    "light-peak": 40,
+    "light-intensity": 1,
+    "pattern-invert": 0,
+    "pattern-zoom": 0.30434782608695654,
+    "caustic": false,
+    "grid": true,
+    "caustic-lumaSelection": 0.13043478260869565,
+    "caustic-blur": 0.9130434782608695,
+    "caustic-brightness": 0.5434782608695652,
+    "caustic-contrast": 0.532608695652174,
+    "grid-perspective": 0.05434782608695652,
+    "grid-wavysky": 0.3695652173913043,
+    "grid-wavyhorizon": 0.22826086956521738,
+    "grid-grounddensity": 0.021739130434782608,
+    "grid-thicknessSky": {
+        "x": 2.8000000000000003,
+        "y": 2.9000000000000004
+    },
+    "grid-thicknessGround": {
+        "x": 4.1,
+        "y": 1.4
+    },
+    "texture-invert": 0.1,
+    "diether": true,
+    "moire": false,
+    "texture-flipY": 0.09782608695652174,
+    "moire-polar": false,
+    "moire-freqX": 39.130434782608695,
+    "moire-freqY": 43.47826086956522,
+    "moire-amountX": 0.6195652173913043,
+    "moire-amountY": 0.3804347826086957,
+    "background-color": {
+        "r": 0.7323031176317919,
+        "g": 0.5819580078125,
+        "b": 0.846484375,
+        "a": 1
+    },
+    "layerZero-color": {
+        "r": 0.2875,
+        "g": 0.42983952702702666,
+        "b": 1,
+        "a": 1
+    },
+    "layerZero": true,
+    "layerOne-color": {
+        "r": 1,
+        "g": 0.8008826013513517,
+        "b": 0.26875000000000004,
+        "a": 1
+    },
+    "layerOne": true,
+    "layerTwo-color": {
+        "r": 1,
+        "g": 0.30000000000000004,
+        "b": 0.30768915115134765,
+        "a": 1
+    },
+    "layerTwo": true,
+    "layers-offset": {
+        "x": 0.011,
+        "y": 0.007000000000000006
+    },
+    "name": "multicolor-dither-wavy-grid"
+}
