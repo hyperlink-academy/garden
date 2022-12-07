@@ -1,8 +1,4 @@
-import {
-  drawBufferInfo,
-  setBuffersAndAttributes,
-  setUniforms,
-} from "twgl.js";
+import { drawBufferInfo, setBuffersAndAttributes, setUniforms } from "twgl.js";
 
 import { useEffect, useRef, useState } from "react";
 import {
@@ -26,25 +22,27 @@ import {
   createFBO,
   Context,
   data,
-  Pass,
   BufferInfo,
   applyProgramAndRenderToBuffer,
+  updateFBO,
 } from "./common";
 
+type NoveltyParams = {
+};
+
 type CanvasProps = {
-  width: number | null;
-  height: number | null;
-  quality: number | null;
-  data: any;
+  width: number;
+  height: number;
+  quality: number;
+  novelty: NoveltyParams;
 };
 
 export const Canvas = (props: CanvasProps) => {
   const canvasRef = useRef();
   const localDataRef = useRef();
-
-  const [quality] = useState(props.quality || 1);
   const [context, setContext] = useState<Context>();
-  const [size] = useState({ w: props.width || 500, h: props.height || 500 });
+
+  const { width, height, quality, novelty} = props;
 
   const buffersRef = useRef<BufferInfo[]>();
 
@@ -68,13 +66,12 @@ export const Canvas = (props: CanvasProps) => {
     const secondPass = localData["grid"]
       ? secondPasses.grid
       : secondPasses.caustics;
-  
+
     //Init Programs&Buffers - Layer 2
     const thirdPasses = initTexturePrograms(gl);
     const thirdPass = localData["diether"]
       ? thirdPasses.diether
       : thirdPasses.moire;
- 
 
     //Init Programs&Buffers - Final
     const colorPass = initColorProgram(gl);
@@ -90,14 +87,14 @@ export const Canvas = (props: CanvasProps) => {
       var uniforms;
       var alluniforms;
       var canvas = gl.canvas as HTMLCanvasElement;
-      
+
       const buffer0 = buffers[0];
       const buffer1 = buffers[1];
       const buffer2 = buffers[2];
 
       //----------------------------------
       // Apply P0 and save it in buffer0
-      //Update attributes & uniforms
+      // Update attributes & uniforms
       alluniforms = getLightUniforms(time, gl.canvas);
       uniforms = localData["shadow"] ? alluniforms.shadow : alluniforms.light;
 
@@ -137,18 +134,19 @@ export const Canvas = (props: CanvasProps) => {
     requestAnimationFrame(render);
   };
 
-  const resizeCanvas = (element: HTMLCanvasElement, gl: Context) => {
-    element.width = size.w / quality;
-    element.height = size.h / quality;
+  const resizeCanvas = (canvas: HTMLCanvasElement, gl: Context) => {
+    canvas.width = width / quality;
+    canvas.height = height / quality;
 
-    element.style.width = size.w + "px";
-    element.style.height = size.h + "px";
+    canvas.style.width = width + "px";
+    canvas.style.height =height + "px";
 
-    gl.viewport(0, 0, element.width, element.height);
-
+    gl.viewport(0, 0, width, height);
   };
 
   useEffect(() => {
+    /** Initializing Canvas **/
+
     if (!canvasRef.current) return;
     const canvas = canvasRef.current as HTMLCanvasElement;
 
@@ -169,7 +167,7 @@ export const Canvas = (props: CanvasProps) => {
         canvas.getContext("experimental-webgl", params);
     }
 
-    gl = gl as Context; //FIXME;
+    gl = gl as Context;
 
     setContext(gl);
     resizeCanvas(canvas, gl);
@@ -181,8 +179,38 @@ export const Canvas = (props: CanvasProps) => {
     ];
     localDataRef.current = data;
 
+
     onCanvasLoaded();
   }, [canvasRef.current]);
+
+  useEffect(() => {
+     /** Updating Canvas and cleaning buffers **/
+    if (!canvasRef.current) return;
+    const canvas = canvasRef.current as HTMLCanvasElement;
+    if (!context) return;
+    resizeCanvas(canvas, context);
+
+    if (!buffersRef.current) return;
+    updateFBO(context, canvas.width, canvas.height, buffersRef.current[0]);
+    updateFBO(context, canvas.width, canvas.height, buffersRef.current[1]);
+    updateFBO(context, canvas.width, canvas.height, buffersRef.current[2]);
+    context.viewport(0, 0, canvas.width, canvas.height);
+
+  }, [canvasRef.current, width, height, quality])
+
+  useEffect(() => {
+    const localData = localDataRef.current;
+    if (!localData) return;
+
+    for (let key in novelty) {
+      if (localData[key]) {
+        localData[key] = novelty[key];
+      }
+    }
+  
+
+  }, [localDataRef.current, novelty])
+  
 
   return <canvas ref={canvasRef} />;
 };

@@ -18,8 +18,6 @@ export type BufferInfo = {
 
 export type Context = WebGL2RenderingContext | WebGLRenderingContext;
 
-
-
 function createTexture(gl: Context, texWidth: number, texHeight: number) {
     var texture = gl.createTexture();
      gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -44,6 +42,23 @@ export function createFBO(gl: Context, w: number, h: number) {
         fbo,
         texture
     }
+    
+}
+
+export function updateFBO(gl: Context, w: number, h: number, target: BufferInfo) {
+    if (target.fbo && gl.isFramebuffer(target.fbo)) {
+        gl.deleteFramebuffer(target.fbo);
+    } 
+
+    if (target.texture && gl.isTexture(target.texture)) {
+        gl.deleteTexture(target.texture)
+    }
+
+    gl.clear(gl.DEPTH_BUFFER_BIT);
+   
+    const bufferInfo = createFBO(gl, w, h);
+    target.fbo = bufferInfo.fbo;
+    target.texture = bufferInfo.texture;
     
 }
 
