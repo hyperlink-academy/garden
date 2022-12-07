@@ -1,6 +1,6 @@
-import { initProgram, data } from "./common";
+import { initProgram, Params } from "./common";
 
-export const getUniforms = (time: number, canvas: HTMLCanvasElement) => ({
+export const getUniforms = (data: Params, time: number, canvas: HTMLCanvasElement) => ({
   grid: {
     time: time * data["time"],
     resolution: [canvas.width, canvas.height],

@@ -19,30 +19,31 @@ import {
 } from "./TexturePass";
 
 import {
+  applyProgramAndRenderToBuffer,
+  BufferInfo,
   createFBO,
   Context,
-  data,
-  BufferInfo,
-  applyProgramAndRenderToBuffer,
+  Params,
   updateFBO,
 } from "./common";
-
-type NoveltyParams = {
-};
 
 type CanvasProps = {
   width: number;
   height: number;
   quality: number;
-  novelty: NoveltyParams;
+  novelty: Params;
 };
 
+//TODO: dataURL as a CanvasProps, and load data when mounting canvas 
+const data = require("../configuration-multicolor-dither-wavy-grid.json")
+  
 export const Canvas = (props: CanvasProps) => {
+
   const canvasRef = useRef();
   const localDataRef = useRef();
   const [context, setContext] = useState<Context>();
 
-  const { width, height, quality, novelty} = props;
+  const { width, height, quality, novelty } = props;
 
   const buffersRef = useRef<BufferInfo[]>();
 
@@ -95,14 +96,14 @@ export const Canvas = (props: CanvasProps) => {
       //----------------------------------
       // Apply P0 and save it in buffer0
       // Update attributes & uniforms
-      alluniforms = getLightUniforms(time, gl.canvas);
+      alluniforms = getLightUniforms(localData, time, gl.canvas);
       uniforms = localData["shadow"] ? alluniforms.shadow : alluniforms.light;
 
       applyProgramAndRenderToBuffer(gl, buffer0, uniforms, firstPass);
 
       //----------------------------------
       // Apply P1 and save it in buffer1
-      alluniforms = getPatternUniforms(time, gl.canvas);
+      alluniforms = getPatternUniforms(localData, time, gl.canvas);
       uniforms = localData["grid"] ? alluniforms.grid : alluniforms.caustics;
 
       applyProgramAndRenderToBuffer(gl, buffer1, uniforms, secondPass);
@@ -110,7 +111,7 @@ export const Canvas = (props: CanvasProps) => {
       //----------------------------------
       // Apply P2 and save it in buffer2
       const prevTex = buffer1.texture as WebGLTexture;
-      alluniforms = getTextureUniforms(time, gl.canvas, prevTex);
+      alluniforms = getTextureUniforms(localData, time, gl.canvas, prevTex);
       uniforms = localData["diether"] ? alluniforms.diether : alluniforms.moire;
 
       applyProgramAndRenderToBuffer(gl, buffer2, uniforms, thirdPass);
@@ -119,7 +120,7 @@ export const Canvas = (props: CanvasProps) => {
       // Apply P3 and render to canvas
       gl.useProgram(colorPass.programInfo.program);
 
-      uniforms = getColorUniforms(time, gl.canvas, {
+      uniforms = getColorUniforms(localData, time, gl.canvas, {
         light: buffer0.texture,
         pattern: buffer1.texture,
         texture: buffer2.texture,
@@ -139,7 +140,7 @@ export const Canvas = (props: CanvasProps) => {
     canvas.height = height / quality;
 
     canvas.style.width = width + "px";
-    canvas.style.height =height + "px";
+    canvas.style.height = height + "px";
 
     gl.viewport(0, 0, width, height);
   };
@@ -179,12 +180,11 @@ export const Canvas = (props: CanvasProps) => {
     ];
     localDataRef.current = data;
 
-
     onCanvasLoaded();
   }, [canvasRef.current]);
 
   useEffect(() => {
-     /** Updating Canvas and cleaning buffers **/
+    /** Updating Canvas and cleaning buffers **/
     if (!canvasRef.current) return;
     const canvas = canvasRef.current as HTMLCanvasElement;
     if (!context) return;
@@ -195,8 +195,7 @@ export const Canvas = (props: CanvasProps) => {
     updateFBO(context, canvas.width, canvas.height, buffersRef.current[1]);
     updateFBO(context, canvas.width, canvas.height, buffersRef.current[2]);
     context.viewport(0, 0, canvas.width, canvas.height);
-
-  }, [canvasRef.current, width, height, quality])
+  }, [canvasRef.current, width, height, quality]);
 
   useEffect(() => {
     const localData = localDataRef.current;
@@ -206,11 +205,8 @@ export const Canvas = (props: CanvasProps) => {
       if (localData[key]) {
         localData[key] = novelty[key];
       }
-    }
-  
-
-  }, [localDataRef.current, novelty])
-  
+    }
+  }, [localDataRef.current, novelty]);
 
   return <canvas ref={canvasRef} />;
 };

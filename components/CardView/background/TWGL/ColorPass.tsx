@@ -1,11 +1,11 @@
-import  { initProgram ,data } from './common'
+import  { initProgram ,Params } from './common'
 
 const parseColor = (color: { r: number, g: number, b: number, a: number }) => {
     return [color.r, color.g, color.b, color.a];
     
 };
 
-export const getUniforms = (time: number, canvas: HTMLCanvasElement, textures : {texture: any, light: any, pattern: any}) => {
+export const getUniforms = (data: Params, time: number, canvas: HTMLCanvasElement, textures : {texture: any, light: any, pattern: any}) => {
 
     return {
         time: time * data['time'],
