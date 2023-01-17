@@ -1,7 +1,7 @@
 import { Disclosure } from "@headlessui/react";
 import { useSpring, animated } from "@react-spring/web";
 import { CardPreview } from "components/CardPreview";
-import { ExpandTiny } from "components/Icons";
+import { DisclosureExpandTiny } from "components/Icons";
 import { useIndex, useMutations } from "hooks/useReplicache";
 import useMeasure from "react-use-measure";
 
@@ -66,14 +66,16 @@ const DropdownArrow = (props: { open: boolean }) => {
       className="self-center"
       style={{ transform: r.to((d) => `rotateZ(${d}deg)`) }}
     >
-      <ExpandTiny />
+      <DisclosureExpandTiny />
     </animated.div>
   );
 };
 
-export const Drawer: React.FC<React.PropsWithChildren<{
-  open: boolean;
-}>> = (props) => {
+export const Drawer: React.FC<
+  React.PropsWithChildren<{
+    open: boolean;
+  }>
+> = (props) => {
   const [ref, { height: innerHeight }] = useMeasure();
   const { height } = useSpring({
     config: { mass: 0.1, tension: 500, friction: 25 },

@@ -2,7 +2,7 @@ import { DraggableAttributes } from "@dnd-kit/core";
 import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
 import { useIndex, useMutations } from "hooks/useReplicache";
 import {
-  Cross,
+  CloseLinedTiny,
   DragRotateHandle,
   MakeBigHandle,
   MakeSmallHandle,
@@ -74,7 +74,11 @@ export const CardPreview = (
   );
 };
 
-export const RotateAndResize: React.FC<React.PropsWithChildren<Pick<Props, "onResize" | "onRotateDrag" | "size" | "factID" | "onDelete">>> = (props) => {
+export const RotateAndResize: React.FC<
+  React.PropsWithChildren<
+    Pick<Props, "onResize" | "onRotateDrag" | "size" | "factID" | "onDelete">
+  >
+> = (props) => {
   let ref = useRef<null | HTMLDivElement>(null);
   let bindPinch = usePinch(
     ({ da, memo, first }) => {
@@ -133,7 +137,7 @@ export const RotateAndResize: React.FC<React.PropsWithChildren<Pick<Props, "onRe
                 props.onDelete?.();
               }}
             >
-              <Cross width={12} height={12} />
+              <CloseLinedTiny width={12} height={12} />
             </button>
           ) : null}
           <div>

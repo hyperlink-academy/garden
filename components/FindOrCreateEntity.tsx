@@ -4,12 +4,11 @@ import { useRef, useState } from "react";
 import { boolean } from "zod";
 import { ButtonPrimary } from "./Buttons";
 import {
-  Add,
-  Card,
-  ChatBubble,
-  ChatBubbleSmall,
+  AddSmall,
+  CardSmall,
+  ChatSmall,
   Checkmark,
-  Cross,
+  CloseFilledTiny,
   DeckSmall,
   Member,
 } from "./Icons";
@@ -164,7 +163,7 @@ export const FindOrCreate = (props: {
                           <li className="addedListItem grid grid-cols-[max-content_auto_max-content] gap-2 ">
                             <div className="pt-[1px]">
                               {addedItem.type === "create" ? (
-                                <Card />
+                                <CardSmall />
                               ) : (
                                 props.items.find(
                                   (item) =>
@@ -193,7 +192,7 @@ export const FindOrCreate = (props: {
                                 setAdded([...added]);
                               }}
                             >
-                              <Cross />
+                              <CloseFilledTiny />
                             </button>
                           </li>
                         ))
@@ -332,7 +331,7 @@ const CreateButton = (props: {
                           cursor-pointer`}
                 >
                   <div className="flex flex-row gap-2">
-                    <Add />
+                    <AddSmall />
                     <div>
                       {!props.value
                         ? `Create a blank ${
@@ -350,7 +349,7 @@ const CreateButton = (props: {
                           text-grey-55 font-bold 
                           grid grid-cols-[min-content_auto] gap-2`}
                 >
-                  <Add />
+                  <AddSmall />
                   <div>"{props.value}" already exists</div>
                 </div>
               )}
@@ -379,7 +378,7 @@ const CreateButton = (props: {
                   : "text-accent-blue"
               } ${props.inputExists ? " text-grey-55 " : ""}`}
             >
-              <ChatBubbleSmall className={``} />
+              <ChatSmall className={``} />
             </SearchItem>
           );
         }}
@@ -440,12 +439,14 @@ const SearchResult = (
   );
 };
 
-const SearchItem: React.FC<React.PropsWithChildren<{
-  active: boolean;
-  className?: string;
-  onLongPress: () => void;
-  setMultiSelect: () => void;
-}>> = (props) => {
+const SearchItem: React.FC<
+  React.PropsWithChildren<{
+    active: boolean;
+    className?: string;
+    onLongPress: () => void;
+    setMultiSelect: () => void;
+  }>
+> = (props) => {
   let isLongPress = useRef(false);
   let longPressTimer = useRef<number>();
 
@@ -518,7 +519,7 @@ export const useAllItems = (open: boolean) => {
         icon: !!decks.find((d) => t.entity === d.entity) ? (
           <DeckSmall />
         ) : (
-          <Card />
+          <CardSmall />
         ),
       };
     })

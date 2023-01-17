@@ -1,7 +1,7 @@
 import { ButtonSecondary } from "components/Buttons";
 import { CardPreview } from "components/CardPreview";
 import { CardViewerLayout, useCardViewer } from "components/CardViewerContext";
-import { RemoveCard } from "components/Icons";
+import { RemoveFromHighlight } from "components/Icons";
 import { flag } from "data/Facts";
 import {
   ReplicacheContext,
@@ -58,7 +58,7 @@ export default function HighlightPage() {
                     mutate("retractFact", { id: f.id });
                   }}
                 >
-                  <RemoveCard />
+                  <RemoveFromHighlight />
                 </button>
                 <AddReply cardEntity={f.value.value} />
               </div>

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { LogInModal } from "components/LoginModal";
 import { useState } from "react";
 import { ButtonLink } from "components/Buttons";
-import { ExitDoor } from "components/Icons";
+import { BackToStudio } from "components/Icons";
 import { Modal } from "components/Layout";
 import { useRouter } from "next/router";
 import { LoginForm } from "./login";
@@ -158,7 +158,7 @@ const LoginBar = () => {
       ) : (
         <Link href={`/s/${session.session.username}`}>
           <div className="justify-self-start flex items-center gap-2">
-            <ExitDoor />
+            <BackToStudio />
             <span>Visit my Studio</span>
           </div>
         </Link>
@@ -193,7 +193,7 @@ const LoginBox = () => {
       ) : (
         <Link href={`/s/${session.session.username}`}>
           <div className="justify-self-start flex items-center gap-2">
-            <ExitDoor />
+            <BackToStudio />
             <span>Visit my Studio</span>
           </div>
         </Link>

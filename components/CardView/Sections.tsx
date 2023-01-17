@@ -1,7 +1,12 @@
 import { Menu } from "@headlessui/react";
 import { Textarea } from "components/Textarea";
 
-import { Close, DownArrow, MoreOptions, UpArrow } from "components/Icons";
+import {
+  CloseLinedTiny,
+  ArrowDown,
+  MoreOptions,
+  ArrowUp,
+} from "components/Icons";
 import { MenuContainer, MenuItem } from "components/Layout";
 import { Fact, multipleReferenceSection, singleTextSection } from "data/Facts";
 import { useIndex, useMutations } from "hooks/useReplicache";
@@ -266,16 +271,16 @@ const SectionMoreOptionsMenu = (props: {
             <MenuContainer>
               <MenuItem onClick={() => moveUp()}>
                 <p>Move Up</p>
-                <UpArrow />
+                <ArrowUp />
               </MenuItem>
               <MenuItem onClick={() => moveDown()}>
                 <p>Move Down</p>
-                <DownArrow />
+                <ArrowDown />
               </MenuItem>
               {!empty ? null : (
                 <MenuItem onClick={() => remove()}>
                   <p>Remove</p>
-                  <Close />
+                  <CloseLinedTiny />
                 </MenuItem>
               )}
             </MenuContainer>

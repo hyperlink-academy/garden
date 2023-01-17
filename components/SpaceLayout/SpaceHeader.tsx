@@ -2,7 +2,7 @@ import { useAuth } from "hooks/useAuth";
 import Link from "next/link";
 import useSWR from "swr";
 import { useRouter } from "next/router";
-import { ExitDoor, HighlightNote } from "../Icons";
+import { BackToStudio as BackToStudioIcon, Note } from "../Icons";
 import { spacePath } from "hooks/utils";
 import { useIndex, useSpaceID } from "hooks/useReplicache";
 import { useInboxState } from "hooks/useInboxState";
@@ -119,7 +119,7 @@ const BackToStudio = (props: { studio?: string }) => {
     <div className="shrink-0 z-10 headerBackToStudio">
       <Link href={`/s/${props.studio}`}>
         <div className="pt-1">
-          <ExitDoor />
+          <BackToStudioIcon />
         </div>
       </Link>
     </div>
@@ -154,7 +154,7 @@ const DesktopHighlightSwitcher = () => {
           } rounded-t-md rounded-b-none  pt-1 pb-3  px-2`}
         >
           <Link href={`${spacePath(query.studio, query.space)}/highlights`}>
-            <HighlightNote />
+            <Note />
           </Link>
         </div>
       </div>

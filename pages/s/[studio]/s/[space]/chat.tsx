@@ -10,8 +10,8 @@ import Head from "next/head";
 import { useAuth } from "hooks/useAuth";
 import { Textarea } from "components/Textarea";
 import {
-  Card,
-  Cross,
+  CardSmall,
+  CloseFilledTiny,
   DeckSmall,
   Member,
   SectionLinkedCard,
@@ -349,11 +349,11 @@ const AttachedCard = (props: { entityID: string; remove: () => void }) => {
   return (
     <div className="grid grid-cols-[max-content_auto_max-content] place-items-start gap-2 hover:bg-bg-blue py-1 px-2 -mx-2 rounded-md">
       <div className="pt-0.5">
-        {!!memberName ? <Member /> : isDeck ? <DeckSmall /> : <Card />}
+        {!!memberName ? <Member /> : isDeck ? <DeckSmall /> : <CardSmall />}
       </div>
       {memberName?.value || title?.value}
       <button className="text-grey-55 pt-1" onClick={() => props.remove()}>
-        <Cross />
+        <CloseFilledTiny />
       </button>
     </div>
   );

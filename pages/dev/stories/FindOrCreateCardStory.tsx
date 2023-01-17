@@ -5,7 +5,7 @@ export { getStaticProps } from "./index";
 import { useState } from "react";
 import { ButtonLink } from "components/Buttons";
 import { useIndex } from "hooks/useReplicache";
-import { Card, DeckSmall } from "components/Icons";
+import { CardSmall, DeckSmall } from "components/Icons";
 const entities: Stories = {
   None: {
     entities: [],
@@ -46,7 +46,7 @@ const Story = () => {
       icon: !!decks.find((d) => t.entity === d.entity) ? (
         <DeckSmall />
       ) : (
-        <Card />
+        <CardSmall />
       ),
     };
   });

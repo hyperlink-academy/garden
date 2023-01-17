@@ -2,7 +2,7 @@ import React, { useContext, useState } from "react";
 import { CardPreview } from "./CardPreview";
 import { useSpring, animated } from "@react-spring/web";
 import { useRouter } from "next/router";
-import { AddTiny, DeckSmall, Card as CardIcon, Member } from "./Icons";
+import { AddTiny, DeckSmall, CardSmall as CardIcon, Member } from "./Icons";
 import { ReferenceAttributes } from "data/Attributes";
 import { SortableContext } from "@dnd-kit/sortable";
 import useMeasure from "react-use-measure";

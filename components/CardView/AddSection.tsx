@@ -1,5 +1,5 @@
 import { ButtonPrimary, ButtonTertiary, ButtonLink } from "components/Buttons";
-import { Add, SectionLinkedCard, SectionText } from "components/Icons";
+import { AddSmall, SectionLinkedCard, SectionText } from "components/Icons";
 import { Divider, Modal } from "components/Layout";
 import { ReplicacheContext, useIndex, useMutations } from "hooks/useReplicache";
 import { useContext, useState } from "react";
@@ -27,7 +27,7 @@ export const AddSection = (props: { cardEntity: string }) => {
       <Divider />
       <button onClick={() => setState("addExisting")}>
         <div className="flex gap-2 text-grey-80 hover:text-accent-blue">
-          <Add />
+          <AddSmall />
           <h4 className="text-inherit">Add Section</h4>
         </div>
       </button>
@@ -172,7 +172,7 @@ export const SelectSection = (props: {
                       inputExists ? "text-grey-55" : "text-accent-blue"
                     } `}
                   >
-                    <Add />
+                    <AddSmall />
 
                     {inputExists
                       ? `"${input}" already exists`
@@ -304,10 +304,12 @@ const CreateSectionDialog = (props: {
   );
 };
 
-const SearchItem: React.FC<React.PropsWithChildren<{
-  active: boolean;
-  className?: string;
-}>> = (props) => {
+const SearchItem: React.FC<
+  React.PropsWithChildren<{
+    active: boolean;
+    className?: string;
+  }>
+> = (props) => {
   return (
     <div
       className={`w-full px-3 py-0.5 ${props.className || ""} ${

@@ -5,7 +5,7 @@ import {
   ButtonPrimary,
 } from "components/Buttons";
 import { Door, DoorSelector } from "components/DoorSelector";
-import { SpaceNew } from "components/Icons";
+import { SpaceCreate } from "components/Icons";
 import { Modal } from "components/Layout";
 import { SpaceList } from "components/SpacesList";
 import { StudioLayout } from "components/StudioLayout";
@@ -56,7 +56,7 @@ const CreateSpace = (props: { studioSpaceID: string }) => {
       <div className="w-full grid">
         <a className="place-self-center">
           <ButtonSecondary
-            icon={<SpaceNew />}
+            icon={<SpaceCreate />}
             content="Create New Space!"
             onClick={() => setOpen(true)}
           />

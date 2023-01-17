@@ -5,7 +5,12 @@ import { createContext, useContext, useRef, useState } from "react";
 import { ulid } from "src/ulid";
 import { CardView } from "./CardView";
 import { FindOrCreate, useAllItems } from "./FindOrCreateEntity";
-import { Close, Cross, GoBackToPage, SearchOrCommand } from "./Icons";
+import {
+  CloseFilledTiny,
+  CloseLinedTiny,
+  GoBackToPage,
+  SearchOrCommand,
+} from "./Icons";
 
 export const CardViewerContext = createContext({
   open: (_args: { entityID: string }) => {},
@@ -142,7 +147,7 @@ const BackButton = (props: {
       }}
     >
       <div className="grid grid-cols-[max-content_auto] gap-2 items-center place-items-start text-grey-55">
-        {props.history.length >= 2 ? <GoBackToPage /> : <Close />}
+        {props.history.length >= 2 ? <GoBackToPage /> : <CloseFilledTiny />}
         <p className="truncate whitespace-nowrap">
           {props.history.length >= 2
             ? width > 1000
