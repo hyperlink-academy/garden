@@ -15,7 +15,7 @@ import useSWR, { mutate } from "swr";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL as string;
-export const SpaceProvider: React.FC<{ id: string }> = (props) => {
+export const SpaceProvider: React.FC<React.PropsWithChildren<{ id: string }>> = (props) => {
   let [rep, setRep] = useState<ReturnType<typeof makeReplicache>>();
   const [reconnectSocket, setReconnect] = useState({});
   let socket = useRef<WebSocket>();
@@ -64,10 +64,10 @@ export const prefetchSpaceId = (studio: string, space: string) => {
   mutate("/studio/" + studio + "/space/" + space, id);
 };
 
-export const SpaceSpaceProvider: React.FC<{
+export const SpaceSpaceProvider: React.FC<React.PropsWithChildren<{
   loading: React.ReactElement;
   notFound: React.ReactElement;
-}> = (props) => {
+}>> = (props) => {
   let router = useRouter();
   let { data: id } = useSWR(
     "persist-/studio/" + router.query.studio + "/space/" + router.query.space,

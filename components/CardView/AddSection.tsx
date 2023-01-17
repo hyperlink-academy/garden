@@ -304,10 +304,10 @@ const CreateSectionDialog = (props: {
   );
 };
 
-const SearchItem: React.FC<{
+const SearchItem: React.FC<React.PropsWithChildren<{
   active: boolean;
   className?: string;
-}> = (props) => {
+}>> = (props) => {
   return (
     <div
       className={`w-full px-3 py-0.5 ${props.className || ""} ${

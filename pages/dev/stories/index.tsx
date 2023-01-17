@@ -61,10 +61,10 @@ const AuthStates = {
     },
   },
 } as const;
-export const ComponentViewer: React.FC<{
+export const ComponentViewer: React.FC<React.PropsWithChildren<{
   components: Props["components"];
   stories: Stories;
-}> = (props) => {
+}>> = (props) => {
   let keys = Object.keys(props.stories);
   let [story, setStory] = useState(keys[0]);
   let [bg, setBg] = useState(true);

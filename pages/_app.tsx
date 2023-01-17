@@ -53,7 +53,7 @@ export default function App({ Component, pageProps }: AppProps) {
   );
 }
 
-const SharedProviders: React.FC = (props) => {
+const SharedProviders: React.FC<React.PropsWithChildren<unknown>> = (props) => {
   return (
     <SmokeProvider>
       <Head>
@@ -70,7 +70,7 @@ const SharedProviders: React.FC = (props) => {
   );
 };
 
-let SWRCache: React.FC = (props) => {
+let SWRCache: React.FC<React.PropsWithChildren<unknown>> = (props) => {
   return (
     <SWRConfig
       value={{
@@ -106,7 +106,7 @@ let SWRCache: React.FC = (props) => {
   );
 };
 
-const Layout: React.FC = (props) => {
+const Layout: React.FC<React.PropsWithChildren<unknown>> = (props) => {
   return (
     <>
       <Head>

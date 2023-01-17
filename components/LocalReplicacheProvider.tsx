@@ -14,10 +14,10 @@ export type Entity = {
     : Fact<k>["value"];
 };
 
-export const LocalReplicacheProvider: React.FC<{
+export const LocalReplicacheProvider: React.FC<React.PropsWithChildren<{
   defaultAttributes: { [k: string]: Schema };
   defaultFacts: Entity[];
-}> = (props) => {
+}>> = (props) => {
   let [rep, setRep] = useState<ReturnType<typeof makeReplicache>>();
   useEffect(() => {
     let rep = makeReplicache({

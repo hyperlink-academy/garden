@@ -74,9 +74,7 @@ export const CardPreview = (
   );
 };
 
-export const RotateAndResize: React.FC<
-  Pick<Props, "onResize" | "onRotateDrag" | "size" | "factID" | "onDelete">
-> = (props) => {
+export const RotateAndResize: React.FC<React.PropsWithChildren<Pick<Props, "onResize" | "onRotateDrag" | "size" | "factID" | "onDelete">>> = (props) => {
   let ref = useRef<null | HTMLDivElement>(null);
   let bindPinch = usePinch(
     ({ da, memo, first }) => {

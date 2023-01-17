@@ -20,7 +20,7 @@ export const AuthContext = createContext({
   },
 });
 
-export const AuthProvider: React.FC = (props) => {
+export const AuthProvider: React.FC<React.PropsWithChildren<unknown>> = (props) => {
   let { data, mutate } = useSWR("persist-session", async () => {
     let token = localStorage.getItem("auth");
     if (!token) return { loggedIn: false } as const;

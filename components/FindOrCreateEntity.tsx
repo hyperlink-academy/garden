@@ -440,12 +440,12 @@ const SearchResult = (
   );
 };
 
-const SearchItem: React.FC<{
+const SearchItem: React.FC<React.PropsWithChildren<{
   active: boolean;
   className?: string;
   onLongPress: () => void;
   setMultiSelect: () => void;
-}> = (props) => {
+}>> = (props) => {
   let isLongPress = useRef(false);
   let longPressTimer = useRef<number>();
 

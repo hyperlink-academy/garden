@@ -257,7 +257,7 @@ const SectionMoreOptionsMenu = (props: {
   return !authorized ? null : (
     <Menu as="div" className="relative">
       {({ open }) => {
-        if (!open && !props.display) return null;
+        if (!open && !props.display) return <></>;
         return (
           <>
             <Menu.Button>

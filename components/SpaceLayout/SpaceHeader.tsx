@@ -17,7 +17,7 @@ import useMeasure from "react-use-measure";
 import { Divider, Modal } from "components/Layout";
 import { BaseSmallCard } from "components/CardPreview/SmallCard";
 
-export const SpaceHeader: React.FC = () => {
+export const SpaceHeader: React.FC<React.PropsWithChildren<unknown>> = () => {
   let { session } = useAuth();
 
   let newHighlightAvailable = useInboxState();

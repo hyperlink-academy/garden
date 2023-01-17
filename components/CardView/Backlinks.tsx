@@ -71,9 +71,9 @@ const DropdownArrow = (props: { open: boolean }) => {
   );
 };
 
-export const Drawer: React.FC<{
+export const Drawer: React.FC<React.PropsWithChildren<{
   open: boolean;
-}> = (props) => {
+}>> = (props) => {
   const [ref, { height: innerHeight }] = useMeasure();
   const { height } = useSpring({
     config: { mass: 0.1, tension: 500, friction: 25 },
