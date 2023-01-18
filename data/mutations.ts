@@ -329,6 +329,13 @@ const retractFact: Mutation<{ id: string }> = async (args, ctx) => {
   await ctx.retractFact(args.id);
 };
 
+const updateFact: Mutation<{
+  id: string;
+  data: Partial<Fact<any>>;
+}> = async (args, ctx) => {
+  await ctx.updateFact(args.id, args.data);
+};
+
 const postMessage: Mutation<Message & { member: string }> = async (
   args,
   ctx
@@ -446,6 +453,7 @@ export const Mutations = {
   addCardToSection,
   assertFact,
   retractFact,
+  updateFact,
   addSection,
   updatePositionInDesktop,
   addCardToDesktop,
