@@ -6,7 +6,7 @@ import {
 } from "data/Attributes";
 import { Fact, ReferenceType, Schema, TimestampeType } from "data/Facts";
 import { Message } from "data/Messages";
-import { CardinalityResult, MutationContext, Mutations } from "data/mutations";
+import { CardinalityResult, MutationContext, Mutations, FactInput } from "data/mutations";
 import { createContext, useContext } from "react";
 import {
   Puller,
@@ -18,6 +18,7 @@ import {
 import { useSubscribe } from "replicache-react";
 import { ulid } from "src/ulid";
 import { useAuth } from "./useAuth";
+import { UndoManager } from "@rocicorp/undo";
 
 export type ReplicacheMutators = {
   [k in keyof typeof Mutations]: (
@@ -29,6 +30,7 @@ export type ReplicacheMutators = {
 export let ReplicacheContext = createContext<{
   rep: Replicache<ReplicacheMutators>;
   id: string;
+  undoManager: UndoManager;
 } | null>(null);
 
 export const scanIndex = (tx: ReadTransaction) => {
@@ -125,64 +127,149 @@ export function FactWithIndexes<A extends keyof Attribute>(f: Fact<A>) {
   return { ...f, indexes };
 }
 
-let mutators: ReplicacheMutators = Object.keys(Mutations).reduce((acc, k) => {
-  acc[k as keyof typeof Mutations] = async (
-    tx: WriteTransaction,
-    mutationArgs: any
-  ) => {
-    let q = scanIndex(tx);
-    let context: MutationContext = {
-      scanIndex: q,
-      retractFact: async (id) => {
-        console.log("retracting");
-        await tx.del(id);
-        return;
-      },
-      postMessage: async (m) => {
-        await tx.put(m.id, MessageWithIndexes(m));
-        return { success: true };
-      },
-      updateFact: async (id, data) => {
-        let existingFact = (await tx.get(id)) as
-          | Fact<keyof Attribute>
-          | undefined;
-        if (!existingFact) return { success: false };
-        await tx.put(id, {
-          ...existingFact,
-          ...data,
-          positions: { ...existingFact.positions, ...data.positions },
-        });
-        return { success: true };
-      },
-      assertFact: async (fact) => {
-        let schema = await getSchema(tx, fact.attribute);
-        if (!schema) return { success: false, error: "no schema" };
-        let lastUpdated = Date.now().toString();
-        let newID;
-        if (schema.cardinality === "one") {
-          let existingFact = (await q.eav(fact.entity, fact.attribute)) as
+function makeMutators (dataFunc:()=>{ rep: Replicache<ReplicacheMutators>, undoManager: UndoManager}): ReplicacheMutators {
+  let mutators: ReplicacheMutators = Object.keys(Mutations).reduce((acc, k) => {
+    acc[k as keyof typeof Mutations] = async (
+      tx: WriteTransaction,
+      mutationArgs: any
+    ) => {
+      let q = scanIndex(tx);
+      let context: MutationContext = {
+        scanIndex: q,
+        retractFact: async (id, undoAction) => {
+          let { rep, undoManager } = dataFunc()
+
+          let existingFact = (await tx.get(id)) as
             | Fact<keyof Attribute>
             | undefined;
-          if (existingFact) {
-            newID = existingFact.id;
+          
+          console.log("retracting");
+          await tx.del(id);
+
+          if(!undoAction) {
+            undoManager.add({
+              undo: async () => {
+                if (!existingFact) return
+                await rep.mutate.assertFact({ ...existingFact, factID: id, undoAction: true } as FactInput)
+              },
+              redo: async () => {
+                await rep.mutate.retractFact({ id, undoAction: true  })
+              }
+            })
           }
-        }
-        if (!newID) newID = fact.factID || ulid();
-        let data = FactWithIndexes({ id: newID, ...fact, lastUpdated, schema });
-        await tx.put(newID, data);
-        return { success: true, factID: newID };
-      },
+
+          return;
+        },
+        postMessage: async (m) => {
+          await tx.put(m.id, MessageWithIndexes(m));
+          return { success: true };
+        },
+        updateFact: async (id, data, undoAction) => {
+          let { rep, undoManager } = dataFunc()
+
+          let existingFact = (await tx.get(id)) as
+            | Fact<keyof Attribute>
+            | undefined;
+          if (!existingFact) return { success: false };
+          await tx.put(id, {
+            ...existingFact,
+            ...data,
+            positions: { ...existingFact.positions, ...data.positions },
+          });
+
+          if(!undoAction) {
+            undoManager.add({
+              undo: async () => {
+                if (!existingFact) return
+                await rep.mutate.updateFact({ id, data: existingFact, undoAction: true })
+              },
+              redo: async () => {
+                await rep.mutate.updateFact({ id, data, undoAction: true  })
+              }
+            })
+          }
+
+          return { success: true };
+        },
+        assertFact: async (fact, undoAction) => {
+          let { rep, undoManager } = dataFunc()
+
+          let schema = await getSchema(tx, fact.attribute);
+          if (!schema) return { success: false, error: "no schema" };
+          let lastUpdated = Date.now().toString();
+          let newID:string = "";
+          let existingFact:Fact<keyof Attribute> | undefined;
+          if (schema.cardinality === "one") {
+            existingFact = (await q.eav(fact.entity, fact.attribute)) as
+              | Fact<keyof Attribute>
+              | undefined;
+            if (existingFact) {
+              newID = existingFact.id;
+            }
+          }
+          if (!newID) newID = fact.factID || ulid();
+          let data = FactWithIndexes({ id: newID, ...fact, lastUpdated, schema });
+          await tx.put(newID, data);
+
+          if(!undoAction) {
+            undoManager.add({
+              undo: async () => {
+                if (existingFact) {
+                  let value = existingFact.value
+                  let position = existingFact.positions
+
+                  // console.log("UNDO assert", fact.entity, fact.attribute, value)
+
+                  await rep.mutate.assertFact({
+                    entity: fact.entity,
+                    attribute: fact.attribute,
+                    value: value,
+                    positions: position,
+                    undoAction: true
+                  } as FactInput )
+                } else {
+                  // console.log("UNDO retract")
+
+                  await rep.mutate.retractFact({ id: newID, undoAction: true })
+                }
+              },
+              redo: async () => {
+                // console.log("REDO assert", fact.entity, fact.attribute, fact.value)
+
+                await rep.mutate.assertFact({
+                  ...fact,
+                  undoAction: true
+                } as FactInput)
+              }
+            })
+          }
+
+
+          return { success: true, factID: newID };
+        },
+      };
+      return Mutations[k as keyof typeof Mutations](mutationArgs, context);
     };
-    return Mutations[k as keyof typeof Mutations](mutationArgs, context);
-  };
-  return acc;
-}, {} as ReplicacheMutators);
+    return acc;
+  }, {} as ReplicacheMutators);
+
+  return mutators
+}
 
 export const makeReplicache = (args: {
   puller: Puller;
   pusher: Pusher;
   name: string;
+  undoManager: UndoManager;
 }) => {
+  let grabData = function(): { rep: Replicache<ReplicacheMutators>, undoManager: UndoManager} {
+    return {
+      undoManager: args.undoManager,
+      rep: rep
+    }
+  }
+
+  // let [undoManager] = useState(new UndoManager());
   let rep = new Replicache({
     licenseKey: "l381074b8d5224dabaef869802421225a",
     schemaVersion: "1.0.1",
@@ -190,7 +277,7 @@ export const makeReplicache = (args: {
     pushDelay: 500,
     pusher: args.pusher,
     puller: args.puller,
-    mutators: mutators,
+    mutators: makeMutators(grabData),
     logLevel: "error",
     indexes: {
       eav: { jsonPointer: "/indexes/eav", allowEmpty: true },
@@ -201,6 +288,7 @@ export const makeReplicache = (args: {
       messages: { jsonPointer: "/indexes/messages", allowEmpty: true },
     },
   });
+  
   return rep;
 };
 
@@ -340,6 +428,8 @@ export const useMutations = () => {
     [session.session?.studio]
   );
 
+  // if (rep == null) throw "Cannot call useMutations() if not nested within a ReplicacheContext context"
+
   return {
     authorized: !!auth,
     memberEntity: auth?.entity || null,
@@ -350,5 +440,13 @@ export const useMutations = () => {
       if (!session || !auth) return;
       return rep?.rep.mutate[mutation](args);
     },
+    action: {
+      start() {
+        rep?.undoManager.startGroup()
+      },
+      end() {
+        rep?.undoManager.endGroup()
+      }
+    }
   };
 };

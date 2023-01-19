@@ -13,13 +13,15 @@ export type MutationContext = {
   assertFact: <A extends keyof Attribute>(
     d: Pick<Fact<A>, "entity" | "attribute" | "value" | "positions"> & {
       factID?: string;
-    }
+    },
+    undoAction?:boolean
   ) => Promise<{ success: false } | { success: true; factID: string }>;
   updateFact: (
     id: string,
-    data: Partial<Fact<any>>
+    data: Partial<Fact<any>>,
+    undoAction?:boolean
   ) => Promise<{ success: boolean }>;
-  retractFact: (id: string) => Promise<void>;
+  retractFact: (id: string, undoAction?:boolean) => Promise<void>;
   scanIndex: {
     vae: <A extends keyof ReferenceAttributes>(
       entity: string,
@@ -158,7 +160,7 @@ const addCardToDesktop: Mutation<{
   });
   if (!id.success) return;
   await ctx.assertFact({
-    entity: id.factID,
+    entity: args.factID,
     attribute: "card/position-in",
     value: { type: "position", ...args.position },
     positions: {},
@@ -311,7 +313,7 @@ const createCard: Mutation<{
   });
 };
 
-type FactInput = {
+export type FactInput = {
   [A in keyof Attribute]: Pick<
     Fact<A>,
     "attribute" | "entity" | "value" | "positions"
@@ -322,7 +324,7 @@ const assertFact: Mutation<
 > = async (args, ctx) => {
   await Promise.all(
     [args].flat().map((f) => {
-      return ctx.assertFact({ ...f });
+      return ctx.assertFact({ ...f }, args.undoAction);
     })
   );
 };
@@ -331,7 +333,7 @@ const retractFact: Mutation<{ id: string; undoAction?: boolean }> = async (
   args,
   ctx
 ) => {
-  await ctx.retractFact(args.id);
+  await ctx.retractFact(args.id, args.undoAction);
 };
 
 const updateFact: Mutation<{
@@ -339,7 +341,7 @@ const updateFact: Mutation<{
   undoAction?: boolean;
   data: Partial<Fact<any>>;
 }> = async (args, ctx) => {
-  await ctx.updateFact(args.id, args.data);
+  await ctx.updateFact(args.id, args.data, args.undoAction);
 };
 
 const postMessage: Mutation<Message & { member: string }> = async (

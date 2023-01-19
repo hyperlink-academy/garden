@@ -7,6 +7,7 @@ import {
 } from "hooks/useReplicache";
 import { useEffect, useState } from "react";
 import { ulid } from "src/ulid";
+import { UndoManager } from "@rocicorp/undo";
 
 export type Entity = {
   [k in keyof Attribute]?: Attribute[k] extends { cardinality: "many" }
@@ -19,6 +20,8 @@ export const LocalReplicacheProvider: React.FC<React.PropsWithChildren<{
   defaultFacts: Entity[];
 }>> = (props) => {
   let [rep, setRep] = useState<ReturnType<typeof makeReplicache>>();
+  let [undoManager] = useState(new UndoManager())
+
   useEffect(() => {
     let rep = makeReplicache({
       name: "test-db",
@@ -90,6 +93,7 @@ export const LocalReplicacheProvider: React.FC<React.PropsWithChildren<{
           },
         };
       },
+      undoManager
     });
     setRep(rep);
     return () => {
@@ -98,7 +102,7 @@ export const LocalReplicacheProvider: React.FC<React.PropsWithChildren<{
   }, [props.defaultFacts, props.defaultAttributes]);
 
   return (
-    <ReplicacheContext.Provider value={rep ? { rep, id: "local" } : null}>
+    <ReplicacheContext.Provider value={rep ? { rep, id: "local", undoManager } : null}>
       {props.children}
     </ReplicacheContext.Provider>
   );

@@ -6,6 +6,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { Replicache } from "replicache";
 import useSWR from "swr";
 import { makeReplicache, ReplicacheMutators } from "./useReplicache";
+import { UndoManager } from "@rocicorp/undo";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 
@@ -30,6 +31,7 @@ export const AuthProvider: React.FC<React.PropsWithChildren<unknown>> = (props) 
   });
 
   let [rep, setRep] = useState<ReturnType<typeof makeReplicache>>();
+  let [undoManager] = useState(new UndoManager())
 
   useEffect(() => {
     if (!data?.loggedIn) return;
@@ -39,6 +41,7 @@ export const AuthProvider: React.FC<React.PropsWithChildren<unknown>> = (props) 
       id: id,
       session: id,
       token: data.token,
+      undoManager: undoManager
     });
     setRep(rep);
     return () => {

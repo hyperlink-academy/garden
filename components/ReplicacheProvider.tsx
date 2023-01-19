@@ -12,12 +12,14 @@ import { PullRequest, PushRequest } from "replicache";
 import { useAuth } from "hooks/useAuth";
 import { useRouter } from "next/router";
 import useSWR, { mutate } from "swr";
+import { UndoManager } from "@rocicorp/undo";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL as string;
 export const SpaceProvider: React.FC<React.PropsWithChildren<{ id: string }>> = (props) => {
   let [rep, setRep] = useState<ReturnType<typeof makeReplicache>>();
   const [reconnectSocket, setReconnect] = useState({});
+  let [undoManager] = useState(new UndoManager())
   let socket = useRef<WebSocket>();
   useEffect(() => {
     if (!props.id || !rep) return;
@@ -29,6 +31,30 @@ export const SpaceProvider: React.FC<React.PropsWithChildren<{ id: string }>> = 
       socket.current?.close();
     };
   }, [props.id, rep, reconnectSocket]);
+
+  useEffect(() => {
+    // @ts-ignore
+    window.undoManager = undoManager
+
+    let handler = (e: KeyboardEvent) => {
+      if (
+        (e.key === "z" && e.ctrlKey) ||
+        (e.key === "z" && e.metaKey && !e.shiftKey)
+      ) {
+        undoManager.undo();
+      }
+      if (
+        (e.key === "y" && e.ctrlKey) ||
+        (e.key === "z" && e.metaKey && e.shiftKey)
+      ) {
+        undoManager.redo();
+      }
+    }
+
+    window.addEventListener('keydown', handler)
+
+    return () => window.removeEventListener('keydown', handler)
+  }, [undoManager])
 
   let { session } = useAuth();
   useEffect(() => {
@@ -43,6 +69,7 @@ export const SpaceProvider: React.FC<React.PropsWithChildren<{ id: string }>> = 
       },
       session: session.session?.studio,
       token: session.token,
+      undoManager: undoManager
     });
     setRep(rep);
     return () => {
@@ -50,7 +77,7 @@ export const SpaceProvider: React.FC<React.PropsWithChildren<{ id: string }>> = 
     };
   }, [props.id, session.token, session.session?.studio]);
   return (
-    <ReplicacheContext.Provider value={rep ? { rep, id: props.id } : null}>
+    <ReplicacheContext.Provider value={rep ? { rep, id: props.id, undoManager } : null}>
       {props.children}
     </ReplicacheContext.Provider>
   );
@@ -90,11 +117,13 @@ export const makeSpaceReplicache = ({
   session,
   onPull,
   token,
+  undoManager,
 }: {
   id: string;
   session?: string;
   onPull?: () => void;
   token?: string;
+  undoManager: UndoManager;
 }) =>
   makeReplicache({
     name: `space-${id}-${session}-${WORKER_URL}`,
@@ -144,4 +173,5 @@ export const makeSpaceReplicache = ({
         },
       };
     },
+    undoManager: undoManager
   });
