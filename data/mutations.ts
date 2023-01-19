@@ -317,7 +317,9 @@ type FactInput = {
     "attribute" | "entity" | "value" | "positions"
   >;
 }[keyof Attribute];
-const assertFact: Mutation<FactInput | FactInput[]> = async (args, ctx) => {
+const assertFact: Mutation<
+  (FactInput | FactInput[]) & { undoAction?: boolean }
+> = async (args, ctx) => {
   await Promise.all(
     [args].flat().map((f) => {
       return ctx.assertFact({ ...f });
@@ -325,12 +327,16 @@ const assertFact: Mutation<FactInput | FactInput[]> = async (args, ctx) => {
   );
 };
 
-const retractFact: Mutation<{ id: string }> = async (args, ctx) => {
+const retractFact: Mutation<{ id: string; undoAction?: boolean }> = async (
+  args,
+  ctx
+) => {
   await ctx.retractFact(args.id);
 };
 
 const updateFact: Mutation<{
   id: string;
+  undoAction?: boolean;
   data: Partial<Fact<any>>;
 }> = async (args, ctx) => {
   await ctx.updateFact(args.id, args.data);
