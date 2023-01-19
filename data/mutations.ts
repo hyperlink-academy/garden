@@ -160,7 +160,7 @@ const addCardToDesktop: Mutation<{
   });
   if (!id.success) return;
   await ctx.assertFact({
-    entity: id.factID,
+    entity: args.factID,
     attribute: "card/position-in",
     value: { type: "position", ...args.position },
     positions: {},

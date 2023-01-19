@@ -129,9 +129,8 @@ export const SingleTextSection = (
   } & JSX.IntrinsicElements["textarea"]
 ) => {
   let fact = useIndex.eav(props.entityID, props.section);
-  let [undoManager] = useState(new UndoManager());
   let timeout = useRef<null | number>(null);
-  let { authorized, mutate } = useMutations();
+  let { authorized, mutate, action } = useMutations();
 
   return (
     <Textarea
@@ -142,50 +141,17 @@ export const SingleTextSection = (
       placeholder={props.placeholder || "write something..."}
       className={`bg-inherit w-full ${props.className || ""}`}
       spellCheck={false}
-      onKeyDown={(e) => {
-        if (
-          (e.key === "z" && e.ctrlKey) ||
-          (e.key === "z" && e.metaKey && !e.shiftKey)
-        ) {
-          undoManager.undo();
-        }
-        if (
-          (e.key === "y" && e.ctrlKey) ||
-          (e.key === "z" && e.metaKey && e.shiftKey)
-        ) {
-          undoManager.redo();
-        }
-        props.onKeyDown?.(e);
-      }}
       value={(fact?.value as string) || ""}
       onChange={async (e) => {
         let currentValue = fact?.value || "";
         let nextValue = e.currentTarget.value;
-        if (!timeout.current) undoManager.startGroup();
+        if (!timeout.current) action.start();
         else clearTimeout(timeout.current);
         timeout.current = window.setTimeout(() => {
           timeout.current = null;
-          undoManager.endGroup();
+          action.end();
         }, 200);
-
-        undoManager.add({
-          undo: async () => {
-            await mutate("assertFact", {
-              entity: props.entityID,
-              attribute: props.section,
-              value: currentValue,
-              positions: fact?.positions || {},
-            });
-          },
-          redo: async () => {
-            await mutate("assertFact", {
-              entity: props.entityID,
-              attribute: props.section,
-              value: nextValue,
-              positions: fact?.positions || {},
-            });
-          },
-        });
+        
         await mutate("assertFact", {
           entity: props.entityID,
           attribute: props.section,

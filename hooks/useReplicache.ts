@@ -150,10 +150,10 @@ function makeMutators (dataFunc:()=>{ rep: Replicache<ReplicacheMutators>, undoM
             undoManager.add({
               undo: async () => {
                 if (!existingFact) return
-                await rep.mutate.updateFact({ id, data: existingFact })
+                await rep.mutate.assertFact({ ...existingFact, factID: id, undoAction: true } as FactInput)
               },
               redo: async () => {
-                await rep.mutate.retractFact({ id  })
+                await rep.mutate.retractFact({ id, undoAction: true  })
               }
             })
           }
@@ -218,6 +218,8 @@ function makeMutators (dataFunc:()=>{ rep: Replicache<ReplicacheMutators>, undoM
                   let value = existingFact.value
                   let position = existingFact.positions
 
+                  // console.log("UNDO assert", fact.entity, fact.attribute, value)
+
                   await rep.mutate.assertFact({
                     entity: fact.entity,
                     attribute: fact.attribute,
@@ -226,15 +228,16 @@ function makeMutators (dataFunc:()=>{ rep: Replicache<ReplicacheMutators>, undoM
                     undoAction: true
                   } as FactInput )
                 } else {
+                  // console.log("UNDO retract")
+
                   await rep.mutate.retractFact({ id: newID, undoAction: true })
                 }
               },
               redo: async () => {
+                // console.log("REDO assert", fact.entity, fact.attribute, fact.value)
+
                 await rep.mutate.assertFact({
-                  entity: fact.entity,
-                  attribute: fact.attribute,
-                  value: fact.value,
-                  positions: fact.positions,
+                  ...fact,
                   undoAction: true
                 } as FactInput)
               }
@@ -425,6 +428,8 @@ export const useMutations = () => {
     [session.session?.studio]
   );
 
+  // if (rep == null) throw "Cannot call useMutations() if not nested within a ReplicacheContext context"
+
   return {
     authorized: !!auth,
     memberEntity: auth?.entity || null,
@@ -435,5 +440,13 @@ export const useMutations = () => {
       if (!session || !auth) return;
       return rep?.rep.mutate[mutation](args);
     },
+    action: {
+      start() {
+        rep?.undoManager.startGroup()
+      },
+      end() {
+        rep?.undoManager.endGroup()
+      }
+    }
   };
 };

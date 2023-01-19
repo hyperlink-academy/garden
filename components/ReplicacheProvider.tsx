@@ -35,6 +35,25 @@ export const SpaceProvider: React.FC<React.PropsWithChildren<{ id: string }>> = 
   useEffect(() => {
     // @ts-ignore
     window.undoManager = undoManager
+
+    let handler = (e: KeyboardEvent) => {
+      if (
+        (e.key === "z" && e.ctrlKey) ||
+        (e.key === "z" && e.metaKey && !e.shiftKey)
+      ) {
+        undoManager.undo();
+      }
+      if (
+        (e.key === "y" && e.ctrlKey) ||
+        (e.key === "z" && e.metaKey && e.shiftKey)
+      ) {
+        undoManager.redo();
+      }
+    }
+
+    window.addEventListener('keydown', handler)
+
+    return () => window.removeEventListener('keydown', handler)
   }, [undoManager])
 
   let { session } = useAuth();

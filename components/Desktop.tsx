@@ -32,7 +32,7 @@ export const Desktop = () => {
   const mouseSensor = useSensor(MouseSensor, {});
   const touchSensor = useSensor(TouchSensor, {});
   const sensors = useSensors(mouseSensor, touchSensor);
-  let { mutate } = useMutations();
+  let { mutate, action } = useMutations();
   let [createCard, setCreateCard] = useState<null | { x: number; y: number }>(
     null
   );
@@ -64,19 +64,28 @@ export const Desktop = () => {
       }}
       onDragEnd={async (props) => {
         let { active, delta, over, collisions } = props;
+
+        action.start();
+
         setDraggingHeight(0);
         let overCollision = collisions?.find(
           (c) => c.data?.droppableContainer.id === over?.id
         );
-        if (!homeEntity[0]) return;
-        if (!over || !overCollision || over.id === active.id)
-          return await mutate("updatePositionInDesktop", {
+        if (!homeEntity[0]) {
+          action.end();
+          return;
+        }
+        if (!over || !overCollision || over.id === active.id) {
+          await mutate("updatePositionInDesktop", {
             factID: active.id as string,
             parent: homeEntity[0].entity,
             dx: delta.x,
             dy: delta.y,
             da: 0,
           });
+          action.end();
+          return
+        }
 
         await mutate("addToOrCreateDeck", {
           droppedCardPositionFact: active.id as string,
@@ -84,6 +93,8 @@ export const Desktop = () => {
           targetCardEntity: over.data.current?.entityID,
           desktop: homeEntity[0].entity,
         });
+
+        action.end();
       }}
     >
       <AddCard
@@ -98,6 +109,7 @@ export const Desktop = () => {
             if (e.currentTarget !== e.target) return;
             let parentRect = e.currentTarget.getBoundingClientRect();
             if (e.ctrlKey) {
+              action.start()
               mutate("addCardToDesktop", {
                 entity: ulid(),
                 factID: ulid(),
@@ -109,6 +121,7 @@ export const Desktop = () => {
                   y: Math.max(e.clientY - parentRect.top - 42, 0),
                 },
               });
+              action.end()
             }
             if (e.detail === 2) {
               setCreateCard({
@@ -255,7 +268,7 @@ const AddCard = (props: {
   position: null | { x: number; y: number };
 }) => {
   let items = useAllItems(!!props.position);
-  let { mutate, memberEntity } = useMutations();
+  let { mutate, memberEntity, action } = useMutations();
   return (
     <FindOrCreate
       items={items}
@@ -265,6 +278,8 @@ const AddCard = (props: {
       onSelect={async (d) => {
         if (!props.position || !memberEntity) return;
         let entity;
+
+        action.start();
         if (d.type === "create") {
           entity = ulid();
           if (d.cardType === "chat") {
@@ -284,7 +299,7 @@ const AddCard = (props: {
           entity = d.entity;
         }
 
-        mutate("addCardToDesktop", {
+        await mutate("addCardToDesktop", {
           entity,
           factID: ulid(),
           desktop: props.desktopEntity,
@@ -295,6 +310,8 @@ const AddCard = (props: {
             y: Math.max(props.position.y - 42, 0),
           },
         });
+
+        action.end()
       }}
       selected={[]}
     />
