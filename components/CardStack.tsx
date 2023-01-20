@@ -25,7 +25,6 @@ export type StackData = {
   parent: string;
   attribute: keyof ReferenceAttributes;
   positionKey: string;
-  backlink?: boolean;
 };
 
 export const CardStack = (
@@ -37,15 +36,14 @@ export const CardStack = (
   return (
     <div className="relative gap-4 w-full flex">
       <div className="relative grow">
-        {!props.backlink && (
+        {
           <AddCard
             expanded={expandAll || props.cards.length === 0}
             parent={props.parent}
             attribute={props.attribute}
-            backlink={props.backlink}
             positionKey={props.positionKey}
           />
-        )}
+        }
         <SortableContext items={props.cards.map((c) => c.id)}>
           {props.cards.map((card, currentIndex) => (
             <Card
@@ -53,11 +51,10 @@ export const CardStack = (
               expandAll={expandAll}
               parent={props.parent}
               attribute={props.attribute}
-              backlink={props.backlink}
               positionKey={props.positionKey}
               last={currentIndex === props.cards.length - 1}
               key={card.id}
-              entity={props.backlink ? card.entity : card.value.value}
+              entity={card.value.value}
               currentIndex={currentIndex}
               focused={expandAll || card.id === focusedCardId}
               nextIndex={
@@ -96,18 +93,17 @@ export const CardStack = (
             />
           ))}
         </SortableContext>
-        {props.cards.length === 0
-          ? ""
-          : !props.backlink && (
-              <AddCard
-                expanded={expandAll || props.cards.length === 0}
-                end
-                parent={props.parent}
-                attribute={props.attribute}
-                backlink={props.backlink}
-                positionKey={props.positionKey}
-              />
-            )}
+        {props.cards.length === 0 ? (
+          ""
+        ) : (
+          <AddCard
+            expanded={expandAll || props.cards.length === 0}
+            end
+            parent={props.parent}
+            attribute={props.attribute}
+            positionKey={props.positionKey}
+          />
+        )}
       </div>
       {props.cards.length === 0 ? null : (
         <div className="cardStackCollapseExpand relative shrink-0 w-4">
@@ -143,7 +139,6 @@ const Card = (
   let [ref, { height }] = useMeasure();
 
   let data = {
-    backlink: props.backlink,
     entityID: props.entity,
     factID: props.factID,
     parent: props.parent,
@@ -210,7 +205,6 @@ const Card = (
             onDelete={() => {
               mutate("retractFact", { id: props.factID });
             }}
-            showRelated={props.backlink}
             entityID={props.entity}
             size={"big"}
           />
@@ -248,8 +242,7 @@ const AddCard = (props: { expanded: boolean; end?: boolean } & StackData) => {
         };
       })
     )
-    .filter((f) => props.attribute !== "deck/contains" || !props.backlink);
-  const alreadyIn = useIndex.vae(props.parent, props.attribute);
+    .filter((f) => props.attribute !== "deck/contains");
   const alreadyInEAV = useIndex.eav(props.parent, props.attribute);
 
   let rep = useContext(ReplicacheContext);
@@ -312,11 +305,7 @@ const AddCard = (props: { expanded: boolean; end?: boolean } & StackData) => {
           action.end();
         }}
         // END OF ONSELECT LOGIC
-        selected={
-          props.backlink
-            ? alreadyIn.map((d) => d.entity)
-            : alreadyInEAV?.map((d) => d.value.value) || []
-        }
+        selected={alreadyInEAV?.map((d) => d.value.value) || []}
         open={open}
         items={items}
       />
@@ -331,16 +320,14 @@ const create = async (
   mutate: ReturnType<typeof useMutations>["mutate"]
 ) => {
   let position;
-  let positionKey = props.backlink ? "vae" : "eav";
+  let positionKey = "eav";
 
   let siblings =
     (await rep.query((tx) => {
-      if (props.backlink)
-        return scanIndex(tx).vae(props.parent, props.attribute);
       return scanIndex(tx).eav(props.parent, props.attribute);
     })) || [];
 
-  if (props.end || props.backlink) {
+  if (props.end) {
     let lastPosition = siblings.sort(sortByPosition(positionKey))[
       siblings.length - 1
     ]?.positions[positionKey];
@@ -349,26 +336,6 @@ const create = async (
     let firstPosition = siblings.sort(sortByPosition(positionKey))[0]
       ?.positions[positionKey];
     position = generateKeyBetween(null, firstPosition || null);
-  }
-
-  if (props.backlink) {
-    let parentCards = await rep.query((tx) => {
-      return scanIndex(tx).eav(entity, props.attribute);
-    });
-    let lastPosition = parentCards.sort(sortByPosition("eav"))[
-      parentCards.length - 1
-    ]?.positions["eav"];
-    let eav = generateKeyBetween(lastPosition || null, null);
-    await mutate("addCardToSection", {
-      cardEntity: props.parent,
-      parent: entity,
-      section: props.attribute,
-      positions: {
-        eav,
-        vae: position,
-      },
-    });
-    return;
   }
 
   await mutate("addCardToSection", {
