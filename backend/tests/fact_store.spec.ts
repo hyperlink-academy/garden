@@ -77,14 +77,14 @@ test("you can't assert a fact with an unknown attribute", async () => {
 test("you can assert a fact if you create the attribute first", async () => {
   const storage = await getMiniflareDurableObjectStorage(id);
   let fact_store = store(storage, { id: "" });
-  let newAttrbuteName = "a-new-attribute" as "arbitrarySectionStringType";
+  let newAttributeName = "a-new-attribute" as "arbitrarySectionStringType";
 
   let attributeEntity = ulid();
   await Promise.all([
     fact_store.assertFact({
       entity: attributeEntity,
       attribute: "name",
-      value: newAttrbuteName,
+      value: newAttributeName,
       positions: {},
     }),
     fact_store.assertFact({
@@ -97,7 +97,7 @@ test("you can assert a fact if you create the attribute first", async () => {
 
   let result = await fact_store.assertFact({
     entity: ulid(),
-    attribute: newAttrbuteName,
+    attribute: newAttributeName,
     value: "a value",
     positions: {},
   });

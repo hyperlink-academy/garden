@@ -1,8 +1,7 @@
 import React, { useContext, useState } from "react";
 import { CardPreview } from "./CardPreview";
 import { useSpring, animated } from "@react-spring/web";
-import { useRouter } from "next/router";
-import { AddTiny, DeckSmall, CardSmall as CardIcon, Member } from "./Icons";
+import { AddTiny, CardSmall as CardIcon, Member } from "./Icons";
 import { ReferenceAttributes } from "data/Attributes";
 import { SortableContext } from "@dnd-kit/sortable";
 import useMeasure from "react-use-measure";
@@ -331,21 +330,6 @@ const create = async (
   rep: Replicache<ReplicacheMutators>,
   mutate: ReturnType<typeof useMutations>["mutate"]
 ) => {
-  if (props.backlink && props.attribute !== "deck/contains") {
-    let existingSections = await rep.query((tx) =>
-      scanIndex(tx).eav(entity, "card/section")
-    );
-    if (!existingSections.find((f) => f.value === props.attribute.slice(8))) {
-      await mutate("addSection", {
-        newSectionEntity: ulid(),
-        sectionName: props.attribute.slice(8),
-        type: "reference",
-        cardEntity: entity,
-        positions: "",
-      });
-    }
-  }
-
   let position;
   let positionKey = props.backlink ? "vae" : "eav";
 

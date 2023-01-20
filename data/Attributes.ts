@@ -75,11 +75,6 @@ export const DefaultAttributes = {
     unique: false,
     cardinality: "one",
   },
-  "card/section": {
-    type: "string",
-    unique: false,
-    cardinality: "many",
-  },
   "card/title": {
     type: "string",
     unique: true,

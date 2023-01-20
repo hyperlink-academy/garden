@@ -6,3 +6,4 @@
 .env.local
 TODO.md
 *.code-workspace
+.vscode

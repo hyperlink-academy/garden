@@ -260,58 +260,6 @@ const updateFact: Mutation<{
   await ctx.updateFact(args.id, args.data, args.undoAction);
 };
 
-const addSection: Mutation<{
-  newSectionEntity: string;
-  sectionName: string;
-  type: "string" | "reference";
-  positions: string;
-  cardEntity: string;
-}> = async (args, ctx) => {
-  if (!args.sectionName) return;
-  let sectionEntity = (
-    await ctx.scanIndex.ave("name", `section/${args.sectionName}`)
-  )?.entity;
-  if (!sectionEntity) {
-    sectionEntity = args.newSectionEntity;
-    await ctx.assertFact({
-      entity: args.newSectionEntity,
-      attribute: "name",
-      value: `section/${args.sectionName}`,
-      positions: {},
-    });
-    await ctx.assertFact({
-      entity: args.newSectionEntity,
-      attribute: "type",
-      value: args.type,
-      positions: {},
-    });
-
-    await ctx.assertFact({
-      entity: args.newSectionEntity,
-      attribute: "cardinality",
-      value: args.type === "reference" ? "many" : "one",
-      positions: {},
-    });
-  }
-  let existingSections = await ctx.scanIndex.eav(
-    args.cardEntity,
-    "card/section"
-  );
-  if (existingSections.find((s) => s.value === args.sectionName)) return;
-
-  let type = await ctx.scanIndex.eav(sectionEntity, "type");
-  let cardinality = await ctx.scanIndex.eav(sectionEntity, "cardinality");
-  if (!type || !cardinality) return;
-  if (type.value !== args.type) return;
-
-  await ctx.assertFact({
-    entity: args.cardEntity,
-    attribute: "card/section",
-    value: args.sectionName,
-    positions: { eav: args.positions },
-  });
-};
-
 const deleteEntity: Mutation<{ entity: string }> = async (args, ctx) => {
   let references = await ctx.scanIndex.vae(args.entity);
   let facts = await ctx.scanIndex.eav(args.entity, null);
@@ -328,7 +276,6 @@ export const Mutations = {
   assertFact,
   retractFact,
   updateFact,
-  addSection,
   updatePositionInDesktop,
   addCardToDesktop,
   addToOrCreateDeck,

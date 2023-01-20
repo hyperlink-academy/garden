@@ -1,29 +1,15 @@
 import { Menu } from "@headlessui/react";
 
-import {
-  MoreOptions,
-  Delete,
-  DeckSmall,
-  Member,
-  CardAdd,
-  Print,
-} from "components/Icons";
+import { MoreOptions, Delete, DeckSmall, Member } from "components/Icons";
 import { Divider, MenuContainer, MenuItem } from "components/Layout";
 import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
-import {
-  MultipleReferenceSection,
-  Sections,
-  SingleTextSection,
-} from "./Sections";
-import { AddSection } from "./AddSection";
+import { MultipleReferenceSection, SingleTextSection } from "./Sections";
 import { Backlinks } from "./Backlinks";
-import { spacePath, usePreserveScroll } from "hooks/utils";
+import { usePreserveScroll } from "hooks/utils";
 import Link from "next/link";
 import { useAuth } from "hooks/useAuth";
 import { MakeImage, ImageSection } from "./ImageSection";
-import { useEffect } from "react";
 import { useRouter } from "next/router";
-import { flag } from "data/Facts";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 const borderStyles = (args: { member: boolean }) => {
@@ -119,10 +105,6 @@ export const CardView = (props: {
               <MakeImage entity={props.entityID} />
             </div>
           </div>
-
-          <Sections entityID={props.entityID} />
-
-          <AddSection cardEntity={props.entityID} />
         </div>
         {/* END CARD CONTENT */}
       </div>
@@ -232,14 +214,6 @@ const CardMoreOptionsMenu = (props: {
           </MenuItem>
         )}
 
-        <MenuItem>
-          <Link
-            href={`${spacePath(q.space, q.studio)}/c/${props.entityID}/print`}
-          >
-            Print
-          </Link>
-          <Print />
-        </MenuItem>
         <div className="py-2">
           <Divider />
         </div>

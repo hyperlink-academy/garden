@@ -12,7 +12,6 @@ export const BigCardBody = (props: { entityID: string } & Props) => {
   let isMember = !!useIndex.eav(props.entityID, "member/name");
   let { session } = useAuth();
   let spaceID = useSpaceID();
-  let sections = useIndex.eav(props.entityID, "card/section");
   let image = useIndex.eav(props.entityID, "card/image");
   let { mutate, authorized } = useMutations();
 
