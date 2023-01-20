@@ -1,7 +1,6 @@
 import { useCardViewer } from "components/CardViewerContext";
 import { GripperBG } from "components/Gripper";
 import { ExternalLink, Member } from "components/Icons";
-import { useReadState } from "hooks/useReadState";
 import { useIndex, useMutations } from "hooks/useReplicache";
 import { isUrl } from "src/isUrl";
 import { Props } from "./index";
@@ -9,7 +8,6 @@ import { Props } from "./index";
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export const SmallCardBody = (props: { entityID: string } & Props) => {
   let isMember = !!useIndex.eav(props.entityID, "member/name");
-  let read = useReadState(props.entityID);
 
   let member = useIndex.eav(props.entityID, "member/name");
   let title = useIndex.eav(props.entityID, "card/title");
@@ -29,7 +27,6 @@ export const SmallCardBody = (props: { entityID: string } & Props) => {
       content={content?.value}
       imageUrl={imageUrl}
       isMember={isMember}
-      read={read}
       memberName={member?.value}
     />
   );
@@ -44,7 +41,6 @@ export const BaseSmallCard = (
     isMember: boolean;
     imageUrl?: string;
     entityID?: string;
-    read: boolean;
   } & Omit<Props, "size" | "href">
 ) => {
   let url = props.content ? isUrl(props.content) : false;
@@ -99,9 +95,6 @@ export const BaseSmallCard = (
                 {props.title}
               </div>
             )}
-            {!props.read ? (
-              <div className="rounded-full bg-accent-red w-1 h-1" />
-            ) : null}
           </a>
 
           {/* Small Card Preview External Link */}

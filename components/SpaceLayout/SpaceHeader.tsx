@@ -5,7 +5,6 @@ import { useRouter } from "next/router";
 import { BackToStudio as BackToStudioIcon, Note } from "../Icons";
 import { spacePath } from "hooks/utils";
 import { useIndex, useSpaceID } from "hooks/useReplicache";
-import { useInboxState } from "hooks/useInboxState";
 import { useState } from "react";
 import { ButtonSecondary } from "../Buttons";
 import { LogInModal } from "../LoginModal";
@@ -20,25 +19,19 @@ import { BaseSmallCard } from "components/CardPreview/SmallCard";
 export const SpaceHeader: React.FC<React.PropsWithChildren<unknown>> = () => {
   let { session } = useAuth();
 
-  let newHighlightAvailable = useInboxState();
-
   return (
     <div className="pageHeader shrink-0 pb-2 text-white">
       <div
         className={`
           headerWrapper
           max-w-6xl mx-auto px-3 
-          before:content-[''] before:absolute before:w-[100vw] before:h-12 before:left-0 ${
-            newHighlightAvailable
-              ? "before:bg-accent-blue"
-              : "before:bg-grey-35"
-          }`}
+          before:content-[''] before:absolute before:w-[100vw] before:h-12 before:left-0 before:bg-grey-35`}
       >
         <div className="headerContent flex gap-4 pt-3">
           <BackToStudio studio={session.session?.username} />
-          <SpaceName newHighlight={!!newHighlightAvailable} />
+          <SpaceName />
           <div className="z-10 shrink-0 flex gap-4">
-            {!session.session ? <Login /> : <DesktopHighlightSwitcher />}
+            {!session.session ? <Login /> : null}
           </div>
         </div>
       </div>
@@ -46,17 +39,15 @@ export const SpaceHeader: React.FC<React.PropsWithChildren<unknown>> = () => {
   );
 };
 
-const SpaceName = (props: { newHighlight: boolean }) => {
+const SpaceName = () => {
   return (
     <Popover className="w-full">
-      {({ open }) => (
-        <SpaceNameContent open={open} newHighlight={props.newHighlight} />
-      )}
+      {({ open }) => <SpaceNameContent open={open} />}
     </Popover>
   );
 };
 
-const SpaceNameContent = (props: { open: boolean; newHighlight: boolean }) => {
+const SpaceNameContent = (props: { open: boolean }) => {
   let spaceName = useIndex.aev("this/name")[0];
   let [ref, { width }] = useMeasure();
   const [drawerRef, { height: innerHeight }] = useMeasure();
@@ -79,11 +70,7 @@ const SpaceNameContent = (props: { open: boolean; newHighlight: boolean }) => {
           width,
         }}
         className={`border-accent-blue absolute rounded-md hover:border-2 hover:bg-bg-blue hover:text-accent-blue px-2 overflow-hidden ${
-          props.open
-            ? "bg-bg-blue text-accent-blue border-2"
-            : props.newHighlight
-            ? "bg-accent-blue"
-            : "bg-grey-35"
+          props.open ? "bg-bg-blue text-accent-blue border-2" : "bg-grey-35"
         }`}
       >
         <Popover.Button
@@ -123,42 +110,6 @@ const BackToStudio = (props: { studio?: string }) => {
         </div>
       </Link>
     </div>
-  );
-};
-
-const DesktopHighlightSwitcher = () => {
-  let { query, pathname } = useRouter();
-  let newHighlightAvailable = useInboxState();
-  let isHighlightPage = pathname.endsWith("/highlights");
-  return (
-    <>
-      <div
-        className={`${
-          newHighlightAvailable ? "text-accent-blue" : "text-grey-35"
-        } flex gap-2 `}
-      >
-        <div
-          className={`${
-            isHighlightPage
-              ? `bg-transparent border border-transparent hover:border hover:border-white text-white `
-              : `bg-background text-inherit font-bold`
-          } rounded-t-md rounded-b-none pt-1 pb-3 px-2`}
-        >
-          <Link href={`${spacePath(query.studio, query.space)}`}>Desktop</Link>
-        </div>
-        <div
-          className={`${
-            isHighlightPage
-              ? `bg-background text-inherit font-bold`
-              : `bg-transparent border border-transparent hover:border hover:border-white text-white `
-          } rounded-t-md rounded-b-none  pt-1 pb-3  px-2`}
-        >
-          <Link href={`${spacePath(query.studio, query.space)}/highlights`}>
-            <Note />
-          </Link>
-        </div>
-      </div>
-    </>
   );
 };
 
@@ -238,12 +189,7 @@ const MembersModal = () => {
             <Link href={`/s/${encodeURIComponent(m.value)}`}>
               <div className="w-[160px]">
                 <div className={`relative grow h-full memberCardBorder `}>
-                  <BaseSmallCard
-                    isMember
-                    read={false}
-                    memberName={m.value}
-                    content=""
-                  />
+                  <BaseSmallCard isMember memberName={m.value} content="" />
                 </div>
               </div>
             </Link>

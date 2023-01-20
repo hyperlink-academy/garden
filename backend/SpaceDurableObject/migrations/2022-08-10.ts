@@ -6,6 +6,7 @@ export default {
   date: "2022-08-10",
   run: async (storage: DurableObjectStorage) => {
     let fact_store = store(storage, { id: "" });
+    // @ts-ignore
     let decks = await fact_store.scanIndex.aev("deck");
     let newHomeEntity = ulid();
     if (decks.length === 0) return;

@@ -53,7 +53,6 @@ export function JoinSpace() {
             <div className={`relative grow h-full memberCardBorder `}>
               <BaseSmallCard
                 isMember
-                read={false}
                 memberName={session.session?.username}
                 content=""
               />

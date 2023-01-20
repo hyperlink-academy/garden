@@ -38,30 +38,7 @@ const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 const Space = (props: { entity: string; name: string }) => {
   let studio = useIndex.eav(props.entity, "space/studio");
   let spaceID = useIndex.eav(props.entity, "space/id");
-  let lastSeenMessage = useIndex.eav(props.entity, "space/lastSeenMessage");
   let prefetched = useRef(false);
-
-  let { data: latestMessage } = useSWR(
-    `${studio?.value}/${props.name}/latestMessage`,
-    async () => {
-      if (!spaceID) return;
-      let data = await spaceAPI(
-        `${WORKER_URL}/space/${spaceID.value}`,
-        "get_latest_message",
-        {}
-      );
-      return data.latestMessage;
-    }
-  );
-
-  let showUnreads =
-    latestMessage && lastSeenMessage && lastSeenMessage?.value < latestMessage
-      ? true
-      : false;
-  let unreadCount =
-    latestMessage && lastSeenMessage && lastSeenMessage?.value < latestMessage
-      ? latestMessage - lastSeenMessage?.value
-      : null;
 
   return (
     <div className="w-min flex flex-col gap-4">
@@ -81,15 +58,9 @@ const Space = (props: { entity: string; name: string }) => {
         }}
       >
         <Link href={`${spacePath(studio?.value, props.name)}`}>
-          <Door entityID={props.entity} glow={showUnreads} />
+          <Door entityID={props.entity} />
         </Link>
         <div className="flex flex-col gap-4 w-[20px] pb-[92px]">
-          {showUnreads ? (
-            <div className="flex flex-col ml-1.5 origin-top skew-y-[-30deg] scale-x-90 scale-y-110">
-              <span className="text-sm text-grey-35">{unreadCount}</span>
-              <span className="bg-accent-red rounded-full w-2 h-2"></span>
-            </div>
-          ) : null}
           <EditSpace spaceEntity={props.entity} />
         </div>
       </div>
@@ -98,10 +69,6 @@ const Space = (props: { entity: string; name: string }) => {
         <div className="origin-top-left skew-y-[-30deg] scale-x-90 scale-y-110 ml-2 w-full">
           <h3 className="text-xl">{props.name}</h3>
         </div>
-        {/* extra shadow - turned off b/c it's a bit much LOL */}
-        {/* <div className="origin-top -ml-4 -rotate-[30deg] skew-x-[30deg] scale-x-90 scale-y-110 blur-[1px]">
-          <h3 className="text-xl text-grey-80">{props.name}</h3>
-        </div> */}
       </div>
     </div>
   );

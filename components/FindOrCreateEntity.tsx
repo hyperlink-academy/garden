@@ -6,10 +6,8 @@ import { ButtonPrimary } from "./Buttons";
 import {
   AddSmall,
   CardSmall,
-  ChatSmall,
   Checkmark,
   CloseFilledTiny,
-  DeckSmall,
   Member,
 } from "./Icons";
 import { Divider } from "./Layout";
@@ -26,7 +24,7 @@ import { Divider } from "./Layout";
 type Item = { display: string; entity: string; icon?: React.ReactElement };
 type AddedItem =
   | { entity: string; type: "existing" }
-  | { name: string; type: "create"; cardType: "card" | "chat" };
+  | { name: string; type: "create"; cardType: "card" };
 
 export const FindOrCreate = (props: {
   allowBlank: boolean;
@@ -318,9 +316,7 @@ const CreateButton = (props: {
               active={active}
               onLongPress={() => props.addItem(props.value)}
               setMultiSelect={props.setMultiSelect}
-              className={`w-full flex-grow ${
-                active || props.activeOption === "chat" ? "bg-bg-blue" : ""
-              }`}
+              className={`w-full flex-grow ${active ? "bg-bg-blue" : ""}`}
             >
               {!props.inputExists || props.value === "" ? (
                 <div
@@ -334,12 +330,8 @@ const CreateButton = (props: {
                     <AddSmall />
                     <div>
                       {!props.value
-                        ? `Create a blank ${
-                            props.activeOption === "chat" ? "chat" : "card"
-                          }`
-                        : `Create "${props.value}" ${
-                            props.activeOption === "chat" ? "chat" : ""
-                          }`}
+                        ? `Create a blank card`
+                        : `Create "${props.value}"`}
                     </div>
                   </div>
                 </div>
@@ -353,32 +345,6 @@ const CreateButton = (props: {
                   <div>"{props.value}" already exists</div>
                 </div>
               )}
-            </SearchItem>
-          );
-        }}
-      </Combobox.Option>
-      <Combobox.Option
-        key={"create-chat"}
-        value={{
-          type: "create",
-          cardType: "chat",
-          name: props.value,
-        }}
-        disabled={props.inputExists}
-      >
-        {({ active }) => {
-          return (
-            <SearchItem
-              active={active}
-              onLongPress={() => props.addItem(props.value)}
-              setMultiSelect={props.setMultiSelect}
-              className={`!p-1 w-fit rounded-md absolute right-3 mt-0.5 ${
-                active
-                  ? "!bg-accent-blue text-white cursor-pointer"
-                  : "text-accent-blue"
-              } ${props.inputExists ? " text-grey-55 " : ""}`}
-            >
-              <ChatSmall className={``} />
             </SearchItem>
           );
         }}
@@ -510,17 +476,12 @@ export const useAllItems = (open: boolean) => {
     .aev(open ? "card/title" : null)
     .filter((f) => !!f.value);
   let members = useIndex.aev("member/name");
-  const decks = useIndex.aev(open ? "deck" : null);
   return titles
     .map((t) => {
       return {
         entity: t.entity,
         display: t.value,
-        icon: !!decks.find((d) => t.entity === d.entity) ? (
-          <DeckSmall />
-        ) : (
-          <CardSmall />
-        ),
+        icon: <CardSmall />,
       };
     })
     .concat(

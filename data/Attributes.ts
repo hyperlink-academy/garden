@@ -55,21 +55,6 @@ export const DefaultAttributes = {
     unique: false,
     cardinality: "many",
   },
-  deck: {
-    type: "flag",
-    unique: false,
-    cardinality: "one",
-  },
-  chat: {
-    type: "flag",
-    unique: false,
-    cardinality: "one",
-  },
-  "chat/last-message": {
-    cardinality: "one",
-    unique: false,
-    type: "number",
-  },
   home: {
     type: "flag",
     unique: false,
@@ -82,6 +67,11 @@ export const DefaultAttributes = {
   },
   "card/content": {
     type: "string",
+    unique: false,
+    cardinality: "one",
+  },
+  "card/scheduled": {
+    type: "timestamp",
     unique: false,
     cardinality: "one",
   },
@@ -150,21 +140,6 @@ export const DefaultAttributes = {
     unique: true,
     cardinality: "one",
   },
-  "space/lastSeenMessage": {
-    type: "number",
-    unique: false,
-    cardinality: "one",
-  },
-  "member/inbox": {
-    type: "reference",
-    cardinality: "many",
-    unique: false,
-  },
-  "member/last-read-highlight": {
-    type: "string",
-    cardinality: "one",
-    unique: false,
-  },
   "member/name": {
     unique: true,
     type: "string",
@@ -180,45 +155,10 @@ export const DefaultAttributes = {
     type: "string",
     cardinality: "one",
   },
-  "message/id": {
-    type: "string",
-    cardinality: "one",
-    unique: true,
-  },
-  "message/attachedCard": {
-    type: "reference",
-    cardinality: "many",
-    unique: false,
-  },
-  "activity/name": {
-    type: "string",
-    cardinality: "one",
-    unique: false,
-  },
-  "activity/active": {
-    type: "flag",
-    cardinality: "one",
-    unique: false,
-  },
-  "activity/hand-contains": {
-    type: "reference",
-    cardinality: "many",
-    unique: false,
-  },
-  "member/in-activity": {
-    type: "reference",
-    cardinality: "one",
-    unique: false,
-  },
   "bot/name": {
     type: "string",
     cardinality: "one",
     unique: true,
-  },
-  "highlight/time": {
-    type: "timestamp",
-    cardinality: "one",
-    unique: false,
   },
   "bot/url": {
     type: "string",
@@ -230,16 +170,10 @@ export const DefaultAttributes = {
     cardinality: "one",
     unique: false,
   },
-  "last-read-message": {
-    type: "last-read-message",
-    cardinality: "many",
-    unique: false,
-  },
 } as const;
 
 export const ShortCodes: { [k in keyof Attribute]?: string | undefined } = {
   "deck/contains": "cards",
-  "activity/hand-contains": "hand",
 };
 
 export const AttributeFromShortCode = (a: string) => {

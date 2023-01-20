@@ -17,7 +17,6 @@ const BaseEntities = [
   }),
   {
     "card/title": "A deck!",
-    deck: flag(),
     "deck/contains": [ref("0")],
   },
   {
@@ -91,7 +90,6 @@ const Stories: Stories = {
       {
         "card/content": "Hi I am a deck card",
         "card/title": "Hello Deck",
-        deck: flag(),
         "card/section": ["Text Section"],
         [singleTextSection(
           "Text Section"

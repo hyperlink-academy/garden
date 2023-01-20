@@ -46,10 +46,6 @@ export async function graphqlServer(request: Request, ctx: Env) {
         }`,
       resolvers: {
         Query: {
-          decks: async () => {
-            let decks = await ctx.factStore.scanIndex.aev("deck");
-            return decks.map((f) => ({ id: f.entity }));
-          },
           name: async (_parent: unknown, args: { name: string }) => {
             let entity = await ctx.factStore.scanIndex.ave(
               "card/title",

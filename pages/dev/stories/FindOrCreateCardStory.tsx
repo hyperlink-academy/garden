@@ -37,17 +37,12 @@ const FindOrCreateCardStory = (props: Props) => {
 const Story = () => {
   let [open, setOpen] = useState(false);
   let [selectedCards, setSelectedCards] = useState<string[]>([]);
-  let decks = useIndex.aev("deck");
   let titles = useIndex.aev("card/title");
   let items = titles.map((t) => {
     return {
       entity: t.entity,
       display: t.value,
-      icon: !!decks.find((d) => t.entity === d.entity) ? (
-        <DeckSmall />
-      ) : (
-        <CardSmall />
-      ),
+      icon: <CardSmall />,
     };
   });
   return (

@@ -14,14 +14,14 @@ export type MutationContext = {
     d: Pick<Fact<A>, "entity" | "attribute" | "value" | "positions"> & {
       factID?: string;
     },
-    undoAction?:boolean
+    undoAction?: boolean
   ) => Promise<{ success: false } | { success: true; factID: string }>;
   updateFact: (
     id: string,
     data: Partial<Fact<any>>,
-    undoAction?:boolean
+    undoAction?: boolean
   ) => Promise<{ success: boolean }>;
-  retractFact: (id: string, undoAction?:boolean) => Promise<void>;
+  retractFact: (id: string, undoAction?: boolean) => Promise<void>;
   scanIndex: {
     vae: <A extends keyof ReferenceAttributes>(
       entity: string,
@@ -59,57 +59,6 @@ export type CardinalityResult<A extends keyof Attribute | null> = null extends A
   : Fact<OptionalAttribute<A>>[];
 
 type Mutation<T> = (args: T, ctx: MutationContext) => Promise<void>;
-
-const addDeck: Mutation<{
-  name: string;
-  newHomeEntity: string;
-  newEntity: string;
-  position: string;
-}> = async (args, ctx) => {
-  let homeFact = await ctx.scanIndex.aev("home");
-  let homeEntity = homeFact[0]?.entity || args.newHomeEntity;
-
-  let existingDecks = (
-    await ctx.scanIndex.eav(homeEntity, "deck/contains")
-  ).sort(sortByPosition("eav"));
-
-  await Promise.all([
-    !homeFact[0]
-      ? ctx.assertFact({
-          entity: homeEntity,
-          attribute: "home",
-          value: flag(),
-          positions: {},
-        })
-      : undefined,
-    ctx.assertFact({
-      entity: homeEntity,
-      attribute: "deck/contains",
-      value: ref(args.newEntity),
-
-      positions: {
-        eav: generateKeyBetween(
-          existingDecks[existingDecks.length]?.positions?.eav || null,
-          null
-        ),
-      },
-    }),
-    ctx.assertFact({
-      entity: args.newEntity,
-      attribute: "deck",
-      value: { type: "flag" },
-      positions: { aev: args.position },
-    }),
-    !args.name
-      ? undefined
-      : ctx.assertFact({
-          entity: args.newEntity,
-          attribute: "card/title",
-          value: args.name,
-          positions: {},
-        }),
-  ]);
-};
 
 const addSpace: Mutation<{
   name: string;
@@ -245,24 +194,6 @@ const updatePositions: Mutation<{
   }
 };
 
-const updateReadState: Mutation<{ member: string; chat: string }> = async (
-  args,
-  ctx
-) => {
-  let readStates = await ctx.scanIndex.eav(args.member, "last-read-message");
-  let read = readStates?.find((f) => f.value.chat === args.chat);
-  let latest = await ctx.scanIndex.eav(args.chat, "chat/last-message");
-  let value = { chat: args.chat, message: latest?.value || 0 };
-  if (read) await ctx.updateFact(read.id, { value });
-  else
-    await ctx.assertFact({
-      entity: args.member,
-      attribute: "last-read-message",
-      value,
-      positions: {},
-    });
-};
-
 const addCardToSection: Mutation<{
   cardEntity: string;
   parent: string;
@@ -294,17 +225,6 @@ const createCard: Mutation<{
     value: ref(args.memberEntity),
     positions: {},
   });
-  let members = await ctx.scanIndex.aev("member/name");
-  for (let member of members) {
-    if (member.entity !== args.memberEntity) {
-      await ctx.assertFact({
-        entity: member.entity,
-        attribute: "member/inbox",
-        value: ref(args.entityID),
-        positions: {},
-      });
-    }
-  }
   await ctx.assertFact({
     entity: args.entityID,
     attribute: "card/title",
@@ -342,33 +262,6 @@ const updateFact: Mutation<{
   data: Partial<Fact<any>>;
 }> = async (args, ctx) => {
   await ctx.updateFact(args.id, args.data, args.undoAction);
-};
-
-const postMessage: Mutation<Message & { member: string }> = async (
-  args,
-  ctx
-) => {
-  let latestMessage = await ctx.scanIndex.eav(args.topic, "chat/last-message");
-
-  let readStates = await ctx.scanIndex.eav(args.member, "last-read-message");
-  let read = readStates?.find((f) => f.value.chat === args.topic);
-  let value = { chat: args.topic, message: (latestMessage?.value || 0) + 1 };
-  if (read) await ctx.updateFact(read.id, { value });
-  else
-    await ctx.assertFact({
-      entity: args.member,
-      attribute: "last-read-message",
-      value,
-      positions: {},
-    });
-
-  await ctx.assertFact({
-    entity: args.topic,
-    attribute: "chat/last-message",
-    value: (latestMessage?.value || 0) + 1,
-    positions: {},
-  });
-  await ctx.postMessage(args);
 };
 
 const addSection: Mutation<{
@@ -423,25 +316,6 @@ const addSection: Mutation<{
   });
 };
 
-const updateLastSeenMessage: Mutation<{
-  space: string;
-  lastSeenMessage: number;
-}> = async (args, ctx) => {
-  let space = await ctx.scanIndex.ave("space/id", args.space);
-  if (!space) return;
-  let lastSeenMessage = await ctx.scanIndex.eav(
-    space.entity,
-    "space/lastSeenMessage"
-  );
-  if ((lastSeenMessage?.value || 0) > args.lastSeenMessage) return;
-  await ctx.assertFact({
-    entity: space.entity,
-    value: args.lastSeenMessage,
-    attribute: "space/lastSeenMessage",
-    positions: {},
-  });
-};
-
 const deleteEntity: Mutation<{ entity: string }> = async (args, ctx) => {
   let references = await ctx.scanIndex.vae(args.entity);
   let facts = await ctx.scanIndex.eav(args.entity, null);
@@ -450,14 +324,10 @@ const deleteEntity: Mutation<{ entity: string }> = async (args, ctx) => {
 };
 
 export const Mutations = {
-  updateLastSeenMessage,
   deleteEntity,
-  postMessage,
   createCard,
   addSpace,
   updatePositions,
-  updateReadState,
-  addDeck,
   addCardToSection,
   assertFact,
   retractFact,

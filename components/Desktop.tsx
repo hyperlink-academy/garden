@@ -283,14 +283,6 @@ const AddCard = (props: {
         for (let d of cards) {
           if (d.type === "create") {
             entity = ulid();
-            if (d.cardType === "chat") {
-              await mutate("assertFact", {
-                entity,
-                attribute: "chat",
-                value: { type: "flag" },
-                positions: {},
-              });
-            }
             await mutate("createCard", {
               entityID: entity,
               title: d.name,

@@ -12,19 +12,11 @@ import { useRef } from "react";
 import { SmallCardBody } from "./SmallCard";
 import { BigCardBody } from "./BigCard";
 
-const borderStyles = (args: {
-  isDeck: boolean;
-  isMember: boolean;
-  isChat: boolean;
-}) => {
+const borderStyles = (args: { isMember: boolean }) => {
   switch (true) {
     //border styles found in global.css
     case args.isMember:
       return "memberCardBorder";
-    case args.isDeck:
-      return "defaultCardBorder";
-    case args.isChat:
-      return "chatCardBorder";
     default:
       return "defaultCardBorder";
   }
@@ -49,19 +41,13 @@ export const CardPreview = (
     entityID: string;
   } & Props
 ) => {
-  let isDeck = !!useIndex.eav(props.entityID, "deck");
   let isMember = !!useIndex.eav(props.entityID, "member/name");
-  let isChat = !!useIndex.eav(props.entityID, "chat");
 
   return (
     <RotateAndResize {...props}>
       <div
         className={`cardPreviewBorder relative grow overflow-hidden ${borderStyles(
-          {
-            isDeck,
-            isMember,
-            isChat,
-          }
+          { isMember }
         )} ${props.isOver ? "rounded-[24px] shadow-[0_0_16px_0_#cccccc]" : ""}`}
       >
         {props.size === "small" ? (

@@ -24,28 +24,22 @@ import { MakeImage, ImageSection } from "./ImageSection";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { flag } from "data/Facts";
-import { MessageInput, Messages } from "pages/s/[studio]/s/[space]/chat";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
-const borderStyles = (args: { deck: boolean; member: boolean }) => {
+const borderStyles = (args: { member: boolean }) => {
   switch (true) {
     //styles can be found is global.css
     case args.member:
       return `memberCardBorder`;
-    case args.deck:
-      return `defaultCardBorder`;
-
     default:
       return `defaultCardBorder`;
   }
 };
 
-const contentStyles = (args: { deck: boolean; member: boolean }) => {
+const contentStyles = (args: { member: boolean }) => {
   switch (true) {
     case args.member:
       return `bg-white rounded-md ml-2 mr-2 mb-2 mt-0 px-3 pt-3 pb-6`;
-    case args.deck:
-      return `px-3 py-4 sm:px-4 sm:py-6`;
     default:
       return `px-3 py-4 sm:px-4 sm:py-6`;
   }
@@ -55,31 +49,9 @@ export const CardView = (props: {
   onDelete?: () => void;
   referenceFactID?: string;
 }) => {
-  let isDeck = useIndex.eav(props.entityID, "deck");
-  let isChat = useIndex.eav(props.entityID, "chat");
   let memberName = useIndex.eav(props.entityID, "member/name");
   let { ref } = usePreserveScroll<HTMLDivElement>();
   let { session } = useAuth();
-
-  // TESTING HIDDEN FEATURE - customizable card styles
-  // get sections at top level to check for style customizations
-  let text_color_value = useIndex.eav(
-    props.entityID,
-    "section/hyperlink_text_color" as "arbitrarySectionStringType"
-  )?.value;
-  let bg_color_value = useIndex.eav(
-    props.entityID,
-    "section/hyperlink_bg_color" as "arbitrarySectionStringType"
-  )?.value;
-  let border_color_value = useIndex.eav(
-    props.entityID,
-    "section/hyperlink_border_color" as "arbitrarySectionStringType"
-  )?.value;
-  let border_width_value = useIndex.eav(
-    props.entityID,
-    "section/hyperlink_border_width" as "arbitrarySectionStringType"
-  )?.value;
-  if (isChat) return <ChatCard {...props} />;
 
   return (
     <div className="flex flex-col items-stretch h-full">
@@ -95,16 +67,9 @@ export const CardView = (props: {
         w-full h-full
         flex flex-col items-stretch
         ${borderStyles({
-          deck: !!isDeck,
           member: !!memberName,
         })}
         `}
-        style={{
-          color: text_color_value ? text_color_value : undefined,
-          backgroundColor: bg_color_value ? bg_color_value : undefined,
-          borderColor: border_color_value ? border_color_value : undefined,
-          borderWidth: border_width_value ? border_width_value : undefined,
-        }}
       >
         {!session?.loggedIn || !memberName ? null : (
           <>
@@ -128,7 +93,6 @@ export const CardView = (props: {
             grow
             overflow-scroll
             ${contentStyles({
-              deck: !!isDeck,
               member: !!memberName,
             })}
             `}
@@ -200,69 +164,6 @@ const DefaultTextSection = (props: { entityID: string }) => {
       entityID={props.entityID}
       section={"card/content"}
     />
-  );
-};
-
-const ChatCard = (props: {
-  entityID: string;
-  onDelete?: () => void;
-  referenceFactID?: string;
-}) => {
-  let { memberEntity, mutate } = useMutations();
-  useEffect(() => {
-    if (memberEntity)
-      mutate("updateReadState", { member: memberEntity, chat: props.entityID });
-  }, [memberEntity]);
-  return (
-    <div className={`chatCardWrapper grow h-full relative`}>
-      <div className="chatCardBackground absolute top-0 bottom-0 left-0 right-0 chatCardBorder">
-        <div className="chatCardContent flex flex-col  h-full px-3 pt-4 sm:px-4 sm:pt-6 pb-1">
-          <div className="cardHeader grid grid-cols-[auto_max-content_max-content] gap-2">
-            <div className="pb-2">
-              <Title entityID={props.entityID} />
-            </div>
-            <div className="">
-              <CardMoreOptionsMenu
-                onDelete={props.onDelete}
-                entityID={props.entityID}
-                referenceFactID={props?.referenceFactID}
-              />
-            </div>
-          </div>
-          <Messages topic={props.entityID} />
-          <MessageInput id={props.entityID} topic={props.entityID} />
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const MakeDeck = (props: { entity: string }) => {
-  let { authorized, mutate } = useMutations();
-  let cards = useIndex.eav(props.entity, "deck/contains");
-  let isDeck = useIndex.eav(props.entity, "deck");
-
-  if (cards && cards.length > 0) return null;
-  if (!authorized) return null;
-  return isDeck ? null : (
-    <button
-      onClick={() => {
-        mutate("assertFact", {
-          entity: props.entity,
-          attribute: "deck",
-          value: flag(),
-          positions: {},
-        });
-      }}
-    >
-      <CardAdd
-        className={
-          isDeck
-            ? `text-accent-blue hover:text-grey-55`
-            : `text-grey-55 hover:text-accent-blue`
-        }
-      />
-    </button>
   );
 };
 

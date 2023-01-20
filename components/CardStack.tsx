@@ -232,17 +232,12 @@ const AddCard = (props: { expanded: boolean; end?: boolean } & StackData) => {
     let entity = ulid();
     create(entity, props, rep.rep, mutate);
   });
-  const decks = useIndex.aev(open ? "deck" : null);
   let items = titles
     .map((t) => {
       return {
         entity: t.entity,
         display: t.value,
-        icon: !!decks.find((d) => t.entity === d.entity) ? (
-          <DeckSmall />
-        ) : (
-          <CardIcon />
-        ),
+        icon: <CardIcon />,
       };
     })
     .concat(
@@ -254,12 +249,7 @@ const AddCard = (props: { expanded: boolean; end?: boolean } & StackData) => {
         };
       })
     )
-    .filter(
-      (f) =>
-        props.attribute !== "deck/contains" ||
-        !props.backlink ||
-        !!decks.find((d) => f.entity === d.entity)
-    );
+    .filter((f) => props.attribute !== "deck/contains" || !props.backlink);
   const alreadyIn = useIndex.vae(props.parent, props.attribute);
   const alreadyInEAV = useIndex.eav(props.parent, props.attribute);
 
@@ -311,14 +301,6 @@ const AddCard = (props: { expanded: boolean; end?: boolean } & StackData) => {
             if (d.type === "existing") entity = d.entity;
             else {
               entity = ulid();
-              if (d.cardType === "chat") {
-                await mutate("assertFact", {
-                  entity,
-                  attribute: "chat",
-                  value: { type: "flag" },
-                  positions: {},
-                });
-              }
               await mutate("createCard", {
                 entityID: entity,
                 title: d.name,
