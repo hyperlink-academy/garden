@@ -1,5 +1,6 @@
 import { useLongPress } from "hooks/useLongPress";
 import { useIndex, useMutations } from "hooks/useReplicache";
+import { useUndoableState } from "hooks/useUndoableState";
 import useWindowDimensions from "hooks/useWindowDimensions";
 import { createContext, useContext, useRef, useState } from "react";
 import { ulid } from "src/ulid";
@@ -24,7 +25,7 @@ export function CardViewerLayout(props: {
   children: React.ReactNode;
   EmptyState: React.ReactNode;
 }) {
-  let [history, setHistory] = useState([] as string[]);
+  let [history, setHistory] = useUndoableState([] as string[]);
 
   let ref = useRef<HTMLDivElement | null>(null);
 
@@ -167,7 +168,7 @@ const FindOrCreateBar = () => {
   let { open: openCard } = useCardViewer();
   let items = useAllItems(open);
 
-  let { authorized, mutate, memberEntity } = useMutations();
+  let { mutate, memberEntity, action } = useMutations();
   return (
     <>
       <button className="flex items-center group" onClick={() => setOpen(true)}>
@@ -183,31 +184,39 @@ const FindOrCreateBar = () => {
         allowBlank={true}
         onClose={() => setOpen(false)}
         //START OF ON SELECT LOGIC
-        onSelect={async (d) => {
+        onSelect={async (cards) => {
           if (!memberEntity) return;
-          let entity;
-          if (d.type === "create") {
-            entity = ulid();
 
-            if (d.cardType === "chat") {
-              await mutate("assertFact", {
-                entity,
-                attribute: "chat",
-                value: { type: "flag" },
-                positions: {},
-              });
+          action.start();
+
+          for (let d of cards) {
+            let entity;
+            if (d.type === "create") {
+              entity = ulid();
+
+              if (d.cardType === "chat") {
+                await mutate("assertFact", {
+                  entity,
+                  attribute: "chat",
+                  value: { type: "flag" },
+                  positions: {},
+                });
+              }
+              if (d.name) {
+                await mutate("createCard", {
+                  entityID: entity,
+                  title: d.name,
+                  memberEntity,
+                });
+              }
+            } else {
+              entity = d.entity;
             }
-            if (d.name) {
-              await mutate("createCard", {
-                entityID: entity,
-                title: d.name,
-                memberEntity,
-              });
-            }
-          } else {
-            entity = d.entity;
+
+            openCard({ entityID: entity });
           }
-          openCard({ entityID: entity });
+
+          action.end();
         }}
         // END OF ONSELECT LOGIC
         selected={[]}

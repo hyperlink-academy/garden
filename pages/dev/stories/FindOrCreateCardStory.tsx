@@ -64,10 +64,13 @@ const Story = () => {
         items={items}
         onClose={() => setOpen(false)}
         selected={selectedCards}
-        onSelect={(e) => {
-          if (e.type == "existing") {
-            setSelectedCards((s) => [...s, e.entity]);
-          }
+        onSelect={(cards) => {
+          // FIX LATER
+          // for(let d of cards) {
+          //   if (d.type == "existing") {
+          //     setSelectedCards((s) => [...s, d.entity]);
+          //   }
+          // }
         }}
       />
       <ul>

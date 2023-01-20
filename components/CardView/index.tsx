@@ -304,7 +304,7 @@ const CardMoreOptionsMenu = (props: {
   referenceFactID?: string;
   onDelete?: () => void;
 }) => {
-  let { authorized, mutate } = useMutations();
+  let { authorized, mutate, action } = useMutations();
   let memberName = useIndex.eav(props.entityID, "member/name");
 
   let { query: q } = useRouter();
@@ -348,9 +348,13 @@ const CardMoreOptionsMenu = (props: {
         {/* TODO: check if deck card; if so display "Delete Deck…"  */}
 
         <MenuItem
-          onClick={() => {
-            mutate("deleteEntity", { entity: props.entityID });
+          onClick={async () => {
+            action.start();
+
+            await mutate("deleteEntity", { entity: props.entityID });
             props.onDelete?.();
+
+            action.end();
           }}
         >
           <p className="font-bold text-accent-red">Delete FOREVER</p>

@@ -264,7 +264,7 @@ const AddCard = (props: { expanded: boolean; end?: boolean } & StackData) => {
   const alreadyInEAV = useIndex.eav(props.parent, props.attribute);
 
   let rep = useContext(ReplicacheContext);
-  let { authorized, mutate, memberEntity } = useMutations();
+  let { authorized, mutate, memberEntity, action } = useMutations();
   if (!authorized) return null;
   return (
     <>
@@ -299,29 +299,36 @@ const AddCard = (props: { expanded: boolean; end?: boolean } & StackData) => {
         allowBlank={true}
         onClose={() => setOpen(false)}
         //START OF ON SELECT LOGIC
-        onSelect={async (d) => {
+        onSelect={async (cards) => {
           if (!rep?.rep || !memberEntity) return;
           // if youre adding to a backlink section, then the entity is a string
           // if youre creating a new deck
-          let entity: string;
-          if (d.type === "existing") entity = d.entity;
-          else {
-            entity = ulid();
-            if (d.cardType === "chat") {
-              await mutate("assertFact", {
-                entity,
-                attribute: "chat",
-                value: { type: "flag" },
-                positions: {},
+
+          action.start();
+
+          for (let d of cards) {
+            let entity: string;
+            if (d.type === "existing") entity = d.entity;
+            else {
+              entity = ulid();
+              if (d.cardType === "chat") {
+                await mutate("assertFact", {
+                  entity,
+                  attribute: "chat",
+                  value: { type: "flag" },
+                  positions: {},
+                });
+              }
+              await mutate("createCard", {
+                entityID: entity,
+                title: d.name,
+                memberEntity,
               });
             }
-            await mutate("createCard", {
-              entityID: entity,
-              title: d.name,
-              memberEntity,
-            });
+            create(entity, props, rep.rep, mutate);
           }
-          create(entity, props, rep.rep, mutate);
+
+          action.end();
         }}
         // END OF ONSELECT LOGIC
         selected={

@@ -5,6 +5,7 @@ import {
   useMutations,
   useSpaceID,
 } from "hooks/useReplicache";
+import { useUndoableState } from "hooks/useUndoableState";
 import { ulid } from "src/ulid";
 import Head from "next/head";
 import { useAuth } from "hooks/useAuth";
@@ -186,7 +187,7 @@ const MessageData = (props: { entity: string }) => {
 
 export const MessageInput = (props: { id: string; topic: string }) => {
   let [message, setMessage] = useState("");
-  let [attachedCards, setAttachedCards] = useState<string[]>([]);
+  let [attachedCards, setAttachedCards] = useUndoableState<string[]>([]);
   let messages = useIndex.messages(props.topic);
   let { session } = useAuth();
   useEffect(() => {
@@ -296,7 +297,9 @@ export const MessageInput = (props: { id: string; topic: string }) => {
         >
           <FindOrCreateCard
             selected={attachedCards}
-            onSelect={(e) => setAttachedCards((a) => [...a, e])}
+            onSelect={(e) => {
+              setAttachedCards((a) => [...a, e]);
+            }}
           />
           <button
             className="text-accent-blue"
@@ -364,7 +367,7 @@ const FindOrCreateCard = (props: {
   selected: string[];
 }) => {
   let [open, setOpen] = useState(false);
-  let { mutate, memberEntity } = useMutations();
+  let { mutate, memberEntity, action } = useMutations();
   let items = useAllItems(open);
 
   return (
@@ -378,21 +381,31 @@ const FindOrCreateCard = (props: {
         open={open}
         items={items}
         selected={props.selected}
-        onSelect={async (e) => {
+        onSelect={async (cards) => {
           if (!memberEntity) return;
-          let entity;
-          if (e.type === "create") {
-            entity = ulid();
-            await mutate("createCard", {
-              entityID: entity,
-              title: e.name,
-              memberEntity,
-            });
-          } else {
-            entity = e.entity;
+
+          action.start();
+          console.log("action start");
+
+          for (let e of cards) {
+            let entity;
+            if (e.type === "create") {
+              entity = ulid();
+              await mutate("createCard", {
+                entityID: entity,
+                title: e.name,
+                memberEntity,
+              });
+            } else {
+              entity = e.entity;
+            }
+
+            console.log(entity);
+            props.onSelect(entity);
           }
 
-          props.onSelect(entity);
+          console.log("action end");
+          action.end();
         }}
       />
     </>
