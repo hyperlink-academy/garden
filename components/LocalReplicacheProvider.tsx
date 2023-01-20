@@ -15,12 +15,14 @@ export type Entity = {
     : Fact<k>["value"];
 };
 
-export const LocalReplicacheProvider: React.FC<React.PropsWithChildren<{
-  defaultAttributes: { [k: string]: Schema };
-  defaultFacts: Entity[];
-}>> = (props) => {
+export const LocalReplicacheProvider: React.FC<
+  React.PropsWithChildren<{
+    defaultAttributes: { [k: string]: Schema };
+    defaultFacts: Entity[];
+  }>
+> = (props) => {
   let [rep, setRep] = useState<ReturnType<typeof makeReplicache>>();
-  let [undoManager] = useState(new UndoManager())
+  let [undoManager] = useState(new UndoManager());
 
   useEffect(() => {
     let rep = makeReplicache({
@@ -93,7 +95,7 @@ export const LocalReplicacheProvider: React.FC<React.PropsWithChildren<{
           },
         };
       },
-      undoManager
+      undoManager,
     });
     setRep(rep);
     return () => {
@@ -102,7 +104,9 @@ export const LocalReplicacheProvider: React.FC<React.PropsWithChildren<{
   }, [props.defaultFacts, props.defaultAttributes]);
 
   return (
-    <ReplicacheContext.Provider value={rep ? { rep, id: "local", undoManager } : null}>
+    <ReplicacheContext.Provider
+      value={rep ? { rep, id: "local", undoManager } : null}
+    >
       {props.children}
     </ReplicacheContext.Provider>
   );

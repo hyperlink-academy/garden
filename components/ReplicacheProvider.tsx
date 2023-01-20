@@ -16,10 +16,12 @@ import { UndoManager } from "@rocicorp/undo";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL as string;
-export const SpaceProvider: React.FC<React.PropsWithChildren<{ id: string }>> = (props) => {
+export const SpaceProvider: React.FC<
+  React.PropsWithChildren<{ id: string }>
+> = (props) => {
   let [rep, setRep] = useState<ReturnType<typeof makeReplicache>>();
   const [reconnectSocket, setReconnect] = useState({});
-  let [undoManager] = useState(new UndoManager())
+  let [undoManager] = useState(new UndoManager());
   let socket = useRef<WebSocket>();
   useEffect(() => {
     if (!props.id || !rep) return;
@@ -34,7 +36,7 @@ export const SpaceProvider: React.FC<React.PropsWithChildren<{ id: string }>> = 
 
   useEffect(() => {
     // @ts-ignore
-    window.undoManager = undoManager
+    window.undoManager = undoManager;
 
     let handler = (e: KeyboardEvent) => {
       if (
@@ -49,12 +51,12 @@ export const SpaceProvider: React.FC<React.PropsWithChildren<{ id: string }>> = 
       ) {
         undoManager.redo();
       }
-    }
+    };
 
-    window.addEventListener('keydown', handler)
+    window.addEventListener("keydown", handler);
 
-    return () => window.removeEventListener('keydown', handler)
-  }, [undoManager])
+    return () => window.removeEventListener("keydown", handler);
+  }, [undoManager]);
 
   let { session } = useAuth();
   useEffect(() => {
@@ -69,7 +71,7 @@ export const SpaceProvider: React.FC<React.PropsWithChildren<{ id: string }>> = 
       },
       session: session.session?.studio,
       token: session.token,
-      undoManager: undoManager
+      undoManager: undoManager,
     });
     setRep(rep);
     return () => {
@@ -77,7 +79,9 @@ export const SpaceProvider: React.FC<React.PropsWithChildren<{ id: string }>> = 
     };
   }, [props.id, session.token, session.session?.studio]);
   return (
-    <ReplicacheContext.Provider value={rep ? { rep, id: props.id, undoManager } : null}>
+    <ReplicacheContext.Provider
+      value={rep ? { rep, id: props.id, undoManager } : null}
+    >
       {props.children}
     </ReplicacheContext.Provider>
   );
@@ -91,10 +95,12 @@ export const prefetchSpaceId = (studio: string, space: string) => {
   mutate("/studio/" + studio + "/space/" + space, id);
 };
 
-export const SpaceSpaceProvider: React.FC<React.PropsWithChildren<{
-  loading: React.ReactElement;
-  notFound: React.ReactElement;
-}>> = (props) => {
+export const SpaceSpaceProvider: React.FC<
+  React.PropsWithChildren<{
+    loading: React.ReactElement;
+    notFound: React.ReactElement;
+  }>
+> = (props) => {
   let router = useRouter();
   let { data: id } = useSWR(
     "persist-/studio/" + router.query.studio + "/space/" + router.query.space,
@@ -173,5 +179,5 @@ export const makeSpaceReplicache = ({
         },
       };
     },
-    undoManager: undoManager
+    undoManager: undoManager,
   });

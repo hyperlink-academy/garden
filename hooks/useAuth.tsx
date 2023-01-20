@@ -21,7 +21,9 @@ export const AuthContext = createContext({
   },
 });
 
-export const AuthProvider: React.FC<React.PropsWithChildren<unknown>> = (props) => {
+export const AuthProvider: React.FC<React.PropsWithChildren<unknown>> = (
+  props
+) => {
   let { data, mutate } = useSWR("persist-session", async () => {
     let token = localStorage.getItem("auth");
     if (!token) return { loggedIn: false } as const;
@@ -31,7 +33,7 @@ export const AuthProvider: React.FC<React.PropsWithChildren<unknown>> = (props) 
   });
 
   let [rep, setRep] = useState<ReturnType<typeof makeReplicache>>();
-  let [undoManager] = useState(new UndoManager())
+  let [undoManager] = useState(new UndoManager());
 
   useEffect(() => {
     if (!data?.loggedIn) return;
@@ -41,7 +43,7 @@ export const AuthProvider: React.FC<React.PropsWithChildren<unknown>> = (props) 
       id: id,
       session: id,
       token: data.token,
-      undoManager: undoManager
+      undoManager: undoManager,
     });
     setRep(rep);
     return () => {

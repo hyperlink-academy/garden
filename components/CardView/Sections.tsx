@@ -151,7 +151,7 @@ export const SingleTextSection = (
           timeout.current = null;
           action.end();
         }, 200);
-        
+
         await mutate("assertFact", {
           entity: props.entityID,
           attribute: props.section,

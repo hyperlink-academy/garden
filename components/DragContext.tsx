@@ -23,7 +23,9 @@ import { useSortable } from "@dnd-kit/sortable";
 import { useAtom, atom } from "jotai";
 import { CardMedium } from "./Icons";
 
-export const SmallCardDragContext: React.FC<React.PropsWithChildren<unknown>> = (props) => {
+export const SmallCardDragContext: React.FC<
+  React.PropsWithChildren<unknown>
+> = (props) => {
   let [activeCard, setActiveCard] = useState<Active | null>(null);
   const mouseSensor = useSensor(MouseSensor, {});
   const touchSensor = useSensor(TouchSensor, {});

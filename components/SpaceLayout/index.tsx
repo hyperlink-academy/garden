@@ -4,7 +4,9 @@ import Head from "next/head";
 
 import { SpaceHeader } from "./SpaceHeader";
 
-export const SpaceLayout: React.FC<React.PropsWithChildren<unknown>> = (props) => {
+export const SpaceLayout: React.FC<React.PropsWithChildren<unknown>> = (
+  props
+) => {
   let spaceName = useIndex.aev("this/name")[0];
 
   return (

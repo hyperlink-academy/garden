@@ -15,7 +15,9 @@ export const useSmoker = () => {
     }, 2000);
   };
 };
-export const SmokeProvider: React.FC<React.PropsWithChildren<unknown>> = (props) => {
+export const SmokeProvider: React.FC<React.PropsWithChildren<unknown>> = (
+  props
+) => {
   let [state, setState] = useState<Smokes>([]);
   return (
     <SmokeContext.Provider value={{ setState }}>
@@ -29,7 +31,9 @@ export const SmokeProvider: React.FC<React.PropsWithChildren<unknown>> = (props)
   );
 };
 
-const Smoke: React.FC<React.PropsWithChildren<{ x: number; y: number }>> = (props) => {
+const Smoke: React.FC<React.PropsWithChildren<{ x: number; y: number }>> = (
+  props
+) => {
   return (
     <div
       className={`smoke absolute z-20 rounded-full bg-accent-blue text-white py-1 px-2 pointer-events-none `}

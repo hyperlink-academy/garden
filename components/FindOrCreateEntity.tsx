@@ -34,7 +34,7 @@ export const FindOrCreate = (props: {
   onClose: () => void;
   items: Item[];
   selected: string[];
-  onSelect: (item: AddedItem) => void;
+  onSelect: (item: AddedItem[]) => void;
 }) => {
   let [input, setInput] = useState("");
   let [added, setAdded] = useState<AddedItem[]>([]);
@@ -84,7 +84,7 @@ export const FindOrCreate = (props: {
             // NOTE: clicking the checkbox, shift clicking, longpress/click on a search result sets state to multiselect.
             // if isMultiSelect = false then onselect and onclose that bish
             if (isMultiSelect.current === false) {
-              props.onSelect(optionValue);
+              props.onSelect([optionValue]);
               props.onClose();
               setAdded([]);
               return;
@@ -211,7 +211,7 @@ export const FindOrCreate = (props: {
                     <ButtonPrimary
                       content={`Add ${added.length} Cards!`}
                       onClick={() => {
-                        added.map((addedItem) => props.onSelect(addedItem));
+                        props.onSelect(added);
                         props.onClose();
                         setAdded([]);
                         isMultiSelect.current = false;

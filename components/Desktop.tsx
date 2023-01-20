@@ -84,7 +84,7 @@ export const Desktop = () => {
             da: 0,
           });
           action.end();
-          return
+          return;
         }
 
         await mutate("addToOrCreateDeck", {
@@ -109,7 +109,7 @@ export const Desktop = () => {
             if (e.currentTarget !== e.target) return;
             let parentRect = e.currentTarget.getBoundingClientRect();
             if (e.ctrlKey) {
-              action.start()
+              action.start();
               mutate("addCardToDesktop", {
                 entity: ulid(),
                 factID: ulid(),
@@ -121,7 +121,7 @@ export const Desktop = () => {
                   y: Math.max(e.clientY - parentRect.top - 42, 0),
                 },
               });
-              action.end()
+              action.end();
             }
             if (e.detail === 2) {
               setCreateCard({
@@ -275,43 +275,45 @@ const AddCard = (props: {
       open={!!props.position}
       allowBlank={true}
       onClose={() => props.onClose()}
-      onSelect={async (d) => {
+      onSelect={async (cards) => {
         if (!props.position || !memberEntity) return;
         let entity;
 
         action.start();
-        if (d.type === "create") {
-          entity = ulid();
-          if (d.cardType === "chat") {
-            await mutate("assertFact", {
-              entity,
-              attribute: "chat",
-              value: { type: "flag" },
-              positions: {},
+        for (let d of cards) {
+          if (d.type === "create") {
+            entity = ulid();
+            if (d.cardType === "chat") {
+              await mutate("assertFact", {
+                entity,
+                attribute: "chat",
+                value: { type: "flag" },
+                positions: {},
+              });
+            }
+            await mutate("createCard", {
+              entityID: entity,
+              title: d.name,
+              memberEntity,
             });
+          } else {
+            entity = d.entity;
           }
-          await mutate("createCard", {
-            entityID: entity,
-            title: d.name,
-            memberEntity,
+
+          await mutate("addCardToDesktop", {
+            entity,
+            factID: ulid(),
+            desktop: props.desktopEntity,
+            position: {
+              rotation: 0,
+              size: "small",
+              x: Math.max(props.position.x - 128, 0),
+              y: Math.max(props.position.y - 42, 0),
+            },
           });
-        } else {
-          entity = d.entity;
         }
 
-        await mutate("addCardToDesktop", {
-          entity,
-          factID: ulid(),
-          desktop: props.desktopEntity,
-          position: {
-            rotation: 0,
-            size: "small",
-            x: Math.max(props.position.x - 128, 0),
-            y: Math.max(props.position.y - 42, 0),
-          },
-        });
-
-        action.end()
+        action.end();
       }}
       selected={[]}
     />

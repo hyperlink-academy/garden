@@ -11,7 +11,9 @@ export const Divider = (props: { dark?: boolean }) => {
   );
 };
 
-export const FloatingContainer: React.FC<React.PropsWithChildren<{ className?: string }>> = (props) => {
+export const FloatingContainer: React.FC<
+  React.PropsWithChildren<{ className?: string }>
+> = (props) => {
   return (
     <div
       className={`
@@ -27,9 +29,9 @@ export const FloatingContainer: React.FC<React.PropsWithChildren<{ className?: s
   );
 };
 
-export const Modal: React.FC<React.PropsWithChildren<{ open: boolean; onClose: () => void }>> = (
-  props
-) => {
+export const Modal: React.FC<
+  React.PropsWithChildren<{ open: boolean; onClose: () => void }>
+> = (props) => {
   return (
     <Dialog
       open={props.open}
@@ -53,7 +55,9 @@ export const Modal: React.FC<React.PropsWithChildren<{ open: boolean; onClose: (
   );
 };
 
-export const MenuContainer: React.FC<React.PropsWithChildren<{ className?: string }>> = (props) => {
+export const MenuContainer: React.FC<
+  React.PropsWithChildren<{ className?: string }>
+> = (props) => {
   return (
     <Transition
       as={Fragment}
@@ -84,10 +88,12 @@ export const MenuContainer: React.FC<React.PropsWithChildren<{ className?: strin
   );
 };
 
-export const MenuItem: React.FC<React.PropsWithChildren<{
-  onClick?: () => void;
-  disabled?: boolean;
-}>> = (props) => {
+export const MenuItem: React.FC<
+  React.PropsWithChildren<{
+    onClick?: () => void;
+    disabled?: boolean;
+  }>
+> = (props) => {
   return (
     <Menu.Item>
       {({ active }) => (
