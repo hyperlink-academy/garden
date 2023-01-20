@@ -35,9 +35,6 @@ export const SpaceProvider: React.FC<
   }, [props.id, rep, reconnectSocket]);
 
   useEffect(() => {
-    // @ts-ignore
-    window.undoManager = undoManager;
-
     let handler = (e: KeyboardEvent) => {
       if (
         (e.key === "z" && e.ctrlKey) ||
@@ -47,6 +44,7 @@ export const SpaceProvider: React.FC<
       }
       if (
         (e.key === "y" && e.ctrlKey) ||
+        (e.key === "Z" && e.ctrlKey) ||
         (e.key === "z" && e.metaKey && e.shiftKey)
       ) {
         undoManager.redo();
