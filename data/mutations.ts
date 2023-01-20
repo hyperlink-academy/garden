@@ -6,10 +6,6 @@ import { Fact, flag, ref } from "./Facts";
 import { Message } from "./Messages";
 
 export type MutationContext = {
-  postMessage: (
-    msg: Message,
-    opts?: { ignoreBots: true }
-  ) => Promise<{ success: boolean }>;
   assertFact: <A extends keyof Attribute>(
     d: Pick<Fact<A>, "entity" | "attribute" | "value" | "positions"> & {
       factID?: string;

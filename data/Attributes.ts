@@ -155,16 +155,6 @@ export const DefaultAttributes = {
     type: "string",
     cardinality: "one",
   },
-  "bot/name": {
-    type: "string",
-    cardinality: "one",
-    unique: true,
-  },
-  "bot/url": {
-    type: "string",
-    cardinality: "one",
-    unique: false,
-  },
   "canvas/height": {
     type: "number",
     cardinality: "one",

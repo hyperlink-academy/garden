@@ -169,9 +169,8 @@ const DefaultTextSection = (props: { entityID: string }) => {
 
 const Title = (props: { entityID: string }) => {
   let memberName = useIndex.eav(props.entityID, "member/name");
-  let botName = useIndex.eav(props.entityID, "bot/name");
   let cardTitle = useIndex.eav(props.entityID, "card/title");
-  let titleFact = memberName || botName || cardTitle;
+  let titleFact = memberName || cardTitle;
   return (
     <SingleTextSection
       onKeyPress={(e) => {

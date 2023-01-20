@@ -122,7 +122,6 @@ const BackButton = (props: {
 }) => {
   let prevCardTitle = useIndex.eav(props.history[1], "card/title")?.value;
   let prevCardMemberName = useIndex.eav(props.history[1], "member/name")?.value;
-  let prevCardBotName = useIndex.eav(props.history[1], "bot/name")?.value;
 
   const { width } = useWindowDimensions();
   let { handlers } = useLongPress(() => {
@@ -152,9 +151,7 @@ const BackButton = (props: {
         <p className="truncate whitespace-nowrap">
           {props.history.length >= 2
             ? width > 1000
-              ? `Back to ${
-                  prevCardTitle || prevCardMemberName || prevCardBotName
-                }`
+              ? `Back to ${prevCardTitle || prevCardMemberName}`
               : "Back"
             : "Close"}
         </p>

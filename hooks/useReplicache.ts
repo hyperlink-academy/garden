@@ -28,7 +28,7 @@ import { UndoManager } from "@rocicorp/undo";
 export type ReplicacheMutators = {
   [k in keyof typeof Mutations]: (
     tx: WriteTransaction,
-    args: Parameters<(typeof Mutations)[k]>[0]
+    args: Parameters<typeof Mutations[k]>[0]
   ) => Promise<void>;
 };
 
@@ -173,10 +173,6 @@ function makeMutators(
           }
 
           return;
-        },
-        postMessage: async (m) => {
-          await tx.put(m.id, MessageWithIndexes(m));
-          return { success: true };
         },
         updateFact: async (id, data, undoAction) => {
           let { rep, undoManager } = dataFunc();
@@ -470,7 +466,7 @@ export const useMutations = () => {
     memberEntity: auth?.entity || null,
     mutate<T extends keyof typeof Mutations>(
       mutation: T,
-      args: Parameters<(typeof Mutations)[T]>[0]
+      args: Parameters<typeof Mutations[T]>[0]
     ) {
       if (!session || !auth) return;
       return rep?.rep.mutate[mutation](args);

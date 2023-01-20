@@ -2,7 +2,6 @@ import { Bindings } from "backend";
 import { Lock } from "src/lock";
 import { makeRouter } from "backend/lib/api";
 import { store } from "./fact_store";
-import { graphqlServer } from "./graphql";
 import { claimRoute } from "./routes/claim";
 import { create_space_route } from "./routes/create_space";
 import { delete_file_upload_route } from "./routes/delete_file_upload";
@@ -15,7 +14,6 @@ import { push_route } from "./routes/push";
 import { connect } from "./socket";
 import { handleFileUpload } from "./upload_file";
 import { migrations } from "./migrations";
-import { bot_mutation_route } from "./routes/bot_mutations";
 import { update_local_space_data_route } from "./internal_routes/update_local_space_data";
 import { update_self_route } from "./routes/update_self";
 import { delete_self_route } from "./routes/delete_self";
@@ -39,7 +37,6 @@ let routes = [
   get_latest_message,
   join_route,
   delete_file_upload_route,
-  bot_mutation_route,
   update_self_route,
   delete_self_route,
 ];
@@ -114,9 +111,6 @@ export class SpaceDurableObject implements DurableObject {
       }
       case "internal_api": {
         return internalRouter(path[2], request, ctx);
-      }
-      case "graphql": {
-        return graphqlServer(request, ctx);
       }
       default:
         return new Response("", { status: 404 });

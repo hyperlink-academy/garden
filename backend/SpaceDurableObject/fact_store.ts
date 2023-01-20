@@ -141,48 +141,6 @@ export const store = (storage: BasicStorage, ctx: { id: string }) => {
 
   let context: MutationContext = {
     scanIndex,
-    postMessage: async (m, opts) => {
-      let latestMessage = await storage.get<number>("meta-latest-message");
-      let index = latestMessage !== undefined ? latestMessage + 1 : 0;
-      storage.put(`messages-${m.ts}-${m.id}`, {
-        ...m,
-        index,
-      });
-
-      // CALL BOTS
-      // Get bots mentioned
-      // Lookup bot URL
-      // generate API key
-      // Send request to bot including: api key, message data, and SPACE_ID
-      if (!opts?.ignoreBots) {
-        let botsMentions = m.content.match(/\@\w*/g);
-        if (botsMentions && botsMentions[0]) {
-          let bot = botsMentions[0].slice(1);
-          let botName = await scanIndex.ave("bot/name", bot);
-          if (botName) {
-            let botURL = await scanIndex.eav(botName.entity, "bot/url");
-            if (botURL) {
-              try {
-                fetch(botURL.value, {
-                  method: "POST",
-                  headers: {
-                    "Content-type": "application/json",
-                  },
-                  body: JSON.stringify({
-                    botEntity: botName.entity,
-                    message: m,
-                    spaceID: ctx.id,
-                  }),
-                });
-              } catch (e) {}
-            }
-          }
-        }
-      }
-
-      await storage.put("meta-latest-message", index);
-      return { success: true };
-    },
     updateFact: async (id, data) => {
       let existingFact = await storage.get<Fact<keyof Attribute>>(
         indexes.factID(id)
