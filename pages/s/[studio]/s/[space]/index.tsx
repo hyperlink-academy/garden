@@ -13,7 +13,7 @@ const EmptyState = () => {
   return (
     <div
       className={`
-                w-full
+                w-full h-full
                 max-w-3xl
                 overflow-y-scroll       
                 relative
@@ -25,34 +25,8 @@ const EmptyState = () => {
                 p-4
                 `}
     >
-      <h3>Welcome!</h3>
-      <p>
-        To the <strong>left</strong> is the <strong>Desktop</strong>, a canvas
-        for working with cards.
-      </p>
-      <ul className="list-disc list-outside ml-4">
-        <li>
-          Double click to add a card — regular cards, decks, or chat cards
-        </li>
-        <li>Move, rotate, and resize cards</li>
-        <li>
-          Drag a card into a deck, or on top of another card to make a new deck
-        </li>
-      </ul>
-      <p>
-        Here on the <strong>right</strong> is your <strong>Card Viewer</strong>.
-      </p>
-      <ul className="list-disc list-outside ml-4">
-        <li>To open cards, click from the Desktop or search above</li>
-        <li>Cards will stack temporarily as you browse</li>
-      </ul>
-      <p>
-        Above the Desktop, view <strong>Space info</strong> and{" "}
-        <strong>Highlights</strong>.
-      </p>
-      <p>
-        Click the same icon on any card to add a <strong>new Highlight</strong>{" "}
-        for others to see.
+      <p className="m-auto">
+        <em>Open a card!</em>
       </p>
     </div>
   );
