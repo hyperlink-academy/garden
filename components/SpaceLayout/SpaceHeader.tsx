@@ -2,9 +2,13 @@ import { useAuth } from "hooks/useAuth";
 import Link from "next/link";
 import useSWR from "swr";
 import { useRouter } from "next/router";
-import { BackToStudio as BackToStudioIcon, Note } from "../Icons";
+import {
+  BackToStudio as BackToStudioIcon,
+  Note,
+  SearchOrCommand,
+} from "../Icons";
 import { spacePath } from "hooks/utils";
-import { useIndex, useSpaceID } from "hooks/useReplicache";
+import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
 import { useState } from "react";
 import { ButtonSecondary } from "../Buttons";
 import { LogInModal } from "../LoginModal";
@@ -15,25 +19,36 @@ import { animated, useSpring } from "@react-spring/web";
 import useMeasure from "react-use-measure";
 import { Divider, Modal } from "components/Layout";
 import { BaseSmallCard } from "components/CardPreview/SmallCard";
+import { useCardViewer } from "components/CardViewerContext";
+import { useAllItems, FindOrCreate } from "components/FindOrCreateEntity";
+import { ulid } from "src/ulid";
 
 export const SpaceHeader: React.FC<React.PropsWithChildren<unknown>> = () => {
   let { session } = useAuth();
+  let spaceName = useIndex.aev("this/name")[0];
 
   return (
-    <div className="pageHeader shrink-0 pb-2 text-white">
+    <div className="pageHeader shrink-0 text-grey-35">
       <div
         className={`
           headerWrapper
-          max-w-6xl mx-auto px-3 
-          before:content-[''] before:absolute before:w-[100vw] before:h-12 before:left-0 before:bg-grey-35`}
+          max-w-6xl
+          mx-auto sm:px-4 px-2 pt-4
+          flex gap-4 place-items-center`}
       >
-        <div className="headerContent flex gap-4 pt-3">
+        <div className="pt-[1px]">
           <BackToStudio studio={session.session?.username} />
-          <SpaceName />
-          <div className="z-10 shrink-0 flex gap-4">
-            {!session.session ? <Login /> : null}
-          </div>
         </div>
+        <SpaceName />
+        {/* <h2>{spaceName?.value}</h2> */}
+
+        {!session.session ? (
+          <div className="z-10 shrink-0 flex gap-4">
+            <Login />
+          </div>
+        ) : (
+          <FindOrCreateBar />
+        )}
       </div>
     </div>
   );
@@ -41,7 +56,7 @@ export const SpaceHeader: React.FC<React.PropsWithChildren<unknown>> = () => {
 
 const SpaceName = () => {
   return (
-    <Popover className="w-full">
+    <Popover className="w-full h-8">
       {({ open }) => <SpaceNameContent open={open} />}
     </Popover>
   );
@@ -63,14 +78,16 @@ const SpaceNameContent = (props: { open: boolean }) => {
         minWidth: minWidth,
       }}
       ref={ref}
-      className={`headerSpaceName z-10 pt-1 font-bold grow pb-0.5 relative max-w-md`}
+      className={`headerSpaceName z-10 font-bold grow relative max-w-md`}
     >
       <animated.div
         style={{
           width,
         }}
-        className={`border-accent-blue absolute rounded-md hover:border-2 hover:bg-bg-blue hover:text-accent-blue px-2 overflow-hidden ${
-          props.open ? "bg-bg-blue text-accent-blue border-2" : "bg-grey-35"
+        className={`border-accent-blue absolute rounded-md hover:border-accent-blue hover:bg-bg-blue hover:text-accent-blue px-2 overflow-hidden ${
+          props.open
+            ? "bg-bg-blue text-accent-blue border-2 border-accent-blue"
+            : "border-2 border-transparent"
         }`}
       >
         <Popover.Button
@@ -82,7 +99,7 @@ const SpaceNameContent = (props: { open: boolean }) => {
             minWidth: props.open ? "240px" : undefined,
           }}
         >
-          {spaceName?.value}
+          <h2>{spaceName?.value}</h2>
         </Popover.Button>
         <animated.div
           style={{
@@ -105,7 +122,7 @@ const BackToStudio = (props: { studio?: string }) => {
   return (
     <div className="shrink-0 z-10 headerBackToStudio">
       <Link href={`/s/${props.studio}`}>
-        <div className="pt-1">
+        <div className="">
           <BackToStudioIcon />
         </div>
       </Link>
@@ -196,6 +213,58 @@ const MembersModal = () => {
           ))}
         </div>
       </Modal>
+    </>
+  );
+};
+
+const FindOrCreateBar = () => {
+  let [open, setOpen] = useState(false);
+  let { open: openCard } = useCardViewer();
+  let items = useAllItems(open);
+
+  let { mutate, memberEntity, action } = useMutations();
+  return (
+    <>
+      <button className="flex items-center group" onClick={() => setOpen(true)}>
+        <div className="text-white bg-accent-blue rounded-md px-3 py-1 group-hover:bg-accent-blue group-hover:text-white">
+          <SearchOrCommand />
+        </div>
+      </button>
+      <FindOrCreate
+        allowBlank={true}
+        onClose={() => setOpen(false)}
+        //START OF ON SELECT LOGIC
+        onSelect={async (cards) => {
+          if (!memberEntity) return;
+
+          action.start();
+
+          for (let d of cards) {
+            let entity;
+            if (d.type === "create") {
+              entity = ulid();
+
+              if (d.name) {
+                await mutate("createCard", {
+                  entityID: entity,
+                  title: d.name,
+                  memberEntity,
+                });
+              }
+            } else {
+              entity = d.entity;
+            }
+
+            openCard({ entityID: entity });
+          }
+
+          action.end();
+        }}
+        // END OF ONSELECT LOGIC
+        selected={[]}
+        open={open}
+        items={items}
+      />
     </>
   );
 };

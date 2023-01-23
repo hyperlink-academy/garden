@@ -129,7 +129,6 @@ export function CardViewerLayout(props: {
             ) : (
               <div />
             )}
-            <FindOrCreateBar />
           </div>
           {history[0] ? (
             <CardView
@@ -188,61 +187,5 @@ const BackButton = (props: {
         </p>
       </div>
     </button>
-  );
-};
-
-const FindOrCreateBar = () => {
-  let [open, setOpen] = useState(false);
-  let { open: openCard } = useCardViewer();
-  let items = useAllItems(open);
-
-  let { mutate, memberEntity, action } = useMutations();
-  return (
-    <>
-      <button className="flex items-center group" onClick={() => setOpen(true)}>
-        <div className="px-3 py-1 italic bg-white border border-grey-80 border-r-0 rounded-l-md text-grey-80">
-          {" "}
-          find or create a card...
-        </div>
-        <div className="text-accent-blue bg-bg-blue border border-accent-blue rounded-r-md px-3 py-1 group-hover:bg-accent-blue group-hover:text-white">
-          <SearchOrCommand />
-        </div>
-      </button>
-      <FindOrCreate
-        allowBlank={true}
-        onClose={() => setOpen(false)}
-        //START OF ON SELECT LOGIC
-        onSelect={async (cards) => {
-          if (!memberEntity) return;
-
-          action.start();
-
-          for (let d of cards) {
-            let entity;
-            if (d.type === "create") {
-              entity = ulid();
-
-              if (d.name) {
-                await mutate("createCard", {
-                  entityID: entity,
-                  title: d.name,
-                  memberEntity,
-                });
-              }
-            } else {
-              entity = d.entity;
-            }
-
-            openCard({ entityID: entity });
-          }
-
-          action.end();
-        }}
-        // END OF ONSELECT LOGIC
-        selected={[]}
-        open={open}
-        items={items}
-      />
-    </>
   );
 };
