@@ -1,19 +1,12 @@
+import { useAppEventListener } from "hooks/useEvents";
 import { useLongPress } from "hooks/useLongPress";
-import { useIndex, useMutations } from "hooks/useReplicache";
+import { useIndex } from "hooks/useReplicache";
 import { useUndoableState } from "hooks/useUndoableState";
 import useWindowDimensions from "hooks/useWindowDimensions";
-import { createContext, useContext, useRef, useState } from "react";
-import { ulid } from "src/ulid";
+import { createContext, useContext, useRef } from "react";
 import { ButtonLink } from "./Buttons";
 import { CardView } from "./CardView";
-import { FindOrCreate, useAllItems } from "./FindOrCreateEntity";
-import {
-  AddTiny,
-  CloseFilledTiny,
-  CloseLinedTiny,
-  GoBackToPage,
-  SearchOrCommand,
-} from "./Icons";
+import { CloseFilledTiny, GoBackToPage } from "./Icons";
 import { Divider } from "./Layout";
 
 export const CardViewerContext = createContext({
@@ -31,6 +24,15 @@ export function CardViewerLayout(props: {
   let [history, setHistory] = useUndoableState([] as string[]);
 
   let ref = useRef<HTMLDivElement | null>(null);
+  useAppEventListener(
+    "cardviewer.open-card",
+    (data) =>
+      setHistory((h) => {
+        if (h[0] === data.entityID) return h;
+        return [data.entityID, ...h];
+      }),
+    []
+  );
 
   return (
     <CardViewerContext.Provider

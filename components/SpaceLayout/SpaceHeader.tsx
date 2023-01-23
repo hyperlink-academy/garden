@@ -1,13 +1,7 @@
 import { useAuth } from "hooks/useAuth";
 import Link from "next/link";
 import useSWR from "swr";
-import { useRouter } from "next/router";
-import {
-  BackToStudio as BackToStudioIcon,
-  Note,
-  SearchOrCommand,
-} from "../Icons";
-import { spacePath } from "hooks/utils";
+import { BackToStudio as BackToStudioIcon, SearchOrCommand } from "../Icons";
 import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
 import { useState } from "react";
 import { ButtonSecondary } from "../Buttons";
@@ -19,14 +13,12 @@ import { animated, useSpring } from "@react-spring/web";
 import useMeasure from "react-use-measure";
 import { Divider, Modal } from "components/Layout";
 import { BaseSmallCard } from "components/CardPreview/SmallCard";
-import { useCardViewer } from "components/CardViewerContext";
 import { useAllItems, FindOrCreate } from "components/FindOrCreateEntity";
 import { ulid } from "src/ulid";
+import { publishAppEvent } from "hooks/useEvents";
 
 export const SpaceHeader: React.FC<React.PropsWithChildren<unknown>> = () => {
   let { session } = useAuth();
-  let spaceName = useIndex.aev("this/name")[0];
-
   return (
     <div className="pageHeader shrink-0 text-grey-35">
       <div
@@ -219,7 +211,6 @@ const MembersModal = () => {
 
 const FindOrCreateBar = () => {
   let [open, setOpen] = useState(false);
-  let { open: openCard } = useCardViewer();
   let items = useAllItems(open);
 
   let { mutate, memberEntity, action } = useMutations();
@@ -254,8 +245,7 @@ const FindOrCreateBar = () => {
             } else {
               entity = d.entity;
             }
-
-            openCard({ entityID: entity });
+            publishAppEvent("cardviewer.open-card", { entityID: entity });
           }
 
           action.end();
