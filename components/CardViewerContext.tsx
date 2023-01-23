@@ -4,14 +4,17 @@ import { useUndoableState } from "hooks/useUndoableState";
 import useWindowDimensions from "hooks/useWindowDimensions";
 import { createContext, useContext, useRef, useState } from "react";
 import { ulid } from "src/ulid";
+import { ButtonLink } from "./Buttons";
 import { CardView } from "./CardView";
 import { FindOrCreate, useAllItems } from "./FindOrCreateEntity";
 import {
+  AddTiny,
   CloseFilledTiny,
   CloseLinedTiny,
   GoBackToPage,
   SearchOrCommand,
 } from "./Icons";
+import { Divider } from "./Layout";
 
 export const CardViewerContext = createContext({
   open: (_args: { entityID: string }) => {},
@@ -52,35 +55,63 @@ export function CardViewerLayout(props: {
         className={`
         contentSplitLayout
         w-full 
-        flex flex-row items-stretch gap-4 sm:gap-8 
+        flex flex-row items-stretch gap-4 sm:gap-4 
         sm:justify-center
-        snap-x snap-mandatory overflow-x-scroll
+        overflow-x-scroll
+        pb-4 sm:pb-8
 `}
         // you need to add this to the contentSplitLayout class if you are going to scroll across more than 2 panes
         // it prevents the last pane from sticking to the end
         // after:content-[""] after:h-full after:w-2 after:block after:shrink-0
       >
-        <div
-          className={`
+        <div className="roomWrapper flex flex-row rounded-md border border-grey-90">
+          <div className="roomListWrapper bg-white rounded-l-[3px] w-48 shrink-0 flex flex-col gap-2 text-grey-35 p-4 border-r border-grey-90">
+            <h3>Brainstorm</h3>
+            <Divider />
+            <div>
+              <h4>Shared</h4>
+              <ul>
+                <li>Homeroom</li>
+                <li>
+                  <strong>Brainstorm</strong>
+                </li>
+                <li>Memes</li>
+                <li>Week 1</li>
+                <li>Week 2</li>
+                <li>Week 3</li>
+              </ul>
+              <ButtonLink content="new room" />
+            </div>
+            <div>
+              <h4>Members</h4>
+              <ul>
+                <li>Brendan</li>
+                <li>Celine</li>
+                <li>Jared</li>
+              </ul>
+              <ButtonLink content="invite member" />
+            </div>
+          </div>
+          <div
+            className={`
           desktopWrapper
           overflow-y-scroll overflow-x-hidden 
           no-scrollbar 
-          snap-center
           flex-shrink-0 
          h-full
           flex flex-col gap-0
           `}
-        >
-          {props.children}
+          >
+            {props.children}
+          </div>
         </div>
 
         <div
           className={`cardViewerWrapper 
           h-full w-[calc(100vw-16px)] max-w-3xl 
-           pb-4  sm:pb-8 
           shrink-0 sm:shrink        
           focus:outline-none
-          snap-center touch-pan-x 
+          touch-pan-x 
           flex flex-col gap-3 items-stretch`}
         >
           <div className="cardViewerHeader grid grid-cols-[auto_max-content] items-center gap-4 ">
