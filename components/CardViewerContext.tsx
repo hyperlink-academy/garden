@@ -114,10 +114,11 @@ export function CardViewerLayout(props: {
           shrink-0 sm:shrink        
           focus:outline-none
           touch-pan-x 
-          flex flex-col gap-3 items-stretch`}
+          flex flex-col items-stretch`}
         >
-          <div className="cardViewerHeader grid grid-cols-[auto_max-content] items-center gap-4 ">
-            {history[0] ? (
+          {/* TODO - MAYBE PUT BACK BUTTON BACK INSIDE CARD? */}
+          {/* {history[0] ? (
+            <div className="cardViewerHeader grid grid-cols-[auto_max-content] items-center gap-4 bg-white border border-grey-80 rounded-lg mx-2 p-2 pb-3 -mb-2">
               <BackButton
                 history={history}
                 setHistory={setHistory}
@@ -128,10 +129,8 @@ export function CardViewerLayout(props: {
                   });
                 }}
               />
-            ) : (
-              <div />
-            )}
-          </div>
+            </div>
+          ) : null} */}
           {history[0] ? (
             <CardView
               entityID={history[0]}
@@ -183,9 +182,9 @@ const BackButton = (props: {
         <p className="truncate whitespace-nowrap">
           {props.history.length >= 2
             ? width > 1000
-              ? `Back to ${prevCardTitle || prevCardMemberName}`
-              : "Back"
-            : "Close"}
+              ? `${prevCardTitle || prevCardMemberName}`
+              : ""
+            : "Clear"}
         </p>
       </div>
     </button>
