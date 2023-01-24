@@ -5,7 +5,6 @@ import { Analytics } from "@vercel/analytics/react";
 import { AuthProvider } from "hooks/useAuth";
 import { useRouter } from "next/router";
 import { SpaceSpaceProvider } from "components/ReplicacheProvider";
-import { SpaceLayout } from "components/SpaceLayout";
 import Head from "next/head";
 import { SmokeProvider } from "components/Smoke";
 import { SWRConfig } from "swr";
@@ -28,9 +27,7 @@ export default function App({ Component, pageProps }: AppProps) {
           notFound={<div className="p-4">404'd space</div>}
           loading={<div className="p-4">loading space…</div>}
         >
-          <SpaceLayout>
-            <Component {...pageProps} />
-          </SpaceLayout>
+          <Component {...pageProps} />
         </SpaceSpaceProvider>
       </SharedProviders>
     );

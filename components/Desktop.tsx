@@ -25,10 +25,9 @@ import { useSubscribe } from "replicache-react";
 const GRID_SIZE = 16;
 const snap = (x: number) => Math.ceil(x / GRID_SIZE) * GRID_SIZE;
 
-export const Desktop = () => {
-  let homeEntity = useIndex.aev("home");
-  let cards = useIndex.eav(homeEntity[0]?.entity || null, "deck/contains");
-  let height = useHeight(homeEntity[0]?.entity);
+export const Desktop = (props: { entityID: string }) => {
+  let cards = useIndex.eav(props.entityID, "deck/contains");
+  let height = useHeight(props.entityID);
   const mouseSensor = useSensor(MouseSensor, {});
   const touchSensor = useSensor(TouchSensor, {});
   const sensors = useSensors(mouseSensor, touchSensor);
@@ -37,8 +36,6 @@ export const Desktop = () => {
     null
   );
   let [draggingHeight, setDraggingHeight] = useState(0);
-
-  //if what we are dragging's y position + something, exceeds the current height, increase it.
 
   return (
     <DndContext
@@ -62,8 +59,8 @@ export const Desktop = () => {
         if (position.y + delta.y + 200 > h)
           setDraggingHeight(position.y + delta.y + 200);
       }}
-      onDragEnd={async (props) => {
-        let { active, delta, over, collisions } = props;
+      onDragEnd={async (dragProps) => {
+        let { active, delta, over, collisions } = dragProps;
 
         action.start();
 
@@ -71,14 +68,10 @@ export const Desktop = () => {
         let overCollision = collisions?.find(
           (c) => c.data?.droppableContainer.id === over?.id
         );
-        if (!homeEntity[0]) {
-          action.end();
-          return;
-        }
         if (!over || !overCollision || over.id === active.id) {
           await mutate("updatePositionInDesktop", {
             factID: active.id as string,
-            parent: homeEntity[0].entity,
+            parent: props.entityID,
             dx: delta.x,
             dy: delta.y,
             da: 0,
@@ -91,7 +84,7 @@ export const Desktop = () => {
           droppedCardPositionFact: active.id as string,
           droppedCardEntity: active.data.current?.entityID,
           targetCardEntity: over.data.current?.entityID,
-          desktop: homeEntity[0].entity,
+          desktop: props.entityID,
         });
 
         action.end();
@@ -100,12 +93,12 @@ export const Desktop = () => {
       <AddCard
         position={createCard}
         onClose={() => setCreateCard(null)}
-        desktopEntity={homeEntity[0]?.entity}
+        desktopEntity={props.entityID}
       />
       {/* TO DO - CELINE: make desktopBackground fit - full bleed! */}
-      <div className="p-4 overflow-y-scroll">
-        <div className="w-[384px] flex flex-col gap-0 items-stretch relative">
-          <div className="desktopBackground absolute w-full h-full" />
+      <div className="overflow-y-scroll p-4">
+        <div className="relative flex w-[384px] flex-col items-stretch gap-0">
+          <div className="desktopBackground absolute h-full w-full" />
           <div
             onClick={(e) => {
               if (e.currentTarget !== e.target) return;
@@ -115,7 +108,7 @@ export const Desktop = () => {
                 mutate("addCardToDesktop", {
                   entity: ulid(),
                   factID: ulid(),
-                  desktop: homeEntity[0].entity,
+                  desktop: props.entityID,
                   position: {
                     rotation: 0,
                     size: "big",
@@ -144,7 +137,7 @@ export const Desktop = () => {
                 key={card.id}
                 relationshipID={card.id}
                 entityID={card.value.value}
-                parent={homeEntity[0]?.entity}
+                parent={props.entityID}
               />
             ))}
           </div>
@@ -213,7 +206,7 @@ const DraggableCard = (props: {
           width: position?.value.size === "big" ? "288px" : "fit-content",
         }}
         ref={refs}
-        className="touch-none absolute"
+        className="absolute touch-none"
       >
         {/* This handles the rotation */}
         <div
@@ -317,8 +310,8 @@ const AddCard = (props: {
 
 export const HelpToast = (props: { helpText: string }) => {
   return (
-    <div className="flex fixed bottom-20 w-[320px] justify-center">
-      <div className="rounded-full text-grey-80 italic text-center px-2 py-1">
+    <div className="fixed bottom-20 flex w-[320px] justify-center">
+      <div className="rounded-full px-2 py-1 text-center italic text-grey-80">
         * {props.helpText} *
       </div>
     </div>
