@@ -25,8 +25,8 @@ export const SpaceHeader: React.FC<React.PropsWithChildren<unknown>> = () => {
         className={`
           headerWrapper
           max-w-6xl
-          mx-auto sm:px-4 px-2 pt-4
-          flex gap-4 place-items-center`}
+          mx-auto sm:px-4 px-2 pt-8
+          flex gap-2 place-items-center`}
       >
         <div className="pt-[1px]">
           <BackToStudio studio={session.session?.username} />
@@ -48,7 +48,7 @@ export const SpaceHeader: React.FC<React.PropsWithChildren<unknown>> = () => {
 
 const SpaceName = () => {
   return (
-    <Popover className="w-full h-8">
+    <Popover className="w-full h-[33px]">
       {({ open }) => <SpaceNameContent open={open} />}
     </Popover>
   );
@@ -76,10 +76,10 @@ const SpaceNameContent = (props: { open: boolean }) => {
         style={{
           width,
         }}
-        className={`border-accent-blue absolute rounded-md hover:border-accent-blue hover:bg-bg-blue hover:text-accent-blue px-2 overflow-hidden ${
+        className={`border-accent-blue absolute rounded-md hover:border-accent-blue hover:bg-bg-blue hover:text-accent-blue px-2 py-[2px] overflow-hidden ${
           props.open
-            ? "bg-bg-blue text-accent-blue border-2 border-accent-blue"
-            : "border-2 border-transparent"
+            ? "bg-bg-blue text-accent-blue border border-accent-blue"
+            : "border border-transparent"
         }`}
       >
         <Popover.Button
@@ -112,11 +112,9 @@ const BackToStudio = (props: { studio?: string }) => {
   if (!props.studio) return <div className="shrink-0" />;
 
   return (
-    <div className="shrink-0 z-10 headerBackToStudio">
+    <div className="shrink-0 z-10 headerBackToStudio hover:text-accent-blue">
       <Link href={`/s/${props.studio}`}>
-        <div className="">
-          <BackToStudioIcon />
-        </div>
+        <BackToStudioIcon />
       </Link>
     </div>
   );
@@ -217,7 +215,7 @@ const FindOrCreateBar = () => {
   return (
     <>
       <button className="flex items-center group" onClick={() => setOpen(true)}>
-        <div className="text-white bg-accent-blue rounded-md px-3 py-1 group-hover:bg-accent-blue group-hover:text-white">
+        <div className="text-white bg-accent-blue rounded-md px-3 py-1 border border-accent-blue hover:bg-bg-blue hover:text-accent-blue hover:border hover:border-accent-blue">
           <SearchOrCommand />
         </div>
       </button>
