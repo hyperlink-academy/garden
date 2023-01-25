@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from "react";
 import useWindowDimensions from "hooks/useWindowDimensions";
 import { Popover } from "@headlessui/react";
 import { atom, useAtom } from "jotai";
+import { Rooms } from "components/Icons";
 
 export default function SpacePage() {
   let spaceName = useIndex.aev("this/name")[0];
@@ -19,8 +20,7 @@ export default function SpacePage() {
     if (homeEntity[0]) setRoom(homeEntity[0].entity);
   }, [homeEntity[0]]);
 
-  console.log(width);
-
+  // console.log("hello " + room);
   return (
     <>
       <Head>
@@ -106,7 +106,7 @@ export default function SpacePage() {
 
                   <CardViewer EmptyState={<EmptyState />} />
                 </div>
-                <MobileFooter />
+                <MobileFooter currentRoom={room} currentCard="card" />
               </div>
             )}
           </SmallCardDragContext>
@@ -116,11 +116,20 @@ export default function SpacePage() {
   );
 }
 let SidebarOpenAtom = atom(false);
-const MobileFooter = () => {
+const MobileFooter = (props: {
+  currentRoom: string | null;
+  currentCard: string;
+}) => {
+  let homeEntity = useIndex.aev("home");
+  let roomName = useIndex.eav(props.currentRoom, "room/name");
+
   let [, setOpen] = useAtom(SidebarOpenAtom);
+  console.log("hello " + props.currentRoom);
+  console.log("uhm " + roomName);
+
   return (
-    <div className="roomFooter flex shrink-0 flex-row justify-between font-bold text-grey-35">
-      <div className="flex flex-row gap-2">
+    <div className="roomFooter grid shrink-0 grid-cols-[auto_auto] justify-between gap-8 font-bold text-grey-35">
+      <div className=" flex w-full shrink grow flex-row gap-4">
         <button
           id="roomToggle"
           onClick={() => {
@@ -129,17 +138,19 @@ const MobileFooter = () => {
             setOpen((open) => !open);
           }}
         >
-          rooms
+          <Rooms />
         </button>
-        <p>/</p>
         <div
           onClick={() => {
             let room = document.getElementById("roomWrapper");
             room ? room.scrollIntoView({ behavior: "smooth" }) : null;
             setOpen(false);
           }}
+          className=" overflow-hidden whitespace-nowrap"
         >
-          room name
+          {props.currentRoom === homeEntity[0]?.entity
+            ? "Homeroom"
+            : roomName?.value}
         </div>
       </div>
 
@@ -148,8 +159,9 @@ const MobileFooter = () => {
           let cardView = document.getElementById("cardViewerWrapper");
           cardView ? cardView.scrollIntoView({ behavior: "smooth" }) : null;
         }}
+        className="shrink grow overflow-hidden whitespace-nowrap text-right"
       >
-        card name
+        {props.currentCard}
       </div>
     </div>
   );
@@ -186,7 +198,7 @@ const MobileSidebar = (props: {
   return (
     <div
       ref={ref}
-      className={`roomListWrapper absolute top-0 bottom-0 z-10 ${
+      className={`roomListWrapper absolute top-0 bottom-0 z-10  ${
         open ? "left-0 " : "-left-48"
       }`}
     >
@@ -211,9 +223,14 @@ const EmptyState = () => {
                 text-grey-35
                 `}
     >
-      <p className="m-auto">
-        <em>Open a card!</em>
-      </p>
+      <div className="m-auto text-center">
+        <p>
+          <em>Double-click canvas to add a card</em>
+        </p>
+        <p>
+          <em>Drag a card to move it</em>
+        </p>
+      </div>
     </div>
   );
 };
