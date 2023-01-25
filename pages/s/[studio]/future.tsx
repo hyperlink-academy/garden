@@ -1,11 +1,10 @@
 import { workerAPI } from "backend/lib/api";
 import { SpaceList } from "components/SpacesList";
-import { StudioName } from "components/StudioLayout";
+import { CreateSpace, StudioName } from "components/StudioLayout";
 import { ReplicacheContext, scanIndex } from "hooks/useReplicache";
 import { GetStaticPropsContext, InferGetStaticPropsType } from "next";
 import { useContext } from "react";
 import { useSubscribe } from "replicache-react";
-import { CreateSpace } from ".";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 type Props = InferGetStaticPropsType<typeof getStaticProps>;

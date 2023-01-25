@@ -1,16 +1,8 @@
-import { spaceAPI } from "backend/lib/api";
-import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
+import { useIndex } from "hooks/useReplicache";
 import Link from "next/link";
-import { useRef, useState } from "react";
-import useSWR from "swr";
-import { ButtonLink, ButtonPrimary, ButtonSecondary } from "./Buttons";
-import { DoorSelector } from "components/DoorSelector";
+import { useRef } from "react";
 import { Door } from "./Doors";
-import { SettingsStudio } from "./Icons";
-import { Modal } from "./Layout";
 import { prefetchSpaceId } from "./ReplicacheProvider";
-import { useAuth } from "hooks/useAuth";
-import { DotLoader } from "./DotLoader";
 import { spacePath } from "hooks/utils";
 import { Fact } from "data/Facts";
 

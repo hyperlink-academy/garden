@@ -8,18 +8,21 @@ import { SpaceSpaceProvider } from "components/ReplicacheProvider";
 import Head from "next/head";
 import { SmokeProvider } from "components/Smoke";
 import { SWRConfig } from "swr";
-import { StudioLayout } from "components/StudioLayout";
+import { HomeLayout } from "components/HomeLayout";
 
 export default function App({ Component, pageProps }: AppProps) {
   let router = useRouter();
+  // dev routes
   if (router.pathname.startsWith("/dev")) return <Component {...pageProps} />;
-  if (router.pathname === "/")
+  // top level home
+  if (router.pathname === "/") {
     return (
       <SharedProviders>
         <Component {...pageProps} />
       </SharedProviders>
     );
-
+  }
+  // individual space layout
   if (router.pathname.startsWith("/s/[studio]/s/[space]")) {
     return (
       <SharedProviders>
@@ -32,15 +35,18 @@ export default function App({ Component, pageProps }: AppProps) {
       </SharedProviders>
     );
   }
-  if (router.pathname.startsWith("/s/[studio]")) {
+  // shared logged in homepage: studio + calendar
+  if (router.pathname.startsWith("/s/[studio]")
+  || router.pathname.startsWith("/calendar")) {
     return (
       <SharedProviders>
-        <StudioLayout {...pageProps}>
+        <HomeLayout {...pageProps}>
           <Component {...pageProps} />
-        </StudioLayout>
+        </HomeLayout>
       </SharedProviders>
     );
   }
+  // default fallback
   return (
     <SharedProviders>
       <Layout>
