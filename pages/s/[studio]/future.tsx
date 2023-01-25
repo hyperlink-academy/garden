@@ -22,6 +22,9 @@ export default function StudioPage(props: Props) {
   );
 }
 
+// copied from history.tsx
+// TODO - query based on date to show only future / draft spaces (any NOT active)
+
 const List = () => {
   let rep = useContext(ReplicacheContext);
   let spaces = useSubscribe(

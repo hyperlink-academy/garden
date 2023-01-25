@@ -14,26 +14,14 @@ export const StudioLayout = (props: {
   return (
     <SpaceProvider id={props.id}>
       <div className="flex flex-col gap-2 p-4 m-auto max-w-3xl">
-        <div className="flex justify-between">
-          <StudioName />
-          <Logout />
-        </div>
-        {pathname.endsWith("history") ? (
-          <Link href={`/s/${query.studio}`}>
-            <ButtonLink content="active" />
-          </Link>
-        ) : (
-          <Link href={`/s/${query.studio}/history`}>
-            <ButtonLink content="history" />
-          </Link>
-        )}
+        <StudioHeader />
         {props.children}
       </div>
     </SpaceProvider>
   );
 };
 
-const StudioName = () => {
+export const StudioName = () => {
   let name = useIndex.aev("this/name", "")[0];
   if (!name) return null;
   return (
@@ -46,6 +34,44 @@ const StudioName = () => {
         <h1>{name?.value}'s studio</h1>
       </div>
     </>
+  );
+};
+
+const StudioHeader = () => {
+  let { query, pathname } = useRouter();
+  return (
+    <div className="flex justify-between py-4">
+      {/* <div className="flex justify-between">
+        <StudioName />
+        <Logout />
+      </div> */}
+      <div className="flex flex-row gap-4">
+        <Link href={`/s/${query.studio}`}>
+          <ButtonLink content="now" />
+        </Link>
+        <Link href={`/s/${query.studio}/future`}>
+          <ButtonLink content="future" />
+        </Link>
+        <Link href={`/s/${query.studio}/history`}>
+          <ButtonLink content="history" />
+        </Link>
+      </div>
+      <div>
+        <Link href={`/s/${query.studio}/calendar`}>
+          <ButtonLink content="calendar" />
+        </Link>
+      </div>
+
+      {/* {pathname.endsWith("history") ? (
+        <Link href={`/s/${query.studio}`}>
+          <ButtonLink content="active" />
+        </Link>
+      ) : (
+        <Link href={`/s/${query.studio}/history`}>
+          <ButtonLink content="history" />
+        </Link>
+      )} */}
+    </div>
   );
 };
 

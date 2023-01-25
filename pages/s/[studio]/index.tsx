@@ -8,7 +8,7 @@ import { Door, DoorSelector } from "components/DoorSelector";
 import { SpaceCreate } from "components/Icons";
 import { Modal } from "components/Layout";
 import { SpaceList } from "components/SpacesList";
-import { StudioLayout } from "components/StudioLayout";
+import { StudioLayout, StudioName } from "components/StudioLayout";
 import { useAuth } from "hooks/useAuth";
 import { ReplicacheContext, useIndex, useMutations } from "hooks/useReplicache";
 import { GetStaticPropsContext, InferGetStaticPropsType } from "next";
@@ -23,6 +23,7 @@ export default function StudioPage(props: Props) {
 
   return (
     <>
+      <StudioName />
       <List />
       <CreateSpace studioSpaceID={props.id} />
     </>
@@ -42,7 +43,7 @@ const List = () => {
   );
 };
 
-const CreateSpace = (props: { studioSpaceID: string }) => {
+export const CreateSpace = (props: { studioSpaceID: string }) => {
   let [open, setOpen] = useState(false);
   let [name, setName] = useState("");
   let [door, setDoor] = useState<Door | undefined>();
@@ -53,7 +54,7 @@ const CreateSpace = (props: { studioSpaceID: string }) => {
     return null;
   } else
     return (
-      <div className="w-full grid">
+      <div className="w-full grid mt-8">
         <a className="place-self-center">
           <ButtonSecondary
             icon={<SpaceCreate />}
