@@ -3,7 +3,7 @@ import { useRef } from "react";
 export const useLongPress = (cb: () => void) => {
   let longPressTimer = useRef<number>();
   let isLongPress = useRef(false);
-  let start = (e: PointerEvent) => {
+  let start = () => {
     // e.preventDefault()
 
     isLongPress.current = false;
@@ -15,9 +15,9 @@ export const useLongPress = (cb: () => void) => {
   let end = () => {
     window.clearTimeout(longPressTimer.current);
   };
-  let click = (e: PointerEvent) => {
-    if(isLongPress.current) e.preventDefault()
-  }
+  let click = (e: React.MouseEvent) => {
+    if (isLongPress.current) e.preventDefault();
+  };
 
   return {
     isLongPress: isLongPress.current,
