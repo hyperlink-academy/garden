@@ -12,7 +12,6 @@ export const Sidebar = (props: {
   let homeEntity = useIndex.aev("home");
   let rooms = useIndex.aev("room/name");
   let { mutate, authorized } = useMutations();
-  // console.log(props.currentRoom);
   return (
     <div className="roomList flex h-full w-48 shrink-0 flex-col gap-2 rounded-l-[3px] border-r border-grey-90 bg-white p-4 text-grey-35">
       {props.currentRoom === homeEntity[0]?.entity ? (
@@ -25,7 +24,9 @@ export const Sidebar = (props: {
         <h4>Shared</h4>
         <ul>
           <ButtonLink
-            onClick={() => props.onRoomChange(homeEntity[0]?.entity)}
+            onClick={() => {
+              props.onRoomChange(homeEntity[0]?.entity);
+            }}
             content="Homeroom"
             className={
               homeEntity[0]?.entity === props.currentRoom

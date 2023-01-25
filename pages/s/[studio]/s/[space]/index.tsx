@@ -9,10 +9,14 @@ import useWindowDimensions from "hooks/useWindowDimensions";
 import { Popover } from "@headlessui/react";
 import { atom, useAtom } from "jotai";
 import { Rooms } from "components/Icons";
+import { parentPort } from "worker_threads";
+
+let SidebarOpenAtom = atom(false);
 
 export default function SpacePage() {
   let spaceName = useIndex.aev("this/name")[0];
   let homeEntity = useIndex.aev("home");
+  let [, setSidebarOpen] = useAtom(SidebarOpenAtom);
 
   let [room, setRoom] = useState<string | null>(null);
   const { width } = useWindowDimensions();
@@ -20,7 +24,6 @@ export default function SpacePage() {
     if (homeEntity[0]) setRoom(homeEntity[0].entity);
   }, [homeEntity[0]]);
 
-  // console.log("hello " + room);
   return (
     <>
       <Head>
@@ -57,7 +60,9 @@ export default function SpacePage() {
               >
                 <div className="roomWrapper flex flex-row rounded-md border border-grey-90">
                   <Sidebar
-                    onRoomChange={(room) => setRoom(room)}
+                    onRoomChange={(room) => {
+                      setRoom(room);
+                    }}
                     currentRoom={room}
                   />
 
@@ -87,7 +92,14 @@ export default function SpacePage() {
                     className="roomWrapper relative flex snap-center flex-row rounded-md border border-grey-90"
                   >
                     <MobileSidebar
-                      onRoomChange={(room) => setRoom(room)}
+                      onRoomChange={(room) => {
+                        setRoom(room);
+                        setSidebarOpen(false);
+                        let roomPane = document.getElementById("roomWrapper");
+                        roomPane
+                          ? roomPane.scrollIntoView({ behavior: "smooth" })
+                          : null;
+                      }}
                       currentRoom={room}
                     />
                     <div
@@ -115,7 +127,6 @@ export default function SpacePage() {
     </>
   );
 }
-let SidebarOpenAtom = atom(false);
 const MobileFooter = (props: {
   currentRoom: string | null;
   currentCard: string;
@@ -123,9 +134,7 @@ const MobileFooter = (props: {
   let homeEntity = useIndex.aev("home");
   let roomName = useIndex.eav(props.currentRoom, "room/name");
 
-  let [, setOpen] = useAtom(SidebarOpenAtom);
-  console.log("hello " + props.currentRoom);
-  console.log("uhm " + roomName);
+  let [, setSidebarOpen] = useAtom(SidebarOpenAtom);
 
   return (
     <div className="roomFooter grid shrink-0 grid-cols-[auto_auto] justify-between gap-8 font-bold text-grey-35">
@@ -133,18 +142,18 @@ const MobileFooter = (props: {
         <button
           id="roomToggle"
           onClick={() => {
-            let room = document.getElementById("roomWrapper");
-            room ? room.scrollIntoView({ behavior: "smooth" }) : null;
-            setOpen((open) => !open);
+            // let room = document.getElementById("roomWrapper");
+            // room ? room.scrollIntoView({ behavior: "smooth" }) : null;
+            setSidebarOpen((open) => !open);
           }}
         >
           <Rooms />
         </button>
         <div
           onClick={() => {
-            let room = document.getElementById("roomWrapper");
-            room ? room.scrollIntoView({ behavior: "smooth" }) : null;
-            setOpen(false);
+            let roomPane = document.getElementById("roomWrapper");
+            roomPane ? roomPane.scrollIntoView({ behavior: "smooth" }) : null;
+            setSidebarOpen(false);
           }}
           className=" overflow-hidden whitespace-nowrap"
         >
@@ -156,8 +165,8 @@ const MobileFooter = (props: {
 
       <div
         onClick={() => {
-          let cardView = document.getElementById("cardViewerWrapper");
-          cardView ? cardView.scrollIntoView({ behavior: "smooth" }) : null;
+          let cardPane = document.getElementById("cardViewerWrapper");
+          cardPane ? cardPane.scrollIntoView({ behavior: "smooth" }) : null;
         }}
         className="shrink grow overflow-hidden whitespace-nowrap text-right"
       >
@@ -170,21 +179,22 @@ const MobileSidebar = (props: {
   onRoomChange: (room: string) => void;
   currentRoom: string | null;
 }) => {
-  let [open, setOpen] = useAtom(SidebarOpenAtom);
+  let [open, setSidebarOpen] = useAtom(SidebarOpenAtom);
   let ref = useRef<HTMLDivElement | null>(null);
+
   useEffect(() => {
     if (!open) return;
 
     let clickcb = (e: MouseEvent) => {
       if (!ref.current?.contains(e.target as Node)) {
         let roomToggle = document.getElementById("roomToggle");
-        if (e.target === roomToggle) return;
-        setOpen(false);
+        if (roomToggle?.contains(e.target as Node)) return;
+        setSidebarOpen(false);
       }
     };
 
     let keycb = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
+      if (e.key === "Escape") setSidebarOpen(false);
     };
 
     window.addEventListener("click", clickcb);
@@ -198,8 +208,8 @@ const MobileSidebar = (props: {
   return (
     <div
       ref={ref}
-      className={`roomListWrapper absolute top-0 bottom-0 z-10  ${
-        open ? "left-0 " : "-left-48"
+      className={`roomListWrapper fixed top-0 bottom-0  z-10  ${
+        open ? "left-0" : "-left-48"
       }`}
     >
       <Sidebar {...props} />
