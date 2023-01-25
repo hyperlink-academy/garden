@@ -4,7 +4,7 @@ import useSWR from "swr";
 import { BackToStudio as BackToStudioIcon, SearchOrCommand } from "../Icons";
 import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
 import { useState } from "react";
-import { ButtonSecondary } from "../Buttons";
+import { ButtonLink, ButtonSecondary } from "../Buttons";
 import { LogInModal } from "../LoginModal";
 import { spaceAPI } from "backend/lib/api";
 import { useSmoker } from "../Smoke";
@@ -24,18 +24,19 @@ export const SpaceHeader: React.FC<React.PropsWithChildren<unknown>> = () => {
       <div
         className={`
           headerWrapper
-          max-w-6xl
-          mx-auto sm:px-4 px-2 pt-4 sm:pt-8
-          flex gap-2 place-items-center`}
+          mx-auto
+          flex max-w-6xl place-items-center gap-2 px-2
+          pt-4 sm:px-4 sm:pt-8`}
       >
         <div className="pt-[1px]">
           <BackToStudio studio={session.session?.username} />
         </div>
         <SpaceName />
+        {/* <SpaceStatus /> */}
         {/* <h2>{spaceName?.value}</h2> */}
 
         {!session.session ? (
-          <div className="z-10 shrink-0 flex gap-4">
+          <div className="z-10 flex shrink-0 gap-4">
             <Login />
           </div>
         ) : (
@@ -48,7 +49,7 @@ export const SpaceHeader: React.FC<React.PropsWithChildren<unknown>> = () => {
 
 const SpaceName = () => {
   return (
-    <Popover className="w-full h-[33px]">
+    <Popover className="h-[33px] w-full">
       {({ open }) => <SpaceNameContent open={open} />}
     </Popover>
   );
@@ -65,46 +66,82 @@ const SpaceNameContent = (props: { open: boolean }) => {
     height: props.open ? innerHeight : 0,
   });
   return (
-    <animated.div
-      style={{
-        minWidth: minWidth,
-      }}
-      ref={ref}
-      className={`headerSpaceName z-10 font-bold grow relative max-w-md`}
-    >
+    <div className="flex gap-2">
       <animated.div
         style={{
-          width,
+          minWidth: minWidth,
         }}
-        className={`border-accent-blue absolute rounded-md hover:border-accent-blue hover:bg-bg-blue hover:text-accent-blue px-2 py-[2px] overflow-hidden ${
-          props.open
-            ? "bg-bg-blue text-accent-blue border border-accent-blue"
-            : "border border-transparent"
-        }`}
+        ref={ref}
+        className={`headerSpaceName relative z-10 max-w-md grow font-bold`}
       >
-        <Popover.Button
-          as="div"
-          className={`${
-            props.open ? "" : "truncate"
-          } font-bold outline-none hover:cursor-pointer`}
-          style={{
-            minWidth: props.open ? "240px" : undefined,
-          }}
-        >
-          <h2>{spaceName?.value}</h2>
-        </Popover.Button>
         <animated.div
           style={{
-            height: height,
-            overflow: "hidden",
+            width,
           }}
+          className={`absolute overflow-hidden rounded-md border-accent-blue px-2 py-[2px] hover:border-accent-blue hover:bg-bg-blue hover:text-accent-blue ${
+            props.open
+              ? "border border-accent-blue bg-bg-blue text-accent-blue"
+              : "border border-transparent"
+          }`}
         >
-          <div ref={drawerRef} className="pb-2">
-            <Settings />
-          </div>
+          <Popover.Button
+            as="div"
+            className={`${
+              props.open ? "" : "truncate"
+            } font-bold outline-none hover:cursor-pointer`}
+            style={{
+              minWidth: props.open ? "240px" : undefined,
+            }}
+          >
+            <h2>{spaceName?.value}</h2>
+          </Popover.Button>
+
+          <animated.div
+            style={{
+              height: height,
+              overflow: "hidden",
+            }}
+          >
+            <div ref={drawerRef} className="pb-2">
+              <Settings />
+            </div>
+          </animated.div>
         </animated.div>
       </animated.div>
-    </animated.div>
+      <SpaceStatus />
+    </div>
+  );
+};
+
+const SpaceStatus = () => {
+  // TODO: get dates + calculate status
+  // options: unscheduled, upcoming, ongoing, completed
+
+  // TODO: maybe pass in status as prop - and also in Settings for more detail
+
+  // TEMP EXAMPLE
+  let status = "unscheduled";
+
+  let statusStyles = "";
+  if (status === "unscheduled") statusStyles = "lightBorder";
+  if (status === "upcoming")
+    statusStyles = "text-white bg-grey-15 border rounded-md";
+  if (status === "ongoing")
+    statusStyles = "text-white bg-[green] border rounded-md";
+  if (status === "completed")
+    statusStyles = "text-white bg-grey-35 border rounded-md";
+
+  return (
+    <div className={`${statusStyles} flex gap-2 px-2 py-1`}>
+      <span>{status}</span>
+      {status === "unscheduled" ? (
+        <Link href="">
+          <ButtonLink content="set dates" />
+        </Link>
+      ) : (
+        ""
+      )}
+    </div>
   );
 };
 
@@ -112,7 +149,7 @@ const BackToStudio = (props: { studio?: string }) => {
   if (!props.studio) return <div className="shrink-0" />;
 
   return (
-    <div className="shrink-0 z-10 headerBackToStudio hover:text-accent-blue">
+    <div className="headerBackToStudio z-10 shrink-0 hover:text-accent-blue">
       <Link href={`/s/${props.studio}`}>
         <BackToStudioIcon />
       </Link>
@@ -191,11 +228,11 @@ const MembersModal = () => {
       <ButtonSecondary content={"See Members"} onClick={() => setOpen(true)} />
       <Modal open={open} onClose={() => setOpen(false)}>
         <h2>Members</h2>
-        <div className="flex flex-wrap gap-2 h-full">
+        <div className="flex h-full flex-wrap gap-2">
           {members.map((m) => (
             <Link href={`/s/${encodeURIComponent(m.value)}`}>
               <div className="w-[160px]">
-                <div className={`relative grow h-full memberCardBorder `}>
+                <div className={`memberCardBorder relative h-full grow `}>
                   <BaseSmallCard isMember memberName={m.value} content="" />
                 </div>
               </div>
@@ -214,8 +251,8 @@ const FindOrCreateBar = () => {
   let { mutate, memberEntity, action } = useMutations();
   return (
     <>
-      <button className="flex items-center group" onClick={() => setOpen(true)}>
-        <div className="text-white bg-accent-blue rounded-md px-3 py-1 border border-accent-blue hover:bg-bg-blue hover:text-accent-blue hover:border hover:border-accent-blue">
+      <button className="group flex items-center" onClick={() => setOpen(true)}>
+        <div className="rounded-md border border-accent-blue bg-accent-blue px-3 py-1 text-white hover:border hover:border-accent-blue hover:bg-bg-blue hover:text-accent-blue">
           <SearchOrCommand />
         </div>
       </button>
