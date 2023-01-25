@@ -99,7 +99,7 @@ const addCardToDesktop: Mutation<{
   let id = await ctx.assertFact({
     factID: args.factID,
     entity: args.desktop,
-    attribute: "deck/contains",
+    attribute: "desktop/contains",
     value: ref(args.entity),
     positions: {},
   });

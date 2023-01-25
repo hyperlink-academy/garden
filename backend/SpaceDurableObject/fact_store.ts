@@ -147,7 +147,11 @@ export const store = (storage: BasicStorage, ctx: { id: string }) => {
       );
       if (!existingFact) return { success: false };
 
-      let schema = await getSchema(existingFact.attribute);
+      //This is a little worrying, what if you change the schema from unique to
+      //not?
+      let schema = await getSchema(
+        data.attribute ? data.attribute : existingFact.attribute
+      );
       if (!schema)
         return {
           success: false,

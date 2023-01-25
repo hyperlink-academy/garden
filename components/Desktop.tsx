@@ -26,7 +26,7 @@ const GRID_SIZE = 16;
 const snap = (x: number) => Math.ceil(x / GRID_SIZE) * GRID_SIZE;
 
 export const Desktop = (props: { entityID: string }) => {
-  let cards = useIndex.eav(props.entityID, "deck/contains");
+  let cards = useIndex.eav(props.entityID, "desktop/contains");
   let height = useHeight(props.entityID) + 500;
   const mouseSensor = useSensor(MouseSensor, {});
   const touchSensor = useSensor(TouchSensor, {});
@@ -59,8 +59,8 @@ export const Desktop = (props: { entityID: string }) => {
         let h = height;
         if (position.y + delta.y + 200 > h)
           setDraggingHeight((oldValue) => {
-            let newValue = position.y + delta.y + 200
-            return newValue > oldValue ? newValue : oldValue
+            let newValue = position.y + delta.y + 200;
+            return newValue > oldValue ? newValue : oldValue;
           });
       }}
       onDragEnd={async (dragProps) => {
@@ -146,11 +146,11 @@ export const Desktop = (props: { entityID: string }) => {
                 onLongPress={() => {
                   setSelection((oldValue) => {
                     if (oldValue.includes(card.id)) {
-                      return oldValue.filter(id => id !== card.id)
+                      return oldValue.filter((id) => id !== card.id);
                     } else {
-                      return [...oldValue, card.id]
+                      return [...oldValue, card.id];
                     }
-                  })
+                  });
                 }}
                 isSelected={selection.includes(card.id)}
                 selectionMode={selection.length > 0}
@@ -169,7 +169,7 @@ let useHeight = (entity: string) => {
   return useSubscribe(
     rep?.rep,
     async (tx) => {
-      let cards = await scanIndex(tx).eav(entity, "deck/contains");
+      let cards = await scanIndex(tx).eav(entity, "desktop/contains");
       return await cards.reduce(async (acc, card) => {
         let position = await scanIndex(tx).eav(card.id, "card/position-in");
         if (position && position.value.y + 200 > (await acc))
@@ -222,7 +222,7 @@ const DraggableCard = (props: {
           transform: style,
           top: snap(y) + "px",
           left: snap(x) + "px",
-          width: position?.value.size === "big" ? "288px" : "fit-content"
+          width: position?.value.size === "big" ? "288px" : "fit-content",
         }}
         ref={refs}
         className="absolute touch-none"

@@ -55,6 +55,11 @@ export const DefaultAttributes = {
     unique: false,
     cardinality: "many",
   },
+  "desktop/contains": {
+    type: "reference",
+    unique: false,
+    cardinality: "many",
+  },
   home: {
     type: "flag",
     unique: false,
