@@ -68,7 +68,11 @@ export const BigCardBody = (props: { entityID: string } & Props) => {
           />
           {isMember ? <div className="shrink-0 text-white">member</div> : ""}
           <div
-            onClick={() => open({ entityID: props.entityID })}
+            onClick={() => {
+              let cardView = document.getElementById("cardViewerWrapper");
+              open({ entityID: props.entityID });
+              cardView ? cardView.scrollIntoView({ behavior: "smooth" }) : null;
+            }}
             className="cardPreviewGoTo hover:cursor-pointer pt-1"
           >
             <a className={`${isMember ? "text-white" : "text-accent-blue"}`}>

@@ -8,7 +8,7 @@ export const Sidebar = (props: {
 }) => {
   let homeEntity = useIndex.aev("home");
   return (
-    <div className="roomListWrapper flex w-48 shrink-0 flex-col gap-2 rounded-l-[3px] border-r border-grey-90 bg-white p-4 text-grey-35">
+    <div className="roomList flex w-48 h-full shrink-0 flex-col gap-2 rounded-l-[3px] border-r border-grey-90 bg-white p-4 text-grey-35">
       <h3>{props.currentRoom === homeEntity[0]?.entity ? "Home" : ""}</h3>
       <Divider />
       <div>

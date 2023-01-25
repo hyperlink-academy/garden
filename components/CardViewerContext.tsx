@@ -26,10 +26,11 @@ export function CardViewer(props: { EmptyState: React.ReactNode }) {
 
   return (
     <div
+      id="cardViewerWrapper"
       className={`cardViewerWrapper 
           flex h-full w-[calc(100vw-16px)] 
           max-w-3xl shrink-0        
-          touch-pan-x
+          touch-pan-x snap-center
           flex-col 
           items-stretch focus:outline-none sm:shrink`}
     >

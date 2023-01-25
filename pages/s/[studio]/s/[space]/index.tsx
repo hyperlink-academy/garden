@@ -5,15 +5,22 @@ import { SmallCardDragContext } from "components/DragContext";
 import { SpaceHeader, Sidebar } from "components/SpaceLayout";
 import Head from "next/head";
 import { useEffect, useState } from "react";
+import useWindowDimensions from "hooks/useWindowDimensions";
+import { Divider } from "components/Layout";
 
 export default function SpacePage() {
   let spaceName = useIndex.aev("this/name")[0];
   let homeEntity = useIndex.aev("home");
+
   let [room, setRoom] = useState<string | null>(null);
+  const { width } = useWindowDimensions();
+  let [openRoomList, setOpenRoomList] = useState(false);
 
   useEffect(() => {
     if (homeEntity[0]) setRoom(homeEntity[0].entity);
   }, [homeEntity[0]]);
+
+  console.log(width);
 
   return (
     <>
@@ -35,39 +42,119 @@ export default function SpacePage() {
           px-2 sm:px-4 `}
         >
           <SmallCardDragContext>
-            <div
-              className={`
-        contentSplitLayout
-        flex 
-        w-full flex-row items-stretch gap-4 overflow-x-scroll 
-        pb-4
-        sm:justify-center
-        sm:gap-4 sm:pb-8
+            {width > 640 ? (
+              <div
+                className={`
+              contentLargeSplitLayout
+              flex 
+              w-full flex-row items-stretch gap-4 overflow-x-scroll 
+              pb-4
+              sm:justify-center
+              sm:gap-4 sm:pb-8
 `}
-              // you need to add this to the contentSplitLayout class if you are going to scroll across more than 2 panes
-              // it prevents the last pane from sticking to the end
-              // after:content-[""] after:h-full after:w-2 after:block after:shrink-0
-            >
-              <div className="roomWrapper flex flex-row rounded-md border border-grey-90">
-                <Sidebar
-                  onRoomChange={(room) => setRoom(room)}
-                  currentRoom={room}
-                />
+                // you need to add this to the contentSplitLayout class if you are going to scroll across more than 2 panes
+                // it prevents the last pane from sticking to the end
+                // after:content-[""] after:h-full after:w-2 after:block after:shrink-0
+              >
+                <div className="roomWrapper flex flex-row rounded-md border border-grey-90">
+                  <Sidebar
+                    onRoomChange={(room) => setRoom(room)}
+                    currentRoom={room}
+                  />
+
+                  <div
+                    className={`
+                  desktopWrapper
+                  no-scrollbar flex 
+                  h-full 
+                  flex-shrink-0 
+                  flex-col
+                  gap-0 overflow-x-hidden overflow-y-scroll
+                  `}
+                  >
+                    {room && <Desktop entityID={room} />}
+                  </div>
+                </div>
+
+                <CardViewer EmptyState={<EmptyState />} />
+              </div>
+            ) : (
+              <div className="smallSplitLayout w-full pb-4 flex flex-col items-stretch gap-2">
                 <div
-                  className={`
-          desktopWrapper
-          no-scrollbar flex 
-          h-full 
-          flex-shrink-0 
-         flex-col
-          gap-0 overflow-x-hidden overflow-y-scroll
-          `}
+                  className={`layoutContent w-full flex flex-row items-stretch gap-4 overflow-x-scroll scroll-smooth snap-x snap-mandatory`}
                 >
-                  {room && <Desktop entityID={room} />}
+                  <div
+                    id="roomWrapper"
+                    className="roomWrapper relative flex flex-row rounded-md border border-grey-90 snap-center"
+                  >
+                    <div
+                      className={`roomListWrapper absolute z-10 top-0 bottom-0 ${
+                        openRoomList ? "left-0 " : "-left-48"
+                      }`}
+                    >
+                      <Sidebar
+                        onRoomChange={(room) => setRoom(room)}
+                        currentRoom={room}
+                      />
+                    </div>
+
+                    <div
+                      className={`
+                      desktopWrapper
+                      no-scrollbar flex 
+                      h-full 
+                      flex-shrink-0 
+                      flex-col
+                      gap-0 overflow-y-scroll
+                      `}
+                    >
+                      {room && <Desktop entityID={room} />}
+                    </div>
+                  </div>
+
+                  <CardViewer EmptyState={<EmptyState />} />
+                </div>
+                <div className="roomFooter shrink-0 flex flex-row justify-between font-bold text-grey-35">
+                  <div className="flex flex-row gap-2">
+                    <div
+                      onClick={() => {
+                        let room = document.getElementById("roomWrapper");
+                        room
+                          ? room.scrollIntoView({ behavior: "smooth" })
+                          : null;
+                        setOpenRoomList(!openRoomList);
+                      }}
+                    >
+                      rooms
+                    </div>
+                    <p>/</p>
+                    <div
+                      onClick={() => {
+                        let room = document.getElementById("roomWrapper");
+                        room
+                          ? room.scrollIntoView({ behavior: "smooth" })
+                          : null;
+                        setOpenRoomList(false);
+                      }}
+                    >
+                      room name
+                    </div>
+                  </div>
+
+                  <div
+                    onClick={() => {
+                      let cardView =
+                        document.getElementById("cardViewerWrapper");
+                      cardView
+                        ? cardView.scrollIntoView({ behavior: "smooth" })
+                        : null;
+                    }}
+                  >
+                    card name
+                  </div>
                 </div>
               </div>
-              <CardViewer EmptyState={<EmptyState />} />
-            </div>
+            )}
           </SmallCardDragContext>
         </div>
       </div>

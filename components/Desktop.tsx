@@ -96,9 +96,10 @@ export const Desktop = (props: { entityID: string }) => {
         desktopEntity={props.entityID}
       />
       {/* TO DO - CELINE: make desktopBackground fit - full bleed! */}
-      <div className="overflow-y-scroll p-4">
+      <div className="overflow-y-scroll sm:p-4">
         <div className="relative flex w-[384px] flex-col items-stretch gap-0">
           <div className="desktopBackground absolute h-full w-full" />
+          {/* Handles Double CLick to Create */}
           <div
             onClick={(e) => {
               if (e.currentTarget !== e.target) return;

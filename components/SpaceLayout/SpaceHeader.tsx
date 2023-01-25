@@ -25,7 +25,7 @@ export const SpaceHeader: React.FC<React.PropsWithChildren<unknown>> = () => {
         className={`
           headerWrapper
           max-w-6xl
-          mx-auto sm:px-4 px-2 pt-8
+          mx-auto sm:px-4 px-2 pt-4 sm:pt-8
           flex gap-2 place-items-center`}
       >
         <div className="pt-[1px]">

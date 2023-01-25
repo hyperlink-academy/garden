@@ -48,7 +48,11 @@ export const BaseSmallCard = (
   let { open } = useCardViewer();
   return (
     <div
-      onClick={() => props.entityID && open({ entityID: props.entityID })}
+      onClick={() => {
+        let cardView = document.getElementById("cardViewerWrapper");
+        props.entityID && open({ entityID: props.entityID });
+        cardView ? cardView.scrollIntoView({ behavior: "smooth" }) : null;
+      }}
       className={`w-full h-full grid grid-cols-[max-content_auto] !bg-cover !bg-center !bg-no-repeat hover:cursor-pointer ${
         props.isMember ? "pr-1 pl-0 pt-2 pb-1" : "pr-3 pl-0 py-2"
       }`}
