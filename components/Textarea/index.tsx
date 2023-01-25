@@ -13,7 +13,7 @@ export const Textarea = (
   let previewElement = useRef<HTMLPreElement | null>(null);
   let ignoreFocus = useRef(false);
 
-  let [initialCursor, setInitialCursor] = useState<number | null>(null);
+  let [initialCursor, setInitialCursor] = useState<[number, number] | null>(null);
   let [focused, setFocused] = useState(false);
   useEffect(() => {
     if (props.focused !== undefined) {
@@ -30,7 +30,7 @@ export const Textarea = (
     if (!focused || !textarea.current) return;
     if (textarea.current === document.activeElement) return;
     textarea.current.focus({ preventScroll: true });
-    textarea.current.setSelectionRange(initialCursor, initialCursor);
+    if(initialCursor) textarea.current.setSelectionRange(initialCursor[0], initialCursor[1]);
   }, [initialCursor, focused, textarea.current]);
 
   if ((!focused || props.previewOnly) && typeof props.value === "string") {
@@ -56,7 +56,7 @@ export const Textarea = (
             if (props.previewOnly) return;
             setFocused(true);
             if (typeof props.value === "string")
-              setInitialCursor(props.value?.length);
+              setInitialCursor([props.value?.length, props.value?.length]);
           }
         }}
         onTouchStart={() => {
@@ -71,8 +71,9 @@ export const Textarea = (
           if (props.value) {
             let range = window.getSelection()?.getRangeAt(0);
             if (!range || !previewElement.current) return;
-            range.setStart(previewElement.current, 0);
-            setInitialCursor(range.toString().length);
+            if (range.startContainer !== range.endContainer) return;
+
+            setInitialCursor([range.startOffset, range.endOffset]);
           }
           setFocused(true);
         }}

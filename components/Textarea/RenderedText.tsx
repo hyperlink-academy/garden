@@ -6,7 +6,7 @@ export const RenderedText = forwardRef<
   { text: string; placeholderOnHover?: boolean } & JSX.IntrinsicElements["pre"]
 >((props, ref) => {
   return (
-    <Linkify options={{ className: "text-accent-blue underline" }}>
+    // <Linkify options={{ className: "text-accent-blue underline" }}>
       <pre
         role="link"
         ref={ref}
@@ -45,7 +45,7 @@ export const RenderedText = forwardRef<
           </span>
         )}
       </pre>
-    </Linkify>
+    // </Linkify>
   );
 });
 

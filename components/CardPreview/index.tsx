@@ -11,6 +11,7 @@ import { useDrag, usePinch } from "@use-gesture/react";
 import { useRef } from "react";
 import { SmallCardBody } from "./SmallCard";
 import { BigCardBody } from "./BigCard";
+import { useLongPress } from "hooks/useLongPress";
 
 const borderStyles = (args: { isMember: boolean }) => {
   switch (true) {
@@ -34,6 +35,9 @@ export type Props = {
   onResize?: (size: "big" | "small") => void;
   showRelated?: boolean;
   isOver?: boolean;
+  onLongPress?: () => void;
+  isSelected?: boolean;
+  selectionMode?: boolean;
 };
 
 export const CardPreview = (
@@ -43,12 +47,14 @@ export const CardPreview = (
 ) => {
   let isMember = !!useIndex.eav(props.entityID, "member/name");
 
+  let { handlers } = useLongPress(() => props.onLongPress?.())
+
   return (
-    <RotateAndResize {...props}>
-      <div
+    <HoverControls {...props}>
+      <div {...handlers}
         className={`cardPreviewBorder relative grow overflow-hidden ${borderStyles(
           { isMember }
-        )} ${props.isOver ? "rounded-[24px] shadow-[0_0_16px_0_#cccccc]" : ""}`}
+        )} ${props.isSelected ? "selectedCardGlow" : ""} ${props.isOver ? "rounded-[24px] shadow-[0_0_16px_0_#cccccc]" : ""}`}
       >
         {props.size === "small" ? (
           <SmallCardBody {...props} />
@@ -56,11 +62,11 @@ export const CardPreview = (
           <BigCardBody {...props} />
         )}
       </div>
-    </RotateAndResize>
+    </HoverControls>
   );
 };
 
-export const RotateAndResize: React.FC<
+export const HoverControls: React.FC<
   React.PropsWithChildren<
     Pick<Props, "onResize" | "onRotateDrag" | "size" | "factID" | "onDelete">
   >
@@ -147,7 +153,7 @@ export const RotateAndResize: React.FC<
             </div>
 
             {authorized && props.onRotateDrag && (
-              <div {...bind()} className="touch-none hover:text-accent-blue  ">
+              <div {...bind()} className="touch-none hover:text-accent-blue" style={{ 'cursor': 'pointer' }}>
                 <DragRotateHandle />
               </div>
             )}

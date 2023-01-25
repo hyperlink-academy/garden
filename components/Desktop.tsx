@@ -27,7 +27,7 @@ const snap = (x: number) => Math.ceil(x / GRID_SIZE) * GRID_SIZE;
 
 export const Desktop = (props: { entityID: string }) => {
   let cards = useIndex.eav(props.entityID, "deck/contains");
-  let height = useHeight(props.entityID);
+  let height = useHeight(props.entityID) + 500;
   const mouseSensor = useSensor(MouseSensor, {});
   const touchSensor = useSensor(TouchSensor, {});
   const sensors = useSensors(mouseSensor, touchSensor);
@@ -36,6 +36,7 @@ export const Desktop = (props: { entityID: string }) => {
     null
   );
   let [draggingHeight, setDraggingHeight] = useState(0);
+  let [selection, setSelection] = useState<string[]>([]);
 
   return (
     <DndContext
@@ -57,7 +58,10 @@ export const Desktop = (props: { entityID: string }) => {
         if (!position) return;
         let h = height;
         if (position.y + delta.y + 200 > h)
-          setDraggingHeight(position.y + delta.y + 200);
+          setDraggingHeight((oldValue) => {
+            let newValue = position.y + delta.y + 200
+            return newValue > oldValue ? newValue : oldValue
+          });
       }}
       onDragEnd={async (dragProps) => {
         let { active, delta, over, collisions } = dragProps;
@@ -139,6 +143,17 @@ export const Desktop = (props: { entityID: string }) => {
                 relationshipID={card.id}
                 entityID={card.value.value}
                 parent={props.entityID}
+                onLongPress={() => {
+                  setSelection((oldValue) => {
+                    if (oldValue.includes(card.id)) {
+                      return oldValue.filter(id => id !== card.id)
+                    } else {
+                      return [...oldValue, card.id]
+                    }
+                  })
+                }}
+                isSelected={selection.includes(card.id)}
+                selectionMode={selection.length > 0}
               />
             ))}
           </div>
@@ -171,6 +186,9 @@ const DraggableCard = (props: {
   entityID: string;
   parent: string;
   relationshipID: string;
+  isSelected: boolean;
+  selectionMode: boolean;
+  onLongPress: () => void;
 }) => {
   let position = useIndex.eav(props.relationshipID, "card/position-in");
   let { mutate } = useMutations();
@@ -204,7 +222,7 @@ const DraggableCard = (props: {
           transform: style,
           top: snap(y) + "px",
           left: snap(x) + "px",
-          width: position?.value.size === "big" ? "288px" : "fit-content",
+          width: position?.value.size === "big" ? "288px" : "fit-content"
         }}
         ref={refs}
         className="absolute touch-none"
