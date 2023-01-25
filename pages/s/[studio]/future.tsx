@@ -1,4 +1,5 @@
 import { workerAPI } from "backend/lib/api";
+import { SpaceProvider } from "components/ReplicacheProvider";
 import { SpaceList } from "components/SpacesList";
 import { CreateSpace, StudioName } from "components/StudioLayout";
 import { ReplicacheContext, scanIndex } from "hooks/useReplicache";
@@ -13,11 +14,11 @@ export default function StudioPage(props: Props) {
   if (!props.id) return <div>loading </div>;
 
   return (
-    <>
+    <SpaceProvider id={props.id}>
       <StudioName />
       <List />
       <CreateSpace studioSpaceID={props.id} />
-    </>
+    </SpaceProvider>
   );
 }
 
