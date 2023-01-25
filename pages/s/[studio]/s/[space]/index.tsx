@@ -137,7 +137,7 @@ const MobileFooter = (props: {
   let [, setSidebarOpen] = useAtom(SidebarOpenAtom);
 
   return (
-    <div className="roomFooter grid shrink-0 grid-cols-[auto_auto] justify-between gap-8 font-bold text-grey-35">
+    <div className="roomFooter grid shrink-0 grid-cols-[minmax(0,auto)_auto] justify-between gap-8 font-bold text-grey-35">
       <div className=" flex w-full shrink grow flex-row gap-4">
         <button
           id="roomToggle"

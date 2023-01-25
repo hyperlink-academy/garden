@@ -39,11 +39,11 @@ export const Sidebar = (props: {
               <ButtonLink
                 onClick={() => props.onRoomChange(room.entity)}
                 content={room.value}
-                className={
+                className={`max-w-full overflow-hidden whitespace-nowrap ${
                   room.entity === props.currentRoom
                     ? "text-grey-35"
                     : "text-grey-55"
-                }
+                }`}
               />
             );
           })}
