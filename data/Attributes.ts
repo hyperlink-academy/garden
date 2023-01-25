@@ -155,6 +155,11 @@ export const DefaultAttributes = {
     cardinality: "one",
     unique: false,
   },
+  "room/name": {
+    type: "string",
+    cardinality: "one",
+    unique: false,
+  },
 } as const;
 
 export const ShortCodes: { [k in keyof Attribute]?: string | undefined } = {

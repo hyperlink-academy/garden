@@ -100,7 +100,7 @@ export function ButtonLink(
     <button
       {...props}
       {...{ content: undefined, icon: undefined }}
-      className={`m-0 ${
+      className={`${props.className} m-0 ${
         props.onDark ? "text-white" : "text-accent-blue"
       } font-bold flex
   justify-center items-center gap-2 w-max disabled:text-grey-80`}
