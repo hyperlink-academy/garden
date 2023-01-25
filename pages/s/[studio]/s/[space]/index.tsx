@@ -4,9 +4,10 @@ import { useIndex } from "hooks/useReplicache";
 import { SmallCardDragContext } from "components/DragContext";
 import { SpaceHeader, Sidebar } from "components/SpaceLayout";
 import Head from "next/head";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import useWindowDimensions from "hooks/useWindowDimensions";
-import { Divider } from "components/Layout";
+import { Popover } from "@headlessui/react";
+import { atom, useAtom } from "jotai";
 
 export default function SpacePage() {
   let spaceName = useIndex.aev("this/name")[0];
@@ -14,8 +15,6 @@ export default function SpacePage() {
 
   let [room, setRoom] = useState<string | null>(null);
   const { width } = useWindowDimensions();
-  let [openRoomList, setOpenRoomList] = useState(false);
-
   useEffect(() => {
     if (homeEntity[0]) setRoom(homeEntity[0].entity);
   }, [homeEntity[0]]);
@@ -79,25 +78,18 @@ export default function SpacePage() {
                 <CardViewer EmptyState={<EmptyState />} />
               </div>
             ) : (
-              <div className="smallSplitLayout w-full pb-4 flex flex-col items-stretch gap-2">
+              <div className="smallSplitLayout flex w-full flex-col items-stretch gap-2 pb-4">
                 <div
-                  className={`layoutContent w-full flex flex-row items-stretch gap-4 overflow-x-scroll scroll-smooth snap-x snap-mandatory`}
+                  className={`layoutContent flex w-full snap-x snap-mandatory flex-row items-stretch gap-4 overflow-x-scroll scroll-smooth`}
                 >
                   <div
                     id="roomWrapper"
-                    className="roomWrapper relative flex flex-row rounded-md border border-grey-90 snap-center"
+                    className="roomWrapper relative flex snap-center flex-row rounded-md border border-grey-90"
                   >
-                    <div
-                      className={`roomListWrapper absolute z-10 top-0 bottom-0 ${
-                        openRoomList ? "left-0 " : "-left-48"
-                      }`}
-                    >
-                      <Sidebar
-                        onRoomChange={(room) => setRoom(room)}
-                        currentRoom={room}
-                      />
-                    </div>
-
+                    <MobileSidebar
+                      onRoomChange={(room) => setRoom(room)}
+                      currentRoom={room}
+                    />
                     <div
                       className={`
                       desktopWrapper
@@ -114,45 +106,7 @@ export default function SpacePage() {
 
                   <CardViewer EmptyState={<EmptyState />} />
                 </div>
-                <div className="roomFooter shrink-0 flex flex-row justify-between font-bold text-grey-35">
-                  <div className="flex flex-row gap-2">
-                    <div
-                      onClick={() => {
-                        let room = document.getElementById("roomWrapper");
-                        room
-                          ? room.scrollIntoView({ behavior: "smooth" })
-                          : null;
-                        setOpenRoomList(!openRoomList);
-                      }}
-                    >
-                      rooms
-                    </div>
-                    <p>/</p>
-                    <div
-                      onClick={() => {
-                        let room = document.getElementById("roomWrapper");
-                        room
-                          ? room.scrollIntoView({ behavior: "smooth" })
-                          : null;
-                        setOpenRoomList(false);
-                      }}
-                    >
-                      room name
-                    </div>
-                  </div>
-
-                  <div
-                    onClick={() => {
-                      let cardView =
-                        document.getElementById("cardViewerWrapper");
-                      cardView
-                        ? cardView.scrollIntoView({ behavior: "smooth" })
-                        : null;
-                    }}
-                  >
-                    card name
-                  </div>
-                </div>
+                <MobileFooter />
               </div>
             )}
           </SmallCardDragContext>
@@ -161,6 +115,85 @@ export default function SpacePage() {
     </>
   );
 }
+let SidebarOpenAtom = atom(false);
+const MobileFooter = () => {
+  let [, setOpen] = useAtom(SidebarOpenAtom);
+  return (
+    <div className="roomFooter flex shrink-0 flex-row justify-between font-bold text-grey-35">
+      <div className="flex flex-row gap-2">
+        <button
+          id="roomToggle"
+          onClick={() => {
+            let room = document.getElementById("roomWrapper");
+            room ? room.scrollIntoView({ behavior: "smooth" }) : null;
+            setOpen((open) => !open);
+          }}
+        >
+          rooms
+        </button>
+        <p>/</p>
+        <div
+          onClick={() => {
+            let room = document.getElementById("roomWrapper");
+            room ? room.scrollIntoView({ behavior: "smooth" }) : null;
+            setOpen(false);
+          }}
+        >
+          room name
+        </div>
+      </div>
+
+      <div
+        onClick={() => {
+          let cardView = document.getElementById("cardViewerWrapper");
+          cardView ? cardView.scrollIntoView({ behavior: "smooth" }) : null;
+        }}
+      >
+        card name
+      </div>
+    </div>
+  );
+};
+const MobileSidebar = (props: {
+  onRoomChange: (room: string) => void;
+  currentRoom: string | null;
+}) => {
+  let [open, setOpen] = useAtom(SidebarOpenAtom);
+  let ref = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (!open) return;
+
+    let clickcb = (e: MouseEvent) => {
+      if (!ref.current?.contains(e.target as Node)) {
+        let roomToggle = document.getElementById("roomToggle");
+        if (e.target === roomToggle) return;
+        setOpen(false);
+      }
+    };
+
+    let keycb = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+
+    window.addEventListener("click", clickcb);
+    window.addEventListener("keydown", keycb);
+    return () => {
+      window.removeEventListener("click", clickcb);
+      window.removeEventListener("keydown", keycb);
+    };
+  }, [open]);
+
+  return (
+    <div
+      ref={ref}
+      className={`roomListWrapper absolute top-0 bottom-0 z-10 ${
+        open ? "left-0 " : "-left-48"
+      }`}
+    >
+      <Sidebar {...props} />
+    </div>
+  );
+};
 
 const EmptyState = () => {
   return (

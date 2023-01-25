@@ -36,7 +36,7 @@
     "eslint-config-next": "^13.0.1",
     "faunadb": "^4.6.0",
     "graphql": "^16.4.0",
-    "jotai": "^1.8.3",
+    "jotai": "^1.13.1",
     "linkify-react": "^3.0.4",
     "linkifyjs": "^3.0.5",
     "next": "^13.0.1",
