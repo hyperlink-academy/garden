@@ -31,18 +31,19 @@ export default function SpacePage() {
         <meta name="theme-color" content="#0000FF" />
       </Head>
 
-      <div className="pageWrapper flex h-screen flex-col items-stretch justify-items-center gap-2 overflow-hidden sm:gap-4">
-        <SpaceHeader />
-
+      <div className="pageWrapperflex h-screen flex-col items-stretch justify-items-center gap-2 overflow-hidden sm:gap-4">
         <div
           className={`
           pageContent 
           relative mx-auto flex 
-          h-[calc(100vh-80px)] w-full max-w-6xl
+          h-screen w-full max-w-6xl
           grow 
           items-stretch 
-          px-2 sm:px-4 `}
+          py-4 px-2
+          sm:py-6 sm:px-4 `}
         >
+          <SpaceHeader />
+
           <SmallCardDragContext>
             {width > 640 ? (
               <div
@@ -50,9 +51,8 @@ export default function SpacePage() {
               contentLargeSplitLayout
               flex 
               w-full flex-row items-stretch gap-4 overflow-x-scroll 
-              pb-4
               sm:justify-center
-              sm:gap-4 sm:pb-8
+              sm:gap-4 
 `}
                 // you need to add this to the contentSplitLayout class if you are going to scroll across more than 2 panes
                 // it prevents the last pane from sticking to the end

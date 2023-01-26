@@ -20,7 +20,7 @@ import { publishAppEvent } from "hooks/useEvents";
 export const SpaceHeader: React.FC<React.PropsWithChildren<unknown>> = () => {
   let { session } = useAuth();
   return (
-    <div className="pageHeader shrink-0 text-grey-35">
+    <div className="pageHeader absolute right-4 bottom-10 z-50 text-grey-35">
       <div
         className={`
           headerWrapper
@@ -28,13 +28,6 @@ export const SpaceHeader: React.FC<React.PropsWithChildren<unknown>> = () => {
           flex max-w-6xl place-items-center gap-2 px-2
           pt-4 sm:px-4 sm:pt-8`}
       >
-        <div className="pt-[1px]">
-          <BackToStudio studio={session.session?.username} />
-        </div>
-        <SpaceName />
-        {/* <SpaceStatus /> */}
-        {/* <h2>{spaceName?.value}</h2> */}
-
         {!session.session ? (
           <div className="z-10 flex shrink-0 gap-4">
             <Login />
@@ -44,14 +37,6 @@ export const SpaceHeader: React.FC<React.PropsWithChildren<unknown>> = () => {
         )}
       </div>
     </div>
-  );
-};
-
-const SpaceName = () => {
-  return (
-    <Popover className="h-[33px] w-full">
-      {({ open }) => <SpaceNameContent open={open} />}
-    </Popover>
   );
 };
 
@@ -108,51 +93,6 @@ const SpaceNameContent = (props: { open: boolean }) => {
           </animated.div>
         </animated.div>
       </animated.div>
-      <SpaceStatus />
-    </div>
-  );
-};
-
-const SpaceStatus = () => {
-  // TODO: get dates + calculate status
-  // options: unscheduled, upcoming, ongoing, completed
-
-  // TODO: maybe pass in status as prop - and also in Settings for more detail
-
-  // TEMP EXAMPLE
-  let status = "unscheduled";
-
-  let statusStyles = "";
-  if (status === "unscheduled") statusStyles = "lightBorder";
-  if (status === "upcoming")
-    statusStyles = "text-white bg-grey-15 border rounded-md";
-  if (status === "ongoing")
-    statusStyles = "text-white bg-[green] border rounded-md";
-  if (status === "completed")
-    statusStyles = "text-white bg-grey-35 border rounded-md";
-
-  return (
-    <div className={`${statusStyles} flex gap-2 px-2 py-1`}>
-      <span>{status}</span>
-      {status === "unscheduled" ? (
-        <Link href="">
-          <ButtonLink content="set dates" />
-        </Link>
-      ) : (
-        ""
-      )}
-    </div>
-  );
-};
-
-const BackToStudio = (props: { studio?: string }) => {
-  if (!props.studio) return <div className="shrink-0" />;
-
-  return (
-    <div className="headerBackToStudio z-10 shrink-0 hover:text-accent-blue">
-      <Link href={`/s/${props.studio}`}>
-        <BackToStudioIcon />
-      </Link>
     </div>
   );
 };
