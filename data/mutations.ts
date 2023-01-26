@@ -267,12 +267,42 @@ const deleteEntity: Mutation<{ entity: string }> = async (args, ctx) => {
   await Promise.all(facts.concat(references).map((f) => ctx.retractFact(f.id)));
 };
 
+const drawAPrompt: Mutation<{
+  desktopEntity: string;
+  factID: string;
+  randomSeed: number;
+}> = async (args, ctx) => {
+  let promptRoom = (await ctx.scanIndex.aev("room/name")).find(
+    (f) => f.value === "prompts"
+  );
+  console.log(promptRoom);
+  if (!promptRoom) return;
+  let prompts = await ctx.scanIndex.eav(promptRoom.entity, "desktop/contains");
+  let prompt = prompts[Math.floor(prompts.length * args.randomSeed)];
+
+  let id = await ctx.assertFact({
+    factID: args.factID,
+    entity: args.desktopEntity,
+    attribute: "desktop/contains",
+    value: ref(prompt.value.value),
+    positions: {},
+  });
+  if (!id.success) return;
+  await ctx.assertFact({
+    entity: args.factID,
+    attribute: "card/position-in",
+    value: { type: "position", y: 64, x: 128, size: "small", rotation: 0 },
+    positions: {},
+  });
+};
+
 export const Mutations = {
   deleteEntity,
   createCard,
   addSpace,
   updatePositions,
   addCardToSection,
+  drawAPrompt,
   assertFact,
   retractFact,
   updateFact,

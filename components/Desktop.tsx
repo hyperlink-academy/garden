@@ -21,6 +21,7 @@ import { ulid } from "src/ulid";
 import { useRouter } from "next/router";
 import { FindOrCreate, useAllItems } from "./FindOrCreateEntity";
 import { useSubscribe } from "replicache-react";
+import { ButtonSecondary } from "./Buttons";
 
 const GRID_SIZE = 16;
 const snap = (x: number) => Math.ceil(x / GRID_SIZE) * GRID_SIZE;
@@ -99,6 +100,7 @@ export const Desktop = (props: { entityID: string }) => {
         onClose={() => setCreateCard(null)}
         desktopEntity={props.entityID}
       />
+      <PromptManager entityID={props.entityID} />
       {/* TO DO - CELINE: make desktopBackground fit - full bleed! */}
       <div className="overflow-y-scroll sm:p-4">
         <div className="relative flex w-[384px] flex-col items-stretch gap-0">
@@ -161,6 +163,27 @@ export const Desktop = (props: { entityID: string }) => {
         </div>
       </div>
     </DndContext>
+  );
+};
+
+let PromptManager = (props: { entityID: string }) => {
+  let name = useIndex.eav(props.entityID, "member/name");
+  let { mutate } = useMutations();
+  console.log(name);
+  if (!name) return null;
+  return (
+    <div className="absolute z-10 flex w-full justify-center gap-2">
+      <ButtonSecondary
+        content="Draw a Prompt"
+        onClick={() => {
+          mutate("drawAPrompt", {
+            factID: ulid(),
+            desktopEntity: props.entityID,
+            randomSeed: Math.random(),
+          });
+        }}
+      />
+    </div>
   );
 };
 

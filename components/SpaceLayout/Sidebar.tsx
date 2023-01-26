@@ -34,19 +34,21 @@ export const Sidebar = (props: {
                 : "text-grey-55"
             }
           />
-          {rooms.map((room) => {
-            return (
-              <ButtonLink
-                onClick={() => props.onRoomChange(room.entity)}
-                content={room.value}
-                className={`max-w-full overflow-hidden whitespace-nowrap ${
-                  room.entity === props.currentRoom
-                    ? "text-grey-35"
-                    : "text-grey-55"
-                }`}
-              />
-            );
-          })}
+          {rooms
+            .filter((f) => f.value !== "prompts")
+            .map((room) => {
+              return (
+                <ButtonLink
+                  onClick={() => props.onRoomChange(room.entity)}
+                  content={room.value}
+                  className={`max-w-full overflow-hidden whitespace-nowrap ${
+                    room.entity === props.currentRoom
+                      ? "text-grey-35"
+                      : "text-grey-55"
+                  }`}
+                />
+              );
+            })}
         </ul>
         <ButtonLink
           onClick={async () => {
@@ -64,20 +66,50 @@ export const Sidebar = (props: {
       </div>
       <div>
         <h4>Members</h4>
-        <MemberList />
+        <MemberList {...props} />
         <ButtonLink content="invite member" />
       </div>
+
+      <button
+        onClick={async () => {
+          let promptRoom = rooms.find((f) => f.value === "prompts")?.entity;
+          if (!promptRoom) {
+            promptRoom = ulid();
+            await mutate("assertFact", {
+              entity: promptRoom,
+              attribute: "room/name",
+              value: "prompts",
+              positions: {},
+            });
+          }
+          console.log(rooms.find((f) => f.value === "prompts"));
+          props.onRoomChange(promptRoom);
+        }}
+      >
+        <h4>Prompts</h4>
+      </button>
     </div>
   );
 };
 
-const MemberList = () => {
+const MemberList = (props: {
+  onRoomChange: (room: string) => void;
+  currentRoom: string | null;
+}) => {
   let members = useIndex.aev("member/name");
 
   return (
     <ul>
       {members.map((member) => (
-        <li>{member.value}</li>
+        <ButtonLink
+          onClick={() => props.onRoomChange(member.entity)}
+          content={member.value}
+          className={
+            member.entity === props.currentRoom
+              ? "text-grey-35"
+              : "text-grey-55"
+          }
+        />
       ))}
     </ul>
   );
@@ -85,27 +117,30 @@ const MemberList = () => {
 
 const RoomTitle = (props: { entityID: string | null }) => {
   let name = useIndex.eav(props.entityID, "room/name");
+  let memberName = useIndex.eav(props.entityID, "member/name");
   let [state, setState] = useState<"editting" | "normal">("normal");
   if (!props.entityID) return null;
   return (
     <div className="grid grid-flow-col gap-2">
-      {state === "editting" ? (
+      {state === "editting" && !memberName ? (
         <SingleTextSection
           entityID={props.entityID}
           section="room/name"
           placeholder="room"
         />
       ) : (
-        <h2>{name?.value}</h2>
+        <h2>{memberName?.value || name?.value}</h2>
       )}
-      <button
-        className="justify-self-end"
-        onClick={() => {
-          setState(state === "editting" ? "normal" : "editting");
-        }}
-      >
-        {state === "editting" ? "done" : "edit"}
-      </button>
+      {!memberName && (
+        <button
+          className="justify-self-end"
+          onClick={() => {
+            setState(state === "editting" ? "normal" : "editting");
+          }}
+        >
+          {state === "editting" ? "done" : "edit"}
+        </button>
+      )}
     </div>
   );
 };
