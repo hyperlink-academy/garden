@@ -71,50 +71,17 @@ export const MultipleReferenceSection = (props: {
   );
 };
 
-export const MakeDate = (props: { entityID: string }) => {
-  let { mutate, authorized } = useMutations();
-  let date = useIndex.eav(props.entityID, "card/date");
-  let ref = useRef<HTMLInputElement | null>(null);
-  let [open, setOpen] = useState(false);
-
-  if (!authorized || date) return null;
-  if (open)
-    return (
-      <input
-        onChange={(e) => {
-          console.log(e.currentTarget.value);
-          mutate("assertFact", {
-            entity: props.entityID,
-            attribute: "card/date",
-            value: { type: "yyyy-mm-dd", value: e.currentTarget.value },
-            positions: {},
-          });
-        }}
-        type="date"
-        ref={ref}
-        style={{ display: "" }}
-      />
-    );
-  return (
-    <>
-      <button
-        onClick={() => {
-          setOpen(true);
-        }}
-      >
-        add date
-      </button>
-    </>
-  );
-};
-
 export const DateSection = (props: { entityID: string }) => {
+  let [editting, setEditting] = useState(false);
   let date = useIndex.eav(props.entityID, "card/date");
   if (!date) return null;
   return (
     <div className="flex flex-col gap-2">
-      <input type="date" value={date.value.value} />
-      <button>remove?</button>
+      {editting ? (
+        <input type="date" value={date.value.value} />
+      ) : (
+        <span>{date.value.value}</span>
+      )}
     </div>
   );
 };
