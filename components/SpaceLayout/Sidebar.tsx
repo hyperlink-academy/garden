@@ -24,7 +24,9 @@ export const Sidebar = (props: {
         <h4>Shared</h4>
         <ul>
           <ButtonLink
-            onClick={() => props.onRoomChange(homeEntity[0]?.entity)}
+            onClick={() => {
+              props.onRoomChange(homeEntity[0]?.entity);
+            }}
             content="Homeroom"
             className={
               homeEntity[0]?.entity === props.currentRoom
@@ -37,11 +39,11 @@ export const Sidebar = (props: {
               <ButtonLink
                 onClick={() => props.onRoomChange(room.entity)}
                 content={room.value}
-                className={
+                className={`max-w-full overflow-hidden whitespace-nowrap ${
                   room.entity === props.currentRoom
                     ? "text-grey-35"
                     : "text-grey-55"
-                }
+                }`}
               />
             );
           })}
