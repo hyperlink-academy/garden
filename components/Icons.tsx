@@ -317,6 +317,23 @@ export const MemberAdd = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
+export const MoreOptionsSmall = (props: SVGProps<SVGSVGElement>) => {
+  <svg
+    width="12"
+    height="24"
+    viewBox="0 0 12 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      fillRule="evenodd"
+      clip-Rule="evenodd"
+      d="M6.45831 8.5C7.28674 8.5 7.95831 7.82843 7.95831 7C7.95831 6.17157 7.28674 5.5 6.45831 5.5C5.62989 5.5 4.95831 6.17157 4.95831 7C4.95831 7.82843 5.62989 8.5 6.45831 8.5ZM7.95831 12C7.95831 12.8284 7.28674 13.5 6.45831 13.5C5.62989 13.5 4.95831 12.8284 4.95831 12C4.95831 11.1716 5.62989 10.5 6.45831 10.5C7.28674 10.5 7.95831 11.1716 7.95831 12ZM7.95831 17C7.95831 17.8284 7.28674 18.5 6.45831 18.5C5.62989 18.5 4.95831 17.8284 4.95831 17C4.95831 16.1716 5.62989 15.5 6.45831 15.5C7.28674 15.5 7.95831 16.1716 7.95831 17Z"
+      fill="currentColor"
+    />
+  </svg>;
+};
+
 export const Note = (props: SVGProps<SVGSVGElement>) => {
   return (
     <svg
@@ -685,20 +702,19 @@ export const GoBackToPage = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
-export const MoreOptions = (props: SVGProps<SVGSVGElement>) => {
+export const MoreOptionsTiny = (props: SVGProps<SVGSVGElement>) => {
   return (
     <svg
-      {...props}
-      width="16"
+      width="8"
       height="16"
-      viewBox="0 0 16 16"
+      viewBox="0 0 8 16"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
         fillRule="evenodd"
         clipRule="evenodd"
-        d="M8 4.5C8.82843 4.5 9.5 3.82843 9.5 3C9.5 2.17157 8.82843 1.5 8 1.5C7.17157 1.5 6.5 2.17157 6.5 3C6.5 3.82843 7.17157 4.5 8 4.5ZM9.5 8C9.5 8.82843 8.82843 9.5 8 9.5C7.17157 9.5 6.5 8.82843 6.5 8C6.5 7.17157 7.17157 6.5 8 6.5C8.82843 6.5 9.5 7.17157 9.5 8ZM9.5 13C9.5 13.8284 8.82843 14.5 8 14.5C7.17157 14.5 6.5 13.8284 6.5 13C6.5 12.1716 7.17157 11.5 8 11.5C8.82843 11.5 9.5 12.1716 9.5 13Z"
+        d="M4 4.5C4.82843 4.5 5.5 3.82843 5.5 3C5.5 2.17157 4.82843 1.5 4 1.5C3.17157 1.5 2.5 2.17157 2.5 3C2.5 3.82843 3.17157 4.5 4 4.5ZM5.5 8C5.5 8.82843 4.82843 9.5 4 9.5C3.17157 9.5 2.5 8.82843 2.5 8C2.5 7.17157 3.17157 6.5 4 6.5C4.82843 6.5 5.5 7.17157 5.5 8ZM5.5 13C5.5 13.8284 4.82843 14.5 4 14.5C3.17157 14.5 2.5 13.8284 2.5 13C2.5 12.1716 3.17157 11.5 4 11.5C4.82843 11.5 5.5 12.1716 5.5 13Z"
         fill="currentColor"
       />
     </svg>

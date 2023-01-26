@@ -8,7 +8,12 @@ import { useAuth } from "hooks/useAuth";
 import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
 import { useState } from "react";
 import { ulid } from "src/ulid";
-import { AddTiny, BackToStudio as BackToStudioIcon, MemberAdd } from "../Icons";
+import {
+  AddTiny,
+  BackToStudio as BackToStudioIcon,
+  MemberAdd,
+  MoreOptionsTiny,
+} from "../Icons";
 import { spaceAPI } from "backend/lib/api";
 import { BaseSmallCard } from "components/CardPreview/SmallCard";
 import { useSmoker } from "components/Smoke";
@@ -52,7 +57,7 @@ export const Sidebar = (props: {
             {rooms.map((room) => {
               return (
                 <button
-                  className={`w-full items-start justify-start overflow-hidden whitespace-nowrap rounded-md py-0.5 px-2 text-left ${
+                  className={`flex  w-full items-center justify-between gap-2 overflow-hidden whitespace-nowrap rounded-md py-0.5 px-2 text-left ${
                     room.entity === props.currentRoom
                       ? "rounded-md bg-accent-blue  font-bold text-white"
                       : "border border-transparent text-grey-35 hover:border-grey-80"
@@ -60,6 +65,13 @@ export const Sidebar = (props: {
                   onClick={() => props.onRoomChange(room.entity)}
                 >
                   {room.value}
+                  <button
+                    className={` ${
+                      room.entity === props.currentRoom ? "" : "hidden"
+                    }`}
+                  >
+                    <MoreOptionsTiny />
+                  </button>
                 </button>
               );
             })}
@@ -137,13 +149,20 @@ const MemberList = (props: {
       {members.map((member) => (
         <button
           onClick={() => props.onRoomChange(member.entity)}
-          className={`w-full items-start justify-start overflow-hidden whitespace-nowrap rounded-md py-0.5 px-2 text-left ${
+          className={`flex w-full items-center justify-between gap-2 overflow-hidden whitespace-nowrap rounded-md py-0.5 px-2 text-left ${
             member.entity === props.currentRoom
               ? "rounded-md bg-accent-blue  font-bold text-white"
               : "border border-transparent text-grey-35 hover:border-grey-80"
           }`}
         >
           {member.value}
+          <button
+            className={` ${
+              member.entity === props.currentRoom ? "" : "hidden"
+            }`}
+          >
+            <MoreOptionsTiny />
+          </button>
         </button>
       ))}
     </ul>

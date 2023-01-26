@@ -1,7 +1,7 @@
 import { Menu } from "@headlessui/react";
 
 import {
-  MoreOptions,
+  MoreOptionsTiny,
   Delete,
   DeckSmall,
   Member,
@@ -247,7 +247,7 @@ const CardMoreOptionsMenu = (props: {
   return !authorized || !!memberName ? null : (
     <Menu as="div" className="relative">
       <Menu.Button className={`pt-[6px]`}>
-        <MoreOptions />
+        <MoreOptionsTiny />
       </Menu.Button>
       <MenuContainer>
         {!props?.referenceFactID ? null : (
