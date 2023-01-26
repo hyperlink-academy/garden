@@ -1,7 +1,7 @@
 import { workerAPI } from "backend/lib/api";
 import { CalendarList } from "components/CalendarList";
 import { SpaceProvider } from "components/ReplicacheProvider";
-import { ReplicacheContext, scanIndex } from "hooks/useReplicache";
+import { ReplicacheContext, scanIndex, useIndex } from "hooks/useReplicache";
 import { InferGetStaticPropsType } from "next";
 import Head from "next/head";
 import { useContext } from "react";
@@ -21,28 +21,8 @@ export default function CalendarPage(props: Props) {
   );
 }
 
-// copied from history.tsx
-// TODO - get actual calendar list (query ALL spaces)
-// TODO - render that list w/ different space display
-
 const List = () => {
-  let rep = useContext(ReplicacheContext);
-  let spaces = useSubscribe(
-    rep?.rep,
-    async (tx) => {
-      let completedSpaces = await scanIndex(tx).aev("space/completed");
-      let results = [];
-      for (let space of completedSpaces) {
-        if (space.value) {
-          let name = await scanIndex(tx).eav(space.entity, "space/name");
-          if (name !== null) results.push(name);
-        }
-      }
-      return results;
-    },
-    [],
-    []
-  );
+  let spaces = useIndex.aev("space/name");
 
   return <CalendarList spaces={spaces} />;
 };
@@ -79,9 +59,10 @@ const CalendarCTA = () => {
 };
 
 export async function getStaticProps() {
-  let id = await workerAPI(WORKER_URL, "get_studio", {
+  let id = await workerAPI(WORKER_URL, "get_community", {
     name: "hyperlink",
   });
+
   if (!id.success)
     return { props: { notFound: true }, revalidate: 10 } as const;
   return { props: { notFound: false, id: id.id } };
