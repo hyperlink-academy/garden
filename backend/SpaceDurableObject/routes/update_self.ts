@@ -12,6 +12,9 @@ export const update_self_route = makeRoute({
     data: z
       .object({
         completed: z.boolean(),
+        start_date: z.string(),
+        end_date: z.string(),
+        description: z.string(),
         image: z.object({
           type: z.union([z.literal("default"), z.literal("uploaded")]),
           value: z.string(),
@@ -37,34 +40,15 @@ export const update_self_route = makeRoute({
     if (!thisEntity)
       return { data: { success: false, error: "No this entity" } } as const;
 
-    if (msg.data.image) {
-      await env.factStore.assertFact({
-        entity: thisEntity.entity,
-        attribute: "space/door/uploaded-image",
-
-        value:
-          msg.data.image.type === "uploaded"
-            ? {
-                type: "file",
-                filetype: "image",
-                id: msg.data.image.value,
-              }
-            : {
-                type: "file",
-                filetype: "external_image",
-                url: msg.data.image.value,
-              },
-        positions: {},
-      });
-    }
-    if (msg.data.completed !== undefined) {
-      await env.factStore.assertFact({
-        entity: thisEntity.entity,
-        attribute: "space/completed",
-        value: msg.data.completed,
-        positions: {},
-      });
-    }
+    let selfStub = env.env.SPACES.get(env.env.SPACES.idFromString(env.id));
+    await privateSpaceAPI(selfStub)(
+      "http://internal",
+      "update_local_space_data",
+      {
+        spaceID: env.id,
+        data: msg.data,
+      }
+    );
 
     //CALL MEMBERS
     let members = await env.factStore.scanIndex.aev("space/member");
@@ -77,6 +61,19 @@ export const update_self_route = makeRoute({
         {
           spaceID: env.id,
           data: { image: msg.data.image, completed: msg.data.completed },
+        }
+      );
+    }
+    let communities = await env.factStore.scanIndex.aev("space/community");
+    for (let community of communities) {
+      let spaceID = env.env.SPACES.idFromString(community.value);
+      let stub = env.env.SPACES.get(spaceID);
+      await privateSpaceAPI(stub)(
+        "http://internal",
+        "update_local_space_data",
+        {
+          spaceID: env.id,
+          data: msg.data,
         }
       );
     }

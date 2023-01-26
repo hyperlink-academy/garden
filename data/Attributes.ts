@@ -105,8 +105,23 @@ export const DefaultAttributes = {
     unique: false,
     cardinality: "one",
   },
+  "space/community": {
+    type: "string",
+    unique: true,
+    cardinality: "one",
+  },
   "space/completed": {
     type: "boolean",
+    unique: false,
+    cardinality: "one",
+  },
+  "space/start-date": {
+    type: "timestamp",
+    unique: false,
+    cardinality: "one",
+  },
+  "space/end-date": {
+    type: "timestamp",
     unique: false,
     cardinality: "one",
   },
@@ -118,11 +133,6 @@ export const DefaultAttributes = {
   ["space/id"]: {
     type: "string",
     unique: true,
-    cardinality: "one",
-  },
-  ["space/external"]: {
-    type: "boolean",
-    unique: false,
     cardinality: "one",
   },
   "space/member": {
@@ -143,6 +153,11 @@ export const DefaultAttributes = {
   "space/name": {
     type: "string",
     unique: true,
+    cardinality: "one",
+  },
+  "space/description": {
+    type: "string",
+    unique: false,
     cardinality: "one",
   },
   "member/name": {

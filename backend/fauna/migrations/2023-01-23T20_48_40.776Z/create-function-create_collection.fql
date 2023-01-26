@@ -1,0 +1,13 @@
+CreateFunction({
+  "name": "create_collection",
+  "role": "server",
+  "body": Query(Lambda("a", Let([], {
+    "success": true,
+    "data": Select("data", Create(Collection("communities"), {
+      "data": {
+        "name": Select("name", Var("a")),
+        "spaceID": Select("spaceID", Var("a"))
+      }
+    }))
+  })))
+})

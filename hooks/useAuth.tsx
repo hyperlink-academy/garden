@@ -1,17 +1,12 @@
 import { workerAPI } from "backend/lib/api";
 import { LoginResponse } from "backend/routes/login";
 import { SessionResponse } from "backend/routes/session";
-import { makeSpaceReplicache } from "components/ReplicacheProvider";
-import { createContext, useContext, useEffect, useState } from "react";
-import { Replicache } from "replicache";
+import { createContext, useContext } from "react";
 import useSWR from "swr";
-import { makeReplicache, ReplicacheMutators } from "./useReplicache";
-import { UndoManager } from "@rocicorp/undo";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 
 export const AuthContext = createContext({
-  rep: null as null | Replicache<ReplicacheMutators>,
   session: { loggedIn: false } as SessionResponse,
   login: async (_data: { username: string; password: string }) => {
     return {} as unknown as LoginResponse;
@@ -32,30 +27,10 @@ export const AuthProvider: React.FC<React.PropsWithChildren<unknown>> = (
     return data;
   });
 
-  let [rep, setRep] = useState<ReturnType<typeof makeReplicache>>();
-  let [undoManager] = useState(new UndoManager());
-
-  useEffect(() => {
-    if (!data?.loggedIn) return;
-    let id = data.session.studio;
-    if (!id) return;
-    let rep = makeSpaceReplicache({
-      id: id,
-      session: id,
-      token: data.token,
-      undoManager: undoManager,
-    });
-    setRep(rep);
-    return () => {
-      rep.close();
-    };
-  }, [data?.loggedIn]);
-
   if (!data) return <div>loading</div>;
   return (
     <AuthContext.Provider
       value={{
-        rep: rep || null,
         session: data,
         login: async (login_data: { username: string; password: string }) => {
           if (data?.loggedIn)

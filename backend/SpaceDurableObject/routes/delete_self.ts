@@ -40,6 +40,7 @@ export const delete_self_route = makeRoute({
         }
       );
     }
+    //TODO delete from community
 
     //DELETING EVERYTHING
     await env.storage.deleteAll();

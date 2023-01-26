@@ -1,9 +1,7 @@
 import { generateKeyBetween } from "src/fractional-indexing";
 import { sortByPosition } from "src/position_helpers";
-import { ulid } from "src/ulid";
 import { Attribute, ReferenceAttributes } from "./Attributes";
-import { Fact, flag, ref } from "./Facts";
-import { Message } from "./Messages";
+import { Fact, ref } from "./Facts";
 
 export type MutationContext = {
   assertFact: <A extends keyof Attribute>(
@@ -55,40 +53,6 @@ export type CardinalityResult<A extends keyof Attribute | null> = null extends A
   : Fact<OptionalAttribute<A>>[];
 
 type Mutation<T> = (args: T, ctx: MutationContext) => Promise<void>;
-
-const addSpace: Mutation<{
-  name: string;
-  studio: string;
-  spaceID: string;
-  entityID: string;
-}> = async (args, ctx) => {
-  await Promise.all([
-    ctx.assertFact({
-      entity: args.entityID,
-      attribute: "space/name",
-      value: args.name,
-      positions: {},
-    }),
-    ctx.assertFact({
-      entity: args.entityID,
-      attribute: "space/studio",
-      value: args.studio,
-      positions: {},
-    }),
-    ctx.assertFact({
-      entity: args.entityID,
-      attribute: "space/id",
-      value: args.spaceID,
-      positions: {},
-    }),
-    ctx.assertFact({
-      entity: args.entityID,
-      attribute: "space/external",
-      value: true,
-      positions: {},
-    }),
-  ]);
-};
 
 const addCardToDesktop: Mutation<{
   entity: string;
@@ -299,7 +263,6 @@ const drawAPrompt: Mutation<{
 export const Mutations = {
   deleteEntity,
   createCard,
-  addSpace,
   updatePositions,
   addCardToSection,
   drawAPrompt,

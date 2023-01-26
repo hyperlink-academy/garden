@@ -1,20 +1,21 @@
-import { makeRoute } from "backend/lib/api";
+import { makeRoute, privateSpaceAPI } from "backend/lib/api";
 import { flag } from "data/Facts";
 import { ulid } from "src/ulid";
 import { z } from "zod";
 import { Env } from "..";
+import { space_input } from "./create_space";
 export const claimRoute = makeRoute({
   route: "claim",
   input: z.object({
     ownerID: z.string(),
     name: z.string(),
     ownerName: z.string(),
-    image: z
-      .object({
-        type: z.union([z.literal("default"), z.literal("uploaded")]),
-        value: z.string(),
+    data: space_input.merge(
+      z.object({
+        studio: z.string().optional(),
+        community: z.string().optional(),
       })
-      .optional(),
+    ),
   }),
   handler: async (msg, env: Env) => {
     let creator = await env.storage.get("meta-creator");
@@ -47,25 +48,14 @@ export const claimRoute = makeRoute({
         positions: { aev: "a0" },
         value: msg.name,
       }),
-      env.factStore.assertFact({
-        entity: thisEntity,
-        attribute: "space/door/uploaded-image",
-        value:
-          msg.image?.type === "uploaded"
-            ? {
-                type: "file",
-                filetype: "image",
-                id: msg.image.value,
-              }
-            : {
-                type: "file",
-                filetype: "external_image",
-                url: msg.image?.value || "/doors/door-clouds-256.jpg",
-              },
-        positions: {},
-      }),
       env.storage.put("meta-creator", msg.ownerID),
     ]);
+    let selfStub = env.env.SPACES.get(env.env.SPACES.idFromString(env.id));
+    await privateSpaceAPI(selfStub)("http://internal", "add_space_data", {
+      entityID: thisEntity,
+      spaceID: env.id,
+      data: msg.data,
+    });
     return { data: { success: true } };
   },
 });

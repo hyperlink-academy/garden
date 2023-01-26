@@ -37,6 +37,12 @@ export const SignupRoute = makeRoute({
     let stub = env.SPACES.get(newSpaceID);
     let newSpace = internalSpaceAPI(stub);
     let res = await newSpace("http://internal", "claim", {
+      data: {
+        name: msg.username,
+        start_date: "",
+        end_date: "",
+        description: "",
+      },
       name: msg.username,
       ownerID: newSpaceID.toString(),
       ownerName: msg.username,

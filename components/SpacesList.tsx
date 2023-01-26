@@ -87,12 +87,19 @@ const Space = (props: { entity: string; name: string }) => {
 
 export const CreateSpace = (props: { studioSpaceID: string }) => {
   let [open, setOpen] = useState(false);
-  let [name, setName] = useState("");
-  let [description, setDescription] = useState("");
-  let [door, setDoor] = useState<Door | undefined>();
+  let [formState, setFormState] = useState({
+    name: "",
+    description: "",
+    start_date: "",
+    end_date: "",
+    publish_on_listings_page: false,
+    door: undefined as Door | undefined,
+  });
+
   let auth = useAuth();
   let { authorized } = useMutations();
   let rep = useContext(ReplicacheContext);
+
   if (authorized === false) {
     return null;
   } else
@@ -112,9 +119,15 @@ export const CreateSpace = (props: { studioSpaceID: string }) => {
               <p className="font-bold">Name this Space</p>
               <input
                 className="w-full"
-                value={name}
+                value={formState.name}
                 placeholder=""
-                onChange={(e) => setName(e.currentTarget.value)}
+                onChange={(e) => {
+                  let value = e.currentTarget.value;
+                  setFormState((form) => ({
+                    ...form,
+                    name: value,
+                  }));
+                }}
               />
             </div>
 
@@ -125,8 +138,14 @@ export const CreateSpace = (props: { studioSpaceID: string }) => {
               <textarea
                 className="!important box-border min-h-[90px] w-full rounded-md border border-grey-55 bg-white p-2"
                 placeholder=""
-                value={description}
-                onChange={(e) => setDescription(e.currentTarget.value)}
+                value={formState.description}
+                onChange={(e) => {
+                  let value = e.currentTarget.value;
+                  setFormState((form) => ({
+                    ...form,
+                    description: value,
+                  }));
+                }}
               />
             </div>
 
@@ -134,16 +153,64 @@ export const CreateSpace = (props: { studioSpaceID: string }) => {
             <div className="flex justify-between gap-2">
               <div className="flex flex-col gap-1">
                 <p className="font-bold">Start Date</p>
-                <input type="date"></input>
+                <input
+                  type="date"
+                  value={formState.start_date}
+                  onChange={(e) => {
+                    let value = e.currentTarget.value;
+                    setFormState((form) => ({
+                      ...form,
+                      start_date: value,
+                    }));
+                  }}
+                />
               </div>
               <div className="flex flex-col gap-1">
-                <p className="font-bold">Duration (# of Days)</p>
-                <input className="w-16"></input>
+                <p className="font-bold">End Date</p>
+
+                <input
+                  type="date"
+                  value={formState.end_date}
+                  onChange={(e) => {
+                    let value = e.currentTarget.value;
+                    setFormState((form) => ({
+                      ...form,
+                      end_date: value,
+                    }));
+                  }}
+                />
               </div>
             </div>
 
             {/* door image selector */}
-            <DoorSelector selected={door} onSelect={(d) => setDoor(d)} />
+            <DoorSelector
+              selected={formState.door}
+              onSelect={(d) => setFormState((form) => ({ ...form, door: d }))}
+            />
+
+            <div className="flex flex-row gap-1">
+              <input
+                type="checkbox"
+                disabled={
+                  !(
+                    formState.start_date &&
+                    formState.end_date &&
+                    formState.name &&
+                    formState.description &&
+                    formState.door
+                  )
+                }
+                checked={formState.publish_on_listings_page}
+                onChange={(e) => {
+                  let value = e.currentTarget.checked;
+                  setFormState((form) => ({
+                    ...form,
+                    publish_on_listings_page: value,
+                  }));
+                }}
+              />
+              <p className="font-bold">Publish to Community Calendar?</p>
+            </div>
 
             {/* action buttons */}
             <div className="flex gap-4 place-self-end">
@@ -154,19 +221,25 @@ export const CreateSpace = (props: { studioSpaceID: string }) => {
 
               <ButtonPrimary
                 content="Create!"
-                disabled={!name || !door}
+                disabled={!formState.name || !formState.door}
                 onClick={async () => {
-                  if (!auth.session.loggedIn || !name) return;
+                  if (!auth.session.loggedIn || !formState.name) return;
                   await spaceAPI(
                     `${WORKER_URL}/space/${props.studioSpaceID}`,
                     "create_space",
                     {
-                      name: name.trim(),
                       token: auth.session.token,
-                      image: door,
+                      ...formState,
                     }
                   );
-                  setName("");
+                  setFormState({
+                    name: "",
+                    description: "",
+                    start_date: "",
+                    end_date: "",
+                    publish_on_listings_page: false,
+                    door: undefined,
+                  });
                   rep?.rep.pull();
                   setOpen(false);
                 }}

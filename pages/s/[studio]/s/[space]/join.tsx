@@ -5,7 +5,6 @@ import { BaseSmallCard } from "components/CardPreview/SmallCard";
 import { useAuth } from "hooks/useAuth";
 import { useIndex, useSpaceID } from "hooks/useReplicache";
 import { useRouter } from "next/router";
-import { ulid } from "src/ulid";
 import { SVGProps, useState } from "react";
 import { LogInModal } from "components/LoginModal";
 
@@ -15,7 +14,7 @@ export default function JoinSpacePage() {
 }
 export function JoinSpace() {
   let id = useSpaceID();
-  let { session, rep } = useAuth();
+  let { session } = useAuth();
   let router = useRouter();
   let code = router.query.code as string | undefined;
   let isMember = useIndex.ave("space/member", session.session?.studio);
@@ -23,18 +22,13 @@ export function JoinSpace() {
   let [isOpen, setLogInModal] = useState(false);
 
   const onClick = async () => {
-    if (!session.token || !code || !rep || isMember || !id) return;
+    if (!session.token || !code || isMember || !id) return;
     let data = await spaceAPI(`${WORKER_URL}/space/${id}`, "join", {
       token: session.token,
       code,
+      studio: router.query.studio as string,
     });
     if (data.success) {
-      await rep.mutate.addSpace({
-        studio: router.query.studio as string,
-        name: router.query.space as string,
-        spaceID: id,
-        entityID: ulid(),
-      });
       router.push(`/s/${router.query.studio}/s/${router.query.space}`);
     }
   };
