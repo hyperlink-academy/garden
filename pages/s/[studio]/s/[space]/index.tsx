@@ -83,7 +83,7 @@ export default function SpacePage() {
                 <CardViewer EmptyState={<EmptyState />} />
               </div>
             ) : (
-              <div className="smallSplitLayout flex w-full flex-col items-stretch gap-2 pb-4">
+              <div className="smallSplitLayout flex w-full flex-col items-stretch gap-2">
                 <div
                   className={`layoutContent flex w-full snap-x snap-mandatory flex-row items-stretch gap-4 overflow-x-scroll scroll-smooth`}
                 >
