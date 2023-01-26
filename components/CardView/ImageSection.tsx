@@ -32,7 +32,7 @@ export const ImageSection = (props: { entity: string }) => {
   return (
     // FOCUS ON DIV AND PASTE AN IMAGE
     image ? (
-      <div className="grid auto-rows-max justify-items-center gap-1">
+      <div className="grid auto-rows-max justify-items-center gap-1 pb-2">
         <img
           className="max-w-full"
           src={
@@ -43,7 +43,7 @@ export const ImageSection = (props: { entity: string }) => {
         />
         {!authorized ? null : (
           <button
-            className="text-grey-55 text-sm justify-self-center hover:text-accent-blue"
+            className="justify-self-center text-sm text-grey-55 hover:text-accent-blue"
             onClick={() => {
               if (!image || !session.token) return;
               mutate("retractFact", { id: image.id });

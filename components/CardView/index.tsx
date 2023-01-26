@@ -3,7 +3,12 @@ import { Menu } from "@headlessui/react";
 import { MoreOptions, Delete, DeckSmall, Member } from "components/Icons";
 import { Divider, MenuContainer, MenuItem } from "components/Layout";
 import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
-import { MultipleReferenceSection, SingleTextSection } from "./Sections";
+import {
+  DateSection,
+  MakeDate,
+  MultipleReferenceSection,
+  SingleTextSection,
+} from "./Sections";
 import { Backlinks } from "./Backlinks";
 import { usePreserveScroll } from "hooks/utils";
 import Link from "next/link";
@@ -40,18 +45,18 @@ export const CardView = (props: {
   let { session } = useAuth();
 
   return (
-    <div className="flex flex-col items-stretch h-full">
+    <div className="flex h-full flex-col items-stretch">
       <Backlinks entityID={props.entityID} />
       <div
         className={`
         card
-        grow
-        relative
-        overflow-y-scroll       
         no-scrollbar
-        max-w-3xl mx-auto
-        w-full h-full
-        flex flex-col items-stretch
+        relative
+        mx-auto       
+        flex
+        h-full w-full
+        max-w-3xl grow
+        flex-col items-stretch overflow-y-scroll
         ${borderStyles({
           member: !!memberName,
         })}
@@ -59,7 +64,7 @@ export const CardView = (props: {
       >
         {!session?.loggedIn || !memberName ? null : (
           <>
-            <div className="grid grid-cols-[auto_max-content] shrink-0 items-end text-white px-2 pt-2 pb-1">
+            <div className="grid shrink-0 grid-cols-[auto_max-content] items-end px-2 pt-2 pb-1 text-white">
               <Member />
               <Link href={`/s/${memberName?.value}`}>
                 <small className="justify-self-start">visit studio</small>
@@ -73,17 +78,17 @@ export const CardView = (props: {
           ref={ref}
           className={`
             cardContent
-            flex flex-col gap-6          
-            no-scrollbar
-            h-full
+            no-scrollbar flex h-full          
             grow
+            flex-col
+            gap-6
             overflow-scroll
             ${contentStyles({
               member: !!memberName,
             })}
             `}
         >
-          <div className="cardDefaultSection grid grid-auto-rows gap-3">
+          <div className="cardDefaultSection grid-auto-rows grid gap-3">
             <div className="cardHeader grid grid-cols-[auto_max-content_max-content] gap-2">
               <Title entityID={props.entityID} />
               <div className="">
@@ -94,16 +99,21 @@ export const CardView = (props: {
                 />
               </div>
             </div>
+
             <DefaultTextSection entityID={props.entityID} />
 
-            <div className="pb-2">
-              <ImageSection entity={props.entityID} />
-            </div>
-            <DeckCardList entityID={props.entityID} />
-
+            {/* display image, if we have one! */}
+            <ImageSection entity={props.entityID} />
+            {/* image icon - click to upload */}
             <div className="flex gap-2 pt-2">
               <MakeImage entity={props.entityID} />
             </div>
+
+            {/* TODO: finish making these + style em */}
+            <MakeDate entityID={props.entityID} />
+            <DateSection entityID={props.entityID} />
+
+            <DeckCardList entityID={props.entityID} />
           </div>
         </div>
         {/* END CARD CONTENT */}
@@ -164,7 +174,7 @@ const Title = (props: { entityID: string }) => {
       }}
       previewOnly={titleFact?.attribute === "member/name"}
       entityID={props.entityID}
-      className="text-xl font-bold bg-inherit"
+      className="bg-inherit text-xl font-bold"
       section={titleFact?.attribute || "card/title"}
     />
   );

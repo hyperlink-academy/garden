@@ -1,7 +1,7 @@
 import { workerAPI } from "backend/lib/api";
 import { SpaceProvider } from "components/ReplicacheProvider";
-import { SpaceList } from "components/SpacesList";
-import { CreateSpace, StudioName } from "components/StudioLayout";
+import { CreateSpace, SpaceList } from "components/SpacesList";
+import { StudioName } from "components/StudioLayout";
 import { useIndex } from "hooks/useReplicache";
 import { GetStaticPropsContext, InferGetStaticPropsType } from "next";
 import { sortByPosition } from "src/position_helpers";
