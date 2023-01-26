@@ -6,17 +6,14 @@ import { SpaceHeader, Sidebar } from "components/SpaceLayout";
 import Head from "next/head";
 import { useEffect, useRef, useState } from "react";
 import useWindowDimensions from "hooks/useWindowDimensions";
-import { Popover } from "@headlessui/react";
+import { Popover, Transition } from "@headlessui/react";
 import { atom, useAtom } from "jotai";
 import { Rooms } from "components/Icons";
 import { parentPort } from "worker_threads";
 
-let SidebarOpenAtom = atom(false);
-
 export default function SpacePage() {
   let spaceName = useIndex.aev("this/name")[0];
   let homeEntity = useIndex.aev("home");
-  let [, setSidebarOpen] = useAtom(SidebarOpenAtom);
 
   let [room, setRoom] = useState<string | null>(null);
   const { width } = useWindowDimensions();
@@ -91,17 +88,6 @@ export default function SpacePage() {
                     id="roomWrapper"
                     className="roomWrapper relative flex snap-center flex-row rounded-md border border-grey-90"
                   >
-                    <MobileSidebar
-                      onRoomChange={(room) => {
-                        setRoom(room);
-                        setSidebarOpen(false);
-                        let roomPane = document.getElementById("roomWrapper");
-                        roomPane
-                          ? roomPane.scrollIntoView({ behavior: "smooth" })
-                          : null;
-                      }}
-                      currentRoom={room}
-                    />
                     <div
                       className={`
                       desktopWrapper
@@ -118,7 +104,17 @@ export default function SpacePage() {
 
                   <CardViewer EmptyState={<EmptyState />} />
                 </div>
-                <MobileFooter currentRoom={room} currentCard="card" />
+                <MobileFooter
+                  currentRoom={room}
+                  currentCard="card"
+                  onRoomChange={(room) => {
+                    setRoom(room);
+                    let roomPane = document.getElementById("roomWrapper");
+                    roomPane
+                      ? roomPane.scrollIntoView({ behavior: "smooth" })
+                      : null;
+                  }}
+                />
               </div>
             )}
           </SmallCardDragContext>
@@ -130,30 +126,33 @@ export default function SpacePage() {
 const MobileFooter = (props: {
   currentRoom: string | null;
   currentCard: string;
+  onRoomChange: (room: string) => void;
 }) => {
   let homeEntity = useIndex.aev("home");
   let roomName = useIndex.eav(props.currentRoom, "room/name");
 
-  let [, setSidebarOpen] = useAtom(SidebarOpenAtom);
-
   return (
     <div className="roomFooter grid shrink-0 grid-cols-[minmax(0,auto)_auto] justify-between gap-8 font-bold text-grey-35">
       <div className=" flex w-full shrink grow flex-row gap-4">
-        <button
-          id="roomToggle"
-          onClick={() => {
-            // let room = document.getElementById("roomWrapper");
-            // room ? room.scrollIntoView({ behavior: "smooth" }) : null;
-            setSidebarOpen((open) => !open);
-          }}
-        >
-          <Rooms />
-        </button>
+        <Popover>
+          <Popover.Button>
+            <Rooms />
+          </Popover.Button>
+          <Popover.Overlay className="fixed inset-0 z-[999998] bg-white opacity-60" />
+
+          <Popover.Panel
+            className={`roomListWrapper fixed top-0 bottom-0 left-0 z-[999999] `}
+          >
+            <Sidebar
+              onRoomChange={props.onRoomChange}
+              currentRoom={props.currentRoom}
+            />
+          </Popover.Panel>
+        </Popover>
         <div
           onClick={() => {
             let roomPane = document.getElementById("roomWrapper");
             roomPane ? roomPane.scrollIntoView({ behavior: "smooth" }) : null;
-            setSidebarOpen(false);
           }}
           className=" overflow-hidden whitespace-nowrap"
         >
@@ -172,47 +171,6 @@ const MobileFooter = (props: {
       >
         {props.currentCard}
       </div>
-    </div>
-  );
-};
-const MobileSidebar = (props: {
-  onRoomChange: (room: string) => void;
-  currentRoom: string | null;
-}) => {
-  let [open, setSidebarOpen] = useAtom(SidebarOpenAtom);
-  let ref = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    if (!open) return;
-
-    let clickcb = (e: MouseEvent) => {
-      if (!ref.current?.contains(e.target as Node)) {
-        let roomToggle = document.getElementById("roomToggle");
-        if (roomToggle?.contains(e.target as Node)) return;
-        setSidebarOpen(false);
-      }
-    };
-
-    let keycb = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setSidebarOpen(false);
-    };
-
-    window.addEventListener("click", clickcb);
-    window.addEventListener("keydown", keycb);
-    return () => {
-      window.removeEventListener("click", clickcb);
-      window.removeEventListener("keydown", keycb);
-    };
-  }, [open]);
-
-  return (
-    <div
-      ref={ref}
-      className={`roomListWrapper fixed top-0 bottom-0  z-10  ${
-        open ? "left-0" : "-left-48"
-      }`}
-    >
-      <Sidebar {...props} />
     </div>
   );
 };
