@@ -22,7 +22,10 @@ export default function CalendarPage(props: Props) {
 }
 
 const List = () => {
-  let spaces = useIndex.aev("space/name");
+  let spaces = useIndex.at(
+    "space/start-date",
+    new Date().toLocaleDateString("en-CA")
+  );
 
   return <CalendarList spaces={spaces} />;
 };
