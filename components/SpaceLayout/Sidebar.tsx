@@ -1,25 +1,31 @@
 import Link from "next/link";
+import useSWR from "swr";
 
-import { ButtonLink } from "components/Buttons";
+import { ButtonLink, ButtonPrimary, ButtonSecondary } from "components/Buttons";
 import { SingleTextSection } from "components/CardView/Sections";
-import { Divider } from "components/Layout";
+import { Divider, Modal } from "components/Layout";
 import { useAuth } from "hooks/useAuth";
-import { useIndex, useMutations } from "hooks/useReplicache";
+import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
 import { useState } from "react";
 import { ulid } from "src/ulid";
 import { AddTiny, BackToStudio as BackToStudioIcon, MemberAdd } from "../Icons";
+import { spaceAPI } from "backend/lib/api";
+import { BaseSmallCard } from "components/CardPreview/SmallCard";
+import { useSmoker } from "components/Smoke";
 
 export const Sidebar = (props: {
   onRoomChange: (room: string) => void;
   currentRoom: string | null;
 }) => {
   let { session } = useAuth();
+  let { mutate } = useMutations();
 
   let homeEntity = useIndex.aev("home");
   let rooms = useIndex.aev("room/name");
   let spaceName = useIndex.aev("this/name")[0];
 
-  let { mutate } = useMutations();
+  let [inviteOpen, setInviteOpen] = useState(false);
+
   return (
     <div className="roomList flex h-full w-48 flex-col items-stretch gap-4 rounded-l-[3px] border-r border-grey-90 bg-white p-3 text-grey-35">
       <div className="flex h-full w-full flex-col gap-2 overflow-y-scroll">
@@ -60,7 +66,7 @@ export const Sidebar = (props: {
           </ul>
 
           <button
-            className="flex place-items-center justify-between gap-1 py-0.5 px-2 hover:italic"
+            className="hover: flex w-full place-items-center justify-between gap-1 rounded-md border border-transparent py-0.5 px-2 text-grey-55 hover:border-accent-blue hover:text-accent-blue"
             onClick={async () => {
               let room = ulid();
               await mutate("assertFact", {
@@ -76,15 +82,22 @@ export const Sidebar = (props: {
             {/* <AddTiny /> */}
           </button>
         </div>
-        <div className="-mb-2 pt-4">
-          <div className="w-full border-t border-dashed border-grey-80" />
+        <div className=" pt-4">
           <small className="px-2 font-bold text-grey-55">members</small>
+          <div className="w-full border-t border-dashed border-grey-80" />
         </div>
         <div>
           <MemberList />
-          <button className="flex place-items-center gap-1 py-0.5 px-2 hover:italic">
-            invite <MemberAdd />
+          <button
+            onClick={() => setInviteOpen(true)}
+            className="flex w-full place-items-center gap-1 rounded-md border border-transparent py-0.5 px-2 text-grey-55 hover:border-accent-blue  hover:text-accent-blue"
+          >
+            + invite
           </button>
+          <InviteMember
+            open={inviteOpen}
+            onClose={() => setInviteOpen(false)}
+          />
         </div>
       </div>
       <div className="mb-2 shrink-0 ">
@@ -154,5 +167,62 @@ const SpaceStatus = () => {
         <span>{status}</span>
       )}
     </div>
+  );
+};
+
+const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
+
+const InviteMember = (props: { open: boolean; onClose: () => void }) => {
+  let { session } = useAuth();
+  let isMember = useIndex.ave("space/member", session.session?.studio);
+  let smoker = useSmoker();
+  const spaceID = useSpaceID();
+  let { data: inviteLink } = useSWR(
+    !isMember ? null : `${WORKER_URL}/space/${spaceID}/get_share_code`,
+    async () => {
+      if (!spaceID || !session.token) return;
+      let code = await spaceAPI(
+        `${WORKER_URL}/space/${spaceID}`,
+        "get_share_code",
+        {
+          token: session.token,
+        }
+      );
+      if (code.success) {
+        return `${document.location.href}/join?code=${code.code}`;
+      }
+    }
+  );
+
+  const getShareLink = async (e: React.MouseEvent) => {
+    if (!inviteLink) return;
+    await navigator.clipboard.writeText(inviteLink);
+    smoker({ position: { x: e.clientX, y: e.clientY }, text: "copied!" });
+  };
+
+  return (
+    <Modal open={props.open} onClose={props.onClose}>
+      <div className="flex flex-col place-items-center gap-4 p-4  text-center">
+        <div>
+          <h3>Send this Invite Link!</h3>
+          <p>
+            Members get thier own room, and can make and edit cards in this
+            space.
+          </p>
+        </div>
+        <div className="flex w-full gap-2">
+          <input
+            className="grow bg-grey-90 text-grey-35"
+            readOnly
+            value={inviteLink}
+            onClick={getShareLink}
+          />
+          <ButtonPrimary
+            onClick={(e) => getShareLink(e)}
+            content={"Copy Invite Link"}
+          />
+        </div>
+      </div>
+    </Modal>
   );
 };
