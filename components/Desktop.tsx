@@ -172,17 +172,19 @@ let PromptManager = (props: { entityID: string }) => {
   console.log(name);
   if (!name) return null;
   return (
-    <div className="absolute z-10 flex w-full justify-center gap-2">
-      <ButtonSecondary
-        content="Draw a Prompt"
-        onClick={() => {
-          mutate("drawAPrompt", {
-            factID: ulid(),
-            desktopEntity: props.entityID,
-            randomSeed: Math.random(),
-          });
-        }}
-      />
+    <div className="relative w-full">
+      <div className="absolute z-10 flex w-full justify-center gap-2">
+        <ButtonSecondary
+          content="Draw a Prompt"
+          onClick={() => {
+            mutate("drawAPrompt", {
+              factID: ulid(),
+              desktopEntity: props.entityID,
+              randomSeed: Math.random(),
+            });
+          }}
+        />
+      </div>
     </div>
   );
 };
