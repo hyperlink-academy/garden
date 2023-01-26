@@ -1,7 +1,7 @@
 import { useIndex } from "hooks/useReplicache";
 import Link from "next/link";
 import { useRef } from "react";
-import { Door } from "./Doors";
+import { DoorImage } from "./Doors";
 import { prefetchSpaceId } from "./ReplicacheProvider";
 import { spacePath } from "hooks/utils";
 import { Fact } from "data/Facts";
@@ -32,9 +32,9 @@ const CalendarSpace = (props: { entity: string; name: string }) => {
   let prefetched = useRef(false);
 
   return (
-    <div className="w-min flex flex-col gap-4">
+    <div className="flex w-min flex-col gap-4">
       <div
-        className="grid grid-cols-[max-content,max-content] -ml-2 gap-1 items-end "
+        className="-ml-2 grid grid-cols-[max-content,max-content] items-end gap-1 "
         onPointerDown={() => {
           if (prefetched.current) return;
           if (!studio?.value) return;
@@ -49,12 +49,12 @@ const CalendarSpace = (props: { entity: string; name: string }) => {
         }}
       >
         <Link href={`${spacePath(studio?.value, props.name)}`}>
-          <Door entityID={props.entity} />
+          <DoorImage entityID={props.entity} />
         </Link>
       </div>
 
       <div className="">
-        <div className="origin-top-left skew-y-[-30deg] scale-x-90 scale-y-110 ml-2 w-full">
+        <div className="ml-2 w-full origin-top-left skew-y-[-30deg] scale-x-90 scale-y-110">
           <h3 className="text-xl">{props.name}</h3>
         </div>
       </div>

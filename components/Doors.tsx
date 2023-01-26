@@ -1,7 +1,7 @@
 import { useIndex } from "hooks/useReplicache";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
-export const Door = (props: {
+export const DoorImage = (props: {
   entityID: string;
   width?: string;
   glow?: boolean;
@@ -66,7 +66,7 @@ export const Door = (props: {
           xlinkHref={image}
           className={
             !defaultDoor && image !== "/doors/door-clouds-256.jpg"
-              ? "-scale-x-100 origin-center"
+              ? "origin-center -scale-x-100"
               : ""
           }
         />

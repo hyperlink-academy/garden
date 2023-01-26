@@ -1,18 +1,29 @@
 import { spaceAPI } from "backend/lib/api";
-import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
+import {
+  ReplicacheContext,
+  useIndex,
+  useMutations,
+  useSpaceID,
+} from "hooks/useReplicache";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import useSWR from "swr";
-import { ButtonLink, ButtonPrimary, ButtonSecondary } from "./Buttons";
-import { DoorSelector } from "components/DoorSelector";
-import { Door } from "./Doors";
-import { SettingsStudio } from "./Icons";
+import {
+  ButtonLink,
+  ButtonPrimary,
+  ButtonSecondary,
+  ButtonTertiary,
+} from "./Buttons";
+import { Door, DoorSelector } from "components/DoorSelector";
+import { DoorImage } from "./Doors";
+import { SettingsStudio, SpaceCreate } from "./Icons";
 import { Modal } from "./Layout";
 import { prefetchSpaceId } from "./ReplicacheProvider";
 import { useAuth } from "hooks/useAuth";
 import { DotLoader } from "./DotLoader";
 import { spacePath } from "hooks/utils";
 import { Fact } from "data/Facts";
+import { Textarea } from "./Textarea";
 
 export const SpaceList = (props: { spaces: Fact<"space/name">[] }) => {
   return (
@@ -41,9 +52,9 @@ const Space = (props: { entity: string; name: string }) => {
   let prefetched = useRef(false);
 
   return (
-    <div className="w-min flex flex-col gap-4">
+    <div className="flex w-min flex-col gap-4">
       <div
-        className="grid grid-cols-[max-content,max-content] -ml-2 gap-1 items-end "
+        className="-ml-2 grid grid-cols-[max-content,max-content] items-end gap-1 "
         onPointerDown={() => {
           if (prefetched.current) return;
           if (!studio?.value) return;
@@ -58,20 +69,113 @@ const Space = (props: { entity: string; name: string }) => {
         }}
       >
         <Link href={`${spacePath(studio?.value, props.name)}`}>
-          <Door entityID={props.entity} />
+          <DoorImage entityID={props.entity} />
         </Link>
-        <div className="flex flex-col gap-4 w-[20px] pb-[92px]">
+        <div className="flex w-[20px] flex-col gap-4 pb-[92px]">
           <EditSpace spaceEntity={props.entity} />
         </div>
       </div>
 
       <div className="">
-        <div className="origin-top-left skew-y-[-30deg] scale-x-90 scale-y-110 ml-2 w-full">
+        <div className="ml-2 w-full origin-top-left skew-y-[-30deg] scale-x-90 scale-y-110">
           <h3 className="text-xl">{props.name}</h3>
         </div>
       </div>
     </div>
   );
+};
+
+export const CreateSpace = (props: { studioSpaceID: string }) => {
+  let [open, setOpen] = useState(false);
+  let [name, setName] = useState("");
+  let [description, setDescription] = useState("");
+  let [door, setDoor] = useState<Door | undefined>();
+  let auth = useAuth();
+  let { authorized } = useMutations();
+  let rep = useContext(ReplicacheContext);
+  if (authorized === false) {
+    return null;
+  } else
+    return (
+      <div className="mt-8 grid w-full">
+        <a className="place-self-center">
+          <ButtonSecondary
+            icon={<SpaceCreate />}
+            content="Create New Space!"
+            onClick={() => setOpen(true)}
+          />
+        </a>
+        <Modal open={open} onClose={() => setOpen(false)}>
+          <div className="flex flex-col gap-6 overflow-y-scroll">
+            {/* space name */}
+            <div className="flex flex-col gap-1">
+              <p className="font-bold">Name this Space</p>
+              <input
+                className="w-full"
+                value={name}
+                placeholder=""
+                onChange={(e) => setName(e.currentTarget.value)}
+              />
+            </div>
+
+            {/* space description */}
+            <div className="flex flex-col gap-1">
+              <p className="font-bold">Add a Description</p>
+              {/* NB: Textarea component = broken w/o placeholder */}
+              <textarea
+                className="!important box-border min-h-[90px] w-full rounded-md border border-grey-55 bg-white p-2"
+                placeholder=""
+                value={description}
+                onChange={(e) => setDescription(e.currentTarget.value)}
+              />
+            </div>
+
+            {/* date section */}
+            <div className="flex justify-between gap-2">
+              <div className="flex flex-col gap-1">
+                <p className="font-bold">Start Date</p>
+                <input type="date"></input>
+              </div>
+              <div className="flex flex-col gap-1">
+                <p className="font-bold">Duration (# of Days)</p>
+                <input className="w-16"></input>
+              </div>
+            </div>
+
+            {/* door image selector */}
+            <DoorSelector selected={door} onSelect={(d) => setDoor(d)} />
+
+            {/* action buttons */}
+            <div className="flex gap-4 place-self-end">
+              <ButtonTertiary
+                content="Nevermind"
+                onClick={() => setOpen(false)}
+              />
+
+              <ButtonPrimary
+                content="Create!"
+                disabled={!name || !door}
+                onClick={async () => {
+                  if (!auth.session.loggedIn || !name) return;
+                  await spaceAPI(
+                    `${WORKER_URL}/space/${props.studioSpaceID}`,
+                    "create_space",
+                    {
+                      name: name.trim(),
+                      token: auth.session.token,
+                      image: door,
+                    }
+                  );
+                  setName("");
+                  rep?.rep.pull();
+                  setOpen(false);
+                }}
+              />
+            </div>
+          </div>
+        </Modal>
+      </div>
+    );
 };
 
 const EditSpace = (props: { spaceEntity: string }) => {
