@@ -1,18 +1,9 @@
 import { useAuth } from "hooks/useAuth";
-import Link from "next/link";
-import useSWR from "swr";
-import { BackToStudio as BackToStudioIcon, SearchOrCommand } from "../Icons";
-import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
+import { SearchOrCommand } from "../Icons";
+import { useMutations } from "hooks/useReplicache";
 import { useState } from "react";
-import { ButtonLink, ButtonSecondary } from "../Buttons";
+import { ButtonSecondary } from "../Buttons";
 import { LogInModal } from "../LoginModal";
-import { spaceAPI } from "backend/lib/api";
-import { useSmoker } from "../Smoke";
-import { Popover } from "@headlessui/react";
-import { animated, useSpring } from "@react-spring/web";
-import useMeasure from "react-use-measure";
-import { Divider, Modal } from "components/Layout";
-import { BaseSmallCard } from "components/CardPreview/SmallCard";
 import { useAllItems, FindOrCreate } from "components/FindOrCreateEntity";
 import { ulid } from "src/ulid";
 import { publishAppEvent } from "hooks/useEvents";
@@ -20,7 +11,7 @@ import { publishAppEvent } from "hooks/useEvents";
 export const SpaceHeader: React.FC<React.PropsWithChildren<unknown>> = () => {
   let { session } = useAuth();
   return (
-    <div className="pageHeader shrink-0 text-grey-35">
+    <div className="pageHeader absolute -right-9 bottom-10 z-50 hidden text-grey-35 sm:block">
       <div
         className={`
           headerWrapper
@@ -28,13 +19,6 @@ export const SpaceHeader: React.FC<React.PropsWithChildren<unknown>> = () => {
           flex max-w-6xl place-items-center gap-2 px-2
           pt-4 sm:px-4 sm:pt-8`}
       >
-        <div className="pt-[1px]">
-          <BackToStudio studio={session.session?.username} />
-        </div>
-        <SpaceName />
-        {/* <SpaceStatus /> */}
-        {/* <h2>{spaceName?.value}</h2> */}
-
         {!session.session ? (
           <div className="z-10 flex shrink-0 gap-4">
             <Login />
@@ -43,116 +27,6 @@ export const SpaceHeader: React.FC<React.PropsWithChildren<unknown>> = () => {
           <FindOrCreateBar />
         )}
       </div>
-    </div>
-  );
-};
-
-const SpaceName = () => {
-  return (
-    <Popover className="h-[33px] w-full">
-      {({ open }) => <SpaceNameContent open={open} />}
-    </Popover>
-  );
-};
-
-const SpaceNameContent = (props: { open: boolean }) => {
-  let spaceName = useIndex.aev("this/name")[0];
-  let [ref, { width }] = useMeasure();
-  const [drawerRef, { height: innerHeight }] = useMeasure();
-
-  let { minWidth, height } = useSpring({
-    config: { mass: 0.1, tension: 500, friction: 25 },
-    minWidth: props.open ? 256 : 0,
-    height: props.open ? innerHeight : 0,
-  });
-  return (
-    <div className="flex gap-2">
-      <animated.div
-        style={{
-          minWidth: minWidth,
-        }}
-        ref={ref}
-        className={`headerSpaceName relative z-10 max-w-md grow font-bold`}
-      >
-        <animated.div
-          style={{
-            width,
-          }}
-          className={`absolute overflow-hidden rounded-md border-accent-blue px-2 py-[2px] hover:border-accent-blue hover:bg-bg-blue hover:text-accent-blue ${
-            props.open
-              ? "border border-accent-blue bg-bg-blue text-accent-blue"
-              : "border border-transparent"
-          }`}
-        >
-          <Popover.Button
-            as="div"
-            className={`${
-              props.open ? "" : "truncate"
-            } font-bold outline-none hover:cursor-pointer`}
-            style={{
-              minWidth: props.open ? "240px" : undefined,
-            }}
-          >
-            <h2>{spaceName?.value}</h2>
-          </Popover.Button>
-
-          <animated.div
-            style={{
-              height: height,
-              overflow: "hidden",
-            }}
-          >
-            <div ref={drawerRef} className="pb-2">
-              <Settings />
-            </div>
-          </animated.div>
-        </animated.div>
-      </animated.div>
-      <SpaceStatus />
-    </div>
-  );
-};
-
-const SpaceStatus = () => {
-  // TODO: get dates + calculate status
-  // options: unscheduled, upcoming, ongoing, completed
-
-  // TODO: maybe pass in status as prop - and also in Settings for more detail
-
-  // TEMP EXAMPLE
-  let status = "unscheduled";
-
-  let statusStyles = "";
-  if (status === "unscheduled") statusStyles = "lightBorder";
-  if (status === "upcoming")
-    statusStyles = "text-white bg-grey-15 border rounded-md";
-  if (status === "ongoing")
-    statusStyles = "text-white bg-[green] border rounded-md";
-  if (status === "completed")
-    statusStyles = "text-white bg-grey-35 border rounded-md";
-
-  return (
-    <div className={`${statusStyles} flex gap-2 px-2 py-1`}>
-      <span>{status}</span>
-      {status === "unscheduled" ? (
-        <Link href="">
-          <ButtonLink content="set dates" />
-        </Link>
-      ) : (
-        ""
-      )}
-    </div>
-  );
-};
-
-const BackToStudio = (props: { studio?: string }) => {
-  if (!props.studio) return <div className="shrink-0" />;
-
-  return (
-    <div className="headerBackToStudio z-10 shrink-0 hover:text-accent-blue">
-      <Link href={`/s/${props.studio}`}>
-        <BackToStudioIcon />
-      </Link>
     </div>
   );
 };
@@ -171,79 +45,6 @@ const Login = () => {
   );
 };
 
-const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
-
-const Settings = () => {
-  let { session } = useAuth();
-  let isMember = useIndex.ave("space/member", session.session?.studio);
-  let smoker = useSmoker();
-  const spaceID = useSpaceID();
-  let { data: inviteLink } = useSWR(
-    !isMember ? null : `${WORKER_URL}/space/${spaceID}/get_share_code`,
-    async () => {
-      if (!spaceID || !session.token) return;
-      let code = await spaceAPI(
-        `${WORKER_URL}/space/${spaceID}`,
-        "get_share_code",
-        {
-          token: session.token,
-        }
-      );
-      if (code.success) {
-        return `${document.location.href}/join?code=${code.code}`;
-      }
-    }
-  );
-
-  const getShareLink = async (e: React.MouseEvent) => {
-    if (!inviteLink) return;
-    await navigator.clipboard.writeText(inviteLink);
-    smoker({ position: { x: e.clientX, y: e.clientY }, text: "copied!" });
-  };
-
-  return (
-    <div className="flex flex-col gap-2 pt-2">
-      <Divider />
-      <MembersModal />
-      <ButtonSecondary
-        onClick={(e) => getShareLink(e)}
-        content={"Copy Invite Link"}
-      />
-      <input
-        style={{ display: "none" }}
-        className="grow"
-        readOnly
-        value={inviteLink}
-        onClick={getShareLink}
-      />
-    </div>
-  );
-};
-
-const MembersModal = () => {
-  let [open, setOpen] = useState(false);
-  let members = useIndex.aev("member/name");
-  return (
-    <>
-      <ButtonSecondary content={"See Members"} onClick={() => setOpen(true)} />
-      <Modal open={open} onClose={() => setOpen(false)}>
-        <h2>Members</h2>
-        <div className="flex h-full flex-wrap gap-2">
-          {members.map((m) => (
-            <Link href={`/s/${encodeURIComponent(m.value)}`}>
-              <div className="w-[160px]">
-                <div className={`memberCardBorder relative h-full grow `}>
-                  <BaseSmallCard isMember memberName={m.value} content="" />
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </Modal>
-    </>
-  );
-};
-
 const FindOrCreateBar = () => {
   let [open, setOpen] = useState(false);
   let items = useAllItems(open);
@@ -251,11 +52,14 @@ const FindOrCreateBar = () => {
   let { mutate, memberEntity, action } = useMutations();
   return (
     <>
-      <button className="group flex items-center" onClick={() => setOpen(true)}>
-        <div className="rounded-md border border-accent-blue bg-accent-blue px-3 py-1 text-white hover:border hover:border-accent-blue hover:bg-bg-blue hover:text-accent-blue">
+      <div className="rounded-full bg-background p-2">
+        <button
+          className="rounded-full border border-accent-blue bg-accent-blue p-4  text-white hover:border hover:border-accent-blue hover:bg-bg-blue hover:text-accent-blue"
+          onClick={() => setOpen(!open)}
+        >
           <SearchOrCommand />
-        </div>
-      </button>
+        </button>
+      </div>
       <FindOrCreate
         allowBlank={true}
         onClose={() => setOpen(false)}
