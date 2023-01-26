@@ -1,7 +1,7 @@
 import { Textarea } from "components/Textarea";
 
 import { useIndex, useMutations } from "hooks/useReplicache";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { sortByPosition } from "src/position_helpers";
 import { FilterAttributes, ReferenceAttributes } from "data/Attributes";
 import { CardStack } from "components/CardStack";
@@ -72,13 +72,48 @@ export const MultipleReferenceSection = (props: {
 };
 
 export const MakeDate = (props: { entityID: string }) => {
-  return <div>add date?</div>;
+  let { mutate, authorized } = useMutations();
+  let date = useIndex.eav(props.entityID, "card/date");
+  let ref = useRef<HTMLInputElement | null>(null);
+  let [open, setOpen] = useState(false);
+
+  if (!authorized || date) return null;
+  if (open)
+    return (
+      <input
+        onChange={(e) => {
+          console.log(e.currentTarget.value);
+          mutate("assertFact", {
+            entity: props.entityID,
+            attribute: "card/date",
+            value: { type: "yyyy-mm-dd", value: e.currentTarget.value },
+            positions: {},
+          });
+        }}
+        type="date"
+        ref={ref}
+        style={{ display: "" }}
+      />
+    );
+  return (
+    <>
+      <button
+        onClick={() => {
+          setOpen(true);
+        }}
+      >
+        add date
+      </button>
+    </>
+  );
 };
 
 export const DateSection = (props: { entityID: string }) => {
+  let date = useIndex.eav(props.entityID, "card/date");
+  if (!date) return null;
   return (
     <div className="flex flex-col gap-2">
-      <input type="date"></input>
+      <input type="date" value={date.value.value} />
       <button>remove?</button>
     </div>
   );

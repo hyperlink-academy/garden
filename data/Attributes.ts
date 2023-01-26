@@ -70,6 +70,11 @@ export const DefaultAttributes = {
     unique: false,
     cardinality: "one",
   },
+  "card/date": {
+    type: "timestamp",
+    unique: false,
+    cardinality: "one",
+  },
   "card/content": {
     type: "string",
     unique: false,
