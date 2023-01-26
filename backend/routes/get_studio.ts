@@ -1,4 +1,5 @@
 import { Bindings } from "backend";
+import { getCommunityByName } from "backend/fauna/resources/functions/get_community_by_name";
 import { getIdentityByUsername } from "backend/fauna/resources/functions/get_identity_by_username";
 import { makeRoute } from "backend/lib/api";
 import { Client } from "faunadb";
@@ -16,5 +17,21 @@ export const getStudioRoute = makeRoute({
     });
     if (!identity) return { data: { success: false } } as const;
     return { data: { success: true, id: identity.studio } } as const;
+  },
+});
+
+export const get_community_route = makeRoute({
+  route: "get_community",
+  input: z.object({ name: z.string() }),
+  handler: async (msg, env: Bindings) => {
+    let fauna = new Client({
+      secret: env.FAUNA_KEY,
+      domain: "db.us.fauna.com",
+    });
+    let community = await getCommunityByName(fauna, {
+      name: msg.name.toLowerCase(),
+    });
+    if (!community) return { data: { success: false } } as const;
+    return { data: { success: true, id: community.spaceID } } as const;
   },
 });

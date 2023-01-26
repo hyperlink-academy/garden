@@ -1,19 +1,23 @@
+import { workerAPI } from "backend/lib/api";
 import { CalendarList } from "components/CalendarList";
+import { SpaceProvider } from "components/ReplicacheProvider";
 import { ReplicacheContext, scanIndex } from "hooks/useReplicache";
+import { InferGetStaticPropsType } from "next";
 import Head from "next/head";
 import { useContext } from "react";
 import { useSubscribe } from "replicache-react";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
-
-export default function CalendarPage() {
+type Props = InferGetStaticPropsType<typeof getStaticProps>;
+export default function CalendarPage(props: Props) {
+  if (props.notFound) return <div>404 - studio not found!</div>;
+  if (!props.id) return <div>loading </div>;
   return (
-    <>
-      {/* <HomeHeader /> */}
+    <SpaceProvider id={props.id}>
       <CalendarInfo />
       <List />
       <CalendarCTA />
-    </>
+    </SpaceProvider>
   );
 }
 
@@ -67,9 +71,18 @@ const CalendarInfo = () => {
 
 const CalendarCTA = () => {
   return (
-    <div className="bg-white p-4 rounded-md border border-dashed border-accent-blue  m-auto mt-8">
+    <div className="m-auto mt-8 rounded-md border border-dashed border-accent-blue  bg-white p-4">
       <p>⬆️ Want to add to the Calendar?</p>
       <p>🚀 Publish from your Space settings!</p>
     </div>
   );
 };
+
+export async function getStaticProps() {
+  let id = await workerAPI(WORKER_URL, "get_studio", {
+    name: "hyperlink",
+  });
+  if (!id.success)
+    return { props: { notFound: true }, revalidate: 10 } as const;
+  return { props: { notFound: false, id: id.id } };
+}
