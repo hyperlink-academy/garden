@@ -1,11 +1,16 @@
 import { Menu } from "@headlessui/react";
 
-import { MoreOptions, Delete, DeckSmall, Member } from "components/Icons";
+import {
+  MoreOptions,
+  Delete,
+  DeckSmall,
+  Member,
+  CalenderMedium,
+} from "components/Icons";
 import { Divider, MenuContainer, MenuItem } from "components/Layout";
 import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
 import {
   DateSection,
-  MakeDate,
   MultipleReferenceSection,
   SingleTextSection,
 } from "./Sections";
@@ -15,6 +20,7 @@ import Link from "next/link";
 import { useAuth } from "hooks/useAuth";
 import { MakeImage, ImageSection } from "./ImageSection";
 import { useRouter } from "next/router";
+import { useState } from "react";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 const borderStyles = (args: { member: boolean }) => {
@@ -89,15 +95,18 @@ export const CardView = (props: {
             `}
         >
           <div className="cardDefaultSection grid-auto-rows grid gap-3">
-            <div className="cardHeader grid grid-cols-[auto_max-content_max-content] gap-2">
-              <Title entityID={props.entityID} />
-              <div className="">
-                <CardMoreOptionsMenu
-                  onDelete={props.onDelete}
-                  entityID={props.entityID}
-                  referenceFactID={props?.referenceFactID}
-                />
+            <div>
+              <div className="cardHeader grid grid-cols-[auto_max-content_max-content] gap-2">
+                <Title entityID={props.entityID} />
+                <div className="">
+                  <CardMoreOptionsMenu
+                    onDelete={props.onDelete}
+                    entityID={props.entityID}
+                    referenceFactID={props?.referenceFactID}
+                  />
+                </div>
               </div>
+              <DateSection entityID={props.entityID} />
             </div>
 
             <DefaultTextSection entityID={props.entityID} />
@@ -105,19 +114,53 @@ export const CardView = (props: {
             {/* display image, if we have one! */}
             <ImageSection entity={props.entityID} />
             {/* image icon - click to upload */}
-            <div className="flex gap-2 pt-2">
-              <MakeImage entity={props.entityID} />
-            </div>
-
             {/* TODO: finish making these + style em */}
-            <MakeDate entityID={props.entityID} />
-            <DateSection entityID={props.entityID} />
+            <AddSections entityID={props.entityID} />
 
             <DeckCardList entityID={props.entityID} />
           </div>
         </div>
         {/* END CARD CONTENT */}
       </div>
+    </div>
+  );
+};
+
+export const AddSections = (props: { entityID: string }) => {
+  let { mutate, authorized } = useMutations();
+  let date = useIndex.eav(props.entityID, "card/date");
+  let [open, setOpen] = useState(false);
+
+  if (!authorized) return null;
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex gap-2 pt-2">
+        <MakeImage entity={props.entityID} />
+        {!date && (
+          <button
+            className="stroke-grey-55 text-grey-55 hover:stroke-accent-blue"
+            onClick={() => {
+              setOpen(!open);
+            }}
+          >
+            <CalenderMedium className="stroke-accent-blue" />
+          </button>
+        )}
+      </div>
+      {open && !date && (
+        <input
+          onChange={(e) => {
+            console.log(e.currentTarget.value);
+            mutate("assertFact", {
+              entity: props.entityID,
+              attribute: "card/date",
+              value: { type: "yyyy-mm-dd", value: e.currentTarget.value },
+              positions: {},
+            });
+          }}
+          type="date"
+        />
+      )}
     </div>
   );
 };

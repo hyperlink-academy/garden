@@ -28,7 +28,7 @@ export const Sidebar = (props: {
 
   return (
     <div className="roomList flex h-full w-48 flex-col items-stretch gap-4 rounded-l-[3px] border-r border-grey-90 bg-white p-3 text-grey-35">
-      <div className="flex h-full w-full flex-col gap-2 overflow-y-scroll">
+      <div className="no-scrollbar flex h-full w-full flex-col gap-2 overflow-y-scroll">
         <div className="flex flex-col gap-1 pb-2">
           <h3 className="px-2">{spaceName?.value}</h3>
           <SpaceStatus />
@@ -87,7 +87,7 @@ export const Sidebar = (props: {
           <div className="w-full border-t border-dashed border-grey-80" />
         </div>
         <div>
-          <MemberList />
+          <MemberList {...props} />
           <button
             onClick={() => setInviteOpen(true)}
             className="flex w-full place-items-center gap-1 rounded-md border border-transparent py-0.5 px-2 text-grey-55 hover:border-accent-blue  hover:text-accent-blue"
@@ -103,21 +103,48 @@ export const Sidebar = (props: {
       <div className="mb-2 shrink-0 ">
         <BackToStudio studio={session.session?.username} />
       </div>
+
+      <button
+        onClick={async () => {
+          let promptRoom = rooms.find((f) => f.value === "prompts")?.entity;
+          if (!promptRoom) {
+            promptRoom = ulid();
+            await mutate("assertFact", {
+              entity: promptRoom,
+              attribute: "room/name",
+              value: "prompts",
+              positions: {},
+            });
+          }
+          console.log(rooms.find((f) => f.value === "prompts"));
+          props.onRoomChange(promptRoom);
+        }}
+      >
+        <h4>Prompts</h4>
+      </button>
     </div>
   );
 };
 
-const MemberList = () => {
+const MemberList = (props: {
+  onRoomChange: (room: string) => void;
+  currentRoom: string | null;
+}) => {
   let members = useIndex.aev("member/name");
 
   return (
     <ul>
       {members.map((member) => (
-        <li
-          className={`w-full items-start justify-start overflow-hidden whitespace-nowrap rounded-md border border-transparent py-0.5 px-2 text-left text-grey-35 hover:border-grey-80`}
+        <button
+          onClick={() => props.onRoomChange(member.entity)}
+          className={`w-full items-start justify-start overflow-hidden whitespace-nowrap rounded-md py-0.5 px-2 text-left ${
+            member.entity === props.currentRoom
+              ? "rounded-md bg-accent-blue  font-bold text-white"
+              : "border border-transparent text-grey-35 hover:border-grey-80"
+          }`}
         >
           {member.value}
-        </li>
+        </button>
       ))}
     </ul>
   );
