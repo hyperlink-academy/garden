@@ -32,7 +32,7 @@ export const SingleTextSection = (
       autoFocus={props.new}
       placeholderOnHover={props.placeholderOnHover}
       placeholder={props.placeholder || "write something..."}
-      className={`bg-inherit w-full ${props.className || ""}`}
+      className={`w-full bg-inherit ${props.className || ""}`}
       spellCheck={false}
       value={(fact?.value as string) || ""}
       onChange={async (e) => {
@@ -67,6 +67,19 @@ export const MultipleReferenceSection = (props: {
         parent={props.entityID}
         attribute={props.section}
       />
+    </div>
+  );
+};
+
+export const MakeDate = (props: { entityID: string }) => {
+  return <div>add date?</div>;
+};
+
+export const DateSection = (props: { entityID: string }) => {
+  return (
+    <div className="flex flex-col gap-2">
+      <input type="date"></input>
+      <button>remove?</button>
     </div>
   );
 };
