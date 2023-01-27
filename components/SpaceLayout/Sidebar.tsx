@@ -259,12 +259,12 @@ const InviteMember = (props: { open: boolean; onClose: () => void }) => {
 
   return (
     <Modal open={props.open} onClose={props.onClose}>
-      <div className="flex flex-col place-items-center gap-4 p-4  text-center">
-        <div>
-          <h3>Send this Invite Link!</h3>
+      <div className="flex flex-col place-items-center gap-4 p-4 text-center">
+        <div className="flex flex-col gap-2">
+          <h3>Send this link to invite others to join!</h3>
           <p>
-            Members get thier own room, and can make and edit cards in this
-            space.
+            Members each get their own room, and can create and edit cards in
+            this Space.
           </p>
         </div>
         <div className="flex w-full gap-2">
