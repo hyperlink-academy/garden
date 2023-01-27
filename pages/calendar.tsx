@@ -1,6 +1,7 @@
 import { workerAPI } from "backend/lib/api";
 import { CalendarList } from "components/CalendarList";
 import { SpaceProvider } from "components/ReplicacheProvider";
+import { truncateSync } from "fs";
 import { ReplicacheContext, scanIndex, useIndex } from "hooks/useReplicache";
 import { InferGetStaticPropsType } from "next";
 import Head from "next/head";
@@ -21,13 +22,44 @@ export default function CalendarPage(props: Props) {
   );
 }
 
+// two lists - active and upcoming
 const List = () => {
-  let spaces = useIndex.at(
+  // spaces ending in the future
+  const spacesByEnd = useIndex.at(
+    "space/end-date",
+    new Date().toLocaleDateString("en-CA")
+  );
+
+  // upcoming:
+  // start-date = in future
+  const spacesUpcoming = useIndex.at(
     "space/start-date",
     new Date().toLocaleDateString("en-CA")
   );
 
-  return <CalendarList spaces={spaces} />;
+  // active:
+  // start-date = in past
+  // end-date = in future
+  let spacesActive = spacesByEnd.filter((s) => {
+    return !spacesUpcoming.find((upcoming) => upcoming.entity === s.entity);
+  });
+
+  return (
+    <>
+      <div className="py-4">
+        <h2 className="mb-8 rounded-md bg-[green] py-2 px-4 text-white">
+          Active
+        </h2>
+        <CalendarList spaces={spacesActive} />
+      </div>
+      <div className="py-4">
+        <h2 className="mb-8 rounded-md bg-[darkgoldenrod] py-2 px-4 text-white">
+          Upcoming
+        </h2>
+        <CalendarList spaces={spacesUpcoming} />
+      </div>
+    </>
+  );
 };
 
 const CalendarInfo = () => {

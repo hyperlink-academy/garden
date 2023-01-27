@@ -6,7 +6,9 @@ import { prefetchSpaceId } from "./ReplicacheProvider";
 import { spacePath } from "hooks/utils";
 import { Fact } from "data/Facts";
 
-export const CalendarList = (props: { spaces: Fact<"space/start-date">[] }) => {
+export const CalendarList = (props: {
+  spaces: Fact<"space/start-date" | "space/end-date">[];
+}) => {
   return (
     <div className="spacesList mt-4 flex flex-col gap-4">
       {props.spaces
