@@ -24,6 +24,7 @@ export const Sidebar = (props: {
 
   let homeEntity = useIndex.aev("home");
   let rooms = useIndex.aev("room/name");
+  let promptRoom = rooms.find((f) => f.value == "prompts");
   let spaceName = useIndex.aev("this/name")[0];
 
   let [inviteOpen, setInviteOpen] = useState(false);
@@ -56,27 +57,29 @@ export const Sidebar = (props: {
               Home
             </button>
 
-            {rooms.map((room) => {
-              return (
-                <button
-                  className={`flex  w-full items-center justify-between gap-2 overflow-hidden whitespace-nowrap rounded-md py-0.5 px-2 text-left ${
-                    room.entity === props.currentRoom
-                      ? "rounded-md bg-accent-blue  font-bold text-white"
-                      : "border border-transparent text-grey-35 hover:border-grey-80"
-                  }`}
-                  onClick={() => props.onRoomChange(room.entity)}
-                >
-                  {room.value}
+            {rooms
+              .filter((f) => f.value !== "prompts")
+              .map((room) => {
+                return (
                   <button
-                    className={` rounded-md border border-transparent pt-[1px] hover:border-white ${
-                      room.entity === props.currentRoom ? "" : "hidden"
+                    className={`flex  w-full items-center justify-between gap-2 overflow-hidden whitespace-nowrap rounded-md py-0.5 px-2 text-left ${
+                      room.entity === props.currentRoom
+                        ? "rounded-md bg-accent-blue  font-bold text-white"
+                        : "border border-transparent text-grey-35 hover:border-grey-80"
                     }`}
+                    onClick={() => props.onRoomChange(room.entity)}
                   >
-                    <MoreOptionsTiny />
+                    {room.value}
+                    <button
+                      className={` rounded-md border border-transparent pt-[1px] hover:border-white ${
+                        room.entity === props.currentRoom ? "" : "hidden"
+                      }`}
+                    >
+                      <MoreOptionsTiny />
+                    </button>
                   </button>
-                </button>
-              );
-            })}
+                );
+              })}
           </ul>
 
           <button
@@ -113,11 +116,15 @@ export const Sidebar = (props: {
           />
         </div>
         <div className=" pt-4">
-          <small className="px-2 font-bold text-grey-55">prompt pools</small>
           <div className="w-full border-t border-dashed border-grey-80" />
         </div>
 
         <button
+          className={`w-full py-0.5 px-2 text-left ${
+            promptRoom?.entity === props.currentRoom
+              ? "rounded-md bg-accent-blue  font-bold text-white"
+              : "rounded-md border border-transparent text-grey-35 hover:border-grey-80"
+          }`}
           onClick={async () => {
             let promptRoom = rooms.find((f) => f.value === "prompts")?.entity;
             if (!promptRoom) {
@@ -129,7 +136,6 @@ export const Sidebar = (props: {
                 positions: {},
               });
             }
-            console.log(rooms.find((f) => f.value === "prompts"));
             props.onRoomChange(promptRoom);
           }}
         >
