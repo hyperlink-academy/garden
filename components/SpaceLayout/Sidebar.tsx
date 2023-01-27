@@ -1,21 +1,18 @@
 import Link from "next/link";
 import useSWR from "swr";
 
-import { ButtonLink, ButtonPrimary, ButtonSecondary } from "components/Buttons";
-import { SingleTextSection } from "components/CardView/Sections";
+import { ButtonPrimary } from "components/Buttons";
 import { Divider, Modal } from "components/Layout";
 import { useAuth } from "hooks/useAuth";
 import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
 import { useState } from "react";
 import { ulid } from "src/ulid";
 import {
-  AddTiny,
   BackToStudio as BackToStudioIcon,
-  MemberAdd,
+  MoreOptionsSmall,
   MoreOptionsTiny,
 } from "../Icons";
 import { spaceAPI } from "backend/lib/api";
-import { BaseSmallCard } from "components/CardPreview/SmallCard";
 import { useSmoker } from "components/Smoke";
 
 export const Sidebar = (props: {
@@ -35,7 +32,12 @@ export const Sidebar = (props: {
     <div className="roomList flex h-full w-48 flex-col items-stretch gap-4 rounded-l-[3px] border-r border-grey-90 bg-white p-3 text-grey-35">
       <div className="no-scrollbar flex h-full w-full flex-col gap-2 overflow-y-scroll">
         <div className="flex flex-col gap-1 pb-2">
-          <h3 className="px-2">{spaceName?.value}</h3>
+          <div className="flex items-start justify-between gap-2">
+            <h3 className="px-2">{spaceName?.value}</h3>
+            <button className="shrink-0 rounded-md border border-transparent pt-[1px] hover:border-accent-blue hover:text-accent-blue">
+              <MoreOptionsSmall />
+            </button>
+          </div>
           <SpaceStatus />
         </div>
         <Divider />
@@ -66,7 +68,7 @@ export const Sidebar = (props: {
                 >
                   {room.value}
                   <button
-                    className={` ${
+                    className={` rounded-md border border-transparent pt-[1px] hover:border-white ${
                       room.entity === props.currentRoom ? "" : "hidden"
                     }`}
                   >
@@ -91,7 +93,6 @@ export const Sidebar = (props: {
             }}
           >
             + room
-            {/* <AddTiny /> */}
           </button>
         </div>
         <div className=" pt-4">
@@ -111,29 +112,33 @@ export const Sidebar = (props: {
             onClose={() => setInviteOpen(false)}
           />
         </div>
+        <div className=" pt-4">
+          <small className="px-2 font-bold text-grey-55">prompt pools</small>
+          <div className="w-full border-t border-dashed border-grey-80" />
+        </div>
+
+        <button
+          onClick={async () => {
+            let promptRoom = rooms.find((f) => f.value === "prompts")?.entity;
+            if (!promptRoom) {
+              promptRoom = ulid();
+              await mutate("assertFact", {
+                entity: promptRoom,
+                attribute: "room/name",
+                value: "prompts",
+                positions: {},
+              });
+            }
+            console.log(rooms.find((f) => f.value === "prompts"));
+            props.onRoomChange(promptRoom);
+          }}
+        >
+          <p>Prompt Pool</p>
+        </button>
       </div>
       <div className="mb-2 shrink-0 ">
         <BackToStudio studio={session.session?.username} />
       </div>
-
-      <button
-        onClick={async () => {
-          let promptRoom = rooms.find((f) => f.value === "prompts")?.entity;
-          if (!promptRoom) {
-            promptRoom = ulid();
-            await mutate("assertFact", {
-              entity: promptRoom,
-              attribute: "room/name",
-              value: "prompts",
-              positions: {},
-            });
-          }
-          console.log(rooms.find((f) => f.value === "prompts"));
-          props.onRoomChange(promptRoom);
-        }}
-      >
-        <h4>Prompts</h4>
-      </button>
     </div>
   );
 };
@@ -157,7 +162,7 @@ const MemberList = (props: {
         >
           {member.value}
           <button
-            className={` ${
+            className={` rounded-md border border-transparent pt-[1px] hover:border-white ${
               member.entity === props.currentRoom ? "" : "hidden"
             }`}
           >
