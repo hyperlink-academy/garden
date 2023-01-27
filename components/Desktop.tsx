@@ -181,8 +181,8 @@ export const Desktop = (props: { entityID: string }) => {
 
 let PromptManager = (props: { entityID: string }) => {
   let name = useIndex.eav(props.entityID, "member/name");
-  let { mutate } = useMutations();
-  if (!name) return null;
+  let { mutate, memberEntity } = useMutations();
+  if (!name || memberEntity !== props.entityID) return null;
   return (
     <div className="relative w-full">
       <div className="absolute z-10 flex w-full justify-center gap-2">
