@@ -4,12 +4,10 @@ import { useIndex } from "hooks/useReplicache";
 import { SmallCardDragContext } from "components/DragContext";
 import { SpaceHeader, Sidebar } from "components/SpaceLayout";
 import Head from "next/head";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import useWindowDimensions from "hooks/useWindowDimensions";
-import { Popover, Transition } from "@headlessui/react";
-import { atom, useAtom } from "jotai";
+import { Popover } from "@headlessui/react";
 import { Rooms } from "components/Icons";
-import { parentPort } from "worker_threads";
 
 export default function SpacePage() {
   let spaceName = useIndex.aev("this/name")[0];
@@ -28,12 +26,13 @@ export default function SpacePage() {
         <meta name="theme-color" content="#0000FF" />
       </Head>
 
-      <div className="pageWrapperflex h-screen flex-col items-stretch justify-items-center gap-2 overflow-hidden sm:gap-4">
+      <div className="pageWrapperflex h-[100dvh] flex-col items-stretch justify-items-center gap-2 overflow-hidden sm:gap-4">
         <div
           className={`
           pageContent 
           relative mx-auto flex 
-          h-screen w-full max-w-6xl
+          h-full
+         w-full max-w-6xl
           grow 
           items-stretch 
           py-4 px-2
