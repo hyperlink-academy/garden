@@ -47,14 +47,17 @@ export const CardPreview = (
 ) => {
   let isMember = !!useIndex.eav(props.entityID, "member/name");
 
-  let { handlers } = useLongPress(() => props.onLongPress?.())
+  let { handlers } = useLongPress(() => props.onLongPress?.());
 
   return (
     <HoverControls {...props}>
-      <div {...handlers}
+      <div
+        {...handlers}
         className={`cardPreviewBorder relative grow overflow-hidden ${borderStyles(
           { isMember }
-        )} ${props.isSelected ? "selectedCardGlow" : ""} ${props.isOver ? "rounded-[24px] shadow-[0_0_16px_0_#cccccc]" : ""}`}
+        )} ${props.isSelected ? "selectedCardGlow" : ""} ${
+          props.isOver ? "rounded-[24px] shadow-[0_0_16px_0_#cccccc]" : ""
+        }`}
       >
         {props.size === "small" ? (
           <SmallCardBody {...props} />
@@ -107,24 +110,25 @@ export const HoverControls: React.FC<
       style={{}}
       className={`
       cardPreviewWrapper
-      ${props.size === "small" ? "w-[160px] h-[6rem]" : "w-full"}
-      grid grid-cols-[auto_min-content] gap-1 
-      h-full
-      group
+      ${props.size === "small" ? "h-[6rem] w-[160px]" : "w-full"}
+      group grid h-full 
+      grid-cols-[auto_min-content]
+      gap-1
       `}
     >
       {props.children}
 
       {/* Rotate and Resize Handle */}
 
-      {props.onDelete || props.onResize || props.onRotateDrag ? (
+      {authorized &&
+      (props.onDelete || props.onResize || props.onRotateDrag) ? (
         <div
           ref={ref}
-          className="text-grey-80 flex flex-col justify-between gap-1 pb-1 opacity-0 group-hover:opacity-100 z-50"
+          className="z-50 flex flex-col justify-between gap-1 pb-1 text-grey-80 opacity-0 group-hover:opacity-100"
         >
-          {props.onDelete ? (
+          {authorized && props.onDelete ? (
             <button
-              className="hover:text-accent-blue pt-1 z-50"
+              className="z-50 pt-1 hover:text-accent-blue"
               onClick={() => {
                 props.onDelete?.();
               }}
@@ -153,7 +157,11 @@ export const HoverControls: React.FC<
             </div>
 
             {authorized && props.onRotateDrag && (
-              <div {...bind()} className="touch-none hover:text-accent-blue" style={{ 'cursor': 'pointer' }}>
+              <div
+                {...bind()}
+                className="touch-none hover:text-accent-blue"
+                style={{ cursor: "pointer" }}
+              >
                 <DragRotateHandle />
               </div>
             )}
