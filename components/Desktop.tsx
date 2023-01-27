@@ -103,7 +103,7 @@ export const Desktop = (props: { entityID: string }) => {
       <PromptManager entityID={props.entityID} />
       {/* TO DO - CELINE: make desktopBackground fit - full bleed! */}
       <div className="overflow-y-scroll sm:p-4">
-        <div className="relative flex w-[384px] flex-col items-stretch gap-0">
+        <div className="relative flex w-[336px] flex-col items-stretch gap-0">
           <div className="desktopBackground absolute h-full w-full" />
           {/* Handles Double CLick to Create */}
           <div
@@ -169,7 +169,6 @@ export const Desktop = (props: { entityID: string }) => {
 let PromptManager = (props: { entityID: string }) => {
   let name = useIndex.eav(props.entityID, "member/name");
   let { mutate } = useMutations();
-  console.log(name);
   if (!name) return null;
   return (
     <div className="relative w-full">
@@ -184,8 +183,43 @@ let PromptManager = (props: { entityID: string }) => {
             });
           }}
         />
+        <DailyPromptsButton entityID={props.entityID} />
       </div>
     </div>
+  );
+};
+
+let DailyPromptsButton = (props: { entityID: string }) => {
+  let prompts = useIndex.at(
+    "card/date",
+    new Date().toLocaleDateString("en-CA")
+  );
+  let cards = useIndex.eav(props.entityID, "desktop/contains") || [];
+  let newPrompts = prompts.filter(
+    (p) => !cards.find((c) => c.value.value === p.entity)
+  );
+  let { mutate } = useMutations();
+  return (
+    <ButtonSecondary
+      disabled={newPrompts.length === 0}
+      content="Today's Prompts"
+      onClick={async () => {
+        for (let i = 0; i < newPrompts.length; i++) {
+          let prompt = newPrompts[i];
+          await mutate("addCardToDesktop", {
+            entity: prompt.entity,
+            factID: ulid(),
+            desktop: props.entityID,
+            position: {
+              y: 64 + 64 * i,
+              x: 128,
+              size: "small",
+              rotation: 0,
+            },
+          });
+        }
+      }}
+    />
   );
 };
 
