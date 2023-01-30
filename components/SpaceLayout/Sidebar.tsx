@@ -17,6 +17,7 @@ import { spaceAPI } from "backend/lib/api";
 import { useSmoker } from "components/Smoke";
 import { SingleTextSection } from "components/CardView/Sections";
 import { printSourceLocation } from "graphql";
+import { Fact } from "data/Facts";
 
 export const Sidebar = (props: {
   onRoomChange: (room: string) => void;
@@ -29,8 +30,6 @@ export const Sidebar = (props: {
   let rooms = useIndex.aev("room/name");
   let promptRoom = rooms.find((f) => f.value == "prompts");
   let spaceName = useIndex.aev("this/name")[0];
-
-  let [inviteOpen, setInviteOpen] = useState(false);
   let [roomEditOpen, setRoomEditOpen] = useState(false);
 
   return (
@@ -47,92 +46,26 @@ export const Sidebar = (props: {
         </div>
         <Divider />
         <div>
-          <ul className="flex flex-col gap-0.5">
-            <button
-              className={`w-full py-0.5 px-2 text-left ${
-                homeEntity[0]?.entity === props.currentRoom
-                  ? "rounded-md bg-accent-blue  font-bold text-white"
-                  : "rounded-md border border-transparent text-grey-35 hover:border-grey-80"
-              }`}
-              onClick={() => {
-                props.onRoomChange(homeEntity[0]?.entity);
-              }}
-            >
-              Home
-            </button>
-
-            {rooms
-              .filter((f) => f.value !== "prompts")
-              .map((room) => {
-                return (
-                  <div
-                    className={`flex w-full items-center gap-2 overflow-hidden whitespace-nowrap rounded-md  text-left ${
-                      room.entity === props.currentRoom
-                        ? "rounded-md bg-accent-blue  font-bold text-white"
-                        : "border border-transparent text-grey-35 hover:border-grey-80"
-                    }`}
-                  >
-                    <button
-                      className="w-full overflow-clip py-0.5 pl-2 text-left"
-                      onClick={() => props.onRoomChange(room.entity)}
-                    >
-                      {room.value}
-                    </button>
-                    <button
-                      onClick={() => setRoomEditOpen(true)}
-                      className={` mr-2 rounded-md border border-transparent pt-[1px] hover:border-white ${
-                        room.entity === props.currentRoom ? "" : "hidden"
-                      }`}
-                    >
-                      <MoreOptionsTiny />
-                    </button>
-                  </div>
-                );
-              })}
-            <EditRoomModal
-              open={roomEditOpen}
-              onClose={() => setRoomEditOpen(false)}
-              entityID={props.currentRoom}
-            />
-          </ul>
-
-          <button
-            className="hover: flex w-full place-items-center justify-between gap-1 rounded-md border border-transparent py-0.5 px-2 text-grey-55 hover:border-accent-blue hover:text-accent-blue"
-            onClick={async () => {
-              let room = ulid();
-              await mutate("assertFact", {
-                entity: room,
-                attribute: "room/name",
-                value: "Untitled Room",
-                positions: {},
-              });
-              props.onRoomChange(room);
-            }}
-          >
-            + room
-          </button>
+          <RoomList {...props} setRoomEditOpen={() => setRoomEditOpen(true)} />
         </div>
         <div className=" pt-4">
           <small className="px-2 font-bold text-grey-55">members</small>
           <div className="w-full border-t border-dashed border-grey-80" />
         </div>
         <div>
-          <MemberList {...props} />
-          <button
-            onClick={() => setInviteOpen(true)}
-            className="flex w-full place-items-center gap-1 rounded-md border border-transparent py-0.5 px-2 text-grey-55 hover:border-accent-blue  hover:text-accent-blue"
-          >
-            + invite
-          </button>
-          <InviteMember
-            open={inviteOpen}
-            onClose={() => setInviteOpen(false)}
+          <MemberList
+            {...props}
+            setRoomEditOpen={() => setRoomEditOpen(true)}
           />
         </div>
         <div className=" pt-4">
           <div className="w-full border-t border-dashed border-grey-80" />
         </div>
-
+        <EditRoomModal
+          open={roomEditOpen}
+          onClose={() => setRoomEditOpen(false)}
+          entityID={props.currentRoom}
+        />
         <button
           className={`w-full py-0.5 px-2 text-left ${
             promptRoom?.entity === props.currentRoom
@@ -163,34 +96,130 @@ export const Sidebar = (props: {
   );
 };
 
+const RoomList = (props: {
+  onRoomChange: (room: string) => void;
+  currentRoom: string | null;
+  setRoomEditOpen: () => void;
+  roomEditOpen: boolean;
+  onRoomEditClose: () => void;
+}) => {
+  let homeEntity = useIndex.aev("home");
+  let rooms = useIndex.aev("room/name");
+
+  return (
+    <ul className="flex flex-col gap-0.5">
+      <button
+        className={`w-full border border-transparent py-0.5 px-2 text-left ${
+          homeEntity[0]?.entity === props.currentRoom
+            ? "rounded-md bg-accent-blue font-bold text-white"
+            : "rounded-md text-grey-35 hover:border-grey-80"
+        }`}
+        onClick={() => {
+          props.onRoomChange(homeEntity[0]?.entity);
+        }}
+      >
+        Home
+      </button>
+
+      {rooms
+        .filter((f) => f.value !== "prompts")
+        .map((room) => {
+          return (
+            <RoomListItem
+              onRoomChange={props.onRoomChange}
+              currentRoom={props.currentRoom}
+              room={room}
+              setRoomEditOpen={props.setRoomEditOpen}
+            >
+              {room.value}
+            </RoomListItem>
+          );
+        })}
+      <button
+        className=" flex w-full place-items-center justify-between gap-1 rounded-md border border-transparent py-0.5 px-2 text-grey-55 hover:border-accent-blue hover:text-accent-blue"
+        onClick={async () => {
+          let room = ulid();
+          await mutate("assertFact", {
+            entity: room,
+            attribute: "room/name",
+            value: "Untitled Room",
+            positions: {},
+          });
+          props.onRoomChange(room);
+        }}
+      >
+        + room
+      </button>
+    </ul>
+  );
+};
+
 const MemberList = (props: {
   onRoomChange: (room: string) => void;
   currentRoom: string | null;
+  setRoomEditOpen: () => void;
 }) => {
   let members = useIndex.aev("member/name");
+  let [inviteOpen, setInviteOpen] = useState(false);
 
   return (
     <ul>
-      {members.map((member) => (
-        <button
-          onClick={() => props.onRoomChange(member.entity)}
-          className={`flex w-full items-center justify-between gap-2 overflow-hidden whitespace-nowrap rounded-md py-0.5 px-2 text-left ${
-            member.entity === props.currentRoom
-              ? "rounded-md bg-accent-blue  font-bold text-white"
-              : "border border-transparent text-grey-35 hover:border-grey-80"
-          }`}
-        >
-          {member.value}
-          <button
-            className={` rounded-md border border-transparent pt-[1px] hover:border-white ${
-              member.entity === props.currentRoom ? "" : "hidden"
-            }`}
-          >
-            <MoreOptionsTiny />
-          </button>
-        </button>
-      ))}
+      {members
+        .filter((f) => f.value !== "prompts")
+        .map((member) => {
+          return (
+            <RoomListItem
+              onRoomChange={props.onRoomChange}
+              currentRoom={props.currentRoom}
+              room={member}
+              setRoomEditOpen={props.setRoomEditOpen}
+            >
+              {member?.value}
+            </RoomListItem>
+          );
+        })}
+      <button
+        onClick={() => setInviteOpen(true)}
+        className="flex w-full place-items-center gap-1 rounded-md border border-transparent py-0.5 px-2 text-grey-55 hover:border-accent-blue  hover:text-accent-blue"
+      >
+        + invite
+      </button>
+      <InviteMember open={inviteOpen} onClose={() => setInviteOpen(false)} />
     </ul>
+  );
+};
+
+const RoomListItem: React.FC<
+  React.PropsWithChildren<{
+    onRoomChange: (room: string) => void;
+    currentRoom: string | null;
+    room: Fact<"room/name"> | Fact<"member/name">;
+    setRoomEditOpen: () => void;
+  }>
+> = (props) => {
+  return (
+    <div
+      className={`flex w-full items-center gap-2 overflow-hidden whitespace-nowrap rounded-md border border-transparent  text-left ${
+        props.room.entity === props.currentRoom
+          ? "rounded-md bg-accent-blue  font-bold text-white"
+          : " text-grey-35 hover:border-grey-80"
+      }`}
+    >
+      <button
+        className="w-full overflow-clip py-0.5 pl-2 text-left"
+        onClick={() => props.onRoomChange(props.room.entity)}
+      >
+        {props.children}
+      </button>
+      <button
+        onClick={() => props.setRoomEditOpen()}
+        className={` mr-2 rounded-md border border-transparent pt-[1px] hover:border-white ${
+          props.room.entity === props.currentRoom ? "" : "hidden"
+        }`}
+      >
+        <MoreOptionsTiny />
+      </button>
+    </div>
   );
 };
 
@@ -308,41 +337,44 @@ const EditRoomModal = (props: {
   let timeout = useRef<null | number>(null);
   let { mutate, authorized, action } = useMutations();
   let [formState, setFormState] = useState(currentRoom?.value);
+  let isMember = !!useIndex.eav(props.entityID, "member/name");
 
   if (!props.entityID) return null;
 
   return (
     <Modal open={props.open} onClose={props.onClose}>
       <h3>Room Settings</h3>
-      <p>Room Name</p>
-      <input
-        className="w-full"
-        value={formState}
-        placeholder=""
-        onChange={(e) => {
-          let value = e.currentTarget.value;
-          setFormState(value);
-          console.log(formState);
-        }}
-      />
+      {isMember ? null : (
+        <>
+          <p>Room Name</p>
+          <input
+            className="w-full"
+            value={formState}
+            placeholder={currentRoom?.value}
+            onChange={(e) => {
+              let value = e.currentTarget.value;
+              setFormState(value);
+            }}
+          />
 
-      <ButtonPrimary
-        content="Edit Room!"
-        onClick={async () => {
-          if (!props.entityID || formState === undefined) {
-            null;
-          } else {
-            await mutate("assertFact", {
-              entity: props.entityID,
-              attribute: "room/name",
-              value: formState,
-            });
-          }
+          <ButtonPrimary
+            content="Edit Room!"
+            onClick={async () => {
+              !props.entityID || formState === undefined
+                ? null
+                : await mutate("assertFact", {
+                    entity: props.entityID,
+                    attribute: "room/name",
+                    value: formState,
+                    positions: {},
+                  });
 
-          props.onClose();
-        }}
-      />
-      <Divider />
+              props.onClose();
+            }}
+          />
+          <Divider />
+        </>
+      )}
       <ButtonPrimary
         destructive
         onClick={async () => {
