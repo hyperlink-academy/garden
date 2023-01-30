@@ -30,9 +30,9 @@ export const DoorSelector = (props: {
     });
   };
   return (
-    <div className="w-full flex flex-col gap-0">
+    <div className="flex w-full flex-col gap-0">
       <p className="font-bold">Set the Scenery</p>
-      <div className="grid grid-cols-[repeat(auto-fill,96px)] gap-0">
+      <div className="grid grid-cols-[repeat(auto-fill,64px)] gap-0 sm:grid-cols-[repeat(auto-fill,96px)]">
         {doorImages.map((f) => {
           return (
             <button
@@ -55,7 +55,7 @@ export const DoorSelector = (props: {
       </div>
       <div>
         <p className="pb-2">Upload a custom image!</p>
-        <p className="text-sm pb-2">
+        <p className="pb-2 text-sm">
           Crop to 256 x 576 px. Try{" "}
           <a
             href="https://museo.app/"
@@ -64,7 +64,7 @@ export const DoorSelector = (props: {
           >
             Museo
           </a>{" "}
-          for inspiration :)
+          for inspo :)
         </p>
         <AddImage
           onUpload={(imageID) => {

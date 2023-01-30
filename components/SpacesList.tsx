@@ -218,8 +218,8 @@ export const CreateSpace = (props: { studioSpaceID: string }) => {
               </div>
 
               <p className="text-sm">
-                Once you add the above info you can list your Space for others
-                to see. People will still need an invite to join.
+                Once all details are set, you can list your Space for others to
+                see. People will still need an invite to join.
               </p>
             </div>
 
