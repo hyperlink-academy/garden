@@ -20,17 +20,85 @@ export default function StudioPage(props: Props) {
     </SpaceProvider>
   );
 }
+
+/*
+three lists:
+- active (scheduled - now) 
+- upcoming (scheduled - soon)
+- unscheduled (i.e. implicit draft)
+*/
 const List = () => {
-  let spaces = useIndex.aev("space/name").sort(sortByPosition("aev"));
-  let completedSpaces = useIndex
+  // all spaces
+  const spacesAll = useIndex.aev("space/name").sort(sortByPosition("aev"));
+
+  // explicitly completed spaces
+  // NB: could remove if we ONLY calculate completed based on dates
+  const spacesCompleted = useIndex
     .aev("space/completed")
     .sort(sortByPosition("aev"));
+
+  // spaces ending in the future
+  const spacesByEnd = useIndex.at(
+    "space/end-date",
+    new Date().toLocaleDateString("en-CA")
+  );
+
+  // upcoming:
+  // start-date = in future
+  // NB: the '+1' part is needed for spaces starting today to show as 'active' not 'upcoming'
+  const spacesUpcoming = useIndex.at(
+    "space/start-date",
+    new Date(new Date().setDate(new Date().getDate() + 1)).toLocaleDateString(
+      "en-CA"
+    )
+  );
+
+  // active:
+  // start-date = in past (NOT in spacesUpcoming)
+  // end-date = in future
+  const spacesActive = spacesByEnd.filter((s) => {
+    return !spacesUpcoming.find((upcoming) => upcoming.entity === s.entity);
+  });
+
+  // unscheduled (implicit draft)
+  // spaces with NEITHER start nor end date
+  // NB: could simplify later if we require both or neither
+  // NB: could ALSO avoid explicit 'completed' check if we ONLY calc based on dates
+  const spacesUnscheduled = spacesAll.filter((s) => {
+    return (
+      !spacesByEnd.find((end) => end.entity === s.entity) &&
+      !spacesUpcoming.find((start) => start.entity === s.entity) &&
+      !spacesCompleted.find((completed) => completed.entity === s.entity)
+    );
+  });
+
   return (
-    <SpaceList
-      spaces={spaces.filter(
-        (f) => !completedSpaces.find((c) => c.entity === f.entity && c.value)
-      )}
-    />
+    <>
+      {spacesActive.length > 0 ? (
+        <div className="py-4">
+          <h2 className="mb-8 rounded-md bg-[teal] py-2 px-4 text-white">
+            Active
+          </h2>
+          <SpaceList spaces={spacesActive} />
+        </div>
+      ) : null}
+      {spacesUpcoming.length > 0 ? (
+        <div className="py-4">
+          <h2 className="mb-8 rounded-md bg-[darkgoldenrod] py-2 px-4 text-white">
+            Upcoming
+          </h2>
+          <SpaceList spaces={spacesUpcoming} />
+        </div>
+      ) : null}
+      {spacesUnscheduled.length > 0 ? (
+        <div className="py-4">
+          <h2 className="mb-8 rounded-md bg-[firebrick] py-2 px-4 text-white">
+            Unscheduled
+          </h2>
+          <SpaceList spaces={spacesUnscheduled} />
+        </div>
+      ) : null}
+    </>
   );
 };
 

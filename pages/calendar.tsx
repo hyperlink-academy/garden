@@ -48,7 +48,7 @@ const List = () => {
     <>
       {spacesActive.length > 0 ? (
         <div className="py-4">
-          <h2 className="mb-8 rounded-md bg-[green] py-2 px-4 text-white">
+          <h2 className="mb-8 rounded-md bg-[teal] py-2 px-4 text-white">
             Active
           </h2>
           <CalendarList spaces={spacesActive} />

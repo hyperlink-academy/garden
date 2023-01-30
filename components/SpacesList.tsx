@@ -25,7 +25,9 @@ import { spacePath } from "hooks/utils";
 import { Fact } from "data/Facts";
 import { Textarea } from "./Textarea";
 
-export const SpaceList = (props: { spaces: Fact<"space/name">[] }) => {
+export const SpaceList = (props: {
+  spaces: Fact<"space/start-date" | "space/end-date" | "space/name">[];
+}) => {
   return (
     <div>
       <style jsx>{`
@@ -38,7 +40,7 @@ export const SpaceList = (props: { spaces: Fact<"space/name">[] }) => {
       `}</style>
       <div className="spacesList grid grid-cols-[repeat(auto-fill,148px)] justify-between gap-4">
         {props.spaces?.map((a) => {
-          return <Space entity={a.entity} name={a.value} key={a.id} />;
+          return <Space entity={a.entity} key={a.id} />;
         })}
       </div>
     </div>
@@ -46,9 +48,11 @@ export const SpaceList = (props: { spaces: Fact<"space/name">[] }) => {
 };
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
-const Space = (props: { entity: string; name: string }) => {
+const Space = (props: { entity: string }) => {
   let studio = useIndex.eav(props.entity, "space/studio");
   let spaceID = useIndex.eav(props.entity, "space/id");
+  let name = useIndex.eav(props.entity, "space/name");
+
   let prefetched = useRef(false);
 
   return (
@@ -58,17 +62,17 @@ const Space = (props: { entity: string; name: string }) => {
         onPointerDown={() => {
           if (prefetched.current) return;
           if (!studio?.value) return;
-          prefetchSpaceId(studio.value, props.name);
+          if (name) prefetchSpaceId(studio.value, name?.value);
           prefetched.current = true;
         }}
         onMouseOver={() => {
           if (prefetched.current) return;
           if (!studio?.value) return;
-          prefetchSpaceId(studio.value, props.name);
+          if (name) prefetchSpaceId(studio.value, name?.value);
           prefetched.current = true;
         }}
       >
-        <Link href={`${spacePath(studio?.value, props.name)}`}>
+        <Link href={`${spacePath(studio?.value, name?.value)}`}>
           <DoorImage entityID={props.entity} />
         </Link>
         <div className="flex w-[20px] flex-col gap-4 pb-[92px]">
@@ -78,7 +82,7 @@ const Space = (props: { entity: string; name: string }) => {
 
       <div className="">
         <div className="ml-2 w-full origin-top-left skew-y-[-30deg] scale-x-90 scale-y-110">
-          <h3 className="text-xl">{props.name}</h3>
+          <h3 className="text-xl">{name?.value}</h3>
         </div>
       </div>
     </div>

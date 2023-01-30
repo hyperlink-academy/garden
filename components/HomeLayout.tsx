@@ -32,16 +32,16 @@ export const HomeHeader = () => {
           href={`/s/${studioName}`}
           className={pathname?.endsWith("/s/[studio]") ? decorationClasses : ``}
         >
-          <ButtonLink content="now" />
+          <ButtonLink content="active" />
         </Link>
-        <Link
+        {/* <Link
           href={`/s/${studioName}/future`}
           className={
             pathname?.endsWith("/s/[studio]/future") ? decorationClasses : ``
           }
         >
           <ButtonLink content="future" />
-        </Link>
+        </Link> */}
         <Link
           href={`/s/${studioName}/history`}
           className={
