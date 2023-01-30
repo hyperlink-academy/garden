@@ -192,28 +192,35 @@ export const CreateSpace = (props: { studioSpaceID: string }) => {
               onSelect={(d) => setFormState((form) => ({ ...form, door: d }))}
             />
 
-            <div className="flex flex-row gap-1">
-              <input
-                type="checkbox"
-                disabled={
-                  !(
-                    formState.start_date &&
-                    formState.end_date &&
-                    formState.name &&
-                    formState.description &&
-                    formState.door
-                  )
-                }
-                checked={formState.publish_on_listings_page}
-                onChange={(e) => {
-                  let value = e.currentTarget.checked;
-                  setFormState((form) => ({
-                    ...form,
-                    publish_on_listings_page: value,
-                  }));
-                }}
-              />
-              <p className="font-bold">Publish to Community Calendar?</p>
+            <div className="flex flex-col gap-2">
+              <div className="flex gap-2">
+                <input
+                  type="checkbox"
+                  disabled={
+                    !(
+                      formState.start_date &&
+                      formState.end_date &&
+                      formState.name &&
+                      formState.description &&
+                      formState.door
+                    )
+                  }
+                  checked={formState.publish_on_listings_page}
+                  onChange={(e) => {
+                    let value = e.currentTarget.checked;
+                    setFormState((form) => ({
+                      ...form,
+                      publish_on_listings_page: value,
+                    }));
+                  }}
+                />
+                <p className="font-bold">Publish to Community Calendar?</p>
+              </div>
+
+              <p className="text-sm">
+                Once you add the above info you can list your Space for others
+                to see. People will still need an invite to join.
+              </p>
             </div>
 
             {/* action buttons */}

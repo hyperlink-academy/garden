@@ -26,7 +26,7 @@ export const HomeHeader = () => {
   if (!studioName) return null;
 
   return (
-    <div className="HomeHeader sticky top-0 z-10 mx-[-1000px] mb-4 flex justify-between bg-background py-4 px-[1000px] shadow-md">
+    <div className="HomeHeader sticky top-0 z-10 mx-[-1000px] mb-4 flex justify-between border-b border-grey-55 bg-background py-4 px-[1000px]">
       <div className="flex flex-row gap-4">
         <Link
           href={`/s/${studioName}`}
