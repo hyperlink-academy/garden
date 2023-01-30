@@ -129,6 +129,7 @@ const MobileFooter = (props: {
 }) => {
   let homeEntity = useIndex.aev("home");
   let roomName = useIndex.eav(props.currentRoom, "room/name");
+  let member = useIndex.eav(props.currentRoom, "member/name");
 
   return (
     <div className="roomFooter grid shrink-0 grid-cols-[minmax(0,auto)_auto] justify-between gap-8 font-bold text-grey-35">
@@ -157,7 +158,7 @@ const MobileFooter = (props: {
         >
           {props.currentRoom === homeEntity[0]?.entity
             ? "Homeroom"
-            : roomName?.value}
+            : roomName?.value || member?.value}
         </div>
       </div>
 
