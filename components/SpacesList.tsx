@@ -53,6 +53,20 @@ const Space = (props: { entity: string }) => {
   let spaceID = useIndex.eav(props.entity, "space/id");
   let name = useIndex.eav(props.entity, "space/name");
 
+  let start_date = useIndex.eav(props.entity, "space/start-date");
+  let end_date = useIndex.eav(props.entity, "space/end-date");
+  let duration_days = null;
+  // calculate duration, in days
+  // add extra +1 day to account for start and end dates
+  if (start_date && end_date) {
+    let start = new Date(start_date.value.value);
+    let end = new Date(end_date.value.value);
+    let start_timestamp = start.getTime();
+    let end_timestamp = end.getTime();
+    let delta = Math.abs(end_timestamp - start_timestamp) / 1000;
+    duration_days = Math.floor(delta / 86400) + 1;
+  }
+
   let prefetched = useRef(false);
 
   return (
@@ -82,7 +96,19 @@ const Space = (props: { entity: string }) => {
 
       <div className="">
         <div className="ml-2 w-full origin-top-left skew-y-[-30deg] scale-x-90 scale-y-110">
-          <h3 className="text-xl">{name?.value}</h3>
+          <div className="flex flex-col gap-2">
+            <h3 className="text-xl">{name?.value}</h3>
+            {start_date ? (
+              <div className="text-sm text-grey-35">
+                <div>
+                  ❇️ <strong>{start_date?.value.value}</strong>
+                </div>
+                <div>
+                  🗓 <strong>{duration_days} days</strong>
+                </div>
+              </div>
+            ) : null}
+          </div>
         </div>
       </div>
     </div>
