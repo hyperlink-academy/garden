@@ -252,7 +252,7 @@ const AddCard = (props: { expanded: boolean; end?: boolean } & StackData) => {
     <>
       <button
         {...handlers}
-        onClick={() => !isLongPress && setOpen(true)}
+        onClick={() => !isLongPress.current && setOpen(true)}
         className={`
           cardStackNewCard 
           w-full h-12 

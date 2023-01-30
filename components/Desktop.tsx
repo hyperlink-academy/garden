@@ -22,6 +22,7 @@ import { useRouter } from "next/router";
 import { FindOrCreate, useAllItems } from "./FindOrCreateEntity";
 import { useSubscribe } from "replicache-react";
 import { ButtonSecondary } from "./Buttons";
+import { ActionBar } from "./ActionBar";
 
 const GRID_SIZE = 16;
 const snap = (x: number) => Math.ceil(x / GRID_SIZE) * GRID_SIZE;
@@ -38,6 +39,7 @@ export const Desktop = (props: { entityID: string }) => {
   );
   let [draggingHeight, setDraggingHeight] = useState(0);
   let [selection, setSelection] = useState<string[]>([]);
+  let [selectionDragTransform, setSelectionDragTransform] = useState<string>("")
 
   return (
     <DndContext
@@ -55,6 +57,15 @@ export const Desktop = (props: { entityID: string }) => {
       ]}
       collisionDetection={customCollisionDetection}
       onDragMove={({ delta, active }) => {
+        let transform = `translate3d(${delta.x}px, ${delta.y}px, 0px)`;
+        setSelectionDragTransform(transform);
+
+        if(selection.length > 0 && !selection.includes(active.id as string)) {
+          setSelection((oldValue) => {
+            return [...oldValue, active.id as string]
+          })
+        }
+
         let position: { y: number } = active.data.current?.position;
         if (!position) return;
         let h = height;
@@ -65,32 +76,39 @@ export const Desktop = (props: { entityID: string }) => {
           });
       }}
       onDragEnd={async (dragProps) => {
-        let { active, delta, over, collisions } = dragProps;
+        let { active, delta, over } = dragProps;
+
+        setSelectionDragTransform('')
 
         action.start();
 
         setDraggingHeight(0);
-        let overCollision = collisions?.find(
-          (c) => c.data?.droppableContainer.id === over?.id
-        );
-        if (!over || !overCollision || over.id === active.id) {
-          await mutate("updatePositionInDesktop", {
-            factID: active.id as string,
-            parent: props.entityID,
-            dx: delta.x,
-            dy: delta.y,
-            da: 0,
-          });
-          action.end();
-          return;
-        }
 
-        await mutate("addToOrCreateDeck", {
-          droppedCardPositionFact: active.id as string,
-          droppedCardEntity: active.data.current?.entityID,
-          targetCardEntity: over.data.current?.entityID,
-          desktop: props.entityID,
-        });
+        let elementsToUpdate = selection.length > 0 ? selection : [active.id]
+
+        for(let id of elementsToUpdate) {
+          if(over && !selection.includes(over.id as string)) {
+            let entityID = cards?.find((f) => f.id == id)?.value.value
+
+            if(entityID) {
+              await mutate("addToOrCreateDeck", {
+                droppedCardPositionFact: id as string,
+                droppedCardEntity: entityID,
+                targetCardEntity: over.data.current?.entityID,
+                desktop: props.entityID,
+                factID: ulid()
+              });
+            }
+          } else {
+            await mutate("updatePositionInDesktop", {
+              factID: id as string,
+              parent: props.entityID,
+              dx: delta.x,
+              dy: delta.y,
+              da: 0,
+            });
+          }
+        }
 
         action.end();
       }}
@@ -145,23 +163,18 @@ export const Desktop = (props: { entityID: string }) => {
                 relationshipID={card.id}
                 entityID={card.value.value}
                 parent={props.entityID}
-                onLongPress={() => {
-                  setSelection((oldValue) => {
-                    if (oldValue.includes(card.id)) {
-                      return oldValue.filter((id) => id !== card.id);
-                    } else {
-                      return [...oldValue, card.id];
-                    }
-                  });
-                }}
+                setSelection={setSelection}
                 isSelected={selection.includes(card.id)}
                 selectionMode={selection.length > 0}
+                dragTransform={selection.includes(card.id) ? selectionDragTransform : ''}
               />
             ))}
           </div>
           {/* <HelpToast helpText={`double click/tap to create new`} /> */}
         </div>
       </div>
+
+      <ActionBar selection={selection} setSelection={setSelection} />
     </DndContext>
   );
 };
@@ -247,7 +260,8 @@ const DraggableCard = (props: {
   relationshipID: string;
   isSelected: boolean;
   selectionMode: boolean;
-  onLongPress: () => void;
+  dragTransform: string;
+  setSelection: React.Dispatch<React.SetStateAction<string[]>>;
 }) => {
   let position = useIndex.eav(props.relationshipID, "card/position-in");
   let { mutate } = useMutations();
@@ -257,16 +271,35 @@ const DraggableCard = (props: {
       id: props.relationshipID,
       data: { entityID: props.entityID, position: position?.value },
     });
-  let { setNodeRef: draggableRef, isOver } = useDroppable({
+  let { setNodeRef: draggableRef, isOver: _isOver } = useDroppable({
     id: props.relationshipID,
     disabled: isDragging,
     data: { entityID: props.entityID },
   });
+  let isOver = _isOver && !props.isSelected;
   let refs = useCombinedRefs(setNodeRef, draggableRef);
 
-  const style = transform
+  const style = transform && (Math.abs(transform.x) > 0 || Math.abs(transform.y) > 0)
     ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
     : "";
+
+  let dragTransform = props.dragTransform || style
+  let hasMoved = dragTransform != ''
+
+
+  let toggleSelection = () => {
+    props.setSelection?.((oldValue:string[]) => {
+      if (oldValue.includes(props.relationshipID)) {
+        return oldValue.filter((id) => id !== props.relationshipID);
+      } else {
+        return [...oldValue, props.relationshipID];
+      }
+    });
+  }
+
+  let pointerUpHandler = (e: React.PointerEvent) => {
+    if(!hasMoved && props.selectionMode && e.button === 0) toggleSelection()
+  }
 
   let y = position?.value.y || 0;
   let x = position?.value.x || 0;
@@ -278,7 +311,7 @@ const DraggableCard = (props: {
           zIndex: isDragging
             ? 100000
             : Math.floor(y / 10) * 100 + Math.floor(x / 10),
-          transform: style,
+          transform: dragTransform,
           top: snap(y) + "px",
           left: snap(x) + "px",
           width: position?.value.size === "big" ? "288px" : "fit-content",
@@ -328,6 +361,9 @@ const DraggableCard = (props: {
               });
             }}
             isOver={isOver}
+            isDragging={hasMoved}
+            onLongPress={toggleSelection}
+            pointerUpHandler={pointerUpHandler}
             {...props}
           />
         </div>

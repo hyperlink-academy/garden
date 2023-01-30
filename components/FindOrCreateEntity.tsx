@@ -11,6 +11,7 @@ import {
   Member,
 } from "./Icons";
 import { Divider } from "./Layout";
+import { useLongPress } from "hooks/useLongPress";
 
 // Can I adapt this to work for section names as well?
 // They are a single select
@@ -99,6 +100,8 @@ export const FindOrCreate = (props: {
               let addedItemIndex = added.indexOf(findAddedItem);
               added.splice(addedItemIndex, 1);
               setAdded([...added]); //create a new array to force a refresh of the addedList
+
+              if (added.length == 0) isMultiSelect.current = false;
               return;
             }
 
@@ -413,18 +416,11 @@ const SearchItem: React.FC<
     setMultiSelect: () => void;
   }>
 > = (props) => {
-  let isLongPress = useRef(false);
-  let longPressTimer = useRef<number>();
+  let { handlers, isLongPress } = useLongPress(() => {
+    props.setMultiSelect();
+    props.onLongPress();
+  });
 
-  const TriggerLongPress = () => {
-    isLongPress.current = false;
-
-    longPressTimer.current = window.setTimeout(() => {
-      isLongPress.current = true;
-      props.setMultiSelect();
-      props.onLongPress();
-    }, 500);
-  };
   return (
     <div
       onClick={(e) => {
@@ -435,33 +431,7 @@ const SearchItem: React.FC<
           e.preventDefault();
         }
       }}
-      // START LONGPRESS LOGIC
-      // If you LongPress or LongClick, you will trigger multiselect. Here, we start a timer for .5 seconds when the user clicks
-      onMouseDown={() => {
-        TriggerLongPress();
-      }}
-      onContextMenu={(e) => e.preventDefault()}
-      onTouchStart={() => {
-        TriggerLongPress();
-
-        console.log("touch");
-      }}
-      // If the user clicks for .5 seconds or more, then isMultiselect = true. Else, just regular click.
-      onMouseUp={(e) => {
-        window.clearTimeout(longPressTimer.current);
-
-        if (isLongPress.current === true) {
-          console.log("longpressed!");
-        }
-      }}
-      onTouchEnd={(e) => {
-        window.clearTimeout(longPressTimer.current);
-
-        if (isLongPress.current === true) {
-          console.log("notouch");
-        }
-      }}
-      //END LONGPRESS LOGIC
+      {...handlers}
       className={`w-full px-3 py-0.5 ${props.className || ""} ${
         props.active ? "bg-bg-blue" : ""
       }`}

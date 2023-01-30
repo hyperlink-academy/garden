@@ -35,9 +35,11 @@ export type Props = {
   onResize?: (size: "big" | "small") => void;
   showRelated?: boolean;
   isOver?: boolean;
-  onLongPress?: () => void;
   isSelected?: boolean;
   selectionMode?: boolean;
+  isDragging?: boolean;
+  onLongPress?: () => void;
+  pointerUpHandler?: (e: React.PointerEvent) => void;
 };
 
 export const CardPreview = (
@@ -47,12 +49,18 @@ export const CardPreview = (
 ) => {
   let isMember = !!useIndex.eav(props.entityID, "member/name");
 
-  let { handlers } = useLongPress(() => props.onLongPress?.());
+  let { handlers, isLongPress } = useLongPress(
+    () => props.onLongPress?.(),
+    props.isDragging
+  );
 
   return (
     <HoverControls {...props}>
       <div
         {...handlers}
+        onPointerUp={(e) => {
+          if (!isLongPress.current) props.pointerUpHandler?.(e);
+        }}
         className={`cardPreviewBorder relative grow overflow-hidden ${borderStyles(
           { isMember }
         )} ${props.isSelected ? "selectedCardGlow" : ""} ${
@@ -93,6 +101,8 @@ export const HoverControls: React.FC<
     let originX = rect.x + rect.width / 2;
     let originY = rect.y + rect.height / 2;
 
+    console.log(ref.current);
+
     let angle = find_angle(
       { x: initial[0], y: initial[1] },
       { x: originX, y: originY },
@@ -122,10 +132,7 @@ export const HoverControls: React.FC<
 
       {authorized &&
       (props.onDelete || props.onResize || props.onRotateDrag) ? (
-        <div
-          ref={ref}
-          className="z-50 flex flex-col justify-between gap-1 pb-1 text-grey-80 opacity-0 group-hover:opacity-100"
-        >
+        <div className="z-50 flex flex-col justify-between gap-1 pb-1 text-grey-80 opacity-0 group-hover:opacity-100">
           {authorized && props.onDelete ? (
             <button
               className="z-50 pt-1 hover:text-accent-blue"

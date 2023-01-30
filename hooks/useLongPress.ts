@@ -1,13 +1,13 @@
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 
-export const useLongPress = (cb: () => void) => {
+export const useLongPress = (cb: () => void, cancel?: boolean) => {
   let longPressTimer = useRef<number>();
   let isLongPress = useRef(false);
-  let start = () => {
-    // e.preventDefault()
 
+  let start = () => {
     isLongPress.current = false;
     longPressTimer.current = window.setTimeout(() => {
+      console.log("cb", cancel);
       isLongPress.current = true;
       cb();
     }, 500);
@@ -15,12 +15,18 @@ export const useLongPress = (cb: () => void) => {
   let end = () => {
     window.clearTimeout(longPressTimer.current);
   };
-  let click = (e: React.MouseEvent) => {
+  let click = (e: React.MouseEvent | React.PointerEvent) => {
     if (isLongPress.current) e.preventDefault();
   };
 
+  useEffect(() => {
+    if (cancel) {
+      end();
+    }
+  }, [cancel]);
+
   return {
-    isLongPress: isLongPress.current,
+    isLongPress: isLongPress,
     handlers: {
       onMouseDown: start,
       onMouseUp: end,

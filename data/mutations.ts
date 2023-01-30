@@ -118,6 +118,7 @@ const addToOrCreateDeck: Mutation<{
   droppedCardPositionFact: string;
   droppedCardEntity: string;
   desktop: string;
+  factID: string;
 }> = async (args, ctx) => {
   // This now just adds a reference to a card since all cards are kinda decks
   let children = await ctx.scanIndex.eav(args.desktop, "deck/contains");
@@ -133,6 +134,7 @@ const addToOrCreateDeck: Mutation<{
     attribute: "deck/contains",
     value: ref(args.droppedCardEntity),
     positions: { eav: newPosition },
+    factID: args.factID,
   });
 
   let childInDesktop = children.find(
