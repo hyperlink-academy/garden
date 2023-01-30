@@ -40,24 +40,30 @@ const List = () => {
   // active:
   // start-date = in past
   // end-date = in future
-  let spacesActive = spacesByEnd.filter((s) => {
+  const spacesActive = spacesByEnd.filter((s) => {
     return !spacesUpcoming.find((upcoming) => upcoming.entity === s.entity);
   });
 
+  console.log(spacesActive.length);
+
   return (
     <>
-      <div className="py-4">
-        <h2 className="mb-8 rounded-md bg-[green] py-2 px-4 text-white">
-          Active
-        </h2>
-        <CalendarList spaces={spacesActive} />
-      </div>
-      <div className="py-4">
-        <h2 className="mb-8 rounded-md bg-[darkgoldenrod] py-2 px-4 text-white">
-          Upcoming
-        </h2>
-        <CalendarList spaces={spacesUpcoming} />
-      </div>
+      {spacesActive.length > 0 ? (
+        <div className="py-4">
+          <h2 className="mb-8 rounded-md bg-[green] py-2 px-4 text-white">
+            Active
+          </h2>
+          <CalendarList spaces={spacesActive} />
+        </div>
+      ) : null}
+      {spacesUpcoming.length > 0 ? (
+        <div className="py-4">
+          <h2 className="mb-8 rounded-md bg-[darkgoldenrod] py-2 px-4 text-white">
+            Upcoming
+          </h2>
+          <CalendarList spaces={spacesUpcoming} />
+        </div>
+      ) : null}
     </>
   );
 };
