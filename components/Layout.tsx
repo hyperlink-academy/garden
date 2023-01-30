@@ -4,7 +4,7 @@ import React, { Fragment } from "react";
 export const Divider = (props: { dark?: boolean }) => {
   return (
     <div
-      className={`border-t border-l w-full ${
+      className={`w-full border-t border-l ${
         props.dark ? `border-grey-55` : `border-grey-80`
       }`}
     ></div>
@@ -17,10 +17,10 @@ export const FloatingContainer: React.FC<
   return (
     <div
       className={`
-        px-4 py-4
-        border border-grey-80 rounded-md 
+        rounded-md border
+        border-grey-80 bg-white px-4 
+        py-4
         shadow-drop
-        bg-white
         ${props.className}
         `}
     >
@@ -36,17 +36,17 @@ export const Modal: React.FC<
     <Dialog
       open={props.open}
       onClose={props.onClose}
-      className="fixed z-10 inset-0 overflow-y-hidden"
+      className="fixed inset-0 z-10 overflow-y-hidden"
     >
       <Dialog.Overlay className="overlay" />
       <FloatingContainer
         className={`
-              fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
-              grid grid-flow-row gap-4
-              max-w-md
+              fixed top-1/2 left-1/2 grid max-h-[calc(100%-32px)]
+              w-[calc(100%-32px)] max-w-md -translate-x-1/2
+              -translate-y-1/2
+              grid-flow-row
+              gap-4
               overflow-auto
-              max-h-[calc(100%-32px)]
-              w-[calc(100%-32px)]
               `}
       >
         {props.children}
@@ -70,16 +70,16 @@ export const MenuContainer: React.FC<
     >
       <Menu.Items
         className={`
-            border border-grey-80 rounded-md 
-            shadow-drop bg-white 
-            absolute justify-items-end 
-            flex flex-col
-            text-right 
-            origin-top-right 
-            right-0 
-            z-40 
-            w-max
-            py-2
+            absolute right-0 z-40 
+            flex w-max 
+            origin-top-right flex-col 
+            justify-items-end rounded-md
+            border 
+            border-grey-80 
+            bg-white 
+            py-2 
+            text-right
+            shadow-drop
             ${props.className}`}
       >
         {props.children}
@@ -98,11 +98,11 @@ export const MenuItem: React.FC<
     <Menu.Item>
       {({ active }) => (
         <button
-          className={`px-3 py-1 flex items-center gap-2 justify-end ${
+          className={`flex items-center justify-end gap-2 px-3 py-1 ${
             active ? "bg-bg-blue" : ""
           } ${
             props?.disabled
-              ? " hover:bg-transparent text-grey-80 line-through"
+              ? " text-grey-80 line-through hover:bg-transparent"
               : ""
           }`}
           onClick={() => props.onClick?.()}

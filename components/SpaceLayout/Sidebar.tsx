@@ -1,19 +1,22 @@
 import Link from "next/link";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 
 import { ButtonPrimary } from "components/Buttons";
 import { Divider, Modal } from "components/Layout";
 import { useAuth } from "hooks/useAuth";
 import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ulid } from "src/ulid";
 import {
   BackToStudio as BackToStudioIcon,
+  Delete,
   MoreOptionsSmall,
   MoreOptionsTiny,
 } from "../Icons";
 import { spaceAPI } from "backend/lib/api";
 import { useSmoker } from "components/Smoke";
+import { SingleTextSection } from "components/CardView/Sections";
+import { printSourceLocation } from "graphql";
 
 export const Sidebar = (props: {
   onRoomChange: (room: string) => void;
@@ -28,6 +31,7 @@ export const Sidebar = (props: {
   let spaceName = useIndex.aev("this/name")[0];
 
   let [inviteOpen, setInviteOpen] = useState(false);
+  let [roomEditOpen, setRoomEditOpen] = useState(false);
 
   return (
     <div className="roomList flex h-full w-48 flex-col items-stretch gap-4 rounded-l-[3px] border-r border-grey-90 bg-white p-3 text-grey-35">
@@ -61,25 +65,35 @@ export const Sidebar = (props: {
               .filter((f) => f.value !== "prompts")
               .map((room) => {
                 return (
-                  <button
-                    className={`flex  w-full items-center justify-between gap-2 overflow-hidden whitespace-nowrap rounded-md py-0.5 px-2 text-left ${
+                  <div
+                    className={`flex w-full items-center gap-2 overflow-hidden whitespace-nowrap rounded-md  text-left ${
                       room.entity === props.currentRoom
                         ? "rounded-md bg-accent-blue  font-bold text-white"
                         : "border border-transparent text-grey-35 hover:border-grey-80"
                     }`}
-                    onClick={() => props.onRoomChange(room.entity)}
                   >
-                    {room.value}
                     <button
-                      className={` rounded-md border border-transparent pt-[1px] hover:border-white ${
+                      className="w-full overflow-clip py-0.5 pl-2 text-left"
+                      onClick={() => props.onRoomChange(room.entity)}
+                    >
+                      {room.value}
+                    </button>
+                    <button
+                      onClick={() => setRoomEditOpen(true)}
+                      className={` mr-2 rounded-md border border-transparent pt-[1px] hover:border-white ${
                         room.entity === props.currentRoom ? "" : "hidden"
                       }`}
                     >
                       <MoreOptionsTiny />
                     </button>
-                  </button>
+                  </div>
                 );
               })}
+            <EditRoomModal
+              open={roomEditOpen}
+              onClose={() => setRoomEditOpen(false)}
+              entityID={props.currentRoom}
+            />
           </ul>
 
           <button
@@ -280,6 +294,66 @@ const InviteMember = (props: { open: boolean; onClose: () => void }) => {
           />
         </div>
       </div>
+    </Modal>
+  );
+};
+
+const EditRoomModal = (props: {
+  open: boolean;
+  onClose: () => void;
+  entityID: string | null;
+}) => {
+  let currentRoom = useIndex.eav(props.entityID, "room/name");
+
+  let timeout = useRef<null | number>(null);
+  let { mutate, authorized, action } = useMutations();
+  let [formState, setFormState] = useState(currentRoom?.value);
+
+  if (!props.entityID) return null;
+
+  return (
+    <Modal open={props.open} onClose={props.onClose}>
+      <h3>Room Settings</h3>
+      <p>Room Name</p>
+      <input
+        className="w-full"
+        value={formState}
+        placeholder=""
+        onChange={(e) => {
+          let value = e.currentTarget.value;
+          setFormState(value);
+          console.log(formState);
+        }}
+      />
+
+      <ButtonPrimary
+        content="Edit Room!"
+        onClick={async () => {
+          if (!props.entityID || formState === undefined) {
+            null;
+          } else {
+            await mutate("assertFact", {
+              entity: props.entityID,
+              attribute: "room/name",
+              value: formState,
+            });
+          }
+
+          props.onClose();
+        }}
+      />
+      <Divider />
+      <ButtonPrimary
+        destructive
+        onClick={async () => {
+          !props.entityID
+            ? null
+            : await mutate("deleteEntity", { entity: props.entityID });
+          props.onClose();
+        }}
+        content="Delete this room"
+        icon={<Delete />}
+      />
     </Modal>
   );
 };

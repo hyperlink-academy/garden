@@ -250,30 +250,6 @@ const CardMoreOptionsMenu = (props: {
         <MoreOptionsTiny />
       </Menu.Button>
       <MenuContainer>
-        {!props?.referenceFactID ? null : (
-          <MenuItem
-            onClick={
-              !authorized
-                ? undefined
-                : () => {
-                    mutate("retractFact", {
-                      id: props?.referenceFactID as string,
-                    });
-                  }
-            }
-          >
-            <p>Remove from Deck</p>
-            <DeckSmall />
-          </MenuItem>
-        )}
-
-        <div className="py-2">
-          <Divider />
-        </div>
-
-        {/* TODO: wire up delete card (and add confirmation?) */}
-        {/* TODO: check if deck card; if so display "Delete Deck…"  */}
-
         <MenuItem
           onClick={async () => {
             action.start();
