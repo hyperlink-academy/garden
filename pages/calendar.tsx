@@ -44,8 +44,6 @@ const List = () => {
     return !spacesUpcoming.find((upcoming) => upcoming.entity === s.entity);
   });
 
-  console.log(spacesActive.length);
-
   return (
     <>
       {spacesActive.length > 0 ? (
