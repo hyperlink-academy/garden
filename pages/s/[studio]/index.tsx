@@ -31,14 +31,18 @@ const List = () => {
   // all spaces
   const spacesAll = useIndex.aev("space/name").sort(sortByPosition("aev"));
 
+  // all space with start / end dates
+  const spacesStartingAll = useIndex.at("space/start-date");
+  const spacesEndingAll = useIndex.at("space/end-date");
+
   // explicitly completed spaces
   // NB: could remove if we ONLY calculate completed based on dates
-  const spacesCompleted = useIndex
+  const spacesExplicitCompleted = useIndex
     .aev("space/completed")
     .sort(sortByPosition("aev"));
 
   // spaces ending in the future
-  const spacesByEnd = useIndex.at(
+  const spacesEndingFuture = useIndex.at(
     "space/end-date",
     new Date().toLocaleDateString("en-CA")
   );
@@ -46,7 +50,7 @@ const List = () => {
   // upcoming:
   // start-date = in future
   // NB: the '+1' part is needed for spaces starting today to show as 'active' not 'upcoming'
-  const spacesUpcoming = useIndex.at(
+  const spacesStartingFuture = useIndex.at(
     "space/start-date",
     new Date(new Date().setDate(new Date().getDate() + 1)).toLocaleDateString(
       "en-CA"
@@ -56,8 +60,24 @@ const List = () => {
   // active:
   // start-date = in past (NOT in spacesUpcoming)
   // end-date = in future
-  const spacesActive = spacesByEnd.filter((s) => {
-    return !spacesUpcoming.find((upcoming) => upcoming.entity === s.entity);
+  const spacesActive = spacesEndingFuture.filter((s) => {
+    return !spacesStartingFuture.find((f) => f.entity === s.entity);
+  });
+
+  // past:
+  // start AND end in past
+  // OR start only in past
+  // OR end only in past
+  // AND NOT explicitly marked "completed"
+  // TODO - remove if we simplify completed (calc by dates only vs. explicit setting)
+  const spacesPast = spacesAll.filter((s) => {
+    return (
+      (spacesStartingAll.find((f) => f.entity === s.entity) ||
+        spacesEndingAll.find((f) => f.entity === s.entity)) &&
+      !spacesActive.find((f) => f.entity === s.entity) &&
+      !spacesStartingFuture.find((f) => f.entity === s.entity) &&
+      !spacesExplicitCompleted.find((f) => f.entity === s.entity)
+    );
   });
 
   // unscheduled (implicit draft)
@@ -66,9 +86,9 @@ const List = () => {
   // NB: could ALSO avoid explicit 'completed' check if we ONLY calc based on dates
   const spacesUnscheduled = spacesAll.filter((s) => {
     return (
-      !spacesByEnd.find((end) => end.entity === s.entity) &&
-      !spacesUpcoming.find((start) => start.entity === s.entity) &&
-      !spacesCompleted.find((completed) => completed.entity === s.entity)
+      !spacesStartingAll.find((f) => f.entity === s.entity) &&
+      !spacesEndingAll.find((f) => f.entity === s.entity) &&
+      !spacesExplicitCompleted.find((f) => f.entity === s.entity)
     );
   });
 
@@ -82,17 +102,25 @@ const List = () => {
           <SpaceList spaces={spacesActive} />
         </div>
       ) : null}
-      {spacesUpcoming.length > 0 ? (
+      {spacesStartingFuture.length > 0 ? (
         <div className="py-4">
           <h2 className="mb-8 rounded-md bg-[darkgoldenrod] py-2 px-4 text-white">
             Upcoming
           </h2>
-          <SpaceList spaces={spacesUpcoming} />
+          <SpaceList spaces={spacesStartingFuture} />
+        </div>
+      ) : null}
+      {spacesPast.length > 0 ? (
+        <div className="py-4">
+          <h2 className="mb-8 rounded-md bg-[firebrick] py-2 px-4 text-white">
+            Past
+          </h2>
+          <SpaceList spaces={spacesPast} />
         </div>
       ) : null}
       {spacesUnscheduled.length > 0 ? (
         <div className="py-4">
-          <h2 className="mb-8 rounded-md bg-[firebrick] py-2 px-4 text-white">
+          <h2 className="mb-8 rounded-md bg-[grey] py-2 px-4 text-white">
             Unscheduled
           </h2>
           <SpaceList spaces={spacesUnscheduled} />
