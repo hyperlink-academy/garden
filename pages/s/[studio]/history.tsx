@@ -2,10 +2,8 @@ import { workerAPI } from "backend/lib/api";
 import { SpaceProvider } from "components/ReplicacheProvider";
 import { CreateSpace, SpaceList } from "components/SpacesList";
 import { StudioName } from "components/StudioLayout";
-import { ReplicacheContext, scanIndex } from "hooks/useReplicache";
+import { useIndex } from "hooks/useReplicache";
 import { GetStaticPropsContext, InferGetStaticPropsType } from "next";
-import { useContext } from "react";
-import { useSubscribe } from "replicache-react";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 type Props = InferGetStaticPropsType<typeof getStaticProps>;
@@ -23,23 +21,10 @@ export default function StudioPage(props: Props) {
 }
 
 const List = () => {
-  let rep = useContext(ReplicacheContext);
-  let spaces = useSubscribe(
-    rep?.rep,
-    async (tx) => {
-      let completedSpaces = await scanIndex(tx).aev("space/completed");
-      let results = [];
-      for (let space of completedSpaces) {
-        if (space.value) {
-          let name = await scanIndex(tx).eav(space.entity, "space/name");
-          if (name !== null) results.push(name);
-        }
-      }
-      return results;
-    },
-    [],
-    []
-  );
+  let now = new Date().toLocaleDateString("en-CA");
+  const spaces = useIndex
+    .aev("space/end-date")
+    .filter((s) => s.value.value && s.value.value < now);
 
   return <SpaceList spaces={spaces} />;
 };

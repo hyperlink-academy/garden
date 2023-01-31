@@ -53,18 +53,22 @@ export const add_space_data_route = makeRoute({
         value: msg.spaceID,
         positions: {},
       }),
-      env.factStore.assertFact({
-        entity: entityID,
-        attribute: "space/start-date",
-        value: { type: "yyyy-mm-dd", value: msg.data.start_date },
-        positions: {},
-      }),
-      env.factStore.assertFact({
-        entity: entityID,
-        attribute: "space/end-date",
-        value: { type: "yyyy-mm-dd", value: msg.data.end_date },
-        positions: {},
-      }),
+      msg.data.start_date
+        ? env.factStore.assertFact({
+            entity: entityID,
+            attribute: "space/start-date",
+            value: { type: "yyyy-mm-dd", value: msg.data.start_date },
+            positions: {},
+          })
+        : undefined,
+      msg.data.end_date
+        ? env.factStore.assertFact({
+            entity: entityID,
+            attribute: "space/end-date",
+            value: { type: "yyyy-mm-dd", value: msg.data.end_date },
+            positions: {},
+          })
+        : undefined,
       !msg.data.image
         ? undefined
         : msg.data.image?.type === "uploaded"

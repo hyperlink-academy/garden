@@ -1,13 +1,7 @@
 import { spaceAPI } from "backend/lib/api";
-import {
-  ReplicacheContext,
-  useIndex,
-  useMutations,
-  useSpaceID,
-} from "hooks/useReplicache";
+import { ReplicacheContext, useIndex, useMutations } from "hooks/useReplicache";
 import Link from "next/link";
 import { useContext, useRef, useState } from "react";
-import useSWR from "swr";
 import {
   ButtonLink,
   ButtonPrimary,
@@ -23,7 +17,6 @@ import { useAuth } from "hooks/useAuth";
 import { DotLoader } from "./DotLoader";
 import { spacePath } from "hooks/utils";
 import { Fact } from "data/Facts";
-import { Textarea } from "./Textarea";
 
 export const SpaceList = (props: {
   spaces: Fact<"space/start-date" | "space/end-date" | "space/name">[];
@@ -50,7 +43,6 @@ export const SpaceList = (props: {
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 const Space = (props: { entity: string }) => {
   let studio = useIndex.eav(props.entity, "space/studio");
-  let spaceID = useIndex.eav(props.entity, "space/id");
   let name = useIndex.eav(props.entity, "space/name");
 
   let start_date = useIndex.eav(props.entity, "space/start-date");
@@ -297,7 +289,6 @@ const EditSpace = (props: { spaceEntity: string }) => {
   let door = useIndex.eav(props.spaceEntity, "space/door/image");
   let spaceID = useIndex.eav(props.spaceEntity, "space/id");
   let studio = useIndex.eav(props.spaceEntity, "space/studio");
-  let completed = useIndex.eav(props.spaceEntity, "space/completed");
   let [mode, setMode] = useState<"normal" | "delete">("normal");
 
   let uploadedDoor = useIndex.eav(
@@ -350,28 +341,6 @@ const EditSpace = (props: { spaceEntity: string }) => {
                 />
               </div>
 
-              <ButtonPrimary
-                content={completed?.value ? "Mark Active" : "Mark Complete"}
-                onClick={async () => {
-                  if (!spaceID || !session.token) return;
-                  console.log(completed);
-                  if (completed?.value) {
-                    console.log(
-                      await spaceAPI(
-                        `${WORKER_URL}/space/${spaceID.value}`,
-                        "update_self",
-                        { token: session.token, data: { completed: false } }
-                      )
-                    );
-                  } else {
-                    await spaceAPI(
-                      `${WORKER_URL}/space/${spaceID.value}`,
-                      "update_self",
-                      { token: session.token, data: { completed: true } }
-                    );
-                  }
-                }}
-              />
               <ButtonPrimary
                 content="Delete this Space"
                 destructive

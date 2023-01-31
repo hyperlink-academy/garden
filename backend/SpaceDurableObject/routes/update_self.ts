@@ -4,14 +4,12 @@ import { z } from "zod";
 import { Client } from "faunadb";
 import { getSessionById } from "backend/fauna/resources/functions/get_session_by_id";
 
-type RouteResponse = ExtractResponse<typeof update_self_route>;
 export const update_self_route = makeRoute({
   route: "update_self",
   input: z.object({
     token: z.string(),
     data: z
       .object({
-        completed: z.boolean(),
         start_date: z.string(),
         end_date: z.string(),
         description: z.string(),
@@ -60,7 +58,7 @@ export const update_self_route = makeRoute({
         "update_local_space_data",
         {
           spaceID: env.id,
-          data: { image: msg.data.image, completed: msg.data.completed },
+          data: { image: msg.data.image },
         }
       );
     }

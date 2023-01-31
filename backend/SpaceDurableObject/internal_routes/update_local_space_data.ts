@@ -9,7 +9,6 @@ export const update_local_space_data_route = makeRoute({
     data: z
       .object({
         deleted: z.boolean(),
-        completed: z.boolean(),
         start_date: z.string(),
         end_date: z.string(),
         description: z.string(),
@@ -54,16 +53,7 @@ export const update_local_space_data_route = makeRoute({
       });
     }
 
-    if (msg.data.completed !== undefined) {
-      await env.factStore.assertFact({
-        entity: spaceEntity,
-        attribute: "space/completed",
-        value: msg.data.completed,
-        positions: {},
-      });
-    }
-
-    if (msg.data.start_date !== undefined) {
+    if (msg.data.start_date !== undefined && msg.data.start_date !== "") {
       await env.factStore.assertFact({
         entity: spaceEntity,
         attribute: "space/start-date",
@@ -72,7 +62,7 @@ export const update_local_space_data_route = makeRoute({
       });
     }
 
-    if (msg.data.end_date !== undefined) {
+    if (msg.data.end_date !== undefined && msg.data.end_date !== "") {
       await env.factStore.assertFact({
         entity: spaceEntity,
         attribute: "space/end-date",
