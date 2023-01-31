@@ -89,7 +89,14 @@ const Space = (props: { entity: string }) => {
       <div className="">
         <div className="ml-2 w-full origin-top-left skew-y-[-30deg] scale-x-90 scale-y-110">
           <div className="flex flex-col gap-2">
-            <h3 className="text-xl">{name?.value}</h3>
+            <h3
+              style={{
+                overflowWrap: "anywhere",
+              }}
+              className="text-xl"
+            >
+              {name?.value}
+            </h3>
             {start_date?.value.value ? (
               <div className="text-sm text-grey-35">
                 <div>

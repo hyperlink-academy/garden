@@ -42,7 +42,14 @@ const CalendarSpace = (props: { entity: string }) => {
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
           <div className="">
-            <h3 className="text-xl">{name?.value}</h3>
+            <h3
+              style={{
+                overflowWrap: "anywhere",
+              }}
+              className="text-xl"
+            >
+              {name?.value}
+            </h3>
           </div>
           <div>
             <p className="text-grey-35">
