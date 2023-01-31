@@ -1,5 +1,5 @@
 import Link from "next/link";
-import useSWR, { mutate } from "swr";
+import useSWR from "swr";
 
 import { ButtonPrimary } from "components/Buttons";
 import { Divider, Modal } from "components/Layout";
@@ -15,8 +15,6 @@ import {
 } from "../Icons";
 import { spaceAPI } from "backend/lib/api";
 import { useSmoker } from "components/Smoke";
-import { SingleTextSection } from "components/CardView/Sections";
-import { printSourceLocation } from "graphql";
 import { Fact } from "data/Facts";
 
 export const Sidebar = (props: {
@@ -103,6 +101,7 @@ const RoomList = (props: {
 }) => {
   let homeEntity = useIndex.aev("home");
   let rooms = useIndex.aev("room/name");
+  let { mutate } = useMutations();
 
   return (
     <ul className="flex flex-col gap-0.5">
