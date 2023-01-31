@@ -13,7 +13,7 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { useContext, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { CardPreview } from "./CardPreview";
 import { customCollisionDetection } from "src/customCollisionDetection";
 import { restrictToParentElement } from "@dnd-kit/modifiers";
@@ -39,7 +39,18 @@ export const Desktop = (props: { entityID: string }) => {
   );
   let [draggingHeight, setDraggingHeight] = useState(0);
   let [selection, setSelection] = useState<string[]>([]);
-  let [selectionDragTransform, setSelectionDragTransform] = useState<string>("")
+  let [selectionDragTransform, setSelectionDragTransform] =
+    useState<string>("");
+
+  useEffect(() => {
+    let handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setSelection([]);
+      }
+    }
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [])
 
   return (
     <DndContext
@@ -128,6 +139,7 @@ export const Desktop = (props: { entityID: string }) => {
             onClick={(e) => {
               if (e.currentTarget !== e.target) return;
               let parentRect = e.currentTarget.getBoundingClientRect();
+              setSelection([]);
               if (e.ctrlKey) {
                 action.start();
                 mutate("addCardToDesktop", {
