@@ -100,8 +100,6 @@ const RoomList = (props: {
   onRoomChange: (room: string) => void;
   currentRoom: string | null;
   setRoomEditOpen: () => void;
-  roomEditOpen: boolean;
-  onRoomEditClose: () => void;
 }) => {
   let homeEntity = useIndex.aev("home");
   let rooms = useIndex.aev("room/name");
