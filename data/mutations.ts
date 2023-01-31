@@ -257,7 +257,13 @@ const drawAPrompt: Mutation<{
   await ctx.assertFact({
     entity: args.factID,
     attribute: "card/position-in",
-    value: { type: "position", y: 64, x: 128, size: "small", rotation: 0 },
+    value: {
+      type: "position",
+      y: 64,
+      x: 128,
+      size: "small",
+      rotation: ((args.randomSeed * 10000) % 60) / 100 - 0.3,
+    },
     positions: {},
   });
 };
