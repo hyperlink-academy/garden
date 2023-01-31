@@ -15,7 +15,6 @@ export default function StudioPage(props: Props) {
     <SpaceProvider id={props.id}>
       <StudioName />
       <List />
-      <CreateSpace studioSpaceID={props.id} />
     </SpaceProvider>
   );
 }

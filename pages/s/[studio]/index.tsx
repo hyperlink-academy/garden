@@ -15,7 +15,7 @@ export default function StudioPage(props: Props) {
   return (
     <SpaceProvider id={props.id}>
       <StudioName />
-      <List />
+      <List id={props.id} />
       <CreateSpace studioSpaceID={props.id} />
     </SpaceProvider>
   );
@@ -27,7 +27,7 @@ three lists:
 - upcoming (scheduled - soon)
 - unscheduled (i.e. implicit draft)
 */
-const List = () => {
+const List = (props: { id: string }) => {
   let now = new Date().toLocaleDateString("en-CA");
 
   // all spaces
@@ -73,6 +73,7 @@ const List = () => {
           <SpaceList spaces={spacesActive} />
         </div>
       ) : null}
+      <CreateSpace studioSpaceID={props.id} />
       {spacesStartingFuture.length > 0 ? (
         <div className="py-4">
           <h2 className="mb-8 rounded-md bg-[darkgoldenrod] py-2 px-4 text-white">

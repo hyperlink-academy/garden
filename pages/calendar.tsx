@@ -1,12 +1,9 @@
 import { workerAPI } from "backend/lib/api";
 import { CalendarList } from "components/CalendarList";
 import { SpaceProvider } from "components/ReplicacheProvider";
-import { truncateSync } from "fs";
-import { ReplicacheContext, scanIndex, useIndex } from "hooks/useReplicache";
+import { useIndex } from "hooks/useReplicache";
 import { InferGetStaticPropsType } from "next";
 import Head from "next/head";
-import { useContext } from "react";
-import { useSubscribe } from "replicache-react";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 type Props = InferGetStaticPropsType<typeof getStaticProps>;
@@ -71,7 +68,6 @@ const CalendarInfo = () => {
     <>
       <Head>
         <title key="title">hyperlink calendar</title>
-        <meta name="theme-color" content="#fffaf0" />
       </Head>
       <div>
         <h1>hyperlink community calendar</h1>

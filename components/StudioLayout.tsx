@@ -1,12 +1,5 @@
-import { spaceAPI } from "backend/lib/api";
-import { useAuth } from "hooks/useAuth";
-import { ReplicacheContext, useIndex, useMutations } from "hooks/useReplicache";
+import { useIndex } from "hooks/useReplicache";
 import Head from "next/head";
-import { useState, useContext } from "react";
-import { ButtonPrimary, ButtonSecondary, ButtonTertiary } from "./Buttons";
-import { Door, DoorSelector } from "./DoorSelector";
-import { SpaceCreate } from "./Icons";
-import { Modal } from "./Layout";
 
 export const StudioName = () => {
   let name = useIndex.aev("this/name", "")[0];
