@@ -11,7 +11,7 @@ import { publishAppEvent } from "hooks/useEvents";
 export const SpaceHeader: React.FC<React.PropsWithChildren<unknown>> = () => {
   let { session } = useAuth();
   return (
-    <div className="pageHeader absolute -right-9 bottom-10 z-50 hidden text-grey-35 sm:block">
+    <div className="pageHeader absolute -right-0 bottom-10 z-50 text-grey-35">
       <div
         className={`
           headerWrapper
@@ -52,7 +52,7 @@ const FindOrCreateBar = () => {
   let { mutate, memberEntity, action } = useMutations();
   return (
     <>
-      <div className="rounded-full bg-background p-2">
+      <div className="rounded-full bg-background pb-4">
         <button
           className="rounded-full border border-accent-blue bg-accent-blue p-4  text-white hover:border hover:border-accent-blue hover:bg-bg-blue hover:text-accent-blue"
           onClick={() => setOpen(!open)}
