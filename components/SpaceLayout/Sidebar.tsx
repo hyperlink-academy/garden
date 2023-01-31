@@ -5,7 +5,7 @@ import { ButtonPrimary } from "components/Buttons";
 import { Divider, Modal } from "components/Layout";
 import { useAuth } from "hooks/useAuth";
 import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ulid } from "src/ulid";
 import {
   BackToStudio as BackToStudioIcon,
@@ -331,12 +331,15 @@ const EditRoomModal = (props: {
 }) => {
   let currentRoom = useIndex.eav(props.entityID, "room/name");
 
-  let timeout = useRef<null | number>(null);
-  let { mutate, authorized, action } = useMutations();
-  let [formState, setFormState] = useState(currentRoom?.value);
+  let { mutate } = useMutations();
+  let [formState, setFormState] = useState(currentRoom?.value || "");
+  useEffect(() => {
+    setFormState(currentRoom?.value || "");
+  }, [currentRoom?.value]);
   let isMember = !!useIndex.eav(props.entityID, "member/name");
 
   if (!props.entityID) return null;
+  let entityID = props.entityID;
 
   return (
     <Modal open={props.open} onClose={props.onClose}>
@@ -357,15 +360,14 @@ const EditRoomModal = (props: {
           <ButtonPrimary
             content="Edit Room!"
             onClick={async () => {
-              !props.entityID || formState === undefined
-                ? null
-                : await mutate("assertFact", {
-                    entity: props.entityID,
-                    attribute: "room/name",
-                    value: formState,
-                    positions: {},
-                  });
+              await mutate("assertFact", {
+                entity: entityID,
+                attribute: "room/name",
+                value: formState,
+                positions: {},
+              });
 
+              setFormState("");
               props.onClose();
             }}
           />
@@ -375,9 +377,8 @@ const EditRoomModal = (props: {
       <ButtonPrimary
         destructive
         onClick={async () => {
-          !props.entityID
-            ? null
-            : await mutate("deleteEntity", { entity: props.entityID });
+          await mutate("deleteEntity", { entity: entityID });
+          setFormState("");
           props.onClose();
         }}
         content="Delete this room"
