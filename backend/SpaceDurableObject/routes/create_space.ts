@@ -11,10 +11,18 @@ export const space_input = z.object({
   end_date: z.string(),
   description: z.string().max(256),
   image: z
-    .object({
-      type: z.union([z.literal("default"), z.literal("uploaded")]),
-      value: z.string(),
-    })
+    .discriminatedUnion("filetype", [
+      z.object({
+        type: z.literal("file"),
+        filetype: z.literal("image"),
+        id: z.string(),
+      }),
+      z.object({
+        type: z.literal("file"),
+        filetype: z.literal("external_image"),
+        url: z.string(),
+      }),
+    ])
     .optional(),
 });
 export const create_space_route = makeRoute({

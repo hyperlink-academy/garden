@@ -119,11 +119,7 @@ export const EditSpace = (props: { spaceEntity: string }) => {
         end_date: end_date?.value.value || "",
         description: description?.value || "",
         name: name?.value || "",
-        image: !uploadedDoor
-          ? undefined
-          : uploadedDoor.value.filetype === "external_image"
-          ? { type: "default", value: uploadedDoor.value.url }
-          : { type: "uploaded", value: uploadedDoor.value.id },
+        image: uploadedDoor?.value,
         publish_on_listings_page: !!community,
       };
     });

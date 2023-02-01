@@ -71,21 +71,10 @@ export const add_space_data_route = makeRoute({
         : undefined,
       !msg.data.image
         ? undefined
-        : msg.data.image?.type === "uploaded"
-        ? env.factStore.assertFact({
-            entity: entityID,
-            attribute: "space/door/uploaded-image",
-            value: {
-              type: "file",
-              filetype: "image",
-              id: msg.data.image.value,
-            },
-            positions: {},
-          })
         : env.factStore.assertFact({
             entity: entityID,
-            attribute: "space/door/image",
-            value: msg.data.image?.value || "/doors/door-clouds-256.jpg",
+            attribute: "space/door/uploaded-image",
+            value: msg.data.image,
             positions: {},
           }),
     ]);

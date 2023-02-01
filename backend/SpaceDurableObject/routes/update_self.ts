@@ -3,22 +3,13 @@ import { ExtractResponse, makeRoute, privateSpaceAPI } from "backend/lib/api";
 import { z } from "zod";
 import { Client } from "faunadb";
 import { getSessionById } from "backend/fauna/resources/functions/get_session_by_id";
+import { space_input } from "./create_space";
 
 export const update_self_route = makeRoute({
   route: "update_self",
   input: z.object({
     token: z.string(),
-    data: z
-      .object({
-        start_date: z.string(),
-        end_date: z.string(),
-        description: z.string(),
-        image: z.object({
-          type: z.union([z.literal("default"), z.literal("uploaded")]),
-          value: z.string(),
-        }),
-      })
-      .partial(),
+    data: space_input.omit({ name: true }).partial(),
   }),
   handler: async (msg, env: Env) => {
     let fauna = new Client({

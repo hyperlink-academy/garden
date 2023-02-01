@@ -67,22 +67,15 @@ export const join_route = makeRoute({
       "space/end-date"
     );
 
-    let image:
-      | Fact<"space/door/image">
-      | Fact<"space/door/uploaded-image">
-      | null = await env.factStore.scanIndex.eav(
+    let image = await env.factStore.scanIndex.eav(
       thisEntity,
-      "space/door/image"
+      "space/door/uploaded-image"
     );
-    if (!image)
-      image = await env.factStore.scanIndex.eav(
-        thisEntity,
-        "space/door/uploaded-image"
-      );
 
     await privateSpaceAPI(memberStudio)("http://internal", "add_space_data", {
       spaceID: env.id,
       data: {
+        image: image?.value,
         description: description?.value || "",
         start_date: start_date?.value.value || "",
         end_date: end_date?.value.value || "",

@@ -1,4 +1,5 @@
 import { spaceAPI } from "backend/lib/api";
+import { Fact } from "data/Facts";
 import { useAuth } from "hooks/useAuth";
 import { useSpaceID } from "hooks/useReplicache";
 import { AddImage } from "./CardView/ImageSection";
@@ -13,7 +14,7 @@ export const defaultDoorImages: string[] = [
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 
-export type Door = { type: "default" | "uploaded"; value: string };
+export type Door = Fact<"space/door/uploaded-image">["value"];
 export const DoorSelector = (props: {
   onSelect: (s: Door) => void;
   selected?: Door;
@@ -36,21 +37,28 @@ export const DoorSelector = (props: {
         {defaultDoorImages.map((f) => {
           return (
             <button
-              className={`${props.selected?.value === f ? "" : "opacity-50"}`}
+              className={`${
+                props.selected?.filetype === "external_image" &&
+                props.selected?.url === f
+                  ? ""
+                  : "opacity-50"
+              }`}
               onClick={() => {
-                if (props.selected?.type === "uploaded")
-                  cleanup(props.selected.value);
-                props.onSelect({ type: "default", value: f });
+                if (props.selected?.filetype === "image")
+                  cleanup(props.selected.id);
+                props.onSelect({
+                  type: "file",
+                  filetype: "external_image",
+                  url: f,
+                });
               }}
             >
               <DoorClippedImage url={f} width="64" />
             </button>
           );
         })}
-        {props.selected?.type === "uploaded" ? (
-          <DoorClippedImage
-            url={`${WORKER_URL}/static/${props.selected.value}`}
-          />
+        {props.selected?.filetype === "image" ? (
+          <DoorClippedImage url={`${WORKER_URL}/static/${props.selected.id}`} />
         ) : null}
       </div>
       <div>
@@ -68,9 +76,9 @@ export const DoorSelector = (props: {
         </p>
         <AddImage
           onUpload={(imageID) => {
-            if (props.selected?.type === "uploaded")
-              cleanup(props.selected.value);
-            props.onSelect({ type: "uploaded", value: imageID });
+            if (props.selected?.filetype === "image")
+              cleanup(props.selected.id);
+            props.onSelect({ type: "file", filetype: "image", id: imageID });
           }}
         >
           <SectionImageAdd />

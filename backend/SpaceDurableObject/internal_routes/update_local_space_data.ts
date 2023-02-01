@@ -1,24 +1,19 @@
 import { Env } from "..";
 import { makeRoute } from "backend/lib/api";
 import { z } from "zod";
+import { space_input } from "../routes/create_space";
 
 export const update_local_space_data_route = makeRoute({
   route: "update_local_space_data",
   input: z.object({
     spaceID: z.string(),
-    data: z
-      .object({
-        deleted: z.boolean(),
-        start_date: z.string(),
-        end_date: z.string(),
-        description: z.string(),
-        image: z
-          .object({
-            type: z.union([z.literal("default"), z.literal("uploaded")]),
-            value: z.string(),
-          })
-          .optional(),
-      })
+    data: space_input
+      .omit({ name: true })
+      .merge(
+        z.object({
+          deleted: z.boolean(),
+        })
+      )
       .partial(),
   }),
   handler: async (msg, env: Env) => {
@@ -37,18 +32,7 @@ export const update_local_space_data_route = makeRoute({
       await env.factStore.assertFact({
         entity: spaceEntity,
         attribute: "space/door/uploaded-image",
-        value:
-          msg.data.image.type === "uploaded"
-            ? {
-                type: "file",
-                filetype: "image",
-                id: msg.data.image.value,
-              }
-            : {
-                type: "file",
-                filetype: "external_image",
-                url: msg.data.image.value,
-              },
+        value: msg.data.image,
         positions: {},
       });
     }

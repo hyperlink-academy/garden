@@ -7,16 +7,13 @@ export const DoorImage = (props: {
   width?: string;
   glow?: boolean;
 }) => {
-  let defaultDoor = useIndex.eav(props.entityID, "space/door/image");
   let uploadedDoor = useIndex.eav(props.entityID, "space/door/uploaded-image");
   let spaceName = useIndex.eav(props.entityID, "space/name");
 
-  let image = uploadedDoor
+  let image = uploadedDoor?.value
     ? uploadedDoor.value.filetype === "image"
       ? `${WORKER_URL}/static/${uploadedDoor.value.id}`
       : uploadedDoor.value.url
-    : defaultDoor
-    ? defaultDoor.value
     : "/doors/door-clouds-256.jpg";
   let color1 = "#ffec96";
   let color2 = "#ffd700";
