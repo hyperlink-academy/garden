@@ -19,7 +19,7 @@ type FormState = {
   start_date: string;
   end_date: string;
   publish_on_listings_page: boolean;
-  door: Door | undefined;
+  image: Door | undefined;
 };
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export const CreateSpace = (props: { studioSpaceID: string }) => {
@@ -30,7 +30,7 @@ export const CreateSpace = (props: { studioSpaceID: string }) => {
     start_date: "",
     end_date: "",
     publish_on_listings_page: false,
-    door: undefined as Door | undefined,
+    image: undefined as Door | undefined,
   });
   let auth = useAuth();
   let rep = useContext(ReplicacheContext);
@@ -55,7 +55,7 @@ export const CreateSpace = (props: { studioSpaceID: string }) => {
 
             <ButtonPrimary
               content="Create!"
-              disabled={!formState.name || !formState.door}
+              disabled={!formState.name || !formState.image}
               onClick={async () => {
                 if (!auth.session.loggedIn || !formState.name) return;
                 await spaceAPI(
@@ -72,7 +72,7 @@ export const CreateSpace = (props: { studioSpaceID: string }) => {
                   start_date: "",
                   end_date: "",
                   publish_on_listings_page: false,
-                  door: undefined,
+                  image: undefined,
                 });
                 rep?.rep.pull();
                 setOpen(false);
@@ -90,13 +90,13 @@ export const EditSpace = (props: { spaceEntity: string }) => {
   let { session } = useAuth();
   let spaceID = useIndex.eav(props.spaceEntity, "space/id");
   let studio = useIndex.eav(props.spaceEntity, "space/studio");
+  let community = useIndex.eav(props.spaceEntity, "space/community");
 
   let name = useIndex.eav(props.spaceEntity, "space/name");
   let description = useIndex.eav(props.spaceEntity, "space/description");
   let start_date = useIndex.eav(props.spaceEntity, "space/start-date");
   let end_date = useIndex.eav(props.spaceEntity, "space/end-date");
 
-  let door = useIndex.eav(props.spaceEntity, "space/door/image");
   let uploadedDoor = useIndex.eav(
     props.spaceEntity,
     "space/door/uploaded-image"
@@ -109,25 +109,25 @@ export const EditSpace = (props: { spaceEntity: string }) => {
     start_date: "",
     end_date: "",
     publish_on_listings_page: false,
-    door: undefined as Door | undefined,
+    image: undefined as Door | undefined,
   });
   useEffect(() => {
     setFormState((s) => {
-      let value: Door | undefined;
-      if (door) value = { type: "default", value: door.value };
-      if (uploadedDoor && uploadedDoor.value.filetype === "external_image")
-        value = { type: "uploaded", value: uploadedDoor.value.url };
-
       return {
         ...s,
         start_date: start_date?.value.value || "",
         end_date: end_date?.value.value || "",
         description: description?.value || "",
         name: name?.value || "",
-        door: value,
+        image: !uploadedDoor
+          ? undefined
+          : uploadedDoor.value.filetype === "external_image"
+          ? { type: "default", value: uploadedDoor.value.url }
+          : { type: "uploaded", value: uploadedDoor.value.id },
+        publish_on_listings_page: !!community,
       };
     });
-  }, [door, uploadedDoor, description, start_date, end_date, name]);
+  }, [uploadedDoor, description, start_date, end_date, name, community, open]);
 
   let [mode, setMode] = useState<"normal" | "delete">("normal");
   if (
@@ -337,8 +337,8 @@ const CreateSpaceForm = ({
 
         {/* door image selector */}
         <DoorSelector
-          selected={formState.door}
-          onSelect={(d) => setFormState((form) => ({ ...form, door: d }))}
+          selected={formState.image}
+          onSelect={(d) => setFormState((form) => ({ ...form, image: d }))}
         />
 
         <div className="flex flex-col gap-2">
@@ -351,7 +351,7 @@ const CreateSpaceForm = ({
                   formState.end_date &&
                   formState.name &&
                   formState.description &&
-                  formState.door
+                  formState.image
                 )
               }
               checked={formState.publish_on_listings_page}

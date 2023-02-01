@@ -1,4 +1,5 @@
 import { useIndex } from "hooks/useReplicache";
+import { defaultDoorImages } from "./DoorSelector";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export const DoorImage = (props: {
@@ -65,7 +66,7 @@ export const DoorImage = (props: {
           preserveAspectRatio="xMinYMin slice"
           xlinkHref={image}
           className={
-            !defaultDoor && image !== "/doors/door-clouds-256.jpg"
+            !defaultDoorImages.includes(image)
               ? "origin-center -scale-x-100"
               : ""
           }

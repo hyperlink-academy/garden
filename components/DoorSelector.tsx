@@ -4,8 +4,7 @@ import { useSpaceID } from "hooks/useReplicache";
 import { AddImage } from "./CardView/ImageSection";
 import { DoorClippedImage } from "./Doors";
 import { SectionImageAdd } from "./Icons";
-
-let doorImages: string[] = [
+export const defaultDoorImages: string[] = [
   "/doors/door-clouds-256.jpg",
   "/doors/door-chicken-256.jpg",
   "/doors/door-field-256.jpg",
@@ -21,6 +20,7 @@ export const DoorSelector = (props: {
 }) => {
   let spaceID = useSpaceID();
   let { session } = useAuth();
+  console.log(props.selected);
 
   const cleanup = (id: string) => {
     if (!session.token) return;
@@ -33,7 +33,7 @@ export const DoorSelector = (props: {
     <div className="flex w-full flex-col gap-0">
       <p className="font-bold">Set the Scenery</p>
       <div className="grid grid-cols-[repeat(auto-fill,64px)] gap-0 sm:grid-cols-[repeat(auto-fill,96px)]">
-        {doorImages.map((f) => {
+        {defaultDoorImages.map((f) => {
           return (
             <button
               className={`${props.selected?.value === f ? "" : "opacity-50"}`}
