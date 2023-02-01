@@ -12,7 +12,7 @@ import {
   useIndex,
   useMutations,
 } from "hooks/useReplicache";
-import { FindOrCreate } from "./FindOrCreateEntity";
+import { FindOrCreate, useAllItems } from "./FindOrCreateEntity";
 import { ulid } from "src/ulid";
 import { sortByPosition } from "src/position_helpers";
 import { Fact } from "data/Facts";
@@ -34,7 +34,7 @@ export const CardStack = (
   let [focusedCardId, setFocusedCardIndex] = useState<null | string>(null);
 
   return (
-    <div className="relative gap-4 w-full flex">
+    <div className="relative flex w-full gap-4">
       <div className="relative grow">
         {
           <AddCard
@@ -106,14 +106,14 @@ export const CardStack = (
         )}
       </div>
       {props.cards.length === 0 ? null : (
-        <div className="cardStackCollapseExpand relative shrink-0 w-4">
-          <div className="sticky top-0 z-20 mt-2 mb-12 pt-3 whitespace-nowrap rotate-90">
+        <div className="cardStackCollapseExpand relative w-4 shrink-0">
+          <div className="sticky top-0 z-20 mt-2 mb-12 rotate-90 whitespace-nowrap pt-3">
             <button
               onClick={() => {
                 setExpandAll((e) => !e);
                 setFocusedCardIndex(null);
               }}
-              className="font-bold text-grey-55 hover:text-accent-blue text-sm relative -top-2"
+              className="relative -top-2 text-sm font-bold text-grey-55 hover:text-accent-blue"
             >
               {expandAll ? "collapse" : "expand"}
             </button>
@@ -216,33 +216,13 @@ const Card = (
 
 const AddCard = (props: { expanded: boolean; end?: boolean } & StackData) => {
   let [open, setOpen] = useState(false);
-  let titles = useIndex
-    .aev(open ? "card/title" : null)
-    .filter((f) => !!f.value);
-  let members = useIndex.aev("member/name");
   let { handlers, isLongPress } = useLongPress(async () => {
     if (!rep?.rep) return;
     let entity = ulid();
     create(entity, props, rep.rep, mutate);
   });
-  let items = titles
-    .map((t) => {
-      return {
-        entity: t.entity,
-        display: t.value,
-        icon: <CardIcon />,
-      };
-    })
-    .concat(
-      members.map((m) => {
-        return {
-          entity: m.entity,
-          display: m.value,
-          icon: <Member />,
-        };
-      })
-    )
-    .filter((f) => props.attribute !== "deck/contains");
+  let items = useAllItems(open);
+
   const alreadyInEAV = useIndex.eav(props.parent, props.attribute);
 
   let rep = useContext(ReplicacheContext);
@@ -255,19 +235,19 @@ const AddCard = (props: { expanded: boolean; end?: boolean } & StackData) => {
         onClick={() => !isLongPress.current && setOpen(true)}
         className={`
           cardStackNewCard 
-          w-full h-12 
-          grid grid-cols-[auto_max-content] 
-          border border-dashed border-grey-80 hover:border-accent-blue rounded-lg 
-          text-grey-55 hover:text-accent-blue font-bold
-          justify-end
+          grid h-12 
+          w-full grid-cols-[auto_max-content] 
+          justify-end rounded-lg border border-dashed border-grey-80 
+          font-bold text-grey-55 hover:border-accent-blue
+          hover:text-accent-blue
 
           ${
             !props.end
               ? props.expanded
-                ? "gap-2 items-center justify-center mb-4"
-                : "pt-2 pl-4 pr-3 -mb-2"
+                ? "mb-4 items-center justify-center gap-2"
+                : "-mb-2 pt-2 pl-4 pr-3"
               : props.expanded
-              ? "gap-2 items-center justify-center mt-4"
+              ? "mt-4 items-center justify-center gap-2"
               : "mt-3 pt-3 pl-4 pr-3"
           }
           `}
