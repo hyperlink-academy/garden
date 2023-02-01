@@ -245,7 +245,7 @@ const drawAPrompt: Mutation<{
   if (!promptRoom) return;
   let prompts = await ctx.scanIndex.eav(promptRoom.entity, "desktop/contains");
   let prompt = prompts[Math.floor(prompts.length * args.randomSeed)];
-
+  if (!prompt) return;
   let id = await ctx.assertFact({
     factID: args.factID,
     entity: args.desktopEntity,
