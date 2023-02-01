@@ -67,28 +67,34 @@ const List = (props: { id: string }) => {
   return (
     <>
       {spacesActive.length > 0 ? (
-        <div className="py-4">
-          <h2 className="mb-8 rounded-md bg-[teal] py-2 px-4 text-white">
+        <div className="my-4 rounded-lg border border-grey-55">
+          <h2 className=" rounded-t-md bg-[steelblue] py-2 px-4 text-white">
             Active
           </h2>
-          <SpaceList spaces={spacesActive} />
+          <div className="p-2 pb-6 sm:p-4 sm:pb-8">
+            <SpaceList spaces={spacesActive} />
+          </div>
         </div>
       ) : null}
       <CreateSpace studioSpaceID={props.id} />
       {spacesStartingFuture.length > 0 ? (
-        <div className="py-4">
-          <h2 className="mb-8 rounded-md bg-[darkgoldenrod] py-2 px-4 text-white">
+        <div className="my-4 rounded-lg border border-grey-55">
+          <h2 className=" rounded-t-md bg-[darkgoldenrod] py-2 px-4 text-white">
             Upcoming
           </h2>
-          <SpaceList spaces={spacesStartingFuture} />
+          <div className="p-2 pb-6 sm:p-4 sm:pb-8">
+            <SpaceList spaces={spacesStartingFuture} />
+          </div>
         </div>
       ) : null}
       {spacesUnscheduled.length > 0 ? (
-        <div className="py-4">
-          <h2 className="mb-8 rounded-md bg-[grey] py-2 px-4 text-white">
+        <div className="my-4 rounded-lg border border-grey-55">
+          <h2 className=" rounded-t-md bg-[grey] py-2 px-4 text-white">
             Unscheduled
           </h2>
-          <SpaceList spaces={spacesUnscheduled} />
+          <div className="p-2 pb-6 sm:p-4 sm:pb-8">
+            <SpaceList spaces={spacesUnscheduled} />
+          </div>
         </div>
       ) : null}
     </>

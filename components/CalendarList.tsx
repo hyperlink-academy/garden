@@ -5,12 +5,13 @@ import { DoorImage } from "./Doors";
 import { prefetchSpaceId } from "./ReplicacheProvider";
 import { spacePath } from "hooks/utils";
 import { Fact } from "data/Facts";
+import useWindowDimensions from "hooks/useWindowDimensions";
 
 export const CalendarList = (props: {
   spaces: Fact<"space/start-date" | "space/end-date">[];
 }) => {
   return (
-    <div className="spacesList mt-4 flex flex-col gap-4">
+    <div className="spacesList mt-4 flex flex-col gap-8">
       {props.spaces
         ?.sort((a, b) => (a.value.value > b.value.value ? 1 : -1))
         .map((a) => {
@@ -31,15 +32,17 @@ const CalendarSpace = (props: { entity: string }) => {
   let creator = useIndex.eav(props.entity, "space/studio");
   let prefetched = useRef(false);
 
+  const { width } = useWindowDimensions();
+
   return (
     <div className="flex gap-4">
       <div className="grid grid-cols-[max-content,max-content] gap-1">
         <Link href={`${spacePath(studio?.value, name?.value)}`}>
-          <DoorImage entityID={props.entity} />
+          <DoorImage width={width < 640 ? "64" : ""} entityID={props.entity} />
         </Link>
       </div>
 
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 pr-2">
         <div className="flex flex-col gap-1">
           <div className="">
             <h3
@@ -52,7 +55,9 @@ const CalendarSpace = (props: { entity: string }) => {
             </h3>
           </div>
           <div>
-            <p className="text-grey-35">
+            <p
+              className={width < 640 ? "text-sm text-grey-35" : "text-grey-35"}
+            >
               <strong>{start_date?.value.value}</strong> to{" "}
               <strong>{end_date?.value.value}</strong>
             </p>
@@ -60,9 +65,9 @@ const CalendarSpace = (props: { entity: string }) => {
         </div>
         <div className="flex flex-col gap-2">
           <div>
-            <p>{description?.value}</p>
+            <p className={width < 640 ? "text-sm" : ""}>{description?.value}</p>
           </div>
-          <div className="mb-16 text-sm text-grey-35">
+          <div className="text-sm text-grey-35">
             <span>created by </span>
             <Link className="text-accent-blue" href={`/s/${creator?.value}`}>
               <strong>{creator?.value}</strong>

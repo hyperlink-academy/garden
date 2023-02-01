@@ -35,7 +35,7 @@ export const CreateSpace = (props: { studioSpaceID: string }) => {
   let auth = useAuth();
   let rep = useContext(ReplicacheContext);
   return (
-    <div className="mt-8 grid w-full">
+    <div className="mt-4 mb-8 grid w-full">
       <a className="place-self-center">
         <ButtonSecondary
           icon={<SpaceCreate />}

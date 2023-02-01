@@ -44,19 +44,23 @@ const List = () => {
   return (
     <>
       {spacesActive.length > 0 ? (
-        <div className="py-4">
-          <h2 className="mb-8 rounded-md bg-[teal] py-2 px-4 text-white">
+        <div className="my-4 rounded-lg border border-grey-55">
+          <h2 className=" rounded-t-md bg-[steelblue] py-2 px-4 text-white">
             Active
           </h2>
-          <CalendarList spaces={spacesActive} />
+          <div className="p-2 pb-6 sm:p-4 sm:pb-8">
+            <CalendarList spaces={spacesActive} />
+          </div>
         </div>
       ) : null}
       {spacesUpcoming.length > 0 ? (
-        <div className="py-4">
-          <h2 className="mb-8 rounded-md bg-[darkgoldenrod] py-2 px-4 text-white">
+        <div className="my-4 rounded-lg border border-grey-55">
+          <h2 className=" rounded-t-md bg-[darkgoldenrod] py-2 px-4 text-white">
             Upcoming
           </h2>
-          <CalendarList spaces={spacesUpcoming} />
+          <div className="p-2 pb-6 sm:p-4 sm:pb-8">
+            <CalendarList spaces={spacesUpcoming} />
+          </div>
         </div>
       ) : null}
     </>
@@ -86,7 +90,7 @@ const CalendarInfo = () => {
 
 const CalendarCTA = () => {
   return (
-    <div className="m-auto mt-8 rounded-md border border-dashed border-accent-blue  bg-white p-4">
+    <div className="m-auto mt-4 mb-8 rounded-md border border-dashed border-accent-blue  bg-white p-4">
       <p>⬆️ Want to add to the Calendar?</p>
       <p>🚀 Publish from your Space settings!</p>
     </div>

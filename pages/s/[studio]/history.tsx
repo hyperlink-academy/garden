@@ -21,11 +21,25 @@ export default function StudioPage(props: Props) {
 
 const List = () => {
   let now = new Date().toLocaleDateString("en-CA");
-  const spaces = useIndex
+  const spacesHistory = useIndex
     .aev("space/end-date")
     .filter((s) => s.value.value && s.value.value < now);
 
-  return <SpaceList spaces={spaces} />;
+  // return <SpaceList spaces={spaces} />;
+  return (
+    <>
+      {spacesHistory.length > 0 ? (
+        <div className="my-4 rounded-lg border border-grey-55">
+          <h2 className=" rounded-t-md bg-[rebeccapurple] py-2 px-4 text-white">
+            History
+          </h2>
+          <div className="p-2 pb-6 sm:p-4 sm:pb-8">
+            <SpaceList spaces={spacesHistory} />
+          </div>
+        </div>
+      ) : null}
+    </>
+  );
 };
 
 export async function getStaticPaths() {
