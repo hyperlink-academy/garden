@@ -35,7 +35,7 @@ export default function SpacePage() {
          w-full max-w-6xl
           grow 
           items-stretch 
-          py-4 px-2
+          py-4
           sm:py-6 sm:px-4 `}
         >
           <SpaceHeader />
@@ -81,7 +81,7 @@ export default function SpacePage() {
             ) : (
               <div className="smallSplitLayout flex w-full flex-col items-stretch gap-2">
                 <div
-                  className={`layoutContent flex w-full snap-x snap-mandatory flex-row items-stretch gap-4 overflow-x-scroll scroll-smooth`}
+                  className={`layoutContent flex w-full snap-x snap-mandatory flex-row items-stretch gap-4 overflow-x-scroll scroll-smooth px-2`}
                 >
                   <div
                     id="roomWrapper"
@@ -132,7 +132,7 @@ const MobileFooter = (props: {
   let member = useIndex.eav(props.currentRoom, "member/name");
 
   return (
-    <div className="roomFooter grid shrink-0 grid-cols-[minmax(0,auto)_auto] justify-between gap-8 font-bold text-grey-35">
+    <div className="roomFooter grid shrink-0 grid-cols-[minmax(0,auto)_auto] justify-between gap-8 px-2 font-bold text-grey-35">
       <div className=" flex w-full shrink grow flex-row gap-4">
         <Popover>
           <Popover.Button>
