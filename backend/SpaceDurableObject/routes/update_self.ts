@@ -58,7 +58,7 @@ export const update_self_route = makeRoute({
         "update_local_space_data",
         {
           spaceID: env.id,
-          data: { image: msg.data.image },
+          data: msg.data,
         }
       );
     }

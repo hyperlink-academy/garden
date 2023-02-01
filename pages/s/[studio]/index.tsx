@@ -1,6 +1,7 @@
 import { workerAPI } from "backend/lib/api";
 import { SpaceProvider } from "components/ReplicacheProvider";
-import { CreateSpace, SpaceList } from "components/SpacesList";
+import { SpaceList } from "components/SpacesList";
+import { CreateSpace } from "components/CreateSpace";
 import { StudioName } from "components/StudioLayout";
 import { useIndex } from "hooks/useReplicache";
 import { GetStaticPropsContext, InferGetStaticPropsType } from "next";
