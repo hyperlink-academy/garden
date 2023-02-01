@@ -73,16 +73,21 @@ const CalendarInfo = () => {
       <Head>
         <title key="title">hyperlink calendar</title>
       </Head>
-      <div>
+      <div className="flex flex-col gap-4 pb-2 text-sm sm:text-base">
         <h1>hyperlink community calendar</h1>
-        <div className="py-2">
-          <p>
-            <span className="text-[blue]">projects</span> ✵{" "}
-            <span className="text-[crimson]">experiments</span> ✵{" "}
-            <span className="text-[darkgoldenrod]">possibilities</span> ✵{" "}
-            <span>🌱</span>
-          </p>
-        </div>
+        {/* <div> */}
+        <p>
+          <span className="text-[blue]">projects</span> ✵{" "}
+          <span className="text-[crimson]">experiments</span> ✵{" "}
+          <span className="text-[darkgoldenrod]">possibilities</span> ✵{" "}
+          <span>🌱</span>
+        </p>
+        <p>
+          This is a place to see what others are exploring. A kind of campus
+          where we can cross paths, peek into adjacent studios, and take
+          inspiration back to our own work.
+        </p>
+        {/* </div> */}
       </div>
     </>
   );
