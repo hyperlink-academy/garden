@@ -11,7 +11,7 @@ import {
   useMutations,
   useSpaceID,
 } from "hooks/useReplicache";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ulid } from "src/ulid";
 import {
   BackToStudio as BackToStudioIcon,
@@ -21,7 +21,6 @@ import {
 } from "../Icons";
 import { spaceAPI } from "backend/lib/api";
 import { useSmoker } from "components/Smoke";
-import { Fact } from "data/Facts";
 import { useSubscribe } from "replicache-react";
 
 export const Sidebar = (props: {
@@ -29,11 +28,8 @@ export const Sidebar = (props: {
   currentRoom: string | null;
 }) => {
   let { session } = useAuth();
-  let { mutate, memberEntity } = useMutations();
+  let { memberEntity } = useMutations();
 
-  let homeEntity = useIndex.aev("home");
-  let rooms = useIndex.aev("room/name");
-  let promptRoom = rooms.find((f) => f.value == "prompts");
   let spaceName = useIndex.aev("this/name")[0];
   let [roomEditOpen, setRoomEditOpen] = useState(false);
   let rep = useContext(ReplicacheContext);
@@ -81,6 +77,10 @@ export const Sidebar = (props: {
           </RoomListItem>
         )}
         <Divider />
+        <div className=" pt-4">
+          <small className="px-2 font-bold text-grey-55">shared</small>
+          <div className="w-full border-t border-dashed border-grey-80" />
+        </div>
         <RoomList {...props} setRoomEditOpen={() => setRoomEditOpen(true)} />
         <div className=" pt-4">
           <small className="px-2 font-bold text-grey-55">members</small>
@@ -92,36 +92,13 @@ export const Sidebar = (props: {
             setRoomEditOpen={() => setRoomEditOpen(true)}
           />
         </div>
-        <div className=" pt-4">
-          <div className="w-full border-t border-dashed border-grey-80" />
-        </div>
         <EditRoomModal
           open={roomEditOpen}
           onClose={() => setRoomEditOpen(false)}
           currentRoom={props.currentRoom}
         />
-        <button
-          className={`w-full py-0.5 px-2 text-left ${
-            promptRoom?.entity === props.currentRoom
-              ? "rounded-md bg-accent-blue  font-bold text-white"
-              : "rounded-md border border-transparent text-grey-35 hover:border-grey-80"
-          }`}
-          onClick={async () => {
-            let promptRoom = rooms.find((f) => f.value === "prompts")?.entity;
-            if (!promptRoom) {
-              promptRoom = ulid();
-              await mutate("assertFact", {
-                entity: promptRoom,
-                attribute: "room/name",
-                value: "prompts",
-                positions: {},
-              });
-            }
-            props.onRoomChange(promptRoom);
-          }}
-        >
-          <p>Prompt Pool</p>
-        </button>
+
+        <PromptRooms {...props} setRoomEditOpen={() => setRoomEditOpen(true)} />
       </div>
       <div className="mb-2 shrink-0 ">
         <BackToStudio studio={session.session?.username} />
@@ -130,12 +107,80 @@ export const Sidebar = (props: {
   );
 };
 
+const PromptRooms = (props: {
+  onRoomChange: (room: string) => void;
+  currentRoom: string | null;
+  setRoomEditOpen: () => void;
+}) => {
+  let promptRooms = useIndex.aev("promptroom/name");
+  let promptRoom = promptRooms.find((f) => f.value == "Prompt Pool");
+  let { mutate } = useMutations();
+  return (
+    <>
+      <div className=" pt-4">
+        <small className="px-2 font-bold text-grey-55">prompts</small>
+        <div className="w-full border-t border-dashed border-grey-80" />
+      </div>
+      <button
+        className={`w-full py-0.5 px-2 text-left ${
+          promptRoom?.entity === props.currentRoom
+            ? "rounded-md bg-accent-blue  font-bold text-white"
+            : "rounded-md border border-transparent text-grey-35 hover:border-grey-80"
+        }`}
+        onClick={async () => {
+          let entity = promptRoom?.entity;
+          if (!entity) {
+            entity = ulid();
+            await mutate("assertFact", {
+              entity,
+              attribute: "promptroom/name",
+              value: "prompts",
+              positions: {},
+            });
+          }
+          props.onRoomChange(entity);
+        }}
+      >
+        <p>Prompt Pool</p>
+      </button>
+      {promptRooms.map((room) => {
+        return (
+          <RoomListItem
+            onRoomChange={props.onRoomChange}
+            currentRoom={props.currentRoom}
+            roomEntity={room.entity}
+            setRoomEditOpen={props.setRoomEditOpen}
+          >
+            {room.value || <i>Prompt Room</i>}
+          </RoomListItem>
+        );
+      })}
+      <button
+        className=" flex w-full place-items-center justify-between gap-1 rounded-md border border-transparent py-0.5 px-2 text-grey-55 hover:border-accent-blue hover:text-accent-blue"
+        onClick={async () => {
+          let room = ulid();
+          await mutate("assertFact", {
+            entity: room,
+            attribute: "promptroom/name",
+            value: "",
+            positions: {},
+          });
+          props.onRoomChange(room);
+          props.setRoomEditOpen();
+        }}
+      >
+        + room
+      </button>
+    </>
+  );
+};
+
 const RoomList = (props: {
   onRoomChange: (room: string) => void;
   currentRoom: string | null;
   setRoomEditOpen: () => void;
 }) => {
-  let { memberEntity, mutate, authorized } = useMutations();
+  let { mutate, authorized } = useMutations();
   let { session } = useAuth();
   let homeEntity = useIndex.aev("home");
   let rooms = useIndex.aev("room/name");
@@ -165,7 +210,7 @@ const RoomList = (props: {
               roomEntity={room.entity}
               setRoomEditOpen={props.setRoomEditOpen}
             >
-              {room.value}
+              {room.value || <i>Untitled Room</i>}
             </RoomListItem>
           );
         })}
@@ -181,6 +226,7 @@ const RoomList = (props: {
               positions: {},
             });
             props.onRoomChange(room);
+            props.setRoomEditOpen();
           }}
         >
           + room
@@ -198,8 +244,6 @@ const MemberList = (props: {
   let members = useIndex.aev("member/name");
   let { memberEntity, authorized } = useMutations();
   let [inviteOpen, setInviteOpen] = useState(false);
-  let rep = useContext(ReplicacheContext);
-
   return (
     <ul>
       {members
@@ -394,7 +438,6 @@ const EditRoomModal = (props: {
   currentRoom: string | null;
 }) => {
   let currentRoom = useIndex.eav(props.currentRoom, "room/name");
-
   let { mutate } = useMutations();
   let [formState, setFormState] = useState(currentRoom?.value || "");
   useEffect(() => {
@@ -434,25 +477,25 @@ const EditRoomModal = (props: {
                   value: formState,
                   positions: {},
                 });
-
                 setFormState("");
                 props.onClose();
               }}
             />
+
             <Divider />
+            {isMember ? null : (
+              <ButtonPrimary
+                destructive
+                onClick={async () => {
+                  await mutate("deleteEntity", { entity: entityID });
+                  setFormState("");
+                  props.onClose();
+                }}
+                content="Delete this room"
+                icon={<Delete />}
+              />
+            )}
           </>
-        )}
-        {isMember ? null : (
-          <ButtonPrimary
-            destructive
-            onClick={async () => {
-              await mutate("deleteEntity", { entity: entityID });
-              setFormState("");
-              props.onClose();
-            }}
-            content="Delete this room"
-            icon={<Delete />}
-          />
         )}
       </div>
     </Modal>
