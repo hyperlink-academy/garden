@@ -6,6 +6,8 @@ import { StudioName } from "components/StudioLayout";
 import { useIndex } from "hooks/useReplicache";
 import { GetStaticPropsContext, InferGetStaticPropsType } from "next";
 import { sortByPosition } from "src/position_helpers";
+import { useAuth } from "hooks/useAuth";
+import { useRouter } from "next/router";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 type Props = InferGetStaticPropsType<typeof getStaticProps>;
@@ -13,11 +15,19 @@ export default function StudioPage(props: Props) {
   if (props.notFound) return <div>404 - studio not found!</div>;
   if (!props.id) return <div>loading </div>;
 
+  let { session } = useAuth();
+  let { query } = useRouter();
+
+  let myStudioName = session.session?.username;
+  let currentStudioName = query.studio;
+
   return (
     <SpaceProvider id={props.id}>
       <StudioName />
       <List id={props.id} />
-      <CreateSpace studioSpaceID={props.id} />
+      {!session?.loggedIn || myStudioName != currentStudioName ? null : (
+        <CreateSpace studioSpaceID={props.id} />
+      )}
     </SpaceProvider>
   );
 }
@@ -29,6 +39,12 @@ three lists:
 - unscheduled (i.e. implicit draft)
 */
 const List = (props: { id: string }) => {
+  let { session } = useAuth();
+  let { query } = useRouter();
+
+  let myStudioName = session.session?.username;
+  let currentStudioName = query.studio;
+
   let now = new Date().toLocaleDateString("en-CA");
 
   // all spaces
@@ -76,7 +92,9 @@ const List = (props: { id: string }) => {
           </div>
         </div>
       ) : null}
-      <CreateSpace studioSpaceID={props.id} />
+      {!session?.loggedIn || myStudioName != currentStudioName ? null : (
+        <CreateSpace studioSpaceID={props.id} />
+      )}
       {spacesStartingFuture.length > 0 ? (
         <div className="my-4 rounded-lg border border-grey-55">
           <h2 className=" rounded-t-md bg-[darkgoldenrod] py-2 px-4 text-white">
