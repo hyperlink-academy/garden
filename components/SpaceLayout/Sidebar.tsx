@@ -38,9 +38,9 @@ export const Sidebar = (props: {
   let [roomEditOpen, setRoomEditOpen] = useState(false);
 
   return (
-    <div className="roomList flex h-full w-48 flex-col items-stretch gap-4 rounded-l-[3px] border-r border-grey-90 bg-white p-3 text-grey-35">
+    <div className="Sidebar flex h-full w-48 flex-col items-stretch gap-4 rounded-l-[3px] border-r border-grey-90 bg-white p-3 text-grey-35">
       <div className="no-scrollbar flex h-full w-full flex-col gap-2 overflow-y-scroll">
-        <div className="flex flex-col gap-1 pb-2">
+        <div className="SidebarSpaceInfo flex flex-col gap-1 pb-2">
           <div className="flex items-start justify-between gap-2">
             <h3 className="px-2">{spaceName?.value}</h3>
             <button className="shrink-0 rounded-md border border-transparent pt-[1px] hover:border-accent-blue hover:text-accent-blue">
@@ -50,9 +50,7 @@ export const Sidebar = (props: {
           <SpaceStatus />
         </div>
         <Divider />
-        <div>
-          <RoomList {...props} setRoomEditOpen={() => setRoomEditOpen(true)} />
-        </div>
+        <RoomList {...props} setRoomEditOpen={() => setRoomEditOpen(true)} />
         <div className=" pt-4">
           <small className="px-2 font-bold text-grey-55">members</small>
           <div className="w-full border-t border-dashed border-grey-80" />
@@ -69,13 +67,14 @@ export const Sidebar = (props: {
         <EditRoomModal
           open={roomEditOpen}
           onClose={() => setRoomEditOpen(false)}
-          entityID={props.currentRoom}
+          currentRoom={props.currentRoom}
         />
         <button
-          className={`w-full py-0.5 px-2 text-left ${promptRoom?.entity === props.currentRoom
+          className={`w-full py-0.5 px-2 text-left ${
+            promptRoom?.entity === props.currentRoom
               ? "rounded-md bg-accent-blue  font-bold text-white"
               : "rounded-md border border-transparent text-grey-35 hover:border-grey-80"
-            }`}
+          }`}
           onClick={async () => {
             let promptRoom = rooms.find((f) => f.value === "prompts")?.entity;
             if (!promptRoom) {
@@ -110,12 +109,13 @@ const RoomList = (props: {
   let { mutate } = useMutations();
 
   return (
-    <ul className="flex flex-col gap-0.5">
+    <ul className="sidebarSharedRoomList flex flex-col gap-0.5">
       <button
-        className={`w-full border border-transparent py-0.5 px-2 text-left ${homeEntity[0]?.entity === props.currentRoom
+        className={`sidebarHomeRoom w-full border border-transparent py-0.5 px-2 text-left ${
+          homeEntity[0]?.entity === props.currentRoom
             ? "rounded-md bg-accent-blue font-bold text-white"
             : "rounded-md text-grey-35 hover:border-grey-80"
-          }`}
+        }`}
         onClick={() => {
           props.onRoomChange(homeEntity[0]?.entity);
         }}
@@ -138,7 +138,7 @@ const RoomList = (props: {
           );
         })}
       <button
-        className=" flex w-full place-items-center justify-between gap-1 rounded-md border border-transparent py-0.5 px-2 text-grey-55 hover:border-accent-blue hover:text-accent-blue"
+        className="sidebarAddRoom flex w-full place-items-center justify-between gap-1 rounded-md border border-transparent py-0.5 px-2 text-grey-55 hover:border-accent-blue hover:text-accent-blue"
         onClick={async () => {
           let room = ulid();
           await mutate("assertFact", {
@@ -206,7 +206,7 @@ const MemberList = (props: {
         })}
       <button
         onClick={() => setInviteOpen(true)}
-        className="flex w-full place-items-center gap-1 rounded-md border border-transparent py-0.5 px-2 text-grey-55 hover:border-accent-blue  hover:text-accent-blue"
+        className="sidebarAddMember flex w-full place-items-center gap-1 rounded-md border border-transparent py-0.5 px-2 text-grey-55 hover:border-accent-blue  hover:text-accent-blue"
       >
         + invite
       </button>
@@ -227,13 +227,14 @@ const RoomListItem: React.FC<
   console.log(props.unreads);
   return (
     <div
-      className={`flex w-full items-center gap-2 overflow-hidden whitespace-nowrap rounded-md border border-transparent  text-left ${props.room.entity === props.currentRoom
+      className={`flex w-full items-center gap-2 overflow-hidden whitespace-nowrap rounded-md border border-transparent  text-left ${
+        props.room.entity === props.currentRoom
           ? "rounded-md bg-accent-blue  font-bold text-white"
           : " text-grey-35 hover:border-grey-80"
-        }`}
+      }`}
     >
       <button
-        className="w-full overflow-clip py-0.5 pl-2 text-left"
+        className="sidebarRoomName w-full overflow-clip py-0.5 pl-2 text-left"
         onClick={() => props.onRoomChange(props.room.entity)}
       >
         {props.children}
@@ -243,8 +244,9 @@ const RoomListItem: React.FC<
       )}
       <button
         onClick={() => props.setRoomEditOpen()}
-        className={` mr-2 rounded-md border border-transparent pt-[1px] hover:border-white ${props.room.entity === props.currentRoom ? "" : "hidden"
-          }`}
+        className={`  sidebarRoomOptions mr-2 rounded-md border border-transparent pt-[1px] hover:border-white ${
+          props.room.entity === props.currentRoom ? "" : "hidden"
+        }`}
       >
         <MoreOptionsTiny />
       </button>
@@ -256,7 +258,7 @@ const BackToStudio = (props: { studio?: string }) => {
   if (!props.studio) return <div className="shrink-0" />;
 
   return (
-    <div className="headerBackToStudio z-10 shrink-0 ">
+    <div className="sidebarBackToStudio z-10 shrink-0 ">
       <Link
         className="flex place-items-center gap-2 rounded-md border border-transparent px-2 py-1 hover:border-accent-blue  hover:text-accent-blue"
         href={`/s/${props.studio}`}
@@ -286,7 +288,7 @@ const SpaceStatus = () => {
 
   return (
     <div
-      className={`${statusStyles}  flex w-fit gap-2 rounded-md px-2 py-1 text-sm`}
+      className={`${statusStyles} sidebarSpaceStatus flex w-fit gap-2 rounded-md px-2 py-1 text-sm`}
     >
       {status === "unscheduled" ? (
         <Link href="">
@@ -331,7 +333,7 @@ const InviteMember = (props: { open: boolean; onClose: () => void }) => {
 
   return (
     <Modal open={props.open} onClose={props.onClose}>
-      <div className="flex flex-col place-items-center gap-4 p-4 text-center">
+      <div className="inviteMemberModal flex flex-col place-items-center gap-4 p-4 text-center">
         <div className="flex flex-col gap-2">
           <h3>Send this link to invite others to join!</h3>
           <p>
@@ -339,7 +341,7 @@ const InviteMember = (props: { open: boolean; onClose: () => void }) => {
             this Space.
           </p>
         </div>
-        <div className="flex w-full gap-2">
+        <div className="inviteMemberModalLink flex w-full gap-2">
           <input
             className="grow bg-grey-90 text-grey-35"
             readOnly
@@ -359,63 +361,66 @@ const InviteMember = (props: { open: boolean; onClose: () => void }) => {
 const EditRoomModal = (props: {
   open: boolean;
   onClose: () => void;
-  entityID: string | null;
+  currentRoom: string | null;
 }) => {
-  let currentRoom = useIndex.eav(props.entityID, "room/name");
+  let currentRoom = useIndex.eav(props.currentRoom, "room/name");
 
   let { mutate } = useMutations();
   let [formState, setFormState] = useState(currentRoom?.value || "");
   useEffect(() => {
     setFormState(currentRoom?.value || "");
   }, [currentRoom?.value]);
-  let isMember = !!useIndex.eav(props.entityID, "member/name");
+  let isMember = !!useIndex.eav(props.currentRoom, "member/name");
 
-  if (!props.entityID) return null;
-  let entityID = props.entityID;
+  if (!props.currentRoom) return null;
+  let entityID = props.currentRoom;
 
   return (
     <Modal open={props.open} onClose={props.onClose}>
-      <h3>Room Settings</h3>
-      {isMember ? null : (
-        <>
-          <p>Room Name</p>
-          <input
-            className="w-full"
-            value={formState}
-            placeholder={currentRoom?.value}
-            onChange={(e) => {
-              let value = e.currentTarget.value;
-              setFormState(value);
-            }}
-          />
+      <div className="editRoomModal flex flex-col gap-3 text-grey-35">
+        <h3>Room Settings</h3>
+        {isMember ? null : (
+          <>
+            <div className="editRoomName flex flex-col gap-1">
+              <p className="font-bold">Room Name</p>
+              <input
+                className="w-full"
+                value={formState}
+                placeholder={currentRoom?.value}
+                onChange={(e) => {
+                  let value = e.currentTarget.value;
+                  setFormState(value);
+                }}
+              />
+            </div>
+            <ButtonPrimary
+              content="Edit Room!"
+              onClick={async () => {
+                await mutate("assertFact", {
+                  entity: entityID,
+                  attribute: "room/name",
+                  value: formState,
+                  positions: {},
+                });
 
-          <ButtonPrimary
-            content="Edit Room!"
-            onClick={async () => {
-              await mutate("assertFact", {
-                entity: entityID,
-                attribute: "room/name",
-                value: formState,
-                positions: {},
-              });
-
-              setFormState("");
-              props.onClose();
-            }}
-          />
-          <Divider />
-        </>
-      )}
-      <ButtonPrimary
-        destructive
-        onClick={async () => {
-          await mutate("deleteEntity", { entity: entityID });
-          setFormState("");
-          props.onClose();
-        }}
-        content="Delete this room"
-        icon={<Delete />}
-      />
+                setFormState("");
+                props.onClose();
+              }}
+            />
+            <Divider />
+          </>
+        )}
+        <ButtonPrimary
+          destructive
+          onClick={async () => {
+            await mutate("deleteEntity", { entity: entityID });
+            setFormState("");
+            props.onClose();
+          }}
+          content="Delete this room"
+          icon={<Delete />}
+        />
+      </div>
     </Modal>
   );
 };
