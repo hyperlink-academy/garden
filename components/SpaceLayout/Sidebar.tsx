@@ -4,8 +4,14 @@ import useSWR from "swr";
 import { ButtonPrimary } from "components/Buttons";
 import { Divider, Modal } from "components/Layout";
 import { useAuth } from "hooks/useAuth";
-import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
-import { useEffect, useRef, useState } from "react";
+import {
+  ReplicacheContext,
+  scanIndex,
+  useIndex,
+  useMutations,
+  useSpaceID,
+} from "hooks/useReplicache";
+import { useContext, useEffect, useRef, useState } from "react";
 import { ulid } from "src/ulid";
 import {
   BackToStudio as BackToStudioIcon,
@@ -16,6 +22,7 @@ import {
 import { spaceAPI } from "backend/lib/api";
 import { useSmoker } from "components/Smoke";
 import { Fact } from "data/Facts";
+import { useSubscribe } from "replicache-react";
 
 export const Sidebar = (props: {
   onRoomChange: (room: string) => void;
@@ -65,11 +72,10 @@ export const Sidebar = (props: {
           entityID={props.currentRoom}
         />
         <button
-          className={`w-full py-0.5 px-2 text-left ${
-            promptRoom?.entity === props.currentRoom
+          className={`w-full py-0.5 px-2 text-left ${promptRoom?.entity === props.currentRoom
               ? "rounded-md bg-accent-blue  font-bold text-white"
               : "rounded-md border border-transparent text-grey-35 hover:border-grey-80"
-          }`}
+            }`}
           onClick={async () => {
             let promptRoom = rooms.find((f) => f.value === "prompts")?.entity;
             if (!promptRoom) {
@@ -106,11 +112,10 @@ const RoomList = (props: {
   return (
     <ul className="flex flex-col gap-0.5">
       <button
-        className={`w-full border border-transparent py-0.5 px-2 text-left ${
-          homeEntity[0]?.entity === props.currentRoom
+        className={`w-full border border-transparent py-0.5 px-2 text-left ${homeEntity[0]?.entity === props.currentRoom
             ? "rounded-md bg-accent-blue font-bold text-white"
             : "rounded-md text-grey-35 hover:border-grey-80"
-        }`}
+          }`}
         onClick={() => {
           props.onRoomChange(homeEntity[0]?.entity);
         }}
@@ -157,7 +162,26 @@ const MemberList = (props: {
   setRoomEditOpen: () => void;
 }) => {
   let members = useIndex.aev("member/name");
+  let { memberEntity } = useMutations();
   let [inviteOpen, setInviteOpen] = useState(false);
+  let rep = useContext(ReplicacheContext);
+  let unreadCount = useSubscribe(
+    rep?.rep,
+    async (tx) => {
+      if (!memberEntity) return 0;
+      let unreads = 0;
+      let cards = await scanIndex(tx).eav(memberEntity, "desktop/contains");
+      for (let card of cards) {
+        let unread = (
+          await scanIndex(tx).eav(card.value.value, "card/unread-by")
+        ).find((f) => f.value.value === memberEntity);
+        if (unread) unreads += 1;
+      }
+      return unreads;
+    },
+    0,
+    [memberEntity]
+  );
 
   return (
     <ul>
@@ -168,6 +192,11 @@ const MemberList = (props: {
             <RoomListItem
               onRoomChange={props.onRoomChange}
               currentRoom={props.currentRoom}
+              unreads={
+                memberEntity && memberEntity === member.entity
+                  ? unreadCount
+                  : undefined
+              }
               room={member}
               setRoomEditOpen={props.setRoomEditOpen}
             >
@@ -189,18 +218,19 @@ const MemberList = (props: {
 const RoomListItem: React.FC<
   React.PropsWithChildren<{
     onRoomChange: (room: string) => void;
+    unreads?: number;
     currentRoom: string | null;
     room: Fact<"room/name"> | Fact<"member/name">;
     setRoomEditOpen: () => void;
   }>
 > = (props) => {
+  console.log(props.unreads);
   return (
     <div
-      className={`flex w-full items-center gap-2 overflow-hidden whitespace-nowrap rounded-md border border-transparent  text-left ${
-        props.room.entity === props.currentRoom
+      className={`flex w-full items-center gap-2 overflow-hidden whitespace-nowrap rounded-md border border-transparent  text-left ${props.room.entity === props.currentRoom
           ? "rounded-md bg-accent-blue  font-bold text-white"
           : " text-grey-35 hover:border-grey-80"
-      }`}
+        }`}
     >
       <button
         className="w-full overflow-clip py-0.5 pl-2 text-left"
@@ -208,11 +238,13 @@ const RoomListItem: React.FC<
       >
         {props.children}
       </button>
+      {!!props.unreads && props.unreads > 0 && (
+        <div className="bg-accent-gold p-0.5">{props.unreads}</div>
+      )}
       <button
         onClick={() => props.setRoomEditOpen()}
-        className={` mr-2 rounded-md border border-transparent pt-[1px] hover:border-white ${
-          props.room.entity === props.currentRoom ? "" : "hidden"
-        }`}
+        className={` mr-2 rounded-md border border-transparent pt-[1px] hover:border-white ${props.room.entity === props.currentRoom ? "" : "hidden"
+          }`}
       >
         <MoreOptionsTiny />
       </button>
