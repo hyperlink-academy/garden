@@ -70,19 +70,6 @@ export const Sidebar = (props: {
         </div>
         <Divider />
         {!memberEntity ? null : (
-          // <button
-          //   onClick={() => {
-          //     props.onRoomChange(memberEntity);
-          //     console.log(memberEntity);
-          //   }}
-          //   className={`sidebarYourRoom w-full border border-transparent py-0.5 px-2 text-left ${
-          //     memberEntity === props.currentRoom
-          //       ? "rounded-md bg-accent-blue font-bold text-white"
-          //       : "rounded-md text-grey-35 hover:border-grey-80"
-          //   }`}
-          // >
-          //   Your Room
-          // </button>
           <RoomListItem
             onRoomChange={props.onRoomChange}
             currentRoom={props.currentRoom}
@@ -157,7 +144,7 @@ const RoomList = (props: {
     <ul className="sidebarSharedRoomList flex flex-col gap-0.5">
       <button
         className={`sidebarHomeRoom w-full border border-transparent py-0.5 px-2 text-left ${
-          session.session?.username === props.currentRoom
+          homeEntity[0]?.entity === props.currentRoom
             ? "rounded-md bg-accent-blue font-bold text-white"
             : "rounded-md text-grey-35 hover:border-grey-80"
         }`}
@@ -212,23 +199,6 @@ const MemberList = (props: {
   let { memberEntity, authorized } = useMutations();
   let [inviteOpen, setInviteOpen] = useState(false);
   let rep = useContext(ReplicacheContext);
-  let unreadCount = useSubscribe(
-    rep?.rep,
-    async (tx) => {
-      if (!memberEntity) return 0;
-      let unreads = 0;
-      let cards = await scanIndex(tx).eav(memberEntity, "desktop/contains");
-      for (let card of cards) {
-        let unread = (
-          await scanIndex(tx).eav(card.value.value, "card/unread-by")
-        ).find((f) => f.value.value === memberEntity);
-        if (unread) unreads += 1;
-      }
-      return unreads;
-    },
-    0,
-    [memberEntity]
-  );
 
   return (
     <ul>
@@ -239,11 +209,7 @@ const MemberList = (props: {
             <RoomListItem
               onRoomChange={props.onRoomChange}
               currentRoom={props.currentRoom}
-              unreads={
-                memberEntity && memberEntity === member.entity
-                  ? unreadCount
-                  : undefined
-              }
+              unreads={undefined}
               roomEntity={member.entity}
               setRoomEditOpen={props.setRoomEditOpen}
             >
@@ -278,7 +244,6 @@ const RoomListItem: React.FC<
     setRoomEditOpen: () => void;
   }>
 > = (props) => {
-  console.log(props.unreads);
   let { authorized } = useMutations();
   return (
     <div
@@ -295,7 +260,9 @@ const RoomListItem: React.FC<
         {props.children}
       </button>
       {!!props.unreads && props.unreads > 0 && (
-        <div className="bg-accent-gold p-0.5">{props.unreads}</div>
+        <div className="h-[20px] w-[20px] shrink-0 rounded-full bg-accent-gold">
+          {props.unreads}
+        </div>
       )}
       {!authorized ? null : (
         <button
