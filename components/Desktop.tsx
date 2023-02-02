@@ -23,6 +23,7 @@ import { FindOrCreate, useAllItems } from "./FindOrCreateEntity";
 import { useSubscribe } from "replicache-react";
 import { ButtonSecondary } from "./Buttons";
 import { ActionBar } from "./ActionBar";
+import { ref } from "data/Facts";
 
 const GRID_SIZE = 16;
 const snap = (x: number) => Math.ceil(x / GRID_SIZE) * GRID_SIZE;
@@ -390,6 +391,7 @@ const AddCard = (props: {
   position: null | { x: number; y: number };
 }) => {
   let items = useAllItems(!!props.position);
+  let name = useIndex.eav(props.desktopEntity, "member/name");
   let { mutate, memberEntity, action } = useMutations();
   return (
     <FindOrCreate
@@ -414,6 +416,14 @@ const AddCard = (props: {
             entity = d.entity;
           }
 
+          if (name && memberEntity !== props.desktopEntity) {
+            await mutate("assertFact", {
+              entity,
+              attribute: "card/unread-by",
+              value: ref(props.desktopEntity),
+              positions: {},
+            });
+          }
           await mutate("addCardToDesktop", {
             entity,
             factID: ulid(),

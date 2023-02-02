@@ -1,5 +1,7 @@
 import { useAppEventListener, publishAppEvent } from "hooks/useEvents";
+import { useIndex, useMutations } from "hooks/useReplicache";
 import { useUndoableState } from "hooks/useUndoableState";
+import { useEffect } from "react";
 import { CardView } from "./CardView";
 
 export const useCardViewer = () => {
@@ -12,6 +14,14 @@ export const useCardViewer = () => {
 
 export function CardViewer(props: { EmptyState: React.ReactNode }) {
   let [history, setHistory] = useUndoableState([] as string[]);
+  let { mutate, memberEntity } = useMutations();
+  let unreadBy = useIndex.eav(history[0] || null, "card/unread-by") || [];
+  useEffect(() => {
+    if (history[0] && memberEntity) {
+      let unread = unreadBy.find((f) => f.value.value === memberEntity);
+      if (unread) mutate("retractFact", { id: unread.id });
+    }
+  }, [history[0], unreadBy, memberEntity]);
 
   useAppEventListener(
     "cardviewer.open-card",
