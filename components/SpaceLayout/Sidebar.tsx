@@ -106,7 +106,7 @@ const RoomList = (props: {
 }) => {
   let homeEntity = useIndex.aev("home");
   let rooms = useIndex.aev("room/name");
-  let { mutate } = useMutations();
+  let { mutate, authorized } = useMutations();
 
   return (
     <ul className="sidebarSharedRoomList flex flex-col gap-0.5">
@@ -137,21 +137,23 @@ const RoomList = (props: {
             </RoomListItem>
           );
         })}
-      <button
-        className="sidebarAddRoom flex w-full place-items-center justify-between gap-1 rounded-md border border-transparent py-0.5 px-2 text-grey-55 hover:border-accent-blue hover:text-accent-blue"
-        onClick={async () => {
-          let room = ulid();
-          await mutate("assertFact", {
-            entity: room,
-            attribute: "room/name",
-            value: "Untitled Room",
-            positions: {},
-          });
-          props.onRoomChange(room);
-        }}
-      >
-        + room
-      </button>
+      {!authorized ? null : (
+        <button
+          className="sidebarAddRoom flex w-full place-items-center justify-between gap-1 rounded-md border border-transparent py-0.5 px-2 text-grey-55 hover:border-accent-blue hover:text-accent-blue"
+          onClick={async () => {
+            let room = ulid();
+            await mutate("assertFact", {
+              entity: room,
+              attribute: "room/name",
+              value: "Untitled Room",
+              positions: {},
+            });
+            props.onRoomChange(room);
+          }}
+        >
+          + room
+        </button>
+      )}
     </ul>
   );
 };
@@ -162,7 +164,7 @@ const MemberList = (props: {
   setRoomEditOpen: () => void;
 }) => {
   let members = useIndex.aev("member/name");
-  let { memberEntity } = useMutations();
+  let { memberEntity, authorized } = useMutations();
   let [inviteOpen, setInviteOpen] = useState(false);
   let rep = useContext(ReplicacheContext);
   let unreadCount = useSubscribe(
@@ -204,13 +206,20 @@ const MemberList = (props: {
             </RoomListItem>
           );
         })}
-      <button
-        onClick={() => setInviteOpen(true)}
-        className="sidebarAddMember flex w-full place-items-center gap-1 rounded-md border border-transparent py-0.5 px-2 text-grey-55 hover:border-accent-blue  hover:text-accent-blue"
-      >
-        + invite
-      </button>
-      <InviteMember open={inviteOpen} onClose={() => setInviteOpen(false)} />
+      {!authorized ? null : (
+        <>
+          <button
+            onClick={() => setInviteOpen(true)}
+            className="sidebarAddMember flex w-full place-items-center gap-1 rounded-md border border-transparent py-0.5 px-2 text-grey-55 hover:border-accent-blue  hover:text-accent-blue"
+          >
+            + invite
+          </button>
+          <InviteMember
+            open={inviteOpen}
+            onClose={() => setInviteOpen(false)}
+          />
+        </>
+      )}
     </ul>
   );
 };
@@ -225,6 +234,7 @@ const RoomListItem: React.FC<
   }>
 > = (props) => {
   console.log(props.unreads);
+  let { authorized } = useMutations();
   return (
     <div
       className={`flex w-full items-center gap-2 overflow-hidden whitespace-nowrap rounded-md border border-transparent  text-left ${
@@ -242,14 +252,16 @@ const RoomListItem: React.FC<
       {!!props.unreads && props.unreads > 0 && (
         <div className="bg-accent-gold p-0.5">{props.unreads}</div>
       )}
-      <button
-        onClick={() => props.setRoomEditOpen()}
-        className={`  sidebarRoomOptions mr-2 rounded-md border border-transparent pt-[1px] hover:border-white ${
-          props.room.entity === props.currentRoom ? "" : "hidden"
-        }`}
-      >
-        <MoreOptionsTiny />
-      </button>
+      {!authorized ? null : (
+        <button
+          onClick={() => props.setRoomEditOpen()}
+          className={`  sidebarRoomOptions mr-2 rounded-md border border-transparent pt-[1px] hover:border-white ${
+            props.room.entity === props.currentRoom ? "" : "hidden"
+          }`}
+        >
+          <MoreOptionsTiny />
+        </button>
+      )}
     </div>
   );
 };
@@ -276,6 +288,8 @@ const SpaceStatus = () => {
   // TODO: maybe pass in status as prop - and also in Settings for more detail
 
   // TEMP EXAMPLE
+
+  let { authorized } = useMutations();
   let status = "unscheduled";
 
   let statusStyles = "";
@@ -291,9 +305,13 @@ const SpaceStatus = () => {
       className={`${statusStyles} sidebarSpaceStatus flex w-fit gap-2 rounded-md px-2 py-1 text-sm`}
     >
       {status === "unscheduled" ? (
-        <Link href="">
-          <p>schedule dates</p>
-        </Link>
+        !authorized ? (
+          <p>unscheduled</p>
+        ) : (
+          <Link href="">
+            <p>schedule dates</p>
+          </Link>
+        )
       ) : (
         <span>{status}</span>
       )}
@@ -379,7 +397,9 @@ const EditRoomModal = (props: {
     <Modal open={props.open} onClose={props.onClose}>
       <div className="editRoomModal flex flex-col gap-3 text-grey-35">
         <h3>Room Settings</h3>
-        {isMember ? null : (
+        {isMember ? (
+          <p className="italic text-grey-55">nothing to edit... yet ;)</p>
+        ) : (
           <>
             <div className="editRoomName flex flex-col gap-1">
               <p className="font-bold">Room Name</p>
@@ -410,16 +430,18 @@ const EditRoomModal = (props: {
             <Divider />
           </>
         )}
-        <ButtonPrimary
-          destructive
-          onClick={async () => {
-            await mutate("deleteEntity", { entity: entityID });
-            setFormState("");
-            props.onClose();
-          }}
-          content="Delete this room"
-          icon={<Delete />}
-        />
+        {isMember ? null : (
+          <ButtonPrimary
+            destructive
+            onClick={async () => {
+              await mutate("deleteEntity", { entity: entityID });
+              setFormState("");
+              props.onClose();
+            }}
+            content="Delete this room"
+            icon={<Delete />}
+          />
+        )}
       </div>
     </Modal>
   );

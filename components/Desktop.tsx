@@ -34,7 +34,7 @@ export const Desktop = (props: { entityID: string }) => {
   const mouseSensor = useSensor(MouseSensor, {});
   const touchSensor = useSensor(TouchSensor, {});
   const sensors = useSensors(mouseSensor, touchSensor);
-  let { mutate, action } = useMutations();
+  let { mutate, action, authorized } = useMutations();
   let [createCard, setCreateCard] = useState<null | { x: number; y: number }>(
     null
   );
@@ -48,10 +48,10 @@ export const Desktop = (props: { entityID: string }) => {
       if (e.key === "Escape") {
         setSelection([]);
       }
-    }
+    };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [])
+  }, []);
 
   return (
     <DndContext
@@ -72,10 +72,10 @@ export const Desktop = (props: { entityID: string }) => {
         let transform = `translate3d(${delta.x}px, ${delta.y}px, 0px)`;
         setSelectionDragTransform(transform);
 
-        if(selection.length > 0 && !selection.includes(active.id as string)) {
+        if (selection.length > 0 && !selection.includes(active.id as string)) {
           setSelection((oldValue) => {
-            return [...oldValue, active.id as string]
-          })
+            return [...oldValue, active.id as string];
+          });
         }
 
         let position: { y: number } = active.data.current?.position;
@@ -90,25 +90,25 @@ export const Desktop = (props: { entityID: string }) => {
       onDragEnd={async (dragProps) => {
         let { active, delta, over } = dragProps;
 
-        setSelectionDragTransform('')
+        setSelectionDragTransform("");
 
         action.start();
 
         setDraggingHeight(0);
 
-        let elementsToUpdate = selection.length > 0 ? selection : [active.id]
+        let elementsToUpdate = selection.length > 0 ? selection : [active.id];
 
-        for(let id of elementsToUpdate) {
-          if(over && !selection.includes(over.id as string)) {
-            let entityID = cards?.find((f) => f.id == id)?.value.value
+        for (let id of elementsToUpdate) {
+          if (over && !selection.includes(over.id as string)) {
+            let entityID = cards?.find((f) => f.id == id)?.value.value;
 
-            if(entityID) {
+            if (entityID) {
               await mutate("addToOrCreateDeck", {
                 droppedCardPositionFact: id as string,
                 droppedCardEntity: entityID,
                 targetCardEntity: over.data.current?.entityID,
                 desktop: props.entityID,
-                factID: ulid()
+                factID: ulid(),
               });
             }
           } else {
@@ -138,10 +138,11 @@ export const Desktop = (props: { entityID: string }) => {
           {/* Handles Double CLick to Create */}
           <div
             onClick={(e) => {
+              if (!authorized) return;
               if (e.currentTarget !== e.target) return;
               let parentRect = e.currentTarget.getBoundingClientRect();
               setSelection([]);
-              if (e.ctrlKey) {
+              if (e.ctrlKey || e.metaKey) {
                 action.start();
                 mutate("addCardToDesktop", {
                   entity: ulid(),
@@ -149,7 +150,7 @@ export const Desktop = (props: { entityID: string }) => {
                   desktop: props.entityID,
                   position: {
                     rotation: 0,
-                    size: "big",
+                    size: "small",
                     x: Math.max(e.clientX - parentRect.left - 128, 0),
                     y: Math.max(e.clientY - parentRect.top - 42, 0),
                   },
@@ -179,7 +180,9 @@ export const Desktop = (props: { entityID: string }) => {
                 setSelection={setSelection}
                 isSelected={selection.includes(card.id)}
                 selectionMode={selection.length > 0}
-                dragTransform={selection.includes(card.id) ? selectionDragTransform : ''}
+                dragTransform={
+                  selection.includes(card.id) ? selectionDragTransform : ""
+                }
               />
             ))}
           </div>
@@ -292,27 +295,27 @@ const DraggableCard = (props: {
   let isOver = _isOver && !props.isSelected;
   let refs = useCombinedRefs(setNodeRef, draggableRef);
 
-  const style = transform && (Math.abs(transform.x) > 0 || Math.abs(transform.y) > 0)
-    ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
-    : "";
+  const style =
+    transform && (Math.abs(transform.x) > 0 || Math.abs(transform.y) > 0)
+      ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
+      : "";
 
-  let dragTransform = props.dragTransform || style
-  let hasMoved = dragTransform != ''
-
+  let dragTransform = props.dragTransform || style;
+  let hasMoved = dragTransform != "";
 
   let toggleSelection = () => {
-    props.setSelection?.((oldValue:string[]) => {
+    props.setSelection?.((oldValue: string[]) => {
       if (oldValue.includes(props.relationshipID)) {
         return oldValue.filter((id) => id !== props.relationshipID);
       } else {
         return [...oldValue, props.relationshipID];
       }
     });
-  }
+  };
 
   let pointerUpHandler = (e: React.PointerEvent) => {
-    if(!hasMoved && props.selectionMode && e.button === 0) toggleSelection()
-  }
+    if (!hasMoved && props.selectionMode && e.button === 0) toggleSelection();
+  };
 
   let y = position?.value.y || 0;
   let x = position?.value.x || 0;
