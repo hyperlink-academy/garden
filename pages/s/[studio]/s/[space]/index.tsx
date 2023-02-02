@@ -4,7 +4,7 @@ import { useIndex } from "hooks/useReplicache";
 import { SmallCardDragContext } from "components/DragContext";
 import { SpaceHeader, Sidebar } from "components/SpaceLayout";
 import Head from "next/head";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import useWindowDimensions from "hooks/useWindowDimensions";
 import { Popover } from "@headlessui/react";
 import { Rooms } from "components/Icons";
@@ -20,7 +20,7 @@ export default function SpacePage() {
   }, [homeEntity[0]]);
 
   return (
-    <>
+    <Suspense fallback={<div>loading...</div>}>
       <Head>
         <title key="title">{spaceName?.value}</title>
         <meta name="theme-color" content="#0000FF" />
@@ -119,7 +119,7 @@ export default function SpacePage() {
           </SmallCardDragContext>
         </div>
       </div>
-    </>
+    </Suspense>
   );
 }
 const MobileFooter = (props: {

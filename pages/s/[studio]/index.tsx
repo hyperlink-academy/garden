@@ -6,6 +6,7 @@ import { StudioName } from "components/StudioLayout";
 import { useIndex } from "hooks/useReplicache";
 import { GetStaticPropsContext, InferGetStaticPropsType } from "next";
 import { sortByPosition } from "src/position_helpers";
+import { Suspense } from "react";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 type Props = InferGetStaticPropsType<typeof getStaticProps>;
@@ -14,11 +15,13 @@ export default function StudioPage(props: Props) {
   if (!props.id) return <div>loading </div>;
 
   return (
-    <SpaceProvider id={props.id}>
-      <StudioName />
-      <List id={props.id} />
-      <CreateSpace studioSpaceID={props.id} />
-    </SpaceProvider>
+    <Suspense fallback={<div>loading...</div>}>
+      <SpaceProvider id={props.id}>
+        <StudioName />
+        <List id={props.id} />
+        <CreateSpace studioSpaceID={props.id} />
+      </SpaceProvider>
+    </Suspense>
   );
 }
 
