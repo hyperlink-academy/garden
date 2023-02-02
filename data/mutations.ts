@@ -238,10 +238,9 @@ const drawAPrompt: Mutation<{
   factID: string;
   randomSeed: number;
 }> = async (args, ctx) => {
-  let promptRoom = (await ctx.scanIndex.aev("room/name")).find(
-    (f) => f.value === "prompts"
+  let promptRoom = (await ctx.scanIndex.aev("promptroom/name")).find(
+    (f) => f.value === "Prompt Pool"
   );
-  console.log(promptRoom);
   if (!promptRoom) return;
   let prompts = await ctx.scanIndex.eav(promptRoom.entity, "desktop/contains");
   let prompt = prompts[Math.floor(prompts.length * args.randomSeed)];
