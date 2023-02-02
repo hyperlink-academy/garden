@@ -95,15 +95,15 @@ export const DefaultAttributes = {
     unique: false,
     cardinality: "one",
   },
-  "card/size-in": {
-    type: "boolean",
-    unique: false,
-    cardinality: "one",
-  },
   "card/created-by": {
     type: "reference",
     unique: false,
     cardinality: "one",
+  },
+  "card/unread-by": {
+    type: "reference",
+    unique: false,
+    cardinality: "many",
   },
   "space/community": {
     type: "string",
