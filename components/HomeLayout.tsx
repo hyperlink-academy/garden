@@ -1,7 +1,10 @@
 import { useAuth } from "hooks/useAuth";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { LoginForm } from "pages/login";
+import { useState } from "react";
 import { ButtonLink } from "./Buttons";
+import { Modal } from "./Layout";
 import { SpaceProvider } from "./ReplicacheProvider";
 
 export const HomeLayout = (props: {
@@ -19,38 +22,30 @@ export const HomeLayout = (props: {
 export const HomeHeader = () => {
   let { query, pathname } = useRouter();
   let { session } = useAuth();
-  let studioName = session.session?.username;
+  let myStudioName = session.session?.username;
+  let currentStudioName = query.studio;
   let decorationClasses =
     "underline decoration-2 decoration-accent-blue underline-offset-4";
 
-  if (!studioName) return null;
-
   return (
     <div className="HomeHeader sticky top-0 z-10 mb-4 flex justify-between border-b border-grey-55 bg-background py-4">
-      <div className="flex flex-row gap-4">
+      {!myStudioName ? (
+        <Login />
+      ) : (
         <Link
-          href={`/s/${studioName}`}
-          className={pathname?.endsWith("/s/[studio]") ? decorationClasses : ``}
-        >
-          <ButtonLink content="active" />
-        </Link>
-        {/* <Link
-          href={`/s/${studioName}/future`}
+          href={`/s/${myStudioName}`}
           className={
-            pathname?.endsWith("/s/[studio]/future") ? decorationClasses : ``
+            currentStudioName == myStudioName &&
+            (pathname?.endsWith("/s/[studio]") ||
+              pathname?.endsWith("/s/[studio]/history"))
+              ? decorationClasses
+              : ``
           }
         >
-          <ButtonLink content="future" />
-        </Link> */}
-        <Link
-          href={`/s/${studioName}/history`}
-          className={
-            pathname?.endsWith("/s/[studio]/history") ? decorationClasses : ``
-          }
-        >
-          <ButtonLink content="history" />
+          <ButtonLink content="my studio" />
         </Link>
-      </div>
+      )}
+
       <div>
         <Link
           href={`/calendar`}
@@ -63,6 +58,21 @@ export const HomeHeader = () => {
   );
 };
 
+const Login = () => {
+  let [isOpen, setIsOpen] = useState(false);
+  let router = useRouter();
+
+  return (
+    <>
+      <ButtonLink content="log in" onClick={() => setIsOpen(true)} />
+      <Modal open={isOpen} onClose={() => setIsOpen(false)}>
+        <LoginForm onLogin={(s) => router.push(`/s/${s.username}`)} />
+      </Modal>
+    </>
+  );
+};
+
+// NB: currently unused!
 const Logout = () => {
   let { session, logout } = useAuth();
   let router = useRouter();
