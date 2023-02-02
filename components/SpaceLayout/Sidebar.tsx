@@ -29,13 +29,32 @@ export const Sidebar = (props: {
   currentRoom: string | null;
 }) => {
   let { session } = useAuth();
-  let { mutate } = useMutations();
+  let { mutate, memberEntity } = useMutations();
 
   let homeEntity = useIndex.aev("home");
   let rooms = useIndex.aev("room/name");
   let promptRoom = rooms.find((f) => f.value == "prompts");
   let spaceName = useIndex.aev("this/name")[0];
   let [roomEditOpen, setRoomEditOpen] = useState(false);
+  let rep = useContext(ReplicacheContext);
+
+  let unreadCount = useSubscribe(
+    rep?.rep,
+    async (tx) => {
+      if (!memberEntity) return 0;
+      let unreads = 0;
+      let cards = await scanIndex(tx).eav(memberEntity, "desktop/contains");
+      for (let card of cards) {
+        let unread = (
+          await scanIndex(tx).eav(card.value.value, "card/unread-by")
+        ).find((f) => f.value.value === memberEntity);
+        if (unread) unreads += 1;
+      }
+      return unreads;
+    },
+    0,
+    [memberEntity]
+  );
 
   return (
     <div className="Sidebar flex h-full w-48 flex-col items-stretch gap-4 rounded-l-[3px] border-r border-grey-90 bg-white p-3 text-grey-35">
@@ -49,6 +68,31 @@ export const Sidebar = (props: {
           </div>
           <SpaceStatus />
         </div>
+        <Divider />
+        {!memberEntity ? null : (
+          // <button
+          //   onClick={() => {
+          //     props.onRoomChange(memberEntity);
+          //     console.log(memberEntity);
+          //   }}
+          //   className={`sidebarYourRoom w-full border border-transparent py-0.5 px-2 text-left ${
+          //     memberEntity === props.currentRoom
+          //       ? "rounded-md bg-accent-blue font-bold text-white"
+          //       : "rounded-md text-grey-35 hover:border-grey-80"
+          //   }`}
+          // >
+          //   Your Room
+          // </button>
+          <RoomListItem
+            onRoomChange={props.onRoomChange}
+            currentRoom={props.currentRoom}
+            unreads={unreadCount}
+            roomEntity={memberEntity}
+            setRoomEditOpen={() => setRoomEditOpen(true)}
+          >
+            Your Room
+          </RoomListItem>
+        )}
         <Divider />
         <RoomList {...props} setRoomEditOpen={() => setRoomEditOpen(true)} />
         <div className=" pt-4">
@@ -104,15 +148,16 @@ const RoomList = (props: {
   currentRoom: string | null;
   setRoomEditOpen: () => void;
 }) => {
+  let { memberEntity, mutate, authorized } = useMutations();
+  let { session } = useAuth();
   let homeEntity = useIndex.aev("home");
   let rooms = useIndex.aev("room/name");
-  let { mutate, authorized } = useMutations();
 
   return (
     <ul className="sidebarSharedRoomList flex flex-col gap-0.5">
       <button
         className={`sidebarHomeRoom w-full border border-transparent py-0.5 px-2 text-left ${
-          homeEntity[0]?.entity === props.currentRoom
+          session.session?.username === props.currentRoom
             ? "rounded-md bg-accent-blue font-bold text-white"
             : "rounded-md text-grey-35 hover:border-grey-80"
         }`}
@@ -130,7 +175,7 @@ const RoomList = (props: {
             <RoomListItem
               onRoomChange={props.onRoomChange}
               currentRoom={props.currentRoom}
-              room={room}
+              roomEntity={room.entity}
               setRoomEditOpen={props.setRoomEditOpen}
             >
               {room.value}
@@ -188,7 +233,7 @@ const MemberList = (props: {
   return (
     <ul>
       {members
-        .filter((f) => f.value !== "prompts")
+        .filter((f) => f.entity !== memberEntity)
         .map((member) => {
           return (
             <RoomListItem
@@ -199,7 +244,7 @@ const MemberList = (props: {
                   ? unreadCount
                   : undefined
               }
-              room={member}
+              roomEntity={member.entity}
               setRoomEditOpen={props.setRoomEditOpen}
             >
               {member?.value}
@@ -229,7 +274,7 @@ const RoomListItem: React.FC<
     onRoomChange: (room: string) => void;
     unreads?: number;
     currentRoom: string | null;
-    room: Fact<"room/name"> | Fact<"member/name">;
+    roomEntity: string;
     setRoomEditOpen: () => void;
   }>
 > = (props) => {
@@ -238,14 +283,14 @@ const RoomListItem: React.FC<
   return (
     <div
       className={`flex w-full items-center gap-2 overflow-hidden whitespace-nowrap rounded-md border border-transparent  text-left ${
-        props.room.entity === props.currentRoom
+        props.roomEntity === props.currentRoom
           ? "rounded-md bg-accent-blue  font-bold text-white"
           : " text-grey-35 hover:border-grey-80"
       }`}
     >
       <button
         className="sidebarRoomName w-full overflow-clip py-0.5 pl-2 text-left"
-        onClick={() => props.onRoomChange(props.room.entity)}
+        onClick={() => props.onRoomChange(props.roomEntity)}
       >
         {props.children}
       </button>
@@ -256,7 +301,7 @@ const RoomListItem: React.FC<
         <button
           onClick={() => props.setRoomEditOpen()}
           className={`  sidebarRoomOptions mr-2 rounded-md border border-transparent pt-[1px] hover:border-white ${
-            props.room.entity === props.currentRoom ? "" : "hidden"
+            props.roomEntity === props.currentRoom ? "" : "hidden"
           }`}
         >
           <MoreOptionsTiny />
