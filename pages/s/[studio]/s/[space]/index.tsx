@@ -4,12 +4,18 @@ import { useIndex } from "hooks/useReplicache";
 import { SmallCardDragContext } from "components/DragContext";
 import { SpaceHeader, Sidebar } from "components/SpaceLayout";
 import Head from "next/head";
-import { Suspense, useEffect, useState } from "react";
+import { startTransition, Suspense, useEffect, useState } from "react";
 import useWindowDimensions from "hooks/useWindowDimensions";
 import { Popover } from "@headlessui/react";
 import { Rooms } from "components/Icons";
-
-export default function SpacePage() {
+export default function SpacePageWrapped() {
+  return (
+    <Suspense fallback={<div>loading...</div>}>
+      <SpacePage />
+    </Suspense>
+  );
+}
+function SpacePage() {
   let spaceName = useIndex.aev("this/name")[0];
   let homeEntity = useIndex.aev("home");
 
@@ -20,7 +26,7 @@ export default function SpacePage() {
   }, [homeEntity[0]]);
 
   return (
-    <Suspense fallback={<div>loading...</div>}>
+    <>
       <Head>
         <title key="title">{spaceName?.value}</title>
         <meta name="theme-color" content="#0000FF" />
@@ -57,13 +63,16 @@ export default function SpacePage() {
                 <div className="roomWrapper flex flex-row rounded-md border border-grey-90">
                   <Sidebar
                     onRoomChange={(room) => {
-                      setRoom(room);
+                      startTransition(() => {
+                        setRoom(room);
+                      });
                     }}
                     currentRoom={room}
                   />
 
-                  <div
-                    className={`
+                  <Suspense fallback={<div>loading...</div>}>
+                    <div
+                      className={`
                   desktopWrapper
                   no-scrollbar flex 
                   h-full 
@@ -71,12 +80,15 @@ export default function SpacePage() {
                   flex-col
                   gap-0 overflow-x-hidden overflow-y-scroll
                   `}
-                  >
-                    {room && <Desktop entityID={room} />}
-                  </div>
+                    >
+                      {room && <Desktop entityID={room} />}
+                    </div>
+                  </Suspense>
                 </div>
 
-                <CardViewer EmptyState={<EmptyState />} />
+                <Suspense fallback={<div>loading...</div>}>
+                  <CardViewer EmptyState={<EmptyState />} />
+                </Suspense>
               </div>
             ) : (
               <div className="smallSplitLayout flex w-full flex-col items-stretch gap-2">
@@ -119,7 +131,7 @@ export default function SpacePage() {
           </SmallCardDragContext>
         </div>
       </div>
-    </Suspense>
+    </>
   );
 }
 const MobileFooter = (props: {

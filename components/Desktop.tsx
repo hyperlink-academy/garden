@@ -13,7 +13,7 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { Suspense, useContext, useEffect, useMemo, useState } from "react";
 import { CardPreview } from "./CardPreview";
 import { customCollisionDetection } from "src/customCollisionDetection";
 import { restrictToParentElement } from "@dnd-kit/modifiers";
@@ -170,16 +170,20 @@ export const Desktop = (props: { entityID: string }) => {
             className="text-sm"
           >
             {cards?.map((card) => (
-              <DraggableCard
-                key={card.id}
-                relationshipID={card.id}
-                entityID={card.value.value}
-                parent={props.entityID}
-                setSelection={setSelection}
-                isSelected={selection.includes(card.id)}
-                selectionMode={selection.length > 0}
-                dragTransform={selection.includes(card.id) ? selectionDragTransform : ''}
-              />
+              <Suspense fallback={null}>
+                <DraggableCard
+                  key={card.id}
+                  relationshipID={card.id}
+                  entityID={card.value.value}
+                  parent={props.entityID}
+                  setSelection={setSelection}
+                  isSelected={selection.includes(card.id)}
+                  selectionMode={selection.length > 0}
+                  dragTransform={
+                    selection.includes(card.id) ? selectionDragTransform : ""
+                  }
+                />
+              </Suspense>
             ))}
           </div>
           {/* <HelpToast helpText={`double click/tap to create new`} /> */}

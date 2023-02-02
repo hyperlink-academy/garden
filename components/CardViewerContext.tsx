@@ -1,11 +1,14 @@
 import { useAppEventListener, publishAppEvent } from "hooks/useEvents";
 import { useUndoableState } from "hooks/useUndoableState";
+import { startTransition } from "react";
 import { CardView } from "./CardView";
 
 export const useCardViewer = () => {
   return {
     open: (args: { entityID: string }) => {
-      publishAppEvent("cardviewer.open-card", args);
+      startTransition(() => {
+        publishAppEvent("cardviewer.open-card", args);
+      });
     },
   };
 };

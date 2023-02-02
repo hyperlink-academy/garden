@@ -6,6 +6,21 @@ import useSWR from "swr";
 
 // We wrap all the callbacks in a `unstable_batchedUpdates` call to ensure that
 // we do not render things more than once over all of the changed subscriptions.
+//
+//
+let hasPendingCallback = false;
+let callbacks: (() => void)[] = [];
+
+function doCallback() {
+  const cbs = callbacks;
+  callbacks = [];
+  hasPendingCallback = false;
+  startTransition(() => {
+    for (const callback of cbs) {
+      callback();
+    }
+  });
+}
 
 export function useSubscribe<R extends ReadonlyJSONValue>(
   rep: Replicache | null | undefined,
@@ -31,9 +46,11 @@ export function useSubscribe<R extends ReadonlyJSONValue>(
 
     return rep.subscribe(query, {
       onData: (data: R) => {
-        startTransition(() => {
-          mutate(data);
-        });
+        callbacks.push(() => mutate(data));
+        if (!hasPendingCallback) {
+          void Promise.resolve().then(doCallback);
+          hasPendingCallback = true;
+        }
       },
     });
   }, [rep, ...deps]);
