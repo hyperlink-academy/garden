@@ -143,18 +143,20 @@ const PromptRooms = (props: {
       >
         <p>Prompt Pool</p>
       </button>
-      {promptRooms.map((room) => {
-        return (
-          <RoomListItem
-            onRoomChange={props.onRoomChange}
-            currentRoom={props.currentRoom}
-            roomEntity={room.entity}
-            setRoomEditOpen={props.setRoomEditOpen}
-          >
-            {room.value || <i>Prompt Room</i>}
-          </RoomListItem>
-        );
-      })}
+      {promptRooms
+        .filter((room) => room.value !== "Prompt Pool")
+        .map((room) => {
+          return (
+            <RoomListItem
+              onRoomChange={props.onRoomChange}
+              currentRoom={props.currentRoom}
+              roomEntity={room.entity}
+              setRoomEditOpen={props.setRoomEditOpen}
+            >
+              {room.value || <i>Prompt Room</i>}
+            </RoomListItem>
+          );
+        })}
       <button
         className=" flex w-full place-items-center justify-between gap-1 rounded-md border border-transparent py-0.5 px-2 text-grey-55 hover:border-accent-blue hover:text-accent-blue"
         onClick={async () => {
