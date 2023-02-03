@@ -10,7 +10,7 @@ import {
 } from "./Buttons";
 import { Door, DoorSelector } from "components/DoorSelector";
 import { DoorImage } from "./Doors";
-import { SettingsStudio, SpaceCreate } from "./Icons";
+import { Information, SettingsStudio, SpaceCreate } from "./Icons";
 import { Modal } from "./Layout";
 import { prefetchSpaceId } from "./ReplicacheProvider";
 import { useAuth } from "hooks/useAuth";
@@ -43,8 +43,10 @@ export const SpaceList = (props: {
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 const Space = (props: { entity: string }) => {
+  let { session } = useAuth();
   let studio = useIndex.eav(props.entity, "space/studio");
   let name = useIndex.eav(props.entity, "space/name");
+  let description = useIndex.eav(props.entity, "space/description");
 
   let start_date = useIndex.eav(props.entity, "space/start-date");
   let end_date = useIndex.eav(props.entity, "space/end-date");
@@ -83,7 +85,15 @@ const Space = (props: { entity: string }) => {
           <DoorImage entityID={props.entity} />
         </Link>
         <div className="flex w-[20px] flex-col gap-4 pb-[92px]">
-          <EditSpace spaceEntity={props.entity} />
+          {studio?.value == session.session?.username ? (
+            <EditSpace spaceEntity={props.entity} />
+          ) : (
+            <SpaceInfo
+              studio={studio?.value}
+              name={name?.value}
+              description={description?.value}
+            />
+          )}
         </div>
       </div>
 
@@ -114,5 +124,51 @@ const Space = (props: { entity: string }) => {
         </div>
       </div>
     </div>
+  );
+};
+
+const SpaceInfo = (props: {
+  studio?: string;
+  name?: string;
+  description?: string;
+}) => {
+  let [open, setOpen] = useState(false);
+
+  let studio = props.studio;
+  let name = props.name;
+  let description = props.description;
+
+  if (!studio || !name) return null;
+
+  return (
+    <>
+      <a className="-rotate-3 skew-y-[-30deg] scale-x-75 scale-y-110">
+        <ButtonLink
+          content=""
+          icon={<Information />}
+          onClick={() => setOpen(true)}
+        />
+      </a>
+      <Modal open={open} onClose={() => setOpen(false)}>
+        <div className="flex flex-col gap-4 ">
+          <h3>{name}</h3>
+          {description ? (
+            <div>{description}</div>
+          ) : (
+            <div>
+              <p>
+                <em>no description</em>
+              </p>
+            </div>
+          )}
+          <div className="flex gap-2">
+            <span>created by:</span>
+            <Link href={`/s/${studio}`} className="">
+              <ButtonLink content={studio} />
+            </Link>
+          </div>
+        </div>
+      </Modal>
+    </>
   );
 };
