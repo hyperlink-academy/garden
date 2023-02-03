@@ -22,6 +22,7 @@ import {
 import { spaceAPI } from "backend/lib/api";
 import { useSmoker } from "components/Smoke";
 import { useSubscribe } from "replicache-react";
+import { Fact } from "data/Facts";
 
 export const Sidebar = (props: {
   onRoomChange: (room: string) => void;
@@ -64,7 +65,9 @@ export const Sidebar = (props: {
           </div>
           <SpaceStatus />
         </div>
+
         <Divider />
+
         {!memberEntity ? null : (
           <RoomListItem
             onRoomChange={props.onRoomChange}
@@ -76,29 +79,40 @@ export const Sidebar = (props: {
             Your Room
           </RoomListItem>
         )}
+
         <Divider />
+
         <div className=" pt-4">
           <small className="px-2 font-bold text-grey-55">shared</small>
           <div className="w-full border-t border-dashed border-grey-80" />
         </div>
-        <RoomList {...props} setRoomEditOpen={() => setRoomEditOpen(true)} />
+        <SharedRoomList
+          {...props}
+          setRoomEditOpen={() => setRoomEditOpen(true)}
+        />
+
         <div className=" pt-4">
           <small className="px-2 font-bold text-grey-55">members</small>
           <div className="w-full border-t border-dashed border-grey-80" />
         </div>
         <div>
-          <MemberList
+          <MemberRoomList
             {...props}
             setRoomEditOpen={() => setRoomEditOpen(true)}
           />
         </div>
+
+        {/* shared; operates on current room */}
         <EditRoomModal
           open={roomEditOpen}
           onClose={() => setRoomEditOpen(false)}
           currentRoom={props.currentRoom}
         />
 
-        <PromptRooms {...props} setRoomEditOpen={() => setRoomEditOpen(true)} />
+        <PromptRoomList
+          {...props}
+          setRoomEditOpen={() => setRoomEditOpen(true)}
+        />
       </div>
       <div className="mb-2 shrink-0 ">
         <BackToStudio studio={session.session?.username} />
@@ -107,7 +121,7 @@ export const Sidebar = (props: {
   );
 };
 
-const PromptRooms = (props: {
+const PromptRoomList = (props: {
   onRoomChange: (room: string) => void;
   currentRoom: string | null;
   setRoomEditOpen: () => void;
@@ -121,63 +135,65 @@ const PromptRooms = (props: {
         <small className="px-2 font-bold text-grey-55">prompts</small>
         <div className="w-full border-t border-dashed border-grey-80" />
       </div>
-      <button
-        className={`w-full py-0.5 px-2 text-left ${
-          promptRoom?.entity === props.currentRoom
-            ? "rounded-md bg-accent-blue  font-bold text-white"
-            : "rounded-md border border-transparent text-grey-35 hover:border-grey-80"
-        }`}
-        onClick={async () => {
-          let entity = promptRoom?.entity;
-          if (!entity) {
-            entity = ulid();
+      <ul className="sidebarPromptRoomList flex flex-col gap-0.5">
+        <button
+          className={`w-full border border-transparent py-0.5 px-2 text-left ${
+            promptRoom?.entity === props.currentRoom
+              ? "rounded-md bg-accent-blue  font-bold text-white"
+              : "rounded-md border border-transparent text-grey-35 hover:border-grey-80"
+          }`}
+          onClick={async () => {
+            let entity = promptRoom?.entity;
+            if (!entity) {
+              entity = ulid();
+              await mutate("assertFact", {
+                entity,
+                attribute: "promptroom/name",
+                value: "prompts",
+                positions: {},
+              });
+            }
+            props.onRoomChange(entity);
+          }}
+        >
+          <p>Prompt Pool</p>
+        </button>
+        {promptRooms
+          .filter((room) => room.value !== "Prompt Pool")
+          .map((room) => {
+            return (
+              <RoomListItem
+                onRoomChange={props.onRoomChange}
+                currentRoom={props.currentRoom}
+                roomEntity={room.entity}
+                setRoomEditOpen={props.setRoomEditOpen}
+              >
+                {room.value || <i>Untitled Prompts</i>}
+              </RoomListItem>
+            );
+          })}
+        <button
+          className=" flex w-full place-items-center justify-between gap-1 rounded-md border border-transparent py-0.5 px-2 text-grey-55 hover:border-accent-blue hover:text-accent-blue"
+          onClick={async () => {
+            let room = ulid();
             await mutate("assertFact", {
-              entity,
+              entity: room,
               attribute: "promptroom/name",
-              value: "prompts",
+              value: "",
               positions: {},
             });
-          }
-          props.onRoomChange(entity);
-        }}
-      >
-        <p>Prompt Pool</p>
-      </button>
-      {promptRooms
-        .filter((room) => room.value !== "Prompt Pool")
-        .map((room) => {
-          return (
-            <RoomListItem
-              onRoomChange={props.onRoomChange}
-              currentRoom={props.currentRoom}
-              roomEntity={room.entity}
-              setRoomEditOpen={props.setRoomEditOpen}
-            >
-              {room.value || <i>Prompt Room</i>}
-            </RoomListItem>
-          );
-        })}
-      <button
-        className=" flex w-full place-items-center justify-between gap-1 rounded-md border border-transparent py-0.5 px-2 text-grey-55 hover:border-accent-blue hover:text-accent-blue"
-        onClick={async () => {
-          let room = ulid();
-          await mutate("assertFact", {
-            entity: room,
-            attribute: "promptroom/name",
-            value: "",
-            positions: {},
-          });
-          props.onRoomChange(room);
-          props.setRoomEditOpen();
-        }}
-      >
-        + room
-      </button>
+            props.onRoomChange(room);
+            props.setRoomEditOpen();
+          }}
+        >
+          + room
+        </button>
+      </ul>
     </>
   );
 };
 
-const RoomList = (props: {
+const SharedRoomList = (props: {
   onRoomChange: (room: string) => void;
   currentRoom: string | null;
   setRoomEditOpen: () => void;
@@ -224,7 +240,7 @@ const RoomList = (props: {
             await mutate("assertFact", {
               entity: room,
               attribute: "room/name",
-              value: "Untitled Room",
+              value: "",
               positions: {},
             });
             props.onRoomChange(room);
@@ -238,7 +254,7 @@ const RoomList = (props: {
   );
 };
 
-const MemberList = (props: {
+const MemberRoomList = (props: {
   onRoomChange: (room: string) => void;
   currentRoom: string | null;
   setRoomEditOpen: () => void;
@@ -247,7 +263,7 @@ const MemberList = (props: {
   let { memberEntity, authorized } = useMutations();
   let [inviteOpen, setInviteOpen] = useState(false);
   return (
-    <ul>
+    <ul className="sidebarMemberRoomList flex flex-col gap-0.5">
       {members
         .filter((f) => f.entity !== memberEntity)
         .map((member) => {
@@ -439,14 +455,31 @@ const EditRoomModal = (props: {
   onClose: () => void;
   currentRoom: string | null;
 }) => {
-  let currentRoom = useIndex.eav(props.currentRoom, "room/name");
+  let currentRoom:
+    | Fact<"room/name">
+    | Fact<"member/name">
+    | Fact<"promptroom/name">
+    | null = null;
+  let isMember = false;
+  let isPromptRoom = false;
+  let sharedRoom = useIndex.eav(props.currentRoom, "room/name");
+  let memberRoom = useIndex.eav(props.currentRoom, "member/name");
+  let promptRoom = useIndex.eav(props.currentRoom, "promptroom/name");
+
+  if (memberRoom) {
+    currentRoom = memberRoom;
+    isMember = true;
+  } else if (promptRoom) {
+    currentRoom = promptRoom;
+    isPromptRoom = true;
+  } else currentRoom = sharedRoom;
+
   let { mutate } = useMutations();
   let [formState, setFormState] = useState(currentRoom?.value || "");
+
   useEffect(() => {
     setFormState(currentRoom?.value || "");
   }, [currentRoom?.value]);
-  let isMember = !!useIndex.eav(props.currentRoom, "member/name");
-  let isPromptRoom = !!useIndex.eav(props.currentRoom, "promptroom/name");
 
   if (!props.currentRoom) return null;
   let entityID = props.currentRoom;
