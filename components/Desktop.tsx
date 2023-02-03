@@ -219,7 +219,7 @@ let RandomPromptsButton = (props: { entityID: string }) => {
       <Menu.Button as={Fragment}>
         <ButtonSecondary content="Draw a prompt " />
       </Menu.Button>
-      <MenuContainer>
+      <MenuContainer className="max-w-[140px] sm:max-w-[160px]">
         {promptRooms.map((room) => {
           return (
             <MenuItem
