@@ -16,6 +16,7 @@ import { ulid } from "src/ulid";
 import {
   BackToStudio as BackToStudioIcon,
   Delete,
+  Information,
   MoreOptionsSmall,
   MoreOptionsTiny,
 } from "../Icons";
@@ -23,6 +24,7 @@ import { spaceAPI } from "backend/lib/api";
 import { useSmoker } from "components/Smoke";
 import { useSubscribe } from "replicache-react";
 import { Fact } from "data/Facts";
+import { Popover } from "@headlessui/react";
 
 export const Sidebar = (props: {
   onRoomChange: (room: string) => void;
@@ -55,8 +57,8 @@ export const Sidebar = (props: {
 
   return (
     <div className="Sidebar flex h-full w-48 flex-col items-stretch gap-4 rounded-l-[3px] border-r border-grey-90 bg-white p-3 text-grey-35">
-      <div className="no-scrollbar flex h-full w-full flex-col gap-2 overflow-y-scroll">
-        <div className="SidebarSpaceInfo flex flex-col gap-1 pb-2">
+      <div className="no-scrollbar flex h-full w-full flex-col gap-4 overflow-y-scroll">
+        <div className="SidebarSpaceInfo flex flex-col gap-1">
           <div className="flex items-start justify-between gap-2">
             <h3 className="px-2">{spaceName?.value}</h3>
             <button className="shrink-0 rounded-md border border-transparent pt-[1px] hover:border-accent-blue hover:text-accent-blue">
@@ -68,35 +70,56 @@ export const Sidebar = (props: {
 
         <Divider />
 
-        {!memberEntity ? null : (
-          <RoomListItem
-            onRoomChange={props.onRoomChange}
-            currentRoom={props.currentRoom}
-            unreads={unreadCount}
-            roomEntity={memberEntity}
+        <div className="flex flex-col gap-4">
+          {!memberEntity ? null : (
+            <div className="flex flex-col gap-1">
+              <div className="flex justify-between">
+                <small className="px-2 font-bold text-grey-55">your room</small>
+                <div className="-mt-[2px] pr-2">
+                  <Popover>
+                    <Popover.Button>
+                      <span className="text-sm text-grey-55">
+                        <em>?</em>
+                      </span>
+                    </Popover.Button>
+                    <Popover.Panel className="lightBorder absolute left-[8px] right-[-140px] z-50 flex max-w-xs flex-col gap-2 bg-white p-4 text-sm sm:left-[24px] sm:right-0">
+                      <p>Your personal workspace.</p>
+                      <p>
+                        Draw random cards from prompt rooms, and open{" "}
+                        <em>daily</em> prompts — any cards with today's date.
+                      </p>
+                      <p>Come back each day and find new things to do!</p>
+                    </Popover.Panel>
+                  </Popover>
+                </div>
+              </div>
+              <div className="w-full border-t border-dashed border-grey-80" />
+
+              <RoomListItem
+                onRoomChange={props.onRoomChange}
+                currentRoom={props.currentRoom}
+                unreads={unreadCount}
+                roomEntity={memberEntity}
+                setRoomEditOpen={() => setRoomEditOpen(true)}
+              >
+                {session.session?.username}
+              </RoomListItem>
+            </div>
+          )}
+
+          <SharedRoomList
+            {...props}
             setRoomEditOpen={() => setRoomEditOpen(true)}
-          >
-            Your Room
-          </RoomListItem>
-        )}
+          />
 
-        <Divider />
+          <div>
+            <MemberRoomList
+              {...props}
+              setRoomEditOpen={() => setRoomEditOpen(true)}
+            />
+          </div>
 
-        <div className=" pt-4">
-          <small className="px-2 font-bold text-grey-55">shared</small>
-          <div className="w-full border-t border-dashed border-grey-80" />
-        </div>
-        <SharedRoomList
-          {...props}
-          setRoomEditOpen={() => setRoomEditOpen(true)}
-        />
-
-        <div className=" pt-4">
-          <small className="px-2 font-bold text-grey-55">members</small>
-          <div className="w-full border-t border-dashed border-grey-80" />
-        </div>
-        <div>
-          <MemberRoomList
+          <PromptRoomList
             {...props}
             setRoomEditOpen={() => setRoomEditOpen(true)}
           />
@@ -107,11 +130,6 @@ export const Sidebar = (props: {
           open={roomEditOpen}
           onClose={() => setRoomEditOpen(false)}
           currentRoom={props.currentRoom}
-        />
-
-        <PromptRoomList
-          {...props}
-          setRoomEditOpen={() => setRoomEditOpen(true)}
         />
       </div>
       <div className="mb-2 shrink-0 ">
@@ -130,11 +148,27 @@ const PromptRoomList = (props: {
   let promptRoom = promptRooms.find((f) => f.value == "Prompt Pool");
   let { mutate } = useMutations();
   return (
-    <>
-      <div className=" pt-4">
+    <div className="flex flex-col gap-1">
+      <div className="flex justify-between">
         <small className="px-2 font-bold text-grey-55">prompts</small>
-        <div className="w-full border-t border-dashed border-grey-80" />
+        <div className="-mt-[2px] pr-2">
+          <Popover>
+            <Popover.Button>
+              <span className="text-sm text-grey-55">
+                <em>?</em>
+              </span>
+            </Popover.Button>
+            <Popover.Panel className="lightBorder absolute left-[8px] right-[-140px] z-50 flex max-w-xs flex-col gap-2 bg-white p-4 text-sm sm:left-[24px] sm:right-0">
+              <p>Prompt rooms are for action items — things to do!</p>
+              <p>
+                You can draw prompt cards from your room, and reply with new
+                cards.
+              </p>
+            </Popover.Panel>
+          </Popover>
+        </div>
       </div>
+      <div className="w-full border-t border-dashed border-grey-80" />
       <ul className="sidebarPromptRoomList flex flex-col gap-0.5">
         <button
           className={`w-full border border-transparent py-0.5 px-2 text-left ${
@@ -189,7 +223,7 @@ const PromptRoomList = (props: {
           + room
         </button>
       </ul>
-    </>
+    </div>
   );
 };
 
@@ -204,53 +238,74 @@ const SharedRoomList = (props: {
   let rooms = useIndex.aev("room/name");
 
   return (
-    <ul className="sidebarSharedRoomList flex flex-col gap-0.5">
-      <button
-        className={`sidebarHomeRoom w-full border border-transparent py-0.5 px-2 text-left ${
-          homeEntity[0]?.entity === props.currentRoom
-            ? "rounded-md bg-accent-blue font-bold text-white"
-            : "rounded-md text-grey-35 hover:border-grey-80"
-        }`}
-        onClick={() => {
-          props.onRoomChange(homeEntity[0]?.entity);
-        }}
-      >
-        Home
-      </button>
-
-      {rooms
-        .filter((f) => f.value !== "prompts")
-        .map((room) => {
-          return (
-            <RoomListItem
-              onRoomChange={props.onRoomChange}
-              currentRoom={props.currentRoom}
-              roomEntity={room.entity}
-              setRoomEditOpen={props.setRoomEditOpen}
-            >
-              {room.value || <i>Untitled Room</i>}
-            </RoomListItem>
-          );
-        })}
-      {!authorized ? null : (
+    <div className="flex flex-col gap-1">
+      <div className="flex justify-between">
+        <small className="px-2 font-bold text-grey-55">shared</small>
+        <div className="-mt-[2px] pr-2">
+          <Popover>
+            <Popover.Button>
+              <span className="text-sm text-grey-55">
+                <em>?</em>
+              </span>
+            </Popover.Button>
+            <Popover.Panel className="lightBorder absolute left-[8px] right-[-140px] z-50 flex max-w-xs flex-col gap-2 bg-white p-4 text-sm sm:left-[24px] sm:right-0">
+              <p>
+                Rooms are workspaces to collect, create, and play with cards.
+              </p>
+              <p>Make as many as you like!</p>
+            </Popover.Panel>
+          </Popover>
+        </div>
+      </div>
+      <div className="w-full border-t border-dashed border-grey-80" />
+      <ul className="sidebarSharedRoomList flex flex-col gap-0.5">
         <button
-          className="sidebarAddRoom flex w-full place-items-center justify-between gap-1 rounded-md border border-transparent py-0.5 px-2 text-grey-55 hover:border-accent-blue hover:text-accent-blue"
-          onClick={async () => {
-            let room = ulid();
-            await mutate("assertFact", {
-              entity: room,
-              attribute: "room/name",
-              value: "",
-              positions: {},
-            });
-            props.onRoomChange(room);
-            props.setRoomEditOpen();
+          className={`sidebarHomeRoom w-full border border-transparent py-0.5 px-2 text-left ${
+            homeEntity[0]?.entity === props.currentRoom
+              ? "rounded-md bg-accent-blue font-bold text-white"
+              : "rounded-md text-grey-35 hover:border-grey-80"
+          }`}
+          onClick={() => {
+            props.onRoomChange(homeEntity[0]?.entity);
           }}
         >
-          + room
+          Home
         </button>
-      )}
-    </ul>
+
+        {rooms
+          .filter((f) => f.value !== "prompts")
+          .map((room) => {
+            return (
+              <RoomListItem
+                onRoomChange={props.onRoomChange}
+                currentRoom={props.currentRoom}
+                roomEntity={room.entity}
+                setRoomEditOpen={props.setRoomEditOpen}
+              >
+                {room.value || <i>Untitled Room</i>}
+              </RoomListItem>
+            );
+          })}
+        {!authorized ? null : (
+          <button
+            className="sidebarAddRoom flex w-full place-items-center justify-between gap-1 rounded-md border border-transparent py-0.5 px-2 text-grey-55 hover:border-accent-blue hover:text-accent-blue"
+            onClick={async () => {
+              let room = ulid();
+              await mutate("assertFact", {
+                entity: room,
+                attribute: "room/name",
+                value: "",
+                positions: {},
+              });
+              props.onRoomChange(room);
+              props.setRoomEditOpen();
+            }}
+          >
+            + room
+          </button>
+        )}
+      </ul>
+    </div>
   );
 };
 
@@ -263,37 +318,56 @@ const MemberRoomList = (props: {
   let { memberEntity, authorized } = useMutations();
   let [inviteOpen, setInviteOpen] = useState(false);
   return (
-    <ul className="sidebarMemberRoomList flex flex-col gap-0.5">
-      {members
-        .filter((f) => f.entity !== memberEntity)
-        .map((member) => {
-          return (
-            <RoomListItem
-              onRoomChange={props.onRoomChange}
-              currentRoom={props.currentRoom}
-              unreads={undefined}
-              roomEntity={member.entity}
-              setRoomEditOpen={props.setRoomEditOpen}
+    <div className="flex flex-col gap-1">
+      <div className="flex justify-between">
+        <small className="px-2 font-bold text-grey-55">members</small>
+        <div className="-mt-[2px] pr-2">
+          <Popover>
+            <Popover.Button>
+              <span className="text-sm text-grey-55">
+                <em>?</em>
+              </span>
+            </Popover.Button>
+            <Popover.Panel className="lightBorder absolute left-[8px] right-[-140px] z-50 flex max-w-xs flex-col gap-2 bg-white p-4 text-sm sm:left-[24px] sm:right-0">
+              <p>Each member gets their own room.</p>
+              <p>Send cards to others' rooms, and they'll see what's new.</p>
+            </Popover.Panel>
+          </Popover>
+        </div>
+      </div>
+      <div className="w-full border-t border-dashed border-grey-80" />
+      <ul className="sidebarMemberRoomList flex flex-col gap-0.5">
+        {members
+          .filter((f) => f.entity !== memberEntity)
+          .map((member) => {
+            return (
+              <RoomListItem
+                onRoomChange={props.onRoomChange}
+                currentRoom={props.currentRoom}
+                unreads={undefined}
+                roomEntity={member.entity}
+                setRoomEditOpen={props.setRoomEditOpen}
+              >
+                {member?.value}
+              </RoomListItem>
+            );
+          })}
+        {!authorized ? null : (
+          <>
+            <button
+              onClick={() => setInviteOpen(true)}
+              className="sidebarAddMember flex w-full place-items-center gap-1 rounded-md border border-transparent py-0.5 px-2 text-grey-55 hover:border-accent-blue  hover:text-accent-blue"
             >
-              {member?.value}
-            </RoomListItem>
-          );
-        })}
-      {!authorized ? null : (
-        <>
-          <button
-            onClick={() => setInviteOpen(true)}
-            className="sidebarAddMember flex w-full place-items-center gap-1 rounded-md border border-transparent py-0.5 px-2 text-grey-55 hover:border-accent-blue  hover:text-accent-blue"
-          >
-            + invite
-          </button>
-          <InviteMember
-            open={inviteOpen}
-            onClose={() => setInviteOpen(false)}
-          />
-        </>
-      )}
-    </ul>
+              + invite
+            </button>
+            <InviteMember
+              open={inviteOpen}
+              onClose={() => setInviteOpen(false)}
+            />
+          </>
+        )}
+      </ul>
+    </div>
   );
 };
 

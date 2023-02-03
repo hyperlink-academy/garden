@@ -129,13 +129,14 @@ const MobileFooter = (props: {
 }) => {
   let homeEntity = useIndex.aev("home");
   let roomName = useIndex.eav(props.currentRoom, "room/name");
-  let member = useIndex.eav(props.currentRoom, "member/name");
+  let memberName = useIndex.eav(props.currentRoom, "member/name");
+  let promptRoomName = useIndex.eav(props.currentRoom, "promptroom/name");
 
   return (
-    <div className="roomFooter grid shrink-0 grid-cols-[minmax(0,auto)_auto] justify-between gap-8 px-2 font-bold text-grey-35">
+    <div className="roomFooter grid shrink-0 grid-cols-[minmax(0,auto)_auto] justify-between gap-8 px-2">
       <div className=" flex w-full shrink grow flex-row gap-4">
         <Popover>
-          <Popover.Button>
+          <Popover.Button className="font-bold text-grey-35">
             <Rooms />
           </Popover.Button>
           <Popover.Overlay className="fixed inset-0 z-[999998] bg-white opacity-60" />
@@ -154,11 +155,11 @@ const MobileFooter = (props: {
             let roomPane = document.getElementById("roomWrapper");
             roomPane ? roomPane.scrollIntoView({ behavior: "smooth" }) : null;
           }}
-          className=" overflow-hidden whitespace-nowrap"
+          className=" overflow-hidden whitespace-nowrap font-bold text-grey-35"
         >
           {props.currentRoom === homeEntity[0]?.entity
-            ? "Homeroom"
-            : roomName?.value || member?.value}
+            ? "Home"
+            : roomName?.value || memberName?.value || promptRoomName?.value}
         </div>
       </div>
 
@@ -167,7 +168,7 @@ const MobileFooter = (props: {
           let cardPane = document.getElementById("cardViewerWrapper");
           cardPane ? cardPane.scrollIntoView({ behavior: "smooth" }) : null;
         }}
-        className="shrink grow overflow-hidden whitespace-nowrap text-right"
+        className="shrink grow overflow-hidden whitespace-nowrap text-right font-bold text-grey-35"
       >
         {props.currentCard}
       </div>
