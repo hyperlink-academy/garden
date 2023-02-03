@@ -70,8 +70,8 @@ const List = (props: { id: string }) => {
   // end-date = in future or unset
   const spacesActive = spacesWithStartAndEnd.filter((s) => {
     if (!s.start) {
-      return s.end && s.end > now;
-    } else return s.start && s.start <= now && (!s.end || s.end > now);
+      return s.end && s.end >= now;
+    } else return s.start && s.start <= now && (!s.end || s.end >= now);
   });
 
   // unscheduled (implicit draft)
