@@ -446,6 +446,7 @@ const EditRoomModal = (props: {
     setFormState(currentRoom?.value || "");
   }, [currentRoom?.value]);
   let isMember = !!useIndex.eav(props.currentRoom, "member/name");
+  let isPromptRoom = !!useIndex.eav(props.currentRoom, "promptroom/name");
 
   if (!props.currentRoom) return null;
   let entityID = props.currentRoom;
@@ -475,7 +476,7 @@ const EditRoomModal = (props: {
               onClick={async () => {
                 await mutate("assertFact", {
                   entity: entityID,
-                  attribute: "room/name",
+                  attribute: isPromptRoom ? "promptroom/name" : "room/name",
                   value: formState,
                   positions: {},
                 });
