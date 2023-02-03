@@ -13,7 +13,7 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { Fragment, useContext, useEffect, useMemo, useState } from "react";
 import { CardPreview } from "./CardPreview";
 import { customCollisionDetection } from "src/customCollisionDetection";
 import { restrictToParentElement } from "@dnd-kit/modifiers";
@@ -24,6 +24,8 @@ import { useSubscribe } from "replicache-react";
 import { ButtonSecondary } from "./Buttons";
 import { ActionBar } from "./ActionBar";
 import { ref } from "data/Facts";
+import { Menu } from "@headlessui/react";
+import { MenuContainer, MenuItem } from "./Layout";
 
 const GRID_SIZE = 16;
 const snap = (x: number) => Math.ceil(x / GRID_SIZE) * GRID_SIZE;
@@ -197,24 +199,45 @@ export const Desktop = (props: { entityID: string }) => {
 
 let PromptManager = (props: { entityID: string }) => {
   let name = useIndex.eav(props.entityID, "member/name");
-  let { mutate, memberEntity } = useMutations();
+  let { memberEntity } = useMutations();
   if (!name || memberEntity !== props.entityID) return null;
   return (
     <div className="relative w-full">
       <div className="absolute z-10 flex w-full justify-center gap-2">
-        <ButtonSecondary
-          content="Draw a Prompt"
-          onClick={() => {
-            mutate("drawAPrompt", {
-              factID: ulid(),
-              desktopEntity: props.entityID,
-              randomSeed: Math.random(),
-            });
-          }}
-        />
+        <RandomPromptsButton entityID={props.entityID} />
         <DailyPromptsButton entityID={props.entityID} />
       </div>
     </div>
+  );
+};
+
+let RandomPromptsButton = (props: { entityID: string }) => {
+  let { mutate } = useMutations();
+  let promptRooms = useIndex.aev("promptroom/name");
+  return (
+    <Menu as="div" className="relative">
+      <Menu.Button as={Fragment}>
+        <ButtonSecondary content="Draw a prompt " />
+      </Menu.Button>
+      <MenuContainer>
+        {promptRooms.map((room) => {
+          return (
+            <MenuItem
+              onClick={async () => {
+                mutate("drawAPrompt", {
+                  factID: ulid(),
+                  promptRoomEntity: room.entity,
+                  desktopEntity: props.entityID,
+                  randomSeed: Math.random(),
+                });
+              }}
+            >
+              {room.value}
+            </MenuItem>
+          );
+        })}
+      </MenuContainer>
+    </Menu>
   );
 };
 
