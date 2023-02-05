@@ -13,7 +13,14 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { Suspense, useContext, useEffect, useMemo, useState } from "react";
+import {
+  Fragment,
+  Suspense,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { CardPreview } from "./CardPreview";
 import { customCollisionDetection } from "src/customCollisionDetection";
 import { restrictToParentElement } from "@dnd-kit/modifiers";
@@ -23,6 +30,10 @@ import { FindOrCreate, useAllItems } from "./FindOrCreateEntity";
 import { useSubscribe } from "replicache-react";
 import { ButtonSecondary } from "./Buttons";
 import { ActionBar } from "./ActionBar";
+import { ref } from "data/Facts";
+import { Menu } from "@headlessui/react";
+import { MenuContainer, MenuItem } from "./Layout";
+import { getCurrentDate } from "src/utils";
 
 const GRID_SIZE = 16;
 const snap = (x: number) => Math.ceil(x / GRID_SIZE) * GRID_SIZE;
@@ -33,7 +44,7 @@ export const Desktop = (props: { entityID: string }) => {
   const mouseSensor = useSensor(MouseSensor, {});
   const touchSensor = useSensor(TouchSensor, {});
   const sensors = useSensors(mouseSensor, touchSensor);
-  let { mutate, action } = useMutations();
+  let { mutate, action, authorized } = useMutations();
   let [createCard, setCreateCard] = useState<null | { x: number; y: number }>(
     null
   );
@@ -47,10 +58,10 @@ export const Desktop = (props: { entityID: string }) => {
       if (e.key === "Escape") {
         setSelection([]);
       }
-    }
+    };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [])
+  }, []);
 
   return (
     <DndContext
@@ -71,10 +82,10 @@ export const Desktop = (props: { entityID: string }) => {
         let transform = `translate3d(${delta.x}px, ${delta.y}px, 0px)`;
         setSelectionDragTransform(transform);
 
-        if(selection.length > 0 && !selection.includes(active.id as string)) {
+        if (selection.length > 0 && !selection.includes(active.id as string)) {
           setSelection((oldValue) => {
-            return [...oldValue, active.id as string]
-          })
+            return [...oldValue, active.id as string];
+          });
         }
 
         let position: { y: number } = active.data.current?.position;
@@ -89,25 +100,25 @@ export const Desktop = (props: { entityID: string }) => {
       onDragEnd={async (dragProps) => {
         let { active, delta, over } = dragProps;
 
-        setSelectionDragTransform('')
+        setSelectionDragTransform("");
 
         action.start();
 
         setDraggingHeight(0);
 
-        let elementsToUpdate = selection.length > 0 ? selection : [active.id]
+        let elementsToUpdate = selection.length > 0 ? selection : [active.id];
 
-        for(let id of elementsToUpdate) {
-          if(over && !selection.includes(over.id as string)) {
-            let entityID = cards?.find((f) => f.id == id)?.value.value
+        for (let id of elementsToUpdate) {
+          if (over && !selection.includes(over.id as string)) {
+            let entityID = cards?.find((f) => f.id == id)?.value.value;
 
-            if(entityID) {
+            if (entityID) {
               await mutate("addToOrCreateDeck", {
                 droppedCardPositionFact: id as string,
                 droppedCardEntity: entityID,
                 targetCardEntity: over.data.current?.entityID,
                 desktop: props.entityID,
-                factID: ulid()
+                factID: ulid(),
               });
             }
           } else {
@@ -137,10 +148,11 @@ export const Desktop = (props: { entityID: string }) => {
           {/* Handles Double CLick to Create */}
           <div
             onClick={(e) => {
+              if (!authorized) return;
               if (e.currentTarget !== e.target) return;
               let parentRect = e.currentTarget.getBoundingClientRect();
               setSelection([]);
-              if (e.ctrlKey) {
+              if (e.ctrlKey || e.metaKey) {
                 action.start();
                 mutate("addCardToDesktop", {
                   entity: ulid(),
@@ -148,7 +160,7 @@ export const Desktop = (props: { entityID: string }) => {
                   desktop: props.entityID,
                   position: {
                     rotation: 0,
-                    size: "big",
+                    size: "small",
                     x: Math.max(e.clientX - parentRect.left - 128, 0),
                     y: Math.max(e.clientY - parentRect.top - 42, 0),
                   },
@@ -197,32 +209,50 @@ export const Desktop = (props: { entityID: string }) => {
 
 let PromptManager = (props: { entityID: string }) => {
   let name = useIndex.eav(props.entityID, "member/name");
-  let { mutate, memberEntity } = useMutations();
+  let { memberEntity } = useMutations();
   if (!name || memberEntity !== props.entityID) return null;
   return (
     <div className="relative w-full">
       <div className="absolute z-10 flex w-full justify-center gap-2">
-        <ButtonSecondary
-          content="Draw a Prompt"
-          onClick={() => {
-            mutate("drawAPrompt", {
-              factID: ulid(),
-              desktopEntity: props.entityID,
-              randomSeed: Math.random(),
-            });
-          }}
-        />
+        <RandomPromptsButton entityID={props.entityID} />
         <DailyPromptsButton entityID={props.entityID} />
       </div>
     </div>
   );
 };
 
-let DailyPromptsButton = (props: { entityID: string }) => {
-  let prompts = useIndex.at(
-    "card/date",
-    new Date().toLocaleDateString("en-CA")
+let RandomPromptsButton = (props: { entityID: string }) => {
+  let { mutate } = useMutations();
+  let promptRooms = useIndex.aev("promptroom/name");
+  return (
+    <Menu as="div" className="relative">
+      <Menu.Button as={Fragment}>
+        <ButtonSecondary content="Draw a prompt " />
+      </Menu.Button>
+      <MenuContainer className="max-w-[140px] sm:max-w-[160px]">
+        {promptRooms.map((room) => {
+          return (
+            <MenuItem
+              onClick={async () => {
+                mutate("drawAPrompt", {
+                  factID: ulid(),
+                  promptRoomEntity: room.entity,
+                  desktopEntity: props.entityID,
+                  randomSeed: Math.random(),
+                });
+              }}
+            >
+              {room.value}
+            </MenuItem>
+          );
+        })}
+      </MenuContainer>
+    </Menu>
   );
+};
+
+let DailyPromptsButton = (props: { entityID: string }) => {
+  let prompts = useIndex.at("card/date", getCurrentDate());
   let cards = useIndex.eav(props.entityID, "desktop/contains") || [];
   let newPrompts = prompts.filter(
     (p) => !cards.find((c) => c.value.value === p.entity)
@@ -295,27 +325,27 @@ const DraggableCard = (props: {
   let isOver = _isOver && !props.isSelected;
   let refs = useCombinedRefs(setNodeRef, draggableRef);
 
-  const style = transform && (Math.abs(transform.x) > 0 || Math.abs(transform.y) > 0)
-    ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
-    : "";
+  const style =
+    transform && (Math.abs(transform.x) > 0 || Math.abs(transform.y) > 0)
+      ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
+      : "";
 
-  let dragTransform = props.dragTransform || style
-  let hasMoved = dragTransform != ''
-
+  let dragTransform = props.dragTransform || style;
+  let hasMoved = dragTransform != "";
 
   let toggleSelection = () => {
-    props.setSelection?.((oldValue:string[]) => {
+    props.setSelection?.((oldValue: string[]) => {
       if (oldValue.includes(props.relationshipID)) {
         return oldValue.filter((id) => id !== props.relationshipID);
       } else {
         return [...oldValue, props.relationshipID];
       }
     });
-  }
+  };
 
   let pointerUpHandler = (e: React.PointerEvent) => {
-    if(!hasMoved && props.selectionMode && e.button === 0) toggleSelection()
-  }
+    if (!hasMoved && props.selectionMode && e.button === 0) toggleSelection();
+  };
 
   let y = position?.value.y || 0;
   let x = position?.value.x || 0;
@@ -394,6 +424,7 @@ const AddCard = (props: {
   position: null | { x: number; y: number };
 }) => {
   let items = useAllItems(!!props.position);
+  let name = useIndex.eav(props.desktopEntity, "member/name");
   let { mutate, memberEntity, action } = useMutations();
   return (
     <FindOrCreate
@@ -418,6 +449,14 @@ const AddCard = (props: {
             entity = d.entity;
           }
 
+          if (name && memberEntity !== props.desktopEntity) {
+            await mutate("assertFact", {
+              entity,
+              attribute: "card/unread-by",
+              value: ref(props.desktopEntity),
+              positions: {},
+            });
+          }
           await mutate("addCardToDesktop", {
             entity,
             factID: ulid(),

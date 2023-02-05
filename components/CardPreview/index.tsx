@@ -48,6 +48,9 @@ export const CardPreview = (
   } & Props
 ) => {
   let isMember = !!useIndex.eav(props.entityID, "member/name");
+  let { memberEntity } = useMutations();
+  let unreadBy = useIndex.eav(props.entityID, "card/unread-by") || [];
+  let isUnread = unreadBy.find((f) => f.value.value === memberEntity);
 
   let { handlers, isLongPress } = useLongPress(
     () => props.onLongPress?.(),
@@ -61,11 +64,11 @@ export const CardPreview = (
         onPointerUp={(e) => {
           if (!isLongPress.current) props.pointerUpHandler?.(e);
         }}
-        className={`cardPreviewBorder relative grow overflow-hidden ${borderStyles(
-          { isMember }
-        )} ${props.isSelected ? "selectedCardGlow" : ""} ${
-          props.isOver ? "rounded-[24px] shadow-[0_0_16px_0_#cccccc]" : ""
-        }`}
+        className={`cardPreviewBorder ${
+          isUnread ? "unreadCardGlow" : ""
+        } relative grow overflow-hidden ${borderStyles({ isMember })} ${
+          props.isSelected ? "selectedCardGlow" : ""
+        } ${props.isOver ? "rounded-[24px] shadow-[0_0_16px_0_#cccccc]" : ""}`}
       >
         {props.size === "small" ? (
           <SmallCardBody {...props} />

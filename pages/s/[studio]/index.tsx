@@ -7,6 +7,9 @@ import { useIndex } from "hooks/useReplicache";
 import { GetStaticPropsContext, InferGetStaticPropsType } from "next";
 import { sortByPosition } from "src/position_helpers";
 import { Suspense } from "react";
+import { useAuth } from "hooks/useAuth";
+import { useRouter } from "next/router";
+import { getCurrentDate } from "src/utils";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 type Props = InferGetStaticPropsType<typeof getStaticProps>;
@@ -14,16 +17,47 @@ export default function StudioPage(props: Props) {
   if (props.notFound) return <div>404 - studio not found!</div>;
   if (!props.id) return <div>loading </div>;
 
+  let { session } = useAuth();
+  let { query } = useRouter();
+
+  let myStudioName = session.session?.username;
+  let currentStudioName = query.studio;
+
   return (
     <Suspense fallback={<div>loading...</div>}>
       <SpaceProvider id={props.id}>
         <StudioName />
-        <List id={props.id} />
-        <CreateSpace studioSpaceID={props.id} />
+        {query.history !== undefined ? <HistoryList /> : <List id={props.id} />}
+        {!session?.loggedIn || myStudioName != currentStudioName ? null : (
+          <CreateSpace studioSpaceID={props.id} />
+        )}
       </SpaceProvider>
     </Suspense>
   );
 }
+
+const HistoryList = () => {
+  let now = getCurrentDate();
+  const spacesHistory = useIndex
+    .aev("space/end-date")
+    .filter((s) => s.value.value && s.value.value < now);
+
+  // return <SpaceList spaces={spaces} />;
+  return (
+    <>
+      {spacesHistory.length > 0 ? (
+        <div className="my-4 rounded-lg border border-grey-55">
+          <h2 className=" rounded-t-md bg-[rebeccapurple] py-2 px-4 text-white">
+            History
+          </h2>
+          <div className="p-2 pb-6 sm:p-4 sm:pb-8">
+            <SpaceList spaces={spacesHistory} />
+          </div>
+        </div>
+      ) : null}
+    </>
+  );
+};
 
 /*
 three lists:
@@ -32,7 +66,13 @@ three lists:
 - unscheduled (i.e. implicit draft)
 */
 const List = (props: { id: string }) => {
-  let now = new Date().toLocaleDateString("en-CA");
+  let { session } = useAuth();
+  let { query } = useRouter();
+
+  let myStudioName = session.session?.username;
+  let currentStudioName = query.studio;
+
+  let now = getCurrentDate();
 
   // all spaces
   const spacesAll = useIndex.aev("space/name").sort(sortByPosition("aev"));
@@ -57,8 +97,8 @@ const List = (props: { id: string }) => {
   // end-date = in future or unset
   const spacesActive = spacesWithStartAndEnd.filter((s) => {
     if (!s.start) {
-      return s.end && s.end > now;
-    } else return s.start && s.start <= now && (!s.end || s.end > now);
+      return s.end && s.end >= now;
+    } else return s.start && s.start <= now && (!s.end || s.end >= now);
   });
 
   // unscheduled (implicit draft)
@@ -79,7 +119,9 @@ const List = (props: { id: string }) => {
           </div>
         </div>
       ) : null}
-      <CreateSpace studioSpaceID={props.id} />
+      {!session?.loggedIn || myStudioName != currentStudioName ? null : (
+        <CreateSpace studioSpaceID={props.id} />
+      )}
       {spacesStartingFuture.length > 0 ? (
         <div className="my-4 rounded-lg border border-grey-55">
           <h2 className=" rounded-t-md bg-[darkgoldenrod] py-2 px-4 text-white">

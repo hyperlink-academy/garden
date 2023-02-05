@@ -236,14 +236,13 @@ const deleteEntity: Mutation<{ entity: string }> = async (args, ctx) => {
 const drawAPrompt: Mutation<{
   desktopEntity: string;
   factID: string;
+  promptRoomEntity: string;
   randomSeed: number;
 }> = async (args, ctx) => {
-  let promptRoom = (await ctx.scanIndex.aev("room/name")).find(
-    (f) => f.value === "prompts"
+  let prompts = await ctx.scanIndex.eav(
+    args.promptRoomEntity,
+    "desktop/contains"
   );
-  console.log(promptRoom);
-  if (!promptRoom) return;
-  let prompts = await ctx.scanIndex.eav(promptRoom.entity, "desktop/contains");
   let prompt = prompts[Math.floor(prompts.length * args.randomSeed)];
   if (!prompt) return;
   let id = await ctx.assertFact({

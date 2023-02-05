@@ -5,6 +5,7 @@ import { useRef, useState } from "react";
 import { sortByPosition } from "src/position_helpers";
 import { FilterAttributes, ReferenceAttributes } from "data/Attributes";
 import { CardStack } from "components/CardStack";
+import { useAuth } from "hooks/useAuth";
 
 export const SingleTextSection = (
   props: {
@@ -72,15 +73,30 @@ export const MultipleReferenceSection = (props: {
 };
 
 export const DateSection = (props: { entityID: string }) => {
-  let [editting, setEditting] = useState(false);
+  let [editing, setEditing] = useState(false);
+
+  let { session } = useAuth();
+  let { mutate, authorized } = useMutations();
+
   let date = useIndex.eav(props.entityID, "card/date");
   if (!date) return null;
   return (
-    <div className="flex flex-col gap-2">
-      {editting ? (
+    <div className="flex gap-2">
+      {editing ? (
         <input type="date" value={date.value.value} />
       ) : (
         <span>{date.value.value}</span>
+      )}
+      {!authorized ? null : (
+        <button
+          className="justify-self-center text-sm text-grey-55 hover:text-accent-blue"
+          onClick={() => {
+            if (!date || !session.token) return;
+            mutate("retractFact", { id: date.id });
+          }}
+        >
+          remove
+        </button>
       )}
     </div>
   );
