@@ -4,6 +4,7 @@ import { SpaceList } from "components/SpacesList";
 import { StudioName } from "components/StudioLayout";
 import { useIndex } from "hooks/useReplicache";
 import { GetStaticPropsContext, InferGetStaticPropsType } from "next";
+import { getCurrentDate } from "src/utils";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 type Props = InferGetStaticPropsType<typeof getStaticProps>;
@@ -20,7 +21,7 @@ export default function StudioPage(props: Props) {
 }
 
 const List = () => {
-  let now = new Date().toLocaleDateString("en-CA");
+  let now = getCurrentDate();
   const spacesHistory = useIndex
     .aev("space/end-date")
     .filter((s) => s.value.value && s.value.value < now);

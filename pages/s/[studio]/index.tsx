@@ -8,6 +8,7 @@ import { GetStaticPropsContext, InferGetStaticPropsType } from "next";
 import { sortByPosition } from "src/position_helpers";
 import { useAuth } from "hooks/useAuth";
 import { useRouter } from "next/router";
+import { getCurrentDate } from "src/utils";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 type Props = InferGetStaticPropsType<typeof getStaticProps>;
@@ -45,7 +46,7 @@ const List = (props: { id: string }) => {
   let myStudioName = session.session?.username;
   let currentStudioName = query.studio;
 
-  let now = new Date().toLocaleDateString("en-CA");
+  let now = getCurrentDate();
 
   // all spaces
   const spacesAll = useIndex.aev("space/name").sort(sortByPosition("aev"));

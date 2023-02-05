@@ -4,6 +4,7 @@ import { SpaceProvider } from "components/ReplicacheProvider";
 import { useIndex } from "hooks/useReplicache";
 import { InferGetStaticPropsType } from "next";
 import Head from "next/head";
+import { getCurrentDate } from "src/utils";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 type Props = InferGetStaticPropsType<typeof getStaticProps>;
@@ -22,17 +23,11 @@ export default function CalendarPage(props: Props) {
 // two lists - active and upcoming
 const List = () => {
   // spaces ending in the future
-  const spacesByEnd = useIndex.at(
-    "space/end-date",
-    new Date().toLocaleDateString("en-CA")
-  );
+  const spacesByEnd = useIndex.at("space/end-date", getCurrentDate());
 
   // upcoming:
   // start-date = in future
-  const spacesUpcoming = useIndex.at(
-    "space/start-date",
-    new Date().toLocaleDateString("en-CA")
-  );
+  const spacesUpcoming = useIndex.at("space/start-date", getCurrentDate());
 
   // active:
   // start-date = in past

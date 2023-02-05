@@ -26,6 +26,7 @@ import { ActionBar } from "./ActionBar";
 import { ref } from "data/Facts";
 import { Menu } from "@headlessui/react";
 import { MenuContainer, MenuItem } from "./Layout";
+import { getCurrentDate } from "src/utils";
 
 const GRID_SIZE = 16;
 const snap = (x: number) => Math.ceil(x / GRID_SIZE) * GRID_SIZE;
@@ -242,10 +243,7 @@ let RandomPromptsButton = (props: { entityID: string }) => {
 };
 
 let DailyPromptsButton = (props: { entityID: string }) => {
-  let prompts = useIndex.at(
-    "card/date",
-    new Date().toLocaleDateString("en-CA")
-  );
+  let prompts = useIndex.at("card/date", getCurrentDate());
   let cards = useIndex.eav(props.entityID, "desktop/contains") || [];
   let newPrompts = prompts.filter(
     (p) => !cards.find((c) => c.value.value === p.entity)
