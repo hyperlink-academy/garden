@@ -6,7 +6,7 @@ export const RenderedText = forwardRef<
   { text: string; placeholderOnHover?: boolean } & JSX.IntrinsicElements["pre"]
 >((props, ref) => {
   return (
-    // <Linkify options={{ className: "text-accent-blue underline" }}>
+    <Linkify options={{ className: "text-accent-blue underline" }}>
       <pre
         role="link"
         ref={ref}
@@ -39,13 +39,13 @@ export const RenderedText = forwardRef<
           <span
             className={`${
               props.placeholderOnHover ? "opacity-0 hover:opacity-100 " : ""
-            } !text-grey-80 italic block w-full`}
+            } block w-full italic !text-grey-80`}
           >
             {props.placeholder}
           </span>
         )}
       </pre>
-    // </Linkify>
+    </Linkify>
   );
 });
 
