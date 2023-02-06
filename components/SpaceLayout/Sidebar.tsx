@@ -145,7 +145,6 @@ const PromptRoomList = (props: {
   setRoomEditOpen: () => void;
 }) => {
   let promptRooms = useIndex.aev("promptroom/name");
-  let promptRoom = promptRooms.find((f) => f.value == "Prompt Pool");
   let { mutate } = useMutations();
   return (
     <div className="flex flex-col gap-1">
@@ -170,42 +169,18 @@ const PromptRoomList = (props: {
       </div>
       <div className="w-full border-t border-dashed border-grey-80" />
       <ul className="sidebarPromptRoomList flex flex-col gap-0.5">
-        <button
-          className={`w-full border border-transparent py-0.5 px-2 text-left ${
-            promptRoom?.entity === props.currentRoom
-              ? "rounded-md bg-accent-blue  font-bold text-white"
-              : "rounded-md border border-transparent text-grey-35 hover:border-grey-80"
-          }`}
-          onClick={async () => {
-            let entity = promptRoom?.entity;
-            if (!entity) {
-              entity = ulid();
-              await mutate("assertFact", {
-                entity,
-                attribute: "promptroom/name",
-                value: "prompts",
-                positions: {},
-              });
-            }
-            props.onRoomChange(entity);
-          }}
-        >
-          <p>Prompt Pool</p>
-        </button>
-        {promptRooms
-          .filter((room) => room.value !== "Prompt Pool")
-          .map((room) => {
-            return (
-              <RoomListItem
-                onRoomChange={props.onRoomChange}
-                currentRoom={props.currentRoom}
-                roomEntity={room.entity}
-                setRoomEditOpen={props.setRoomEditOpen}
-              >
-                {room.value || <i>Untitled Prompts</i>}
-              </RoomListItem>
-            );
-          })}
+        {promptRooms.map((room) => {
+          return (
+            <RoomListItem
+              onRoomChange={props.onRoomChange}
+              currentRoom={props.currentRoom}
+              roomEntity={room.entity}
+              setRoomEditOpen={props.setRoomEditOpen}
+            >
+              {room.value || <i>Untitled Prompts</i>}
+            </RoomListItem>
+          );
+        })}
         <button
           className=" flex w-full place-items-center justify-between gap-1 rounded-md border border-transparent py-0.5 px-2 text-grey-55 hover:border-accent-blue hover:text-accent-blue"
           onClick={async () => {
