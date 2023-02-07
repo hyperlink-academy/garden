@@ -11,15 +11,15 @@ import { Rooms } from "components/Icons";
 
 export default function SpacePage() {
   let spaceName = useIndex.aev("this/name")[0];
-  let homeRoom = useIndex
+  let firstRoom = useIndex
     .aev("room/name")
-    .find((f) => f.value === "Home")?.entity;
+    .sort((a, b) => (a.id > b.id ? 1 : -1))[0]?.entity;
 
   let [room, setRoom] = useState<string | null>(null);
   const { width } = useWindowDimensions();
   useEffect(() => {
-    if (homeRoom) setRoom(homeRoom);
-  }, [homeRoom]);
+    if (firstRoom) setRoom(firstRoom);
+  }, [firstRoom]);
 
   return (
     <>
@@ -47,8 +47,9 @@ export default function SpacePage() {
               <div
                 className={`
               contentLargeSplitLayout
-              flex 
-              w-full flex-row items-stretch gap-4 overflow-x-scroll 
+              no-scrollbar 
+              flex w-full flex-row items-stretch gap-4 
+              overflow-x-scroll
               sm:justify-center
               sm:gap-4 
 `}
@@ -74,7 +75,12 @@ export default function SpacePage() {
                   gap-0 overflow-x-hidden overflow-y-scroll
                   `}
                   >
-                    {room && <Desktop entityID={room} />}
+                    <div className="no-scrollbar overflow-y-scroll sm:p-4">
+                      <div className="relative flex w-[336px] flex-col items-stretch gap-0">
+                        <div className="desktopBackground absolute h-full w-full" />
+                        {room && <Desktop entityID={room} />}
+                      </div>
+                    </div>
                   </div>
                 </div>
 

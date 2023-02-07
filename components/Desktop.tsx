@@ -134,64 +134,58 @@ export const Desktop = (props: { entityID: string }) => {
         desktopEntity={props.entityID}
       />
       <PromptManager entityID={props.entityID} />
-      {/* TO DO - CELINE: make desktopBackground fit - full bleed! */}
-      <div className="overflow-y-scroll sm:p-4">
-        <div className="relative flex w-[336px] flex-col items-stretch gap-0">
-          <div className="desktopBackground absolute h-full w-full" />
-          {/* Handles Double CLick to Create */}
-          <div
-            onClick={(e) => {
-              if (!authorized) return;
-              if (e.currentTarget !== e.target) return;
-              let parentRect = e.currentTarget.getBoundingClientRect();
-              setSelection([]);
-              if (e.ctrlKey || e.metaKey) {
-                action.start();
-                mutate("addCardToDesktop", {
-                  entity: ulid(),
-                  factID: ulid(),
-                  desktop: props.entityID,
-                  position: {
-                    rotation: 0,
-                    size: "small",
-                    x: Math.max(e.clientX - parentRect.left - 128, 0),
-                    y: Math.max(e.clientY - parentRect.top - 42, 0),
-                  },
-                });
-                action.end();
-              }
-              if (e.detail === 2) {
-                setCreateCard({
-                  x: e.clientX - parentRect.left,
-                  y: e.clientY - parentRect.top,
-                });
-              }
-            }}
-            style={{
-              zIndex: 1,
-              height: `${draggingHeight > height ? draggingHeight : height}px`,
-              position: "relative",
-            }}
-            className="text-sm"
-          >
-            {cards?.map((card) => (
-              <DraggableCard
-                key={card.id}
-                relationshipID={card.id}
-                entityID={card.value.value}
-                parent={props.entityID}
-                setSelection={setSelection}
-                isSelected={selection.includes(card.id)}
-                selectionMode={selection.length > 0}
-                dragTransform={
-                  selection.includes(card.id) ? selectionDragTransform : ""
-                }
-              />
-            ))}
-          </div>
-          {/* <HelpToast helpText={`double click/tap to create new`} /> */}
-        </div>
+      {/* Handles Double CLick to Create */}
+      <div
+        onClick={(e) => {
+          if (!authorized) return;
+          if (e.currentTarget !== e.target) return;
+          let parentRect = e.currentTarget.getBoundingClientRect();
+          setSelection([]);
+          if (e.ctrlKey || e.metaKey) {
+            action.start();
+            mutate("addCardToDesktop", {
+              entity: ulid(),
+              factID: ulid(),
+              desktop: props.entityID,
+              position: {
+                rotation: 0,
+                size: "small",
+                x: Math.max(e.clientX - parentRect.left - 128, 0),
+                y: Math.max(e.clientY - parentRect.top - 42, 0),
+              },
+            });
+            action.end();
+          }
+          if (e.detail === 2) {
+            setCreateCard({
+              x: e.clientX - parentRect.left,
+              y: e.clientY - parentRect.top,
+            });
+          }
+        }}
+        style={{
+          zIndex: 1,
+          height: `${draggingHeight > height ? draggingHeight : height}px`,
+          position: "relative",
+        }}
+        className="text-sm"
+      >
+        {cards?.map((card) => (
+          <DraggableCard
+            key={card.id}
+            relationshipID={card.id}
+            entityID={card.value.value}
+            parent={props.entityID}
+            setSelection={setSelection}
+            isSelected={selection.includes(card.id)}
+            selectionMode={selection.length > 0}
+            dragTransform={
+              selection.includes(card.id) ? selectionDragTransform : ""
+            }
+          />
+        ))}
       </div>
+      {/* <HelpToast helpText={`double click/tap to create new`} /> */}
 
       <ActionBar selection={selection} setSelection={setSelection} />
     </DndContext>
