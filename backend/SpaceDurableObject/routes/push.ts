@@ -61,6 +61,13 @@ export const push_route = makeRoute({
       if (mutation.id <= lastMutationID) continue;
       lastMutationID = mutation.id;
       let name = mutation.name as keyof typeof Mutations;
+      if (name === "createCard") {
+        app_event(env.env, {
+          event: "created_card",
+          spaceID: env.id,
+          user: session.username,
+        });
+      }
       if (!Mutations[name]) {
         continue;
       }

@@ -5,7 +5,8 @@ type AppEvents =
   | "create_space"
   | "joined_space"
   | "pushed_to_space"
-  | "pulled_from_space";
+  | "pulled_from_space"
+  | "created_card";
 
 export const app_event = (
   env: Pick<Bindings, "APP_EVENT_ANALYTICS">,
