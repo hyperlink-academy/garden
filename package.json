@@ -50,7 +50,7 @@
     "zod": "^3.17.10"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^3.14.0",
+    "@cloudflare/workers-types": "^4.20230115.0",
     "@fauna-labs/fauna-schema-migrate": "^2.2.1",
     "@next/bundle-analyzer": "^12.2.5",
     "@types/bcryptjs": "^2.4.2",
@@ -69,6 +69,7 @@
     "prettier": "^2.8.3",
     "prettier-plugin-tailwindcss": "^0.2.1",
     "tailwindcss": "^3.0.23",
-    "ts-jest": "^28.0.5"
+    "ts-jest": "^28.0.5",
+    "wrangler": "^2.9.0"
   }
 }

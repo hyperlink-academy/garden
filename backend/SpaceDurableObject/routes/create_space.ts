@@ -1,5 +1,6 @@
 import { getCommunityByName } from "backend/fauna/resources/functions/get_community_by_name";
 import { getSessionById } from "backend/fauna/resources/functions/get_session_by_id";
+import { app_event } from "backend/lib/analytics";
 import { internalSpaceAPI, makeRoute, privateSpaceAPI } from "backend/lib/api";
 import { Client } from "faunadb";
 import { z } from "zod";
@@ -98,6 +99,11 @@ export const create_space_route = makeRoute({
       );
     }
     env.poke();
+    app_event(env.env, {
+      event: "create_space",
+      user: session.username,
+      spaceID: env.id,
+    });
     return { data: { success: true } } as const;
   },
 });

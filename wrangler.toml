@@ -11,6 +11,10 @@ kv_namespaces = []
 
 main = "out/index.mjs"
 
+analytics_engine_datasets = [
+    { binding = "APP_EVENT_ANALYTICS" }
+]
+
 [triggers]
 crons = ["0 */1 * * *"]
 
