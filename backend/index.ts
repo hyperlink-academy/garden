@@ -34,6 +34,7 @@ export type WorkerRoutes = typeof Routes;
 let router = makeRouter(Routes);
 
 export type Bindings = {
+  APP_EVENT_ANALYTICS: AnalyticsEngineDataset;
   FAUNA_KEY: string;
   SPACES: DurableObjectNamespace;
   USER_UPLOADS: R2Bucket;

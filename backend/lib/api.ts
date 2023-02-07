@@ -19,7 +19,7 @@ export function makeAPIClient<R extends Routes<any>>(
   basePath: string,
   f?: Fetcher["fetch"]
 ) {
-  let fetcher = fetch;
+  let fetcher: Fetcher["fetch"] = fetch;
   if (f) fetcher = f;
   return async <T extends R[number]["route"]>(
     path: string,

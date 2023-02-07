@@ -28,8 +28,10 @@ export const delete_self_route = makeRoute({
     });
 
     let members = await env.factStore.scanIndex.aev("space/member");
-    for (let i = 0; i < members.length; i++) {
-      let spaceID = env.env.SPACES.idFromString(members[i].value);
+    let communities = await env.factStore.scanIndex.aev("space/community");
+    let thingsToDeleteFrom = [...members, ...communities];
+    for (let i = 0; i < thingsToDeleteFrom.length; i++) {
+      let spaceID = env.env.SPACES.idFromString(thingsToDeleteFrom[i].value);
       let stub = env.env.SPACES.get(spaceID);
       await privateSpaceAPI(stub)(
         "http://internal",
@@ -40,8 +42,6 @@ export const delete_self_route = makeRoute({
         }
       );
     }
-    //TODO delete from community
-
     //DELETING EVERYTHING
     await env.storage.deleteAll();
     return { data: { success: true } };
