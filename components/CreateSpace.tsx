@@ -2,15 +2,10 @@ import { spaceAPI } from "backend/lib/api";
 import { useAuth } from "hooks/useAuth";
 import { ReplicacheContext, useIndex, useMutations } from "hooks/useReplicache";
 import { useContext, useEffect, useState } from "react";
-import {
-  ButtonLink,
-  ButtonPrimary,
-  ButtonSecondary,
-  ButtonTertiary,
-} from "./Buttons";
+import { ButtonPrimary, ButtonSecondary, ButtonTertiary } from "./Buttons";
 import { Door, DoorSelector } from "./DoorSelector";
 import { DotLoader } from "./DotLoader";
-import { SettingsStudio, SpaceCreate } from "./Icons";
+import { SpaceCreate } from "./Icons";
 import { Modal } from "./Layout";
 
 type FormState = {
@@ -84,12 +79,15 @@ export const CreateSpace = (props: { studioSpaceID: string }) => {
     </div>
   );
 };
-export const EditSpace = (props: { spaceEntity: string }) => {
-  let [open, setOpen] = useState(false);
-  let { authorized } = useMutations();
+
+export const EditSpaceModal = (props: {
+  open: boolean;
+  onDelete: () => void;
+  onClose: () => void;
+  spaceEntity: string;
+}) => {
   let { session } = useAuth();
   let spaceID = useIndex.eav(props.spaceEntity, "space/id");
-  let studio = useIndex.eav(props.spaceEntity, "space/studio");
   let community = useIndex.eav(props.spaceEntity, "space/community");
 
   let name = useIndex.eav(props.spaceEntity, "space/name");
@@ -126,72 +124,58 @@ export const EditSpace = (props: { spaceEntity: string }) => {
   }, [uploadedDoor, description, start_date, end_date, name, community, open]);
 
   let [mode, setMode] = useState<"normal" | "delete">("normal");
-  if (
-    authorized === false ||
-    session.session?.username !== studio?.value.toLocaleLowerCase()
-  ) {
-    return null;
-  } else
-    return (
-      <>
-        <a>
-          {/* <ButtonLink content="edit" onClick={() => setOpen(true)} /> */}
-          <ButtonLink
-            content=""
-            icon={<SettingsStudio />}
-            onClick={() => setOpen(true)}
+  return (
+    <Modal open={props.open} onClose={props.onClose}>
+      {mode === "normal" ? (
+        <>
+          <CreateSpaceForm
+            disableName
+            formState={formState}
+            setFormState={setFormState}
           />
-        </a>
-        <Modal open={open} onClose={() => setOpen(false)}>
-          {mode === "normal" ? (
-            <>
-              <CreateSpaceForm
-                disableName
-                formState={formState}
-                setFormState={setFormState}
-              />
 
-              <div className="flex gap-4 place-self-end">
-                <ButtonPrimary
-                  content="Delete this Space"
-                  destructive
-                  onClick={() => setMode("delete")}
-                />
-                <ButtonPrimary
-                  content={status === "normal" ? "Update" : <DotLoader />}
-                  onClick={async () => {
-                    if (!session.loggedIn || !spaceID?.value) return;
-                    setStatus("loading");
-                    await spaceAPI(
-                      `${WORKER_URL}/space/${spaceID.value}`,
-                      "update_self",
-                      {
-                        token: session.token,
-                        data: formState,
-                      }
-                    );
-                    setStatus("normal");
-                  }}
-                />
-              </div>
-            </>
-          ) : (
-            <>
-              {!spaceID ? null : (
-                <DeleteSpaceForm
-                  spaceEntity={props.spaceEntity}
-                  onCancel={() => setMode("normal")}
-                  onDelete={() => {
-                    setOpen(false);
-                  }}
-                />
-              )}
-            </>
+          <div className="flex gap-4 place-self-end">
+            <ButtonPrimary
+              content="Delete this Space"
+              destructive
+              onClick={() => setMode("delete")}
+            />
+            <ButtonPrimary
+              content={status === "normal" ? "Update" : <DotLoader />}
+              onClick={async () => {
+                if (!session.loggedIn || !spaceID?.value) return;
+                setStatus("loading");
+                console.log(
+                  await spaceAPI(
+                    `${WORKER_URL}/space/${spaceID.value}`,
+                    "update_self",
+                    {
+                      token: session.token,
+                      data: formState,
+                    }
+                  )
+                );
+                setStatus("normal");
+              }}
+            />
+          </div>
+        </>
+      ) : (
+        <>
+          {!spaceID ? null : (
+            <DeleteSpaceForm
+              spaceEntity={props.spaceEntity}
+              onCancel={() => setMode("normal")}
+              onDelete={() => {
+                props.onDelete();
+              }}
+            />
           )}
-          {/* <ButtonTertiary content="Nevermind" onClick={() => setOpen(false)} /> */}
-        </Modal>
-      </>
-    );
+        </>
+      )}
+      {/* <ButtonTertiary content="Nevermind" onClick={() => setOpen(false)} /> */}
+    </Modal>
+  );
 };
 
 const DeleteSpaceForm = (props: {

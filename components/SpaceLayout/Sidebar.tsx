@@ -25,6 +25,9 @@ import { useSmoker } from "components/Smoke";
 import { useSubscribe } from "replicache-react";
 import { Fact } from "data/Facts";
 import { Popover } from "@headlessui/react";
+import { EditSpaceModal } from "components/CreateSpace";
+import { getCurrentDate } from "src/utils";
+import { useRouter } from "next/router";
 
 export const Sidebar = (props: {
   onRoomChange: (room: string) => void;
@@ -33,7 +36,6 @@ export const Sidebar = (props: {
   let { session } = useAuth();
   let { memberEntity } = useMutations();
 
-  let spaceName = useIndex.aev("this/name")[0];
   let [roomEditOpen, setRoomEditOpen] = useState(false);
   let rep = useContext(ReplicacheContext);
 
@@ -58,16 +60,7 @@ export const Sidebar = (props: {
   return (
     <div className="Sidebar flex h-full w-48 flex-col items-stretch gap-4 rounded-l-[3px] border-r border-grey-90 bg-white p-3 text-grey-35">
       <div className="no-scrollbar flex h-full w-full flex-col gap-4 overflow-y-scroll">
-        <div className="SidebarSpaceInfo flex flex-col gap-1">
-          <div className="flex items-start justify-between gap-2">
-            <h3 className="px-2">{spaceName?.value}</h3>
-            <button className="shrink-0 rounded-md border border-transparent pt-[1px] hover:border-accent-blue hover:text-accent-blue">
-              <MoreOptionsSmall />
-            </button>
-          </div>
-          <SpaceStatus />
-        </div>
-
+        <SpaceName />
         <Divider />
 
         <div className="flex flex-col gap-4">
@@ -135,6 +128,44 @@ export const Sidebar = (props: {
       <div className="mb-2 shrink-0 ">
         <BackToStudio studio={session.session?.username} />
       </div>
+    </div>
+  );
+};
+const SpaceName = () => {
+  let spaceName = useIndex.aev("this/name")[0];
+  let studio = useIndex.eav(spaceName?.entity, "space/studio");
+  let router = useRouter();
+  let { session } = useAuth();
+  let authorized =
+    session.session && session.session.username === studio?.value;
+  console.log(session, studio);
+  let [editModal, setEditModal] = useState(false);
+  return (
+    <div className="SidebarSpaceInfo flex flex-col gap-1">
+      <div className="flex items-start justify-between gap-2">
+        <h3 className="px-2">{spaceName?.value}</h3>
+        {authorized && (
+          <button
+            onClick={() => setEditModal(true)}
+            className="shrink-0 rounded-md border border-transparent pt-[1px] hover:border-accent-blue hover:text-accent-blue"
+          >
+            <MoreOptionsSmall />
+          </button>
+        )}
+      </div>
+      <SpaceStatus
+        entityID={spaceName?.entity}
+        openEditModal={() => setEditModal(true)}
+      />
+      <EditSpaceModal
+        open={editModal}
+        onDelete={() => {
+          if (!session.session) return;
+          router.push(`/s/${session.session.username}`);
+        }}
+        onClose={() => setEditModal(false)}
+        spaceEntity={spaceName?.entity}
+      />
     </div>
   );
 };
@@ -404,40 +435,48 @@ const BackToStudio = (props: { studio?: string }) => {
   );
 };
 
-const SpaceStatus = () => {
-  // TODO: get dates + calculate status
-  // options: unscheduled, upcoming, ongoing, completed
+const SpaceStatus = (props: {
+  entityID: string;
+  openEditModal: () => void;
+}) => {
+  let start_date = useIndex.eav(props.entityID, "space/start-date");
+  let end_date = useIndex.eav(props.entityID, "space/end-date");
 
-  // TODO: maybe pass in status as prop - and also in Settings for more detail
-
-  // TEMP EXAMPLE
-
-  let { authorized } = useMutations();
-  let status = "unscheduled";
+  let studio = useIndex.eav(props.entityID, "space/studio");
+  let { session } = useAuth();
+  let status: "unscheduled" | "ongoing" | "upcoming" | "completed" =
+    "unscheduled";
+  if (start_date) status = "ongoing";
+  if (start_date && start_date.value.value > getCurrentDate())
+    status = "upcoming";
+  if (end_date && end_date.value.value < getCurrentDate()) status = "completed";
 
   let statusStyles = "";
   if (status === "unscheduled")
-    statusStyles =
-      "border border-grey-90 text-grey-55  hover:border-accent-blue hover:text-accent-blue";
+    statusStyles = "border border-grey-90 text-grey-55  ";
   if (status === "upcoming") statusStyles = "text-white bg-grey-15 ";
   if (status === "ongoing") statusStyles = "text-white bg-[green] ";
   if (status === "completed") statusStyles = "text-white bg-grey-35 ";
 
+  if (
+    status === "unscheduled" &&
+    session.session &&
+    session.session.username === studio?.value
+  ) {
+    return (
+      <button
+        onClick={() => props.openEditModal()}
+        className={`sidebarSpaceStatus flex w-fit gap-2 rounded-md border border-grey-90 px-2 py-1 text-sm text-grey-55 hover:border-accent-blue hover:text-accent-blue`}
+      >
+        schedule dates
+      </button>
+    );
+  }
   return (
     <div
       className={`${statusStyles} sidebarSpaceStatus flex w-fit gap-2 rounded-md px-2 py-1 text-sm`}
     >
-      {status === "unscheduled" ? (
-        !authorized ? (
-          <p>unscheduled</p>
-        ) : (
-          <Link href="">
-            <p>schedule dates</p>
-          </Link>
-        )
-      ) : (
-        <span>{status}</span>
-      )}
+      <span>{status}</span>
     </div>
   );
 };
