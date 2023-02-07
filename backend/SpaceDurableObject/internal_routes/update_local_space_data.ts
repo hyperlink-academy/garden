@@ -37,22 +37,38 @@ export const update_local_space_data_route = makeRoute({
       });
     }
 
-    if (msg.data.start_date !== undefined && msg.data.start_date !== "") {
-      await env.factStore.assertFact({
-        entity: spaceEntity,
-        attribute: "space/start-date",
-        value: { type: "yyyy-mm-dd", value: msg.data.start_date },
-        positions: {},
-      });
+    if (msg.data.start_date !== undefined) {
+      if (msg.data.start_date === "") {
+        let existingFact = await env.factStore.scanIndex.eav(
+          spaceEntity,
+          "space/start-date"
+        );
+        if (existingFact) await env.factStore.retractFact(existingFact.id);
+      } else {
+        await env.factStore.assertFact({
+          entity: spaceEntity,
+          attribute: "space/start-date",
+          value: { type: "yyyy-mm-dd", value: msg.data.start_date },
+          positions: {},
+        });
+      }
     }
 
-    if (msg.data.end_date !== undefined && msg.data.end_date !== "") {
-      await env.factStore.assertFact({
-        entity: spaceEntity,
-        attribute: "space/end-date",
-        value: { type: "yyyy-mm-dd", value: msg.data.end_date },
-        positions: {},
-      });
+    if (msg.data.end_date !== undefined) {
+      if (msg.data.end_date === "") {
+        let existingFact = await env.factStore.scanIndex.eav(
+          spaceEntity,
+          "space/end-date"
+        );
+        if (existingFact) await env.factStore.retractFact(existingFact.id);
+      } else {
+        await env.factStore.assertFact({
+          entity: spaceEntity,
+          attribute: "space/end-date",
+          value: { type: "yyyy-mm-dd", value: msg.data.end_date },
+          positions: {},
+        });
+      }
     }
 
     if (msg.data.description !== undefined) {
