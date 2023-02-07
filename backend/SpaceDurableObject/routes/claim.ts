@@ -31,6 +31,12 @@ export const claimRoute = makeRoute({
         positions: {},
       }),
       env.factStore.assertFact({
+        entity: homeEntity,
+        attribute: "room/name",
+        value: "Home",
+        positions: {},
+      }),
+      env.factStore.assertFact({
         entity: memberEntity,
         attribute: "space/member",
         value: msg.ownerID,

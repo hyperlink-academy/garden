@@ -239,8 +239,6 @@ const SharedRoomList = (props: {
   setRoomEditOpen: () => void;
 }) => {
   let { mutate, authorized } = useMutations();
-  let { session } = useAuth();
-  let homeEntity = useIndex.aev("home");
   let rooms = useIndex.aev("room/name");
 
   return (
@@ -265,19 +263,6 @@ const SharedRoomList = (props: {
       </div>
       <div className="w-full border-t border-dashed border-grey-80" />
       <ul className="sidebarSharedRoomList flex flex-col gap-0.5">
-        <button
-          className={`sidebarHomeRoom w-full border border-transparent py-0.5 px-2 text-left ${
-            homeEntity[0]?.entity === props.currentRoom
-              ? "rounded-md bg-accent-blue font-bold text-white"
-              : "rounded-md text-grey-35 hover:border-grey-80"
-          }`}
-          onClick={() => {
-            props.onRoomChange(homeEntity[0]?.entity);
-          }}
-        >
-          Home
-        </button>
-
         {rooms
           .filter((f) => f.value !== "prompts")
           .map((room) => {

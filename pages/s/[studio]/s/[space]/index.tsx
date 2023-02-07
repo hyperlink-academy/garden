@@ -11,13 +11,15 @@ import { Rooms } from "components/Icons";
 
 export default function SpacePage() {
   let spaceName = useIndex.aev("this/name")[0];
-  let homeEntity = useIndex.aev("home");
+  let homeRoom = useIndex
+    .aev("room/name")
+    .find((f) => f.value === "Home")?.entity;
 
   let [room, setRoom] = useState<string | null>(null);
   const { width } = useWindowDimensions();
   useEffect(() => {
-    if (homeEntity[0]) setRoom(homeEntity[0].entity);
-  }, [homeEntity[0]]);
+    if (homeRoom) setRoom(homeRoom);
+  }, [homeRoom]);
 
   return (
     <>
@@ -127,7 +129,6 @@ const MobileFooter = (props: {
   currentCard: string;
   onRoomChange: (room: string) => void;
 }) => {
-  let homeEntity = useIndex.aev("home");
   let roomName = useIndex.eav(props.currentRoom, "room/name");
   let memberName = useIndex.eav(props.currentRoom, "member/name");
   let promptRoomName = useIndex.eav(props.currentRoom, "promptroom/name");
@@ -157,9 +158,7 @@ const MobileFooter = (props: {
           }}
           className=" overflow-hidden whitespace-nowrap font-bold text-grey-35"
         >
-          {props.currentRoom === homeEntity[0]?.entity
-            ? "Home"
-            : roomName?.value || memberName?.value || promptRoomName?.value}
+          {roomName?.value || memberName?.value || promptRoomName?.value}
         </div>
       </div>
 
