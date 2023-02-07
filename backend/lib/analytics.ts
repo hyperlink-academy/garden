@@ -1,6 +1,11 @@
 import { Bindings } from "backend";
 
-type AppEvents = "signup" | "create_space" | "joined_space";
+type AppEvents =
+  | "signup"
+  | "create_space"
+  | "joined_space"
+  | "pushed_to_space"
+  | "pulled_from_space";
 
 export const app_event = (
   env: Pick<Bindings, "APP_EVENT_ANALYTICS">,

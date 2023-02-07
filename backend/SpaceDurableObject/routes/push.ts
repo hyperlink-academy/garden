@@ -6,6 +6,7 @@ import { getSessionById } from "backend/fauna/resources/functions/get_session_by
 import { Mutations } from "data/mutations";
 import { store } from "../fact_store";
 import { CachedStorage } from "../storage_cache";
+import { app_event } from "backend/lib/analytics";
 
 export const push_route = makeRoute({
   route: "push",
@@ -75,6 +76,11 @@ export const push_route = makeRoute({
     cachedStore.put<number>(`lastMutationID-${msg.clientID}`, lastMutationID);
     await cachedStore.flush();
     release();
+    app_event(env.env, {
+      event: "pushed_to_space",
+      spaceID: env.id,
+      user: session.username,
+    });
 
     env.poke();
     return { data: { success: true, errors: [] } };
