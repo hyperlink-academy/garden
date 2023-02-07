@@ -1,4 +1,5 @@
 import { getSessionById } from "backend/fauna/resources/functions/get_session_by_id";
+import { app_event } from "backend/lib/analytics";
 import { makeRoute, privateSpaceAPI } from "backend/lib/api";
 import { Fact } from "data/Facts";
 import { Client } from "faunadb";
@@ -84,6 +85,11 @@ export const join_route = makeRoute({
       },
     });
     env.poke();
+    app_event(env.env, {
+      event: "joined_space",
+      user: session.username,
+      spaceID: env.id,
+    });
     return { data: { success: true } } as const;
   },
 });

@@ -1,6 +1,7 @@
 import { Bindings } from "backend";
 
-type AppEvents = "signup" | "create_space";
+type AppEvents = "signup" | "create_space" | "joined_space";
+
 export const app_event = (
   env: Pick<Bindings, "APP_EVENT_ANALYTICS">,
   event: { event: AppEvents; user: string; spaceID: string }
