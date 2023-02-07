@@ -28,7 +28,7 @@ export default function App({ Component, pageProps }: AppProps) {
       <SharedProviders>
         <SpaceSpaceProvider
           notFound={<div className="p-4">404'd space</div>}
-          loading={<div className="p-4">loading space…</div>}
+          loading={<></>}
         >
           <Component {...pageProps} />
         </SpaceSpaceProvider>
@@ -36,8 +36,10 @@ export default function App({ Component, pageProps }: AppProps) {
     );
   }
   // shared logged in homepage: studio + calendar
-  if (router.pathname.startsWith("/s/[studio]")
-  || router.pathname.startsWith("/calendar")) {
+  if (
+    router.pathname.startsWith("/s/[studio]") ||
+    router.pathname.startsWith("/calendar")
+  ) {
     return (
       <SharedProviders>
         <HomeLayout {...pageProps}>
