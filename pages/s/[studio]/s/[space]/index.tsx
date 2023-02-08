@@ -105,7 +105,12 @@ export default function SpacePage() {
                       gap-0 overflow-y-scroll
                       `}
                     >
-                      {room && <Desktop entityID={room} />}
+                      <div className="no-scrollbar overflow-y-scroll sm:p-4">
+                        <div className="relative flex w-[336px] flex-col items-stretch gap-0">
+                          <div className="desktopBackground absolute h-full w-full" />
+                          {room && <Desktop entityID={room} />}
+                        </div>
+                      </div>
                     </div>
                   </div>
 
