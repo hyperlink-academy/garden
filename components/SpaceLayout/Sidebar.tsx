@@ -176,7 +176,7 @@ const PromptRoomList = (props: {
   setRoomEditOpen: () => void;
 }) => {
   let promptRooms = useIndex.aev("promptroom/name");
-  let { mutate } = useMutations();
+  let { mutate, authorized } = useMutations();
   return (
     <div className="flex flex-col gap-1">
       <div className="flex justify-between">
@@ -212,22 +212,24 @@ const PromptRoomList = (props: {
             </RoomListItem>
           );
         })}
-        <button
-          className=" flex w-full place-items-center justify-between gap-1 rounded-md border border-transparent py-0.5 px-2 text-grey-55 hover:border-accent-blue hover:text-accent-blue"
-          onClick={async () => {
-            let room = ulid();
-            await mutate("assertFact", {
-              entity: room,
-              attribute: "promptroom/name",
-              value: "",
-              positions: {},
-            });
-            props.onRoomChange(room);
-            props.setRoomEditOpen();
-          }}
-        >
-          + room
-        </button>
+        {!authorized ? null : (
+          <button
+            className=" flex w-full place-items-center justify-between gap-1 rounded-md border border-transparent py-0.5 px-2 text-grey-55 hover:border-accent-blue hover:text-accent-blue"
+            onClick={async () => {
+              let room = ulid();
+              await mutate("assertFact", {
+                entity: room,
+                attribute: "promptroom/name",
+                value: "",
+                positions: {},
+              });
+              props.onRoomChange(room);
+              props.setRoomEditOpen();
+            }}
+          >
+            + room
+          </button>
+        )}
       </ul>
     </div>
   );
