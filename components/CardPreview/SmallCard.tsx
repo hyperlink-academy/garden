@@ -1,6 +1,6 @@
 import { useCardViewer } from "components/CardViewerContext";
 import { GripperBG } from "components/Gripper";
-import { ExternalLink, Member } from "components/Icons";
+import { CalendarMedium, ExternalLink, Member } from "components/Icons";
 import { useIndex, useMutations } from "hooks/useReplicache";
 import { isUrl } from "src/isUrl";
 import { Props } from "./index";
@@ -13,6 +13,7 @@ export const SmallCardBody = (props: { entityID: string } & Props) => {
   let title = useIndex.eav(props.entityID, "card/title");
   let content = useIndex.eav(props.entityID, "card/content");
   let image = useIndex.eav(props.entityID, "card/image");
+  let date = useIndex.eav(props.entityID, "card/date");
 
   let imageUrl = !image
     ? undefined
@@ -28,6 +29,7 @@ export const SmallCardBody = (props: { entityID: string } & Props) => {
       imageUrl={imageUrl}
       isMember={isMember}
       memberName={member?.value}
+      date={date?.value.value}
     />
   );
 };
@@ -41,9 +43,11 @@ export const BaseSmallCard = (
     isMember: boolean;
     imageUrl?: string;
     entityID?: string;
+    date?: string;
   } & Omit<Props, "size" | "href">
 ) => {
   let url = props.content ? isUrl(props.content) : false;
+  let date = props.date;
   let { authorized } = useMutations();
   let { open } = useCardViewer();
   return (
@@ -53,8 +57,8 @@ export const BaseSmallCard = (
         props.entityID && open({ entityID: props.entityID });
         cardView ? cardView.scrollIntoView({ behavior: "smooth" }) : null;
       }}
-      className={`w-full h-full grid grid-cols-[max-content_auto] !bg-cover !bg-center !bg-no-repeat hover:cursor-pointer ${
-        props.isMember ? "pr-1 pl-0 pt-2 pb-1" : "pr-3 pl-0 py-2"
+      className={`grid h-full w-full grid-cols-[max-content_auto] !bg-cover !bg-center !bg-no-repeat hover:cursor-pointer ${
+        props.isMember ? "pr-1 pl-0 pt-2 pb-1" : "py-2 pr-3 pl-0"
       }`}
       style={{
         background: props.imageUrl ? `url(${props.imageUrl})` : "",
@@ -75,7 +79,7 @@ export const BaseSmallCard = (
       {!props.isMember ? (
         /* Default Content (Member Content Futher DOwn) */
         <div
-          className="w-full h-full flex flex-col gap-2 items-stretch overflow-hidden"
+          className="flex h-full w-full flex-col items-stretch gap-2 overflow-hidden"
           style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
         >
           {/* Small Card Preivew Title Or Contnet */}
@@ -83,8 +87,8 @@ export const BaseSmallCard = (
             {!props.title ? (
               <small>
                 <pre
-                  className={`whitespace-pre-wrap truncate leading-tight ${
-                    !props.image ? "" : "rounded-[3px] px-1 bg-white/75"
+                  className={`truncate whitespace-pre-wrap leading-tight ${
+                    !props.image ? "" : "rounded-[3px] bg-white/75 px-1"
                   } `}
                 >
                   {props?.content}
@@ -92,8 +96,8 @@ export const BaseSmallCard = (
               </small>
             ) : (
               <div
-                className={`leading-tight text-ellipsis text-grey-35 font-bold  ${
-                  !props.image ? "" : "rounded-[3px] px-1 bg-white/75"
+                className={`text-ellipsis font-bold leading-tight text-grey-35  ${
+                  !props.image ? "" : "rounded-[3px] bg-white/75 px-1"
                 }`}
               >
                 {props.title}
@@ -101,7 +105,7 @@ export const BaseSmallCard = (
             )}
           </a>
 
-          {/* Small Card Preview External Link */}
+          {/* Small Card Preview - External Link */}
           {url ? (
             <a
               href={props.content}
@@ -118,22 +122,30 @@ export const BaseSmallCard = (
           ) : (
             <div />
           )}
+          {/* Small Card Preview - Date */}
+          {date ? (
+            <div className="text-grey-35">
+              <CalendarMedium />
+            </div>
+          ) : (
+            <div />
+          )}
         </div>
       ) : (
         // END OF DEFAULT CARD CONTENT, START OF MEMBER CARD CONTENT
-        <div className="w-full h-full flex flex-col gap-2 items-stretch overflow-hidden">
+        <div className="flex h-full w-full flex-col items-stretch gap-2 overflow-hidden">
           <div className="grid grid-cols-[auto_max-content] items-end text-white ">
             <Member />
             <small>member</small>
           </div>
           <div
             className={`
-            py-1 px-2 
+            flex h-full 
             grow
-            bg-white rounded-md 
-            text-accent-red font-bold leading-tight 
-            h-full overflow-y-hidden
-            flex items-end
+            items-end overflow-y-hidden 
+            rounded-md bg-white py-1 
+            px-2 font-bold
+            leading-tight text-accent-red
             `}
           >
             <p className="overflow-hidden">{props.memberName}</p>

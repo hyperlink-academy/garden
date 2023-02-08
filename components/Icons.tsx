@@ -7,7 +7,7 @@ import { SVGProps } from "react";
 // These are large click targets, very important, or somewhat illustrative
 //
 
-export const CalenderMedium = (props: SVGProps<SVGSVGElement>) => (
+export const CalendarMedium = (props: SVGProps<SVGSVGElement>) => (
   <svg
     width="25"
     height="24"

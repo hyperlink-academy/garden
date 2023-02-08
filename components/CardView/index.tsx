@@ -5,7 +5,7 @@ import {
   Delete,
   DeckSmall,
   Member,
-  CalenderMedium,
+  CalendarMedium,
 } from "components/Icons";
 import { Divider, MenuContainer, MenuItem } from "components/Layout";
 import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
@@ -143,7 +143,7 @@ export const AddSections = (props: { entityID: string }) => {
               setOpen(!open);
             }}
           >
-            <CalenderMedium className="stroke-accent-blue" />
+            <CalendarMedium className="stroke-accent-blue" />
           </button>
         )}
       </div>
