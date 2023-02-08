@@ -143,7 +143,7 @@ const SpaceName = () => {
   return (
     <div className="SidebarSpaceInfo flex flex-col gap-1">
       <div className="flex items-start justify-between gap-2">
-        <h3 className="px-2">{spaceName?.value}</h3>
+        <h3 className="">{spaceName?.value}</h3>
         {authorized && (
           <button
             onClick={() => setEditModal(true)}
@@ -424,17 +424,29 @@ const SpaceStatus = (props: {
   entityID: string;
   openEditModal: () => void;
 }) => {
-  let start_date = useIndex.eav(props.entityID, "space/start-date");
-  let end_date = useIndex.eav(props.entityID, "space/end-date");
+  let start_date = useIndex.eav(props.entityID, "space/start-date")?.value
+    .value;
+  let end_date = useIndex.eav(props.entityID, "space/end-date")?.value.value;
 
   let studio = useIndex.eav(props.entityID, "space/studio");
   let { session } = useAuth();
   let status: "unscheduled" | "ongoing" | "upcoming" | "completed" =
     "unscheduled";
-  if (start_date) status = "ongoing";
-  if (start_date && start_date.value.value > getCurrentDate())
-    status = "upcoming";
-  if (end_date && end_date.value.value < getCurrentDate()) status = "completed";
+
+  // date logic - this should match studio index.tsx
+  if (
+    // start in past + end missing or in future
+    (start_date &&
+      start_date <= getCurrentDate() &&
+      (!end_date || end_date >= getCurrentDate())) ||
+    // OR no start + future end date
+    (!start_date && end_date && end_date >= getCurrentDate())
+  )
+    status = "ongoing";
+
+  if (start_date && start_date > getCurrentDate()) status = "upcoming";
+
+  if (end_date && end_date < getCurrentDate()) status = "completed";
 
   let statusStyles = "";
   if (status === "unscheduled")
