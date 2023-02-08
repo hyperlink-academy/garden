@@ -237,7 +237,7 @@ let RandomPromptsButton = (props: { entityID: string }) => {
 };
 
 let DailyPromptsButton = (props: { entityID: string }) => {
-  let prompts = useIndex.at("card/date", getCurrentDate());
+  let prompts = useIndex.at("card/date", getCurrentDate(), true);
   let cards = useIndex.eav(props.entityID, "desktop/contains") || [];
   let newPrompts = prompts.filter(
     (p) => !cards.find((c) => c.value.value === p.entity)
