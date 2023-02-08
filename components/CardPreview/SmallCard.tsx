@@ -77,12 +77,12 @@ export const BaseSmallCard = (
       )}
       {/* Small Card Preview Content Wrapper (is it default or member?) */}
       {!props.isMember ? (
-        /* Default Content (Member Content Futher DOwn) */
+        /* Default Content (Member Content Further Down) */
         <div
           className="flex h-full w-full flex-col items-stretch gap-2 overflow-hidden"
           style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
         >
-          {/* Small Card Preivew Title Or Contnet */}
+          {/* Small Card Preview Title Or Content */}
           <a className="h-full overflow-hidden">
             {!props.title ? (
               <small>
@@ -119,17 +119,13 @@ export const BaseSmallCard = (
                 <ExternalLink />
               </div>
             </a>
-          ) : (
-            <div />
-          )}
+          ) : null}
           {/* Small Card Preview - Date */}
           {date ? (
             <div className="text-grey-35">
               <CalendarMedium />
             </div>
-          ) : (
-            <div />
-          )}
+          ) : null}
         </div>
       ) : (
         // END OF DEFAULT CARD CONTENT, START OF MEMBER CARD CONTENT
