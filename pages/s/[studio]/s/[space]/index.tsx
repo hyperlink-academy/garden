@@ -84,7 +84,7 @@ export default function SpacePage() {
                   </div>
                 </div>
 
-                <CardViewer EmptyState={<EmptyState />} />
+                <CardViewer EmptyState={<EmptyState />} room={room} />
               </div>
             ) : (
               <div className="smallSplitLayout flex w-full flex-col items-stretch gap-2">
@@ -109,7 +109,7 @@ export default function SpacePage() {
                     </div>
                   </div>
 
-                  <CardViewer EmptyState={<EmptyState />} />
+                  <CardViewer EmptyState={<EmptyState />} room={room} />
                 </div>
                 <MobileFooter
                   currentRoom={room}
