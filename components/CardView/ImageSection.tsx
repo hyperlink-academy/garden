@@ -2,6 +2,8 @@ import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
 import { useAuth } from "hooks/useAuth";
 import { spaceAPI } from "backend/lib/api";
 import { SectionImageAdd } from "components/Icons";
+import { useState } from "react";
+import { DotLoader } from "components/DotLoader";
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 
 export const MakeImage = (props: { entity: string }) => {
@@ -67,10 +69,11 @@ export const AddImage: React.FC<
 > = (props) => {
   let { session } = useAuth();
   let spaceID = useSpaceID();
+  let [state, setState] = useState<"normal" | "uploading">("normal");
 
   return (
     <label className="inline-block w-max text-grey-55 hover:text-accent-blue ">
-      {props.children}
+      {state === "normal" ? props.children : <DotLoader />}
       <input
         type="file"
         accept="image/*"
@@ -78,6 +81,7 @@ export const AddImage: React.FC<
         onChange={async (e) => {
           let files = e.currentTarget.files;
           if (!files || !session.session || !spaceID) return;
+          setState("uploading");
           let res = await fetch(`${WORKER_URL}/space/${spaceID}/upload_file`, {
             headers: {
               "X-Authorization": session.session.id,
@@ -85,6 +89,7 @@ export const AddImage: React.FC<
             method: "POST",
             body: files[0],
           });
+          setState("normal");
           let data = (await res.json()) as
             | { success: false }
             | { success: true; data: { id: string } };
