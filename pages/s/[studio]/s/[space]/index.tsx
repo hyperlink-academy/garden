@@ -33,7 +33,6 @@ export default function SpacePage() {
     <>
       <Head>
         <title key="title">{spaceName?.value}</title>
-        <meta name="theme-color" content="#0000FF" />
       </Head>
 
       <div className="pageWrapperflex h-[100dvh] flex-col items-stretch justify-items-center gap-2 overflow-hidden sm:gap-4">
