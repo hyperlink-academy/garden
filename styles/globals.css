@@ -250,3 +250,9 @@ input {
 .pwa-padding {
   padding-top: env(safe-area-inset-top);
 }
+
+@media (display-mode: standalone) {
+  .safari-pwa-height {
+    !height: 100lvh;
+  }
+}
