@@ -21,6 +21,14 @@ export default function SpacePage() {
     if (firstRoom) setRoom(firstRoom);
   }, [firstRoom]);
 
+  useEffect(() => {
+    window.requestAnimationFrame(() => {
+      let roomPane = document.getElementById("desktopWrapper");
+      console.log(roomPane);
+      roomPane?.scrollIntoView();
+    });
+  }, []);
+
   return (
     <>
       <Head>
@@ -37,7 +45,6 @@ export default function SpacePage() {
          w-full max-w-6xl
           grow 
           items-stretch 
-          py-4
           sm:py-6 sm:px-4 `}
         >
           <SpaceHeader />
@@ -67,7 +74,7 @@ export default function SpacePage() {
 
                   <div
                     className={`
-                  desktopWrapper
+                    desktopWrapper
                   no-scrollbar flex 
                   h-full 
                   flex-shrink-0 
@@ -87,46 +94,47 @@ export default function SpacePage() {
                 <CardViewer EmptyState={<EmptyState />} room={room} />
               </div>
             ) : (
-              <div className="smallSplitLayout flex w-full flex-col items-stretch gap-2">
+              <div className="flex snap-x snap-mandatory flex-row gap-2 overflow-x-scroll">
+                <div className="snap-end">
+                  <Sidebar
+                    onRoomChange={(room) => {
+                      setRoom(room);
+                      let roomPane = document.getElementById("roomWrapper");
+                      roomPane
+                        ? roomPane.scrollIntoView({ behavior: "smooth" })
+                        : null;
+                    }}
+                    currentRoom={room}
+                  />
+                </div>
                 <div
-                  className={`layoutContent flex w-full snap-x snap-mandatory flex-row items-stretch gap-4 overflow-x-scroll scroll-smooth px-2`}
+                  id="roomWrapper"
+                  className="roomWrapper relative flex snap-center flex-row py-4"
                 >
                   <div
-                    id="roomWrapper"
-                    className="roomWrapper relative flex snap-center flex-row rounded-md border border-grey-90"
-                  >
-                    <div
-                      className={`
-                      desktopWrapper
-                      no-scrollbar flex 
-                      h-full 
-                      flex-shrink-0 
-                      flex-col
-                      gap-0 overflow-y-scroll
+                    id="desktopWrapper"
+                    className={`
+                      desktopWrapper no-scrollbar flex 
+                      h-full
+                      flex-shrink-0 flex-col 
+                      gap-0 
+                      overflow-y-scroll 
+                      rounded-md
+                      border border-grey-90
                       `}
-                    >
-                      <div className="no-scrollbar overflow-y-scroll sm:p-4">
-                        <div className="relative flex w-[336px] flex-col items-stretch gap-0">
-                          <div className="desktopBackground absolute h-full w-full" />
-                          {room && <Desktop entityID={room} />}
-                        </div>
+                  >
+                    <div className="no-scrollbar overflow-y-scroll sm:p-4">
+                      <div className="relative flex w-[336px] flex-col items-stretch gap-0">
+                        <div className="desktopBackground absolute h-full w-full" />
+                        {room && <Desktop entityID={room} />}
                       </div>
                     </div>
                   </div>
+                </div>
 
+                <div className="py-4 pr-2">
                   <CardViewer EmptyState={<EmptyState />} room={room} />
                 </div>
-                <MobileFooter
-                  currentRoom={room}
-                  currentCard="card"
-                  onRoomChange={(room) => {
-                    setRoom(room);
-                    let roomPane = document.getElementById("roomWrapper");
-                    roomPane
-                      ? roomPane.scrollIntoView({ behavior: "smooth" })
-                      : null;
-                  }}
-                />
               </div>
             )}
           </SmallCardDragContext>
@@ -135,56 +143,6 @@ export default function SpacePage() {
     </>
   );
 }
-const MobileFooter = (props: {
-  currentRoom: string | null;
-  currentCard: string;
-  onRoomChange: (room: string) => void;
-}) => {
-  let roomName = useIndex.eav(props.currentRoom, "room/name");
-  let memberName = useIndex.eav(props.currentRoom, "member/name");
-  let promptRoomName = useIndex.eav(props.currentRoom, "promptroom/name");
-
-  return (
-    <div className="roomFooter grid shrink-0 grid-cols-[minmax(0,auto)_auto] justify-between gap-8 px-2">
-      <div className=" flex w-full shrink grow flex-row gap-4">
-        <Popover>
-          <Popover.Button className="font-bold text-grey-35">
-            <Rooms />
-          </Popover.Button>
-          <Popover.Overlay className="fixed inset-0 z-[999998] bg-white opacity-60" />
-
-          <Popover.Panel
-            className={`roomListWrapper fixed top-0 bottom-0 left-0 z-[999999] `}
-          >
-            <Sidebar
-              onRoomChange={props.onRoomChange}
-              currentRoom={props.currentRoom}
-            />
-          </Popover.Panel>
-        </Popover>
-        <div
-          onClick={() => {
-            let roomPane = document.getElementById("roomWrapper");
-            roomPane ? roomPane.scrollIntoView({ behavior: "smooth" }) : null;
-          }}
-          className=" overflow-hidden whitespace-nowrap font-bold text-grey-35"
-        >
-          {roomName?.value || memberName?.value || promptRoomName?.value}
-        </div>
-      </div>
-
-      <div
-        onClick={() => {
-          let cardPane = document.getElementById("cardViewerWrapper");
-          cardPane ? cardPane.scrollIntoView({ behavior: "smooth" }) : null;
-        }}
-        className="shrink grow overflow-hidden whitespace-nowrap text-right font-bold text-grey-35"
-      >
-        {props.currentCard}
-      </div>
-    </div>
-  );
-};
 
 const EmptyState = () => {
   return (
