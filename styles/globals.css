@@ -247,12 +247,12 @@ input {
   scrollbar-width: none; /* Firefox */
 }
 
-.pwa-padding {
-  padding-top: env(safe-area-inset-top) !important;
-}
+@media (display-mode: standalone), (display-mode: fullscreen) {
+  .pwa-padding {
+    padding-top: env(safe-area-inset-top) !important;
+  }
 
-@media (display-mode: standalone) {
   .safari-pwa-height {
-    !height: 100lvh;
+    height: 100lvh !important;
   }
 }
