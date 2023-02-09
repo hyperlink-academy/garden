@@ -21,7 +21,7 @@ export const StudioName = () => {
       <div>
         <h1>{name?.value}'s studio</h1>
       </div>
-      <div className="flex flex-row gap-4">
+      <div className="pwa-padding flex flex-row gap-4">
         {/* someone ELSE'S studio: active + history */}
         <Link
           replace

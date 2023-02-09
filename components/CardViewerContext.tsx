@@ -52,7 +52,7 @@ export function CardViewer(props: {
       className={`cardViewerWrapper 
           flex h-full w-[calc(100vw-16px)] 
           max-w-3xl shrink-0        
-          touch-pan-x snap-center
+          touch-pan-x snap-center snap-always
           flex-col 
           items-stretch focus:outline-none sm:shrink`}
     >

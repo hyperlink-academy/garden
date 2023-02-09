@@ -41,7 +41,6 @@ body {
   @apply p-0;
   @apply text-grey-15;
   min-height: -webkit-fill-available;
-
   font-family: "Quattro";
 }
 
@@ -193,13 +192,20 @@ input {
 }
 
 .selectedCardGlow {
-  filter: drop-shadow(2px 0px 0px rgba(0,125,255, 1)) drop-shadow(0px 2px 0px rgba(0,125,255, 1)) drop-shadow(-2px 0px 0px rgba(0,125,255, 1)) drop-shadow(0px -2px 0px rgba(0,125,255, 1));
+  filter: drop-shadow(2px 0px 0px rgba(0, 125, 255, 1))
+    drop-shadow(0px 2px 0px rgba(0, 125, 255, 1))
+    drop-shadow(-2px 0px 0px rgba(0, 125, 255, 1))
+    drop-shadow(0px -2px 0px rgba(0, 125, 255, 1));
   /* animation: squishy 1s linear infinite; */
 }
 
 @keyframes squishy {
-  25% { transform: scale(1.0, 0.925) }
-  75% { transform: scale(1.0, 1.075) }
+  25% {
+    transform: scale(1, 0.925);
+  }
+  75% {
+    transform: scale(1, 1.075);
+  }
 }
 
 .desktopBackground {
@@ -214,8 +220,8 @@ input {
   border-image-slice: 37.5% fill;
   border-width: 48px; */
   background-image: url(/img/desktopBackgroundCropped.svg);
-	background-repeat: repeat;
-	background-size: 120px;
+  background-repeat: repeat;
+  background-size: 120px;
 
   position: absolute;
   top: 0;
@@ -239,4 +245,8 @@ input {
 .no-scrollbar {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
+}
+
+.pwa-padding {
+  padding-top: env(safe-area-inset-top);
 }

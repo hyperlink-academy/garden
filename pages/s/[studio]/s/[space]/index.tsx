@@ -94,8 +94,8 @@ export default function SpacePage() {
                 <CardViewer EmptyState={<EmptyState />} room={room} />
               </div>
             ) : (
-              <div className="flex snap-x snap-mandatory flex-row gap-2 overflow-x-scroll">
-                <div className="snap-end">
+              <div className="no-scrollbar flex snap-x snap-mandatory flex-row gap-2 overflow-x-scroll overscroll-x-none">
+                <div className="snap-end snap-always">
                   <Sidebar
                     onRoomChange={(room) => {
                       setRoom(room);
@@ -109,7 +109,7 @@ export default function SpacePage() {
                 </div>
                 <div
                   id="roomWrapper"
-                  className="roomWrapper relative flex snap-center flex-row py-4"
+                  className="roomWrapper pwa-padding relative flex snap-center snap-always flex-row py-4"
                 >
                   <div
                     id="desktopWrapper"
@@ -123,7 +123,7 @@ export default function SpacePage() {
                       border border-grey-90
                       `}
                   >
-                    <div className="no-scrollbar overflow-y-scroll sm:p-4">
+                    <div className="no-scrollbar  overflow-y-scroll sm:p-4">
                       <div className="relative flex w-[336px] flex-col items-stretch gap-0">
                         <div className="desktopBackground absolute h-full w-full" />
                         {room && <Desktop entityID={room} />}
@@ -132,7 +132,7 @@ export default function SpacePage() {
                   </div>
                 </div>
 
-                <div className="py-4 pr-2">
+                <div className="pwa-padding py-4 pr-2">
                   <CardViewer EmptyState={<EmptyState />} room={room} />
                 </div>
               </div>
