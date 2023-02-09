@@ -14,6 +14,5 @@
     }
   ],
   "display": "fullscreen",
-  "orientation": "portrait",
-  "start_url": "/?fullscreen=true"
+  "orientation": "portrait"
 }
