@@ -248,7 +248,7 @@ input {
 }
 
 .pwa-padding {
-  padding-top: env(safe-area-inset-top);
+  padding-top: env(safe-area-inset-top) !important;
 }
 
 @media (display-mode: standalone) {
