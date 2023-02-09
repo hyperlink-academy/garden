@@ -29,6 +29,7 @@ export const SharedRoomList = (props: {
           .map((room) => {
             return (
               <RoomListItem
+                key={room.id}
                 onRoomChange={props.onRoomChange}
                 currentRoom={props.currentRoom}
                 roomEntity={room.entity}

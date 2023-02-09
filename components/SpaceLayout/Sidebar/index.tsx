@@ -118,7 +118,6 @@ const SpaceName = () => {
   let { session } = useAuth();
   let authorized =
     session.session && session.session.username === studio?.value;
-  console.log(session, studio);
   let [editModal, setEditModal] = useState(false);
   return (
     <div className="SidebarSpaceInfo flex flex-col gap-1">

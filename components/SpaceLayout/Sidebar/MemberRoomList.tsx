@@ -34,6 +34,7 @@ export const MemberRoomList = (props: {
           .map((member) => {
             return (
               <RoomListItem
+                key={member.id}
                 onRoomChange={props.onRoomChange}
                 currentRoom={props.currentRoom}
                 unreads={undefined}
