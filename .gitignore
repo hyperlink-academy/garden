@@ -8,3 +8,4 @@ TODO.md
 *.code-workspace
 public/sw.*
 public/workbox-*
+.vscode/
