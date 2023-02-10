@@ -65,6 +65,7 @@ export const update_self_route = makeRoute({
           spaceID: env.id,
           data: {
             name: thisEntity.value,
+            studio: session.username,
             ...msg.data,
           },
         }
