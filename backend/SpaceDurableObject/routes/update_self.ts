@@ -30,30 +30,6 @@ export const update_self_route = makeRoute({
     if (!thisEntity)
       return { data: { success: false, error: "No this entity" } } as const;
 
-    let selfStub = env.env.SPACES.get(env.env.SPACES.idFromString(env.id));
-    await privateSpaceAPI(selfStub)(
-      "http://internal",
-      "update_local_space_data",
-      {
-        spaceID: env.id,
-        data: msg.data,
-      }
-    );
-
-    //CALL MEMBERS
-    let members = await env.factStore.scanIndex.aev("space/member");
-    for (let i = 0; i < members.length; i++) {
-      let spaceID = env.env.SPACES.idFromString(members[i].value);
-      let stub = env.env.SPACES.get(spaceID);
-      await privateSpaceAPI(stub)(
-        "http://internal",
-        "update_local_space_data",
-        {
-          spaceID: env.id,
-          data: msg.data,
-        }
-      );
-    }
     let community = await env.factStore.scanIndex.eav(
       thisEntity.entity,
       "space/community"
@@ -91,6 +67,31 @@ export const update_self_route = makeRoute({
             name: thisEntity.value,
             ...msg.data,
           },
+        }
+      );
+    }
+
+    let selfStub = env.env.SPACES.get(env.env.SPACES.idFromString(env.id));
+    await privateSpaceAPI(selfStub)(
+      "http://internal",
+      "update_local_space_data",
+      {
+        spaceID: env.id,
+        data: msg.data,
+      }
+    );
+
+    //CALL MEMBERS
+    let members = await env.factStore.scanIndex.aev("space/member");
+    for (let i = 0; i < members.length; i++) {
+      let spaceID = env.env.SPACES.idFromString(members[i].value);
+      let stub = env.env.SPACES.get(spaceID);
+      await privateSpaceAPI(stub)(
+        "http://internal",
+        "update_local_space_data",
+        {
+          spaceID: env.id,
+          data: msg.data,
         }
       );
     }
