@@ -61,6 +61,9 @@ three lists:
 - active (scheduled - now) 
 - upcoming (scheduled - soon)
 - unscheduled (i.e. implicit draft)
+
+NB: calendar.tsx uses same date calculations
+but simplified b/c calendar requires start + end dates
 */
 const List = (props: { id: string }) => {
   let { session } = useAuth();
@@ -85,7 +88,7 @@ const List = (props: { id: string }) => {
 
   // upcoming:
   // start-date = in future
-  const spacesStartingFuture = spacesWithStartAndEnd.filter(
+  const spacesUpcoming = spacesWithStartAndEnd.filter(
     (s) => s.start && s.start > now
   );
 
@@ -119,13 +122,13 @@ const List = (props: { id: string }) => {
       {!session?.loggedIn || myStudioName != currentStudioName ? null : (
         <CreateSpace studioSpaceID={props.id} />
       )}
-      {spacesStartingFuture.length > 0 ? (
+      {spacesUpcoming.length > 0 ? (
         <div className="my-4 rounded-lg border border-grey-55">
           <h2 className=" rounded-t-md bg-[darkgoldenrod] py-2 px-4 text-white">
             Upcoming
           </h2>
           <div className="p-2 pb-6 sm:p-4 sm:pb-8">
-            <SpaceList spaces={spacesStartingFuture} />
+            <SpaceList spaces={spacesUpcoming} />
           </div>
         </div>
       ) : null}

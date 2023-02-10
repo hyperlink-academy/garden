@@ -8,15 +8,13 @@ import { Fact } from "data/Facts";
 import useWindowDimensions from "hooks/useWindowDimensions";
 
 export const CalendarList = (props: {
-  spaces: Fact<"space/start-date" | "space/end-date">[];
+  spaces: Fact<"space/start-date" | "space/end-date" | "space/name">[];
 }) => {
   return (
     <div className="spacesList mt-4 flex flex-col gap-8">
-      {props.spaces
-        ?.sort((a, b) => (a.value.value > b.value.value ? 1 : -1))
-        .map((a) => {
-          return <CalendarSpace entity={a.entity} key={a.id} />;
-        })}
+      {props.spaces.map((a) => {
+        return <CalendarSpace entity={a.entity} key={a.id} />;
+      })}
     </div>
   );
 };
