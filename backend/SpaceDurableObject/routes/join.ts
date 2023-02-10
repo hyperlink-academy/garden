@@ -1,7 +1,6 @@
 import { getSessionById } from "backend/fauna/resources/functions/get_session_by_id";
 import { app_event } from "backend/lib/analytics";
 import { makeRoute, privateSpaceAPI } from "backend/lib/api";
-import { Fact } from "data/Facts";
 import { Client } from "faunadb";
 import { ulid } from "src/ulid";
 import { z } from "zod";
@@ -72,10 +71,15 @@ export const join_route = makeRoute({
       thisEntity,
       "space/door/uploaded-image"
     );
+    let community = await env.factStore.scanIndex.eav(
+      thisEntity,
+      "space/community"
+    );
 
     await privateSpaceAPI(memberStudio)("http://internal", "add_space_data", {
       spaceID: env.id,
       data: {
+        publish_on_listings_page: !!community,
         image: image?.value,
         description: description?.value || "",
         start_date: start_date?.value.value || "",

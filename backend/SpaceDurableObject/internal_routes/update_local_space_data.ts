@@ -2,6 +2,8 @@ import { Env } from "..";
 import { makeRoute } from "backend/lib/api";
 import { z } from "zod";
 import { space_input } from "../routes/create_space";
+import { getCommunityByName } from "backend/fauna/resources/functions/get_community_by_name";
+import { Client } from "faunadb";
 
 export const update_local_space_data_route = makeRoute({
   route: "update_local_space_data",
@@ -11,12 +13,16 @@ export const update_local_space_data_route = makeRoute({
       .omit({ name: true })
       .merge(
         z.object({
-          deleted: z.boolean(),
+          deleted: z.boolean().optional(),
         })
       )
       .partial(),
   }),
   handler: async (msg, env: Env) => {
+    let fauna = new Client({
+      secret: env.env.FAUNA_KEY,
+      domain: "db.us.fauna.com",
+    });
     let spaceEntity = (
       await env.factStore.scanIndex.ave("space/id", msg.spaceID)
     )?.entity;
@@ -68,6 +74,27 @@ export const update_local_space_data_route = makeRoute({
           value: { type: "yyyy-mm-dd", value: msg.data.end_date },
           positions: {},
         });
+      }
+    }
+    if (msg.data.publish_on_listings_page !== undefined) {
+      let community = await env.factStore.scanIndex.eav(
+        spaceEntity,
+        "space/community"
+      );
+      if (!community && msg.data.publish_on_listings_page) {
+        let communityData = await getCommunityByName(fauna, {
+          name: "hyperlink",
+        });
+        if (communityData)
+          env.factStore.assertFact({
+            entity: spaceEntity,
+            attribute: "space/community",
+            value: communityData.spaceID,
+            positions: {},
+          });
+      }
+      if (community && !msg.data.publish_on_listings_page) {
+        env.factStore.retractFact(community.id);
       }
     }
 

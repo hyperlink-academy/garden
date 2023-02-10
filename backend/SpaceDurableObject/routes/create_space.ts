@@ -11,6 +11,7 @@ export const space_input = z.object({
   start_date: z.string(),
   end_date: z.string(),
   description: z.string().max(256),
+  publish_on_listings_page: z.boolean(),
   image: z
     .discriminatedUnion("filetype", [
       z.object({
@@ -31,7 +32,6 @@ export const create_space_route = makeRoute({
   input: z
     .object({
       token: z.string(),
-      publish_on_listings_page: z.boolean(),
     })
     .merge(space_input),
   handler: async (msg, env: Env) => {

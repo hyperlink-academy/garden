@@ -39,6 +39,7 @@ export const SignupRoute = makeRoute({
     let newSpace = internalSpaceAPI(stub);
     let res = await newSpace("http://internal", "claim", {
       data: {
+        publish_on_listings_page: false,
         name: msg.username,
         start_date: "",
         end_date: "",

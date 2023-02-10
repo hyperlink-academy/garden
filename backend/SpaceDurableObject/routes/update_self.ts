@@ -4,12 +4,13 @@ import { z } from "zod";
 import { Client } from "faunadb";
 import { getSessionById } from "backend/fauna/resources/functions/get_session_by_id";
 import { space_input } from "./create_space";
+import { getCommunityByName } from "backend/fauna/resources/functions/get_community_by_name";
 
 export const update_self_route = makeRoute({
   route: "update_self",
   input: z.object({
     token: z.string(),
-    data: space_input.omit({ name: true }).partial(),
+    data: space_input.omit({ name: true }),
   }),
   handler: async (msg, env: Env) => {
     let fauna = new Client({
@@ -53,8 +54,47 @@ export const update_self_route = makeRoute({
         }
       );
     }
-    let communities = await env.factStore.scanIndex.aev("space/community");
-    for (let community of communities) {
+    let community = await env.factStore.scanIndex.eav(
+      thisEntity.entity,
+      "space/community"
+    );
+    if (!msg.data.publish_on_listings_page && community) {
+      let spaceID = env.env.SPACES.idFromString(community.value);
+      let stub = env.env.SPACES.get(spaceID);
+      await privateSpaceAPI(stub)(
+        "http://internal",
+        "update_local_space_data",
+        {
+          spaceID: env.id,
+          data: {
+            deleted: true,
+          },
+        }
+      );
+    }
+    if (msg.data.publish_on_listings_page && !community) {
+      let communityData = await getCommunityByName(fauna, {
+        name: "hyperlink",
+      });
+      if (!communityData)
+        return {
+          data: { success: false, error: "no hyperlink community" },
+        } as const;
+      let communitySpaceID = env.env.SPACES.idFromString(communityData.spaceID);
+      let communitySpace = env.env.SPACES.get(communitySpaceID);
+      await privateSpaceAPI(communitySpace)(
+        "http://internal",
+        "add_space_data",
+        {
+          spaceID: env.id,
+          data: {
+            name: thisEntity.value,
+            ...msg.data,
+          },
+        }
+      );
+    }
+    if (msg.data.publish_on_listings_page && community) {
       let spaceID = env.env.SPACES.idFromString(community.value);
       let stub = env.env.SPACES.get(spaceID);
       await privateSpaceAPI(stub)(
