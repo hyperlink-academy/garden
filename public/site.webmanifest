@@ -13,6 +13,9 @@
       "type": "image/png"
     }
   ],
+  "theme_color": "#fffaf0",
+  "background_color": "#fffaf0",
   "display": "fullscreen",
-  "orientation": "portrait"
+  "orientation": "portrait",
+  "start_url": "/pwa?fullscreen=true"
 }
