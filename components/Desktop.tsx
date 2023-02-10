@@ -58,6 +58,7 @@ export const Desktop = (props: { entityID: string }) => {
 
   return (
     <DndContext
+      autoScroll={false}
       sensors={sensors}
       modifiers={[
         (args) => {
