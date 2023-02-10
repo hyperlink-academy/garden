@@ -6,4 +6,5 @@
 .env.local
 TODO.md
 *.code-workspace
-.vscode
+public/sw.*
+public/workbox-*
