@@ -78,10 +78,10 @@ export default function SpacePage() {
                   h-full 
                   flex-shrink-0 
                   flex-col
-                  gap-0 overflow-x-hidden overflow-y-scroll
+                  gap-0
                   `}
                   >
-                    <div className="no-scrollbar overflow-y-scroll sm:p-4">
+                    <div className="no-scrollbar overflow-x-hidden overflow-y-scroll sm:p-4">
                       <div className="relative flex w-[336px] flex-col items-stretch gap-0">
                         <div className="desktopBackground absolute h-full w-full" />
                         {room && <Desktop entityID={room} />}
@@ -117,12 +117,11 @@ export default function SpacePage() {
                       h-full
                       flex-shrink-0 flex-col 
                       gap-0 
-                      overflow-y-scroll 
                       rounded-md
                       border border-grey-90
                       `}
                   >
-                    <div className="no-scrollbar  overflow-y-scroll sm:p-4">
+                    <div className="no-scrollbar  overflow-x-hidden overflow-y-scroll sm:p-4">
                       <div className="relative flex w-[336px] flex-col items-stretch gap-0">
                         <div className="desktopBackground absolute h-full w-full" />
                         {room && <Desktop entityID={room} />}
