@@ -4,6 +4,7 @@ import { SpaceProvider } from "components/ReplicacheProvider";
 import { useIndex } from "hooks/useReplicache";
 import { InferGetStaticPropsType } from "next";
 import Head from "next/head";
+import { sortByPosition } from "src/position_helpers";
 import { getCurrentDate } from "src/utils";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
@@ -20,21 +21,43 @@ export default function CalendarPage(props: Props) {
   );
 }
 
-// two lists - active and upcoming
+/*
+two lists:
+ - active (scheduled - now) 
+- upcoming (scheduled - soon)
+
+NB: same as studio index.tsx
+EXCEPT start and end dates both required here, so don't need those extra checks
+*/
 const List = () => {
-  // spaces ending in the future
-  const spacesByEnd = useIndex.at("space/end-date", getCurrentDate());
+  let now = getCurrentDate();
+
+  // all spaces
+  const spacesAll = useIndex.aev("space/name").sort(sortByPosition("aev"));
+  const spacesStartingAll = useIndex.at("space/start-date");
+  const spacesEndingAll = useIndex.at("space/end-date");
+
+  // all space with start / end dates
+  let spacesWithStartAndEnd = spacesAll.map((s) => {
+    const start = spacesStartingAll.find((f) => f.entity === s.entity);
+    const end = spacesEndingAll.find((f) => f.entity === s.entity);
+    return { ...s, start: start?.value.value, end: end?.value.value };
+  });
 
   // upcoming:
   // start-date = in future
-  const spacesUpcoming = useIndex.at("space/start-date", getCurrentDate());
+  const spacesUpcoming = spacesWithStartAndEnd
+    .filter((s) => s.start && s.start > now)
+    .sort((a, b) => (a.start && b.start && a.start > b.start ? 1 : -1));
 
   // active:
   // start-date = in past
-  // end-date = in future
-  const spacesActive = spacesByEnd.filter((s) => {
-    return !spacesUpcoming.find((upcoming) => upcoming.entity === s.entity);
-  });
+  // end-date = in future or unset
+  const spacesActive = spacesWithStartAndEnd
+    .filter((s) => {
+      return s.start && s.start <= now && s.end && s.end >= now;
+    })
+    .sort((a, b) => (a.start && b.start && a.start > b.start ? 1 : -1));
 
   return (
     <>

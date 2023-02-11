@@ -15,10 +15,10 @@ export default function IndexPage() {
       <Head>
         <title key="title">Hyperlink Academy</title>
       </Head>
-      <div className="py-8 md:py-16 px-8 max-w-4xl flex-col gap-8 m-auto flex">
+      <div className="m-auto flex max-w-4xl flex-col gap-8 py-8 px-8 md:py-16">
         {/* title */}
         <div className="text-center">
-          <h1 className="text-4xl md:text-6xl	pb-4 md:pb-8">
+          <h1 className="pb-4 text-4xl	md:pb-8 md:text-6xl">
             Hyperlink Academy
           </h1>
           <p className="text-xl md:text-2xl ">
@@ -30,7 +30,7 @@ export default function IndexPage() {
         <LoginBox />
 
         {/* intro */}
-        <div className="max-w-xl m-auto space-y-8">
+        <div className="m-auto max-w-xl space-y-8">
           <p>
             🌱 First, we experimented with{" "}
             <a
@@ -67,28 +67,28 @@ export default function IndexPage() {
         <Divider marginTop="mt-8 md:mt-16" marginBottom="mb-8 md:mb-0" />
 
         {/* doors */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4">
-          <div className="place-self-start text-center m-auto md:mt-0">
+        <div className="grid grid-cols-1 gap-4 py-4 md:grid-cols-3">
+          <div className="m-auto place-self-start text-center md:mt-0">
             <h3>What if your group chats were infinite games & gardens?</h3>
-            <p className="text-sm italic my-2">
+            <p className="my-2 text-sm italic">
               Space not only to talk, but to explore & build together
             </p>
             <DoorInactive width="128" image="/doors/door-clouds-256.jpg" />
           </div>
 
-          <div className="place-self-start text-center m-auto md:mt-16">
+          <div className="m-auto place-self-start text-center md:mt-16">
             <h3>
               What if you could build shared worlds for the things that matter?
             </h3>
-            <p className="text-sm italic my-2">
+            <p className="my-2 text-sm italic">
               Bespoke structures & systems: map, collect, play, publish
             </p>
             <DoorInactive width="128" image="/doors/door-windowseat-256.jpg" />
           </div>
 
-          <div className="place-self-start text-center m-auto md:mt-32">
+          <div className="m-auto place-self-start text-center md:mt-32">
             <h3>What if your tools helped you do meaningful long-term work?</h3>
-            <p className="text-sm italic my-2">
+            <p className="my-2 text-sm italic">
               A game engine for agency; repeatable recipes for action
             </p>
             <DoorInactive width="128" image="/doors/door-field-256.jpg" />
@@ -98,7 +98,7 @@ export default function IndexPage() {
         <Divider marginTop="mt-8 md:mt-0" marginBottom="mb-8 md:mb-16" />
 
         {/* CTA */}
-        <div className="max-w-xl m-auto">
+        <div className="m-auto max-w-xl">
           <div className="space-y-8">
             <p className="text-lg font-bold">
               Hyperlink's new platform is in alpha, open by invitation.
@@ -136,7 +136,7 @@ export default function IndexPage() {
 
 const Divider = (props: { marginTop: string; marginBottom: string }) => (
   <hr
-    className={`skew-x-[14deg] rotate-[14deg] border-[12px] w-64 md:w-96 mx-auto border-solid border-accent-gold ${props.marginTop} ${props.marginBottom}`}
+    className={`mx-auto w-64 rotate-[14deg] skew-x-[14deg] border-[12px] border-solid border-accent-gold md:w-96 ${props.marginTop} ${props.marginBottom}`}
   />
 );
 
@@ -145,7 +145,7 @@ const LoginBar = () => {
   let { session } = useAuth();
 
   return (
-    <div className="sticky top-0 p-4 bg-white border border-accent-gold z-10">
+    <div className="sticky top-0 z-10 border border-accent-gold bg-white p-4">
       {!session?.loggedIn ? (
         <>
           <ButtonLink
@@ -157,7 +157,7 @@ const LoginBar = () => {
         </>
       ) : (
         <Link href={`/s/${session.session.username}`}>
-          <div className="justify-self-start flex items-center gap-2">
+          <div className="flex items-center gap-2 justify-self-start">
             <BackToStudio />
             <span>Visit my Studio</span>
           </div>
@@ -173,13 +173,11 @@ const LoginBox = () => {
   let router = useRouter();
 
   return (
-    <div className="px-8 py-4 bg-white border-2 border-solid border-accent-gold z-10 mx-auto">
+    <div className="z-10 mx-auto w-full max-w-sm justify-center justify-items-center border-2 border-solid border-accent-gold bg-white px-8 py-4">
       {!session?.loggedIn ? (
-        <div className="text-center m-auto space-y-2">
+        <div className="flex w-full flex-col gap-2 text-center">
           <ButtonLink
-            // icon={<ExitDoor />}
-            style={{ margin: "auto" }}
-            className="justify-self-start"
+            className="w-full justify-self-start"
             content="Hypernaut Entry Portal: Log In!"
             onClick={() => setIsOpen(true)}
           />
@@ -191,11 +189,12 @@ const LoginBox = () => {
           </Modal>
         </div>
       ) : (
-        <Link href={`/s/${session.session.username}`}>
-          <div className="justify-self-start flex items-center gap-2">
-            <BackToStudio />
-            <span>Visit my Studio</span>
-          </div>
+        <Link
+          href={`/s/${session.session.username}`}
+          className="mx-auto flex justify-center gap-2"
+        >
+          <BackToStudio />
+          <span>Visit my Studio</span>
         </Link>
       )}
     </div>
@@ -213,15 +212,15 @@ const NewsletterForm = () => {
       onSubmit={() =>
         window.open("https://buttondown.email/hyperlink", "popupwindow")
       }
-      className="embeddable-buttondown-form px-8 py-4 flex flex-col md:flex-row gap-4 items-center place-content-center  bg-white border-2 border-solid border-accent-gold z-10 mx-auto my-8"
+      className="embeddable-buttondown-form z-10 mx-auto my-8 flex flex-col place-content-center items-center gap-4  border-2 border-solid border-accent-gold bg-white px-8 py-4 md:flex-row"
     >
       <label htmlFor="bd-email">Email? </label>
       <input type="email" name="email" id="bd-email" placeholder="email!" />
       <input
-        className="py-2 px-4 m-0       
-      text-white font-bold bg-accent-blue border rounded-md border-accent-blue 
-      hover:text-accent-blue hover:bg-bg-blue 
-      active:text-accent-blue active:bg-bg-blue active:outline outline-offset-[-2px] active:outline-2 cursor-pointer"
+        className="m-0 cursor-pointer rounded-md       
+      border border-accent-blue bg-accent-blue py-2 px-4 font-bold 
+      text-white outline-offset-[-2px] 
+      hover:bg-bg-blue hover:text-accent-blue active:bg-bg-blue active:text-accent-blue active:outline active:outline-2"
         type="submit"
         value="Subscribe"
       />
@@ -240,7 +239,7 @@ const DoorInactive = (props: { width?: string; image?: string }) => {
       xmlns="http://www.w3.org/2000/svg"
       width={props.width || "128"}
       viewBox="0 0 256 576"
-      className="flex-none -scale-x-100 m-auto"
+      className="m-auto flex-none -scale-x-100"
       // className="flex-none m-auto"
       overflow="visible"
     >

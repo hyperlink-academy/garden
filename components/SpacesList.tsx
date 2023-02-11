@@ -1,23 +1,15 @@
-import { spaceAPI } from "backend/lib/api";
-import { ReplicacheContext, useIndex, useMutations } from "hooks/useReplicache";
+import { useIndex, useMutations } from "hooks/useReplicache";
 import Link from "next/link";
-import { useContext, useRef, useState } from "react";
-import {
-  ButtonLink,
-  ButtonPrimary,
-  ButtonSecondary,
-  ButtonTertiary,
-} from "./Buttons";
-import { Door, DoorSelector } from "components/DoorSelector";
+import { useRef, useState } from "react";
+import { ButtonLink } from "./Buttons";
 import { DoorImage } from "./Doors";
-import { Information, SettingsStudio, SpaceCreate } from "./Icons";
+import { Information, SettingsStudio } from "./Icons";
 import { Modal } from "./Layout";
 import { prefetchSpaceId } from "./ReplicacheProvider";
 import { useAuth } from "hooks/useAuth";
-import { DotLoader } from "./DotLoader";
 import { spacePath } from "hooks/utils";
 import { Fact } from "data/Facts";
-import { EditSpace } from "./CreateSpace";
+import { EditSpaceModal } from "./CreateSpace";
 
 export const SpaceList = (props: {
   spaces: Fact<"space/start-date" | "space/end-date" | "space/name">[];
@@ -86,7 +78,7 @@ const Space = (props: { entity: string }) => {
         </Link>
         <div className="flex w-[20px] flex-col gap-4 pb-[92px]">
           {studio?.value == session.session?.username ? (
-            <EditSpace spaceEntity={props.entity} />
+            <EditSpaceButton spaceEntity={props.entity} />
           ) : (
             <SpaceInfo
               studio={studio?.value}
@@ -125,6 +117,36 @@ const Space = (props: { entity: string }) => {
       </div>
     </div>
   );
+};
+export const EditSpaceButton = (props: { spaceEntity: string }) => {
+  let [open, setOpen] = useState(false);
+  let { authorized } = useMutations();
+  let { session } = useAuth();
+  let studio = useIndex.eav(props.spaceEntity, "space/studio");
+  if (
+    authorized === false ||
+    session.session?.username !== studio?.value.toLocaleLowerCase()
+  ) {
+    return null;
+  } else
+    return (
+      <>
+        <a>
+          {/* <ButtonLink content="edit" onClick={() => setOpen(true)} /> */}
+          <ButtonLink
+            content=""
+            icon={<SettingsStudio />}
+            onClick={() => setOpen(true)}
+          />
+        </a>
+        <EditSpaceModal
+          open={open}
+          onClose={() => setOpen(false)}
+          onDelete={() => setOpen(false)}
+          spaceEntity={props.spaceEntity}
+        />
+      </>
+    );
 };
 
 const SpaceInfo = (props: {

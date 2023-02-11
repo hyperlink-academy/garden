@@ -34,6 +34,7 @@ export type WorkerRoutes = typeof Routes;
 let router = makeRouter(Routes);
 
 export type Bindings = {
+  APP_EVENT_ANALYTICS: AnalyticsEngineDataset;
   FAUNA_KEY: string;
   SPACES: DurableObjectNamespace;
   USER_UPLOADS: R2Bucket;
@@ -73,6 +74,7 @@ async function handleRequest(request: Request, env: Bindings) {
       const headers = new Headers();
       object.writeHttpMetadata(headers);
       headers.set("etag", object.httpEtag);
+      headers.set("Cache-control", "public, max-age=15552000");
 
       return new Response(object.body, {
         headers,

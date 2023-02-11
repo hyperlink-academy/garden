@@ -16,7 +16,6 @@ export const StudioName = () => {
     <>
       <Head>
         <title key="title">{name?.value}'s studio</title>
-        <meta name="theme-color" content="#fffaf0" />
       </Head>
       <div>
         <h1>{name?.value}'s studio</h1>

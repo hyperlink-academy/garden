@@ -9,18 +9,15 @@ import { sortByPosition } from "src/position_helpers";
 
 export const Backlinks = (props: { entityID: string }) => {
   let backlinks = useIndex.vae(props.entityID, "deck/contains");
-  let homeEntity = useIndex.aev("home");
-  let cards = backlinks
-    .filter((c) => c.entity !== homeEntity[0]?.entity)
-    .sort(sortByPosition("vae"));
+  let cards = backlinks.sort(sortByPosition("vae"));
   let { mutate } = useMutations();
   if (cards.length === 0) return null;
   return (
     <div className="grid grid-cols-[auto_max-content] gap-0">
       <Disclosure>
         {({ open }) => (
-          <div className="bg-bg-blue border border-grey-90 rounded-md px-4 py-2 mb-3">
-            <Disclosure.Button className="w-full flex flex-row justify-between outline-none text-grey-55">
+          <div className="mb-3 rounded-md border border-grey-90 bg-bg-blue px-4 py-2">
+            <Disclosure.Button className="flex w-full flex-row justify-between text-grey-55 outline-none">
               <h4 className="font-bold text-grey-55">
                 Responding to {cards.length}{" "}
                 {cards.length === 1 ? "Card" : "Cards"}
@@ -51,7 +48,7 @@ export const Backlinks = (props: { entityID: string }) => {
           </div>
         )}
       </Disclosure>
-      <div className=" mr-3 h-8 w-3 rounded-tr-md border-t border-t-1 border-r border-r-1 border-dashed border-r-grey-55 self-end " />
+      <div className=" border-t-1 border-r-1 mr-3 h-8 w-3 self-end rounded-tr-md border-t border-r border-dashed border-r-grey-55 " />
     </div>
   );
 };

@@ -4,35 +4,38 @@ import { useIndex } from "hooks/useReplicache";
 import { SmallCardDragContext } from "components/DragContext";
 import { SpaceHeader, Sidebar } from "components/SpaceLayout";
 import Head from "next/head";
-import { startTransition, Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import useWindowDimensions from "hooks/useWindowDimensions";
 import { Popover } from "@headlessui/react";
 import { Rooms } from "components/Icons";
-export default function SpacePageWrapped() {
-  return (
-    <Suspense fallback={<div>loading...</div>}>
-      <SpacePage />
-    </Suspense>
-  );
-}
-function SpacePage() {
+
+export default function SpacePage() {
   let spaceName = useIndex.aev("this/name")[0];
-  let homeEntity = useIndex.aev("home");
+  let firstRoom = useIndex
+    .aev("room/name")
+    .sort((a, b) => (a.id > b.id ? 1 : -1))[0]?.entity;
 
   let [room, setRoom] = useState<string | null>(null);
   const { width } = useWindowDimensions();
   useEffect(() => {
-    if (homeEntity[0]) setRoom(homeEntity[0].entity);
-  }, [homeEntity[0]]);
+    if (firstRoom) setRoom(firstRoom);
+  }, [firstRoom]);
+
+  useEffect(() => {
+    window.requestAnimationFrame(() => {
+      let roomPane = document.getElementById("desktopWrapper");
+      console.log(roomPane);
+      roomPane?.scrollIntoView();
+    });
+  }, []);
 
   return (
     <>
       <Head>
         <title key="title">{spaceName?.value}</title>
-        <meta name="theme-color" content="#0000FF" />
       </Head>
 
-      <div className="pageWrapperflex h-[100dvh] flex-col items-stretch justify-items-center gap-2 overflow-hidden sm:gap-4">
+      <div className="pageWrapperflex safari-pwa-height h-[100dvh] flex-col items-stretch justify-items-center gap-2 overflow-hidden sm:gap-4">
         <div
           className={`
           pageContent 
@@ -41,7 +44,6 @@ function SpacePage() {
          w-full max-w-6xl
           grow 
           items-stretch 
-          py-4
           sm:py-6 sm:px-4 `}
         >
           <SpaceHeader />
@@ -51,8 +53,9 @@ function SpacePage() {
               <div
                 className={`
               contentLargeSplitLayout
-              flex 
-              w-full flex-row items-stretch gap-4 overflow-x-scroll 
+              no-scrollbar 
+              flex w-full flex-row items-stretch gap-4 
+              overflow-x-scroll
               sm:justify-center
               sm:gap-4 
 `}
@@ -63,69 +66,73 @@ function SpacePage() {
                 <div className="roomWrapper flex flex-row rounded-md border border-grey-90">
                   <Sidebar
                     onRoomChange={(room) => {
-                      startTransition(() => {
-                        setRoom(room);
-                      });
+                      setRoom(room);
                     }}
                     currentRoom={room}
                   />
 
-                  <Suspense fallback={<div>loading...</div>}>
-                    <div
-                      className={`
-                  desktopWrapper
+                  <div
+                    className={`
+                    desktopWrapper
                   no-scrollbar flex 
                   h-full 
                   flex-shrink-0 
                   flex-col
-                  gap-0 overflow-x-hidden overflow-y-scroll
+                  gap-0
                   `}
-                    >
-                      {room && <Desktop entityID={room} />}
-                    </div>
-                  </Suspense>
-                </div>
-
-                <Suspense fallback={<div>loading...</div>}>
-                  <CardViewer EmptyState={<EmptyState />} />
-                </Suspense>
-              </div>
-            ) : (
-              <div className="smallSplitLayout flex w-full flex-col items-stretch gap-2">
-                <div
-                  className={`layoutContent flex w-full snap-x snap-mandatory flex-row items-stretch gap-4 overflow-x-scroll scroll-smooth px-2`}
-                >
-                  <div
-                    id="roomWrapper"
-                    className="roomWrapper relative flex snap-center flex-row rounded-md border border-grey-90"
                   >
-                    <div
-                      className={`
-                      desktopWrapper
-                      no-scrollbar flex 
-                      h-full 
-                      flex-shrink-0 
-                      flex-col
-                      gap-0 overflow-y-scroll
-                      `}
-                    >
-                      {room && <Desktop entityID={room} />}
+                    <div className="no-scrollbar overflow-x-hidden overflow-y-scroll sm:p-4">
+                      <div className="relative flex w-[336px] flex-col items-stretch gap-0">
+                        <div className="desktopBackground absolute h-full w-full" />
+                        {room && <Desktop entityID={room} />}
+                      </div>
                     </div>
                   </div>
-
-                  <CardViewer EmptyState={<EmptyState />} />
                 </div>
-                <MobileFooter
-                  currentRoom={room}
-                  currentCard="card"
-                  onRoomChange={(room) => {
-                    setRoom(room);
-                    let roomPane = document.getElementById("roomWrapper");
-                    roomPane
-                      ? roomPane.scrollIntoView({ behavior: "smooth" })
-                      : null;
-                  }}
-                />
+
+                <CardViewer EmptyState={<EmptyState />} room={room} />
+              </div>
+            ) : (
+              <div className="no-scrollbar flex snap-x snap-mandatory flex-row gap-2 overflow-x-scroll overscroll-x-none">
+                <div className="snap-end snap-always">
+                  <Sidebar
+                    onRoomChange={(room) => {
+                      setRoom(room);
+                      let roomPane = document.getElementById("roomWrapper");
+                      roomPane
+                        ? roomPane.scrollIntoView({ behavior: "smooth" })
+                        : null;
+                    }}
+                    currentRoom={room}
+                  />
+                </div>
+                <div
+                  id="roomWrapper"
+                  className="roomWrapper pwa-padding relative flex snap-center snap-always flex-row py-4"
+                >
+                  <div
+                    id="desktopWrapper"
+                    className={`
+                      desktopWrapper no-scrollbar flex 
+                      h-full
+                      flex-shrink-0 flex-col 
+                      gap-0 
+                      rounded-md
+                      border border-grey-90
+                      `}
+                  >
+                    <div className="no-scrollbar  overflow-x-hidden overflow-y-scroll sm:p-4">
+                      <div className="relative flex w-[336px] flex-col items-stretch gap-0">
+                        <div className="desktopBackground absolute h-full w-full" />
+                        {room && <Desktop entityID={room} />}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pwa-padding py-4 pr-2">
+                  <CardViewer EmptyState={<EmptyState />} room={room} />
+                </div>
               </div>
             )}
           </SmallCardDragContext>
@@ -134,59 +141,6 @@ function SpacePage() {
     </>
   );
 }
-const MobileFooter = (props: {
-  currentRoom: string | null;
-  currentCard: string;
-  onRoomChange: (room: string) => void;
-}) => {
-  let homeEntity = useIndex.aev("home");
-  let roomName = useIndex.eav(props.currentRoom, "room/name");
-  let memberName = useIndex.eav(props.currentRoom, "member/name");
-  let promptRoomName = useIndex.eav(props.currentRoom, "promptroom/name");
-
-  return (
-    <div className="roomFooter grid shrink-0 grid-cols-[minmax(0,auto)_auto] justify-between gap-8 px-2">
-      <div className=" flex w-full shrink grow flex-row gap-4">
-        <Popover>
-          <Popover.Button className="font-bold text-grey-35">
-            <Rooms />
-          </Popover.Button>
-          <Popover.Overlay className="fixed inset-0 z-[999998] bg-white opacity-60" />
-
-          <Popover.Panel
-            className={`roomListWrapper fixed top-0 bottom-0 left-0 z-[999999] `}
-          >
-            <Sidebar
-              onRoomChange={props.onRoomChange}
-              currentRoom={props.currentRoom}
-            />
-          </Popover.Panel>
-        </Popover>
-        <div
-          onClick={() => {
-            let roomPane = document.getElementById("roomWrapper");
-            roomPane ? roomPane.scrollIntoView({ behavior: "smooth" }) : null;
-          }}
-          className=" overflow-hidden whitespace-nowrap font-bold text-grey-35"
-        >
-          {props.currentRoom === homeEntity[0]?.entity
-            ? "Home"
-            : roomName?.value || memberName?.value || promptRoomName?.value}
-        </div>
-      </div>
-
-      <div
-        onClick={() => {
-          let cardPane = document.getElementById("cardViewerWrapper");
-          cardPane ? cardPane.scrollIntoView({ behavior: "smooth" }) : null;
-        }}
-        className="shrink grow overflow-hidden whitespace-nowrap text-right font-bold text-grey-35"
-      >
-        {props.currentCard}
-      </div>
-    </div>
-  );
-};
 
 const EmptyState = () => {
   return (

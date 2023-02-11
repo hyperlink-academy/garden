@@ -28,7 +28,7 @@ export default function App({ Component, pageProps }: AppProps) {
       <SharedProviders>
         <SpaceSpaceProvider
           notFound={<div className="p-4">404'd space</div>}
-          loading={<div className="p-4">loading space…</div>}
+          loading={<></>}
         >
           <Component {...pageProps} />
         </SpaceSpaceProvider>
@@ -36,8 +36,10 @@ export default function App({ Component, pageProps }: AppProps) {
     );
   }
   // shared logged in homepage: studio + calendar
-  if (router.pathname.startsWith("/s/[studio]")
-  || router.pathname.startsWith("/calendar")) {
+  if (
+    router.pathname.startsWith("/s/[studio]") ||
+    router.pathname.startsWith("/calendar")
+  ) {
     return (
       <SharedProviders>
         <HomeLayout {...pageProps}>
@@ -58,18 +60,24 @@ export default function App({ Component, pageProps }: AppProps) {
 
 const SharedProviders: React.FC<React.PropsWithChildren<unknown>> = (props) => {
   return (
-    <SmokeProvider>
-      <Head>
-        <meta
-          name="viewport"
-          content="minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, user-scalable=no, viewport-fit=cover"
-        />
-      </Head>
-      <AuthProvider>
-        <SWRCache>{props.children}</SWRCache>
-      </AuthProvider>
-      <Analytics />
-    </SmokeProvider>
+    <SWRCache>
+      <SmokeProvider>
+        <Head>
+          <meta
+            name="viewport"
+            content="minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, user-scalable=no, viewport-fit=cover"
+          />
+          <meta name="mobile-web-app-capable" content="yes" />
+          <meta name="apple-mobile-web-app-capable" content="yes" />
+          <meta
+            name="apple-mobile-web-app-status-bar-style"
+            content="black-translucent"
+          />
+        </Head>
+        <AuthProvider>{props.children}</AuthProvider>
+        <Analytics />
+      </SmokeProvider>
+    </SWRCache>
   );
 };
 
@@ -78,13 +86,16 @@ let SWRCache: React.FC<React.PropsWithChildren<unknown>> = (props) => {
     <SWRConfig
       value={{
         provider: (cache) => {
-          const localMap = new Map<any, any>(
-            JSON.parse(localStorage.getItem("app-cache") || "[]")
-          );
-          window.addEventListener("beforeunload", () => {
-            const appCache = JSON.stringify(Array.from(localMap.entries()));
-            localStorage.setItem("app-cache", appCache);
-          });
+          let localMap = new Map<any, any>([]);
+          if (typeof window !== "undefined") {
+            const localMap = new Map<any, any>(
+              JSON.parse(localStorage.getItem("app-cache") || "[]")
+            );
+            addEventListener("beforeunload", () => {
+              const appCache = JSON.stringify(Array.from(localMap.entries()));
+              localStorage.setItem("app-cache", appCache);
+            });
+          }
 
           return {
             keys: cache.keys,

@@ -27,7 +27,7 @@ export const AuthProvider: React.FC<React.PropsWithChildren<unknown>> = (
     return data;
   });
 
-  if (!data) return <div>loading</div>;
+  if (!data) return null;
   return (
     <AuthContext.Provider
       value={{

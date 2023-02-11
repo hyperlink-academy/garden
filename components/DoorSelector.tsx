@@ -21,7 +21,6 @@ export const DoorSelector = (props: {
 }) => {
   let spaceID = useSpaceID();
   let { session } = useAuth();
-  console.log(props.selected);
 
   const cleanup = (id: string) => {
     if (!session.token) return;

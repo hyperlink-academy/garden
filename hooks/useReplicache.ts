@@ -330,7 +330,7 @@ export const useIndex = {
       unique: any;
       cardinality: any;
     }>
-  >(attribute: A, start?: string): Fact<A>[] {
+  >(attribute: A, start?: string, match?: boolean): Fact<A>[] {
     let rep = useContext(ReplicacheContext);
     return useSubscribe(
       rep?.rep,
@@ -338,7 +338,7 @@ export const useIndex = {
         let results = await tx
           .scan({
             indexName: "at",
-            prefix: `${attribute}-`,
+            prefix: match && start ? `${attribute}-${start}` : `${attribute}-`,
             start: start ? { key: `${attribute}-${start}` } : undefined,
           })
           .values()

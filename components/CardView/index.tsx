@@ -5,7 +5,7 @@ import {
   Delete,
   DeckSmall,
   Member,
-  CalenderMedium,
+  CalendarMedium,
 } from "components/Icons";
 import { Divider, MenuContainer, MenuItem } from "components/Layout";
 import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
@@ -47,6 +47,13 @@ export const CardView = (props: {
   referenceFactID?: string;
 }) => {
   let memberName = useIndex.eav(props.entityID, "member/name");
+  let cardCreator = useIndex.eav(props.entityID, "card/created-by");
+  // returns reference…
+  let cardCreatorName = useIndex.eav(
+    cardCreator?.value.value as string,
+    "member/name"
+  )?.value;
+
   let { ref } = usePreserveScroll<HTMLDivElement>();
   let { session } = useAuth();
 
@@ -98,6 +105,11 @@ export const CardView = (props: {
             <div>
               <div className="cardHeader grid grid-cols-[auto_max-content_max-content] gap-2">
                 <Title entityID={props.entityID} />
+                {cardCreatorName ? (
+                  <div className="lightBorder self-start rounded-md py-1 px-2 text-sm text-grey-35">
+                    {cardCreatorName}
+                  </div>
+                ) : null}
                 <div className="">
                   <CardMoreOptionsMenu
                     onDelete={props.onDelete}
@@ -143,14 +155,13 @@ export const AddSections = (props: { entityID: string }) => {
               setOpen(!open);
             }}
           >
-            <CalenderMedium className="stroke-accent-blue" />
+            <CalendarMedium className="stroke-accent-blue" />
           </button>
         )}
       </div>
       {open && !date && (
         <input
           onChange={(e) => {
-            console.log(e.currentTarget.value);
             mutate("assertFact", {
               entity: props.entityID,
               attribute: "card/date",

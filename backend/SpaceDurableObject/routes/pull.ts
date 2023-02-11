@@ -1,3 +1,4 @@
+import { app_event } from "backend/lib/analytics";
 import { makeRoute } from "backend/lib/api";
 import { Attribute } from "data/Attributes";
 import { Fact } from "data/Facts";
@@ -50,6 +51,11 @@ export const pullRoute = makeRoute({
     let newCookie: typeof msg.cookie = {
       lastUpdated: newLastUpdated,
     };
+    app_event(env.env, {
+      event: "pulled_from_space",
+      user: "",
+      spaceID: env.id,
+    });
 
     return {
       data: {

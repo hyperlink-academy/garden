@@ -14,10 +14,17 @@ export const useCardViewer = () => {
   };
 };
 
-export function CardViewer(props: { EmptyState: React.ReactNode }) {
-  let [history, setHistory] = useUndoableState([] as string[]);
+export function CardViewer(props: {
+  EmptyState: React.ReactNode;
+  room: string | null;
+}) {
+  let [history, setHistory] = useUndoableState<{ [k: string]: string[] }>({});
   let { mutate, memberEntity } = useMutations();
-  let unreadBy = useIndex.eav(history[0] || null, "card/unread-by") || [];
+  let unreadBy =
+    useIndex.eav(
+      props.room ? history[props.room]?.[0] || null : null,
+      "card/unread-by"
+    ) || [];
   useEffect(() => {
     if (history[0] && memberEntity) {
       let unread = unreadBy.find((f) => f.value.value === memberEntity);
@@ -29,11 +36,16 @@ export function CardViewer(props: { EmptyState: React.ReactNode }) {
     "cardviewer.open-card",
     (data) => {
       setHistory((h) => {
-        if (h[0] === data.entityID) return h;
-        return [data.entityID, ...h];
+        if (!props.room) return h;
+        let room = h[props.room] || [];
+        if (room[0] === data.entityID) return h;
+        return {
+          ...h,
+          [props.room]: [data.entityID, ...room],
+        };
       });
     },
-    []
+    [props.room]
   );
 
   return (
@@ -42,15 +54,24 @@ export function CardViewer(props: { EmptyState: React.ReactNode }) {
       className={`cardViewerWrapper 
           flex h-full w-[calc(100vw-16px)] 
           max-w-3xl shrink-0        
-          touch-pan-x snap-center
+          touch-pan-x snap-center snap-always
           flex-col 
           items-stretch focus:outline-none sm:shrink`}
     >
-      {history[0] ? (
+      {props.room && history[props.room]?.[0] ? (
         <CardView
-          entityID={history[0]}
-          key={history[0]}
-          onDelete={() => setHistory((s) => s.slice(1))}
+          entityID={history[props.room][0]}
+          key={history[props.room][0]}
+          onDelete={() =>
+            setHistory((h) => {
+              if (!props.room) return h;
+              let room = h[props.room] || [];
+              return {
+                ...h,
+                [props.room]: room.slice(1),
+              };
+            })
+          }
         />
       ) : (
         props.EmptyState

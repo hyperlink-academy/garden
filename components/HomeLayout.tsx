@@ -28,7 +28,7 @@ export const HomeHeader = () => {
     "underline decoration-2 decoration-accent-blue underline-offset-4";
 
   return (
-    <div className="HomeHeader sticky top-0 z-10 mb-4 flex justify-between border-b border-grey-55 bg-background py-4">
+    <div className="HomeHeader pwa-padding sticky top-0 z-10 mb-4 flex justify-between border-b border-grey-55 bg-background py-4">
       {!myStudioName ? (
         <Login />
       ) : (
