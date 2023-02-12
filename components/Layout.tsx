@@ -98,7 +98,7 @@ export const MenuItem: React.FC<
     <Menu.Item>
       {({ active }) => (
         <button
-          className={`flex items-center justify-end gap-2 px-3 py-1 ${
+          className={`flex justify-end gap-2 px-3 py-1 text-right ${
             active ? "bg-bg-blue" : ""
           } ${
             props?.disabled
