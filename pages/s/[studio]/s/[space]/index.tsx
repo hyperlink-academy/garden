@@ -1,6 +1,6 @@
 import { Desktop } from "components/Desktop";
 import { CardViewer } from "components/CardViewerContext";
-import { useIndex } from "hooks/useReplicache";
+import { useIndex, useMutations } from "hooks/useReplicache";
 import { SmallCardDragContext } from "components/DragContext";
 import { SpaceHeader, Sidebar } from "components/SpaceLayout";
 import Head from "next/head";
@@ -11,9 +11,14 @@ import { Rooms } from "components/Icons";
 
 export default function SpacePage() {
   let spaceName = useIndex.aev("this/name")[0];
-  let firstRoom = useIndex
+
+  // get first room = your room
+  // OR if viewing anon, get first room based on room id
+  let { memberEntity } = useMutations();
+  let firstRoomByID = useIndex
     .aev("room/name")
     .sort((a, b) => (a.id > b.id ? 1 : -1))[0]?.entity;
+  let firstRoom = memberEntity ? memberEntity : firstRoomByID;
 
   let [room, setRoom] = useState<string | null>(null);
   const { width } = useWindowDimensions();
