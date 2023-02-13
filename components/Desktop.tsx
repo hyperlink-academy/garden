@@ -23,10 +23,11 @@ import { FindOrCreate, useAllItems } from "./FindOrCreateEntity";
 import { useSubscribe } from "replicache-react";
 import { ButtonSecondary } from "./Buttons";
 import { ActionBar } from "./ActionBar";
-import { ref } from "data/Facts";
+import { Fact, ref } from "data/Facts";
 import { Menu } from "@headlessui/react";
 import { MenuContainer, MenuItem } from "./Layout";
 import { getCurrentDate } from "src/utils";
+import { CardinalityResult } from "data/mutations";
 
 const GRID_SIZE = 16;
 const snap = (x: number) => Math.ceil(x / GRID_SIZE) * GRID_SIZE;
@@ -208,32 +209,55 @@ let PromptManager = (props: { entityID: string }) => {
 };
 
 let RandomPromptsButton = (props: { entityID: string }) => {
-  let { mutate } = useMutations();
   let promptRooms = useIndex.aev("promptroom/name");
   return (
     <Menu as="div" className="relative">
       <Menu.Button as={Fragment}>
-        <ButtonSecondary content="Draw a prompt " />
+        <ButtonSecondary content="Draw a prompt" />
       </Menu.Button>
       <MenuContainer className="max-w-[140px] sm:max-w-[160px]">
         {promptRooms.map((room) => {
           return (
-            <MenuItem
-              onClick={async () => {
-                mutate("drawAPrompt", {
-                  factID: ulid(),
-                  promptRoomEntity: room.entity,
-                  desktopEntity: props.entityID,
-                  randomSeed: Math.random(),
-                });
-              }}
-            >
-              {room.value}
-            </MenuItem>
+            <RandomPromptsRoomItem
+              roomEntity={room.entity}
+              desktopEntity={props.entityID}
+              roomName={room.value}
+            />
           );
         })}
       </MenuContainer>
     </Menu>
+  );
+};
+
+let RandomPromptsRoomItem = (props: {
+  roomEntity: string;
+  desktopEntity: string;
+  roomName: string;
+}) => {
+  let { mutate } = useMutations();
+
+  let promptsInRoom = useIndex.eav(props.roomEntity, "desktop/contains") || [];
+  let promptsOnDesktop =
+    useIndex.eav(props.desktopEntity, "desktop/contains") || [];
+  let newPrompts = promptsInRoom.filter(
+    (p) => !promptsOnDesktop.find((c) => c.value.value === p.value.value)
+  );
+
+  return (
+    <MenuItem
+      disabled={newPrompts.length === 0}
+      onClick={async () => {
+        mutate("drawAPrompt", {
+          factID: ulid(),
+          promptRoomEntity: props.roomEntity,
+          desktopEntity: props.desktopEntity,
+          randomSeed: Math.random(),
+        });
+      }}
+    >
+      {props.roomName}
+    </MenuItem>
   );
 };
 
