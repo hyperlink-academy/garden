@@ -2,9 +2,7 @@ import { Textarea } from "components/Textarea";
 
 import { useIndex, useMutations } from "hooks/useReplicache";
 import { useRef, useState } from "react";
-import { sortByPosition } from "src/position_helpers";
-import { FilterAttributes, ReferenceAttributes } from "data/Attributes";
-import { CardStack } from "components/CardStack";
+import { FilterAttributes } from "data/Attributes";
 import { useAuth } from "hooks/useAuth";
 
 export const SingleTextSection = (
@@ -52,23 +50,6 @@ export const SingleTextSection = (
         });
       }}
     />
-  );
-};
-
-export const MultipleReferenceSection = (props: {
-  entityID: string;
-  section: keyof ReferenceAttributes;
-}) => {
-  let references = useIndex.eav(props.entityID, props.section);
-  return (
-    <div className="flex flex-col gap-4">
-      <CardStack
-        positionKey="eav"
-        cards={references?.sort(sortByPosition("eav")) || []}
-        parent={props.entityID}
-        attribute={props.section}
-      />
-    </div>
   );
 };
 
