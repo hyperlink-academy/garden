@@ -37,7 +37,7 @@ export const CardStack = (
   return (
     <div className="cardStackWrapper flex w-full gap-4">
       <div className="cardStackandAdd flex grow flex-col gap-4">
-        <div className="cardStack relative bg-test-pink">
+        <div className="cardStack relative">
           <SortableContext items={props.cards.map((c) => c.id)}>
             {props.cards.map((card, currentIndex) => (
               <Card
