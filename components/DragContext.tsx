@@ -20,15 +20,20 @@ import { StackData } from "./CardStack";
 import { animated, useTransition } from "@react-spring/web";
 import { createPortal } from "react-dom";
 import { useSortable } from "@dnd-kit/sortable";
-import { useAtom, atom } from "jotai";
 import { CardMedium } from "./Icons";
 
-export const SmallCardDragContext: React.FC<
-  React.PropsWithChildren<unknown>
-> = (props) => {
+export const SmallCardDragContext = (props: {
+  children: React.ReactNode;
+  activationConstraints?: { delay: number; tolerance: number };
+  noDeleteZone?: boolean;
+}) => {
   let [activeCard, setActiveCard] = useState<Active | null>(null);
-  const mouseSensor = useSensor(MouseSensor, {});
-  const touchSensor = useSensor(TouchSensor, {});
+  const mouseSensor = useSensor(MouseSensor, {
+    activationConstraint: props.activationConstraints,
+  });
+  const touchSensor = useSensor(TouchSensor, {
+    activationConstraint: props.activationConstraints,
+  });
   const sensors = useSensors(mouseSensor, touchSensor);
 
   let { mutate } = useMutations();
@@ -48,7 +53,7 @@ export const SmallCardDragContext: React.FC<
       onDragStart={({ active }) => {
         setActiveCard(active);
       }}
-      onDragOver={({}) => {}}
+      onDragOver={({ }) => { }}
       onDragEnd={async (data) => {
         let { over, active } = data;
         setActiveCard(null);
@@ -60,18 +65,29 @@ export const SmallCardDragContext: React.FC<
           mutate("retractFact", { id: activeData.factID });
           return;
         }
-        let siblings = (
-          await rep.rep.query((tx) => {
-            return scanIndex(tx).eav(overData.parent, overData.attribute);
-          })
-        ).sort(sortByPosition(overData.positionKey));
-
-        console.log(siblings);
-        let currentIndex = siblings.findIndex(
-          (f) => f.value.value === activeData.entityID
+        let siblings;
+        if (!overData.parent) {
+          siblings = (
+            await rep.rep.query((tx) => {
+              return scanIndex(tx).aev(overData.attribute);
+            })
+          ).sort(sortByPosition(overData.positionKey));
+        } else {
+          siblings = (
+            await rep.rep.query((tx) => {
+              return scanIndex(tx).eav(overData.parent, overData.attribute);
+            })
+          ).sort(sortByPosition(overData.positionKey));
+        }
+        let currentIndex = siblings.findIndex((f) =>
+          !overData.parent
+            ? f.entity === activeData.entityID
+            : f.value.value === activeData.entityID
         );
-        let newIndex = siblings.findIndex(
-          (f) => f.value.value === overData.entityID
+        let newIndex = siblings.findIndex((f) =>
+          !overData.parent
+            ? f.entity === overData.entityID
+            : f.value.value === overData.entityID
         );
         let newPositions = updatePositions(overData.positionKey, siblings, [
           [
@@ -88,7 +104,7 @@ export const SmallCardDragContext: React.FC<
     >
       {props.children}
       <DragOverlayCard entityID={activeCard?.data.current?.entityID} />
-      <DeleteZone display={!!activeCard} />
+      {!props.noDeleteZone && <DeleteZone display={!!activeCard} />}
     </DndContext>
   );
 };
@@ -96,11 +112,7 @@ export const SmallCardDragContext: React.FC<
 const DragOverlayCard = (props: { entityID?: string }) => {
   return (
     <DragOverlay dropAnimation={null}>
-      {props.entityID ? (
-        <div className="relative top-2">
-          <CardMedium />
-        </div>
-      ) : null}
+      {props.entityID ? <div className="relative top-2"></div> : null}
     </DragOverlay>
   );
 };
