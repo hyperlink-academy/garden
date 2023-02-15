@@ -37,7 +37,6 @@ export const MemberRoomList = (props: {
                 key={member.id}
                 onRoomChange={props.onRoomChange}
                 currentRoom={props.currentRoom}
-                unreads={undefined}
                 roomEntity={member.entity}
                 setRoomEditOpen={props.setRoomEditOpen}
               >
