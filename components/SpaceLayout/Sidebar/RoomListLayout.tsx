@@ -141,7 +141,7 @@ export const RoomListItem = (props: {
       }`}
     >
       <button
-        className="sidebarRoomName flex flex-row gap-2 py-0.5 pl-2 text-left"
+        className="sidebarRoomName flex w-full flex-row gap-2 py-0.5 pl-2 text-left"
         onClick={() => props.onRoomChange(props.roomEntity)}
       >
         {roomType?.value === "collection" ? (
