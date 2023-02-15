@@ -25,11 +25,11 @@ export function CardViewer(props: {
       "card/unread-by"
     ) || [];
   useEffect(() => {
-    if (history[0] && memberEntity) {
+    if (props.room && history[props.room]?.[0] && memberEntity) {
       let unread = unreadBy.find((f) => f.value.value === memberEntity);
       if (unread) mutate("retractFact", { id: unread.id });
     }
-  }, [history[0], unreadBy, memberEntity]);
+  }, [history, props.room, unreadBy, memberEntity]);
 
   useAppEventListener(
     "cardviewer.open-card",
