@@ -2,20 +2,24 @@ import { useAuth } from "hooks/useAuth";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { LoginForm } from "pages/login";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { ButtonLink } from "./Buttons";
 import { Modal } from "./Layout";
-import { SpaceProvider } from "./ReplicacheProvider";
 
 export const HomeLayout = (props: {
   id: string;
   children: React.ReactNode;
 }) => {
   return (
-    <div className="m-auto flex max-w-3xl flex-col gap-2 px-4 pb-8">
-      <HomeHeader />
-      {props.children}
-    </div>
+    <Suspense fallback={null}>
+      <div
+        style={{ scrollbarGutter: "stable" }}
+        className="over m-auto flex max-w-3xl flex-col gap-2 px-4 pb-8"
+      >
+        <HomeHeader />
+        {props.children}
+      </div>
+    </Suspense>
   );
 };
 
@@ -36,8 +40,8 @@ export const HomeHeader = () => {
           href={`/s/${myStudioName}`}
           className={
             currentStudioName == myStudioName &&
-            (pathname?.endsWith("/s/[studio]") ||
-              pathname?.endsWith("/s/[studio]/history"))
+              (pathname?.endsWith("/s/[studio]") ||
+                pathname?.endsWith("/s/[studio]/history"))
               ? decorationClasses
               : ``
           }

@@ -24,15 +24,13 @@ export default function StudioPage(props: Props) {
   let currentStudioName = query.studio;
 
   return (
-    <Suspense fallback={<div>loading...</div>}>
-      <SpaceProvider id={props.id}>
-        <StudioName />
-        {query.history !== undefined ? <HistoryList /> : <List id={props.id} />}
-        {!session?.loggedIn || myStudioName != currentStudioName ? null : (
-          <CreateSpace studioSpaceID={props.id} />
-        )}
-      </SpaceProvider>
-    </Suspense>
+    <SpaceProvider id={props.id}>
+      <StudioName />
+      {query.history !== undefined ? <HistoryList /> : <List id={props.id} />}
+      {!session?.loggedIn || myStudioName != currentStudioName ? null : (
+        <CreateSpace studioSpaceID={props.id} />
+      )}
+    </SpaceProvider>
   );
 }
 

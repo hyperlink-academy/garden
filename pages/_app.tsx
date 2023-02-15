@@ -1,14 +1,16 @@
 import "styles/globals.css";
 import type { AppProps } from "next/app";
-import React from "react";
+import React, { useEffect } from "react";
 import { Analytics } from "@vercel/analytics/react";
 import { AuthProvider } from "hooks/useAuth";
-import { useRouter } from "next/router";
+import { Router, useRouter } from "next/router";
 import { SpaceSpaceProvider } from "components/ReplicacheProvider";
 import Head from "next/head";
 import { SmokeProvider } from "components/Smoke";
 import { SWRConfig } from "swr";
 import { HomeLayout } from "components/HomeLayout";
+import { useAtom } from "jotai";
+import { suspenseAtom } from "hooks/useSubscribe";
 
 export default function App({ Component, pageProps }: AppProps) {
   let router = useRouter();
@@ -59,6 +61,28 @@ export default function App({ Component, pageProps }: AppProps) {
 }
 
 const SharedProviders: React.FC<React.PropsWithChildren<unknown>> = (props) => {
+  let [, setSuspense] = useAtom(suspenseAtom);
+  useEffect(() => {
+    const handleRouteChangeStart = () => {
+      setSuspense(true);
+    };
+
+    const handleRouteChangeEnd = () => {
+      setTimeout(() => {
+        setSuspense(false);
+      }, 1000);
+    };
+
+    Router.events.on("routeChangeComplete", handleRouteChangeEnd);
+    Router.events.on("routeChangeStart", handleRouteChangeStart);
+
+    // If the component is unmounted, unsubscribe
+    // from the event with the `off` method:
+    return () => {
+      Router.events.off("routeChangeStart", handleRouteChangeStart);
+      Router.events.off("routeChangeComplete", handleRouteChangeEnd);
+    };
+  }, []);
   return (
     <SWRCache>
       <SmokeProvider>

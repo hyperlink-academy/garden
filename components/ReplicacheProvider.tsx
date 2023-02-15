@@ -76,6 +76,7 @@ export const SpaceProvider: React.FC<
       rep.close();
     };
   }, [props.id, session.token, session.session?.studio]);
+  if (!rep) return null;
   return (
     <ReplicacheContext.Provider
       value={rep ? { rep, id: props.id, undoManager } : null}

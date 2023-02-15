@@ -11,7 +11,7 @@ const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 type Props = InferGetStaticPropsType<typeof getStaticProps>;
 export default function CalendarPage(props: Props) {
   if (props.notFound) return <div>404 - studio not found!</div>;
-  if (!props.id) return <div>loading </div>;
+  if (!props.id) return null;
   return (
     <SpaceProvider id={props.id}>
       <CalendarInfo />

@@ -4,7 +4,7 @@ import { useIndex, useMutations } from "hooks/useReplicache";
 import { SmallCardDragContext } from "components/DragContext";
 import { SpaceHeader, Sidebar } from "components/SpaceLayout";
 import Head from "next/head";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import useWindowDimensions from "hooks/useWindowDimensions";
 import { CardCollection } from "components/CardCollection";
 
@@ -34,7 +34,7 @@ export default function SpacePage() {
   }, []);
 
   return (
-    <>
+    <Suspense fallback={null}>
       <Head>
         <title key="title">{spaceName?.value}</title>
       </Head>
@@ -132,7 +132,7 @@ export default function SpacePage() {
           </SmallCardDragContext>
         </div>
       </div>
-    </>
+    </Suspense>
   );
 }
 
