@@ -33,7 +33,6 @@ export const SpaceList = (props: {
   );
 };
 
-const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 const Space = (props: { entity: string }) => {
   let { session } = useAuth();
   let studio = useIndex.eav(props.entity, "space/studio");

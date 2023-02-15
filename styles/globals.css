@@ -192,10 +192,12 @@ input {
 }
 
 .selectedCardGlow {
-  filter: drop-shadow(2px 0px 0px rgba(0, 125, 255, 1))
+  /* testing box-shadow instead of drop-shadow for better iOS support */
+  box-shadow: 0px 0px 0px 2px blue, 0px 0px 6px 0px blue;
+  /* filter: drop-shadow(2px 0px 0px rgba(0, 125, 255, 1))
     drop-shadow(0px 2px 0px rgba(0, 125, 255, 1))
     drop-shadow(-2px 0px 0px rgba(0, 125, 255, 1))
-    drop-shadow(0px -2px 0px rgba(0, 125, 255, 1));
+    drop-shadow(0px -2px 0px rgba(0, 125, 255, 1)); */
   /* animation: squishy 1s linear infinite; */
 }
 

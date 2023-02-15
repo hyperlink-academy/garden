@@ -3,17 +3,15 @@ import { Menu } from "@headlessui/react";
 import {
   MoreOptionsTiny,
   Delete,
-  DeckSmall,
   Member,
   CalendarMedium,
+  CardAdd,
 } from "components/Icons";
-import { Divider, MenuContainer, MenuItem } from "components/Layout";
+import { MenuContainer, MenuItem } from "components/Layout";
 import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
-import {
-  DateSection,
-  MultipleReferenceSection,
-  SingleTextSection,
-} from "./Sections";
+import { sortByPosition } from "src/position_helpers";
+
+import { DateSection, SingleTextSection } from "./Sections";
 import { Backlinks } from "./Backlinks";
 import { usePreserveScroll } from "hooks/utils";
 import Link from "next/link";
@@ -21,6 +19,9 @@ import { useAuth } from "hooks/useAuth";
 import { MakeImage, ImageSection } from "./ImageSection";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import { AddAttachedCard, CardStack } from "components/CardStack";
+import { ReferenceAttributes } from "data/Attributes";
+import { Fact } from "data/Facts";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 const borderStyles = (args: { member: boolean }) => {
@@ -75,7 +76,8 @@ export const CardView = (props: {
         })}
         `}
       >
-        {!session?.loggedIn || !memberName ? null : (
+        {/* IF MEMBER CARD, INCLUDE LINK TO STUDIO  */}
+        {!memberName ? null : (
           <>
             <div className="grid shrink-0 grid-cols-[auto_max-content] items-end px-2 pt-2 pb-1 text-white">
               <Member />
@@ -90,7 +92,7 @@ export const CardView = (props: {
         <div
           ref={ref}
           className={`
-            cardContent
+            cardContentAndDiscussion
             no-scrollbar flex h-full          
             grow
             flex-col
@@ -101,7 +103,7 @@ export const CardView = (props: {
             })}
             `}
         >
-          <div className="cardDefaultSection grid-auto-rows grid gap-3">
+          <div className="cardContent grid-auto-rows grid gap-3">
             <div>
               <div className="cardHeader grid grid-cols-[auto_max-content_max-content] gap-2">
                 <Title entityID={props.entityID} />
@@ -127,9 +129,9 @@ export const CardView = (props: {
             <ImageSection entity={props.entityID} />
             {/* image icon - click to upload */}
             {/* TODO: finish making these + style em */}
-            <AddSections entityID={props.entityID} />
+            <AttachedCardSection entityID={props.entityID} />
 
-            <DeckCardList entityID={props.entityID} />
+            <SectionAdder entityID={props.entityID} />
           </div>
         </div>
         {/* END CARD CONTENT */}
@@ -138,41 +140,60 @@ export const CardView = (props: {
   );
 };
 
-export const AddSections = (props: { entityID: string }) => {
-  let { mutate, authorized } = useMutations();
-  let date = useIndex.eav(props.entityID, "card/date");
-  let [open, setOpen] = useState(false);
-
-  if (!authorized) return null;
+const Title = (props: { entityID: string }) => {
+  let memberName = useIndex.eav(props.entityID, "member/name");
+  let cardTitle = useIndex.eav(props.entityID, "card/title");
+  let titleFact = memberName || cardTitle;
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex gap-2 pt-2">
-        <MakeImage entity={props.entityID} />
-        {!date && (
-          <button
-            className="stroke-grey-55 text-grey-55 hover:stroke-accent-blue"
-            onClick={() => {
-              setOpen(!open);
-            }}
-          >
-            <CalendarMedium className="stroke-accent-blue" />
-          </button>
-        )}
-      </div>
-      {open && !date && (
-        <input
-          onChange={(e) => {
-            mutate("assertFact", {
-              entity: props.entityID,
-              attribute: "card/date",
-              value: { type: "yyyy-mm-dd", value: e.currentTarget.value },
-              positions: {},
-            });
+    <SingleTextSection
+      onKeyPress={(e) => {
+        if (e.key === "Enter") {
+          let className = `${props.entityID}-default-text-section}`;
+          let element = document.getElementById(className);
+          element?.focus();
+        }
+      }}
+      previewOnly={titleFact?.attribute === "member/name"}
+      entityID={props.entityID}
+      className="bg-inherit text-xl font-bold"
+      section={titleFact?.attribute || "card/title"}
+    />
+  );
+};
+
+const CardMoreOptionsMenu = (props: {
+  entityID: string;
+  referenceFactID?: string;
+  onDelete?: () => void;
+}) => {
+  let { authorized, mutate, action } = useMutations();
+  let memberName = useIndex.eav(props.entityID, "member/name");
+
+  let { query: q } = useRouter();
+
+  return !authorized || !!memberName ? null : (
+    <Menu as="div" className="relative">
+      <Menu.Button className={`pt-[6px]`}>
+        <MoreOptionsTiny />
+      </Menu.Button>
+      <MenuContainer>
+        <MenuItem
+          onClick={async () => {
+            action.start();
+
+            await mutate("deleteEntity", { entity: props.entityID });
+            props.onDelete?.();
+
+            action.end();
           }}
-          type="date"
-        />
-      )}
-    </div>
+        >
+          <p className="font-bold text-accent-red">Delete FOREVER</p>
+          <div className="text-accent-red">
+            <Delete />
+          </div>
+        </MenuItem>
+      </MenuContainer>
+    </Menu>
   );
 };
 
@@ -213,70 +234,71 @@ const DefaultTextSection = (props: { entityID: string }) => {
   );
 };
 
-const Title = (props: { entityID: string }) => {
-  let memberName = useIndex.eav(props.entityID, "member/name");
-  let cardTitle = useIndex.eav(props.entityID, "card/title");
-  let titleFact = memberName || cardTitle;
-  return (
-    <SingleTextSection
-      onKeyPress={(e) => {
-        if (e.key === "Enter") {
-          let className = `${props.entityID}-default-text-section}`;
-          let element = document.getElementById(className);
-          element?.focus();
-        }
-      }}
-      previewOnly={titleFact?.attribute === "member/name"}
-      entityID={props.entityID}
-      className="bg-inherit text-xl font-bold"
-      section={titleFact?.attribute || "card/title"}
-    />
-  );
-};
+export const SectionAdder = (props: { entityID: string }) => {
+  let { mutate, authorized } = useMutations();
+  let date = useIndex.eav(props.entityID, "card/date");
+  let [open, setOpen] = useState(false);
+  let attachedCards = useIndex.eav(props.entityID, "deck/contains");
 
-const DeckCardList = (props: { entityID: string }) => {
+  if (!authorized) return null;
   return (
-    <div className="flex flex-col justify-center">
-      <MultipleReferenceSection
-        entityID={props.entityID}
-        section="deck/contains"
-      />
+    <div className="flex flex-col gap-2 text-grey-55">
+      <div className="flex gap-2 pt-2">
+        <MakeImage entity={props.entityID} />
+        {!date && (
+          <button
+            className="hover:text-accent-blue"
+            onClick={() => {
+              setOpen(!open);
+            }}
+          >
+            <CalendarMedium />
+          </button>
+        )}
+
+        {attachedCards && attachedCards.length !== 0 ? null : (
+          <AddAttachedCard
+            parent={props.entityID}
+            attribute="deck/contains"
+            positionKey="eav"
+          >
+            <div className="hover:text-accent-blue">
+              <CardAdd />
+            </div>
+          </AddAttachedCard>
+        )}
+      </div>
+      {open && !date && (
+        <input
+          onChange={(e) => {
+            mutate("assertFact", {
+              entity: props.entityID,
+              attribute: "card/date",
+              value: { type: "yyyy-mm-dd", value: e.currentTarget.value },
+              positions: {},
+            });
+          }}
+          type="date"
+        />
+      )}
     </div>
   );
 };
 
-const CardMoreOptionsMenu = (props: {
-  entityID: string;
-  referenceFactID?: string;
-  onDelete?: () => void;
-}) => {
-  let { authorized, mutate, action } = useMutations();
-  let memberName = useIndex.eav(props.entityID, "member/name");
-
-  let { query: q } = useRouter();
-
-  return !authorized || !!memberName ? null : (
-    <Menu as="div" className="relative">
-      <Menu.Button className={`pt-[6px]`}>
-        <MoreOptionsTiny />
-      </Menu.Button>
-      <MenuContainer>
-        <MenuItem
-          onClick={async () => {
-            action.start();
-
-            await mutate("deleteEntity", { entity: props.entityID });
-            props.onDelete?.();
-
-            action.end();
-          }}
-        >
-          <p className="font-bold text-accent-red">Delete FOREVER</p>
-          <div className="text-accent-red">
-            <Delete />
-          </div>
-        </MenuItem>
-      </MenuContainer>
-    </Menu>
+const AttachedCardSection = (props: { entityID: string }) => {
+  let attachedCards = useIndex.eav(props.entityID, "deck/contains");
+  return (
+    <>
+      {attachedCards && attachedCards.length === 0 ? null : (
+        <div className="flex flex-col gap-4">
+          <CardStack
+            positionKey="eav"
+            cards={attachedCards?.sort(sortByPosition("eav")) || []}
+            parent={props.entityID}
+            attribute="deck/contains"
+          />
+        </div>
+      )}
+    </>
   );
 };

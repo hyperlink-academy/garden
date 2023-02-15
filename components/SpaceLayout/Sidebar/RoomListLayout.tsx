@@ -2,7 +2,7 @@ import { Popover } from "@headlessui/react";
 import { ButtonPrimary } from "components/Buttons";
 import { Modal, Divider } from "components/Layout";
 import { Fact } from "data/Facts";
-import { Delete, MoreOptionsTiny } from "../../Icons";
+import { DeckSmall, Delete, MoreOptionsTiny } from "../../Icons";
 import { useIndex, useMutations } from "hooks/useReplicache";
 import { useState, useEffect } from "react";
 
@@ -122,29 +122,34 @@ export const EditRoomModal = (props: {
   );
 };
 
-export const RoomListItem: React.FC<
-  React.PropsWithChildren<{
-    onRoomChange: (room: string) => void;
-    unreads?: number;
-    currentRoom: string | null;
-    roomEntity: string;
-    setRoomEditOpen: () => void;
-  }>
-> = (props) => {
+export const RoomListItem = (props: {
+  onRoomChange: (room: string) => void;
+  children: React.ReactNode;
+  unreads?: number;
+  currentRoom: string | null;
+  roomEntity: string;
+  setRoomEditOpen: () => void;
+}) => {
   let { authorized } = useMutations();
+  let roomType = useIndex.eav(props.roomEntity, "room/type");
   return (
     <div
-      className={`flex w-full items-center gap-2 overflow-hidden whitespace-nowrap rounded-md border border-transparent  text-left ${
+      className={`flex w-full items-center gap-2 rounded-md border border-transparent text-left ${
         props.roomEntity === props.currentRoom
-          ? "rounded-md bg-accent-blue  font-bold text-white"
+          ? "rounded-md bg-accent-blue font-bold text-white"
           : " text-grey-35 hover:border-grey-80"
       }`}
     >
       <button
-        className="sidebarRoomName w-full overflow-clip py-0.5 pl-2 text-left"
+        className="sidebarRoomName flex w-full flex-row gap-2 py-0.5 pl-2 text-left"
         onClick={() => props.onRoomChange(props.roomEntity)}
       >
-        {props.children}
+        {roomType?.value === "collection" ? (
+          <div className="w-6">
+            <DeckSmall />
+          </div>
+        ) : null}
+        <div className="">{props.children}</div>
       </button>
       {!!props.unreads && props.unreads > 0 && (
         <div className="h-[20px] w-[20px] shrink-0 rounded-full bg-accent-gold">

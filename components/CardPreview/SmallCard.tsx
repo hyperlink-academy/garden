@@ -18,8 +18,8 @@ export const SmallCardBody = (props: { entityID: string } & Props) => {
   let imageUrl = !image
     ? undefined
     : image.value.filetype === "image"
-    ? `${WORKER_URL}/static/${image.value.id}`
-    : image.value.url;
+      ? `${WORKER_URL}/static/${image.value.id}`
+      : image.value.url;
 
   return (
     <BaseSmallCard
@@ -53,13 +53,10 @@ export const BaseSmallCard = (
   return (
     <div
       onClick={() => {
-        let cardView = document.getElementById("cardViewerWrapper");
         props.entityID && open({ entityID: props.entityID });
-        cardView ? cardView.scrollIntoView({ behavior: "smooth" }) : null;
       }}
-      className={`grid h-full w-full grid-cols-[max-content_auto] !bg-cover !bg-center !bg-no-repeat hover:cursor-pointer ${
-        props.isMember ? "pr-1 pl-0 pt-2 pb-1" : "py-2 pr-3 pl-0"
-      }`}
+      className={`grid h-full w-full grid-cols-[max-content_auto] !bg-cover !bg-center !bg-no-repeat hover:cursor-pointer ${props.isMember ? "pr-1 pl-0 pt-2 pb-1" : "py-2 pr-3 pl-0"
+        }`}
       style={{
         background: props.imageUrl ? `url(${props.imageUrl})` : "",
       }}
@@ -87,18 +84,16 @@ export const BaseSmallCard = (
             {!props.title ? (
               <small>
                 <pre
-                  className={`truncate whitespace-pre-wrap leading-tight ${
-                    !props.image ? "" : "rounded-[3px] bg-white/75 px-1"
-                  } `}
+                  className={`truncate whitespace-pre-wrap leading-tight ${!props.image ? "" : "rounded-[3px] bg-white/75 px-1"
+                    } `}
                 >
                   {props?.content}
                 </pre>
               </small>
             ) : (
               <div
-                className={`text-ellipsis font-bold leading-tight text-grey-35  ${
-                  !props.image ? "" : "rounded-[3px] bg-white/75 px-1"
-                }`}
+                className={`text-ellipsis font-bold leading-tight text-grey-35  ${!props.image ? "" : "rounded-[3px] bg-white/75 px-1"
+                  }`}
               >
                 {props.title}
               </div>

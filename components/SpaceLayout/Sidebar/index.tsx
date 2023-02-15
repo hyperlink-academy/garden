@@ -18,7 +18,6 @@ import { EditSpaceModal } from "components/CreateSpace";
 import { getCurrentDate } from "src/utils";
 import { useRouter } from "next/router";
 import { RoomListLabel, RoomListItem, EditRoomModal } from "./RoomListLayout";
-import { PromptRoomList } from "./PromptRoomList";
 import { SharedRoomList } from "./SharedRoomList";
 import { MemberRoomList } from "./MemberRoomList";
 
@@ -57,33 +56,27 @@ export const Sidebar = (props: {
         <Divider />
 
         <div className="flex flex-col gap-4">
-          {!memberEntity ? null : (
-            <div className="flex flex-col gap-1">
-              <RoomListLabel
-                label="your room"
-                helpText={
-                  <>
-                    <p>Your personal workspace.</p>
-                    <p>Come back each day and find new things to do!</p>
-                  </>
-                }
-              />
-              <RoomListItem
-                onRoomChange={props.onRoomChange}
-                currentRoom={props.currentRoom}
-                unreads={unreadCount}
-                roomEntity={memberEntity}
-                setRoomEditOpen={() => setRoomEditOpen(true)}
-              >
-                {session.session?.username}
-              </RoomListItem>
-            </div>
-          )}
+          <div className="flex flex-col gap-2">
+            {!memberEntity ? null : (
+              <>
+                <RoomListItem
+                  onRoomChange={props.onRoomChange}
+                  currentRoom={props.currentRoom}
+                  unreads={unreadCount}
+                  roomEntity={memberEntity}
+                  setRoomEditOpen={() => setRoomEditOpen(true)}
+                >
+                  Your Room
+                </RoomListItem>
+                <div className="w-full border-t border-dashed border-grey-80" />
+              </>
+            )}
 
-          <SharedRoomList
-            {...props}
-            setRoomEditOpen={() => setRoomEditOpen(true)}
-          />
+            <SharedRoomList
+              {...props}
+              setRoomEditOpen={() => setRoomEditOpen(true)}
+            />
+          </div>
 
           <div>
             <MemberRoomList
@@ -91,11 +84,6 @@ export const Sidebar = (props: {
               setRoomEditOpen={() => setRoomEditOpen(true)}
             />
           </div>
-
-          <PromptRoomList
-            {...props}
-            setRoomEditOpen={() => setRoomEditOpen(true)}
-          />
         </div>
 
         {/* shared; operates on current room */}

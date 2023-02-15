@@ -1,19 +1,23 @@
 import { Desktop } from "components/Desktop";
 import { CardViewer } from "components/CardViewerContext";
-import { useIndex } from "hooks/useReplicache";
+import { useIndex, useMutations } from "hooks/useReplicache";
 import { SmallCardDragContext } from "components/DragContext";
 import { SpaceHeader, Sidebar } from "components/SpaceLayout";
 import Head from "next/head";
 import { useEffect, useState } from "react";
 import useWindowDimensions from "hooks/useWindowDimensions";
-import { Popover } from "@headlessui/react";
-import { Rooms } from "components/Icons";
+import { CardCollection } from "components/CardCollection";
 
 export default function SpacePage() {
   let spaceName = useIndex.aev("this/name")[0];
-  let firstRoom = useIndex
+
+  // get first room = your room
+  // OR if viewing anon, get first room based on room id
+  let { memberEntity } = useMutations();
+  let firstRoomByID = useIndex
     .aev("room/name")
     .sort((a, b) => (a.id > b.id ? 1 : -1))[0]?.entity;
+  let firstRoom = memberEntity ? memberEntity : firstRoomByID;
 
   let [room, setRoom] = useState<string | null>(null);
   const { width } = useWindowDimensions();
@@ -59,9 +63,9 @@ export default function SpacePage() {
               sm:justify-center
               sm:gap-4 
 `}
-                // you need to add this to the contentSplitLayout class if you are going to scroll across more than 2 panes
-                // it prevents the last pane from sticking to the end
-                // after:content-[""] after:h-full after:w-2 after:block after:shrink-0
+              // you need to add this to the contentSplitLayout class if you are going to scroll across more than 2 panes
+              // it prevents the last pane from sticking to the end
+              // after:content-[""] after:h-full after:w-2 after:block after:shrink-0
               >
                 <div className="roomWrapper flex flex-row rounded-md border border-grey-90">
                   <Sidebar
@@ -81,12 +85,7 @@ export default function SpacePage() {
                   gap-0
                   `}
                   >
-                    <div className="no-scrollbar overflow-x-hidden overflow-y-scroll sm:p-4">
-                      <div className="relative flex w-[336px] flex-col items-stretch gap-0">
-                        <div className="desktopBackground absolute h-full w-full" />
-                        {room && <Desktop entityID={room} />}
-                      </div>
-                    </div>
+                    <Room entityID={room} />
                   </div>
                 </div>
 
@@ -99,9 +98,9 @@ export default function SpacePage() {
                     onRoomChange={(room) => {
                       setRoom(room);
                       let roomPane = document.getElementById("roomWrapper");
-                      roomPane
-                        ? roomPane.scrollIntoView({ behavior: "smooth" })
-                        : null;
+                      setTimeout(() => {
+                        roomPane?.scrollIntoView({ behavior: "smooth" });
+                      }, 10);
                     }}
                     currentRoom={room}
                   />
@@ -121,12 +120,7 @@ export default function SpacePage() {
                       border border-grey-90
                       `}
                   >
-                    <div className="no-scrollbar  overflow-x-hidden overflow-y-scroll sm:p-4">
-                      <div className="relative flex w-[336px] flex-col items-stretch gap-0">
-                        <div className="desktopBackground absolute h-full w-full" />
-                        {room && <Desktop entityID={room} />}
-                      </div>
-                    </div>
+                    <Room entityID={room} />
                   </div>
                 </div>
 
@@ -141,6 +135,24 @@ export default function SpacePage() {
     </>
   );
 }
+
+const Room = (props: { entityID: string | null }) => {
+  let roomType = useIndex.eav(props.entityID, "room/type");
+  return (
+    <div className="no-scrollbar overflow-x-hidden overflow-y-scroll sm:p-4">
+      <div className="relative flex w-[336px] flex-col items-stretch gap-0">
+        <div className="desktopBackground absolute h-full w-full" />
+        {props.entityID ? (
+          roomType?.value === "collection" ? (
+            <CardCollection entityID={props.entityID} />
+          ) : (
+            <Desktop entityID={props.entityID} />
+          )
+        ) : null}
+      </div>
+    </div>
+  );
+};
 
 const EmptyState = () => {
   return (

@@ -11,27 +11,31 @@ export function ButtonPrimary(
       {...props}
       {...{ content: undefined, icon: undefined }}
       className={`
-      m-0 box-border py-1 
-      px-2
-      font-bold text-white
+      m-0  
+      box-border flex w-max
+
+      items-center justify-center
+      gap-2 rounded-md
+
+      border py-1 px-2 
+      font-bold text-white 
+
+      outline-offset-[-2px] active:outline active:outline-2 disabled:border-grey-90 
+      disabled:bg-grey-90 disabled:text-grey-80 disabled:hover:text-grey-80 
       ${
         props.destructive
           ? `
-          active:bg-bg-red border-accent-red
-          bg-accent-red hover:bg-white
+          active:bg-bg-red
+          border-accent-red bg-accent-red hover:bg-white 
           hover:text-accent-red active:text-accent-red `
           : `
-          border-accent-blue bg-accent-blue 
-          hover:bg-bg-blue hover:text-accent-blue
+          border-accent-blue
+          bg-accent-blue  hover:bg-bg-blue hover:text-accent-blue
           active:bg-bg-blue active:text-accent-blue 
+
           `
       }
-      flex w-max  
-      items-center justify-center gap-2 rounded-md 
-      border
-      outline-offset-[-2px] active:outline active:outline-2 
-      disabled:border-grey-90 disabled:bg-grey-90 
-      disabled:text-grey-80 disabled:hover:text-grey-80
+
       `}
     >
       {props.icon ? <span className="">{props.icon}</span> : null}
@@ -80,7 +84,7 @@ export function ButtonTertiary(
       {...{ content: undefined, icon: undefined }}
       className="m-0 flex w-max
   items-center justify-center gap-2 rounded-md border border-grey-55 bg-white
-  p-2 text-grey-35 hover:bg-bg-blue hover:text-accent-blue active:bg-accent-blue
+  py-1 px-2 text-grey-35 hover:border-accent-blue hover:bg-bg-blue hover:text-accent-blue active:bg-accent-blue
   active:text-white disabled:border-grey-90 disabled:bg-white disabled:text-grey-80 disabled:hover:text-grey-80"
     >
       {props.icon ? <span className="">{props.icon}</span> : null}
