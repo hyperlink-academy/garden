@@ -10,7 +10,6 @@ import {
 } from "components/Icons";
 import { Divider, MenuContainer, MenuItem } from "components/Layout";
 import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
-import { sortByPosition } from "src/position_helpers";
 
 import {
   AttachedCardSection,
@@ -24,11 +23,9 @@ import { useAuth } from "hooks/useAuth";
 import { MakeImage, ImageSection } from "./ImageSection";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { AddAttachedCard, CardStack } from "components/CardStack";
-import { ReferenceAttributes } from "data/Attributes";
-import { Fact } from "data/Facts";
-import { ButtonSecondary } from "components/Buttons";
-import { Discussion } from "./discussion";
+import { AddAttachedCard } from "components/CardStack";
+import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
+import { Discussion } from "./Discussion";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 const borderStyles = (args: { member: boolean }) => {
@@ -102,7 +99,8 @@ export const CardView = (props: {
         >
           {cardState === "card" ? (
             <CardContent
-              setCardState={() =>
+              cardState={cardState}
+              toggleCardState={() =>
                 cardState === "card"
                   ? setCardState("discussion")
                   : setCardState("card")
@@ -111,7 +109,8 @@ export const CardView = (props: {
             />
           ) : (
             <Discussion
-              setCardState={() =>
+              cardState={cardState}
+              toggleCardState={() =>
                 cardState === "card"
                   ? setCardState("discussion")
                   : setCardState("card")
@@ -128,7 +127,8 @@ export const CardContent = (props: {
   entityID: string;
   onDelete?: () => void;
   referenceFactID?: string;
-  setCardState: () => void;
+  toggleCardState: () => void;
+  cardState: string;
 }) => {
   let memberName = useIndex.eav(props.entityID, "member/name");
   let cardCreator = useIndex.eav(props.entityID, "card/created-by");
@@ -140,6 +140,7 @@ export const CardContent = (props: {
 
   let { ref } = usePreserveScroll<HTMLDivElement>();
   let { session } = useAuth();
+  let [thoughtInputFocus, setThoughtInputFocus] = useState(false);
 
   return (
     <>
@@ -175,20 +176,32 @@ export const CardContent = (props: {
       </div>
       {/* END CARD CONTENT */}
       {/* START CARD THOUGHTS */}
-      <div className="cardThoughts flex w-full flex-col gap-4">
-        <p className="font-bold text-grey-35">Thoughts</p>
-        <div>
-          <textarea
-            placeholder="add your thoughts..."
-            className="h-32 w-full"
-          ></textarea>
-          <div className="flex items-center justify-between text-grey-55">
-            <CardAdd />
-            <ButtonSecondary icon={<Send />} />
-          </div>
-        </div>
+
+      <div className="cardThoughts flex w-full flex-col gap-3">
         <Divider />
-        <Thought setCardState={props.setCardState} />
+        <div className="flex flex-col gap-2 pt-3">
+          <textarea
+            placeholder="add a comment..."
+            onFocus={() => setThoughtInputFocus(true)}
+            onBlur={() => setThoughtInputFocus(false)}
+            className={`${
+              thoughtInputFocus ? "test-bg-pink h-32" : "h-10"
+            } w-full border-grey-80`}
+            id="thoughtInput"
+          ></textarea>
+          {!thoughtInputFocus ? null : (
+            <div className="flex items-center justify-between text-grey-55 ">
+              <div className="hover:text-accent-blue">
+                <CardAdd />
+              </div>
+              <ButtonPrimary icon={<Send />} />
+            </div>
+          )}
+        </div>
+        <Thought
+          toggleCardState={props.toggleCardState}
+          cardState={props.cardState}
+        />
       </div>
     </>
   );
@@ -339,22 +352,35 @@ export const SectionAdder = (props: { entityID: string }) => {
   );
 };
 
-export const Thought = (props: { setCardState?: () => void }) => {
+export const Thought = (props: {
+  toggleCardState?: () => void;
+  cardState: string;
+}) => {
   return (
     <button
       onClick={() => {
-        !props.setCardState ? null : props.setCardState();
+        !props.toggleCardState ? null : props.toggleCardState();
       }}
-      className="lightBorder group flex flex-col gap-1 py-2 px-3 text-left hover:border-accent-blue"
+      className={`group flex flex-col gap-1 rounded-md border py-2 px-3 text-left ${
+        props.cardState === "discussion"
+          ? "border-grey-80 bg-bg-blue text-grey-35"
+          : " border-transparent text-grey-55 hover:border-accent-blue hover:bg-bg-blue hover:text-grey-35"
+      } `}
     >
-      <div className="flex w-full justify-between gap-2 text-grey-55">
-        <small className="font-bold">celine</small>
-        <small>3/3/23</small>
+      <div className="flex w-full items-baseline gap-2">
+        <div className="font-bold">celine</div>
+        <div className="text-sm">3/3/23</div>
       </div>
-      <div className="text-grey-35">
+      <div className="">
         This is my content I love make comments about other people's shit
       </div>
-      <small className=" place-self-end text-grey-80 underline group-hover:text-accent-blue">
+      <small
+        className={`place-self-end  ${
+          props.cardState === "discussion"
+            ? ""
+            : "underline group-hover:text-accent-blue"
+        }`}
+      >
         2 replies
       </small>
     </button>
