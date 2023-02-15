@@ -461,14 +461,6 @@ const AddCard = (props: {
             entity = d.entity;
           }
 
-          if (name && memberEntity !== props.desktopEntity) {
-            await mutate("assertFact", {
-              entity,
-              attribute: "card/unread-by",
-              value: ref(props.desktopEntity),
-              positions: {},
-            });
-          }
           await mutate("addCardToDesktop", {
             entity,
             factID: ulid(),
