@@ -46,7 +46,6 @@ export const CardView = (props: {
   entityID: string;
   onDelete?: () => void;
   referenceFactID?: string;
-  cards: Fact<keyof ReferenceAttributes>[];
 }) => {
   let memberName = useIndex.eav(props.entityID, "member/name");
   let cardCreator = useIndex.eav(props.entityID, "card/created-by");
