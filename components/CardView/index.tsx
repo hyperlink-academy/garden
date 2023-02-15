@@ -128,7 +128,6 @@ export const CardContent = (props: {
   entityID: string;
   onDelete?: () => void;
   referenceFactID?: string;
-  cards: Fact<keyof ReferenceAttributes>[];
   setCardState: () => void;
 }) => {
   let memberName = useIndex.eav(props.entityID, "member/name");
@@ -348,7 +347,7 @@ export const Thought = (props: { setCardState?: () => void }) => {
       }}
       className="lightBorder group flex flex-col gap-1 py-2 px-3 text-left hover:border-accent-blue"
     >
-      <div className="flex justify-between gap-2 text-grey-55">
+      <div className="flex w-full justify-between gap-2 text-grey-55">
         <small className="font-bold">celine</small>
         <small>3/3/23</small>
       </div>
