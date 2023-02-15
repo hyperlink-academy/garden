@@ -6,12 +6,17 @@ import {
   Member,
   CalendarMedium,
   CardAdd,
+  Send,
 } from "components/Icons";
-import { MenuContainer, MenuItem } from "components/Layout";
+import { Divider, MenuContainer, MenuItem } from "components/Layout";
 import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
 import { sortByPosition } from "src/position_helpers";
 
-import { DateSection, SingleTextSection } from "./Sections";
+import {
+  AttachedCardSection,
+  DateSection,
+  SingleTextSection,
+} from "./Sections";
 import { Backlinks } from "./Backlinks";
 import { usePreserveScroll } from "hooks/utils";
 import Link from "next/link";
@@ -22,6 +27,8 @@ import { useState } from "react";
 import { AddAttachedCard, CardStack } from "components/CardStack";
 import { ReferenceAttributes } from "data/Attributes";
 import { Fact } from "data/Facts";
+import { ButtonSecondary } from "components/Buttons";
+import { Discussion } from "./discussion";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 const borderStyles = (args: { member: boolean }) => {
@@ -42,53 +49,43 @@ const contentStyles = (args: { member: boolean }) => {
       return `px-3 py-4 sm:px-4 sm:py-6`;
   }
 };
+
 export const CardView = (props: {
   entityID: string;
   onDelete?: () => void;
   referenceFactID?: string;
 }) => {
+  let [cardState, setCardState] = useState<"card" | "discussion">("card");
   let memberName = useIndex.eav(props.entityID, "member/name");
-  let cardCreator = useIndex.eav(props.entityID, "card/created-by");
-  // returns reference…
-  let cardCreatorName = useIndex.eav(
-    cardCreator?.value.value as string,
-    "member/name"
-  )?.value;
-
   let { ref } = usePreserveScroll<HTMLDivElement>();
-  let { session } = useAuth();
 
   return (
     <div className="flex h-full flex-col items-stretch">
       <Backlinks entityID={props.entityID} />
       <div
         className={`
-        card
-        no-scrollbar
-        relative
-        mx-auto       
-        flex
-        h-full w-full
-        max-w-3xl grow
-        flex-col items-stretch overflow-y-scroll
-        ${borderStyles({
-          member: !!memberName,
-        })}
-        `}
+      card
+      no-scrollbar
+      relative
+      mx-auto       
+      flex
+      h-full w-full
+      max-w-3xl grow
+      flex-col items-stretch overflow-y-scroll
+      ${borderStyles({
+        member: !!memberName,
+      })}
+      `}
       >
         {/* IF MEMBER CARD, INCLUDE LINK TO STUDIO  */}
         {!memberName ? null : (
-          <>
-            <div className="grid shrink-0 grid-cols-[auto_max-content] items-end px-2 pt-2 pb-1 text-white">
-              <Member />
-              <Link href={`/s/${memberName?.value}`}>
-                <small className="justify-self-start">visit studio</small>
-              </Link>
-            </div>
-          </>
+          <div className="grid shrink-0 grid-cols-[auto_max-content] items-end px-2 pt-2 pb-1 text-white">
+            <Member />
+            <Link href={`/s/${memberName?.value}`}>
+              <small className="justify-self-start">visit studio</small>
+            </Link>
+          </div>
         )}
-
-        {/* CARD CONTENT HERE */}
         <div
           ref={ref}
           className={`
@@ -103,40 +100,98 @@ export const CardView = (props: {
             })}
             `}
         >
-          <div className="cardContent grid-auto-rows grid gap-3">
-            <div>
-              <div className="cardHeader grid grid-cols-[auto_max-content_max-content] gap-2">
-                <Title entityID={props.entityID} />
-                {cardCreatorName ? (
-                  <div className="lightBorder self-start rounded-md py-1 px-2 text-sm text-grey-35">
-                    {cardCreatorName}
-                  </div>
-                ) : null}
-                <div className="">
-                  <CardMoreOptionsMenu
-                    onDelete={props.onDelete}
-                    entityID={props.entityID}
-                    referenceFactID={props?.referenceFactID}
-                  />
-                </div>
-              </div>
-              <DateSection entityID={props.entityID} />
-            </div>
-
-            <DefaultTextSection entityID={props.entityID} />
-
-            {/* display image, if we have one! */}
-            <ImageSection entity={props.entityID} />
-            {/* image icon - click to upload */}
-            {/* TODO: finish making these + style em */}
-            <AttachedCardSection entityID={props.entityID} />
-
-            <SectionAdder entityID={props.entityID} />
-          </div>
+          {cardState === "card" ? (
+            <CardContent
+              setCardState={() =>
+                cardState === "card"
+                  ? setCardState("discussion")
+                  : setCardState("card")
+              }
+              {...props}
+            />
+          ) : (
+            <Discussion
+              setCardState={() =>
+                cardState === "card"
+                  ? setCardState("discussion")
+                  : setCardState("card")
+              }
+            />
+          )}
         </div>
-        {/* END CARD CONTENT */}
       </div>
     </div>
+  );
+};
+
+export const CardContent = (props: {
+  entityID: string;
+  onDelete?: () => void;
+  referenceFactID?: string;
+  cards: Fact<keyof ReferenceAttributes>[];
+  setCardState: () => void;
+}) => {
+  let memberName = useIndex.eav(props.entityID, "member/name");
+  let cardCreator = useIndex.eav(props.entityID, "card/created-by");
+  // returns reference…
+  let cardCreatorName = useIndex.eav(
+    cardCreator?.value.value as string,
+    "member/name"
+  )?.value;
+
+  let { ref } = usePreserveScroll<HTMLDivElement>();
+  let { session } = useAuth();
+
+  return (
+    <>
+      {/* START CARD CONTENT */}
+      <div className="cardContent grid-auto-rows grid gap-3">
+        <div>
+          <div className="cardHeader grid grid-cols-[auto_max-content_max-content] gap-2">
+            <Title entityID={props.entityID} />
+            {cardCreatorName ? (
+              <div className="lightBorder self-start rounded-md py-1 px-2 text-sm text-grey-35">
+                {cardCreatorName}
+              </div>
+            ) : null}
+            <div className="">
+              <CardMoreOptionsMenu
+                onDelete={props.onDelete}
+                entityID={props.entityID}
+                referenceFactID={props?.referenceFactID}
+              />
+            </div>
+          </div>
+          <DateSection entityID={props.entityID} />
+        </div>
+
+        <DefaultTextSection entityID={props.entityID} />
+
+        {/* show the image and attached cards if any */}
+        <ImageSection entityID={props.entityID} />
+        <AttachedCardSection entityID={props.entityID} />
+
+        {/* this handles the triggers to add cards, image, and date! */}
+        <SectionAdder entityID={props.entityID} />
+      </div>
+      {/* END CARD CONTENT */}
+      {/* START CARD THOUGHTS */}
+      <div className="cardThoughts flex w-full flex-col gap-4">
+        <p className="font-bold text-grey-35">Thoughts</p>
+        <div>
+          <textarea
+            placeholder="add your thoughts..."
+            className="h-32 w-full"
+          ></textarea>
+          <div className="flex items-center justify-between text-grey-55">
+            <CardAdd />
+            <ButtonSecondary icon={<Send />} />
+          </div>
+        </div>
+        <Divider />
+        <Thought setCardState={props.setCardState} />
+      </div>
+    </>
   );
 };
 
@@ -285,20 +340,24 @@ export const SectionAdder = (props: { entityID: string }) => {
   );
 };
 
-const AttachedCardSection = (props: { entityID: string }) => {
-  let attachedCards = useIndex.eav(props.entityID, "deck/contains");
+export const Thought = (props: { setCardState?: () => void }) => {
   return (
-    <>
-      {attachedCards && attachedCards.length === 0 ? null : (
-        <div className="flex flex-col gap-4">
-          <CardStack
-            positionKey="eav"
-            cards={attachedCards?.sort(sortByPosition("eav")) || []}
-            parent={props.entityID}
-            attribute="deck/contains"
-          />
-        </div>
-      )}
-    </>
+    <button
+      onClick={() => {
+        !props.setCardState ? null : props.setCardState();
+      }}
+      className="lightBorder group flex flex-col gap-1 py-2 px-3 text-left hover:border-accent-blue"
+    >
+      <div className="flex justify-between gap-2 text-grey-55">
+        <small className="font-bold">celine</small>
+        <small>3/3/23</small>
+      </div>
+      <div className="text-grey-35">
+        This is my content I love make comments about other people's shit
+      </div>
+      <small className=" place-self-end text-grey-80 underline group-hover:text-accent-blue">
+        2 replies
+      </small>
+    </button>
   );
 };
