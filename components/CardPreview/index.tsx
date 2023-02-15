@@ -104,8 +104,6 @@ export const HoverControls: React.FC<
     let originX = rect.x + rect.width / 2;
     let originY = rect.y + rect.height / 2;
 
-    console.log(ref.current);
-
     let angle = find_angle(
       { x: initial[0], y: initial[1] },
       { x: originX, y: originY },
