@@ -6,8 +6,7 @@ import { SpaceHeader, Sidebar } from "components/SpaceLayout";
 import Head from "next/head";
 import { useEffect, useState } from "react";
 import useWindowDimensions from "hooks/useWindowDimensions";
-import { Popover } from "@headlessui/react";
-import { Rooms } from "components/Icons";
+import { CardCollection } from "components/CardCollection";
 
 export default function SpacePage() {
   let spaceName = useIndex.aev("this/name")[0];
@@ -86,12 +85,7 @@ export default function SpacePage() {
                   gap-0
                   `}
                   >
-                    <div className="no-scrollbar overflow-x-hidden overflow-y-scroll sm:p-4">
-                      <div className="relative flex w-[336px] flex-col items-stretch gap-0">
-                        <div className="desktopBackground absolute h-full w-full" />
-                        {room && <Desktop entityID={room} />}
-                      </div>
-                    </div>
+                    <Room entityID={room} />
                   </div>
                 </div>
 
@@ -126,12 +120,7 @@ export default function SpacePage() {
                       border border-grey-90
                       `}
                   >
-                    <div className="no-scrollbar  overflow-x-hidden overflow-y-scroll sm:p-4">
-                      <div className="relative flex w-[336px] flex-col items-stretch gap-0">
-                        <div className="desktopBackground absolute h-full w-full" />
-                        {room && <Desktop entityID={room} />}
-                      </div>
-                    </div>
+                    <Room entityID={room} />
                   </div>
                 </div>
 
@@ -146,6 +135,24 @@ export default function SpacePage() {
     </>
   );
 }
+
+const Room = (props: { entityID: string | null }) => {
+  let roomType = useIndex.eav(props.entityID, "room/type");
+  return (
+    <div className="no-scrollbar overflow-x-hidden overflow-y-scroll sm:p-4">
+      <div className="relative flex w-[336px] flex-col items-stretch gap-0">
+        <div className="desktopBackground absolute h-full w-full" />
+        {props.entityID ? (
+          roomType?.value === "collection" ? (
+            <CardCollection entityID={props.entityID} />
+          ) : (
+            <Desktop entityID={props.entityID} />
+          )
+        ) : null}
+      </div>
+    </div>
+  );
+};
 
 const EmptyState = () => {
   return (

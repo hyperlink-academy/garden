@@ -209,7 +209,9 @@ let PromptManager = (props: { entityID: string }) => {
 };
 
 let RandomPromptsButton = (props: { entityID: string }) => {
-  let promptRooms = useIndex.aev("promptroom/name");
+  let promptRooms = useIndex
+    .aev("room/type")
+    .filter((f) => f.value === "collection");
   return (
     <Menu as="div" className="relative">
       <Menu.Button as={Fragment}>
@@ -321,7 +323,6 @@ const DraggableCard = (props: {
 }) => {
   let position = useIndex.eav(props.relationshipID, "card/position-in");
   let { mutate } = useMutations();
-  let { query: q } = useRouter();
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({
       id: props.relationshipID,
