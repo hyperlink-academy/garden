@@ -1,3 +1,4 @@
+import { useIndex } from "hooks/useReplicache";
 import { generateKeyBetween } from "src/fractional-indexing";
 import { sortByPosition } from "src/position_helpers";
 import { Attribute, ReferenceAttributes } from "./Attributes";
@@ -181,6 +182,11 @@ const createCard: Mutation<{
   title: string;
   memberEntity: string;
 }> = async (args, ctx) => {
+  // all members - but filter out card creator for unread-by
+  let members = (await ctx.scanIndex.aev("member/name")).filter(
+    (f) => f.entity !== args.memberEntity
+  );
+
   await ctx.assertFact({
     entity: args.entityID,
     attribute: "card/created-by",
@@ -193,6 +199,14 @@ const createCard: Mutation<{
     value: args.title,
     positions: {},
   });
+  for (let m of members) {
+    await ctx.assertFact({
+      entity: args.entityID,
+      attribute: "card/unread-by",
+      value: ref(m.entity),
+      positions: {},
+    });
+  }
 };
 
 export type FactInput = {
