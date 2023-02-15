@@ -134,8 +134,6 @@ export const CardView = (props: {
 
             <SectionAdder entityID={props.entityID} />
           </div>
-
-          <div className="cardDiscussion w-full bg-test-pink">hi</div>
         </div>
         {/* END CARD CONTENT */}
       </div>
