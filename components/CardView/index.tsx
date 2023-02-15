@@ -10,6 +10,7 @@ import {
 } from "components/Icons";
 import { Divider, MenuContainer, MenuItem } from "components/Layout";
 import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
+import { sortByPosition } from "src/position_helpers";
 
 import {
   AttachedCardSection,
@@ -23,7 +24,9 @@ import { useAuth } from "hooks/useAuth";
 import { MakeImage, ImageSection } from "./ImageSection";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { AddAttachedCard } from "components/CardStack";
+import { AddAttachedCard, CardStack } from "components/CardStack";
+import { ReferenceAttributes } from "data/Attributes";
+import { Fact } from "data/Facts";
 import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
 import { Discussion } from "./Discussion";
 

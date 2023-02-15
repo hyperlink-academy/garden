@@ -6,35 +6,102 @@ import { useState } from "react";
 import { ulid } from "src/ulid";
 import { RoomListLabel, RoomListItem } from "./RoomListLayout";
 import { sortByPosition } from "src/position_helpers";
+import { SortableContext, useSortable } from "@dnd-kit/sortable";
+import { useLongPress } from "hooks/useLongPress";
+import { SmallCardDragContext } from "components/DragContext";
 
 export const SharedRoomList = (props: {
   onRoomChange: (room: string) => void;
   currentRoom: string | null;
   setRoomEditOpen: () => void;
 }) => {
-  let desktops = useIndex.aev("room/name");
-  let collections = useIndex.aev("promptroom/name");
-  let rooms = [...desktops, ...collections].sort(sortByPosition("roomList"));
+  let rooms = useIndex.aev("room/name").sort(sortByPosition("roomList"));
+  let [mode, setMode] = useState<"normal" | "edit">("normal");
 
   return (
-    <ul className="sidebarSharedRoomList flex flex-col gap-0.5">
-      {rooms
-        .filter((f) => f.value !== "prompts")
-        .map((room) => {
-          return (
-            <RoomListItem
-              key={room.id}
-              onRoomChange={props.onRoomChange}
-              currentRoom={props.currentRoom}
-              roomEntity={room.entity}
-              setRoomEditOpen={props.setRoomEditOpen}
-            >
-              {room.value || <i>Untitled Room</i>}
-            </RoomListItem>
-          );
-        })}
-      <CreateRoom />
-    </ul>
+    <SmallCardDragContext
+      activationConstraints={{ delay: 400, tolerance: 5 }}
+      noDeleteZone
+    >
+      <SortableContext items={rooms.map((c) => c.id)}>
+        <ul className="sidebarSharedRoomList flex flex-col gap-0.5">
+          {rooms
+            .filter((f) => f.value !== "prompts")
+            .map((room) => {
+              return (
+                <DraggableRoomListItem
+                  {...props}
+                  mode={mode}
+                  setEditMode={() => setMode("edit")}
+                  key={room.id}
+                  name={room.value}
+                  entityID={room.entity}
+                  factID={room.id}
+                />
+              );
+            })}
+          <CreateRoom />
+        </ul>
+      </SortableContext>
+    </SmallCardDragContext>
+  );
+};
+
+const DraggableRoomListItem = (props: {
+  mode: "normal" | "edit";
+  setEditMode: () => void;
+  entityID: string;
+  factID: string;
+  name: string;
+  onRoomChange: (room: string) => void;
+  currentRoom: string | null;
+  setRoomEditOpen: () => void;
+}) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef: draggableRef,
+    transition,
+    isDragging,
+    transform,
+  } = useSortable({
+    id: props.factID,
+    data: {
+      positionKey: "roomList",
+      entityID: props.entityID,
+      attribute: "room/name",
+    },
+  });
+  let { handlers } = useLongPress(() => {
+    props.setEditMode();
+  });
+
+  const style =
+    transform && (Math.abs(transform.x) > 0 || Math.abs(transform.y) > 0)
+      ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
+      : "";
+
+  let obj =
+    props.mode === "normal" ? handlers : { ...listeners, ...attributes };
+  return (
+    <div
+      {...obj}
+      ref={draggableRef}
+      className={`${isDragging ? "border border-accent-blue" : ""}`}
+      style={{
+        transform: style,
+        transition,
+      }}
+    >
+      <RoomListItem
+        onRoomChange={props.onRoomChange}
+        currentRoom={props.currentRoom}
+        roomEntity={props.entityID}
+        setRoomEditOpen={props.setRoomEditOpen}
+      >
+        {props.name || <i>Untitled Room</i>}
+      </RoomListItem>
+    </div>
   );
 };
 
@@ -104,9 +171,8 @@ const CreateRoom = () => {
                 <RadioGroup.Option value="Canvas">
                   {({ checked }) => (
                     <div
-                      className={`${
-                        checked ? "bg-bg-blue" : ""
-                      } rounded-md border border-grey-15 p-4 hover:cursor-pointer`}
+                      className={`${checked ? "bg-bg-blue" : ""
+                        } rounded-md border border-grey-15 p-4 hover:cursor-pointer`}
                     >
                       Canvas
                     </div>
@@ -115,9 +181,8 @@ const CreateRoom = () => {
                 <RadioGroup.Option value="collection">
                   {({ checked }) => (
                     <div
-                      className={`${
-                        checked ? "bg-bg-blue" : ""
-                      } rounded-md border border-grey-15 p-4 hover:cursor-pointer`}
+                      className={`${checked ? "bg-bg-blue" : ""
+                        } rounded-md border border-grey-15 p-4 hover:cursor-pointer`}
                     >
                       Collection
                     </div>

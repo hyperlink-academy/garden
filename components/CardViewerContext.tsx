@@ -1,7 +1,7 @@
 import { useAppEventListener, publishAppEvent } from "hooks/useEvents";
 import { useIndex, useMutations } from "hooks/useReplicache";
 import { useUndoableState } from "hooks/useUndoableState";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { CardView } from "./CardView";
 
 export const useCardViewer = () => {
@@ -17,6 +17,7 @@ export function CardViewer(props: {
   room: string | null;
 }) {
   let [history, setHistory] = useUndoableState<{ [k: string]: string[] }>({});
+  let ref = useRef<HTMLDivElement | null>(null);
   let { mutate, memberEntity } = useMutations();
   let unreadBy =
     useIndex.eav(
@@ -24,11 +25,11 @@ export function CardViewer(props: {
       "card/unread-by"
     ) || [];
   useEffect(() => {
-    if (history[0] && memberEntity) {
+    if (props.room && history[props.room]?.[0] && memberEntity) {
       let unread = unreadBy.find((f) => f.value.value === memberEntity);
       if (unread) mutate("retractFact", { id: unread.id });
     }
-  }, [history[0], unreadBy, memberEntity]);
+  }, [history, props.room, unreadBy, memberEntity]);
 
   useAppEventListener(
     "cardviewer.open-card",
@@ -42,12 +43,16 @@ export function CardViewer(props: {
           [props.room]: [data.entityID, ...room],
         };
       });
+      setTimeout(() => {
+        ref.current?.scrollIntoView({ inline: "center", behavior: "smooth" });
+      }, 10);
     },
     [props.room]
   );
 
   return (
     <div
+      ref={ref}
       id="cardViewerWrapper"
       className={`cardViewerWrapper 
           flex h-full w-[calc(100vw-16px)] 

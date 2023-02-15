@@ -212,6 +212,7 @@ let RandomPromptsButton = (props: { entityID: string }) => {
   let promptRooms = useIndex
     .aev("room/type")
     .filter((f) => f.value === "collection");
+
   return (
     <Menu as="div" className="relative">
       <Menu.Button as={Fragment}>
@@ -223,7 +224,6 @@ let RandomPromptsButton = (props: { entityID: string }) => {
             <RandomPromptsRoomItem
               roomEntity={room.entity}
               desktopEntity={props.entityID}
-              roomName={room.value}
             />
           );
         })}
@@ -235,9 +235,10 @@ let RandomPromptsButton = (props: { entityID: string }) => {
 let RandomPromptsRoomItem = (props: {
   roomEntity: string;
   desktopEntity: string;
-  roomName: string;
 }) => {
   let { mutate } = useMutations();
+
+  let roomName = useIndex.eav(props.roomEntity, "room/name");
 
   let promptsInRoom = useIndex.eav(props.roomEntity, "desktop/contains") || [];
   let promptsOnDesktop =
@@ -258,7 +259,7 @@ let RandomPromptsRoomItem = (props: {
         });
       }}
     >
-      {props.roomName}
+      {roomName?.value}
     </MenuItem>
   );
 };
@@ -460,14 +461,6 @@ const AddCard = (props: {
             entity = d.entity;
           }
 
-          if (name && memberEntity !== props.desktopEntity) {
-            await mutate("assertFact", {
-              entity,
-              attribute: "card/unread-by",
-              value: ref(props.desktopEntity),
-              positions: {},
-            });
-          }
           await mutate("addCardToDesktop", {
             entity,
             factID: ulid(),

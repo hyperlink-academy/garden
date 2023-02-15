@@ -63,9 +63,9 @@ export default function SpacePage() {
               sm:justify-center
               sm:gap-4 
 `}
-                // you need to add this to the contentSplitLayout class if you are going to scroll across more than 2 panes
-                // it prevents the last pane from sticking to the end
-                // after:content-[""] after:h-full after:w-2 after:block after:shrink-0
+              // you need to add this to the contentSplitLayout class if you are going to scroll across more than 2 panes
+              // it prevents the last pane from sticking to the end
+              // after:content-[""] after:h-full after:w-2 after:block after:shrink-0
               >
                 <div className="roomWrapper flex flex-row rounded-md border border-grey-90">
                   <Sidebar
@@ -98,9 +98,9 @@ export default function SpacePage() {
                     onRoomChange={(room) => {
                       setRoom(room);
                       let roomPane = document.getElementById("roomWrapper");
-                      roomPane
-                        ? roomPane.scrollIntoView({ behavior: "smooth" })
-                        : null;
+                      setTimeout(() => {
+                        roomPane?.scrollIntoView({ behavior: "smooth" });
+                      }, 10);
                     }}
                     currentRoom={room}
                   />
