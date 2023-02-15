@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import { CardPreview } from "./CardPreview";
 import { useSpring, animated } from "@react-spring/web";
-import { AddTiny, CardSmall as CardIcon, Member } from "./Icons";
+import { AddTiny, CardAdd, CardSmall as CardIcon, Member } from "./Icons";
 import { ReferenceAttributes } from "data/Attributes";
 import { SortableContext } from "@dnd-kit/sortable";
 import useMeasure from "react-use-measure";
@@ -20,6 +20,7 @@ import { generateKeyBetween } from "src/fractional-indexing";
 import { useSortableCard } from "./DragContext";
 import { useLongPress } from "hooks/useLongPress";
 import { Replicache } from "replicache";
+import { ButtonTertiary } from "./Buttons";
 
 export type StackData = {
   parent: string;
@@ -34,92 +35,59 @@ export const CardStack = (
   let [focusedCardId, setFocusedCardIndex] = useState<null | string>(null);
 
   return (
-    <div className="relative flex w-full gap-4">
-      <div className="relative grow">
-        {
-          <AddCard
-            expanded={expandAll || props.cards.length === 0}
-            parent={props.parent}
-            attribute={props.attribute}
-            positionKey={props.positionKey}
-          />
-        }
-        <SortableContext items={props.cards.map((c) => c.id)}>
-          {props.cards.map((card, currentIndex) => (
-            <Card
-              factID={card.id}
-              expandAll={expandAll}
-              parent={props.parent}
-              attribute={props.attribute}
-              positionKey={props.positionKey}
-              last={currentIndex === props.cards.length - 1}
-              key={card.id}
-              entity={card.value.value}
-              currentIndex={currentIndex}
-              focused={expandAll || card.id === focusedCardId}
-              nextIndex={
-                currentIndex === props.cards.length - 1 ? 0 : currentIndex + 1
-              }
-              onClick={(e) => {
-                setFocusedCardIndex(card.id);
-                console.log(focusedCardId);
-                let element = e.currentTarget;
-                //Commented out for now because it messes w/ scroll state when
-                //following links!
-                // setTimeout(
-                //   // if parent is bottomed, do nothing. else:
-                //   () => {
-                //     let offsetContainerTop =
-                //       element.offsetTop - element.scrollTop;
-                //     function getCardParent(
-                //       node: HTMLElement | null
-                //     ): HTMLElement | undefined {
-                //       if (!node) return undefined;
-                //       if (node.classList.contains("cardContent")) return node;
-                //       return getCardParent(node.parentElement);
-                //     }
-                //     let cardParent = getCardParent(element.parentElement);
-                //
-                //     if (!cardParent) return;
-                //
-                //     cardParent.scrollTo({
-                //       top: offsetContainerTop - 20,
-                //       behavior: "smooth",
-                //     });
-                //   },
-                //   410
-                // );
-              }}
-            />
-          ))}
-        </SortableContext>
-        {props.cards.length === 0 ? (
-          ""
-        ) : (
-          <AddCard
+    <div className="cardStackWrapper flex w-full gap-4">
+      <div className="cardStackandAdd flex grow flex-col gap-4">
+        <div className="cardStack relative">
+          <SortableContext items={props.cards.map((c) => c.id)}>
+            {props.cards.map((card, currentIndex) => (
+              <Card
+                factID={card.id}
+                expandAll={expandAll}
+                parent={props.parent}
+                attribute={props.attribute}
+                positionKey={props.positionKey}
+                last={currentIndex === props.cards.length - 1}
+                key={card.id}
+                entity={card.value.value}
+                currentIndex={currentIndex}
+                focused={expandAll || card.id === focusedCardId}
+                nextIndex={
+                  currentIndex === props.cards.length - 1 ? 0 : currentIndex + 1
+                }
+                onClick={(e) => {
+                  setFocusedCardIndex(card.id);
+                  console.log(focusedCardId);
+                  let element = e.currentTarget;
+                }}
+              />
+            ))}
+          </SortableContext>
+        </div>
+        <div className="cardStackAddCard text-right">
+          <AddAttachedCard
             expanded={expandAll || props.cards.length === 0}
             end
             parent={props.parent}
             attribute={props.attribute}
             positionKey={props.positionKey}
-          />
-        )}
-      </div>
-      {props.cards.length === 0 ? null : (
-        <div className="cardStackCollapseExpand relative w-4 shrink-0">
-          <div className="sticky top-0 z-20 mt-2 mb-12 rotate-90 whitespace-nowrap pt-3">
-            <button
-              onClick={() => {
-                setExpandAll((e) => !e);
-                setFocusedCardIndex(null);
-              }}
-              className="relative -top-2 text-sm font-bold text-grey-55 hover:text-accent-blue"
-            >
-              {expandAll ? "collapse" : "expand"}
-            </button>
-          </div>
+          >
+            <ButtonTertiary content=" + Attach Card" />
+          </AddAttachedCard>
         </div>
-      )}
+      </div>
+      <div className="cardStackCollapseExpand relative w-4 shrink-0">
+        <div className="sticky top-0 z-20 mt-2 mb-12 rotate-90 whitespace-nowrap pt-3">
+          <button
+            onClick={() => {
+              setExpandAll((e) => !e);
+              setFocusedCardIndex(null);
+            }}
+            className="relative -top-2 -left-3 text-sm font-bold text-grey-55 hover:text-accent-blue"
+          >
+            {expandAll ? "collapse" : "expand"}
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
@@ -162,8 +130,8 @@ const Card = (
   // console.log(focused);
   const CardHeightAnim = useSpring({
     config: { mass: 0.1, tension: 500, friction: 25 },
-    maxHeight: focused ? height : 52,
-    marginBottom: focused ? 12 : -12,
+    maxHeight: focused ? height : 44,
+    marginBottom: props.last ? 0 : focused ? 12 : -4,
   });
 
   const style = {
@@ -193,8 +161,6 @@ const Card = (
             : {
                 overflow: "hidden",
                 ...CardHeightAnim,
-                // maxHeight: 128,
-                // maxHeight: height,
               }
         }
       >
@@ -214,7 +180,13 @@ const Card = (
   );
 };
 
-const AddCard = (props: { expanded: boolean; end?: boolean } & StackData) => {
+export const AddAttachedCard = (
+  props: {
+    expanded?: boolean;
+    end?: boolean;
+    children: React.ReactNode;
+  } & StackData
+) => {
   let [open, setOpen] = useState(false);
   let { handlers, isLongPress } = useLongPress(async () => {
     if (!rep?.rep) return;
@@ -230,32 +202,13 @@ const AddCard = (props: { expanded: boolean; end?: boolean } & StackData) => {
   if (!authorized) return null;
   return (
     <>
+      {/* decide styling of button via children */}
       <button
         {...handlers}
         onClick={() => !isLongPress.current && setOpen(true)}
-        className={`
-          cardStackNewCard 
-          grid h-12 
-          w-full grid-cols-[auto_max-content] 
-          justify-end rounded-lg border border-dashed border-grey-80 
-          font-bold text-grey-55 hover:border-accent-blue
-          hover:text-accent-blue
-
-          ${
-            !props.end
-              ? props.expanded
-                ? "mb-4 items-center justify-center gap-2"
-                : "-mb-2 pt-2 pl-4 pr-3"
-              : props.expanded
-              ? "mt-4 items-center justify-center gap-2"
-              : "mt-3 pt-3 pl-4 pr-3"
-          }
-          `}
       >
-        {props.expanded ? "Attach Card" : ""}
-        <div className="h-6 pt-1">
-          <AddTiny />
-        </div>
+        {/* {props.expanded ? "Attach Card" : ""} */}
+        {props.children}
       </button>
       <FindOrCreate
         allowBlank={true}
