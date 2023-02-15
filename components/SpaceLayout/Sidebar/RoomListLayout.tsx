@@ -2,7 +2,7 @@ import { Popover } from "@headlessui/react";
 import { ButtonPrimary } from "components/Buttons";
 import { Modal, Divider } from "components/Layout";
 import { Fact } from "data/Facts";
-import { DeckSmall, Delete, MoreOptionsTiny } from "../../Icons";
+import { DeckSmall, Delete, Member, MoreOptionsTiny, Rooms } from "../../Icons";
 import {
   ReplicacheContext,
   scanIndex,
@@ -160,37 +160,44 @@ export const RoomListItem = (props: {
 
   return (
     <div
-      className={`flex w-full items-center gap-2 rounded-md border border-transparent text-left ${
+      className={`relative flex w-full items-center gap-1 rounded-md border border-transparent text-left ${
         props.roomEntity === props.currentRoom
           ? "rounded-md bg-accent-blue font-bold text-white"
           : " text-grey-35 hover:border-grey-80"
       }`}
     >
+      {/* buttom = name + either edit button OR room type icon */}
       <button
-        className="sidebarRoomName flex w-full flex-row gap-2 py-0.5 pl-2 text-left"
+        style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
+        className="sidebarRoomName flex w-full flex-row gap-1 py-0.5 pl-1 pr-1 text-left"
         onClick={() => props.onRoomChange(props.roomEntity)}
       >
-        {roomType?.value === "collection" ? (
+        {props.roomEntity === props.currentRoom && authorized ? (
+          // edit options - only if auth-ed AND on current room
+          <div className="flex w-6 shrink-0 place-content-center pt-0.5">
+            <button
+              onClick={() => props.setRoomEditOpen()}
+              className={`sidebarRoomOptions rounded-md border border-transparent hover:border-white`}
+            >
+              <MoreOptionsTiny />
+            </button>
+          </div>
+        ) : // when not on room, show room type icon
+        roomType?.value === "collection" ? (
           <div className="w-6">
             <DeckSmall />
+          </div>
+        ) : roomType?.value === "canvas" ? (
+          <div className="w-6">
+            <Rooms />
           </div>
         ) : null}
         <div className="">{props.children}</div>
       </button>
       {!!unreadCount && unreadCount > 0 && (
-        <div className="h-[20px] w-[20px] shrink-0 rounded-full bg-accent-gold">
+        <div className="unreadCount mr-1 flex h-[24px] w-[24px] shrink-0 place-content-center items-center rounded-full bg-accent-gold text-center text-xs text-grey-15">
           {unreadCount}
         </div>
-      )}
-      {!authorized ? null : (
-        <button
-          onClick={() => props.setRoomEditOpen()}
-          className={`  sidebarRoomOptions mr-2 rounded-md border border-transparent pt-[1px] hover:border-white ${
-            props.roomEntity === props.currentRoom ? "" : "hidden"
-          }`}
-        >
-          <MoreOptionsTiny />
-        </button>
       )}
     </div>
   );

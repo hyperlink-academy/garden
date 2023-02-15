@@ -168,11 +168,12 @@ const CreateRoom = () => {
                 Room Type
               </RadioGroup.Label>
               <div className="flex flex-row gap-2">
-                <RadioGroup.Option value="Canvas">
+                <RadioGroup.Option value="canvas">
                   {({ checked }) => (
                     <div
-                      className={`${checked ? "bg-bg-blue" : ""
-                        } rounded-md border border-grey-15 p-4 hover:cursor-pointer`}
+                      className={`${
+                        checked ? "bg-bg-blue" : ""
+                      } rounded-md border border-grey-15 p-4 hover:cursor-pointer`}
                     >
                       Canvas
                     </div>
@@ -181,8 +182,9 @@ const CreateRoom = () => {
                 <RadioGroup.Option value="collection">
                   {({ checked }) => (
                     <div
-                      className={`${checked ? "bg-bg-blue" : ""
-                        } rounded-md border border-grey-15 p-4 hover:cursor-pointer`}
+                      className={`${
+                        checked ? "bg-bg-blue" : ""
+                      } rounded-md border border-grey-15 p-4 hover:cursor-pointer`}
                     >
                       Collection
                     </div>
