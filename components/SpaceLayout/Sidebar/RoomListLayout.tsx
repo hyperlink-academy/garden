@@ -134,13 +134,14 @@ export const RoomListItem = (props: {
   let roomType = useIndex.eav(props.roomEntity, "room/type");
   return (
     <div
-      className={`flex w-full items-center gap-2 overflow-hidden rounded-md border border-transparent  text-left ${props.roomEntity === props.currentRoom
-          ? "rounded-md bg-accent-blue  font-bold text-white"
+      className={`flex w-full items-center gap-2 rounded-md border border-transparent text-left ${
+        props.roomEntity === props.currentRoom
+          ? "rounded-md bg-accent-blue font-bold text-white"
           : " text-grey-35 hover:border-grey-80"
-        }`}
+      }`}
     >
       <button
-        className="sidebarRoomName flex w-full flex-row gap-2 whitespace-nowrap py-0.5 pl-2 text-left"
+        className="sidebarRoomName flex flex-row gap-2 py-0.5 pl-2 text-left"
         onClick={() => props.onRoomChange(props.roomEntity)}
       >
         {roomType?.value === "collection" ? (
@@ -148,7 +149,7 @@ export const RoomListItem = (props: {
             <DeckSmall />
           </div>
         ) : null}
-        {props.children}
+        <div className="">{props.children}</div>
       </button>
       {!!props.unreads && props.unreads > 0 && (
         <div className="h-[20px] w-[20px] shrink-0 rounded-full bg-accent-gold">
@@ -158,8 +159,9 @@ export const RoomListItem = (props: {
       {!authorized ? null : (
         <button
           onClick={() => props.setRoomEditOpen()}
-          className={`  sidebarRoomOptions mr-2 rounded-md border border-transparent pt-[1px] hover:border-white ${props.roomEntity === props.currentRoom ? "" : "hidden"
-            }`}
+          className={`  sidebarRoomOptions mr-2 rounded-md border border-transparent pt-[1px] hover:border-white ${
+            props.roomEntity === props.currentRoom ? "" : "hidden"
+          }`}
         >
           <MoreOptionsTiny />
         </button>
