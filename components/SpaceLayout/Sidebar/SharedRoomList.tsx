@@ -9,6 +9,7 @@ import { sortByPosition } from "src/position_helpers";
 import { SortableContext, useSortable } from "@dnd-kit/sortable";
 import { useLongPress } from "hooks/useLongPress";
 import { SmallCardDragContext } from "components/DragContext";
+import { AddTiny } from "components/Icons";
 
 export const SharedRoomList = (props: {
   onRoomChange: (room: string) => void;
@@ -117,12 +118,15 @@ const CreateRoom = () => {
   return (
     <>
       <button
-        className="sidebarAddRoom flex w-full place-items-center justify-between gap-1 rounded-md border border-transparent py-0.5 px-2 text-grey-55 hover:border-accent-blue hover:text-accent-blue"
+        className="sidebarAddRoom group flex w-full items-center gap-2 rounded-md border border-transparent py-0.5 px-1 text-grey-55 hover:border-accent-blue hover:text-accent-blue"
         onClick={async () => {
           setOpen(true);
         }}
       >
-        + new room
+        <div className="text-grey-80 group-hover:text-accent-blue">
+          <AddTiny />
+        </div>
+        new room
       </button>
       <Modal open={open} onClose={() => setOpen(false)}>
         <form
