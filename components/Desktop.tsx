@@ -170,7 +170,6 @@ export const Desktop = (props: { entityID: string }) => {
           height: `${draggingHeight > height ? draggingHeight : height}px`,
           position: "relative",
         }}
-        className="text-sm"
       >
         {cards?.map((card) => (
           <DraggableCard
@@ -199,7 +198,7 @@ let PromptManager = (props: { entityID: string }) => {
   let { memberEntity } = useMutations();
   if (!name || memberEntity !== props.entityID) return null;
   return (
-    <div className="relative w-full">
+    <div className="relative w-full text-base">
       <div className="absolute z-10 flex w-full justify-center gap-2">
         <RandomPromptsButton entityID={props.entityID} />
         <DailyPromptsButton entityID={props.entityID} />
@@ -216,7 +215,7 @@ let RandomPromptsButton = (props: { entityID: string }) => {
   return (
     <Menu as="div" className="relative">
       <Menu.Button as={Fragment}>
-        <ButtonSecondary content="Draw a prompt" />
+        <ButtonSecondary content="Draw a Prompt" />
       </Menu.Button>
       <MenuContainer className="max-w-[140px] sm:max-w-[160px]">
         {promptRooms.map((room) => {
@@ -253,7 +252,7 @@ let RandomPromptsRoomItem = (props: {
       onClick={async () => {
         mutate("drawAPrompt", {
           factID: ulid(),
-          promptRoomEntity: props.roomEntity,
+          prompts: newPrompts,
           desktopEntity: props.desktopEntity,
           randomSeed: Math.random(),
         });

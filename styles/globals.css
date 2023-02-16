@@ -250,7 +250,8 @@ textarea {
   scrollbar-width: none; /* Firefox */
 }
 
-@media (display-mode: standalone), (display-mode: fullscreen) {
+@media (display-mode: standalone),
+  (display-mode: fullscreen) and (max-width: 640px) {
   .pwa-padding {
     padding-top: env(safe-area-inset-top) !important;
   }

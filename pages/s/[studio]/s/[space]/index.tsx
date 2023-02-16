@@ -63,9 +63,9 @@ export default function SpacePage() {
               sm:justify-center
               sm:gap-4 
 `}
-              // you need to add this to the contentSplitLayout class if you are going to scroll across more than 2 panes
-              // it prevents the last pane from sticking to the end
-              // after:content-[""] after:h-full after:w-2 after:block after:shrink-0
+                // you need to add this to the contentSplitLayout class if you are going to scroll across more than 2 panes
+                // it prevents the last pane from sticking to the end
+                // after:content-[""] after:h-full after:w-2 after:block after:shrink-0
               >
                 <div className="roomWrapper flex flex-row rounded-md border border-grey-90">
                   <Sidebar
@@ -139,9 +139,12 @@ export default function SpacePage() {
 const Room = (props: { entityID: string | null }) => {
   let roomType = useIndex.eav(props.entityID, "room/type");
   return (
-    <div className="no-scrollbar overflow-x-hidden overflow-y-scroll sm:p-4">
+    <div className="no-scrollbar overflow-x-hidden overflow-y-scroll text-sm sm:p-4">
       <div className="relative flex w-[336px] flex-col items-stretch gap-0">
-        <div className="desktopBackground absolute h-full w-full" />
+        {/* remove desktop bg for collections (member rooms still canvas for now) */}
+        {roomType?.value !== "collection" ? (
+          <div className="desktopBackground absolute h-full w-full" />
+        ) : null}
         {props.entityID ? (
           roomType?.value === "collection" ? (
             <CardCollection entityID={props.entityID} />
