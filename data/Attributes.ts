@@ -105,6 +105,26 @@ export const DefaultAttributes = {
     unique: false,
     cardinality: "many",
   },
+  "card/discussion": {
+    type: "reference",
+    unique: false,
+    cardinality: "many",
+  },
+  "discussion/author": {
+    type: "reference",
+    unique: false,
+    cardinality: "one",
+  },
+  "discussion/created-at": {
+    type: "timestamp",
+    unique: false,
+    cardinality: "one",
+  },
+  "discussion/content": {
+    type: "string",
+    unique: false,
+    cardinality: "one",
+  },
   "space/community": {
     type: "string",
     unique: true,
