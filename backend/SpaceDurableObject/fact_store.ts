@@ -199,6 +199,17 @@ export const store = (storage: BasicStorage, ctx: { id: string }) => {
         return { success: false };
       });
     },
+    postMessage: async (m) => {
+      let latestMessage = await storage.get<number>("meta-latest-message");
+      let index = latestMessage !== undefined ? latestMessage + 1 : 0;
+      storage.put(`messages-${m.ts}-${m.id}`, {
+        ...m,
+        index,
+      });
+
+      await storage.put("meta-latest-message", index);
+      return { success: true };
+    },
   };
   return {
     ...context,
