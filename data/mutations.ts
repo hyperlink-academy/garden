@@ -1,10 +1,11 @@
-import { useIndex } from "hooks/useReplicache";
 import { generateKeyBetween } from "src/fractional-indexing";
 import { sortByPosition } from "src/position_helpers";
 import { Attribute, ReferenceAttributes } from "./Attributes";
 import { Fact, ref } from "./Facts";
+import { Message } from "./Messages";
 
 export type MutationContext = {
+  postMessage: (message: Message) => Promise<{ success: boolean }>;
   assertFact: <A extends keyof Attribute>(
     d: Pick<Fact<A>, "entity" | "attribute" | "value" | "positions"> & {
       factID?: string;
@@ -39,8 +40,8 @@ export type MutationContext = {
 
 type UniqueFacts = {
   [A in keyof Attribute as Attribute[A]["unique"] extends true
-    ? A
-    : never]: Attribute[A];
+  ? A
+  : never]: Attribute[A];
 };
 
 type OptionalAttribute<A extends keyof Attribute | null> =
@@ -48,8 +49,8 @@ type OptionalAttribute<A extends keyof Attribute | null> =
 export type CardinalityResult<A extends keyof Attribute | null> = null extends A
   ? Fact<keyof Attribute>[]
   : Attribute[OptionalAttribute<A>] extends {
-      cardinality: "one";
-    }
+    cardinality: "one";
+  }
   ? Fact<OptionalAttribute<A>> | null
   : Fact<OptionalAttribute<A>>[];
 
@@ -240,6 +241,12 @@ const updateFact: Mutation<{
   await ctx.updateFact(args.id, args.data, args.undoAction);
 };
 
+const postMessage: Mutation<{
+  message: Message;
+}> = async (args, ctx) => {
+  await ctx.postMessage(args.message);
+};
+
 const deleteEntity: Mutation<{ entity: string }> = async (args, ctx) => {
   let references = await ctx.scanIndex.vae(args.entity);
   let facts = await ctx.scanIndex.eav(args.entity, null);
@@ -284,6 +291,7 @@ export const Mutations = {
   updatePositions,
   addCardToSection,
   drawAPrompt,
+  postMessage,
   assertFact,
   retractFact,
   updateFact,
