@@ -253,7 +253,7 @@ let RandomPromptsRoomItem = (props: {
       onClick={async () => {
         mutate("drawAPrompt", {
           factID: ulid(),
-          promptRoomEntity: props.roomEntity,
+          prompts: newPrompts,
           desktopEntity: props.desktopEntity,
           randomSeed: Math.random(),
         });
