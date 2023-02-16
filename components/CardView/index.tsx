@@ -22,6 +22,7 @@ import { useState } from "react";
 import { AddAttachedCard, CardStack } from "components/CardStack";
 import { ReferenceAttributes } from "data/Attributes";
 import { Fact } from "data/Facts";
+import { memberColors } from "components/SpaceLayout/Sidebar/MemberRoomList";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 const borderStyles = (args: { member: boolean }) => {
@@ -48,12 +49,21 @@ export const CardView = (props: {
   referenceFactID?: string;
 }) => {
   let memberName = useIndex.eav(props.entityID, "member/name");
-  let cardCreator = useIndex.eav(props.entityID, "card/created-by");
+  let cardCreatorRef = useIndex.eav(props.entityID, "card/created-by");
   // returns reference…
-  let cardCreatorName = useIndex.eav(
-    cardCreator?.value.value as string,
+  let cardCreator = useIndex.eav(
+    cardCreatorRef?.value.value as string,
     "member/name"
-  )?.value;
+  );
+
+  let members = useIndex.aev("member/name");
+  let membersWithColors = members.map((m, index) => {
+    index = index % memberColors.length;
+    return { ...m, color: memberColors[index] };
+  });
+  let memberWithColor = membersWithColors.find(
+    (f) => f.entity === cardCreator?.entity
+  );
 
   let { ref } = usePreserveScroll<HTMLDivElement>();
   let { session } = useAuth();
@@ -107,9 +117,12 @@ export const CardView = (props: {
             <div>
               <div className="cardHeader grid grid-cols-[auto_max-content_max-content] gap-2">
                 <Title entityID={props.entityID} />
-                {cardCreatorName ? (
-                  <div className="lightBorder self-start rounded-md py-1 px-2 text-sm text-grey-35">
-                    {cardCreatorName}
+                {cardCreator ? (
+                  <div
+                    // prev default: text-grey-35
+                    className={`lightBorder self-start rounded-md py-1 px-2 text-sm ${memberWithColor?.color}`}
+                  >
+                    {cardCreator.value}
                   </div>
                 ) : null}
                 <div className="">

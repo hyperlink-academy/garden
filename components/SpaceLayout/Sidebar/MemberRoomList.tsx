@@ -17,6 +17,12 @@ export const MemberRoomList = (props: {
   let members = useIndex.aev("member/name");
   let { memberEntity, authorized } = useMutations();
   let [inviteOpen, setInviteOpen] = useState(false);
+
+  let membersWithColors = members.map((m, index) => {
+    index = index % memberColors.length;
+    return { ...m, color: memberColors[index] };
+  });
+
   return (
     <div className="flex flex-col gap-1">
       <RoomListLabel
@@ -29,7 +35,7 @@ export const MemberRoomList = (props: {
         }
       />
       <ul className="sidebarMemberRoomList flex flex-col gap-0.5">
-        {members
+        {membersWithColors
           .filter((f) => f.entity !== memberEntity)
           .map((member) => {
             return (
@@ -40,7 +46,7 @@ export const MemberRoomList = (props: {
                 roomEntity={member.entity}
                 setRoomEditOpen={props.setRoomEditOpen}
               >
-                {member?.value}
+                <div className={member.color}>{member?.value}</div>
               </RoomListItem>
             );
           })}
@@ -119,3 +125,13 @@ const InviteMember = (props: { open: boolean; onClose: () => void }) => {
     </Modal>
   );
 };
+
+export const memberColors = [
+  "text-[blue]",
+  "text-[crimson]",
+  "text-[darkgoldenrod]",
+  "text-[green]",
+  "text-[purple]",
+  "text-[orange]",
+  "text-[teal]",
+];
