@@ -139,14 +139,12 @@ export default function SpacePage() {
 const Room = (props: { entityID: string | null }) => {
   let roomType = useIndex.eav(props.entityID, "room/type");
   return (
-    <div className="no-scrollbar overflow-x-hidden overflow-y-scroll sm:p-4">
+    <div className="no-scrollbar overflow-x-hidden overflow-y-scroll text-sm sm:p-4">
       <div className="relative flex w-[336px] flex-col items-stretch gap-0">
-        <div
-          // remove desktop bg for collections (member rooms still canvas for now)
-          className={`absolute h-full w-full ${
-            roomType?.value !== "collection" ? "desktopBackground" : ""
-          }`}
-        />
+        {/* remove desktop bg for collections (member rooms still canvas for now) */}
+        {roomType?.value !== "collection" ? (
+          <div className="desktopBackground absolute h-full w-full" />
+        ) : null}
         {props.entityID ? (
           roomType?.value === "collection" ? (
             <CardCollection entityID={props.entityID} />
