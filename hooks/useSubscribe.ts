@@ -15,11 +15,9 @@ function doCallback() {
   const cbs = callbacks;
   callbacks = [];
   hasPendingCallback = false;
-  startTransition(() => {
-    for (const callback of cbs) {
-      callback();
-    }
-  });
+  for (const callback of cbs) {
+    callback();
+  }
 }
 
 export let suspenseAtom = atom(true);
