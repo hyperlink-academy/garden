@@ -419,6 +419,7 @@ export const Thought = (props: { entityID: string; open: () => void }) => {
         props.open();
       }}
       className={`group flex flex-col gap-1 rounded-md border py-2 px-3 text-left ${" border-transparent text-grey-55 hover:border-accent-blue hover:bg-bg-blue hover:text-grey-35"} `}
+      style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
     >
       <div className="flex w-full items-baseline gap-2">
         <div className="font-bold">{authorName?.value}</div>
