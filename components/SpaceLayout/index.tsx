@@ -1,2 +1,2 @@
 export { Sidebar } from "./Sidebar";
-export { SpaceHeader } from "./SpaceHeader";
+export { CommandBarAndLogIn as SpaceHeader } from "./SpaceHeader";

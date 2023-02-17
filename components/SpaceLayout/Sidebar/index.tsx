@@ -25,7 +25,7 @@ export const Sidebar = (props: {
   let [roomEditOpen, setRoomEditOpen] = useState(false);
 
   return (
-    <div className="Sidebar pwa-padding flex h-full w-48 flex-col items-stretch gap-4 rounded-l-[3px] border-r border-grey-90 bg-white p-3 text-grey-35">
+    <div className="Sidebar pwa-padding flex h-full w-52 flex-col items-stretch gap-4 rounded-l-[3px] border-r border-grey-90 bg-white p-3 text-grey-35">
       <div className="no-scrollbar flex h-full w-full flex-col gap-4 overflow-y-scroll">
         <SpaceName />
         <Divider />

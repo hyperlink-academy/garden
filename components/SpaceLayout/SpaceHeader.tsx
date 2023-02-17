@@ -8,15 +8,17 @@ import { useAllItems, FindOrCreate } from "components/FindOrCreateEntity";
 import { ulid } from "src/ulid";
 import { publishAppEvent } from "hooks/useEvents";
 
-export const SpaceHeader: React.FC<React.PropsWithChildren<unknown>> = () => {
+export const CommandBarAndLogIn: React.FC<
+  React.PropsWithChildren<unknown>
+> = () => {
   let { session } = useAuth();
   return (
-    <div className="pageHeader absolute -right-0 bottom-10 z-50 text-grey-35">
+    <div className="CommandBarOrLogIn absolute -right-0 bottom-10 z-50 text-grey-35">
       <div
         className={`
           headerWrapper
           mx-auto
-          flex max-w-6xl place-items-center gap-2 px-2
+          flex max-w-7xl place-items-center gap-2 px-2
           pt-4 sm:px-4 sm:pt-8`}
       >
         {!session.session ? (
