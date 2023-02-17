@@ -26,11 +26,11 @@ export const MakeImage = (props: { entity: string }) => {
   );
 };
 
-export const ImageSection = (props: { entity: string }) => {
+export const ImageSection = (props: { entityID: string }) => {
   let { session } = useAuth();
   let { mutate, authorized } = useMutations();
   let spaceID = useSpaceID();
-  let image = useIndex.eav(props.entity, "card/image");
+  let image = useIndex.eav(props.entityID, "card/image");
   return (
     // FOCUS ON DIV AND PASTE AN IMAGE
     image ? (

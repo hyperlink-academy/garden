@@ -19,7 +19,7 @@ export const Backlinks = (props: { entityID: string }) => {
           <div className="mb-3 rounded-md border border-grey-90 bg-bg-blue px-4 py-2">
             <Disclosure.Button className="flex w-full flex-row justify-between text-grey-55 outline-none">
               <h4 className="font-bold text-grey-55">
-                Responding to {cards.length}{" "}
+                Attached to {cards.length}{" "}
                 {cards.length === 1 ? "Card" : "Cards"}
               </h4>
               <DropdownArrow open={open} />

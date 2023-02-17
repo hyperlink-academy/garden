@@ -94,7 +94,8 @@ pre {
 /* END FONT STYLING */
 
 /* START GLOBAL STYLING */
-input {
+input,
+textarea {
   @apply bg-white;
   @apply rounded-md;
   @apply border;

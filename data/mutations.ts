@@ -241,9 +241,21 @@ const updateFact: Mutation<{
   await ctx.updateFact(args.id, args.data, args.undoAction);
 };
 
-const postMessage: Mutation<{
+const replyToDiscussion: Mutation<{
+  discussion: string;
   message: Message;
 }> = async (args, ctx) => {
+  let messageCount = await ctx.scanIndex.eav(
+    args.discussion,
+    "discussion/message-count"
+  );
+  await ctx.assertFact({
+    entity: args.discussion,
+    attribute: "discussion/message-count",
+    value: messageCount ? messageCount.value + 1 : 1,
+    positions: {},
+  });
+
   await ctx.postMessage(args.message);
 };
 
@@ -291,7 +303,7 @@ export const Mutations = {
   updatePositions,
   addCardToSection,
   drawAPrompt,
-  postMessage,
+  replyToDiscussion,
   assertFact,
   retractFact,
   updateFact,

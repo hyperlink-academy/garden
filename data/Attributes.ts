@@ -120,6 +120,11 @@ export const DefaultAttributes = {
     unique: false,
     cardinality: "one",
   },
+  "discussion/message-count": {
+    type: "number",
+    unique: false,
+    cardinality: "one",
+  },
   "discussion/content": {
     type: "string",
     unique: false,
