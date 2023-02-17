@@ -29,6 +29,7 @@ import { Discussion } from "./Discussion";
 import { ulid } from "src/ulid";
 import { ref } from "data/Facts";
 import { animated, useSpring } from "@react-spring/web";
+import { RenderedText } from "components/Textarea/RenderedText";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 const borderStyles = (args: { member: boolean }) => {
@@ -425,7 +426,15 @@ export const Thought = (props: { entityID: string; open: () => void }) => {
         <div className="font-bold">{authorName?.value}</div>
         <div className="text-sm">{time}</div>
       </div>
-      <div className="">{content?.value}</div>
+      {!content?.value ? null : (
+        <RenderedText
+          text={content?.value}
+          tabIndex={0}
+          style={{
+            whiteSpace: "pre-wrap",
+          }}
+        />
+      )}
       <small
         className={`place-self-end  ${"underline group-hover:text-accent-blue"}`}
       >
