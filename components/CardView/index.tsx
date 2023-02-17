@@ -6,12 +6,16 @@ import {
   Member,
   CalendarMedium,
   CardAdd,
+  Send,
 } from "components/Icons";
-import { MenuContainer, MenuItem } from "components/Layout";
+import { Divider, MenuContainer, MenuItem } from "components/Layout";
 import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
-import { sortByPosition } from "src/position_helpers";
 
-import { DateSection, SingleTextSection } from "./Sections";
+import {
+  AttachedCardSection,
+  DateSection,
+  SingleTextSection,
+} from "./Sections";
 import { Backlinks } from "./Backlinks";
 import { usePreserveScroll } from "hooks/utils";
 import Link from "next/link";
@@ -19,9 +23,12 @@ import { useAuth } from "hooks/useAuth";
 import { MakeImage, ImageSection } from "./ImageSection";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { AddAttachedCard, CardStack } from "components/CardStack";
-import { ReferenceAttributes } from "data/Attributes";
-import { Fact } from "data/Facts";
+import { AddAttachedCard } from "components/CardStack";
+import { ButtonPrimary } from "components/Buttons";
+import { Discussion } from "./Discussion";
+import { ulid } from "src/ulid";
+import { ref } from "data/Facts";
+import { animated, useSpring } from "@react-spring/web";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 const borderStyles = (args: { member: boolean }) => {
@@ -42,53 +49,43 @@ const contentStyles = (args: { member: boolean }) => {
       return `px-3 py-4 sm:px-4 sm:py-6`;
   }
 };
+
 export const CardView = (props: {
   entityID: string;
   onDelete?: () => void;
   referenceFactID?: string;
 }) => {
+  let [cardState, setCardState] = useState<null | string>(null);
   let memberName = useIndex.eav(props.entityID, "member/name");
-  let cardCreator = useIndex.eav(props.entityID, "card/created-by");
-  // returns reference…
-  let cardCreatorName = useIndex.eav(
-    cardCreator?.value.value as string,
-    "member/name"
-  )?.value;
-
   let { ref } = usePreserveScroll<HTMLDivElement>();
-  let { session } = useAuth();
 
   return (
     <div className="flex h-full flex-col items-stretch">
       <Backlinks entityID={props.entityID} />
       <div
         className={`
-        card
-        no-scrollbar
-        relative
-        mx-auto       
-        flex
-        h-full w-full
-        max-w-3xl grow
-        flex-col items-stretch overflow-y-scroll
-        ${borderStyles({
+      card
+      no-scrollbar
+      relative
+      mx-auto       
+      flex
+      h-full w-full
+      max-w-3xl grow
+      flex-col items-stretch overflow-y-scroll
+      ${borderStyles({
           member: !!memberName,
         })}
-        `}
+      `}
       >
         {/* IF MEMBER CARD, INCLUDE LINK TO STUDIO  */}
         {!memberName ? null : (
-          <>
-            <div className="grid shrink-0 grid-cols-[auto_max-content] items-end px-2 pt-2 pb-1 text-white">
-              <Member />
-              <Link href={`/s/${memberName?.value}`}>
-                <small className="justify-self-start">visit studio</small>
-              </Link>
-            </div>
-          </>
+          <div className="grid shrink-0 grid-cols-[auto_max-content] items-end px-2 pt-2 pb-1 text-white">
+            <Member />
+            <Link href={`/s/${memberName?.value}`}>
+              <small className="justify-self-start">visit studio</small>
+            </Link>
+          </div>
         )}
-
-        {/* CARD CONTENT HERE */}
         <div
           ref={ref}
           className={`
@@ -99,44 +96,160 @@ export const CardView = (props: {
             gap-6
             overflow-scroll
             ${contentStyles({
-              member: !!memberName,
-            })}
+            member: !!memberName,
+          })}
             `}
         >
-          <div className="cardContent grid-auto-rows grid gap-3">
-            <div>
-              <div className="cardHeader grid grid-cols-[auto_max-content_max-content] gap-2">
-                <Title entityID={props.entityID} />
-                {cardCreatorName ? (
-                  <div className="lightBorder self-start rounded-md py-1 px-2 text-sm text-grey-35">
-                    {cardCreatorName}
-                  </div>
-                ) : null}
-                <div className="">
-                  <CardMoreOptionsMenu
-                    onDelete={props.onDelete}
-                    entityID={props.entityID}
-                    referenceFactID={props?.referenceFactID}
-                  />
-                </div>
-              </div>
-              <DateSection entityID={props.entityID} />
-            </div>
-
-            <DefaultTextSection entityID={props.entityID} />
-
-            {/* display image, if we have one! */}
-            <ImageSection entity={props.entityID} />
-            {/* image icon - click to upload */}
-            {/* TODO: finish making these + style em */}
-            <AttachedCardSection entityID={props.entityID} />
-
-            <SectionAdder entityID={props.entityID} />
-          </div>
+          {cardState === null ? (
+            <CardContent open={(id) => setCardState(id)} {...props} />
+          ) : (
+            <Discussion entityID={cardState} close={() => setCardState(null)} />
+          )}
         </div>
-        {/* END CARD CONTENT */}
       </div>
     </div>
+  );
+};
+
+export const CardContent = (props: {
+  entityID: string;
+  onDelete?: () => void;
+  referenceFactID?: string;
+  open: (k: string) => void;
+}) => {
+  let memberName = useIndex.eav(props.entityID, "member/name");
+  let cardCreator = useIndex.eav(props.entityID, "card/created-by");
+  // returns reference…
+  let cardCreatorName = useIndex.eav(
+    cardCreator?.value.value as string,
+    "member/name"
+  )?.value;
+
+  return (
+    <>
+      {/* START CARD CONTENT */}
+      <div className="cardContent grid-auto-rows grid gap-3">
+        <div>
+          <div className="cardHeader grid grid-cols-[auto_max-content_max-content] gap-2">
+            <Title entityID={props.entityID} />
+            {cardCreatorName ? (
+              <div className="lightBorder self-start rounded-md py-1 px-2 text-sm text-grey-35">
+                {cardCreatorName}
+              </div>
+            ) : null}
+            <div className="">
+              <CardMoreOptionsMenu
+                onDelete={props.onDelete}
+                entityID={props.entityID}
+                referenceFactID={props?.referenceFactID}
+              />
+            </div>
+          </div>
+          <DateSection entityID={props.entityID} />
+        </div>
+
+        <DefaultTextSection entityID={props.entityID} />
+
+        {/* show the image and attached cards if any */}
+        <ImageSection entityID={props.entityID} />
+        <AttachedCardSection entityID={props.entityID} />
+
+        {/* this handles the triggers to add cards, image, and date! */}
+        <SectionAdder entityID={props.entityID} />
+      </div>
+      {/* END CARD CONTENT */}
+      {/* START CARD THOUGHTS */}
+
+      <div className="cardThoughts flex w-full flex-col gap-3">
+        <Divider />
+        <div className="flex flex-col gap-2 pt-3"></div>
+        <StartDiscussion entityID={props.entityID} />
+      </div>
+      <Discussions entityID={props.entityID} open={props.open} />
+    </>
+  );
+};
+
+const Discussions = (props: {
+  entityID: string;
+  open: (id: string) => void;
+}) => {
+  let discussions = useIndex.eav(props.entityID, "card/discussion") || [];
+  return (
+    <>
+      {discussions.map((f) => (
+        <Thought
+          entityID={f.value.value}
+          open={() => props.open(f.value.value)}
+        />
+      ))}
+    </>
+  );
+};
+
+const StartDiscussion = (props: { entityID: string }) => {
+  let { mutate, memberEntity, authorized } = useMutations();
+  let [thoughtInputFocus, setThoughtInputFocus] = useState(false);
+  let [value, setValue] = useState("");
+  let { height } = useSpring({ height: thoughtInputFocus || value ? 128 : 40 });
+  if (!authorized || !memberEntity) return null;
+  return (
+    <>
+      <animated.textarea
+        value={value}
+        onChange={(e) => setValue(e.currentTarget.value)}
+        placeholder="add a comment..."
+        onFocus={() => setThoughtInputFocus(true)}
+        onBlur={() => setThoughtInputFocus(false)}
+        style={{ height }}
+        className={`w-full resize-none overflow-hidden border-grey-80`}
+        id="thoughtInput"
+      />
+      {!thoughtInputFocus && !value ? null : (
+        <div className="flex items-center justify-between text-grey-55 ">
+          <div className="hover:text-accent-blue">
+            <CardAdd />
+          </div>
+          <ButtonPrimary
+            disabled={!value}
+            icon={<Send />}
+            onClick={async () => {
+              if (!memberEntity) return;
+              let discussionEntity = ulid();
+              await mutate("assertFact", [
+                {
+                  entity: props.entityID,
+                  attribute: "card/discussion",
+                  value: ref(discussionEntity),
+                  positions: {},
+                },
+                {
+                  entity: discussionEntity,
+                  attribute: "discussion/content",
+                  value,
+                  positions: {},
+                },
+                {
+                  entity: discussionEntity,
+                  attribute: "discussion/created-at",
+                  value: {
+                    type: "iso_string",
+                    value: new Date().toISOString(),
+                  },
+                  positions: {},
+                },
+                {
+                  entity: discussionEntity,
+                  attribute: "discussion/author",
+                  value: ref(memberEntity),
+                  positions: {},
+                },
+              ]);
+            }}
+          />
+        </div>
+      )}
+    </>
   );
 };
 
@@ -285,20 +398,40 @@ export const SectionAdder = (props: { entityID: string }) => {
   );
 };
 
-const AttachedCardSection = (props: { entityID: string }) => {
-  let attachedCards = useIndex.eav(props.entityID, "deck/contains");
+export const Thought = (props: { entityID: string; open: () => void }) => {
+  let content = useIndex.eav(props.entityID, "discussion/content");
+  let author = useIndex.eav(props.entityID, "discussion/author");
+  let authorName = useIndex.eav(author?.value.value || null, "member/name");
+  let createdAt = useIndex.eav(props.entityID, "discussion/created-at");
+  let replyCount = useIndex.eav(props.entityID, "discussion/message-count");
+
+  let time = createdAt
+    ? new Date(createdAt?.value.value).toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    })
+    : "";
   return (
-    <>
-      {attachedCards && attachedCards.length === 0 ? null : (
-        <div className="flex flex-col gap-4">
-          <CardStack
-            positionKey="eav"
-            cards={attachedCards?.sort(sortByPosition("eav")) || []}
-            parent={props.entityID}
-            attribute="deck/contains"
-          />
-        </div>
-      )}
-    </>
+    <button
+      onClick={() => {
+        props.open();
+      }}
+      className={`group flex flex-col gap-1 rounded-md border py-2 px-3 text-left ${" border-transparent text-grey-55 hover:border-accent-blue hover:bg-bg-blue hover:text-grey-35"} `}
+    >
+      <div className="flex w-full items-baseline gap-2">
+        <div className="font-bold">{authorName?.value}</div>
+        <div className="text-sm">{time}</div>
+      </div>
+      <div className="">{content?.value}</div>
+      <small
+        className={`place-self-end  ${"underline group-hover:text-accent-blue"}`}
+      >
+        {replyCount?.value
+          ? `${replyCount.value} ${replyCount.value === 1 ? "reply" : "replies"
+          }`
+          : null}
+      </small>
+    </button>
   );
 };

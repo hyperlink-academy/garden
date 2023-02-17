@@ -4,6 +4,8 @@ import { useIndex, useMutations } from "hooks/useReplicache";
 import { useRef, useState } from "react";
 import { FilterAttributes } from "data/Attributes";
 import { useAuth } from "hooks/useAuth";
+import { CardStack } from "components/CardStack";
+import { sortByPosition } from "src/position_helpers";
 
 export const SingleTextSection = (
   props: {
@@ -80,5 +82,23 @@ export const DateSection = (props: { entityID: string }) => {
         </button>
       )}
     </div>
+  );
+};
+
+export const AttachedCardSection = (props: { entityID: string }) => {
+  let attachedCards = useIndex.eav(props.entityID, "deck/contains");
+  return (
+    <>
+      {attachedCards && attachedCards.length === 0 ? null : (
+        <div className="flex flex-col gap-4">
+          <CardStack
+            positionKey="eav"
+            cards={attachedCards?.sort(sortByPosition("eav")) || []}
+            parent={props.entityID}
+            attribute="deck/contains"
+          />
+        </div>
+      )}
+    </>
   );
 };
