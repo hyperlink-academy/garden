@@ -142,6 +142,8 @@ export const RoomListItem = (props: {
   children: React.ReactNode;
   currentRoom: string | null;
   roomEntity: string;
+  memberColorText?: string;
+  memberColorBackground?: string;
   setRoomEditOpen: () => void;
 }) => {
   let { memberEntity, authorized } = useMutations();
@@ -172,8 +174,14 @@ export const RoomListItem = (props: {
     <div
       className={`relative select-none rounded-md border border-transparent ${
         props.roomEntity === props.currentRoom
-          ? "rounded-md bg-accent-blue font-bold text-white"
-          : " text-grey-35 hover:border-grey-80"
+          ? `rounded-md font-bold text-white ${
+              props.memberColorBackground
+                ? props.memberColorBackground
+                : `bg-accent-blue`
+            }`
+          : `hover:border-grey-80 ${
+              props.memberColorText ? props.memberColorText : `text-grey-35`
+            }`
       }`}
     >
       {/* buttom = name + either edit button OR room type icon */}

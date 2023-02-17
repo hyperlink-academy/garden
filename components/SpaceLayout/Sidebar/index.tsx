@@ -13,7 +13,11 @@ import { getCurrentDate } from "src/utils";
 import { useRouter } from "next/router";
 import { RoomListLabel, RoomListItem, EditRoomModal } from "./RoomListLayout";
 import { SharedRoomList } from "./SharedRoomList";
-import { MemberRoomList } from "./MemberRoomList";
+import {
+  memberColorsBackground,
+  memberColorsText,
+  MemberRoomList,
+} from "./MemberRoomList";
 
 export const Sidebar = (props: {
   onRoomChange: (room: string) => void;
@@ -23,6 +27,18 @@ export const Sidebar = (props: {
   let { memberEntity } = useMutations();
 
   let [roomEditOpen, setRoomEditOpen] = useState(false);
+
+  // same as in MemberRoomList
+  let members = useIndex.aev("member/name");
+  let membersWithColors = members.map((m, index) => {
+    index = index % memberColorsText.length;
+    return {
+      ...m,
+      colorText: memberColorsText[index],
+      colorBackground: memberColorsBackground[index],
+    };
+  });
+  let youWithColor = membersWithColors.find((f) => f.entity === memberEntity);
 
   return (
     <div className="Sidebar pwa-padding flex h-full w-52 flex-col items-stretch gap-4 rounded-l-[3px] border-r border-grey-90 bg-white p-3 text-grey-35">
@@ -39,6 +55,8 @@ export const Sidebar = (props: {
                   currentRoom={props.currentRoom}
                   roomEntity={memberEntity}
                   setRoomEditOpen={() => setRoomEditOpen(true)}
+                  memberColorText={youWithColor?.colorText}
+                  memberColorBackground={youWithColor?.colorBackground}
                 >
                   Your Room
                 </RoomListItem>

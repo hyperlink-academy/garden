@@ -20,8 +20,12 @@ export const MemberRoomList = (props: {
   let [inviteOpen, setInviteOpen] = useState(false);
 
   let membersWithColors = members.map((m, index) => {
-    index = index % memberColors.length;
-    return { ...m, color: memberColors[index] };
+    index = index % memberColorsText.length;
+    return {
+      ...m,
+      colorText: memberColorsText[index],
+      colorBackground: memberColorsBackground[index],
+    };
   });
 
   return (
@@ -45,8 +49,10 @@ export const MemberRoomList = (props: {
                 currentRoom={props.currentRoom}
                 roomEntity={member.entity}
                 setRoomEditOpen={props.setRoomEditOpen}
+                memberColorText={member.colorText}
+                memberColorBackground={member.colorBackground}
               >
-                <div className={member.color}>{member?.value}</div>
+                {member?.value}
               </RoomListItem>
             );
           })}
@@ -129,12 +135,62 @@ const InviteMember = (props: { open: boolean; onClose: () => void }) => {
   );
 };
 
-export const memberColors = [
-  "text-[blue]",
-  "text-[crimson]",
-  "text-[darkgoldenrod]",
-  "text-[green]",
-  "text-[purple]",
-  "text-[orange]",
-  "text-[teal]",
+// named web colors
+// export const memberColorsText = [
+//   "text-[royalblue]",
+//   "text-[crimson]",
+//   "text-[darkgoldenrod]",
+//   "text-[green]",
+//   "text-[purple]",
+//   "text-[darkorange]",
+//   "text-[teal]",
+//   "text-[mediumvioletred]",
+//   "text-[slateblue]",
+//   "text-[seagreen]",
+//   "text-[steelblue]",
+//   "text-[rebeccapurple]",
+// ];
+// export const memberColorsBackground = [
+//   "bg-[royalblue]",
+//   "bg-[crimson]",
+//   "bg-[darkgoldenrod]",
+//   "bg-[green]",
+//   "bg-[purple]",
+//   "bg-[darkorange]",
+//   "bg-[teal]",
+//   "bg-[mediumvioletred]",
+//   "bg-[slateblue]",
+//   "bg-[seagreen]",
+//   "bg-[steelblue]",
+//   "bg-[rebeccapurple]",
+// ];
+
+// via https://palettte.app/ - more separated
+export const memberColorsText = [
+  "text-[#C61E1E]",
+  "text-[#017293]",
+  "text-[#956E00]",
+  "text-[#657E0F]",
+  "text-[#B9086F]",
+  "text-[#6716DA]",
+  "text-[#008071]",
+  "text-[#AF5A06]",
+  "text-[#B600B6]",
+  "text-[#1B8122]",
+  "text-[#9200D4]",
+  "text-[#0C56BD]",
+];
+export const memberColorsBackground = [
+  "bg-[#C61E1E]",
+  "bg-[#017293]",
+  "bg-[#956E00]",
+  "bg-[#657E0F]",
+  "bg-[#B9086F]",
+  "bg-[#6716DA]",
+  "bg-[#008071]",
+  "bg-[#AF5A06]",
+  "bg-[#B600B6]",
+  "bg-[#1B8122]",
+  "bg-[#9200D4]",
+  "bg-[#0C56BD]",
 ];
