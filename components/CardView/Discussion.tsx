@@ -1,9 +1,6 @@
 import { ButtonPrimary } from "components/Buttons";
 import { GoBackToPage, Member, Send } from "components/Icons";
-<<<<<<< HEAD
 import { RenderedText } from "components/Textarea/RenderedText";
-=======
->>>>>>> b6b45e4 (Feature/discussions (#15))
 import { useIndex, useMutations } from "hooks/useReplicache";
 import { useState } from "react";
 import { ulid } from "src/ulid";
@@ -73,14 +70,10 @@ const MessageInput = (props: { entityID: string }) => {
 const Messages = (props: { entityID: string }) => {
   let messages = useIndex.messages(props.entityID);
   return (
-<<<<<<< HEAD
     <div
       className="flex flex-col gap-6 px-3"
       style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
     >
-=======
-    <div className="flex flex-col gap-6 px-3">
->>>>>>> b6b45e4 (Feature/discussions (#15))
       {messages.map((m) => (
         <Reply author={m.sender} date={m.ts} content={m.content} />
       ))}
@@ -107,16 +100,12 @@ export const Thought = (props: { entityID: string; open: () => void }) => {
         props.open();
       }}
       className={`group flex flex-col gap-1 rounded-md border py-2 px-3 text-left ${"border-grey-80 bg-bg-blue text-grey-35"} `}
-<<<<<<< HEAD
       style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
-=======
->>>>>>> b6b45e4 (Feature/discussions (#15))
     >
       <div className="flex w-full items-baseline gap-2">
         <div className="font-bold">{authorName?.value}</div>
         <div className="text-sm">{time}</div>
       </div>
-<<<<<<< HEAD
       {!content?.value ? null : (
         <RenderedText
           text={content?.value}
@@ -126,9 +115,6 @@ export const Thought = (props: { entityID: string; open: () => void }) => {
           }}
         />
       )}
-=======
-      <div className="">{content?.value}</div>
->>>>>>> b6b45e4 (Feature/discussions (#15))
     </button>
   );
 };
@@ -149,7 +135,6 @@ const Reply = (props: { content: string; author: string; date: string }) => {
           })}
         </small>
       </div>
-<<<<<<< HEAD
       <RenderedText
         text={props.content}
         tabIndex={0}
@@ -157,9 +142,6 @@ const Reply = (props: { content: string; author: string; date: string }) => {
           whiteSpace: "pre-wrap",
         }}
       />
-=======
-      <div className="text-grey-35">{props.content} </div>
->>>>>>> b6b45e4 (Feature/discussions (#15))
     </div>
   );
 };
