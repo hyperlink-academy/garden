@@ -73,8 +73,8 @@ export const CardView = (props: {
       max-w-3xl grow
       flex-col items-stretch overflow-y-scroll
       ${borderStyles({
-          member: !!memberName,
-        })}
+        member: !!memberName,
+      })}
       `}
       >
         {/* IF MEMBER CARD, INCLUDE LINK TO STUDIO  */}
@@ -96,8 +96,8 @@ export const CardView = (props: {
             gap-6
             overflow-scroll
             ${contentStyles({
-            member: !!memberName,
-          })}
+              member: !!memberName,
+            })}
             `}
         >
           {cardState === null ? (
@@ -408,10 +408,10 @@ export const Thought = (props: { entityID: string; open: () => void }) => {
 
   let time = createdAt
     ? new Date(createdAt?.value.value).toLocaleDateString(undefined, {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    })
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      })
     : "";
   return (
     <button
@@ -429,9 +429,10 @@ export const Thought = (props: { entityID: string; open: () => void }) => {
         className={`place-self-end  ${"underline group-hover:text-accent-blue"}`}
       >
         {replyCount?.value
-          ? `${replyCount.value} ${replyCount.value === 1 ? "reply" : "replies"
-          }`
-          : null}
+          ? `${replyCount.value} ${
+              replyCount.value === 1 ? "reply" : "replies"
+            }`
+          : "reply"}
       </small>
     </button>
   );
