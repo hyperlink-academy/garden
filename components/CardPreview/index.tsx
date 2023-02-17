@@ -64,7 +64,7 @@ export const CardPreview = (
         onPointerUp={(e) => {
           if (!isLongPress.current) props.pointerUpHandler?.(e);
         }}
-        className={`cardPreviewBorder ${
+        className={`cardPreviewBorder select-none ${
           isUnread ? "unreadCardGlow" : ""
         } relative grow overflow-hidden ${borderStyles({ isMember })} ${
           props.isSelected ? "selectedCardGlow" : ""
