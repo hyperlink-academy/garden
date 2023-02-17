@@ -245,6 +245,7 @@ const StartDiscussion = (props: { entityID: string }) => {
                   positions: {},
                 },
               ]);
+              setValue("");
             }}
           />
         </div>
