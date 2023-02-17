@@ -79,7 +79,8 @@ const SpaceName = () => {
   let router = useRouter();
   let { session } = useAuth();
   let authorized =
-    session.session && session.session.username === studio?.value;
+    session.session &&
+    session.session.username === studio?.value.toLocaleLowerCase();
   let [editModal, setEditModal] = useState(false);
   return (
     <div className="SidebarSpaceInfo flex flex-col gap-1">
@@ -164,7 +165,7 @@ const SpaceStatus = (props: {
   if (
     status === "unscheduled" &&
     session.session &&
-    session.session.username === studio?.value
+    session.session.username === studio?.value.toLocaleLowerCase()
   ) {
     return (
       <button

@@ -76,7 +76,7 @@ const Space = (props: { entity: string }) => {
           <DoorImage entityID={props.entity} />
         </Link>
         <div className="flex w-[20px] flex-col gap-4 pb-[92px]">
-          {studio?.value == session.session?.username ? (
+          {studio?.value.toLocaleLowerCase() == session.session?.username ? (
             <EditSpaceButton spaceEntity={props.entity} />
           ) : (
             <SpaceInfo
