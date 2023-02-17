@@ -33,6 +33,11 @@ import { AddAttachedCard, CardStack } from "components/CardStack";
 import { ReferenceAttributes } from "data/Attributes";
 import { Fact } from "data/Facts";
 import { memberColors } from "components/SpaceLayout/Sidebar/MemberRoomList";
+import { ButtonPrimary } from "components/Buttons";
+import { Discussion } from "./Discussion";
+import { ulid } from "src/ulid";
+import { ref } from "data/Facts";
+import { animated, useSpring } from "@react-spring/web";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 const borderStyles = (args: { member: boolean }) => {
@@ -265,7 +270,10 @@ const StartDiscussion = (props: { entityID: string }) => {
                   positions: {},
                 },
               ]);
+<<<<<<< HEAD
               setValue("");
+=======
+>>>>>>> b6b45e4 (Feature/discussions (#15))
             }}
           />
         </div>
@@ -439,12 +447,16 @@ export const Thought = (props: { entityID: string; open: () => void }) => {
         props.open();
       }}
       className={`group flex flex-col gap-1 rounded-md border py-2 px-3 text-left ${" border-transparent text-grey-55 hover:border-accent-blue hover:bg-bg-blue hover:text-grey-35"} `}
+<<<<<<< HEAD
       style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
+=======
+>>>>>>> b6b45e4 (Feature/discussions (#15))
     >
       <div className="flex w-full items-baseline gap-2">
         <div className="font-bold">{authorName?.value}</div>
         <div className="text-sm">{time}</div>
       </div>
+<<<<<<< HEAD
       {!content?.value ? null : (
         <RenderedText
           text={content?.value}
@@ -454,6 +466,9 @@ export const Thought = (props: { entityID: string; open: () => void }) => {
           }}
         />
       )}
+=======
+      <div className="">{content?.value}</div>
+>>>>>>> b6b45e4 (Feature/discussions (#15))
       <small
         className={`place-self-end  ${"underline group-hover:text-accent-blue"}`}
       >
@@ -461,7 +476,11 @@ export const Thought = (props: { entityID: string; open: () => void }) => {
           ? `${replyCount.value} ${
               replyCount.value === 1 ? "reply" : "replies"
             }`
+<<<<<<< HEAD
           : "reply"}
+=======
+          : null}
+>>>>>>> b6b45e4 (Feature/discussions (#15))
       </small>
     </button>
   );
