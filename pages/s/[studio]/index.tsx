@@ -119,7 +119,12 @@ const List = (props: { id: string }) => {
           </div>
         </div>
       ) : null}
-      {!session?.loggedIn || myStudioName != currentStudioName ? null : (
+      {/* not logged in or not my studio */}
+      {/* OR no active spaces OR no others, to avoid duplicate CreateSpace */}
+      {!session?.loggedIn ||
+      myStudioName != currentStudioName ||
+      spacesActive.length == 0 ||
+      !(spacesUpcoming.length > 0 || spacesUnscheduled.length > 0) ? null : (
         <CreateSpace studioSpaceID={props.id} />
       )}
       {spacesUpcoming.length > 0 ? (
