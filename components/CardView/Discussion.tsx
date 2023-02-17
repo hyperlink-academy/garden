@@ -69,7 +69,10 @@ const MessageInput = (props: { entityID: string }) => {
 const Messages = (props: { entityID: string }) => {
   let messages = useIndex.messages(props.entityID);
   return (
-    <div className="flex flex-col gap-6 px-3">
+    <div
+      className="flex flex-col gap-6 px-3"
+      style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
+    >
       {messages.map((m) => (
         <Reply author={m.sender} date={m.ts} content={m.content} />
       ))}
@@ -96,6 +99,7 @@ export const Thought = (props: { entityID: string; open: () => void }) => {
         props.open();
       }}
       className={`group flex flex-col gap-1 rounded-md border py-2 px-3 text-left ${"border-grey-80 bg-bg-blue text-grey-35"} `}
+      style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
     >
       <div className="flex w-full items-baseline gap-2">
         <div className="font-bold">{authorName?.value}</div>
