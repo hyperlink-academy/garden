@@ -451,7 +451,7 @@ export const Thought = (props: { entityID: string; open: () => void }) => {
           ? `${replyCount.value} ${
               replyCount.value === 1 ? "reply" : "replies"
             }`
-          : null}
+          : "reply"}
       </small>
     </button>
   );
