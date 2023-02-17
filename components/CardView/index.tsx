@@ -10,7 +10,6 @@ import {
 } from "components/Icons";
 import { Divider, MenuContainer, MenuItem } from "components/Layout";
 import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
-import { sortByPosition } from "src/position_helpers";
 
 import {
   AttachedCardSection,
@@ -24,11 +23,12 @@ import { useAuth } from "hooks/useAuth";
 import { MakeImage, ImageSection } from "./ImageSection";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { AddAttachedCard, CardStack } from "components/CardStack";
-import { ReferenceAttributes } from "data/Attributes";
-import { Fact } from "data/Facts";
-import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
+import { AddAttachedCard } from "components/CardStack";
+import { ButtonPrimary } from "components/Buttons";
 import { Discussion } from "./Discussion";
+import { ulid } from "src/ulid";
+import { ref } from "data/Facts";
+import { animated, useSpring } from "@react-spring/web";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 const borderStyles = (args: { member: boolean }) => {
@@ -55,7 +55,7 @@ export const CardView = (props: {
   onDelete?: () => void;
   referenceFactID?: string;
 }) => {
-  let [cardState, setCardState] = useState<"card" | "discussion">("card");
+  let [cardState, setCardState] = useState<null | string>(null);
   let memberName = useIndex.eav(props.entityID, "member/name");
   let { ref } = usePreserveScroll<HTMLDivElement>();
 
@@ -73,8 +73,8 @@ export const CardView = (props: {
       max-w-3xl grow
       flex-col items-stretch overflow-y-scroll
       ${borderStyles({
-        member: !!memberName,
-      })}
+          member: !!memberName,
+        })}
       `}
       >
         {/* IF MEMBER CARD, INCLUDE LINK TO STUDIO  */}
@@ -96,29 +96,14 @@ export const CardView = (props: {
             gap-6
             overflow-scroll
             ${contentStyles({
-              member: !!memberName,
-            })}
+            member: !!memberName,
+          })}
             `}
         >
-          {cardState === "card" ? (
-            <CardContent
-              cardState={cardState}
-              toggleCardState={() =>
-                cardState === "card"
-                  ? setCardState("discussion")
-                  : setCardState("card")
-              }
-              {...props}
-            />
+          {cardState === null ? (
+            <CardContent open={(id) => setCardState(id)} {...props} />
           ) : (
-            <Discussion
-              cardState={cardState}
-              toggleCardState={() =>
-                cardState === "card"
-                  ? setCardState("discussion")
-                  : setCardState("card")
-              }
-            />
+            <Discussion entityID={cardState} close={() => setCardState(null)} />
           )}
         </div>
       </div>
@@ -130,8 +115,7 @@ export const CardContent = (props: {
   entityID: string;
   onDelete?: () => void;
   referenceFactID?: string;
-  toggleCardState: () => void;
-  cardState: string;
+  open: (k: string) => void;
 }) => {
   let memberName = useIndex.eav(props.entityID, "member/name");
   let cardCreator = useIndex.eav(props.entityID, "card/created-by");
@@ -140,10 +124,6 @@ export const CardContent = (props: {
     cardCreator?.value.value as string,
     "member/name"
   )?.value;
-
-  let { ref } = usePreserveScroll<HTMLDivElement>();
-  let { session } = useAuth();
-  let [thoughtInputFocus, setThoughtInputFocus] = useState(false);
 
   return (
     <>
@@ -182,30 +162,93 @@ export const CardContent = (props: {
 
       <div className="cardThoughts flex w-full flex-col gap-3">
         <Divider />
-        <div className="flex flex-col gap-2 pt-3">
-          <textarea
-            placeholder="add a comment..."
-            onFocus={() => setThoughtInputFocus(true)}
-            onBlur={() => setThoughtInputFocus(false)}
-            className={`${
-              thoughtInputFocus ? "test-bg-pink h-32" : "h-10"
-            } w-full border-grey-80`}
-            id="thoughtInput"
-          ></textarea>
-          {!thoughtInputFocus ? null : (
-            <div className="flex items-center justify-between text-grey-55 ">
-              <div className="hover:text-accent-blue">
-                <CardAdd />
-              </div>
-              <ButtonPrimary icon={<Send />} />
-            </div>
-          )}
-        </div>
-        <Thought
-          toggleCardState={props.toggleCardState}
-          cardState={props.cardState}
-        />
+        <div className="flex flex-col gap-2 pt-3"></div>
+        <StartDiscussion entityID={props.entityID} />
       </div>
+      <Discussions entityID={props.entityID} open={props.open} />
+    </>
+  );
+};
+
+const Discussions = (props: {
+  entityID: string;
+  open: (id: string) => void;
+}) => {
+  let discussions = useIndex.eav(props.entityID, "card/discussion") || [];
+  return (
+    <>
+      {discussions.map((f) => (
+        <Thought
+          entityID={f.value.value}
+          open={() => props.open(f.value.value)}
+        />
+      ))}
+    </>
+  );
+};
+
+const StartDiscussion = (props: { entityID: string }) => {
+  let { mutate, memberEntity, authorized } = useMutations();
+  let [thoughtInputFocus, setThoughtInputFocus] = useState(false);
+  let [value, setValue] = useState("");
+  let { height } = useSpring({ height: thoughtInputFocus || value ? 128 : 40 });
+  if (!authorized || !memberEntity) return null;
+  return (
+    <>
+      <animated.textarea
+        value={value}
+        onChange={(e) => setValue(e.currentTarget.value)}
+        placeholder="add a comment..."
+        onFocus={() => setThoughtInputFocus(true)}
+        onBlur={() => setThoughtInputFocus(false)}
+        style={{ height }}
+        className={`w-full resize-none overflow-hidden border-grey-80`}
+        id="thoughtInput"
+      />
+      {!thoughtInputFocus && !value ? null : (
+        <div className="flex items-center justify-between text-grey-55 ">
+          <div className="hover:text-accent-blue">
+            <CardAdd />
+          </div>
+          <ButtonPrimary
+            disabled={!value}
+            icon={<Send />}
+            onClick={async () => {
+              if (!memberEntity) return;
+              let discussionEntity = ulid();
+              await mutate("assertFact", [
+                {
+                  entity: props.entityID,
+                  attribute: "card/discussion",
+                  value: ref(discussionEntity),
+                  positions: {},
+                },
+                {
+                  entity: discussionEntity,
+                  attribute: "discussion/content",
+                  value,
+                  positions: {},
+                },
+                {
+                  entity: discussionEntity,
+                  attribute: "discussion/created-at",
+                  value: {
+                    type: "iso_string",
+                    value: new Date().toISOString(),
+                  },
+                  positions: {},
+                },
+                {
+                  entity: discussionEntity,
+                  attribute: "discussion/author",
+                  value: ref(memberEntity),
+                  positions: {},
+                },
+              ]);
+            }}
+          />
+        </div>
+      )}
     </>
   );
 };
@@ -355,36 +398,39 @@ export const SectionAdder = (props: { entityID: string }) => {
   );
 };
 
-export const Thought = (props: {
-  toggleCardState?: () => void;
-  cardState: string;
-}) => {
+export const Thought = (props: { entityID: string; open: () => void }) => {
+  let content = useIndex.eav(props.entityID, "discussion/content");
+  let author = useIndex.eav(props.entityID, "discussion/author");
+  let authorName = useIndex.eav(author?.value.value || null, "member/name");
+  let createdAt = useIndex.eav(props.entityID, "discussion/created-at");
+  let replyCount = useIndex.eav(props.entityID, "discussion/message-count");
+
+  let time = createdAt
+    ? new Date(createdAt?.value.value).toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    })
+    : "";
   return (
     <button
       onClick={() => {
-        !props.toggleCardState ? null : props.toggleCardState();
+        props.open();
       }}
-      className={`group flex flex-col gap-1 rounded-md border py-2 px-3 text-left ${
-        props.cardState === "discussion"
-          ? "border-grey-80 bg-bg-blue text-grey-35"
-          : " border-transparent text-grey-55 hover:border-accent-blue hover:bg-bg-blue hover:text-grey-35"
-      } `}
+      className={`group flex flex-col gap-1 rounded-md border py-2 px-3 text-left ${" border-transparent text-grey-55 hover:border-accent-blue hover:bg-bg-blue hover:text-grey-35"} `}
     >
       <div className="flex w-full items-baseline gap-2">
-        <div className="font-bold">celine</div>
-        <div className="text-sm">3/3/23</div>
+        <div className="font-bold">{authorName?.value}</div>
+        <div className="text-sm">{time}</div>
       </div>
-      <div className="">
-        This is my content I love make comments about other people's shit
-      </div>
+      <div className="">{content?.value}</div>
       <small
-        className={`place-self-end  ${
-          props.cardState === "discussion"
-            ? ""
-            : "underline group-hover:text-accent-blue"
-        }`}
+        className={`place-self-end  ${"underline group-hover:text-accent-blue"}`}
       >
-        2 replies
+        {replyCount?.value
+          ? `${replyCount.value} ${replyCount.value === 1 ? "reply" : "replies"
+          }`
+          : null}
       </small>
     </button>
   );
