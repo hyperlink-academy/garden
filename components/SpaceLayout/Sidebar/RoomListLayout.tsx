@@ -170,7 +170,7 @@ export const RoomListItem = (props: {
 
   return (
     <div
-      className={`relative flex w-full items-start gap-1 rounded-md border border-transparent text-left ${
+      className={`relative rounded-md border border-transparent ${
         props.roomEntity === props.currentRoom
           ? "rounded-md bg-accent-blue font-bold text-white"
           : " text-grey-35 hover:border-grey-80"
@@ -184,10 +184,10 @@ export const RoomListItem = (props: {
       >
         {props.roomEntity === props.currentRoom && authorized ? (
           // edit options - only if auth-ed AND on current room
-          <div className="flex w-5 shrink-0 place-content-center pt-0.5">
+          <div className=" roomListItemSettings flex w-5 shrink-0 place-content-center pt-0.5">
             <button
               onClick={() => props.setRoomEditOpen()}
-              className={`sidebarRoomOptions rounded-md border border-transparent pt-[1px] hover:border-white`}
+              className={` rounded-md border border-transparent pt-[1px] hover:border-white`}
             >
               <MoreOptionsTiny />
             </button>
@@ -195,7 +195,7 @@ export const RoomListItem = (props: {
         ) : (
           // when not on room, show room type icon
           <div
-            className={`} mt-[2px] h-5 w-5 shrink-0 pt-[1px] pl-[2px]
+            className={` roomListItemIcon mt-[2px] h-5 w-5 shrink-0 pt-[1px] pl-[2px]
             text-grey-55`}
           >
             {props.roomEntity === memberEntity || isMember ? (
@@ -207,9 +207,9 @@ export const RoomListItem = (props: {
             ) : null}
           </div>
         )}
-        <div className="grow">{props.children}</div>
+        <div className="roomListItemUnreads grow">{props.children}</div>
         {!!unreadCount && unreadCount > 0 && (
-          <div className="unreadCount mt-[6px] h-[12px] w-[12px] shrink-0 rounded-full border  border-white bg-accent-gold"></div>
+          <div className="unreadCount mt-[6px] ml-1 h-[12px] w-[12px] shrink-0 rounded-full border  border-white bg-accent-gold"></div>
         )}
       </button>
     </div>

@@ -45,7 +45,7 @@ export default function SpacePage() {
           pageContent 
           relative mx-auto flex 
           h-full
-         w-full max-w-6xl
+         w-full max-w-screen-xl
           grow 
           items-stretch 
           sm:py-6 sm:px-4 `}
@@ -53,7 +53,7 @@ export default function SpacePage() {
           <SpaceHeader />
 
           <SmallCardDragContext>
-            {width > 640 ? (
+            {width > 960 ? (
               <div
                 className={`
               contentLargeSplitLayout
