@@ -170,7 +170,7 @@ export const RoomListItem = (props: {
 
   return (
     <div
-      className={`relative rounded-md border border-transparent ${
+      className={`relative select-none rounded-md border border-transparent ${
         props.roomEntity === props.currentRoom
           ? "rounded-md bg-accent-blue font-bold text-white"
           : " text-grey-35 hover:border-grey-80"
