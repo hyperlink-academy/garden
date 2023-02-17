@@ -1,5 +1,6 @@
 import { ButtonPrimary } from "components/Buttons";
 import { GoBackToPage, Member, Send } from "components/Icons";
+import { RenderedText } from "components/Textarea/RenderedText";
 import { useIndex, useMutations } from "hooks/useReplicache";
 import { useState } from "react";
 import { ulid } from "src/ulid";
@@ -105,7 +106,15 @@ export const Thought = (props: { entityID: string; open: () => void }) => {
         <div className="font-bold">{authorName?.value}</div>
         <div className="text-sm">{time}</div>
       </div>
-      <div className="">{content?.value}</div>
+      {!content?.value ? null : (
+        <RenderedText
+          text={content?.value}
+          tabIndex={0}
+          style={{
+            whiteSpace: "pre-wrap",
+          }}
+        />
+      )}
     </button>
   );
 };
@@ -126,7 +135,13 @@ const Reply = (props: { content: string; author: string; date: string }) => {
           })}
         </small>
       </div>
-      <div className="text-grey-35">{props.content} </div>
+      <RenderedText
+        text={props.content}
+        tabIndex={0}
+        style={{
+          whiteSpace: "pre-wrap",
+        }}
+      />
     </div>
   );
 };
