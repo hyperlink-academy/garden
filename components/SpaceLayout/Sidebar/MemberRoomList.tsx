@@ -8,6 +8,7 @@ import { useAuth } from "hooks/useAuth";
 import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
 import { useState } from "react";
 import { RoomListItem, RoomListLabel } from "./RoomListLayout";
+import { AddTiny } from "components/Icons";
 
 export const MemberRoomList = (props: {
   onRoomChange: (room: string) => void;
@@ -23,8 +24,7 @@ export const MemberRoomList = (props: {
         label="members"
         helpText={
           <>
-            <p>Each member gets their own room.</p>
-            <p>Send cards to others' rooms, and they'll see what's new.</p>{" "}
+            <p>Visit other members' rooms and see what they're up to!</p>
           </>
         }
       />
@@ -48,9 +48,12 @@ export const MemberRoomList = (props: {
           <>
             <button
               onClick={() => setInviteOpen(true)}
-              className="sidebarAddMember flex w-full place-items-center gap-1 rounded-md border border-transparent py-0.5 px-2 text-grey-55 hover:border-accent-blue  hover:text-accent-blue"
+              className="sidebarAddMember group flex w-full items-center gap-2 rounded-md border border-transparent py-0.5 px-1 text-grey-55 hover:border-accent-blue  hover:text-accent-blue"
             >
-              + invite
+              <div className="text-grey-80 group-hover:text-accent-blue">
+                <AddTiny />
+              </div>
+              invite
             </button>
             <InviteMember
               open={inviteOpen}
