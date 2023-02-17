@@ -8,12 +8,10 @@ import { useAllItems, FindOrCreate } from "components/FindOrCreateEntity";
 import { ulid } from "src/ulid";
 import { publishAppEvent } from "hooks/useEvents";
 
-export const CommandBarAndLogIn: React.FC<
-  React.PropsWithChildren<unknown>
-> = () => {
+export const CommandBarAndLogIn = () => {
   let { session } = useAuth();
   return (
-    <div className="CommandBarOrLogIn absolute -right-0 bottom-10 z-50 text-grey-35">
+    <div className="CommandBarOrLogIn absolute -right-0 bottom-0 z-50 text-grey-35">
       <div
         className={`
           headerWrapper

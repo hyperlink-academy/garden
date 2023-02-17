@@ -50,8 +50,6 @@ export default function SpacePage() {
           items-stretch 
           sm:py-6 sm:px-4 `}
         >
-          <SpaceHeader />
-
           <SmallCardDragContext>
             {width > 960 ? (
               <div
@@ -77,8 +75,8 @@ export default function SpacePage() {
 
                   <div
                     className={`
-                    desktopWrapper
-                  no-scrollbar flex 
+                    desktopWrapper no-scrollbar
+                  relative flex 
                   h-full 
                   flex-shrink-0 
                   flex-col
@@ -86,6 +84,7 @@ export default function SpacePage() {
                   `}
                   >
                     <Room entityID={room} />
+                    <SpaceHeader />
                   </div>
                 </div>
 
@@ -112,7 +111,7 @@ export default function SpacePage() {
                   <div
                     id="desktopWrapper"
                     className={`
-                      desktopWrapper no-scrollbar flex 
+                      desktopWrapper no-scrollbar relative  flex
                       h-full
                       flex-shrink-0 flex-col 
                       gap-0 
@@ -121,6 +120,7 @@ export default function SpacePage() {
                       `}
                   >
                     <Room entityID={room} />
+                    <SpaceHeader />
                   </div>
                 </div>
 
