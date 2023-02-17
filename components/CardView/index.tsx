@@ -23,16 +23,16 @@ import { useAuth } from "hooks/useAuth";
 import { MakeImage, ImageSection } from "./ImageSection";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { AddAttachedCard, CardStack } from "components/CardStack";
-import { ReferenceAttributes } from "data/Attributes";
-import { Fact } from "data/Facts";
-import { memberColors } from "components/SpaceLayout/Sidebar/MemberRoomList";
 import { ButtonPrimary } from "components/Buttons";
 import { Discussion } from "./Discussion";
 import { ulid } from "src/ulid";
 import { ref } from "data/Facts";
 import { animated, useSpring } from "@react-spring/web";
 import { RenderedText } from "components/Textarea/RenderedText";
+import { AddAttachedCard, CardStack } from "components/CardStack";
+import { ReferenceAttributes } from "data/Attributes";
+import { Fact } from "data/Facts";
+import { memberColors } from "components/SpaceLayout/Sidebar/MemberRoomList";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 const borderStyles = (args: { member: boolean }) => {
