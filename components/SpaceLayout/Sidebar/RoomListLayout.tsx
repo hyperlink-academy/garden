@@ -153,18 +153,29 @@ export const RoomListItem = (props: {
     rep?.rep,
     async (tx) => {
       if (!memberEntity) return 0;
-      let unreads = 0;
       // NB - currently collections also use 'desktop/contains'
       let cards = await scanIndex(tx).eav(props.roomEntity, "desktop/contains");
       for (let card of cards) {
         let unread = (
           await scanIndex(tx).eav(card.value.value, "card/unread-by")
         ).find((f) => f.value.value === memberEntity);
-        if (unread) unreads += 1;
+
+        if (unread) return true;
+
+        let discussions = await scanIndex(tx).eav(
+          card.value.value,
+          "card/discussion"
+        );
+        for (let d of discussions) {
+          let unread = (
+            await scanIndex(tx).eav(d.value.value, "discussion/unread-by")
+          ).find((f) => f.value.value === memberEntity);
+          if (unread) return true;
+        }
       }
-      return unreads;
+      return false;
     },
-    0,
+    false,
     [memberEntity]
   );
 
@@ -208,7 +219,7 @@ export const RoomListItem = (props: {
           </div>
         )}
         <div className="roomListItemUnreads grow">{props.children}</div>
-        {!!unreadCount && unreadCount > 0 && (
+        {unreadCount && (
           <div className="unreadCount mt-[6px] ml-1 h-[12px] w-[12px] shrink-0 rounded-full border  border-white bg-accent-gold"></div>
         )}
       </button>
