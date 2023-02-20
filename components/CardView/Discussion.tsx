@@ -37,9 +37,29 @@ const MessageInput = (props: { entityID: string }) => {
   let [value, setValue] = useState("");
   let { mutate, memberEntity, authorized } = useMutations();
   if (!authorized) return null;
+  const send = async () => {
+    if (!memberEntity) return;
+    await mutate("replyToDiscussion", {
+      discussion: props.entityID,
+      message: {
+        id: ulid(),
+        topic: props.entityID,
+        ts: Date.now().toString(),
+        sender: memberEntity,
+        content: value,
+      },
+    });
+    setValue("");
+  };
   return (
     <div className="sticky bottom-0 flex flex-col gap-2 px-2 pt-2">
       <textarea
+        onKeyDown={(e) => {
+          console.log(e);
+          if (e.key === "Enter" && e.ctrlKey) {
+            send();
+          }
+        }}
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder="add your response..."
@@ -52,24 +72,7 @@ const MessageInput = (props: { entityID: string }) => {
       ></textarea>
       {!focused && !value ? null : (
         <div className="flex items-center justify-end text-grey-55">
-          <ButtonPrimary
-            disabled={!value}
-            onClick={async () => {
-              if (!memberEntity) return;
-              await mutate("replyToDiscussion", {
-                discussion: props.entityID,
-                message: {
-                  id: ulid(),
-                  topic: props.entityID,
-                  ts: Date.now().toString(),
-                  sender: memberEntity,
-                  content: value,
-                },
-              });
-              setValue("");
-            }}
-            icon={<Send />}
-          />
+          <ButtonPrimary disabled={!value} onClick={send} icon={<Send />} />
         </div>
       )}
     </div>
