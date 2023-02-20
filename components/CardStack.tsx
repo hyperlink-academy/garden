@@ -184,6 +184,7 @@ export const AddAttachedCard = (
   props: {
     expanded?: boolean;
     end?: boolean;
+    onAdd?: (entity: string) => void;
     children: React.ReactNode;
   } & StackData
 ) => {
@@ -233,6 +234,7 @@ export const AddAttachedCard = (
               });
             }
             create(entity, props, rep.rep, mutate);
+            props.onAdd?.(entity);
           }
 
           action.end();

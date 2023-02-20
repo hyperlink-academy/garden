@@ -9,6 +9,9 @@ export const useCardViewer = () => {
     open: (args: { entityID: string }) => {
       publishAppEvent("cardviewer.open-card", args);
     },
+    close: (args: { entityID: string }) => {
+      publishAppEvent("cardviewer.close-card", args);
+    },
   };
 };
 
@@ -46,6 +49,21 @@ export function CardViewer(props: {
       setTimeout(() => {
         ref.current?.scrollIntoView({ inline: "center", behavior: "smooth" });
       }, 10);
+    },
+    [props.room]
+  );
+
+  useAppEventListener(
+    "cardviewer.close-card",
+    (data) => {
+      setHistory((h) => {
+        if (!props.room) return h;
+        let room = h[props.room] || [];
+        return {
+          ...h,
+          [props.room]: room.filter((r) => r !== data.entityID),
+        };
+      });
     },
     [props.room]
   );

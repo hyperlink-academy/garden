@@ -1,6 +1,9 @@
 import { useEffect } from "react";
 
-type AppEvent = { "cardviewer.open-card": { entityID: string } };
+type AppEvent = {
+  "cardviewer.open-card": { entityID: string };
+  "cardviewer.close-card": { entityID: string };
+};
 let listeners: { callback: Function; event: string }[] = [];
 
 export function useAppEventListener<T extends keyof AppEvent>(

@@ -28,6 +28,7 @@ import { Menu } from "@headlessui/react";
 import { MenuContainer, MenuItem } from "./Layout";
 import { getCurrentDate } from "src/utils";
 import { CardinalityResult } from "data/mutations";
+import { useCardViewer } from "./CardViewerContext";
 
 const GRID_SIZE = 16;
 const snap = (x: number) => Math.ceil(x / GRID_SIZE) * GRID_SIZE;
@@ -335,6 +336,7 @@ const DraggableCard = (props: {
   });
   let isOver = _isOver && !props.isSelected;
   let refs = useCombinedRefs(setNodeRef, draggableRef);
+  let { close } = useCardViewer();
 
   const style =
     transform && (Math.abs(transform.x) > 0 || Math.abs(transform.y) > 0)
@@ -404,6 +406,7 @@ const DraggableCard = (props: {
             }}
             onDelete={() => {
               mutate("retractFact", { id: props.relationshipID });
+              close({ entityID: props.entityID });
             }}
             dragHandleProps={{ listeners, attributes }}
             size={position?.value.size || "small"}
@@ -436,6 +439,7 @@ const AddCard = (props: {
 }) => {
   let items = useAllItems(!!props.position);
   let name = useIndex.eav(props.desktopEntity, "member/name");
+  let { open } = useCardViewer();
   let { mutate, memberEntity, action } = useMutations();
   return (
     <FindOrCreate
@@ -471,8 +475,8 @@ const AddCard = (props: {
               y: Math.max(props.position.y - 42, 0),
             },
           });
+          open({ entityID: entity });
         }
-
         action.end();
       }}
       selected={[]}

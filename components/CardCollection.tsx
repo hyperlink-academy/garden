@@ -4,6 +4,7 @@ import { sortByPosition } from "src/position_helpers";
 import { ButtonTertiary } from "./Buttons";
 import { CardPreview } from "./CardPreview";
 import { AddAttachedCard } from "./CardStack";
+import { useCardViewer } from "./CardViewerContext";
 import { useCombinedRefs } from "./Desktop";
 import { AddSmall } from "./Icons";
 
@@ -11,10 +12,14 @@ export const CardCollection = (props: { entityID: string }) => {
   let cards = (useIndex.eav(props.entityID, "desktop/contains") || []).sort(
     sortByPosition("eav")
   );
+  let { open } = useCardViewer();
   return (
     <div className="min-h-screen">
       <div className="z-50 flex flex-wrap gap-x-2 gap-y-4">
         <AddAttachedCard
+          onAdd={(entity) => {
+            open({ entityID: entity });
+          }}
           parent={props.entityID}
           positionKey="eav"
           attribute="desktop/contains"
@@ -61,6 +66,8 @@ const DraggableCard = (props: {
     },
   });
 
+  let { close } = useCardViewer();
+
   let refs = useCombinedRefs(draggableRef);
   let { mutate } = useMutations();
 
@@ -84,6 +91,7 @@ const DraggableCard = (props: {
           dragHandleProps={{ listeners, attributes }}
           onDelete={() => {
             mutate("retractFact", { id: props.id });
+            close({ entityID: props.entityID });
           }}
         />
       </div>
