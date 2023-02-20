@@ -145,6 +145,7 @@ const CreateRoom = () => {
               value: roomState.type,
               positions: {},
             });
+            setRoomState({ name: "", type: "canvas" });
             setOpen(false);
           }}
           className="editRoomModal flex flex-col gap-3 text-grey-35"
