@@ -1,6 +1,11 @@
 import { DraggableAttributes } from "@dnd-kit/core";
 import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
-import { useIndex, useMutations } from "hooks/useReplicache";
+import {
+  ReplicacheContext,
+  scanIndex,
+  useIndex,
+  useMutations,
+} from "hooks/useReplicache";
 import {
   CloseLinedTiny,
   DragRotateHandle,
@@ -8,10 +13,11 @@ import {
   MakeSmallHandle,
 } from "components/Icons";
 import { useDrag, usePinch } from "@use-gesture/react";
-import { useRef } from "react";
+import { useContext, useRef } from "react";
 import { SmallCardBody } from "./SmallCard";
 import { BigCardBody } from "./BigCard";
 import { useLongPress } from "hooks/useLongPress";
+import { useSubscribe } from "replicache-react";
 
 const borderStyles = (args: { isMember: boolean }) => {
   switch (true) {
@@ -51,6 +57,27 @@ export const CardPreview = (
   let { memberEntity } = useMutations();
   let unreadBy = useIndex.eav(props.entityID, "card/unread-by") || [];
   let isUnread = unreadBy.find((f) => f.value.value === memberEntity);
+  let rep = useContext(ReplicacheContext);
+  let unreadDiscussions = useSubscribe(
+    rep?.rep,
+    async (tx) => {
+      if (!memberEntity) return false;
+      // NB - currently collections also use 'desktop/contains'
+      let discussions = await scanIndex(tx).eav(
+        props.entityID,
+        "card/discussion"
+      );
+      for (let d of discussions) {
+        let unread = (
+          await scanIndex(tx).eav(d.value.value, "discussion/unread-by")
+        ).find((f) => f.value.value === memberEntity);
+        if (unread) return true;
+      }
+      return false;
+    },
+    false,
+    [memberEntity]
+  );
 
   let { handlers, isLongPress } = useLongPress(
     () => props.onLongPress?.(),
@@ -74,6 +101,9 @@ export const CardPreview = (
           <SmallCardBody {...props} />
         ) : (
           <BigCardBody {...props} />
+        )}
+        {unreadDiscussions && (
+          <div className="unreadCount absolute bottom-2 right-2 mt-[6px] ml-1 h-[12px] w-[12px] shrink-0 rounded-full border  border-white bg-accent-gold"></div>
         )}
       </div>
     </HoverControls>

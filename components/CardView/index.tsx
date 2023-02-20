@@ -378,11 +378,17 @@ export const SectionAdder = (props: { entityID: string }) => {
 };
 
 export const Thought = (props: { entityID: string; open: () => void }) => {
+  let { memberEntity } = useMutations();
+  let unreadBy = useIndex.eav(props.entityID, "discussion/unread-by");
+
   let content = useIndex.eav(props.entityID, "discussion/content");
   let author = useIndex.eav(props.entityID, "discussion/author");
   let authorName = useIndex.eav(author?.value.value || null, "member/name");
   let createdAt = useIndex.eav(props.entityID, "discussion/created-at");
   let replyCount = useIndex.eav(props.entityID, "discussion/message-count");
+
+  let unread =
+    memberEntity && unreadBy?.find((u) => u.value.value === memberEntity);
 
   let time = createdAt
     ? new Date(createdAt?.value.value).toLocaleDateString(undefined, {
@@ -402,6 +408,9 @@ export const Thought = (props: { entityID: string; open: () => void }) => {
       <div className="flex w-full items-baseline gap-2">
         <div className="font-bold">{authorName?.value}</div>
         <div className="text-sm">{time}</div>
+        {unread && (
+          <div className="unreadCount mt-[6px] ml-1 h-[12px] w-[12px] shrink-0 rounded-full border  border-white bg-accent-gold"></div>
+        )}
       </div>
       {!content?.value ? null : (
         <RenderedText
