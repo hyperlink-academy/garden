@@ -115,6 +115,11 @@ export const DefaultAttributes = {
     unique: false,
     cardinality: "one",
   },
+  "discussion/unread-by": {
+    type: "reference",
+    unique: false,
+    cardinality: "one",
+  },
   "discussion/created-at": {
     type: "timestamp",
     unique: false,

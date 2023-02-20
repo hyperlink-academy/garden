@@ -118,7 +118,6 @@ export const CardContent = (props: {
   referenceFactID?: string;
   open: (k: string) => void;
 }) => {
-  let memberName = useIndex.eav(props.entityID, "member/name");
   let cardCreator = useIndex.eav(props.entityID, "card/created-by");
   // returns reference…
   let cardCreatorName = useIndex.eav(
@@ -217,35 +216,13 @@ const StartDiscussion = (props: { entityID: string }) => {
             onClick={async () => {
               if (!memberEntity) return;
               let discussionEntity = ulid();
-              await mutate("assertFact", [
-                {
-                  entity: props.entityID,
-                  attribute: "card/discussion",
-                  value: ref(discussionEntity),
-                  positions: {},
-                },
-                {
-                  entity: discussionEntity,
-                  attribute: "discussion/content",
-                  value,
-                  positions: {},
-                },
-                {
-                  entity: discussionEntity,
-                  attribute: "discussion/created-at",
-                  value: {
-                    type: "iso_string",
-                    value: new Date().toISOString(),
-                  },
-                  positions: {},
-                },
-                {
-                  entity: discussionEntity,
-                  attribute: "discussion/author",
-                  value: ref(memberEntity),
-                  positions: {},
-                },
-              ]);
+              await mutate("createDiscussion", {
+                cardEntity: props.entityID,
+                discussionEntity,
+                memberEntity,
+                date: new Date().toISOString(),
+                content: value,
+              });
               setValue("");
             }}
           />

@@ -40,8 +40,8 @@ export type MutationContext = {
 
 type UniqueFacts = {
   [A in keyof Attribute as Attribute[A]["unique"] extends true
-  ? A
-  : never]: Attribute[A];
+    ? A
+    : never]: Attribute[A];
 };
 
 type OptionalAttribute<A extends keyof Attribute | null> =
@@ -49,8 +49,8 @@ type OptionalAttribute<A extends keyof Attribute | null> =
 export type CardinalityResult<A extends keyof Attribute | null> = null extends A
   ? Fact<keyof Attribute>[]
   : Attribute[OptionalAttribute<A>] extends {
-    cardinality: "one";
-  }
+      cardinality: "one";
+    }
   ? Fact<OptionalAttribute<A>> | null
   : Fact<OptionalAttribute<A>>[];
 
@@ -241,6 +241,55 @@ const updateFact: Mutation<{
   await ctx.updateFact(args.id, args.data, args.undoAction);
 };
 
+const createDiscussion: Mutation<{
+  cardEntity: string;
+  discussionEntity: string;
+  content: string;
+  date: string;
+  memberEntity: string;
+}> = async (args, ctx) => {
+  // all members - but filter out card creator for unread-by
+  let members = (await ctx.scanIndex.aev("member/name")).filter(
+    (f) => f.entity !== args.memberEntity
+  );
+  await ctx.assertFact({
+    entity: args.cardEntity,
+    attribute: "card/discussion",
+    value: ref(args.discussionEntity),
+    positions: {},
+  });
+  await ctx.assertFact({
+    entity: args.discussionEntity,
+    attribute: "discussion/content",
+    value: args.content,
+    positions: {},
+  });
+  await ctx.assertFact({
+    entity: args.discussionEntity,
+    attribute: "discussion/created-at",
+    value: {
+      type: "iso_string",
+      value: args.date,
+    },
+    positions: {},
+  });
+  await ctx.assertFact({
+    entity: args.discussionEntity,
+    attribute: "discussion/author",
+    value: ref(args.memberEntity),
+    positions: {},
+  });
+
+  for (let m of members) {
+    await ctx.assertFact({
+      entity: args.discussionEntity,
+      attribute: "discussion/unread-by",
+      value: ref(m.entity),
+      positions: {},
+    });
+  }
+};
+
 const replyToDiscussion: Mutation<{
   discussion: string;
   message: Message;
@@ -255,6 +304,19 @@ const replyToDiscussion: Mutation<{
     value: messageCount ? messageCount.value + 1 : 1,
     positions: {},
   });
+
+  let members = (await ctx.scanIndex.aev("member/name")).filter(
+    (f) => f.entity !== args.message.sender
+  );
+
+  for (let m of members) {
+    await ctx.assertFact({
+      entity: args.discussion,
+      attribute: "discussion/unread-by",
+      value: ref(m.entity),
+      positions: {},
+    });
+  }
 
   await ctx.postMessage(args.message);
 };
@@ -303,6 +365,7 @@ export const Mutations = {
   updatePositions,
   addCardToSection,
   drawAPrompt,
+  createDiscussion,
   replyToDiscussion,
   assertFact,
   retractFact,
