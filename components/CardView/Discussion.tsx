@@ -2,10 +2,19 @@ import { ButtonPrimary } from "components/Buttons";
 import { GoBackToPage, Member, Send } from "components/Icons";
 import { RenderedText } from "components/Textarea/RenderedText";
 import { useIndex, useMutations } from "hooks/useReplicache";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ulid } from "src/ulid";
 
 export const Discussion = (props: { close: () => void; entityID: string }) => {
+  let unreadBy = useIndex.eav(props.entityID, "discussion/unread-by") || [];
+
+  let { mutate, memberEntity } = useMutations();
+  useEffect(() => {
+    if (props.entityID && memberEntity) {
+      let unread = unreadBy.find((f) => f.value.value === memberEntity);
+      if (unread) mutate("retractFact", { id: unread.id });
+    }
+  }, [history, props.entityID, unreadBy, memberEntity]);
   return (
     <div className="flex flex-col gap-4 ">
       <div className="flex flex-col gap-2">
