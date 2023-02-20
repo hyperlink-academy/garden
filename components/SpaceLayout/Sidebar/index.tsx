@@ -2,18 +2,12 @@ import Link from "next/link";
 
 import { Divider } from "components/Layout";
 import { useAuth } from "hooks/useAuth";
-import {
-  ReplicacheContext,
-  scanIndex,
-  useIndex,
-  useMutations,
-} from "hooks/useReplicache";
-import React, { useContext, useState } from "react";
+import { useIndex, useMutations } from "hooks/useReplicache";
+import React, { useState } from "react";
 import {
   BackToStudio as BackToStudioIcon,
   MoreOptionsSmall,
 } from "../../Icons";
-import { useSubscribe } from "replicache-react";
 import { EditSpaceModal } from "components/CreateSpace";
 import { getCurrentDate } from "src/utils";
 import { useRouter } from "next/router";
@@ -29,28 +23,9 @@ export const Sidebar = (props: {
   let { memberEntity } = useMutations();
 
   let [roomEditOpen, setRoomEditOpen] = useState(false);
-  let rep = useContext(ReplicacheContext);
-
-  let unreadCount = useSubscribe(
-    rep?.rep,
-    async (tx) => {
-      if (!memberEntity) return 0;
-      let unreads = 0;
-      let cards = await scanIndex(tx).eav(memberEntity, "desktop/contains");
-      for (let card of cards) {
-        let unread = (
-          await scanIndex(tx).eav(card.value.value, "card/unread-by")
-        ).find((f) => f.value.value === memberEntity);
-        if (unread) unreads += 1;
-      }
-      return unreads;
-    },
-    0,
-    [memberEntity]
-  );
 
   return (
-    <div className="Sidebar pwa-padding flex h-full w-48 flex-col items-stretch gap-4 rounded-l-[3px] border-r border-grey-90 bg-white p-3 text-grey-35">
+    <div className="Sidebar pwa-padding flex h-full w-52 flex-col items-stretch gap-4 rounded-l-[3px] border-r border-grey-90 bg-white p-3 text-grey-35">
       <div className="no-scrollbar flex h-full w-full flex-col gap-4 overflow-y-scroll">
         <SpaceName />
         <Divider />
@@ -62,7 +37,6 @@ export const Sidebar = (props: {
                 <RoomListItem
                   onRoomChange={props.onRoomChange}
                   currentRoom={props.currentRoom}
-                  unreads={unreadCount}
                   roomEntity={memberEntity}
                   setRoomEditOpen={() => setRoomEditOpen(true)}
                 >
@@ -105,7 +79,8 @@ const SpaceName = () => {
   let router = useRouter();
   let { session } = useAuth();
   let authorized =
-    session.session && session.session.username === studio?.value;
+    session.session &&
+    session.session.username === studio?.value.toLocaleLowerCase();
   let [editModal, setEditModal] = useState(false);
   return (
     <div className="SidebarSpaceInfo flex flex-col gap-1">
@@ -190,7 +165,7 @@ const SpaceStatus = (props: {
   if (
     status === "unscheduled" &&
     session.session &&
-    session.session.username === studio?.value
+    session.session.username === studio?.value.toLocaleLowerCase()
   ) {
     return (
       <button

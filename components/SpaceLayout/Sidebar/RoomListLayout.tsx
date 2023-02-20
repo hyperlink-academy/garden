@@ -2,9 +2,24 @@ import { Popover } from "@headlessui/react";
 import { ButtonPrimary } from "components/Buttons";
 import { Modal, Divider } from "components/Layout";
 import { Fact } from "data/Facts";
-import { DeckSmall, Delete, MoreOptionsTiny } from "../../Icons";
-import { useIndex, useMutations } from "hooks/useReplicache";
-import { useState, useEffect } from "react";
+import {
+  DeckSmall,
+  Delete,
+  Member,
+  MoreOptionsTiny,
+  RoomCanvas,
+  RoomCollection,
+  RoomMember,
+  Rooms,
+} from "../../Icons";
+import {
+  ReplicacheContext,
+  scanIndex,
+  useIndex,
+  useMutations,
+} from "hooks/useReplicache";
+import { useState, useEffect, useContext } from "react";
+import { useSubscribe } from "replicache-react";
 
 export const RoomListLabel = (props: {
   helpText: React.ReactNode;
@@ -125,47 +140,89 @@ export const EditRoomModal = (props: {
 export const RoomListItem = (props: {
   onRoomChange: (room: string) => void;
   children: React.ReactNode;
-  unreads?: number;
   currentRoom: string | null;
   roomEntity: string;
   setRoomEditOpen: () => void;
 }) => {
-  let { authorized } = useMutations();
+  let { memberEntity, authorized } = useMutations();
+  let isMember = !!useIndex.eav(props.roomEntity, "member/name");
   let roomType = useIndex.eav(props.roomEntity, "room/type");
+
+  let rep = useContext(ReplicacheContext);
+  let unreadCount = useSubscribe(
+    rep?.rep,
+    async (tx) => {
+      if (!memberEntity) return 0;
+      // NB - currently collections also use 'desktop/contains'
+      let cards = await scanIndex(tx).eav(props.roomEntity, "desktop/contains");
+      for (let card of cards) {
+        let unread = (
+          await scanIndex(tx).eav(card.value.value, "card/unread-by")
+        ).find((f) => f.value.value === memberEntity);
+
+        if (unread) return true;
+
+        let discussions = await scanIndex(tx).eav(
+          card.value.value,
+          "card/discussion"
+        );
+        for (let d of discussions) {
+          let unread = (
+            await scanIndex(tx).eav(d.value.value, "discussion/unread-by")
+          ).find((f) => f.value.value === memberEntity);
+          if (unread) return true;
+        }
+      }
+      return false;
+    },
+    false,
+    [memberEntity]
+  );
+
   return (
     <div
-      className={`flex w-full items-center gap-2 rounded-md border border-transparent text-left ${
+      className={`relative select-none rounded-md border border-transparent ${
         props.roomEntity === props.currentRoom
           ? "rounded-md bg-accent-blue font-bold text-white"
           : " text-grey-35 hover:border-grey-80"
       }`}
     >
+      {/* buttom = name + either edit button OR room type icon */}
       <button
-        className="sidebarRoomName flex w-full flex-row gap-2 py-0.5 pl-2 text-left"
+        style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
+        className="sidebarRoomName flex w-full flex-row gap-1 py-0.5 pl-1 pr-1 text-left"
         onClick={() => props.onRoomChange(props.roomEntity)}
       >
-        {roomType?.value === "collection" ? (
-          <div className="w-6">
-            <DeckSmall />
+        {props.roomEntity === props.currentRoom && authorized ? (
+          // edit options - only if auth-ed AND on current room
+          <div className=" roomListItemSettings flex w-5 shrink-0 place-content-center pt-0.5">
+            <button
+              onClick={() => props.setRoomEditOpen()}
+              className={` rounded-md border border-transparent pt-[1px] hover:border-white`}
+            >
+              <MoreOptionsTiny />
+            </button>
           </div>
-        ) : null}
-        <div className="">{props.children}</div>
+        ) : (
+          // when not on room, show room type icon
+          <div
+            className={` roomListItemIcon mt-[2px] h-5 w-5 shrink-0 pt-[1px] pl-[2px]
+            text-grey-55`}
+          >
+            {props.roomEntity === memberEntity || isMember ? (
+              <RoomMember />
+            ) : roomType?.value === "collection" ? (
+              <RoomCollection />
+            ) : roomType?.value === "canvas" ? (
+              <RoomCanvas />
+            ) : null}
+          </div>
+        )}
+        <div className="roomListItemUnreads grow">{props.children}</div>
+        {unreadCount && (
+          <div className="unreadCount mt-[6px] ml-1 h-[12px] w-[12px] shrink-0 rounded-full border  border-white bg-accent-gold"></div>
+        )}
       </button>
-      {!!props.unreads && props.unreads > 0 && (
-        <div className="h-[20px] w-[20px] shrink-0 rounded-full bg-accent-gold">
-          {props.unreads}
-        </div>
-      )}
-      {!authorized ? null : (
-        <button
-          onClick={() => props.setRoomEditOpen()}
-          className={`  sidebarRoomOptions mr-2 rounded-md border border-transparent pt-[1px] hover:border-white ${
-            props.roomEntity === props.currentRoom ? "" : "hidden"
-          }`}
-        >
-          <MoreOptionsTiny />
-        </button>
-      )}
     </div>
   );
 };

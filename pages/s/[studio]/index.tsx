@@ -76,7 +76,11 @@ const List = (props: { id: string }) => {
   let now = getCurrentDate();
 
   // all spaces
-  const spacesAll = useIndex.aev("space/name").sort(sortByPosition("aev"));
+  const thisEntity = useIndex.aev("this/name");
+  const spacesAll = useIndex
+    .aev("space/name")
+    .sort(sortByPosition("aev"))
+    .filter((f) => f.entity !== thisEntity[0]?.entity);
   const spacesStartingAll = useIndex.at("space/start-date");
   const spacesEndingAll = useIndex.at("space/end-date");
 
@@ -120,7 +124,12 @@ const List = (props: { id: string }) => {
           </div>
         </div>
       ) : null}
-      {!session?.loggedIn || myStudioName != currentStudioName ? null : (
+      {/* not logged in or not my studio */}
+      {/* OR no active spaces OR no others, to avoid duplicate CreateSpace */}
+      {!session?.loggedIn ||
+      myStudioName != currentStudioName ||
+      spacesActive.length == 0 ||
+      !(spacesUpcoming.length > 0 || spacesUnscheduled.length > 0) ? null : (
         <CreateSpace studioSpaceID={props.id} />
       )}
       {spacesUpcoming.length > 0 ? (

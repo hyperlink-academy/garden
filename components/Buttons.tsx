@@ -1,7 +1,7 @@
 type ButtonProps = JSX.IntrinsicElements["button"];
 export function ButtonPrimary(
   props: {
-    content: string | React.ReactElement;
+    content?: string | React.ReactElement;
     icon?: React.ReactElement;
     destructive?: boolean;
   } & ButtonProps
@@ -13,10 +13,8 @@ export function ButtonPrimary(
       className={`
       m-0  
       box-border flex w-max
-
       items-center justify-center
       gap-2 rounded-md
-
       border py-1 px-2 
       font-bold text-white 
 
@@ -39,14 +37,14 @@ export function ButtonPrimary(
       `}
     >
       {props.icon ? <span className="">{props.icon}</span> : null}
-      <span className="">{props.content}</span>
+      {props.content ? <span className="">{props.content}</span> : null}
     </button>
   );
 }
 
 export function ButtonSecondary(
   props: {
-    content: string;
+    content?: string;
     icon?: React.ReactElement;
   } & ButtonProps
 ) {
@@ -67,7 +65,7 @@ export function ButtonSecondary(
       disabled:text-grey-80 disabled:hover:text-grey-80`}
     >
       {props.icon ? <span className="">{props.icon}</span> : null}
-      <span className="">{props.content}</span>
+      {props.content ? <span className="">{props.content}</span> : null}
     </button>
   );
 }
@@ -109,7 +107,7 @@ export function ButtonLink(
       } flex items-center justify-center gap-2 font-bold disabled:text-grey-80`}
     >
       {props.icon ? <span className="">{props.icon}</span> : null}
-      <span className="">{props.content}</span>
+      {props.content ? <span className="">{props.content}</span> : null}
     </button>
   );
 }

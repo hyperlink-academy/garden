@@ -35,6 +35,7 @@ import { Menu } from "@headlessui/react";
 import { MenuContainer, MenuItem } from "./Layout";
 import { getCurrentDate } from "src/utils";
 import { CardinalityResult } from "data/mutations";
+import { useCardViewer } from "./CardViewerContext";
 
 const GRID_SIZE = 16;
 const snap = (x: number) => Math.ceil(x / GRID_SIZE) * GRID_SIZE;
@@ -177,7 +178,6 @@ export const Desktop = (props: { entityID: string }) => {
           height: `${draggingHeight > height ? draggingHeight : height}px`,
           position: "relative",
         }}
-        className="text-sm"
       >
         {cards?.map((card) => (
           <DraggableCard
@@ -206,7 +206,7 @@ let PromptManager = (props: { entityID: string }) => {
   let { memberEntity } = useMutations();
   if (!name || memberEntity !== props.entityID) return null;
   return (
-    <div className="relative w-full">
+    <div className="relative w-full text-base">
       <div className="absolute z-10 flex w-full justify-center gap-2">
         <RandomPromptsButton entityID={props.entityID} />
         <DailyPromptsButton entityID={props.entityID} />
@@ -223,7 +223,7 @@ let RandomPromptsButton = (props: { entityID: string }) => {
   return (
     <Menu as="div" className="relative">
       <Menu.Button as={Fragment}>
-        <ButtonSecondary content="Draw a prompt" />
+        <ButtonSecondary content="Draw a Prompt" />
       </Menu.Button>
       <MenuContainer className="max-w-[140px] sm:max-w-[160px]">
         {promptRooms.map((room) => {
@@ -260,7 +260,7 @@ let RandomPromptsRoomItem = (props: {
       onClick={async () => {
         mutate("drawAPrompt", {
           factID: ulid(),
-          promptRoomEntity: props.roomEntity,
+          prompts: newPrompts,
           desktopEntity: props.desktopEntity,
           randomSeed: Math.random(),
         });
@@ -343,6 +343,7 @@ const DraggableCard = (props: {
   });
   let isOver = _isOver && !props.isSelected;
   let refs = useCombinedRefs(setNodeRef, draggableRef);
+  let { close } = useCardViewer();
 
   const style =
     transform && (Math.abs(transform.x) > 0 || Math.abs(transform.y) > 0)
@@ -411,6 +412,7 @@ const DraggableCard = (props: {
             }}
             onDelete={() => {
               mutate("retractFact", { id: props.relationshipID });
+              close({ entityID: props.entityID });
             }}
             dragHandleProps={{ listeners, attributes }}
             size={position?.value.size || "small"}
@@ -443,6 +445,7 @@ const AddCard = (props: {
 }) => {
   let items = useAllItems(!!props.position);
   let name = useIndex.eav(props.desktopEntity, "member/name");
+  let { open } = useCardViewer();
   let { mutate, memberEntity, action } = useMutations();
   return (
     <FindOrCreate
@@ -467,14 +470,6 @@ const AddCard = (props: {
             entity = d.entity;
           }
 
-          if (name && memberEntity !== props.desktopEntity) {
-            await mutate("assertFact", {
-              entity,
-              attribute: "card/unread-by",
-              value: ref(props.desktopEntity),
-              positions: {},
-            });
-          }
           await mutate("addCardToDesktop", {
             entity,
             factID: ulid(),
@@ -486,8 +481,8 @@ const AddCard = (props: {
               y: Math.max(props.position.y - 42, 0),
             },
           });
+          open({ entityID: entity });
         }
-
         action.end();
       }}
       selected={[]}

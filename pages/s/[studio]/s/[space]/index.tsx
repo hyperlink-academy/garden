@@ -45,15 +45,13 @@ export default function SpacePage() {
           pageContent 
           relative mx-auto flex 
           h-full
-         w-full max-w-6xl
+         w-full max-w-screen-xl
           grow 
           items-stretch 
           sm:py-6 sm:px-4 `}
         >
-          <SpaceHeader />
-
           <SmallCardDragContext>
-            {width > 640 ? (
+            {width > 960 ? (
               <div
                 className={`
               contentLargeSplitLayout
@@ -63,9 +61,9 @@ export default function SpacePage() {
               sm:justify-center
               sm:gap-4 
 `}
-              // you need to add this to the contentSplitLayout class if you are going to scroll across more than 2 panes
-              // it prevents the last pane from sticking to the end
-              // after:content-[""] after:h-full after:w-2 after:block after:shrink-0
+                // you need to add this to the contentSplitLayout class if you are going to scroll across more than 2 panes
+                // it prevents the last pane from sticking to the end
+                // after:content-[""] after:h-full after:w-2 after:block after:shrink-0
               >
                 <div className="roomWrapper flex flex-row rounded-md border border-grey-90">
                   <Sidebar
@@ -77,8 +75,8 @@ export default function SpacePage() {
 
                   <div
                     className={`
-                    desktopWrapper
-                  no-scrollbar flex 
+                    desktopWrapper no-scrollbar
+                  relative flex 
                   h-full 
                   flex-shrink-0 
                   flex-col
@@ -86,6 +84,7 @@ export default function SpacePage() {
                   `}
                   >
                     <Room entityID={room} />
+                    <SpaceHeader />
                   </div>
                 </div>
 
@@ -112,7 +111,7 @@ export default function SpacePage() {
                   <div
                     id="desktopWrapper"
                     className={`
-                      desktopWrapper no-scrollbar flex 
+                      desktopWrapper no-scrollbar relative  flex
                       h-full
                       flex-shrink-0 flex-col 
                       gap-0 
@@ -121,6 +120,7 @@ export default function SpacePage() {
                       `}
                   >
                     <Room entityID={room} />
+                    <SpaceHeader />
                   </div>
                 </div>
 
@@ -139,9 +139,12 @@ export default function SpacePage() {
 const Room = (props: { entityID: string | null }) => {
   let roomType = useIndex.eav(props.entityID, "room/type");
   return (
-    <div className="no-scrollbar overflow-x-hidden overflow-y-scroll sm:p-4">
+    <div className="no-scrollbar overflow-x-hidden overflow-y-scroll text-sm sm:p-4">
       <div className="relative flex w-[336px] flex-col items-stretch gap-0">
-        <div className="desktopBackground absolute h-full w-full" />
+        {/* remove desktop bg for collections (member rooms still canvas for now) */}
+        {roomType?.value !== "collection" ? (
+          <div className="desktopBackground absolute h-full w-full" />
+        ) : null}
         {props.entityID ? (
           roomType?.value === "collection" ? (
             <CardCollection entityID={props.entityID} />

@@ -102,9 +102,10 @@ export const MenuItem: React.FC<
             active ? "bg-bg-blue" : ""
           } ${
             props?.disabled
-              ? " text-grey-80 line-through hover:bg-transparent"
+              ? "text-grey-80 line-through hover:bg-transparent"
               : ""
           }`}
+          style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
           onClick={() => props.onClick?.()}
           disabled={props?.disabled}
         >

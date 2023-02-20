@@ -94,7 +94,8 @@ pre {
 /* END FONT STYLING */
 
 /* START GLOBAL STYLING */
-input {
+input,
+textarea {
   @apply bg-white;
   @apply rounded-md;
   @apply border;
@@ -249,7 +250,8 @@ input {
   scrollbar-width: none; /* Firefox */
 }
 
-@media (display-mode: standalone), (display-mode: fullscreen) {
+@media (display-mode: standalone),
+  (display-mode: fullscreen) and (max-width: 640px) {
   .pwa-padding {
     padding-top: env(safe-area-inset-top) !important;
   }

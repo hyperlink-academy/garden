@@ -62,7 +62,7 @@ type Value<A extends AttributeName> = Attribute[A] extends {
 export type ReferenceType = { type: "reference"; value: string };
 export type TimestampeType =
   | {
-      type: "unix_seconds";
+      type: "iso_string";
       value: string;
     }
   | {

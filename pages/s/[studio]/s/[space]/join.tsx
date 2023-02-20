@@ -37,14 +37,14 @@ export function JoinSpace() {
 
   if (session.loggedIn) {
     return (
-      <div className=" flex flex-col gap-6 place-items-center max-w-3xl mx-auto mt-6">
+      <div className=" mx-auto mt-6 flex max-w-3xl flex-col place-items-center gap-6">
         <div className="flex flex-col gap-2 text-center ">
           <h2>You've been invited to {spaceName?.value}!</h2>
           <p>A new membership card is waiting for you!</p>
         </div>
         <div className="relative">
-          <div className="p-5 w-[160px]">
-            <div className={`relative grow h-full memberCardBorder `}>
+          <div className="h-[94px] w-[160px] p-5">
+            <div className={`memberCardBorder relative h-full grow `}>
               <BaseSmallCard
                 isMember
                 memberName={session.session?.username}
@@ -65,7 +65,7 @@ export function JoinSpace() {
     );
   }
   return (
-    <div className="lightBorder p-5 flex flex-col gap-4 text-center place-items-center">
+    <div className="lightBorder flex flex-col place-items-center gap-4 p-5 text-center">
       <h3>Log in to join this space!</h3>
       <ButtonPrimary
         content="Log In"

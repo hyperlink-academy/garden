@@ -9,6 +9,7 @@ import { sortByPosition } from "src/position_helpers";
 import { SortableContext, useSortable } from "@dnd-kit/sortable";
 import { useLongPress } from "hooks/useLongPress";
 import { SmallCardDragContext } from "components/DragContext";
+import { AddTiny } from "components/Icons";
 
 export const SharedRoomList = (props: {
   onRoomChange: (room: string) => void;
@@ -117,12 +118,15 @@ const CreateRoom = () => {
   return (
     <>
       <button
-        className="sidebarAddRoom flex w-full place-items-center justify-between gap-1 rounded-md border border-transparent py-0.5 px-2 text-grey-55 hover:border-accent-blue hover:text-accent-blue"
+        className="sidebarAddRoom group flex w-full items-center gap-2 rounded-md border border-transparent py-0.5 px-1 text-grey-55 hover:border-accent-blue hover:text-accent-blue"
         onClick={async () => {
           setOpen(true);
         }}
       >
-        + new room
+        <div className="text-grey-80 group-hover:text-accent-blue">
+          <AddTiny />
+        </div>
+        new room
       </button>
       <Modal open={open} onClose={() => setOpen(false)}>
         <form
@@ -141,6 +145,7 @@ const CreateRoom = () => {
               value: roomState.type,
               positions: {},
             });
+            setRoomState({ name: "", type: "canvas" });
             setOpen(false);
           }}
           className="editRoomModal flex flex-col gap-3 text-grey-35"
@@ -168,11 +173,12 @@ const CreateRoom = () => {
                 Room Type
               </RadioGroup.Label>
               <div className="flex flex-row gap-2">
-                <RadioGroup.Option value="Canvas">
+                <RadioGroup.Option value="canvas">
                   {({ checked }) => (
                     <div
-                      className={`${checked ? "bg-bg-blue" : ""
-                        } rounded-md border border-grey-15 p-4 hover:cursor-pointer`}
+                      className={`${
+                        checked ? "bg-bg-blue" : ""
+                      } rounded-md border border-grey-15 p-4 hover:cursor-pointer`}
                     >
                       Canvas
                     </div>
@@ -181,8 +187,9 @@ const CreateRoom = () => {
                 <RadioGroup.Option value="collection">
                   {({ checked }) => (
                     <div
-                      className={`${checked ? "bg-bg-blue" : ""
-                        } rounded-md border border-grey-15 p-4 hover:cursor-pointer`}
+                      className={`${
+                        checked ? "bg-bg-blue" : ""
+                      } rounded-md border border-grey-15 p-4 hover:cursor-pointer`}
                     >
                       Collection
                     </div>

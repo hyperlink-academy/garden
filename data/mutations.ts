@@ -2,8 +2,10 @@ import { generateKeyBetween } from "src/fractional-indexing";
 import { sortByPosition } from "src/position_helpers";
 import { Attribute, ReferenceAttributes } from "./Attributes";
 import { Fact, ref } from "./Facts";
+import { Message } from "./Messages";
 
 export type MutationContext = {
+  postMessage: (message: Message) => Promise<{ success: boolean }>;
   assertFact: <A extends keyof Attribute>(
     d: Pick<Fact<A>, "entity" | "attribute" | "value" | "positions"> & {
       factID?: string;
@@ -181,6 +183,11 @@ const createCard: Mutation<{
   title: string;
   memberEntity: string;
 }> = async (args, ctx) => {
+  // all members - but filter out card creator for unread-by
+  let members = (await ctx.scanIndex.aev("member/name")).filter(
+    (f) => f.entity !== args.memberEntity
+  );
+
   await ctx.assertFact({
     entity: args.entityID,
     attribute: "card/created-by",
@@ -193,6 +200,14 @@ const createCard: Mutation<{
     value: args.title,
     positions: {},
   });
+  for (let m of members) {
+    await ctx.assertFact({
+      entity: args.entityID,
+      attribute: "card/unread-by",
+      value: ref(m.entity),
+      positions: {},
+    });
+  }
 };
 
 export type FactInput = {
@@ -226,6 +241,86 @@ const updateFact: Mutation<{
   await ctx.updateFact(args.id, args.data, args.undoAction);
 };
 
+const createDiscussion: Mutation<{
+  cardEntity: string;
+  discussionEntity: string;
+  content: string;
+  date: string;
+  memberEntity: string;
+}> = async (args, ctx) => {
+  // all members - but filter out card creator for unread-by
+  let members = (await ctx.scanIndex.aev("member/name")).filter(
+    (f) => f.entity !== args.memberEntity
+  );
+  await ctx.assertFact({
+    entity: args.cardEntity,
+    attribute: "card/discussion",
+    value: ref(args.discussionEntity),
+    positions: {},
+  });
+  await ctx.assertFact({
+    entity: args.discussionEntity,
+    attribute: "discussion/content",
+    value: args.content,
+    positions: {},
+  });
+  await ctx.assertFact({
+    entity: args.discussionEntity,
+    attribute: "discussion/created-at",
+    value: {
+      type: "iso_string",
+      value: args.date,
+    },
+    positions: {},
+  });
+  await ctx.assertFact({
+    entity: args.discussionEntity,
+    attribute: "discussion/author",
+    value: ref(args.memberEntity),
+    positions: {},
+  });
+
+  for (let m of members) {
+    await ctx.assertFact({
+      entity: args.discussionEntity,
+      attribute: "discussion/unread-by",
+      value: ref(m.entity),
+      positions: {},
+    });
+  }
+};
+
+const replyToDiscussion: Mutation<{
+  discussion: string;
+  message: Message;
+}> = async (args, ctx) => {
+  let messageCount = await ctx.scanIndex.eav(
+    args.discussion,
+    "discussion/message-count"
+  );
+  await ctx.assertFact({
+    entity: args.discussion,
+    attribute: "discussion/message-count",
+    value: messageCount ? messageCount.value + 1 : 1,
+    positions: {},
+  });
+
+  let members = (await ctx.scanIndex.aev("member/name")).filter(
+    (f) => f.entity !== args.message.sender
+  );
+
+  for (let m of members) {
+    await ctx.assertFact({
+      entity: args.discussion,
+      attribute: "discussion/unread-by",
+      value: ref(m.entity),
+      positions: {},
+    });
+  }
+
+  await ctx.postMessage(args.message);
+};
+
 const deleteEntity: Mutation<{ entity: string }> = async (args, ctx) => {
   let references = await ctx.scanIndex.vae(args.entity);
   let facts = await ctx.scanIndex.eav(args.entity, null);
@@ -236,14 +331,11 @@ const deleteEntity: Mutation<{ entity: string }> = async (args, ctx) => {
 const drawAPrompt: Mutation<{
   desktopEntity: string;
   factID: string;
-  promptRoomEntity: string;
+  prompts: Fact<"desktop/contains">[];
   randomSeed: number;
 }> = async (args, ctx) => {
-  let prompts = await ctx.scanIndex.eav(
-    args.promptRoomEntity,
-    "desktop/contains"
-  );
-  let prompt = prompts[Math.floor(prompts.length * args.randomSeed)];
+  let prompt = args.prompts[Math.floor(args.prompts.length * args.randomSeed)];
+
   if (!prompt) return;
   let id = await ctx.assertFact({
     factID: args.factID,
@@ -273,6 +365,8 @@ export const Mutations = {
   updatePositions,
   addCardToSection,
   drawAPrompt,
+  createDiscussion,
+  replyToDiscussion,
   assertFact,
   retractFact,
   updateFact,
