@@ -75,7 +75,11 @@ const List = (props: { id: string }) => {
   let now = getCurrentDate();
 
   // all spaces
-  const spacesAll = useIndex.aev("space/name").sort(sortByPosition("aev"));
+  const thisEntity = useIndex.aev("this/name");
+  const spacesAll = useIndex
+    .aev("space/name")
+    .sort(sortByPosition("aev"))
+    .filter((f) => f.entity !== thisEntity[0]?.entity);
   const spacesStartingAll = useIndex.at("space/start-date");
   const spacesEndingAll = useIndex.at("space/end-date");
 
