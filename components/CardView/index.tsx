@@ -193,6 +193,19 @@ const StartDiscussion = (props: { entityID: string }) => {
   let [value, setValue] = useState("");
   let { height } = useSpring({ height: thoughtInputFocus || value ? 128 : 40 });
   if (!authorized || !memberEntity) return null;
+
+  const send = async () => {
+    if (!memberEntity) return;
+    let discussionEntity = ulid();
+    await mutate("createDiscussion", {
+      cardEntity: props.entityID,
+      discussionEntity,
+      memberEntity,
+      date: new Date().toISOString(),
+      content: value,
+    });
+    setValue("");
+  };
   return (
     <>
       <animated.textarea
@@ -204,6 +217,9 @@ const StartDiscussion = (props: { entityID: string }) => {
         style={{ height }}
         className={`w-full resize-none overflow-hidden border-grey-80`}
         id="thoughtInput"
+        onKeyPress={(e) => {
+          if (e.key === "Enter" && e.ctrlKey) send();
+        }}
       />
       {!thoughtInputFocus && !value ? null : (
         <div className="flex items-center justify-between text-grey-55 ">
@@ -213,18 +229,7 @@ const StartDiscussion = (props: { entityID: string }) => {
           <ButtonPrimary
             disabled={!value}
             icon={<Send />}
-            onClick={async () => {
-              if (!memberEntity) return;
-              let discussionEntity = ulid();
-              await mutate("createDiscussion", {
-                cardEntity: props.entityID,
-                discussionEntity,
-                memberEntity,
-                date: new Date().toISOString(),
-                content: value,
-              });
-              setValue("");
-            }}
+            onClick={() => send()}
           />
         </div>
       )}
