@@ -55,8 +55,10 @@ const MessageInput = (props: { entityID: string }) => {
     <div className="sticky bottom-0 flex flex-col gap-2 px-2 pt-2">
       <textarea
         onKeyDown={(e) => {
-          console.log(e);
-          if (e.key === "Enter" && e.ctrlKey) {
+          if (
+            (e.key === "Enter" && e.ctrlKey) ||
+            (e.key === "Enter" && e.metaKey)
+          ) {
             send();
           }
         }}

@@ -218,7 +218,11 @@ const StartDiscussion = (props: { entityID: string }) => {
         className={`w-full resize-none overflow-hidden border-grey-80`}
         id="thoughtInput"
         onKeyPress={(e) => {
-          if (e.key === "Enter" && e.ctrlKey) send();
+          if (
+            (e.key === "Enter" && e.ctrlKey) ||
+            (e.key === "Enter" && e.metaKey)
+          )
+            send();
         }}
       />
       {!thoughtInputFocus && !value ? null : (
