@@ -217,7 +217,7 @@ const StartDiscussion = (props: { entityID: string }) => {
         style={{ height }}
         className={`w-full resize-none overflow-hidden border-grey-80`}
         id="thoughtInput"
-        onKeyPress={(e) => {
+        onKeyDown={(e) => {
           if (
             (e.key === "Enter" && e.ctrlKey) ||
             (e.key === "Enter" && e.metaKey)
@@ -247,7 +247,7 @@ const Title = (props: { entityID: string }) => {
   let titleFact = memberName || cardTitle;
   return (
     <SingleTextSection
-      onKeyPress={(e) => {
+      onKeyDown={(e) => {
         if (e.key === "Enter") {
           let className = `${props.entityID}-default-text-section}`;
           let element = document.getElementById(className);
