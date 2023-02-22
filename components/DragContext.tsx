@@ -20,7 +20,6 @@ import { StackData } from "./CardStack";
 import { animated, useTransition } from "@react-spring/web";
 import { createPortal } from "react-dom";
 import { useSortable } from "@dnd-kit/sortable";
-import { CardMedium } from "./Icons";
 
 export const SmallCardDragContext = (props: {
   children: React.ReactNode;
@@ -42,18 +41,10 @@ export const SmallCardDragContext = (props: {
     <DndContext
       collisionDetection={closestCorners}
       sensors={sensors}
-      modifiers={[
-        (args) => {
-          let { transform } = args;
-          return {
-            ...transform,
-          };
-        },
-      ]}
       onDragStart={({ active }) => {
         setActiveCard(active);
       }}
-      onDragOver={({ }) => { }}
+      onDragOver={({}) => {}}
       onDragEnd={async (data) => {
         let { over, active } = data;
         setActiveCard(null);
