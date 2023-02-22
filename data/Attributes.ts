@@ -211,6 +211,12 @@ export const DefaultAttributes = {
     unique: false,
     "union/value": ["canvas", "collection"],
   },
+  "collection/type": {
+    type: "union",
+    cardinality: "one",
+    unique: false,
+    "union/value": ["grid", "list"],
+  },
 } as const;
 
 export const ShortCodes: { [k in keyof Attribute]?: string | undefined } = {
