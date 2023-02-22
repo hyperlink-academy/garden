@@ -3,14 +3,11 @@ import { ButtonPrimary } from "components/Buttons";
 import { Modal, Divider } from "components/Layout";
 import { Fact } from "data/Facts";
 import {
-  DeckSmall,
   Delete,
-  Member,
   MoreOptionsTiny,
   RoomCanvas,
   RoomCollection,
   RoomMember,
-  Rooms,
 } from "../../Icons";
 import {
   ReplicacheContext,
@@ -54,23 +51,15 @@ export const EditRoomModal = (props: {
   onClose: () => void;
   currentRoom: string | null;
 }) => {
-  let currentRoom:
-    | Fact<"room/name">
-    | Fact<"member/name">
-    | Fact<"promptroom/name">
-    | null = null;
+  let currentRoom: Fact<"room/name"> | Fact<"member/name"> | null = null;
   let isMember = false;
   let isPromptRoom = false;
   let sharedRoom = useIndex.eav(props.currentRoom, "room/name");
   let memberRoom = useIndex.eav(props.currentRoom, "member/name");
-  let promptRoom = useIndex.eav(props.currentRoom, "promptroom/name");
 
   if (memberRoom) {
     currentRoom = memberRoom;
     isMember = true;
-  } else if (promptRoom) {
-    currentRoom = promptRoom;
-    isPromptRoom = true;
   } else currentRoom = sharedRoom;
 
   let { mutate } = useMutations();
@@ -108,7 +97,7 @@ export const EditRoomModal = (props: {
               onClick={async () => {
                 await mutate("assertFact", {
                   entity: entityID,
-                  attribute: isPromptRoom ? "promptroom/name" : "room/name",
+                  attribute: "room/name",
                   value: formState,
                   positions: {},
                 });

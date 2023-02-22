@@ -200,11 +200,6 @@ export const DefaultAttributes = {
     cardinality: "one",
     unique: false,
   },
-  "promptroom/name": {
-    type: "string",
-    cardinality: "one",
-    unique: false,
-  },
   "room/name": {
     type: "string",
     cardinality: "one",
