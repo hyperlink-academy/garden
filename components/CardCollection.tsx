@@ -1,4 +1,5 @@
 import {
+  rectSortingStrategy,
   SortableContext,
   useSortable,
   verticalListSortingStrategy,
@@ -22,7 +23,11 @@ export const CardCollection = (props: { entityID: string }) => {
       <CollectionHeader entityID={props.entityID} />
       <SortableContext
         items={cards?.map((c) => c.id) || []}
-        strategy={verticalListSortingStrategy}
+        strategy={
+          collectionType?.value !== "grid"
+            ? verticalListSortingStrategy
+            : rectSortingStrategy
+        }
       >
         {collectionType?.value === "list" ? (
           <CollectionList
