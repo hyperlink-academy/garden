@@ -141,7 +141,7 @@ export const RoomListItem = (props: {
   let unreadCount = useSubscribe(
     rep?.rep,
     async (tx) => {
-      if (!memberEntity) return 0;
+      if (!memberEntity) return false;
       // NB - currently collections also use 'desktop/contains'
       let cards = await scanIndex(tx).eav(props.roomEntity, "desktop/contains");
       for (let card of cards) {
