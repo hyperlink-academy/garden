@@ -83,7 +83,7 @@ const SpaceName = () => {
     session.session.username === studio?.value.toLocaleLowerCase();
   let [editModal, setEditModal] = useState(false);
   return (
-    <div className="SidebarSpaceInfo flex flex-col gap-1">
+    <div className="SidebarSpaceInfo flex flex-col gap-2">
       <div className="flex items-start justify-between gap-2">
         <h3 className="">{spaceName?.value}</h3>
         {authorized && (
@@ -140,6 +140,26 @@ const SpaceStatus = (props: {
   let status: "unscheduled" | "ongoing" | "upcoming" | "completed" =
     "unscheduled";
 
+  // NB: same calculation as SpacesList.tsx
+  // + adding current_day and space_progress
+  let duration_days = undefined;
+  let current_day = undefined;
+  let space_progress = undefined;
+  let now = new Date();
+  let now_timestamp = now.getTime();
+
+  if (start_date && end_date) {
+    let start = new Date(start_date);
+    let end = new Date(end_date);
+    let start_timestamp = start.getTime();
+    let end_timestamp = end.getTime();
+    let delta_duration = Math.abs(end_timestamp - start_timestamp) / 1000;
+    let delta_now = Math.abs(now_timestamp - start_timestamp) / 1000;
+    duration_days = Math.floor(delta_duration / 86400) + 1;
+    current_day = Math.floor(delta_now / 86400) + 1;
+    space_progress = (current_day / duration_days) * 100; // calc as percent
+  }
+
   // date logic - this should match studio index.tsx
   if (
     // start in past + end missing or in future
@@ -162,11 +182,12 @@ const SpaceStatus = (props: {
   if (status === "ongoing") statusStyles = "text-white bg-[green] ";
   if (status === "completed") statusStyles = "text-white bg-grey-35 ";
 
+  // unscheduled and your studio - prompt adding dates
   if (
     status === "unscheduled" &&
     session.session &&
     session.session.username === studio?.value.toLocaleLowerCase()
-  ) {
+  )
     return (
       <button
         onClick={() => props.openEditModal()}
@@ -175,7 +196,22 @@ const SpaceStatus = (props: {
         schedule dates
       </button>
     );
-  }
+
+  // ongoing - just show progress bar
+  if (status === "ongoing")
+    return (
+      <div
+        title={`day ${current_day} of ${duration_days}`}
+        className="spaceProgress h-4 w-full rounded-md bg-grey-35"
+      >
+        <div
+          className="h-4 rounded-md border border-grey-35 bg-accent-gold"
+          style={{ width: `${space_progress}%` }}
+        ></div>
+      </div>
+    );
+
+  // otherwise show status - 'upcoming' or 'completed'
   return (
     <div
       className={`${statusStyles} sidebarSpaceStatus flex w-fit gap-2 rounded-md px-2 py-1 text-sm`}
