@@ -215,7 +215,7 @@ export const DefaultAttributes = {
     type: "union",
     cardinality: "one",
     unique: false,
-    "union/value": ["grid", "list"],
+    "union/value": ["grid", "list", "cardpreview"],
   },
 } as const;
 
