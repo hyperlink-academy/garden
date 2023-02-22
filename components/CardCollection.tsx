@@ -56,7 +56,11 @@ const CollectionList = (props: {
         positionKey="eav"
         attribute="desktop/contains"
       >
-        <div className="relative mr-4 flex h-[6rem] w-full items-center justify-center rounded-lg border border-dashed text-grey-35">
+        <div
+          className={`relative mr-4 flex ${
+            props.size === "big" ? "h-24" : "h-10"
+          } w-full items-center justify-center rounded-lg border border-dashed text-grey-35`}
+        >
           <AddSmall />
         </div>
       </AddAttachedCard>
