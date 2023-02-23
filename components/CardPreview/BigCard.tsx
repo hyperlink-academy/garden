@@ -2,18 +2,15 @@ import { Backlinks } from "components/CardView/Backlinks";
 import { SingleTextSection } from "components/CardView/Sections";
 import { useCardViewer } from "components/CardViewerContext";
 import { GripperBG } from "components/Gripper";
-import { GoToPage } from "components/Icons";
-import { useAuth } from "hooks/useAuth";
-import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
+import { CloseLinedTiny } from "components/Icons";
+import { useIndex, useMutations } from "hooks/useReplicache";
 import { Props } from "./index";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export const BigCardBody = (props: { entityID: string } & Props) => {
   let isMember = !!useIndex.eav(props.entityID, "member/name");
-  let { session } = useAuth();
-  let spaceID = useSpaceID();
   let image = useIndex.eav(props.entityID, "card/image");
-  let { mutate, authorized } = useMutations();
+  let { authorized } = useMutations();
 
   let { open } = useCardViewer();
 
@@ -25,7 +22,7 @@ export const BigCardBody = (props: { entityID: string } & Props) => {
 
   return (
     <div
-      className={`CardPreivewContent grow overflow-hidden h-full flex flex-row pl-0  ${
+      className={`CardPreivewContent flex h-full grow flex-row overflow-hidden pl-0  ${
         isMember ? "py-2 pr-2" : "py-2 pr-3"
       }`}
       style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
@@ -45,91 +42,65 @@ export const BigCardBody = (props: { entityID: string } & Props) => {
       </div>
 
       {/* Big Card Preview Content Wrapper */}
-      <div className="cardPreview flex flex-col w-full">
+      <div
+        className="cardPreview flex w-full flex-col hover:cursor-pointer"
+        onClick={() => {
+          let cardView = document.getElementById("cardViewerWrapper");
+          open({ entityID: props.entityID });
+          cardView ? cardView.scrollIntoView({ behavior: "smooth" }) : null;
+        }}
+      >
         {/* Big Card Preview Title and GoTo Button*/}
         <div className={`cardPreviewHeader flex gap-2`}>
           <SingleTextSection
             entityID={props.entityID}
-            onKeyPress={(e) => {
-              if (e.key === "Enter") {
-                let element = document.getElementById(
-                  `${props.entityID}-${props.factID}-text-section`
-                );
-                element?.focus();
-              }
-            }}
-            previewOnly={isMember}
+            previewOnly
             section={isMember ? "member/name" : "card/title"}
             placeholderOnHover={true}
             placeholder="Untitled"
-            className={`cardPreviewTitle font-bold text-md grow ${
+            className={`cardPreviewTitle text-md grow font-bold ${
               isMember ? "text-white" : "text-grey-35"
-            } ${!image ? "" : "rounded-[3px] px-1 bg-white/75"}`}
+            } ${!image ? "" : "rounded-[3px] bg-white/75 px-1"}`}
           />
-          {isMember ? <div className="shrink-0 text-white">member</div> : ""}
-          <div
-            onClick={() => {
-              let cardView = document.getElementById("cardViewerWrapper");
-              open({ entityID: props.entityID });
-              cardView ? cardView.scrollIntoView({ behavior: "smooth" }) : null;
-            }}
-            className="cardPreviewGoTo hover:cursor-pointer pt-1"
-          >
-            <a className={`${isMember ? "text-white" : "text-accent-blue"}`}>
-              <GoToPage />
-            </a>
-          </div>
+          {isMember ? <div className="shrink-0 text-white ">member</div> : ""}
+          {!props.outerControls && props.onDelete ? (
+            <button
+              className="text-grey-80 opacity-0 hover:text-grey-15 group-hover:opacity-100"
+              onClick={(e) => {
+                e.stopPropagation();
+                props.onDelete?.();
+              }}
+            >
+              <CloseLinedTiny width={12} height={12} />
+            </button>
+          ) : null}
         </div>
         {props.showRelated && <Backlinks entityID={props.entityID} />}
 
         {/* Big Card Preview Default Content */}
         <div
           className={` cardPreviewDefaultContent ${
-            isMember ? "bg-white rounded-md p-2 pt-1 text-accent-red mt-1" : ""
+            isMember ? "mt-1 rounded-md bg-white p-2 pt-1 text-accent-red" : ""
           }`}
         >
           {!image ? null : (
             <img
               src={`${imageUrl}`}
-              className="py-2 px-1  max-w-full max-h-[600px]"
+              className="max-h-[600px] max-w-full  py-2 px-1"
             />
           )}
-          <SingleTextSection
-            id={`${props.entityID}-${props.factID}-text-section`}
-            entityID={props.entityID}
-            onPaste={async (e) => {
-              let items = e.clipboardData.items;
-              if (!items[0].type.includes("image") || !session.session) return;
-              let image = items[0].getAsFile();
-              if (!image) return;
-
-              let res = await fetch(
-                `${WORKER_URL}/space/${spaceID}/upload_file`,
-                {
-                  headers: {
-                    "X-Authorization": session.session.id,
-                  },
-                  method: "POST",
-                  body: image,
-                }
-              );
-              let data = (await res.json()) as
-                | { success: false }
-                | { success: true; data: { id: string } };
-              if (!data.success) return;
-              await mutate("assertFact", {
-                entity: props.entityID,
-                attribute: "card/image",
-                value: { type: "file", id: data.data.id, filetype: "image" },
-                positions: {},
-              });
-            }}
-            section="card/content"
-            placeholderOnHover={true}
-            className={`cardPreviewDefaultTextContent whitespace-pre-wrap truncate leading-tight pt-1  ${
-              !image ? "" : "rounded-[3px] px-1 bg-white/75"
-            } `}
-          />
+          {!props.hideContent && (
+            <SingleTextSection
+              previewOnly
+              id={`${props.entityID}-${props.factID}-text-section`}
+              entityID={props.entityID}
+              section="card/content"
+              placeholderOnHover={true}
+              className={`cardPreviewDefaultTextContent truncate whitespace-pre-wrap pt-1 leading-tight  ${
+                !image ? "" : "rounded-[3px] bg-white/75 px-1"
+              } `}
+            />
+          )}
         </div>
       </div>
     </div>

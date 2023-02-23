@@ -6,7 +6,11 @@ import { useState } from "react";
 import { ulid } from "src/ulid";
 import { RoomListLabel, RoomListItem } from "./RoomListLayout";
 import { sortByPosition } from "src/position_helpers";
-import { SortableContext, useSortable } from "@dnd-kit/sortable";
+import {
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 import { useLongPress } from "hooks/useLongPress";
 import { SmallCardDragContext } from "components/DragContext";
 import { AddTiny } from "components/Icons";
@@ -24,7 +28,10 @@ export const SharedRoomList = (props: {
       activationConstraints={{ delay: 400, tolerance: 5 }}
       noDeleteZone
     >
-      <SortableContext items={rooms.map((c) => c.id)}>
+      <SortableContext
+        strategy={verticalListSortingStrategy}
+        items={rooms.map((c) => c.id)}
+      >
         <ul className="sidebarSharedRoomList flex flex-col gap-0.5">
           {rooms
             .filter((f) => f.value !== "prompts")

@@ -33,6 +33,8 @@ export type Props = {
   size: "big" | "small";
   onRotateDrag?: (da: number) => void;
   onDelete?: () => void;
+  outerControls?: boolean;
+  hideContent?: boolean;
   factID?: string;
   dragHandleProps?: {
     attributes?: DraggableAttributes;
@@ -110,11 +112,17 @@ export const CardPreview = (
   );
 };
 
-export const HoverControls: React.FC<
-  React.PropsWithChildren<
-    Pick<Props, "onResize" | "onRotateDrag" | "size" | "factID" | "onDelete">
-  >
-> = (props) => {
+export const HoverControls = (
+  props: Pick<
+    Props,
+    | "onResize"
+    | "onRotateDrag"
+    | "size"
+    | "factID"
+    | "onDelete"
+    | "outerControls"
+  > & { children: React.ReactNode }
+) => {
   let ref = useRef<null | HTMLDivElement>(null);
   let bindPinch = usePinch(
     ({ da, memo, first }) => {
@@ -162,6 +170,7 @@ export const HoverControls: React.FC<
       {/* Rotate and Resize Handle */}
 
       {authorized &&
+      props.outerControls &&
       (props.onDelete || props.onResize || props.onRotateDrag) ? (
         <div className="z-50 flex flex-col justify-between gap-1 pb-1 text-grey-80 opacity-0 group-hover:opacity-100">
           {authorized && props.onDelete ? (

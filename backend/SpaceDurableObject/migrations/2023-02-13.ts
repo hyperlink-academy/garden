@@ -6,6 +6,7 @@ export default {
     // This migration changes all prompt rooms to just normal rooms with type
     // collection.
     let fact_store = store(storage, { id: "" });
+    //@ts-ignore
     let promptrooms = await fact_store.scanIndex.aev("promptroom/name");
     let desktopRooms = await fact_store.scanIndex.aev("room/name");
     for (let room of promptrooms) {

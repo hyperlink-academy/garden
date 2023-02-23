@@ -2,7 +2,7 @@ import { store } from "../fact_store";
 
 export default {
   date: "2023-02-02",
-  run: async function(storage: DurableObjectStorage) {
+  run: async function (storage: DurableObjectStorage) {
     let fact_store = store(storage, { id: "" });
     // We're casting because we deleted this attribute
     // We just want an arbitrary string attribute

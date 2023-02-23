@@ -200,11 +200,6 @@ export const DefaultAttributes = {
     cardinality: "one",
     unique: false,
   },
-  "promptroom/name": {
-    type: "string",
-    cardinality: "one",
-    unique: false,
-  },
   "room/name": {
     type: "string",
     cardinality: "one",
@@ -215,6 +210,12 @@ export const DefaultAttributes = {
     cardinality: "one",
     unique: false,
     "union/value": ["canvas", "collection"],
+  },
+  "collection/type": {
+    type: "union",
+    cardinality: "one",
+    unique: false,
+    "union/value": ["grid", "list", "cardpreview"],
   },
 } as const;
 

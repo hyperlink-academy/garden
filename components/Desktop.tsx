@@ -400,6 +400,7 @@ const DraggableCard = (props: {
         >
           {/* This is the actual card and its buttons. It also handles size */}
           <CardPreview
+            outerControls
             factID={props.relationshipID}
             onRotateDrag={(da) => {
               mutate("updatePositionInDesktop", {
