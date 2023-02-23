@@ -76,6 +76,10 @@ const SharedProviders: React.FC<React.PropsWithChildren<unknown>> = (props) => {
     Router.events.on("routeChangeComplete", handleRouteChangeEnd);
     Router.events.on("routeChangeStart", handleRouteChangeStart);
 
+    setTimeout(() => {
+      setSuspense(false);
+    }, 1000);
+
     // If the component is unmounted, unsubscribe
     // from the event with the `off` method:
     return () => {
