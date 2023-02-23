@@ -18,6 +18,10 @@ export default function SpacePage() {
     .aev("room/name")
     .sort((a, b) => (a.id > b.id ? 1 : -1))[0]?.entity;
   let firstRoom = memberEntity ? memberEntity : firstRoomByID;
+  let unreadCards = useIndex.eav(memberEntity || null, "card/unread-by") || [];
+  let unreadDiscussions =
+    useIndex.eav(memberEntity || null, "discussion/unread-by") || [];
+  let unreads = unreadCards.length + unreadDiscussions.length;
 
   let [room, setRoom] = useState<string | null>(null);
   const { width } = useWindowDimensions();
@@ -36,7 +40,9 @@ export default function SpacePage() {
   return (
     <>
       <Head>
-        <title key="title">{spaceName?.value}</title>
+        <title key="title">{`${spaceName?.value} ${
+          memberEntity && unreads > 0 ? `(${unreads})` : ""
+        }`}</title>
       </Head>
 
       <div className="pageWrapperflex safari-pwa-height h-[100dvh] flex-col items-stretch justify-items-center gap-2 overflow-hidden sm:gap-4">
