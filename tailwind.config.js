@@ -7,6 +7,10 @@ module.exports = {
   darkMode: false,
 
   theme: {
+    screens: {
+      sm: "640px",
+      md: "960px",
+    },
     borderRadius: {
       none: "0",
       md: "0.25rem",
