@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Divider } from "components/Layout";
 import { useAuth } from "hooks/useAuth";
 import { useIndex, useMutations } from "hooks/useReplicache";
-import React, { useState } from "react";
+import React, { Fragment, useState } from "react";
 import {
   BackToStudio as BackToStudioIcon,
   MoreOptionsSmall,
@@ -14,6 +14,7 @@ import { useRouter } from "next/router";
 import { RoomListLabel, RoomListItem, EditRoomModal } from "./RoomListLayout";
 import { SharedRoomList } from "./SharedRoomList";
 import { MemberRoomList } from "./MemberRoomList";
+import { Popover } from "@headlessui/react";
 
 export const Sidebar = (props: {
   onRoomChange: (room: string) => void;
@@ -197,15 +198,24 @@ const SpaceStatus = (props: {
   // ongoing - just show progress bar
   if (status === "ongoing")
     return (
-      <div
-        title={`day ${current_day} of ${duration_days}`}
-        className="spaceProgress h-4 w-full rounded-md bg-grey-35"
-      >
-        <div
-          className="h-4 rounded-md border border-grey-35 bg-accent-gold"
-          style={{ width: `${space_progress}%` }}
-        ></div>
-      </div>
+      <Popover className="w-full cursor-pointer">
+        <Popover.Button as={Fragment}>
+          <div
+            title={`day ${current_day} of ${duration_days}`}
+            className="spaceProgress h-4 w-full rounded-md bg-grey-35"
+          >
+            <div
+              className="h-4 rounded-md border border-grey-35 bg-accent-gold"
+              style={{ width: `${space_progress}%` }}
+            ></div>
+          </div>
+        </Popover.Button>
+        <div className="absolute z-10">
+          <Popover.Panel className="lightBorder z-50 mt-1 flex gap-2 bg-white p-2 text-sm text-grey-35">
+            {`day ${current_day} of ${duration_days}`}
+          </Popover.Panel>
+        </div>
+      </Popover>
     );
 
   // otherwise show status - 'upcoming' or 'completed'

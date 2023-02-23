@@ -25,7 +25,7 @@
     "@dnd-kit/modifiers": "^6.0.0",
     "@dnd-kit/sortable": "^7.0.1",
     "@graphql-yoga/common": "^2.5.0",
-    "@headlessui/react": "^1.7.0",
+    "@headlessui/react": "^1.7.11",
     "@radix-ui/react-slider": "^1.0.0",
     "@react-spring/web": "^9.5.0",
     "@rocicorp/undo": "^0.2.0",
