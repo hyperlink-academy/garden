@@ -145,14 +145,11 @@ const SpaceStatus = (props: {
   let duration_days = undefined;
   let current_day = undefined;
   let space_progress = undefined;
-  let now = new Date();
-  let now_timestamp = now.getTime();
+  let now_timestamp = new Date(getCurrentDate()).getTime();
 
   if (start_date && end_date) {
-    let start = new Date(start_date);
-    let end = new Date(end_date);
-    let start_timestamp = start.getTime();
-    let end_timestamp = end.getTime();
+    let start_timestamp = new Date(start_date).getTime();
+    let end_timestamp = new Date(end_date).getTime();
     let delta_duration = Math.abs(end_timestamp - start_timestamp) / 1000;
     let delta_now = Math.abs(now_timestamp - start_timestamp) / 1000;
     duration_days = Math.floor(delta_duration / 86400) + 1;
