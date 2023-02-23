@@ -1,12 +1,18 @@
 import { Desktop } from "components/Desktop";
 import { CardViewer } from "components/CardViewerContext";
-import { useIndex, useMutations } from "hooks/useReplicache";
+import {
+  ReplicacheContext,
+  scanIndex,
+  useIndex,
+  useMutations,
+} from "hooks/useReplicache";
 import { SmallCardDragContext } from "components/DragContext";
 import { SpaceHeader, Sidebar } from "components/SpaceLayout";
 import Head from "next/head";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import useWindowDimensions from "hooks/useWindowDimensions";
 import { CardCollection } from "components/CardCollection";
+import { useSubscribe } from "replicache-react";
 
 export default function SpacePage() {
   let spaceName = useIndex.aev("this/name")[0];
@@ -18,16 +24,50 @@ export default function SpacePage() {
     .aev("room/name")
     .sort((a, b) => (a.id > b.id ? 1 : -1))[0]?.entity;
   let firstRoom = memberEntity ? memberEntity : firstRoomByID;
-  let unreadCards = useIndex.eav(memberEntity || null, "card/unread-by") || [];
-  let unreadDiscussions =
-    useIndex.eav(memberEntity || null, "discussion/unread-by") || [];
-  let unreads = unreadCards.length + unreadDiscussions.length;
 
   let [room, setRoom] = useState<string | null>(null);
   const { width } = useWindowDimensions();
   useEffect(() => {
     if (firstRoom) setRoom(firstRoom);
   }, [firstRoom]);
+
+  let rep = useContext(ReplicacheContext);
+  let unreadCount = useSubscribe(
+    rep?.rep,
+    async (tx) => {
+      //This is more complciated than you would think as we only want to notify
+      //for cards in rooms directly, and discussions on those cards
+      if (!memberEntity) return null;
+      let count = 0;
+      let unreadDiscussions = await scanIndex(tx).vae(
+        memberEntity,
+        "discussion/unread-by"
+      );
+      let unreadCards = await scanIndex(tx).vae(memberEntity, "card/unread-by");
+
+      for (let card of unreadCards) {
+        let inRooms = await scanIndex(tx).vae(card.entity, "desktop/contains");
+        if (inRooms.length > 0) count++;
+      }
+      for (let discussion of unreadDiscussions) {
+        let cards = await scanIndex(tx).vae(
+          discussion.entity,
+          "card/discussion"
+        );
+        for (let card of cards) {
+          let inRooms = await scanIndex(tx).vae(
+            card.entity,
+            "desktop/contains"
+          );
+          if (inRooms.length > 0) count++;
+        }
+      }
+
+      return count;
+    },
+    null as number | null,
+    [memberEntity]
+  );
 
   useEffect(() => {
     window.requestAnimationFrame(() => {
@@ -41,7 +81,7 @@ export default function SpacePage() {
     <>
       <Head>
         <title key="title">{`${spaceName?.value} ${
-          memberEntity && unreads > 0 ? `(${unreads})` : ""
+          unreadCount && unreadCount > 0 ? `(${unreadCount})` : ""
         }`}</title>
       </Head>
 
@@ -54,7 +94,7 @@ export default function SpacePage() {
          w-full max-w-screen-xl
           grow 
           items-stretch 
-          sm:py-6 sm:px-4 `}
+          md:py-6 md:px-4 `}
         >
           <SmallCardDragContext>
             {width > 960 ? (
