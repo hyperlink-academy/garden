@@ -80,9 +80,8 @@ export default function SpacePage() {
   return (
     <>
       <Head>
-        <title key="title">{`${spaceName?.value} ${
-          unreadCount && unreadCount > 0 ? `(${unreadCount})` : ""
-        }`}</title>
+        <title key="title">{`${unreadCount && unreadCount > 0 ? `(${unreadCount})` : ""
+          } ${spaceName?.value}`}</title>
       </Head>
 
       <div className="pageWrapperflex safari-pwa-height h-[100dvh] flex-col items-stretch justify-items-center gap-2 overflow-hidden sm:gap-4">
