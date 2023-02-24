@@ -110,6 +110,16 @@ export const DefaultAttributes = {
     unique: false,
     cardinality: "many",
   },
+  "card/reaction": {
+    type: "string",
+    unique: false,
+    cardinality: "many",
+  },
+  "reaction/author": {
+    type: "reference",
+    unique: false,
+    cardinality: "one",
+  },
   "discussion/author": {
     type: "reference",
     unique: false,
