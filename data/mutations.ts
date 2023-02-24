@@ -40,8 +40,8 @@ export type MutationContext = {
 
 type UniqueFacts = {
   [A in keyof Attribute as Attribute[A]["unique"] extends true
-    ? A
-    : never]: Attribute[A];
+  ? A
+  : never]: Attribute[A];
 };
 
 type OptionalAttribute<A extends keyof Attribute | null> =
@@ -49,8 +49,8 @@ type OptionalAttribute<A extends keyof Attribute | null> =
 export type CardinalityResult<A extends keyof Attribute | null> = null extends A
   ? Fact<keyof Attribute>[]
   : Attribute[OptionalAttribute<A>] extends {
-      cardinality: "one";
-    }
+    cardinality: "one";
+  }
   ? Fact<OptionalAttribute<A>> | null
   : Fact<OptionalAttribute<A>>[];
 
@@ -214,7 +214,7 @@ export type FactInput = {
   [A in keyof Attribute]: Pick<
     Fact<A>,
     "attribute" | "entity" | "value" | "positions"
-  >;
+  > & { factID?: string };
 }[keyof Attribute];
 const assertFact: Mutation<
   (FactInput | FactInput[]) & { undoAction?: boolean }
