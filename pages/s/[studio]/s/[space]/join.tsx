@@ -7,6 +7,7 @@ import { useIndex, useSpaceID } from "hooks/useReplicache";
 import { useRouter } from "next/router";
 import { SVGProps, useState } from "react";
 import { LogInModal } from "components/LoginModal";
+import Head from "next/head";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export default function JoinSpacePage() {
@@ -37,33 +38,39 @@ export function JoinSpace() {
 
   if (session.loggedIn) {
     return (
-      <div className=" mx-auto mt-6 flex max-w-3xl flex-col place-items-center gap-6">
-        <div className="flex flex-col gap-2 text-center ">
-          <h2>You've been invited to {spaceName?.value}!</h2>
-          <p>A new membership card is waiting for you!</p>
-        </div>
-        <div className="relative">
-          <div className="mb-2 p-4">
-            <div
-              className={`memberCardBorder relative h-[94px] w-[160px] grow`}
-            >
-              <BaseSmallCard
-                isMember
-                memberName={session.session?.username}
-                content=""
-              />
+      <>
+        <Head>
+          <title key="title">{spaceName?.value}: you're invited!</title>
+        </Head>
+
+        <div className=" mx-auto mt-6 flex max-w-3xl flex-col place-items-center gap-6">
+          <div className="flex flex-col gap-2 text-center ">
+            <h2>You've been invited to {spaceName?.value}</h2>
+            <p>A new membership card is waiting for you!</p>
+          </div>
+          <div className="relative">
+            <div className="mb-2 p-4">
+              <div
+                className={`memberCardBorder relative h-[94px] w-[160px] grow`}
+              >
+                <BaseSmallCard
+                  isMember
+                  memberName={session.session?.username}
+                  content=""
+                />
+              </div>
+            </div>
+            <div className="absolute top-0 -left-2">
+              <WelcomeSparkle />
             </div>
           </div>
-          <div className="absolute top-0 -left-2">
-            <WelcomeSparkle />
-          </div>
+          <ButtonPrimary
+            content="Become a Member!"
+            icon={<Member />}
+            onClick={onClick}
+          />
         </div>
-        <ButtonPrimary
-          content="Become a Member!"
-          icon={<Member />}
-          onClick={onClick}
-        />
-      </div>
+      </>
     );
   }
   return (
