@@ -43,8 +43,10 @@ export function JoinSpace() {
           <p>A new membership card is waiting for you!</p>
         </div>
         <div className="relative">
-          <div className="h-[94px] w-[160px] p-5">
-            <div className={`memberCardBorder relative h-full grow `}>
+          <div className="mb-2 p-4">
+            <div
+              className={`memberCardBorder relative h-[94px] w-[160px] grow`}
+            >
               <BaseSmallCard
                 isMember
                 memberName={session.session?.username}
@@ -52,7 +54,7 @@ export function JoinSpace() {
               />
             </div>
           </div>
-          <div className="absolute top-0 -left-3">
+          <div className="absolute top-0 -left-2">
             <WelcomeSparkle />
           </div>
         </div>
