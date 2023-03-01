@@ -63,7 +63,7 @@ export const BigCardBody = (props: { entityID: string } & Props) => {
             } ${!image ? "" : "rounded-[3px] bg-white/75 px-1"}`}
           />
           {isMember ? <div className="shrink-0 text-white ">member</div> : ""}
-          {!props.outerControls && props.onDelete ? (
+          {!props.outerControls && props.onDelete && authorized ? (
             <button
               className="text-grey-80 opacity-0 hover:text-grey-15 group-hover:opacity-100"
               onClick={(e) => {
