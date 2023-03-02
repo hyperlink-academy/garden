@@ -13,6 +13,7 @@ import { useContext, useEffect, useState } from "react";
 import useWindowDimensions from "hooks/useWindowDimensions";
 import { CardCollection } from "components/CardCollection";
 import { useSubscribe } from "replicache-react";
+import { usePreserveScroll } from "hooks/utils";
 
 export default function SpacePage() {
   let spaceName = useIndex.aev("this/name")[0];
@@ -183,8 +184,13 @@ export default function SpacePage() {
 
 const Room = (props: { entityID: string | null }) => {
   let roomType = useIndex.eav(props.entityID, "room/type");
+  let { ref } = usePreserveScroll<HTMLDivElement>(props.entityID);
   return (
-    <div className="no-scrollbar overflow-x-hidden overflow-y-scroll p-2 text-sm sm:p-4">
+    <div
+      key={props.entityID}
+      ref={ref}
+      className="no-scrollbar overflow-x-hidden overflow-y-scroll p-2 text-sm sm:p-4"
+    >
       <div className="relative flex w-[336px] flex-col items-stretch gap-0">
         {/* remove desktop bg for collections (member rooms still canvas for now) */}
         {roomType?.value !== "collection" ? (

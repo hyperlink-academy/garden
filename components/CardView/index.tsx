@@ -58,7 +58,7 @@ export const CardView = (props: {
 }) => {
   let [cardState, setCardState] = useState<null | string>(null);
   let memberName = useIndex.eav(props.entityID, "member/name");
-  let { ref } = usePreserveScroll<HTMLDivElement>();
+  let { ref } = usePreserveScroll<HTMLDivElement>(props.entityID);
 
   return (
     <div className="flex h-full flex-col items-stretch">

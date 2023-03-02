@@ -8,24 +8,23 @@ export function usePrevious<T>(value: T) {
 }
 
 let scrollPositions: { [key: string]: number } = {};
-export function usePreserveScroll<T extends HTMLElement>() {
+export function usePreserveScroll<T extends HTMLElement>(key: string | null) {
   let ref = useRef<T | null>(null);
-  let router = useRouter();
   useEffect(() => {
-    if (!ref.current) return;
+    if (!ref.current || !key) return;
 
     window.requestAnimationFrame(() => {
-      ref.current?.scrollTo({ top: scrollPositions[router.asPath] || 0 });
+      ref.current?.scrollTo({ top: scrollPositions[key] || 0 });
     });
 
     const listener = () => {
       if (!ref.current?.scrollTop) return;
-      scrollPositions[router.asPath] = ref.current.scrollTop;
+      scrollPositions[key] = ref.current.scrollTop;
     };
 
     ref.current.addEventListener("scroll", listener);
     return () => ref.current?.removeEventListener("scroll", listener);
-  }, [router.asPath, ref.current]);
+  }, [key, ref.current]);
   return { ref };
 }
 
