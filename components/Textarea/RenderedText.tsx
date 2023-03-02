@@ -1,5 +1,6 @@
 import React, { forwardRef } from "react";
 import Linkify from "linkify-react";
+import { parseLine } from "src/parseMarkdownLine";
 
 export const RenderedText = forwardRef<
   HTMLPreElement,
@@ -24,16 +25,32 @@ export const RenderedText = forwardRef<
             if (t.startsWith("##"))
               return (
                 <p className="font-bold text-grey-35" key={key}>
-                  {t + "\n"}
+                  {parseLine(t)}
                 </p>
               );
             if (t.startsWith("#"))
               return (
-                <p className="font-bold" key={key}>
-                  {t + "\n"}
+                <p className="font-bold underline decoration-2 " key={key}>
+                  {parseLine(t)}
                 </p>
               );
-            return <p key={key}>{t + "\n"}</p>;
+            if (t.match(/^[0-9]+\./)) {
+              let [num, ...rest] = t.split(" ");
+              return (
+                <p className="" key={key}>
+                  <strong>{num}</strong> {parseLine(rest.join(" "))}
+                </p>
+              );
+            }
+            if (t.startsWith("-"))
+              return (
+                <p key={key}>
+                  <strong>-</strong>
+                  {parseLine(t.slice(1))}
+                </p>
+              );
+
+            return <p key={key}>{parseLine(t)}</p>;
           })
         ) : (
           <span
