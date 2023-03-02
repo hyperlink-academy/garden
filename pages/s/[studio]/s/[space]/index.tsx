@@ -14,6 +14,7 @@ import useWindowDimensions from "hooks/useWindowDimensions";
 import { CardCollection } from "components/CardCollection";
 import { useSubscribe } from "replicache-react";
 import { usePreserveScroll } from "hooks/utils";
+import { sortByPosition } from "src/position_helpers";
 
 export default function SpacePage() {
   let spaceName = useIndex.aev("this/name")[0];
@@ -23,8 +24,8 @@ export default function SpacePage() {
   let { memberEntity } = useMutations();
   let firstRoomByID = useIndex
     .aev("room/name")
-    .sort((a, b) => (a.id > b.id ? 1 : -1))[0]?.entity;
-  let firstRoom = memberEntity ? memberEntity : firstRoomByID;
+    .sort(sortByPosition("roomList"))[0]?.entity
+  let firstRoom = firstRoomByID;
 
   let [room, setRoom] = useState<string | null>(null);
   const { width } = useWindowDimensions();
