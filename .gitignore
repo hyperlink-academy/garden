@@ -9,3 +9,4 @@ TODO.md
 public/sw.*
 public/workbox-*
 .vscode/
+.DS_Store
