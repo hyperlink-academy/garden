@@ -99,7 +99,9 @@ export const Textarea = (
         let start = e.currentTarget.selectionStart,
           end = e.currentTarget.selectionEnd;
         await Promise.all([props.onChange(e)]);
-        textarea.current?.setSelectionRange(start, end);
+        requestAnimationFrame(() => {
+          textarea.current?.setSelectionRange(start, end);
+        });
       }}
       onBlur={(e) => {
         setFocused(false);
