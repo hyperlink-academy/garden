@@ -53,7 +53,6 @@ export const EditRoomModal = (props: {
 }) => {
   let currentRoom: Fact<"room/name"> | Fact<"member/name"> | null = null;
   let isMember = false;
-  let isPromptRoom = false;
   let sharedRoom = useIndex.eav(props.currentRoom, "room/name");
   let memberRoom = useIndex.eav(props.currentRoom, "member/name");
 
@@ -67,7 +66,7 @@ export const EditRoomModal = (props: {
 
   useEffect(() => {
     setFormState(currentRoom?.value || "");
-  }, [currentRoom?.value]);
+  }, [currentRoom?.value, props.open]);
 
   if (!props.currentRoom) return null;
   let entityID = props.currentRoom;
