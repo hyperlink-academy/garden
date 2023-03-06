@@ -120,6 +120,11 @@ export const DefaultAttributes = {
     unique: false,
     cardinality: "one",
   },
+  "space/reaction": {
+    type: "string",
+    unique: true,
+    cardinality: "many",
+  },
   "discussion/author": {
     type: "reference",
     unique: false,
