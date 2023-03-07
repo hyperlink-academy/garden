@@ -27,9 +27,9 @@ import { AddAttachedCard } from "components/CardStack";
 import { ButtonPrimary } from "components/Buttons";
 import { Discussion } from "./Discussion";
 import { ulid } from "src/ulid";
-import { ref } from "data/Facts";
 import { animated, useSpring } from "@react-spring/web";
 import { RenderedText } from "components/Textarea/RenderedText";
+import { ReactionList, Reactions } from "./Reactions";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 const borderStyles = (args: { member: boolean }) => {
@@ -160,9 +160,9 @@ export const CardContent = (props: {
       {/* END CARD CONTENT */}
       {/* START CARD THOUGHTS */}
 
-      <div className="cardThoughts flex w-full flex-col gap-3">
+      <div className="cardThoughts flex w-full flex-col gap-2">
         <Divider />
-        <div className="flex flex-col gap-2 pt-3"></div>
+        <Reactions entityID={props.entityID} />
         <StartDiscussion entityID={props.entityID} />
       </div>
       <Discussions entityID={props.entityID} open={props.open} />
