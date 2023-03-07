@@ -1,12 +1,12 @@
 import { query as q } from "faunadb";
-import { IndexDefinition } from "../types";
+import { IndexDefinition } from "backend/fauna/types";
 import { IdentitiesCollectionName } from "./identities_collection";
 
-export const IdentitiesByUsernameIndexName = "identities_by_username";
+export const IdentitiesByEmailIndexName = "identities_by_email";
 const Definition: IndexDefinition = {
-  name: IdentitiesByUsernameIndexName,
+  name: IdentitiesByEmailIndexName,
   source: q.Collection(IdentitiesCollectionName),
-  terms: [{ field: ["data", "username"] }],
+  terms: [{ field: ["data", "email"] }],
   unique: true,
   values: [],
 };

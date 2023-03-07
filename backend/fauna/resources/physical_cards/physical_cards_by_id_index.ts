@@ -1,5 +1,5 @@
 import { query as q } from "faunadb";
-import { IndexDefinition } from "../types";
+import { IndexDefinition } from "backend/fauna/types";
 import { PhysicalCardsCollectionName } from "./physical_cards_collection";
 
 export const PhysicalCardsByIdIndexName = "physical_cards_by_id2";

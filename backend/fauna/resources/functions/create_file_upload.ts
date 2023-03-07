@@ -1,6 +1,6 @@
 import { Client, query as q, values } from "faunadb";
 import { FunctionDefinition } from "backend/fauna/types";
-import { CreateFileUpload } from "../file_uploads_collection";
+import { CreateFileUpload } from "../file_uploads/file_uploads_collection";
 import { getSessionByIdFunctionName } from "./get_session_by_id";
 export const CreateFileUploadFunctionName = "create_file_upload";
 

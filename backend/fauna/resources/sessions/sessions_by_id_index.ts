@@ -1,5 +1,5 @@
 import { query as q } from "faunadb";
-import { IndexDefinition } from "../types";
+import { IndexDefinition } from "backend/fauna/types";
 import { SessionsCollectionName } from "./session_collection";
 
 export const SessionsByIdIndexName = "sessions_by_id";

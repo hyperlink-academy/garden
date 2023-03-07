@@ -1,5 +1,5 @@
 import { Client, query as q } from "faunadb";
-import { FileUploadsCollectionName } from "../file_uploads_collection";
+import { FileUploadsCollectionName } from "../file_uploads/file_uploads_collection";
 import { getSessionByIdFunctionName } from "./get_session_by_id";
 
 export const deleteFileUploadFunctionName = "delete_file_upload";

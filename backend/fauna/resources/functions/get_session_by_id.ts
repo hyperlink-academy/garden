@@ -1,7 +1,6 @@
 import { Client, query as q } from "faunadb";
-import { Identity } from "../identities_collection";
-import { SessionsByIdIndexName } from "../sessions_by_id_index";
-import { Session } from "../session_collection";
+import { SessionsByIdIndexName } from "../sessions/sessions_by_id_index";
+import { Session } from "../sessions/session_collection";
 
 export const getSessionByIdFunctionName = "get_session_by_id";
 

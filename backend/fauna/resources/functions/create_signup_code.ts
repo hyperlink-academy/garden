@@ -1,10 +1,10 @@
 import { FunctionDefinition } from "backend/fauna/types";
 import { Client, Expr, query as q } from "faunadb";
-import { SignupTokensByCodeIndexName } from "../signup_tokens_by_code_index";
+import { SignupTokensByCodeIndexName } from "../signup_tokens/signup_tokens_by_code_index";
 import {
   SignupToken,
   SignupTokensCollectionName,
-} from "../signup_tokens_collection";
+} from "../signup_tokens/signup_tokens_collection";
 
 export const createSignupCodeFunctionName = "create_signup_code";
 

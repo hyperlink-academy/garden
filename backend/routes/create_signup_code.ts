@@ -3,7 +3,7 @@ import { z } from "zod";
 import { getSessionById } from "backend/fauna/resources/functions/get_session_by_id";
 import { makeRoute } from "backend/lib/api";
 import { Client } from "faunadb";
-import { Session } from "backend/fauna/resources/session_collection";
+import { Session } from "backend/fauna/resources/sessions/session_collection";
 import { createSignupCode } from "backend/fauna/resources/functions/create_signup_code";
 import { ulid } from "src/ulid";
 

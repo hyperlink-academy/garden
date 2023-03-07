@@ -1,6 +1,6 @@
 import { Client, query as q } from "faunadb";
-import { CommunitiesByNameIndexName } from "../communities_by_name_index";
-import { Community } from "../communities_collection";
+import { CommunitiesByNameIndexName } from "../communities/communities_by_name_index";
+import { Community } from "../communities/communities_collection";
 
 export const getCommunityByNameFunctionName = "get_community_by_name";
 

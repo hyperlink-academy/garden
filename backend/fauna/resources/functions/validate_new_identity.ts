@@ -1,7 +1,7 @@
 import { FunctionDefinition } from "backend/fauna/types";
 import { Client, query as q } from "faunadb";
-import { IdentitiesByEmailIndexName } from "../identities_by_email_index";
-import { IdentitiesByUsernameIndexName } from "../identities_by_username_index";
+import { IdentitiesByEmailIndexName } from "../identities/identities_by_email_index";
+import { IdentitiesByUsernameIndexName } from "../identities/identities_by_username_index";
 
 export const ValidateNewIdentityFunctionName = "validate_new_identity";
 

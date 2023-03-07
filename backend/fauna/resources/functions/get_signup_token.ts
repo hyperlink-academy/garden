@@ -1,6 +1,6 @@
 import { Client, query as q } from "faunadb";
-import { SignupTokensByCodeIndexName } from "../signup_tokens_by_code_index";
-import { SignupToken } from "../signup_tokens_collection";
+import { SignupTokensByCodeIndexName } from "../signup_tokens/signup_tokens_by_code_index";
+import { SignupToken } from "../signup_tokens/signup_tokens_collection";
 
 export const getSignupTokenFunctionName = "get_signup_token";
 

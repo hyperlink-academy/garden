@@ -1,8 +1,8 @@
 import { FunctionDefinition } from "backend/fauna/types";
 import { Client, query as q } from "faunadb";
-import { CreateIdentity } from "../identities_collection";
-import { SignupTokensByCodeIndexName } from "../signup_tokens_by_code_index";
-import { UpdateSignupToken } from "../signup_tokens_collection";
+import { CreateIdentity } from "../identities/identities_collection";
+import { SignupTokensByCodeIndexName } from "../signup_tokens/signup_tokens_by_code_index";
+import { UpdateSignupToken } from "../signup_tokens/signup_tokens_collection";
 import { ValidateNewIdentityFunctionName } from "./validate_new_identity";
 
 export const CreateIdentityFunctionName = "create_identity";
@@ -25,7 +25,7 @@ export const CreateNewIdentity = (c: Client, args: Args) =>
   c.query(q.Call(q.Function(CreateIdentityFunctionName), args)) as Promise<
     | {
         success: false;
-        error: typeof Errors[keyof typeof Errors];
+        error: (typeof Errors)[keyof typeof Errors];
       }
     | { success: true }
   >;

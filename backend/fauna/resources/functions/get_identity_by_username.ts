@@ -1,7 +1,7 @@
 import { Client, query as q } from "faunadb";
-import { IdentitiesByEmailIndexName } from "../identities_by_email_index";
-import { IdentitiesByUsernameIndexName } from "../identities_by_username_index";
-import { Identity } from "../identities_collection";
+import { IdentitiesByEmailIndexName } from "../identities/identities_by_email_index";
+import { IdentitiesByUsernameIndexName } from "../identities/identities_by_username_index";
+import { Identity } from "../identities/identities_collection";
 
 export const getIdentityByUsernameFunctionName = "get_identity_by_username";
 

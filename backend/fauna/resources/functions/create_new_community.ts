@@ -3,7 +3,7 @@ import { FunctionDefinition } from "backend/fauna/types";
 import {
   Community,
   CreateCommunity,
-} from "backend/fauna/resources/communities_collection";
+} from "backend/fauna/resources/communities/communities_collection";
 export const CreateCommunityFunctionName = "create_collection";
 
 type Args = {

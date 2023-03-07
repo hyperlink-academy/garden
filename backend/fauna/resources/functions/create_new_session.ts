@@ -1,7 +1,7 @@
 import { Client, query as q } from "faunadb";
 import { FunctionDefinition } from "backend/fauna/types";
-import { CreateSession, Session } from "../session_collection";
-import { IdentitiesByUsernameIndexName } from "../identities_by_username_index";
+import { CreateSession, Session } from "../sessions/session_collection";
+import { IdentitiesByUsernameIndexName } from "../identities/identities_by_username_index";
 export const CreateSessionFunctionName = "create_session";
 
 type Args = {

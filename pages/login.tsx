@@ -1,4 +1,4 @@
-import { Session } from "backend/fauna/resources/session_collection";
+import { Session } from "backend/fauna/resources/sessions/session_collection";
 import { ButtonPrimary } from "components/Buttons";
 import { useAuth } from "hooks/useAuth";
 import { useRouter } from "next/router";
@@ -40,15 +40,15 @@ export function LoginForm(props: { onLogin: (s: Session) => void }) {
     }
   };
   return (
-    <div className="grid grid-auto-rows gap-8 mx-auto max-w-md">
+    <div className="grid-auto-rows mx-auto grid max-w-md gap-8">
       <h1>Hi, Welcome Back!</h1>
-      <form className="grid gap-4 w-full" onSubmit={onSubmit}>
+      <form className="grid w-full gap-4" onSubmit={onSubmit}>
         {status !== "incorrect" ? null : (
           <div className="text-accent-red">
             Your username or password is incorrect
           </div>
         )}
-        <label className="grid grid-flow-rows gap-2 font-bold">
+        <label className="grid-flow-rows grid gap-2 font-bold">
           Username
           <input
             className="w-[100%]]"
@@ -60,7 +60,7 @@ export function LoginForm(props: { onLogin: (s: Session) => void }) {
             }
           />
         </label>
-        <label className="grid grid-flow-rows gap-2 font-bold">
+        <label className="grid-flow-rows grid gap-2 font-bold">
           Password
           <input
             type="password"
@@ -71,7 +71,7 @@ export function LoginForm(props: { onLogin: (s: Session) => void }) {
             }
           />
         </label>
-        <div className="grid grid-rows-max gap-2 justify-items-end text-right">
+        <div className="grid-rows-max grid justify-items-end gap-2 text-right">
           <ButtonPrimary
             content={status === "loading" ? "" : "Log In!"}
             icon={status === "loading" ? <DotLoader /> : undefined}

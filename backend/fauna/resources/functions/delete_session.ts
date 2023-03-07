@@ -1,5 +1,5 @@
 import { Client, query as q } from "faunadb";
-import { SessionsByIdIndexName } from "../sessions_by_id_index";
+import { SessionsByIdIndexName } from "../sessions/sessions_by_id_index";
 
 export const deleteSessionFunctionName = "delete_session";
 

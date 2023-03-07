@@ -1,5 +1,5 @@
 import { query as q } from "faunadb";
-import { IndexDefinition } from "../types";
+import { IndexDefinition } from "backend/fauna/types";
 import { CommunitiesCollectionName } from "./communities_collection";
 
 export const CommunitiesByNameIndexName = "communities_by_name";

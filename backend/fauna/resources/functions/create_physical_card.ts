@@ -1,7 +1,7 @@
 import { Client, query as q } from "faunadb";
 import { FunctionDefinition } from "backend/fauna/types";
-import { PhysicalCardsByIdIndexName } from "../physical_cards_by_id_index";
-import { CreatePhysicalCard } from "../physical_cards_collection";
+import { PhysicalCardsByIdIndexName } from "../physical_cards/physical_cards_by_id_index";
+import { CreatePhysicalCard } from "../physical_cards/physical_cards_collection";
 export const CreatePhysicalCardFunctionName = "create_physical_card";
 
 type Args = {

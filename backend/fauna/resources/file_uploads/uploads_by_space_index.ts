@@ -1,12 +1,12 @@
 import { query as q } from "faunadb";
-import { IndexDefinition } from "../types";
+import { IndexDefinition } from "backend/fauna/types";
 import { FileUploadsCollectionName } from "./file_uploads_collection";
 
-export const DeletedFileUploadsIndexName = "deleted_file_uploads";
+export const UploadsBySpaceIndexName = "file_uploads_by_space";
 const Definition: IndexDefinition = {
-  name: DeletedFileUploadsIndexName,
+  name: UploadsBySpaceIndexName,
   source: q.Collection(FileUploadsCollectionName),
-  terms: [{ field: ["data", "deleted"] }],
+  terms: [{ field: ["data", "space"] }],
   values: [],
 };
 export default q.CreateIndex(Definition);

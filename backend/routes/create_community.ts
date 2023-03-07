@@ -1,7 +1,7 @@
 import { Bindings } from "backend";
 import { createCommunity } from "backend/fauna/resources/functions/create_new_community";
 import { getSessionById } from "backend/fauna/resources/functions/get_session_by_id";
-import { Session } from "backend/fauna/resources/session_collection";
+import { Session } from "backend/fauna/resources/sessions/session_collection";
 import { internalSpaceAPI, makeRoute } from "backend/lib/api";
 import { Client } from "faunadb";
 import { z } from "zod";

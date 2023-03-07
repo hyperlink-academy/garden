@@ -1,5 +1,5 @@
 import { Client, query as q } from "faunadb";
-import { UploadsBySpaceIndexName } from "../uploads_by_space_index";
+import { UploadsBySpaceIndexName } from "../file_uploads/uploads_by_space_index";
 import { getSessionByIdFunctionName } from "./get_session_by_id";
 
 export const deleteFileUploadsBySpaceFunctionName =

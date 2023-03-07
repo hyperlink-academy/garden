@@ -1,6 +1,6 @@
 import { Client, query as q } from "faunadb";
-import { PhysicalCardsByIdIndexName } from "../physical_cards_by_id_index";
-import { PhysicalCard } from "../physical_cards_collection";
+import { PhysicalCardsByIdIndexName } from "../physical_cards/physical_cards_by_id_index";
+import { PhysicalCard } from "../physical_cards/physical_cards_collection";
 
 export const getPhysicalCardByIdFunctionName = "get_physical_card_by_id";
 
