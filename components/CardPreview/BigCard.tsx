@@ -13,14 +13,7 @@ export const BigCardBody = (props: { entityID: string } & Props) => {
   let isMember = !!useIndex.eav(props.entityID, "member/name");
   let image = useIndex.eav(props.entityID, "card/image");
 
-  let reactions = null;
-  if (props.entityID) reactions = useReactions(props.entityID);
-  let reactionsCount = 0;
-  let reactionsPreview: any = [];
-  if (reactions && reactions.length > 0) {
-    reactionsCount = reactions.length;
-    reactionsPreview = reactions.slice(0, 3);
-  }
+  let reactions = useReactions(props.entityID);
 
   let { authorized } = useMutations();
   let { open } = useCardViewer();
@@ -114,9 +107,9 @@ export const BigCardBody = (props: { entityID: string } & Props) => {
           )}
         </div>
         {/* Reactions */}
-        {reactions && reactionsCount > 0 && props.entityID ? (
+        {reactions.length > 0 ? (
           <div className="flex w-full flex-row items-center gap-2 pt-2">
-            {reactionsPreview?.map(([reaction, data]) => {
+            {reactions.slice(0, 3).map(([reaction, data]) => {
               return (
                 <SingleReaction
                   {...data}
@@ -126,9 +119,9 @@ export const BigCardBody = (props: { entityID: string } & Props) => {
                 />
               );
             })}
-            {reactionsCount > 3 ? (
+            {reactions.length > 3 ? (
               <span className="text-xs">
-                <em>{`+${reactionsCount - 3} more`}</em>
+                <em>{`+${reactions.length - 3} more`}</em>
               </span>
             ) : (
               ""

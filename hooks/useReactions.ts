@@ -2,13 +2,14 @@ import { useContext } from "react";
 import { useSubscribe } from "replicache-react";
 import { ReplicacheContext, scanIndex, useMutations } from "./useReplicache";
 
-export const useReactions = (entityID: string) => {
+export const useReactions = (entityID?: string | null) => {
   let { memberEntity } = useMutations();
   let rep = useContext(ReplicacheContext);
 
   let reactions = useSubscribe(
     rep?.rep,
     async (tx) => {
+      if (!entityID) return [];
       let reactions = await scanIndex(tx).eav(entityID, "card/reaction");
       let data: {
         [reaction: string]: { count: number; memberReaction: string | null };
