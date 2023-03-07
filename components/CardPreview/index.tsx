@@ -162,7 +162,7 @@ export const HoverControls = (
       ${props.size === "small" ? "h-[6rem] w-[160px]" : "w-full"}
       group grid h-full 
       grid-cols-[auto_min-content]
-      gap-1
+      ${props.outerControls ? "gap-1" : ""}
       `}
     >
       {props.children}

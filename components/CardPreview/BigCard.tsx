@@ -1,8 +1,10 @@
 import { Backlinks } from "components/CardView/Backlinks";
+import { SingleReaction } from "components/CardView/Reactions";
 import { SingleTextSection } from "components/CardView/Sections";
 import { useCardViewer } from "components/CardViewerContext";
 import { GripperBG } from "components/Gripper";
 import { CloseLinedTiny } from "components/Icons";
+import { useReactions } from "hooks/useReactions";
 import { useIndex, useMutations } from "hooks/useReplicache";
 import { Props } from "./index";
 
@@ -10,8 +12,17 @@ const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export const BigCardBody = (props: { entityID: string } & Props) => {
   let isMember = !!useIndex.eav(props.entityID, "member/name");
   let image = useIndex.eav(props.entityID, "card/image");
-  let { authorized } = useMutations();
 
+  let reactions = null;
+  if (props.entityID) reactions = useReactions(props.entityID);
+  let reactionsCount = 0;
+  let reactionsPreview: any = [];
+  if (reactions && reactions.length > 0) {
+    reactionsCount = reactions.length;
+    reactionsPreview = reactions.slice(0, 3);
+  }
+
+  let { authorized } = useMutations();
   let { open } = useCardViewer();
 
   let imageUrl = !image
@@ -22,7 +33,7 @@ export const BigCardBody = (props: { entityID: string } & Props) => {
 
   return (
     <div
-      className={`CardPreivewContent flex h-full grow flex-row overflow-hidden pl-0  ${
+      className={`CardPreviewContent flex h-full grow flex-row overflow-hidden pl-0  ${
         isMember ? "py-2 pr-2" : "py-2 pr-3"
       }`}
       style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
@@ -102,6 +113,28 @@ export const BigCardBody = (props: { entityID: string } & Props) => {
             />
           )}
         </div>
+        {/* Reactions */}
+        {reactions && reactionsCount > 0 && props.entityID ? (
+          <div className="flex w-full flex-row items-center gap-2 pt-2">
+            {reactionsPreview?.map(([reaction, data]) => {
+              return (
+                <SingleReaction
+                  {...data}
+                  reaction={reaction}
+                  entityID={props.entityID}
+                  preview={true}
+                />
+              );
+            })}
+            {reactionsCount > 3 ? (
+              <span className="text-xs">
+                <em>{`+${reactionsCount - 3} more`}</em>
+              </span>
+            ) : (
+              ""
+            )}
+          </div>
+        ) : null}
       </div>
     </div>
   );

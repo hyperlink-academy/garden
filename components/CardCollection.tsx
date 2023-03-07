@@ -52,7 +52,7 @@ const CollectionList = (props: {
 }) => {
   let { open } = useCardViewer();
   return (
-    <div className="z-50 flex flex-col gap-x-2 gap-y-4">
+    <div className="z-50 flex flex-col gap-y-2">
       <AddAttachedCard
         onAdd={(entity) => {
           open({ entityID: entity });
@@ -98,7 +98,7 @@ const CollectionGrid = (props: {
         positionKey="eav"
         attribute="desktop/contains"
       >
-        <div className="relative mr-4 flex h-[6rem] w-[143px] items-center justify-center rounded-lg border border-dashed text-grey-35">
+        <div className="relative mr-2 flex h-[6rem] w-[154px] items-center justify-center rounded-lg border border-dashed text-grey-35">
           <AddSmall />
         </div>
       </AddAttachedCard>

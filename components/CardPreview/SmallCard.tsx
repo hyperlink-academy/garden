@@ -1,6 +1,8 @@
+import { SingleReaction } from "components/CardView/Reactions";
 import { useCardViewer } from "components/CardViewerContext";
 import { GripperBG } from "components/Gripper";
 import { CalendarMedium, ExternalLink, Member } from "components/Icons";
+import { useReactions } from "hooks/useReactions";
 import { useIndex, useMutations } from "hooks/useReplicache";
 import { isUrl } from "src/isUrl";
 import { Props } from "./index";
@@ -48,6 +50,16 @@ export const BaseSmallCard = (
 ) => {
   let url = props.content ? isUrl(props.content) : false;
   let date = props.date;
+
+  let reactions = null;
+  if (props.entityID) reactions = useReactions(props.entityID);
+  let reactionsCount = 0;
+  let reactionsPreview: any = [];
+  if (reactions && reactions.length > 0) {
+    reactionsCount = reactions.length;
+    reactionsPreview = reactions[0];
+  }
+
   let { authorized } = useMutations();
   let { open } = useCardViewer();
   return (
@@ -122,6 +134,25 @@ export const BaseSmallCard = (
           {date ? (
             <div className="text-grey-35">
               <CalendarMedium />
+            </div>
+          ) : null}
+          {/* Small Card Preview - Reactions */}
+          {reactions && reactionsCount > 0 && props.entityID ? (
+            <div className="flex w-full flex-row items-center gap-2">
+              <SingleReaction
+                count={reactionsPreview[1].count}
+                memberReaction={reactionsPreview[1].memberReaction}
+                reaction={reactionsPreview[0]}
+                entityID={props.entityID}
+                preview={true}
+              />
+              {reactionsCount > 1 ? (
+                <span className="text-xs">
+                  <em>{`+${reactionsCount - 1} more`}</em>
+                </span>
+              ) : (
+                ""
+              )}
             </div>
           ) : null}
         </div>

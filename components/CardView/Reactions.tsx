@@ -1,5 +1,6 @@
 import { AddSmall, ReactionAdd } from "components/Icons";
 import { ref } from "data/Facts";
+import { useReactions } from "hooks/useReactions";
 import {
   ReplicacheContext,
   scanIndex,
@@ -30,32 +31,10 @@ export const Reactions = (props: { entityID: string }) => {
 };
 
 export const ReactionList = (props: { entityID: string }) => {
-  let { memberEntity } = useMutations();
-  let rep = useContext(ReplicacheContext);
-  let reactions = useSubscribe(
-    rep?.rep,
-    async (tx) => {
-      let reactions = await scanIndex(tx).eav(props.entityID, "card/reaction");
-      let data: {
-        [reaction: string]: { count: number; memberReaction: string | null };
-      } = {};
-      for (let reaction of reactions) {
-        let r = data[reaction.value] || { count: 0, memberReaction: null };
-        if (memberEntity) {
-          let author = await scanIndex(tx).eav(reaction.id, "reaction/author");
-          if (author?.value.value === memberEntity)
-            r.memberReaction = reaction.id;
-        }
-        r.count++;
-        data[reaction.value] = r;
-      }
-      return Object.entries(data);
-    },
-    [],
-    [props.entityID, memberEntity]
-  );
+  let reactions = useReactions(props.entityID);
+
   return (
-    <div className="flex w-full flex-row items-center gap-4">
+    <div className="flex w-full flex-row flex-wrap items-center gap-2">
       {reactions?.map(([reaction, data]) => {
         return (
           <SingleReaction
@@ -155,16 +134,19 @@ const AddReaction = (props: { entityID: string; close: () => void }) => {
   );
 };
 
-const SingleReaction = (props: {
+export const SingleReaction = (props: {
   entityID: string;
   reaction: string;
   count: number;
   memberReaction: string | null;
+  preview?: boolean;
 }) => {
   let { authorized, mutate, memberEntity } = useMutations();
   return (
     <button
-      className={`rounded-md border px-2 text-lg ${
+      className={`rounded-md border px-2 ${
+        props.preview ? "text-xs" : "text-lg"
+      } ${
         props.memberReaction
           ? "border-accent-blue bg-bg-blue "
           : "border-grey-80"
