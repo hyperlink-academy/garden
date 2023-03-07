@@ -76,7 +76,7 @@ const AddReaction = (props: { entityID: string; close: () => void }) => {
   let [newReaction, setNewReaction] = useState("");
   if (!authorized) return null;
   return (
-    <div className="flex gap-4 rounded-md border border-grey-90 bg-bg-blue py-1 px-2">
+    <div className="flex flex-wrap gap-4 rounded-md border border-grey-90 bg-bg-blue py-1 px-2">
       {reactions.map((r) => (
         <button
           className="text-xl"
