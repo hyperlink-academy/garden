@@ -8,6 +8,7 @@ import {
   RoomCanvas,
   RoomCollection,
   RoomMember,
+  RoomSearch,
 } from "../../Icons";
 import {
   ReplicacheContext,
@@ -205,6 +206,8 @@ export const RoomListItem = (props: {
               <RoomCollection />
             ) : roomType?.value === "canvas" ? (
               <RoomCanvas />
+            ) : props.roomEntity === "search" ? (
+              <RoomSearch />
             ) : null}
           </div>
         )}
