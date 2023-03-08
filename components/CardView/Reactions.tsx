@@ -55,23 +55,13 @@ const AddReaction = (props: { entityID: string; close: () => void }) => {
           className="text-xl"
           onClick={async () => {
             if (!memberEntity) return;
-            let factID = ulid();
-            mutate("assertFact", [
-              {
-                entity: props.entityID,
-                factID,
-                attribute: "card/reaction",
-                value: r.value,
-                positions: {},
-              },
-              {
-                entity: factID,
-                factID: ulid(),
-                attribute: "reaction/author",
-                value: ref(memberEntity),
-                positions: {},
-              },
-            ]);
+            mutate("addReaction", {
+              reaction: r.value,
+              reactionFactID: ulid(),
+              reactionAuthorFactID: ulid(),
+              memberEntity,
+              cardEntity: props.entityID,
+            });
             props.close();
           }}
         >
@@ -89,31 +79,22 @@ const AddReaction = (props: { entityID: string; close: () => void }) => {
           />
         )}
         <button
-          onClick={() => {
+          onClick={async () => {
             if (!editting) return setEditting(true);
             if (!memberEntity) return;
-
-            let factID = ulid();
-            mutate("assertFact", [
+            await mutate("addReaction", {
+              reaction: newReaction.slice(0, 4),
+              reactionFactID: ulid(),
+              reactionAuthorFactID: ulid(),
+              memberEntity,
+              cardEntity: props.entityID,
+            });
+            await mutate("assertFact", [
               {
                 entity: memberEntity,
                 value: newReaction.slice(0, 4),
                 factID: ulid(),
                 attribute: "space/reaction",
-                positions: {},
-              },
-              {
-                entity: props.entityID,
-                factID,
-                attribute: "card/reaction",
-                value: newReaction,
-                positions: {},
-              },
-              {
-                entity: factID,
-                factID: ulid(),
-                attribute: "reaction/author",
-                value: ref(memberEntity),
                 positions: {},
               },
             ]);

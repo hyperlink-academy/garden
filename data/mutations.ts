@@ -40,8 +40,8 @@ export type MutationContext = {
 
 type UniqueFacts = {
   [A in keyof Attribute as Attribute[A]["unique"] extends true
-  ? A
-  : never]: Attribute[A];
+    ? A
+    : never]: Attribute[A];
 };
 
 type OptionalAttribute<A extends keyof Attribute | null> =
@@ -49,8 +49,8 @@ type OptionalAttribute<A extends keyof Attribute | null> =
 export type CardinalityResult<A extends keyof Attribute | null> = null extends A
   ? Fact<keyof Attribute>[]
   : Attribute[OptionalAttribute<A>] extends {
-    cardinality: "one";
-  }
+      cardinality: "one";
+    }
   ? Fact<OptionalAttribute<A>> | null
   : Fact<OptionalAttribute<A>>[];
 
@@ -359,6 +359,38 @@ const drawAPrompt: Mutation<{
   });
 };
 
+const addReaction: Mutation<{
+  cardEntity: string;
+  reactionFactID: string;
+  reactionAuthorFactID: string;
+  reaction: string;
+  memberEntity: string;
+}> = async (args, ctx) => {
+  let reactions = await ctx.scanIndex.eav(args.cardEntity, "card/reaction");
+  for (let reaction of reactions) {
+    let author = await ctx.scanIndex.eav(reaction.entity, "reaction/author");
+    if (
+      author?.value.value === args.memberEntity &&
+      reaction.value === args.reaction
+    )
+      return;
+  }
+  await ctx.assertFact({
+    entity: args.cardEntity,
+    factID: args.reactionFactID,
+    attribute: "card/reaction",
+    value: args.reaction,
+    positions: {},
+  });
+  await ctx.assertFact({
+    entity: args.reactionFactID,
+    factID: args.reactionAuthorFactID,
+    attribute: "reaction/author",
+    value: ref(args.memberEntity),
+    positions: {},
+  });
+};
+
 export const Mutations = {
   deleteEntity,
   createCard,
@@ -373,4 +405,5 @@ export const Mutations = {
   updatePositionInDesktop,
   addCardToDesktop,
   addToOrCreateDeck,
+  addReaction,
 };
