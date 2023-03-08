@@ -31,6 +31,13 @@ export const Sidebar = (props: {
         <SpaceName />
         <Divider />
 
+        <RoomListItem
+          onRoomChange={props.onRoomChange}
+          currentRoom={props.currentRoom}
+          roomEntity={"search"}
+        >
+          Search
+        </RoomListItem>
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
             {!memberEntity ? null : (

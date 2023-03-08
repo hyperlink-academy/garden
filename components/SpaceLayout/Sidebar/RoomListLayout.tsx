@@ -130,7 +130,7 @@ export const RoomListItem = (props: {
   children: React.ReactNode;
   currentRoom: string | null;
   roomEntity: string;
-  setRoomEditOpen: () => void;
+  setRoomEditOpen?: () => void;
 }) => {
   let { memberEntity, authorized } = useMutations();
   let isMember = !!useIndex.eav(props.roomEntity, "member/name");
@@ -181,11 +181,13 @@ export const RoomListItem = (props: {
         className="sidebarRoomName flex w-full flex-row gap-1 py-0.5 pl-1 pr-1 text-left"
         onClick={() => props.onRoomChange(props.roomEntity)}
       >
-        {props.roomEntity === props.currentRoom && authorized ? (
+        {props.roomEntity === props.currentRoom &&
+        authorized &&
+        props.setRoomEditOpen ? (
           // edit options - only if auth-ed AND on current room
           <div className=" roomListItemSettings flex w-5 shrink-0 place-content-center pt-0.5">
             <button
-              onClick={() => props.setRoomEditOpen()}
+              onClick={() => props.setRoomEditOpen?.()}
               className={` rounded-md border border-transparent pt-[1px] hover:border-white`}
             >
               <MoreOptionsTiny />

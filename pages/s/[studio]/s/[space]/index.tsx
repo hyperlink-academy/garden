@@ -15,6 +15,7 @@ import { CardCollection } from "components/CardCollection";
 import { useSubscribe } from "replicache-react";
 import { usePreserveScroll } from "hooks/utils";
 import { sortByPosition } from "src/position_helpers";
+import { SearchRoom } from "components/SearchRoom";
 
 export default function SpacePage() {
   let spaceName = useIndex.aev("this/name")[0];
@@ -24,7 +25,7 @@ export default function SpacePage() {
   let { memberEntity } = useMutations();
   let firstRoomByID = useIndex
     .aev("room/name")
-    .sort(sortByPosition("roomList"))[0]?.entity
+    .sort(sortByPosition("roomList"))[0]?.entity;
   let firstRoom = firstRoomByID;
 
   let [room, setRoom] = useState<string | null>(null);
@@ -82,17 +83,18 @@ export default function SpacePage() {
   return (
     <>
       <Head>
-        <title key="title">{`${unreadCount && unreadCount > 0 ? `(${unreadCount})` : ""
-          } ${spaceName?.value}`}</title>
+        <title key="title">{`${
+          unreadCount && unreadCount > 0 ? `(${unreadCount})` : ""
+        } ${spaceName?.value}`}</title>
       </Head>
 
       <div className="pageWrapperflex safari-pwa-height h-[100dvh] flex-col items-stretch justify-items-center gap-2 overflow-hidden sm:gap-4">
         <div
           className={`
           pageContent 
-          relative mx-auto flex 
-          h-full
-         w-full max-w-screen-xl
+          max-w-screen-xl relative mx-auto 
+          flex
+         h-full w-full
           grow 
           items-stretch 
           md:py-6 md:px-4 `}
@@ -186,6 +188,7 @@ export default function SpacePage() {
 const Room = (props: { entityID: string | null }) => {
   let roomType = useIndex.eav(props.entityID, "room/type");
   let { ref } = usePreserveScroll<HTMLDivElement>(props.entityID);
+  if (props.entityID === "search") return <SearchRoom />;
   return (
     <div
       key={props.entityID}
