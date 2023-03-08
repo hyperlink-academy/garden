@@ -1,5 +1,8 @@
 import { Backlinks } from "components/CardView/Backlinks";
-import { SingleReaction } from "components/CardView/Reactions";
+import {
+  SingleReaction,
+  SingleReactionPreview,
+} from "components/CardView/Reactions";
 import { SingleTextSection } from "components/CardView/Sections";
 import { useCardViewer } from "components/CardViewerContext";
 import { GripperBG } from "components/Gripper";
@@ -87,7 +90,7 @@ export const BigCardBody = (props: { entityID: string } & Props) => {
             isMember ? "mt-1 rounded-md bg-white p-2 pt-1 text-accent-red" : ""
           }`}
         >
-          {!image ? null : (
+          {!image || props.hideContent ? null : (
             <img
               src={`${imageUrl}`}
               className="max-h-[600px] max-w-full  py-2 px-1"
@@ -108,20 +111,19 @@ export const BigCardBody = (props: { entityID: string } & Props) => {
         </div>
         {/* Reactions */}
         {reactions.length > 0 ? (
-          <div className="flex w-full flex-row items-center gap-2 pt-2">
+          <div className="flex w-full flex-row items-center gap-1 pt-2">
             {reactions.slice(0, 3).map(([reaction, data]) => {
               return (
-                <SingleReaction
+                <SingleReactionPreview
                   {...data}
                   reaction={reaction}
                   entityID={props.entityID}
-                  preview={true}
                 />
               );
             })}
             {reactions.length > 3 ? (
-              <span className="text-xs">
-                <em>{`+${reactions.length - 3} more`}</em>
+              <span className="rounded-md border border-grey-80 bg-white py-0.5 px-2 text-sm">
+                <em>{`+${reactions.length - 3}…`}</em>
               </span>
             ) : (
               ""

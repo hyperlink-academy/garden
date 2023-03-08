@@ -1,4 +1,7 @@
-import { SingleReaction } from "components/CardView/Reactions";
+import {
+  SingleReaction,
+  SingleReactionPreview,
+} from "components/CardView/Reactions";
 import { useCardViewer } from "components/CardViewerContext";
 import { GripperBG } from "components/Gripper";
 import { CalendarMedium, ExternalLink, Member } from "components/Icons";
@@ -50,15 +53,7 @@ export const BaseSmallCard = (
 ) => {
   let url = props.content ? isUrl(props.content) : false;
   let date = props.date;
-
-  let reactions = null;
-  if (props.entityID) reactions = useReactions(props.entityID);
-  let reactionsCount = 0;
-  let reactionsPreview: any = [];
-  if (reactions && reactions.length > 0) {
-    reactionsCount = reactions.length;
-    reactionsPreview = reactions[0];
-  }
+  let reactions = useReactions(props.entityID);
 
   let { authorized } = useMutations();
   let { open } = useCardViewer();
@@ -116,8 +111,10 @@ export const BaseSmallCard = (
           </a>
 
           {/* Small Card Preview - External Link */}
+          {/* NB: we COULD also turn this off */}
           {url ? (
             <a
+              className="fixed -bottom-[12px] left-[6px] rounded-md border border-grey-80 bg-white p-1 text-accent-blue"
               href={props.content}
               target="_blank"
               rel="noopener noreferrer"
@@ -125,30 +122,34 @@ export const BaseSmallCard = (
                 e.stopPropagation();
               }}
             >
-              <div className="text-accent-blue ">
-                <ExternalLink />
-              </div>
+              <ExternalLink />
             </a>
           ) : null}
+
           {/* Small Card Preview - Date */}
-          {date ? (
+          {/* NB: turning off to simplify! */}
+          {/* {date ? (
             <div className="text-grey-35">
               <CalendarMedium />
             </div>
-          ) : null}
+          ) : null} */}
+
           {/* Small Card Preview - Reactions */}
-          {reactions && reactionsCount > 0 && props.entityID ? (
-            <div className="flex w-full flex-row items-center gap-2">
-              <SingleReaction
-                count={reactionsPreview[1].count}
-                memberReaction={reactionsPreview[1].memberReaction}
-                reaction={reactionsPreview[0]}
-                entityID={props.entityID}
-                preview={true}
-              />
-              {reactionsCount > 1 ? (
-                <span className="text-xs">
-                  <em>{`+${reactionsCount - 1} more`}</em>
+          {reactions && reactions.length > 0 ? (
+            <div className="fixed -bottom-[12px] right-[24px] flex items-center gap-1">
+              {reactions.slice(0, 1).map(([reaction, data]) => {
+                if (props.entityID)
+                  return (
+                    <SingleReactionPreview
+                      {...data}
+                      reaction={reaction}
+                      entityID={props.entityID}
+                    />
+                  );
+              })}
+              {reactions.length > 1 ? (
+                <span className="rounded-md border border-grey-80 bg-white py-0.5 px-2 text-sm">
+                  <em>{`+${reactions.length - 1}…`}</em>
                 </span>
               ) : (
                 ""

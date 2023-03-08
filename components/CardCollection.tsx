@@ -181,7 +181,7 @@ const DraggableCard = (props: {
   const style =
     transform && (Math.abs(transform.x) > 0 || Math.abs(transform.y) > 0)
       ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
-      : "";
+      : "rotate(0)"; // needed for 'fixed' position reactions relative to card rather than page
   return (
     <>
       <div

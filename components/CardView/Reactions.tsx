@@ -1,14 +1,8 @@
 import { AddSmall, ReactionAdd } from "components/Icons";
 import { ref } from "data/Facts";
 import { useReactions } from "hooks/useReactions";
-import {
-  ReplicacheContext,
-  scanIndex,
-  useIndex,
-  useMutations,
-} from "hooks/useReplicache";
-import { useContext, useState } from "react";
-import { useSubscribe } from "replicache-react";
+import { useIndex, useMutations } from "hooks/useReplicache";
+import { useState } from "react";
 import { ulid } from "src/ulid";
 
 export const Reactions = (props: { entityID: string }) => {
@@ -144,11 +138,11 @@ export const SingleReaction = (props: {
   let { authorized, mutate, memberEntity } = useMutations();
   return (
     <button
-      className={`rounded-md border px-2 ${
+      className={`rounded-md border px-2 py-0.5 ${
         props.preview ? "text-xs" : "text-lg"
       } ${
         props.memberReaction
-          ? "border-accent-blue bg-bg-blue "
+          ? "border-accent-blue bg-bg-blue"
           : "border-grey-80"
       }`}
       onClick={() => {
@@ -176,6 +170,26 @@ export const SingleReaction = (props: {
     >
       {props.reaction} {props.count}
     </button>
+  );
+};
+
+export const SingleReactionPreview = (props: {
+  entityID: string;
+  reaction: string;
+  count: number;
+  memberReaction: string | null;
+}) => {
+  let { authorized, mutate, memberEntity } = useMutations();
+  return (
+    <div
+      className={`rounded-md border py-0.5 px-2 text-sm ${
+        props.memberReaction
+          ? "border-grey-80 bg-bg-blue"
+          : "border-grey-80 bg-background"
+      }`}
+    >
+      {props.reaction} {props.count}
+    </div>
   );
 };
 
