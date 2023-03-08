@@ -115,6 +115,7 @@ export const BigCardBody = (props: { entityID: string } & Props) => {
             {reactions.slice(0, 3).map(([reaction, data]) => {
               return (
                 <SingleReactionPreview
+                  key={reaction}
                   {...data}
                   reaction={reaction}
                   entityID={props.entityID}

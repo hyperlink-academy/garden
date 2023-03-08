@@ -141,6 +141,7 @@ export const BaseSmallCard = (
                 if (props.entityID)
                   return (
                     <SingleReactionPreview
+                      key={reaction}
                       {...data}
                       reaction={reaction}
                       entityID={props.entityID}
