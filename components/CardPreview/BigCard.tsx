@@ -58,7 +58,7 @@ export const BigCardBody = (props: { entityID: string } & Props) => {
         }}
       >
         {/* Big Card Preview Title and GoTo Button*/}
-        <div className={`cardPreviewHeader flex gap-2`}>
+        <div className={`cardPreviewHeader items-top flex gap-2`}>
           <SingleTextSection
             entityID={props.entityID}
             previewOnly
@@ -72,7 +72,7 @@ export const BigCardBody = (props: { entityID: string } & Props) => {
           {isMember ? <div className="shrink-0 text-white ">member</div> : ""}
           {!props.outerControls && props.onDelete && authorized ? (
             <button
-              className="text-grey-80 hover:text-grey-15"
+              className="h-fit pt-1 text-grey-80 hover:text-grey-15"
               onClick={(e) => {
                 e.stopPropagation();
                 props.onDelete?.();

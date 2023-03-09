@@ -11,7 +11,12 @@ import { CardPreview } from "./CardPreview";
 import { AddAttachedCard } from "./CardStack";
 import { useCardViewer } from "./CardViewerContext";
 import { useCombinedRefs } from "./Desktop";
-import { AddSmall } from "./Icons";
+import {
+  AddSmall,
+  CollectionGrid as CollectionGridIcon,
+  CollectionList as CollectionListIcon,
+  CollectionPreview as CollectionPreviewIcon,
+} from "./Icons";
 
 export const CardCollection = (props: { entityID: string }) => {
   let cards = (useIndex.eav(props.entityID, "desktop/contains") || []).sort(
@@ -19,7 +24,7 @@ export const CardCollection = (props: { entityID: string }) => {
   );
   let collectionType = useIndex.eav(props.entityID, "collection/type");
   return (
-    <div className="min-h-screen">
+    <div className="flex min-h-screen flex-col gap-4">
       <CollectionHeader entityID={props.entityID} />
       <SortableContext
         items={cards?.map((c) => c.id) || []}
@@ -130,21 +135,31 @@ const CollectionHeader = (props: { entityID: string }) => {
     });
   };
   const className = (typeName: Fact<"collection/type">["value"]) =>
-    `px-1 ${type === typeName ? "rounded-md border" : ""}`;
+    `p-1 text-grey-55 ${
+      type === typeName
+        ? "rounded-md border border-grey-55"
+        : "border border-transparent"
+    }`;
 
   return (
-    <div className="flex flex-row gap-2 pb-2">
-      <button className={className("grid")} onClick={onClick("grid")}>
-        grid
-      </button>
-      <button className={className("list")} onClick={onClick("list")}>
-        list
+    <div className="collectionTypeSelector flex flex-row gap-1 place-self-end">
+      <button
+        className={`${className("grid")} shrink-0`}
+        onClick={onClick("grid")}
+      >
+        <CollectionGridIcon />
       </button>
       <button
-        className={className("cardpreview")}
+        className={`${className("list")} shrink-0`}
+        onClick={onClick("list")}
+      >
+        <CollectionListIcon />
+      </button>
+      <button
+        className={`${className("cardpreview")} shrink-0`}
         onClick={onClick("cardpreview")}
       >
-        preview
+        <CollectionPreviewIcon />
       </button>
     </div>
   );
