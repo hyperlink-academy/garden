@@ -155,6 +155,11 @@ export const DefaultAttributes = {
     unique: true,
     cardinality: "one",
   },
+  "space/unread-notifications": {
+    type: "number",
+    unique: false,
+    cardinality: "one",
+  },
   "space/start-date": {
     type: "timestamp",
     unique: false,

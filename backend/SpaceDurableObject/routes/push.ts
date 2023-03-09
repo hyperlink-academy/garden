@@ -72,7 +72,10 @@ export const push_route = makeRoute({
         continue;
       }
       try {
-        await Mutations[name](mutation.args, fact_store);
+        await Mutations[name](mutation.args, {
+          ...fact_store,
+          runOnServer: (fn) => fn(env),
+        });
       } catch (e) {
         console.log(
           `Error occured while running mutation: ${name}`,

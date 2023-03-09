@@ -12,7 +12,8 @@ export const Discussion = (props: { close: () => void; entityID: string }) => {
   useEffect(() => {
     if (props.entityID && memberEntity) {
       let unread = unreadBy.find((f) => f.value.value === memberEntity);
-      if (unread) mutate("retractFact", { id: unread.id });
+      if (unread)
+        mutate("markRead", { memberEntity, entityID: props.entityID });
     }
   }, [history, props.entityID, unreadBy, memberEntity]);
   return (

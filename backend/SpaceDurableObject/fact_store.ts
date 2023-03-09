@@ -139,7 +139,7 @@ export const store = (storage: BasicStorage, ctx: { id: string }) => {
     },
   };
 
-  let context: MutationContext = {
+  let context: Omit<MutationContext, "runOnServer"> = {
     scanIndex,
     updateFact: async (id, data) => {
       let existingFact = await storage.get<Fact<keyof Attribute>>(

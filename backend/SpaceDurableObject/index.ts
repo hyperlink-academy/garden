@@ -18,6 +18,7 @@ import { update_self_route } from "./routes/update_self";
 import { delete_self_route } from "./routes/delete_self";
 import { claim_as_community_route } from "./routes/claim_as_community";
 import { add_space_data_route } from "./internal_routes/add_space";
+import { sync_notifications_route } from "./internal_routes/sync_notifications";
 
 export type Env = {
   factStore: ReturnType<typeof store>;
@@ -41,8 +42,11 @@ let routes = [
   update_self_route,
   delete_self_route,
 ];
-
-let private_routes = [update_local_space_data_route, add_space_data_route];
+let private_routes = [
+  update_local_space_data_route,
+  add_space_data_route,
+  sync_notifications_route,
+];
 export type PrivateSpaceRoutes = typeof private_routes;
 export type SpaceRoutes = typeof routes;
 let router = makeRouter(routes);

@@ -1,4 +1,7 @@
+import { privateSpaceAPI } from "backend/lib/api";
+import { Env } from "backend/SpaceDurableObject";
 import { generateKeyBetween } from "src/fractional-indexing";
+import { calculateUnreads, markUnread } from "src/markUnread";
 import { sortByPosition } from "src/position_helpers";
 import { Attribute, ReferenceAttributes } from "./Attributes";
 import { Fact, ref } from "./Facts";
@@ -17,6 +20,7 @@ export type MutationContext = {
     data: Partial<Fact<any>>,
     undoAction?: boolean
   ) => Promise<{ success: boolean }>;
+  runOnServer: (fn: (env: Env) => Promise<void>) => Promise<void>;
   retractFact: (id: string, undoAction?: boolean) => Promise<void>;
   scanIndex: {
     vae: <A extends keyof ReferenceAttributes>(
@@ -183,11 +187,6 @@ const createCard: Mutation<{
   title: string;
   memberEntity: string;
 }> = async (args, ctx) => {
-  // all members - but filter out card creator for unread-by
-  let members = (await ctx.scanIndex.aev("member/name")).filter(
-    (f) => f.entity !== args.memberEntity
-  );
-
   await ctx.assertFact({
     entity: args.entityID,
     attribute: "card/created-by",
@@ -200,14 +199,7 @@ const createCard: Mutation<{
     value: args.title,
     positions: {},
   });
-  for (let m of members) {
-    await ctx.assertFact({
-      entity: args.entityID,
-      attribute: "card/unread-by",
-      value: ref(m.entity),
-      positions: {},
-    });
-  }
+  await markUnread(args, ctx);
 };
 
 export type FactInput = {
@@ -248,10 +240,6 @@ const createDiscussion: Mutation<{
   date: string;
   memberEntity: string;
 }> = async (args, ctx) => {
-  // all members - but filter out card creator for unread-by
-  let members = (await ctx.scanIndex.aev("member/name")).filter(
-    (f) => f.entity !== args.memberEntity
-  );
   await ctx.assertFact({
     entity: args.cardEntity,
     attribute: "card/discussion",
@@ -279,15 +267,10 @@ const createDiscussion: Mutation<{
     value: ref(args.memberEntity),
     positions: {},
   });
-
-  for (let m of members) {
-    await ctx.assertFact({
-      entity: args.discussionEntity,
-      attribute: "discussion/unread-by",
-      value: ref(m.entity),
-      positions: {},
-    });
-  }
+  await markUnread(
+    { entityID: args.discussionEntity, memberEntity: args.memberEntity },
+    ctx
+  );
 };
 
 const replyToDiscussion: Mutation<{
@@ -305,18 +288,10 @@ const replyToDiscussion: Mutation<{
     positions: {},
   });
 
-  let members = (await ctx.scanIndex.aev("member/name")).filter(
-    (f) => f.entity !== args.message.sender
+  await markUnread(
+    { entityID: args.discussion, memberEntity: args.message.sender },
+    ctx
   );
-
-  for (let m of members) {
-    await ctx.assertFact({
-      entity: args.discussion,
-      attribute: "discussion/unread-by",
-      value: ref(m.entity),
-      positions: {},
-    });
-  }
 
   await ctx.postMessage(args.message);
 };
@@ -391,7 +366,28 @@ const addReaction: Mutation<{
   });
 };
 
+const markRead: Mutation<{ entityID: string; memberEntity: string }> = async (
+  args,
+  ctx
+) => {
+  let unreads = await ctx.scanIndex.eav(args.entityID, "card/unread-by");
+  let unread = unreads.find((u) => u.value.value === args.memberEntity);
+  if (unread) await ctx.retractFact(unread.id);
+  await ctx.runOnServer(async (env) => {
+    let space = await ctx.scanIndex.eav(args.memberEntity, "space/member");
+    if (!space) return;
+    let spaceID = env.env.SPACES.idFromString(space.value);
+    let unreads = await calculateUnreads(args.memberEntity, ctx);
+    let stub = env.env.SPACES.get(spaceID);
+    await privateSpaceAPI(stub)("http://internal", "sync_notifications", {
+      space: env.id,
+      unreads,
+    });
+  });
+};
+
 export const Mutations = {
+  markRead,
   deleteEntity,
   createCard,
   updatePositions,
