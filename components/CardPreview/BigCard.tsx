@@ -7,14 +7,19 @@ import { SingleTextSection } from "components/CardView/Sections";
 import { useCardViewer } from "components/CardViewerContext";
 import { GripperBG } from "components/Gripper";
 import { CloseLinedTiny } from "components/Icons";
+import { Textarea } from "components/Textarea";
+import { RenderedText } from "components/Textarea/RenderedText";
+import { FilterAttributes } from "data/Attributes";
 import { useReactions } from "hooks/useReactions";
 import { useIndex, useMutations } from "hooks/useReplicache";
+import { useRef } from "react";
 import { Props } from "./index";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export const BigCardBody = (props: { entityID: string } & Props) => {
   let isMember = !!useIndex.eav(props.entityID, "member/name");
   let image = useIndex.eav(props.entityID, "card/image");
+  let fact = useIndex.eav(props.entityID, "card/content");
 
   let reactions = useReactions(props.entityID);
 
@@ -87,7 +92,7 @@ export const BigCardBody = (props: { entityID: string } & Props) => {
         {/* Big Card Preview Default Content */}
         <div
           className={` cardPreviewDefaultContent ${
-            isMember && !props.hideContent
+            isMember && !props.hideContent && fact?.value
               ? "mt-1 rounded-md bg-white p-2 pt-1 text-accent-red"
               : ""
           }`}
@@ -98,16 +103,12 @@ export const BigCardBody = (props: { entityID: string } & Props) => {
               className="max-h-[600px] max-w-full  py-2 px-1"
             />
           )}
-          {!props.hideContent && (
-            <SingleTextSection
-              previewOnly
-              id={`${props.entityID}-${props.factID}-text-section`}
-              entityID={props.entityID}
-              section="card/content"
-              placeholderOnHover={true}
+          {!props.hideContent && fact?.value && (
+            <RenderedText
               className={`cardPreviewDefaultTextContent truncate whitespace-pre-wrap pt-1 leading-tight  ${
                 !image ? "" : "rounded-[3px] bg-white/75 px-1"
               } `}
+              text={(fact?.value as string) || ""}
             />
           )}
         </div>
