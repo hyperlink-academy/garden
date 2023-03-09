@@ -34,7 +34,7 @@ export function CalendarRoom() {
   }, {} as { [key: string]: { entity: string; value: string }[] });
 
   return (
-    <div className="no-scrollbar relative flex h-full w-[336px] flex-col overflow-y-scroll p-2 sm:p-4">
+    <div className="no-scrollbar relative m-2 flex h-full w-[336px] flex-col overflow-y-scroll sm:m-4">
       <div className="flex h-full flex-col gap-8">
         {days.map((d) => {
           let dateParts = Intl.DateTimeFormat("en", {
