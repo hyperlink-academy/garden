@@ -16,6 +16,7 @@ import { useSubscribe } from "replicache-react";
 import { usePreserveScroll } from "hooks/utils";
 import { sortByPosition } from "src/position_helpers";
 import { SearchRoom } from "components/SearchRoom";
+import { CalendarRoom } from "components/CalendarRoom";
 
 export default function SpacePage() {
   let spaceName = useIndex.aev("this/name")[0];
@@ -189,6 +190,7 @@ const Room = (props: { entityID: string | null }) => {
   let roomType = useIndex.eav(props.entityID, "room/type");
   let { ref } = usePreserveScroll<HTMLDivElement>(props.entityID);
   if (props.entityID === "search") return <SearchRoom />;
+  if (props.entityID === "calendar") return <CalendarRoom />;
   return (
     <div
       key={props.entityID}

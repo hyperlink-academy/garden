@@ -11,7 +11,7 @@ import {
 import { EditSpaceModal } from "components/CreateSpace";
 import { getCurrentDate } from "src/utils";
 import { useRouter } from "next/router";
-import { RoomListLabel, RoomListItem, EditRoomModal } from "./RoomListLayout";
+import { RoomListItem, EditRoomModal } from "./RoomListLayout";
 import { SharedRoomList } from "./SharedRoomList";
 import { MemberRoomList } from "./MemberRoomList";
 import { Popover } from "@headlessui/react";
@@ -37,6 +37,13 @@ export const Sidebar = (props: {
           roomEntity={"search"}
         >
           Search
+        </RoomListItem>
+        <RoomListItem
+          onRoomChange={props.onRoomChange}
+          currentRoom={props.currentRoom}
+          roomEntity={"calendar"}
+        >
+          Calendar
         </RoomListItem>
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
