@@ -19,16 +19,29 @@ export const MemberRoomList = (props: {
   let { memberEntity, authorized } = useMutations();
   let [inviteOpen, setInviteOpen] = useState(false);
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-0.5">
       <RoomListLabel
-        label="members"
+        label="Members"
         helpText={
           <>
-            <p>Visit other members' rooms and see what they're up to!</p>
+            <p>
+              Use your member room as a personal space for scratch, notes, and
+              WIP!
+            </p>
           </>
         }
       />
       <ul className="sidebarMemberRoomList flex flex-col gap-0.5">
+        {!memberEntity ? null : (
+          <RoomListItem
+            onRoomChange={props.onRoomChange}
+            currentRoom={props.currentRoom}
+            roomEntity={memberEntity}
+            setRoomEditOpen={() => props.setRoomEditOpen}
+          >
+            <div className="font-bold">You</div>
+          </RoomListItem>
+        )}
         {members
           .filter((f) => f.entity !== memberEntity)
           .map((member) => {

@@ -30,37 +30,24 @@ export const Sidebar = (props: {
       <div className="no-scrollbar flex h-full w-full flex-col gap-4 overflow-y-scroll">
         <SpaceName />
         <Divider />
-
-        <RoomListItem
-          onRoomChange={props.onRoomChange}
-          currentRoom={props.currentRoom}
-          roomEntity={"search"}
-        >
-          Search
-        </RoomListItem>
-        <RoomListItem
-          onRoomChange={props.onRoomChange}
-          currentRoom={props.currentRoom}
-          roomEntity={"calendar"}
-        >
-          Calendar
-        </RoomListItem>
+        <div className="flex flex-col gap-0.5">
+          <RoomListItem
+            onRoomChange={props.onRoomChange}
+            currentRoom={props.currentRoom}
+            roomEntity={"search"}
+          >
+            Search
+          </RoomListItem>
+          <RoomListItem
+            onRoomChange={props.onRoomChange}
+            currentRoom={props.currentRoom}
+            roomEntity={"calendar"}
+          >
+            Calendar
+          </RoomListItem>
+        </div>
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
-            {!memberEntity ? null : (
-              <>
-                <RoomListItem
-                  onRoomChange={props.onRoomChange}
-                  currentRoom={props.currentRoom}
-                  roomEntity={memberEntity}
-                  setRoomEditOpen={() => setRoomEditOpen(true)}
-                >
-                  Your Room
-                </RoomListItem>
-                <div className="w-full border-t border-dashed border-grey-80" />
-              </>
-            )}
-
             <SharedRoomList
               {...props}
               setRoomEditOpen={() => setRoomEditOpen(true)}

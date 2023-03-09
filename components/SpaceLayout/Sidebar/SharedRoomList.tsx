@@ -32,24 +32,34 @@ export const SharedRoomList = (props: {
         strategy={verticalListSortingStrategy}
         items={rooms.map((c) => c.id)}
       >
-        <ul className="sidebarSharedRoomList flex flex-col gap-0.5">
-          {rooms
-            .filter((f) => f.value !== "prompts")
-            .map((room) => {
-              return (
-                <DraggableRoomListItem
-                  {...props}
-                  mode={mode}
-                  setEditMode={() => setMode("edit")}
-                  key={room.id}
-                  name={room.value}
-                  entityID={room.entity}
-                  factID={room.id}
-                />
-              );
-            })}
-          <CreateRoom />
-        </ul>
+        <div className="flex flex-col gap-0.5">
+          <RoomListLabel
+            label="Rooms"
+            helpText={
+              <>
+                <p>Create, organize, and share cards together!</p>
+              </>
+            }
+          />
+          <ul className="sidebarSharedRoomList flex flex-col gap-0.5">
+            {rooms
+              .filter((f) => f.value !== "prompts")
+              .map((room) => {
+                return (
+                  <DraggableRoomListItem
+                    {...props}
+                    mode={mode}
+                    setEditMode={() => setMode("edit")}
+                    key={room.id}
+                    name={room.value}
+                    entityID={room.entity}
+                    factID={room.id}
+                  />
+                );
+              })}
+            <CreateRoom />
+          </ul>
+        </div>
       </SortableContext>
     </SmallCardDragContext>
   );

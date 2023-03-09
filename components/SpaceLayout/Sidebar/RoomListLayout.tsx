@@ -5,6 +5,7 @@ import { Fact } from "data/Facts";
 import {
   Delete,
   MoreOptionsTiny,
+  RoomCalendar,
   RoomCanvas,
   RoomCollection,
   RoomMember,
@@ -26,7 +27,7 @@ export const RoomListLabel = (props: {
   return (
     <div className="flex flex-col gap-1 pb-1">
       <div className="flex justify-between">
-        <small className="px-2 font-bold text-grey-55">{props.label}</small>
+        <div className="px-2 font-bold text-grey-35">{props.label}</div>
         <div className=" -mt-[2px] pr-2 ">
           <Popover className="">
             <Popover.Button>
@@ -42,7 +43,6 @@ export const RoomListLabel = (props: {
           </Popover>
         </div>
       </div>
-      <div className="w-full border-t border-dashed border-grey-80" />
     </div>
   );
 };
@@ -198,7 +198,11 @@ export const RoomListItem = (props: {
           // when not on room, show room type icon
           <div
             className={` roomListItemIcon mt-[2px] h-5 w-5 shrink-0 pt-[1px] pl-[2px]
-            text-grey-55`}
+             ${
+               props.roomEntity === props.currentRoom
+                 ? "text-white"
+                 : "text-grey-55"
+             }`}
           >
             {props.roomEntity === memberEntity || isMember ? (
               <RoomMember />
@@ -208,6 +212,8 @@ export const RoomListItem = (props: {
               <RoomCanvas />
             ) : props.roomEntity === "search" ? (
               <RoomSearch />
+            ) : props.roomEntity === "calendar" ? (
+              <RoomCalendar />
             ) : null}
           </div>
         )}
