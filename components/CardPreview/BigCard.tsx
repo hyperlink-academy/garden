@@ -87,7 +87,9 @@ export const BigCardBody = (props: { entityID: string } & Props) => {
         {/* Big Card Preview Default Content */}
         <div
           className={` cardPreviewDefaultContent ${
-            isMember ? "mt-1 rounded-md bg-white p-2 pt-1 text-accent-red" : ""
+            isMember && !props.hideContent
+              ? "mt-1 rounded-md bg-white p-2 pt-1 text-accent-red"
+              : ""
           }`}
         >
           {!image || props.hideContent ? null : (
