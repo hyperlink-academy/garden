@@ -30,7 +30,12 @@ export function CardViewer(props: {
   useEffect(() => {
     if (props.room && history[props.room]?.[0] && memberEntity) {
       let unread = unreadBy.find((f) => f.value.value === memberEntity);
-      if (unread) mutate("markRead", { memberEntity, entityID: props.room });
+      if (unread)
+        mutate("markRead", {
+          memberEntity,
+          entityID: props.room,
+          attribute: "card/unread-by",
+        });
     }
   }, [history, props.room, unreadBy, memberEntity]);
 

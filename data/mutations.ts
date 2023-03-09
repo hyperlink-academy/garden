@@ -44,8 +44,8 @@ export type MutationContext = {
 
 type UniqueFacts = {
   [A in keyof Attribute as Attribute[A]["unique"] extends true
-    ? A
-    : never]: Attribute[A];
+  ? A
+  : never]: Attribute[A];
 };
 
 type OptionalAttribute<A extends keyof Attribute | null> =
@@ -53,8 +53,8 @@ type OptionalAttribute<A extends keyof Attribute | null> =
 export type CardinalityResult<A extends keyof Attribute | null> = null extends A
   ? Fact<keyof Attribute>[]
   : Attribute[OptionalAttribute<A>] extends {
-      cardinality: "one";
-    }
+    cardinality: "one";
+  }
   ? Fact<OptionalAttribute<A>> | null
   : Fact<OptionalAttribute<A>>[];
 
@@ -199,7 +199,14 @@ const createCard: Mutation<{
     value: args.title,
     positions: {},
   });
-  await markUnread(args, ctx);
+  await markUnread(
+    {
+      attribute: "card/unread-by",
+      memberEntity: args.memberEntity,
+      entityID: args.entityID,
+    },
+    ctx
+  );
 };
 
 export type FactInput = {
@@ -268,7 +275,11 @@ const createDiscussion: Mutation<{
     positions: {},
   });
   await markUnread(
-    { entityID: args.discussionEntity, memberEntity: args.memberEntity },
+    {
+      entityID: args.discussionEntity,
+      memberEntity: args.memberEntity,
+      attribute: "discussion/unread-by",
+    },
     ctx
   );
 };
@@ -289,7 +300,11 @@ const replyToDiscussion: Mutation<{
   });
 
   await markUnread(
-    { entityID: args.discussion, memberEntity: args.message.sender },
+    {
+      entityID: args.discussion,
+      memberEntity: args.message.sender,
+      attribute: "discussion/unread-by",
+    },
     ctx
   );
 
@@ -366,13 +381,15 @@ const addReaction: Mutation<{
   });
 };
 
-const markRead: Mutation<{ entityID: string; memberEntity: string }> = async (
-  args,
-  ctx
-) => {
-  let unreads = await ctx.scanIndex.eav(args.entityID, "card/unread-by");
+const markRead: Mutation<{
+  entityID: string;
+  memberEntity: string;
+  attribute: "discussion/unread-by" | "card/unread-by";
+}> = async (args, ctx) => {
+  let unreads = await ctx.scanIndex.eav(args.entityID, args.attribute);
   let unread = unreads.find((u) => u.value.value === args.memberEntity);
   if (unread) await ctx.retractFact(unread.id);
+
   await ctx.runOnServer(async (env) => {
     let space = await ctx.scanIndex.eav(args.memberEntity, "space/member");
     if (!space) return;

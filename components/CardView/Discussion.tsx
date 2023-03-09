@@ -13,7 +13,11 @@ export const Discussion = (props: { close: () => void; entityID: string }) => {
     if (props.entityID && memberEntity) {
       let unread = unreadBy.find((f) => f.value.value === memberEntity);
       if (unread)
-        mutate("markRead", { memberEntity, entityID: props.entityID });
+        mutate("markRead", {
+          memberEntity,
+          entityID: props.entityID,
+          attribute: "discussion/unread-by",
+        });
     }
   }, [history, props.entityID, unreadBy, memberEntity]);
   return (
@@ -25,7 +29,7 @@ export const Discussion = (props: { close: () => void; entityID: string }) => {
           </div>
         </button>
 
-        <Thought entityID={props.entityID} open={() => {}} />
+        <Thought entityID={props.entityID} open={() => { }} />
       </div>
       <Messages entityID={props.entityID} />
       <MessageInput entityID={props.entityID} />
@@ -68,9 +72,8 @@ const MessageInput = (props: { entityID: string }) => {
         placeholder="add your response..."
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
-        className={`${
-          focused || value ? "test-bg-pink h-32" : "h-10"
-        } w-full resize-none overflow-hidden border-grey-80`}
+        className={`${focused || value ? "test-bg-pink h-32" : "h-10"
+          } w-full resize-none overflow-hidden border-grey-80`}
         id="thoughtInput"
       ></textarea>
       {!focused && !value ? null : (
@@ -104,10 +107,10 @@ export const Thought = (props: { entityID: string; open: () => void }) => {
 
   let time = createdAt
     ? new Date(createdAt?.value.value).toLocaleDateString(undefined, {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      })
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    })
     : "";
   return (
     <button

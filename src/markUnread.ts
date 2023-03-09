@@ -3,7 +3,11 @@ import { ref } from "data/Facts";
 import { MutationContext } from "data/mutations";
 
 export const markUnread = async (
-  args: { entityID: string; memberEntity: string },
+  args: {
+    entityID: string;
+    memberEntity: string;
+    attribute: "discussion/unread-by" | "card/unread-by";
+  },
   ctx: MutationContext
 ) => {
   let members = (await ctx.scanIndex.aev("space/member")).filter(
@@ -13,7 +17,7 @@ export const markUnread = async (
   for (let m of members) {
     await ctx.assertFact({
       entity: args.entityID,
-      attribute: "card/unread-by",
+      attribute: args.attribute,
       value: ref(m.entity),
       positions: {},
     });
