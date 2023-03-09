@@ -74,7 +74,7 @@ export const push_route = makeRoute({
       try {
         await Mutations[name](mutation.args, {
           ...fact_store,
-          runOnServer: (fn) => fn(env),
+          runOnServer: (fn) => fn({ ...env, factStore: fact_store }),
         });
       } catch (e) {
         console.log(
