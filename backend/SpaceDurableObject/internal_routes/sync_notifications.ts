@@ -17,6 +17,7 @@ export const sync_notifications_route = makeRoute({
       value: msg.unreads,
       positions: {},
     });
+    env.poke();
     return { data: {} };
   },
 });
