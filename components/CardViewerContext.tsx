@@ -33,7 +33,7 @@ export function CardViewer(props: {
       if (unread)
         mutate("markRead", {
           memberEntity,
-          entityID: props.room,
+          entityID: history[props.room][0],
           attribute: "card/unread-by",
         });
     }
