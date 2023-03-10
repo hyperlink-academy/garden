@@ -4,6 +4,23 @@ import { ulid } from "src/ulid";
 import { z } from "zod";
 import { Env } from "..";
 import { space_input } from "./create_space";
+
+let defaultReactions = [
+  "😊",
+  "😔",
+  "❤️",
+  "🎉",
+  "🔥",
+  "👀",
+  "💀",
+  "📌",
+  "✅",
+  "👍",
+  "👎",
+  "!!",
+  "?",
+];
+
 export const claimRoute = makeRoute({
   route: "claim",
   input: z.object({
@@ -60,6 +77,14 @@ export const claimRoute = makeRoute({
         positions: { aev: "a0" },
         value: msg.name,
       }),
+      ...defaultReactions.map((r) =>
+        env.factStore.assertFact({
+          entity: thisEntity,
+          attribute: "space/reaction",
+          value: r,
+          positions: {},
+        })
+      ),
       env.storage.put("meta-creator", msg.ownerID),
     ]);
     let selfStub = env.env.SPACES.get(env.env.SPACES.idFromString(env.id));
