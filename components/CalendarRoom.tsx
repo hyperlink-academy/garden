@@ -61,77 +61,27 @@ export function CalendarRoom() {
                   <span className="font-bold text-white">{weekday?.value}</span>
                 </div>
                 <div className="calendarCards flex h-full w-full flex-col gap-2">
-                  {!!!cardsWithDate[d] ? (
+                  {!cardsWithDate[d] ? (
                     <div className="calendarEmpty flex h-full flex-col place-items-end text-center text-sm italic text-grey-55">
                       <div className="flex grow place-items-end">
                         <p>no scheduled cards</p>
-                      </div>
-                      <div className="flex shrink-0 place-items-center gap-2 ">
-                        <button>
-                          <p className="font-bold hover:text-accent-blue">
-                            create new
-                          </p>
-                        </button>
-                        <div className="h-full border-l text-grey-80" />
-                        <AddAttachedCard day={d}>
-                          <div className="hover:text-accent-blue">
-                            <CardSearch />
-                          </div>{" "}
-                        </AddAttachedCard>
                       </div>
                     </div>
                   ) : (
                     <>
                       {cardsWithDate[d]?.map((card) => (
-                        <CardPreview
-                          entityID={card.entity}
-                          key={card.entity}
-                          size="big"
-                          hideContent
-                        />
+                        <div className="h-fit">
+                          <CardPreview
+                            entityID={card.entity}
+                            key={card.entity}
+                            size="big"
+                            hideContent
+                          />
+                        </div>
                       ))}
-
-                      <div className="flex place-items-center  gap-2 place-self-end text-sm text-grey-55">
-                        <button>
-                          <p className=" font-bold hover:text-accent-blue">
-                            create new
-                          </p>
-                        </button>{" "}
-                        <div className="h-full border-l text-grey-80" />
-                        <AddAttachedCard day={d}>
-                          <div className="hover:text-accent-blue">
-                            <CardSearch />
-                          </div>{" "}
-                        </AddAttachedCard>
-                      </div>
-
-                      {/* <div className="flex gap-2 place-self-end text-sm text-grey-55">
-                        <button className="font-bold hover:text-accent-blue">
-                          create new
-                        </button>
-
-                        <div className="h-full border-l text-grey-80" />
-                        <AddAttachedCard day={d}>
-                          <div className="shrink-0 hover:text-accent-blue">
-                            <CardSearch />
-                          </div>
-                        </AddAttachedCard>
-                      </div> */}
-
-                      {/* <div className="flex justify-between gap-2 rounded-md border border-dashed border-grey-80 p-2 text-sm text-grey-55">
-                        <button className="grow font-bold hover:text-accent-blue">
-                          create new
-                        </button>
-
-                        <div className="h-full border-l text-grey-80" />
-                        <AddAttachedCard day={d}>
-                          <div className="shrink-0 hover:text-accent-blue">
-                            <CardSearch />
-                          </div>
-                        </AddAttachedCard>
-                      </div> */}
                     </>
                   )}
+                  <AddCardToCalendar day={d} />
                 </div>
               </div>
               {index + 1 === days.length ? null : <Divider />}
@@ -200,5 +150,44 @@ const AddAttachedCard = (props: { day: string; children: React.ReactNode }) => {
         items={items}
       />
     </>
+  );
+};
+
+const AddCardToCalendar = (props: { day: string }) => {
+  let { authorized, mutate, memberEntity, action } = useMutations();
+
+  return (
+    <div className="flex shrink-0 place-items-center gap-2  place-self-end text-sm text-grey-55">
+      <button
+        onClick={async () => {
+          if (!memberEntity) return;
+          action.start();
+          let entity = ulid();
+          await mutate("createCard", {
+            entityID: entity,
+            title: "",
+            memberEntity,
+          });
+
+          await mutate("assertFact", {
+            entity,
+            factID: ulid(),
+            attribute: "card/date",
+            value: { type: "yyyy-mm-dd", value: props.day },
+            positions: {},
+          });
+
+          action.end();
+        }}
+      >
+        <p className="font-bold hover:text-accent-blue">create new</p>
+      </button>
+      <div className="h-full border-l text-grey-80" />
+      <AddAttachedCard day={props.day}>
+        <div className="hover:text-accent-blue">
+          <CardSearch />
+        </div>{" "}
+      </AddAttachedCard>
+    </div>
   );
 };
