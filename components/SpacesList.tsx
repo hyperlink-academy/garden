@@ -38,6 +38,7 @@ const Space = (props: { entity: string }) => {
   let studio = useIndex.eav(props.entity, "space/studio");
   let name = useIndex.eav(props.entity, "space/name");
   let description = useIndex.eav(props.entity, "space/description");
+  let unreads = useIndex.eav(props.entity, "space/unread-notifications");
 
   let start_date = useIndex.eav(props.entity, "space/start-date");
   let end_date = useIndex.eav(props.entity, "space/end-date");
@@ -73,7 +74,10 @@ const Space = (props: { entity: string }) => {
         }}
       >
         <Link href={`${spacePath(studio?.value, name?.value)}`}>
-          <DoorImage entityID={props.entity} />
+          <DoorImage
+            entityID={props.entity}
+            glow={!!unreads && unreads.value > 0}
+          />
         </Link>
         <div className="flex w-[20px] flex-col gap-4 pb-[92px]">
           {studio?.value.toLocaleLowerCase() == session.session?.username ? (
