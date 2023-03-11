@@ -109,6 +109,13 @@ export const EditSpaceModal = (props: {
     publish_on_listings_page: false,
     image: undefined as Door | undefined,
   });
+  let modified =
+    formState.name !== (name?.value || "") ||
+    formState.description !== (description?.value || "") ||
+    formState.start_date !== (start_date?.value.value || "") ||
+    formState.end_date !== (end_date?.value.value || "") ||
+    JSON.stringify(formState.image) !== JSON.stringify(uploadedDoor?.value);
+
   useEffect(() => {
     setFormState((s) => {
       return {
@@ -142,6 +149,7 @@ export const EditSpaceModal = (props: {
             />
             <ButtonPrimary
               content={status === "normal" ? "Update" : <DotLoader />}
+              disabled={!modified}
               onClick={async () => {
                 if (!session.loggedIn || !spaceID?.value) return;
                 setStatus("loading");
