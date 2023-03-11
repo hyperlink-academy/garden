@@ -13,21 +13,14 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { Fragment, useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { CardPreview } from "./CardPreview";
 import { customCollisionDetection } from "src/customCollisionDetection";
 import { restrictToParentElement } from "@dnd-kit/modifiers";
 import { ulid } from "src/ulid";
-import { useRouter } from "next/router";
 import { FindOrCreate, useAllItems } from "./FindOrCreateEntity";
 import { useSubscribe } from "replicache-react";
-import { ButtonSecondary } from "./Buttons";
 import { ActionBar } from "./ActionBar";
-import { Fact, ref } from "data/Facts";
-import { Menu } from "@headlessui/react";
-import { MenuContainer, MenuItem } from "./Layout";
-import { getCurrentDate } from "src/utils";
-import { CardinalityResult } from "data/mutations";
 import { useCardViewer } from "./CardViewerContext";
 
 const GRID_SIZE = 16;
@@ -136,7 +129,6 @@ export const Desktop = (props: { entityID: string }) => {
         onClose={() => setCreateCard(null)}
         desktopEntity={props.entityID}
       />
-      <PromptManager entityID={props.entityID} />
       {/* Handles Double CLick to Create */}
       <div
         onClick={(e) => {
@@ -191,107 +183,6 @@ export const Desktop = (props: { entityID: string }) => {
 
       <ActionBar selection={selection} setSelection={setSelection} />
     </DndContext>
-  );
-};
-
-let PromptManager = (props: { entityID: string }) => {
-  let name = useIndex.eav(props.entityID, "member/name");
-  let { memberEntity } = useMutations();
-  if (!name || memberEntity !== props.entityID) return null;
-  return (
-    <div className="relative w-full text-base">
-      <div className="absolute z-10 flex w-full justify-center gap-2">
-        <RandomPromptsButton entityID={props.entityID} />
-        <DailyPromptsButton entityID={props.entityID} />
-      </div>
-    </div>
-  );
-};
-
-let RandomPromptsButton = (props: { entityID: string }) => {
-  let promptRooms = useIndex
-    .aev("room/type")
-    .filter((f) => f.value === "collection");
-
-  return (
-    <Menu as="div" className="relative">
-      <Menu.Button as={Fragment}>
-        <ButtonSecondary content="Draw a Prompt" />
-      </Menu.Button>
-      <MenuContainer className="max-w-[140px] sm:max-w-[160px]">
-        {promptRooms.map((room) => {
-          return (
-            <RandomPromptsRoomItem
-              roomEntity={room.entity}
-              desktopEntity={props.entityID}
-            />
-          );
-        })}
-      </MenuContainer>
-    </Menu>
-  );
-};
-
-let RandomPromptsRoomItem = (props: {
-  roomEntity: string;
-  desktopEntity: string;
-}) => {
-  let { mutate } = useMutations();
-
-  let roomName = useIndex.eav(props.roomEntity, "room/name");
-
-  let promptsInRoom = useIndex.eav(props.roomEntity, "desktop/contains") || [];
-  let promptsOnDesktop =
-    useIndex.eav(props.desktopEntity, "desktop/contains") || [];
-  let newPrompts = promptsInRoom.filter(
-    (p) => !promptsOnDesktop.find((c) => c.value.value === p.value.value)
-  );
-
-  return (
-    <MenuItem
-      disabled={newPrompts.length === 0}
-      onClick={async () => {
-        mutate("drawAPrompt", {
-          factID: ulid(),
-          prompts: newPrompts,
-          desktopEntity: props.desktopEntity,
-          randomSeed: Math.random(),
-        });
-      }}
-    >
-      {roomName?.value}
-    </MenuItem>
-  );
-};
-
-let DailyPromptsButton = (props: { entityID: string }) => {
-  let prompts = useIndex.at("card/date", getCurrentDate(), true);
-  let cards = useIndex.eav(props.entityID, "desktop/contains") || [];
-  let newPrompts = prompts.filter(
-    (p) => !cards.find((c) => c.value.value === p.entity)
-  );
-  let { mutate } = useMutations();
-  return (
-    <ButtonSecondary
-      disabled={newPrompts.length === 0}
-      content="Today's Prompts"
-      onClick={async () => {
-        for (let i = 0; i < newPrompts.length; i++) {
-          let prompt = newPrompts[i];
-          await mutate("addCardToDesktop", {
-            entity: prompt.entity,
-            factID: ulid(),
-            desktop: props.entityID,
-            position: {
-              y: 64 + 64 * i,
-              x: 128,
-              size: "small",
-              rotation: 0,
-            },
-          });
-        }
-      }}
-    />
   );
 };
 
