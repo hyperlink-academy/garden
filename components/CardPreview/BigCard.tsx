@@ -34,10 +34,13 @@ export const BigCardBody = (props: { entityID: string } & Props) => {
 
   return (
     <div
-      className={`CardPreviewContent flex h-full grow flex-row overflow-hidden pl-0  ${
+      className={`CardPreviewContent flex h-full  grow flex-row overflow-hidden !bg-cover !bg-center !bg-no-repeat pl-0  ${
         isMember ? "py-2 pr-2" : "py-2 pr-3"
       }`}
-      style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
+      style={{
+        wordBreak: "break-word",
+        background: props.hideContent && imageUrl ? `url(${imageUrl})` : "",
+      }} //no tailwind equiv - need for long titles to wrap
     >
       {/* Gripper  */}
       <div className="cardPreviewGripper pl-1 pr-2 text-grey-80">
