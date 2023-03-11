@@ -17,6 +17,7 @@ import { usePreserveScroll } from "hooks/utils";
 import { sortByPosition } from "src/position_helpers";
 import { SearchRoom } from "components/SearchRoom";
 import { CalendarRoom } from "components/CalendarRoom";
+import { useUndoableState } from "hooks/useUndoableState";
 
 export default function SpacePage() {
   let spaceName = useIndex.aev("this/name")[0];
@@ -29,11 +30,9 @@ export default function SpacePage() {
     .sort(sortByPosition("roomList"))[0]?.entity;
   let firstRoom = firstRoomByID;
 
-  let [room, setRoom] = useState<string | null>(null);
+  let [r, setRoom] = useUndoableState<string | null>(null);
+  let room = r || firstRoom;
   const { width } = useWindowDimensions();
-  useEffect(() => {
-    if (firstRoom) setRoom(firstRoom);
-  }, [firstRoom]);
 
   let rep = useContext(ReplicacheContext);
   let unreadCount = useSubscribe(
