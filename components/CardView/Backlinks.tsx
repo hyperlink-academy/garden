@@ -31,6 +31,7 @@ export const Backlinks = (props: { entityID: string }) => {
                     {cards.map((c) => {
                       return (
                         <CardPreview
+                          hideContent
                           factID={c.id}
                           onDelete={() => {
                             mutate("retractFact", { id: c.id });
