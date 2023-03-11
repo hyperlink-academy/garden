@@ -18,13 +18,16 @@ import {
   CollectionPreview as CollectionPreviewIcon,
 } from "./Icons";
 
-export const CardCollection = (props: { entityID: string }) => {
-  let cards = (useIndex.eav(props.entityID, "desktop/contains") || []).sort(
+export const CardCollection = (props: {
+  entityID: string;
+  attribute: "desktop/contains" | "deck/contains";
+}) => {
+  let cards = (useIndex.eav(props.entityID, props.attribute) || []).sort(
     sortByPosition("eav")
   );
   let collectionType = useIndex.eav(props.entityID, "collection/type");
   return (
-    <div className="flex min-h-screen flex-col gap-4">
+    <>
       <CollectionHeader entityID={props.entityID} />
       <SortableContext
         items={cards?.map((c) => c.id) || []}
@@ -36,24 +39,35 @@ export const CardCollection = (props: { entityID: string }) => {
       >
         {collectionType?.value === "list" ? (
           <CollectionList
+            attribute={props.attribute}
             entityID={props.entityID}
             cards={cards}
             size="small"
           />
         ) : collectionType?.value === "cardpreview" ? (
-          <CollectionList entityID={props.entityID} cards={cards} size="big" />
+          <CollectionList
+            attribute={props.attribute}
+            entityID={props.entityID}
+            cards={cards}
+            size="big"
+          />
         ) : (
-          <CollectionGrid entityID={props.entityID} cards={cards} />
+          <CollectionGrid
+            attribute={props.attribute}
+            entityID={props.entityID}
+            cards={cards}
+          />
         )}
       </SortableContext>
-    </div>
+    </>
   );
 };
 
 const CollectionList = (props: {
   size: "small" | "big";
   entityID: string;
-  cards: Fact<"desktop/contains">[];
+  attribute: "desktop/contains" | "deck/contains";
+  cards: Fact<"desktop/contains" | "deck/contains">[];
 }) => {
   let { open } = useCardViewer();
   return (
@@ -64,7 +78,7 @@ const CollectionList = (props: {
         }}
         parent={props.entityID}
         positionKey="eav"
-        attribute="desktop/contains"
+        attribute={props.attribute}
       >
         <div
           className={`relative mr-4 flex ${
@@ -77,6 +91,7 @@ const CollectionList = (props: {
       {props.cards?.map((card) => (
         <DraggableCard
           size="big"
+          attribute={props.attribute}
           hideContent={props.size === "small"}
           parent={props.entityID}
           entityID={card.value.value}
@@ -90,7 +105,8 @@ const CollectionList = (props: {
 
 const CollectionGrid = (props: {
   entityID: string;
-  cards: Fact<"desktop/contains">[];
+  attribute: "desktop/contains" | "deck/contains";
+  cards: Fact<"desktop/contains" | "deck/contains">[];
 }) => {
   let { open } = useCardViewer();
   return (
@@ -101,7 +117,7 @@ const CollectionGrid = (props: {
         }}
         parent={props.entityID}
         positionKey="eav"
-        attribute="desktop/contains"
+        attribute={props.attribute}
       >
         <div className="relative mr-2 flex h-[6rem] w-[154px] items-center justify-center rounded-lg border border-dashed text-grey-35">
           <AddSmall />
@@ -109,6 +125,7 @@ const CollectionGrid = (props: {
       </AddAttachedCard>
       {props.cards?.map((card) => (
         <DraggableCard
+          attribute={props.attribute}
           size="small"
           parent={props.entityID}
           entityID={card.value.value}
@@ -167,6 +184,7 @@ const CollectionHeader = (props: { entityID: string }) => {
 
 const DraggableCard = (props: {
   entityID: string;
+  attribute: "desktop/contains" | "deck/contains";
   size: "big" | "small";
   hideContent?: boolean;
   id: string;
@@ -184,7 +202,7 @@ const DraggableCard = (props: {
       positionKey: "eav",
       entityID: props.entityID,
       parent: props.parent,
-      attribute: "desktop/contains",
+      attribute: props.attribute,
     },
   });
 

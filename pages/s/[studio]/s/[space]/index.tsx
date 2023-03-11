@@ -203,7 +203,12 @@ const Room = (props: { entityID: string | null }) => {
         ) : null}
         {props.entityID ? (
           roomType?.value === "collection" ? (
-            <CardCollection entityID={props.entityID} />
+            <div className="flex min-h-screen flex-col gap-4">
+              <CardCollection
+                entityID={props.entityID}
+                attribute="desktop/contains"
+              />
+            </div>
           ) : (
             <Desktop entityID={props.entityID} />
           )

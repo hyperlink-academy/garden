@@ -4,8 +4,7 @@ import { useIndex, useMutations } from "hooks/useReplicache";
 import { useRef, useState } from "react";
 import { FilterAttributes } from "data/Attributes";
 import { useAuth } from "hooks/useAuth";
-import { CardStack } from "components/CardStack";
-import { sortByPosition } from "src/position_helpers";
+import { CardCollection } from "components/CardCollection";
 
 export const SingleTextSection = (
   props: {
@@ -91,12 +90,7 @@ export const AttachedCardSection = (props: { entityID: string }) => {
     <>
       {attachedCards && attachedCards.length === 0 ? null : (
         <div className="flex flex-col gap-4">
-          <CardStack
-            positionKey="eav"
-            cards={attachedCards?.sort(sortByPosition("eav")) || []}
-            parent={props.entityID}
-            attribute="deck/contains"
-          />
+          <CardCollection entityID={props.entityID} attribute="deck/contains" />
         </div>
       )}
     </>
