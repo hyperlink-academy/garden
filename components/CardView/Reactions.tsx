@@ -33,6 +33,7 @@ export const ReactionList = (props: { entityID: string }) => {
         return (
           <SingleReaction
             {...data}
+            key={reaction}
             reaction={reaction}
             entityID={props.entityID}
           />
@@ -149,7 +150,8 @@ export const SingleReaction = (props: {
         ]);
       }}
     >
-      {props.reaction} {props.count}
+      <strong>{props.reaction}</strong>{" "}
+      <span className="text-grey-55">{props.count}</span>
     </button>
   );
 };
@@ -160,7 +162,6 @@ export const SingleReactionPreview = (props: {
   count: number;
   memberReaction: string | null;
 }) => {
-  let { authorized, mutate, memberEntity } = useMutations();
   return (
     <div
       className={`rounded-md border py-0.5 px-2 text-sm ${
@@ -169,12 +170,8 @@ export const SingleReactionPreview = (props: {
           : "border-grey-80 bg-background"
       }`}
     >
-      {props.reaction} {props.count}
+      <strong>{props.reaction}</strong>{" "}
+      <span className="text-grey-55">{props.count}</span>
     </div>
   );
 };
-
-// How should I store which reactions have already been made?
-// I could just process the list of reactions and extract out the unique ones,
-// but that's kind of complicated. I could use replicache's watch functionality
-// which could work well, but is a little frustrating.

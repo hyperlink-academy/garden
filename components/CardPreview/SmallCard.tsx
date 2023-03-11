@@ -149,8 +149,8 @@ export const BaseSmallCard = (
                   );
               })}
               {reactions.length > 1 ? (
-                <span className="rounded-md border border-grey-80 bg-white py-0.5 px-2 text-sm">
-                  <em>{`+${reactions.length - 1}…`}</em>
+                <span className="rounded-md border border-grey-80 bg-white py-0.5 px-2 text-sm text-grey-55">
+                  {`+${reactions.length - 1}`}
                 </span>
               ) : (
                 ""
