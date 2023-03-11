@@ -43,14 +43,16 @@ const CalendarSpace = (props: { entity: string }) => {
       <div className="flex flex-col gap-4 pr-2">
         <div className="flex flex-col gap-1">
           <div className="">
-            <h3
-              style={{
-                overflowWrap: "anywhere",
-              }}
-              className="text-xl"
-            >
-              {name?.value}
-            </h3>
+            <Link href={`${spacePath(studio?.value, name?.value)}`}>
+              <h3
+                style={{
+                  overflowWrap: "anywhere",
+                }}
+                className="text-xl"
+              >
+                {name?.value}
+              </h3>
+            </Link>
           </div>
           <div>
             <p
