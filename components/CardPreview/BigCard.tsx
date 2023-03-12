@@ -66,16 +66,18 @@ export const BigCardBody = (props: { entityID: string } & Props) => {
         }}
       >
         {/* Big Card Preview Title and GoTo Button*/}
-        <div className={`cardPreviewHeader items-top flex gap-2`}>
+        <div
+          className={`cardPreviewHeader items-top flex justify-between gap-2`}
+        >
           <SingleTextSection
             entityID={props.entityID}
             previewOnly
             section={isMember ? "member/name" : "card/title"}
             placeholderOnHover={true}
             placeholder="Untitled"
-            className={`cardPreviewTitle text-md grow font-bold ${
+            className={`cardPreviewTitle text-md !w-fit font-bold ${
               isMember ? "text-white" : "text-grey-35"
-            } ${!image ? "" : "rounded-[3px] bg-white/75 px-1"}`}
+            } ${!imageUrl ? "" : "rounded-[3px] !bg-white px-1"}`}
           />
           {isMember ? <div className="shrink-0 text-white ">member</div> : ""}
           {!props.outerControls && props.onDelete && authorized ? (
@@ -100,7 +102,7 @@ export const BigCardBody = (props: { entityID: string } & Props) => {
               : ""
           }`}
         >
-          {!image || props.hideContent ? null : (
+          {!imageUrl || props.hideContent ? null : (
             <img
               src={`${imageUrl}`}
               className="max-h-[600px] max-w-full  py-2 px-1"
@@ -109,7 +111,7 @@ export const BigCardBody = (props: { entityID: string } & Props) => {
           {!props.hideContent && fact?.value && (
             <RenderedText
               className={`cardPreviewDefaultTextContent truncate whitespace-pre-wrap pt-1 leading-tight  ${
-                !image ? "" : "rounded-[3px] bg-white/75 px-1"
+                !imageUrl ? "" : "rounded-[3px] bg-white/75 px-1"
               } `}
               text={(fact?.value as string) || ""}
             />

@@ -42,13 +42,13 @@ export const SmallCardBody = (props: { entityID: string } & Props) => {
 export const BaseSmallCard = (
   props: {
     title?: string;
-    image?: string;
-    memberName?: string;
+    // image?: string;
     content?: string;
-    isMember: boolean;
     imageUrl?: string;
-    entityID?: string;
+    isMember: boolean;
+    memberName?: string;
     date?: string;
+    entityID?: string;
   } & Omit<Props, "size" | "href">
 ) => {
   let url = props.content ? isUrl(props.content) : false;
@@ -57,6 +57,7 @@ export const BaseSmallCard = (
 
   let { authorized } = useMutations();
   let { open } = useCardViewer();
+
   return (
     <div
       onClick={() => {
@@ -92,8 +93,8 @@ export const BaseSmallCard = (
             {!props.title ? (
               <small>
                 <pre
-                  className={`truncate whitespace-pre-wrap leading-tight ${
-                    !props.image ? "" : "rounded-[3px] bg-white/75 px-1"
+                  className={`w-fit truncate whitespace-pre-wrap leading-tight ${
+                    !props.imageUrl ? "" : "rounded-[3px] bg-white/75 px-1"
                   } `}
                 >
                   {props?.content}
@@ -101,8 +102,8 @@ export const BaseSmallCard = (
               </small>
             ) : (
               <div
-                className={`text-ellipsis font-bold leading-tight text-grey-35 ${
-                  !props.image ? "" : "rounded-[3px] bg-white px-1"
+                className={`w-fit text-ellipsis font-bold leading-tight text-grey-35 ${
+                  !props.imageUrl ? "" : "rounded-[3px] bg-white px-1"
                 }`}
               >
                 {props.title}
