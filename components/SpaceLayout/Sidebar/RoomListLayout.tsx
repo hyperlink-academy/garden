@@ -20,33 +20,6 @@ import {
 import { useState, useEffect, useContext } from "react";
 import { useSubscribe } from "replicache-react";
 
-export const RoomListLabel = (props: {
-  helpText: React.ReactNode;
-  label: string;
-}) => {
-  return (
-    <div className="flex flex-col gap-1 pb-1">
-      <div className="flex justify-between">
-        <div className="px-2 font-bold text-grey-35">{props.label}</div>
-        <div className=" -mt-[2px] pr-2 ">
-          <Popover className="">
-            <Popover.Button>
-              <span className="text-sm text-grey-55">
-                <em>?</em>
-              </span>
-            </Popover.Button>
-            <div className="absolute z-10">
-              <Popover.Panel className="lightBorder absolute left-9 -top-6 z-50 flex w-[154px] flex-col gap-2 bg-white p-2 text-sm text-grey-55  sm:w-56">
-                <div className="flex flex-col gap-1">{props.helpText}</div>
-              </Popover.Panel>
-            </div>
-          </Popover>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 export const EditRoomModal = (props: {
   open: boolean;
   onClose: () => void;

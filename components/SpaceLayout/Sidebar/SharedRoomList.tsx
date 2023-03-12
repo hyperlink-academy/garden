@@ -4,7 +4,7 @@ import { RadioGroup } from "@headlessui/react";
 import { useMutations, useIndex } from "hooks/useReplicache";
 import { useState } from "react";
 import { ulid } from "src/ulid";
-import { RoomListLabel, RoomListItem } from "./RoomListLayout";
+import { RoomListItem } from "./RoomListLayout";
 import { sortByPosition } from "src/position_helpers";
 import {
   SortableContext,
@@ -33,14 +33,6 @@ export const SharedRoomList = (props: {
         items={rooms.map((c) => c.id)}
       >
         <div className="flex flex-col gap-0.5">
-          <RoomListLabel
-            label="Rooms"
-            helpText={
-              <>
-                <p>Create, organize, and share cards together!</p>
-              </>
-            }
-          />
           <ul className="sidebarSharedRoomList flex flex-col gap-0.5">
             {rooms
               .filter((f) => f.value !== "prompts")
