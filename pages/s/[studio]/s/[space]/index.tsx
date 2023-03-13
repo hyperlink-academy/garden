@@ -99,7 +99,7 @@ export default function SpacePage() {
           items-stretch 
           md:py-6 md:px-4 `}
         >
-          <SmallCardDragContext>
+          <SmallCardDragContext activationConstraints={{ distance: 16 }}>
             {width > 960 ? (
               <div
                 className={`

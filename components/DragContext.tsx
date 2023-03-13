@@ -5,7 +5,6 @@ import {
   DragOverlay,
   MouseSensor,
   TouchSensor,
-  useDroppable,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
@@ -17,13 +16,15 @@ import {
 import { useContext, useState } from "react";
 import { sortByPosition, updatePositions } from "src/position_helpers";
 import { StackData } from "./CardStack";
-import { animated, useTransition } from "@react-spring/web";
 import { createPortal } from "react-dom";
 import { useSortable } from "@dnd-kit/sortable";
+import { CardPreview } from "./CardPreview";
 
 export const SmallCardDragContext = (props: {
   children: React.ReactNode;
-  activationConstraints?: { delay: number; tolerance: number };
+  activationConstraints?:
+    | { delay: number; tolerance: number }
+    | { distance: number };
   noDeleteZone?: boolean;
 }) => {
   let [activeCard, setActiveCard] = useState<Active | null>(null);
@@ -86,7 +87,6 @@ export const SmallCardDragContext = (props: {
             currentIndex < newIndex ? newIndex : newIndex - 1,
           ],
         ]);
-        console.log(newPositions);
         mutate("updatePositions", {
           positionKey: overData.positionKey,
           newPositions,
