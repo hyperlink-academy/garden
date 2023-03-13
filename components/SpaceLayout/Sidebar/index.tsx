@@ -21,7 +21,6 @@ export const Sidebar = (props: {
   currentRoom: string | null;
 }) => {
   let { session } = useAuth();
-  let { memberEntity } = useMutations();
 
   let [roomEditOpen, setRoomEditOpen] = useState(false);
 

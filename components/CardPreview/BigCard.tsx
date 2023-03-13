@@ -32,9 +32,17 @@ export const BigCardBody = (props: { entityID: string } & Props) => {
     ? `${WORKER_URL}/static/${image.value.id}`
     : image.value.url;
 
+  let listenersAndAttributes = authorized
+    ? {
+        ...props?.dragHandleProps?.attributes,
+        ...props?.dragHandleProps?.listeners,
+      }
+    : {};
+
   return (
     <div
-      className={`CardPreviewContent flex h-full  grow flex-row overflow-hidden !bg-cover !bg-center !bg-no-repeat pl-0  ${
+      {...listenersAndAttributes}
+      className={`CardPreviewContent flex h-full  grow flex-row overflow-hidden !bg-cover !bg-center !bg-no-repeat pl-2 ${
         isMember ? "py-2 pr-2" : "py-2 pr-3"
       }`}
       style={{
@@ -42,20 +50,6 @@ export const BigCardBody = (props: { entityID: string } & Props) => {
         background: props.hideContent && imageUrl ? `url(${imageUrl})` : "",
       }} //no tailwind equiv - need for long titles to wrap
     >
-      {/* Gripper  */}
-      <div className="cardPreviewGripper pl-1 pr-2 text-grey-80">
-        {authorized && props.dragHandleProps ? (
-          <div className="h-full">
-            <GripperBG
-              {...props.dragHandleProps.attributes}
-              {...props.dragHandleProps.listeners}
-            />
-          </div>
-        ) : (
-          <div />
-        )}
-      </div>
-
       {/* Big Card Preview Content Wrapper */}
       <div
         className="cardPreview flex w-full flex-col hover:cursor-pointer"

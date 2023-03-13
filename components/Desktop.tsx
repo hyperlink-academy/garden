@@ -29,8 +29,12 @@ const snap = (x: number) => Math.ceil(x / GRID_SIZE) * GRID_SIZE;
 export const Desktop = (props: { entityID: string }) => {
   let cards = useIndex.eav(props.entityID, "desktop/contains");
   let height = useHeight(props.entityID) + 500;
-  const mouseSensor = useSensor(MouseSensor, {});
-  const touchSensor = useSensor(TouchSensor, {});
+  const mouseSensor = useSensor(MouseSensor, {
+    activationConstraint: { delay: 100, tolerance: 5 },
+  });
+  const touchSensor = useSensor(TouchSensor, {
+    activationConstraint: { delay: 100, tolerance: 5 },
+  });
   const sensors = useSensors(mouseSensor, touchSensor);
   let { mutate, action, authorized } = useMutations();
   let [createCard, setCreateCard] = useState<null | { x: number; y: number }>(

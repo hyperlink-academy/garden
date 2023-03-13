@@ -52,35 +52,29 @@ export const BaseSmallCard = (
   } & Omit<Props, "size" | "href">
 ) => {
   let url = props.content ? isUrl(props.content) : false;
-  let date = props.date;
   let reactions = useReactions(props.entityID);
 
   let { authorized } = useMutations();
   let { open } = useCardViewer();
-
+  let listenersAndAttributes = authorized
+    ? {
+        ...props?.dragHandleProps?.attributes,
+        ...props?.dragHandleProps?.listeners,
+      }
+    : {};
   return (
     <div
+      {...listenersAndAttributes}
       onClick={() => {
         props.entityID && open({ entityID: props.entityID });
       }}
-      className={`grid h-full w-full grid-cols-[max-content_auto] !bg-cover !bg-center !bg-no-repeat hover:cursor-pointer ${
-        props.isMember ? "pr-1 pl-0 pt-2 pb-1" : "py-2 pr-3 pl-0"
+      className={`h-full w-full !bg-cover !bg-center !bg-no-repeat hover:cursor-pointer ${
+        props.isMember ? "pr-1 pl-2 pt-2 pb-1" : "py-2 pr-3 pl-2"
       }`}
       style={{
         background: props.imageUrl ? `url(${props.imageUrl})` : "",
       }}
     >
-      {authorized && props.dragHandleProps ? (
-        <div
-          className="gripper group pl-1 pr-2"
-          {...props.dragHandleProps.attributes}
-          {...props.dragHandleProps.listeners}
-        >
-          <GripperBG />
-        </div>
-      ) : (
-        <div className={`${props.isMember ? "pl-1" : "pl-3"}`} />
-      )}
       {/* Small Card Preview Content Wrapper (is it default or member?) */}
       {!props.isMember ? (
         /* Default Content (Member Content Further Down) */
