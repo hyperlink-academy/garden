@@ -72,7 +72,7 @@ export const AddImage: React.FC<
   let [state, setState] = useState<"normal" | "uploading">("normal");
 
   return (
-    <label className="inline-block w-max text-grey-55 hover:text-accent-blue ">
+    <label className="inline-block w-max cursor-pointer text-grey-55 hover:text-accent-blue">
       {state === "normal" ? props.children : <DotLoader />}
       <input
         type="file"
