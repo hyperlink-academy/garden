@@ -95,7 +95,6 @@ export const SmallCardDragContext = (props: {
     >
       {props.children}
       <DragOverlayCard entityID={activeCard?.data.current?.entityID} />
-      {!props.noDeleteZone && <DeleteZone display={!!activeCard} />}
     </DndContext>
   );
 };
@@ -114,41 +113,3 @@ type Data = StackData & {
 };
 export const useSortableCard = (c: { id: string; data: Data }) =>
   useSortable(c);
-
-const DeleteZone = (props: { display: boolean }) => {
-  let { setNodeRef, isOver } = useDroppable({ id: "delete" });
-  let transition = useTransition(props.display, {
-    config: { mass: 0.1, tension: 500, friction: 25 },
-    from: { width: 0 },
-    enter: { width: 32 },
-    update: { width: isOver ? 64 : 32 },
-    leave: { width: 0 },
-    delay: 100,
-    reverse: props.display,
-  });
-  return transition(
-    (a, show) =>
-      show &&
-      createPortal(
-        <animated.div
-          className="rounded-md"
-          style={{
-            writingMode: "vertical-lr",
-            position: "fixed",
-            height: "calc(100vh - 256px)",
-            right: 0,
-            zIndex: 50,
-            width: a.width.to((w) => `${w}px`),
-            top: "96px",
-            background: "lightgrey",
-            textAlign: "center",
-            verticalAlign: "bottom",
-            overflow: "hidden",
-          }}
-        >
-          <div ref={setNodeRef}>Drag here to delete</div>
-        </animated.div>,
-        document.body
-      )
-  );
-};
