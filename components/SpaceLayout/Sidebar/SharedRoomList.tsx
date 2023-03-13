@@ -2,7 +2,7 @@ import { ButtonPrimary } from "components/Buttons";
 import { Modal } from "components/Layout";
 import { RadioGroup } from "@headlessui/react";
 import { useMutations, useIndex } from "hooks/useReplicache";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ulid } from "src/ulid";
 import { RoomListItem } from "./RoomListLayout";
 import { sortByPosition } from "src/position_helpers";
@@ -22,6 +22,33 @@ export const SharedRoomList = (props: {
 }) => {
   let rooms = useIndex.aev("room/name").sort(sortByPosition("roomList"));
   let [mode, setMode] = useState<"normal" | "edit">("normal");
+
+  useEffect(() => {
+    let listener = (e: KeyboardEvent) => {
+      if (e.key === "ArrowUp" && e.altKey) {
+        let currentIndex = rooms.findIndex(
+          (r) => r.entity === props.currentRoom
+        );
+        if (currentIndex === -1) return;
+        if (currentIndex > 0) {
+          props.onRoomChange(rooms[currentIndex - 1].entity);
+        }
+      }
+      if (e.key === "ArrowDown" && e.altKey) {
+        let currentIndex = rooms.findIndex(
+          (r) => r.entity === props.currentRoom
+        );
+        if (currentIndex === -1) return;
+        if (currentIndex < rooms.length) {
+          props.onRoomChange(rooms[currentIndex + 1].entity);
+        }
+      }
+    };
+    window.addEventListener("keydown", listener);
+    return () => {
+      window.removeEventListener("keydown", listener);
+    };
+  }, [props.currentRoom]);
 
   return (
     <SmallCardDragContext
