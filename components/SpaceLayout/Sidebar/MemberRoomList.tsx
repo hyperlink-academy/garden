@@ -7,7 +7,7 @@ import { useSmoker } from "components/Smoke";
 import { useAuth } from "hooks/useAuth";
 import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
 import { useState } from "react";
-import { RoomListItem } from "./RoomListLayout";
+import { RoomListItem, RoomListLabel } from "./RoomListLayout";
 import { AddTiny } from "components/Icons";
 
 export const MemberRoomList = (props: {
@@ -20,6 +20,17 @@ export const MemberRoomList = (props: {
   let [inviteOpen, setInviteOpen] = useState(false);
   return (
     <div className="flex flex-col gap-0.5">
+      <RoomListLabel
+        label="Members"
+        helpText={
+          <>
+            <p>
+              Use your member room as a personal space for scratch, notes, and
+              WIP!
+            </p>
+          </>
+        }
+      />
       <ul className="sidebarMemberRoomList flex flex-col gap-0.5">
         {!memberEntity ? null : (
           <RoomListItem
