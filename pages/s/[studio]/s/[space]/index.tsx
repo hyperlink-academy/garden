@@ -18,6 +18,7 @@ import { sortByPosition } from "src/position_helpers";
 import { SearchRoom } from "components/SearchRoom";
 import { CalendarRoom } from "components/CalendarRoom";
 import { useUndoableState } from "hooks/useUndoableState";
+import { Fact } from "data/Facts";
 
 export default function SpacePage() {
   let spaceName = useIndex.aev("this/name")[0];
@@ -32,13 +33,14 @@ export default function SpacePage() {
 
   let [r, setRoom] = useUndoableState<string | null>(null);
   let room = r || firstRoom;
+  let roomType = useIndex.eav(room, "room/type")?.value;
   const { width } = useWindowDimensions();
 
   let rep = useContext(ReplicacheContext);
   let unreadCount = useSubscribe(
     rep?.rep,
     async (tx) => {
-      //This is more complciated than you would think as we only want to notify
+      //This is more complicated than you would think as we only want to notify
       //for cards in rooms directly, and discussions on those cards
       if (!memberEntity) return null;
       let count = 0;
@@ -137,7 +139,10 @@ export default function SpacePage() {
                   </div>
                 </div>
 
-                <CardViewer EmptyState={<EmptyState />} room={room} />
+                <CardViewer
+                  EmptyState={<EmptyState roomType={roomType} />}
+                  room={room}
+                />
               </div>
             ) : (
               <div className="no-scrollbar flex snap-x snap-mandatory flex-row gap-2 overflow-x-scroll overscroll-x-none">
@@ -174,7 +179,10 @@ export default function SpacePage() {
                 </div>
 
                 <div className="pwa-padding py-4 pr-2">
-                  <CardViewer EmptyState={<EmptyState />} room={room} />
+                  <CardViewer
+                    EmptyState={<EmptyState roomType={roomType} />}
+                    room={room}
+                  />
                 </div>
               </div>
             )}
@@ -218,7 +226,7 @@ const Room = (props: { entityID: string | null }) => {
   );
 };
 
-const EmptyState = () => {
+const EmptyState = (props: { roomType?: string | undefined }) => {
   return (
     <div
       className={`
@@ -235,12 +243,26 @@ const EmptyState = () => {
                 `}
     >
       <div className="m-auto text-center">
-        <p>
-          <em>Double-click canvas to add a card</em>
-        </p>
-        <p>
-          <em>Drag a card to move it</em>
-        </p>
+        {props.roomType === "canvas" ? (
+          <>
+            <p>
+              <em>Double-click canvas to add a card</em>
+            </p>
+            <p>
+              <em>Drag a card to move it</em>
+            </p>
+          </>
+        ) : (
+          // if not 'canvas' we can assume room type is 'collection'
+          <>
+            <p>
+              <em>Click a card to open it here</em>
+            </p>
+            <p>
+              <em>Drag cards to reorder</em>
+            </p>
+          </>
+        )}
       </div>
     </div>
   );
