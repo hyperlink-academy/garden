@@ -1,11 +1,12 @@
 import Link from "next/link";
 
-import { Divider } from "components/Layout";
+import { Divider, Modal } from "components/Layout";
 import { useAuth } from "hooks/useAuth";
 import { useIndex, useMutations } from "hooks/useReplicache";
 import React, { Fragment, useState } from "react";
 import {
   BackToStudio as BackToStudioIcon,
+  Information,
   MoreOptionsSmall,
 } from "../../Icons";
 import { EditSpaceModal } from "components/CreateSpace";
@@ -15,17 +16,17 @@ import { RoomListItem, EditRoomModal } from "./RoomListLayout";
 import { SharedRoomList } from "./SharedRoomList";
 import { MemberRoomList } from "./MemberRoomList";
 import { Popover } from "@headlessui/react";
+import { ButtonLink } from "components/Buttons";
 
 export const Sidebar = (props: {
   onRoomChange: (room: string) => void;
   currentRoom: string | null;
 }) => {
   let { session } = useAuth();
-
   let [roomEditOpen, setRoomEditOpen] = useState(false);
 
   return (
-    <div className="Sidebar pwa-padding relative z-50 flex h-full w-52 flex-col items-stretch gap-4 rounded-l-[3px] border-r border-grey-90 bg-white p-3 text-grey-35">
+    <div className="Sidebar pwa-padding flex h-full w-52 flex-col items-stretch gap-4 rounded-l-[3px] border-r border-grey-90 bg-white p-3 text-grey-35">
       <div className="no-scrollbar flex h-full w-full flex-col gap-4 overflow-y-scroll">
         <SpaceName />
         <Divider />
@@ -68,9 +69,7 @@ export const Sidebar = (props: {
           currentRoom={props.currentRoom}
         />
       </div>
-      <div className="mb-2 shrink-0 ">
-        <BackToStudio studio={session.session?.username} />
-      </div>
+      <SidebarFooter studio={session.session?.username} />
     </div>
   );
 };
@@ -113,18 +112,55 @@ const SpaceName = () => {
   );
 };
 
-const BackToStudio = (props: { studio?: string }) => {
+const SidebarFooter = (props: { studio?: string }) => {
+  let [infoOpen, setInfoOpen] = useState(false);
   if (!props.studio) return <div className="shrink-0" />;
 
   return (
-    <div className="sidebarBackToStudio z-10 shrink-0 ">
+    <div className="sidebarBackToStudio z-10 flex shrink-0 items-center justify-between">
       <Link
         className="flex place-items-center gap-2 rounded-md border border-transparent px-2 py-1 hover:border-accent-blue  hover:text-accent-blue"
         href={`/s/${props.studio}`}
       >
         <BackToStudioIcon /> To Studio
       </Link>
+      <button
+        className="hover:text-accent-blue"
+        onClick={() => setInfoOpen(true)}
+      >
+        <Information />
+      </button>
+
+      <InfoModal open={infoOpen} onClose={() => setInfoOpen(false)} />
     </div>
+  );
+};
+
+const InfoModal = (props: { open: boolean; onClose: () => void }) => {
+  return (
+    <Modal open={props.open} onClose={props.onClose}>
+      <div className="editRoomModal flex flex-col gap-3 text-grey-35">
+        <h3>Hyperlink Help Center 🌱</h3>
+        <p>
+          You're viewing a Space on{" "}
+          <a className="text-accent-blue" href="https://hyperlink.academy/">
+            Hyperlink
+          </a>
+          .
+        </p>
+        <p>
+          Question? Bug report? We'd love to hear from you —{" "}
+          <a
+            className="text-accent-blue"
+            href="mailto:contact@hyperlink.academy"
+          >
+            drop us an email
+          </a>
+          !
+        </p>
+        <p>—The Hyperlink Team</p>
+      </div>
+    </Modal>
   );
 };
 

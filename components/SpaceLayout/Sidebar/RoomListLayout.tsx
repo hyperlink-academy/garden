@@ -153,7 +153,12 @@ export const RoomListItem = (props: {
       <button
         style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
         className="sidebarRoomName flex w-full flex-row gap-1 py-0.5 pl-1 pr-1 text-left"
-        onClick={() => props.onRoomChange(props.roomEntity)}
+        onClick={() =>
+          // don't trigger 'onRoomChange' if room already active (may be trying to setRoomEditOpen instead)
+          props.roomEntity !== props.currentRoom
+            ? props.onRoomChange(props.roomEntity)
+            : undefined
+        }
       >
         {props.roomEntity === props.currentRoom &&
         authorized &&
