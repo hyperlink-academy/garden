@@ -60,14 +60,7 @@ export const SharedRoomList = (props: {
         items={rooms.map((c) => c.id)}
       >
         <div className="flex flex-col gap-0.5">
-          <RoomListLabel
-            label="Rooms"
-            helpText={
-              <>
-                <p>Create, organize, and share cards together!</p>
-              </>
-            }
-          />
+          <RoomListLabel label="Rooms" />
           <ul className="sidebarSharedRoomList flex flex-col gap-0.5">
             {rooms
               .filter((f) => f.value !== "prompts")
