@@ -94,7 +94,7 @@ export const CardView = (props: {
             no-scrollbar flex h-full          
             grow
             flex-col
-            gap-6
+            gap-4
             overflow-scroll
             ${contentStyles({
               member: !!memberName,
@@ -158,10 +158,9 @@ export const CardContent = (props: {
         <SectionAdder entityID={props.entityID} />
       </div>
       {/* END CARD CONTENT */}
+      <Divider />
       {/* START CARD THOUGHTS */}
-
       <div className="cardThoughts flex w-full flex-col gap-2">
-        <Divider />
         <Reactions entityID={props.entityID} />
         <StartDiscussion entityID={props.entityID} />
       </div>

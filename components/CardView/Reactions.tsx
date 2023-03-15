@@ -10,16 +10,21 @@ export const Reactions = (props: { entityID: string }) => {
   let [open, setOpen] = useState(false);
 
   return (
-    <div className="flex w-full flex-col gap-1">
-      {authorized && (
-        <button onClick={() => setOpen(!open)}>
-          <ReactionAdd />
-        </button>
-      )}
+    <div className="flex w-full flex-col gap-2">
+      <div className="flex">
+        <ReactionList entityID={props.entityID} />
+        {authorized && (
+          <button
+            className="text-grey-55 hover:text-accent-blue"
+            onClick={() => setOpen(!open)}
+          >
+            <ReactionAdd />
+          </button>
+        )}
+      </div>
       {open && authorized && (
         <AddReaction entityID={props.entityID} close={() => setOpen(false)} />
       )}
-      <ReactionList entityID={props.entityID} />
     </div>
   );
 };
@@ -46,33 +51,35 @@ export const ReactionList = (props: { entityID: string }) => {
 const AddReaction = (props: { entityID: string; close: () => void }) => {
   let { authorized, mutate, memberEntity } = useMutations();
   let reactions = useIndex.aev("space/reaction");
-  let [editting, setEditting] = useState(false);
+  let [editing, setEditing] = useState(false);
   let [newReaction, setNewReaction] = useState("");
   if (!authorized) return null;
   return (
-    <div className="flex flex-wrap gap-4 rounded-md border border-grey-90 bg-bg-blue py-1 px-2">
-      {reactions.map((r) => (
-        <button
-          className="text-xl"
-          onClick={async () => {
-            if (!memberEntity) return;
-            mutate("addReaction", {
-              reaction: r.value,
-              reactionFactID: ulid(),
-              reactionAuthorFactID: ulid(),
-              memberEntity,
-              cardEntity: props.entityID,
-            });
-            props.close();
-          }}
-        >
-          {r.value}
-        </button>
-      ))}
-      <div className="flex gap-1 text-sm">
-        {editting && (
+    <div className="flex flex-wrap gap-4 rounded-md border border-grey-80 py-1 px-2">
+      {reactions
+        .filter((f) => !!f.value) // strip empty strings
+        .map((r) => (
+          <button
+            className="text-xl"
+            onClick={async () => {
+              if (!memberEntity) return;
+              mutate("addReaction", {
+                reaction: r.value,
+                reactionFactID: ulid(),
+                reactionAuthorFactID: ulid(),
+                memberEntity,
+                cardEntity: props.entityID,
+              });
+              props.close();
+            }}
+          >
+            {r.value}
+          </button>
+        ))}
+      <div className="flex gap-1">
+        {editing && (
           <input
-            className="h-3 w-[6ch] self-center"
+            className="h-6 w-[6ch] self-center"
             autoFocus
             maxLength={4}
             value={newReaction}
@@ -80,8 +87,9 @@ const AddReaction = (props: { entityID: string; close: () => void }) => {
           />
         )}
         <button
+          className="text-grey-55 hover:text-accent-blue disabled:hover:text-grey-55"
           onClick={async () => {
-            if (!editting) return setEditting(true);
+            if (!editing) return setEditing(true);
             if (!memberEntity) return;
             await mutate("addReaction", {
               reaction: newReaction.slice(0, 4),
@@ -102,6 +110,7 @@ const AddReaction = (props: { entityID: string; close: () => void }) => {
             setNewReaction("");
             props.close();
           }}
+          disabled={editing && newReaction == "" ? true : false}
         >
           <AddSmall />
         </button>
@@ -115,14 +124,11 @@ export const SingleReaction = (props: {
   reaction: string;
   count: number;
   memberReaction: string | null;
-  preview?: boolean;
 }) => {
   let { authorized, mutate, memberEntity } = useMutations();
   return (
     <button
-      className={`rounded-md border px-2 py-0.5 ${
-        props.preview ? "text-xs" : "text-lg"
-      } ${
+      className={`text-md flex items-center gap-2 rounded-md border px-2 py-0.5 ${
         props.memberReaction
           ? "border-accent-blue bg-bg-blue"
           : "border-grey-80"
@@ -151,7 +157,7 @@ export const SingleReaction = (props: {
       }}
     >
       <strong>{props.reaction}</strong>{" "}
-      <span className="text-grey-55">{props.count}</span>
+      <span className="text-sm text-grey-55">{props.count}</span>
     </button>
   );
 };
@@ -164,14 +170,14 @@ export const SingleReactionPreview = (props: {
 }) => {
   return (
     <div
-      className={`rounded-md border py-0.5 px-2 text-sm ${
+      className={`flex items-center gap-1.5 rounded-md border py-0.5 px-2 text-sm ${
         props.memberReaction
           ? "border-grey-80 bg-bg-blue"
           : "border-grey-80 bg-background"
       }`}
     >
-      <strong>{props.reaction}</strong>{" "}
-      <span className="text-grey-55">{props.count}</span>
+      <strong>{props.reaction}</strong>
+      <span className="text-xs text-grey-55">{props.count}</span>
     </div>
   );
 };
