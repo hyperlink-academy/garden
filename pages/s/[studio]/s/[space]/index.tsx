@@ -102,7 +102,7 @@ export default function SpacePage() {
           md:py-6 md:px-4 `}
         >
           <SmallCardDragContext
-            activationConstraints={{ delay: 200, tolerance: 100 }}
+            activationConstraints={{ delay: 300, tolerance: 100 }}
           >
             {width > 960 ? (
               <div
