@@ -147,7 +147,7 @@ export default function SpacePage() {
                 />
               </div>
             ) : (
-              <div className="no-scrollbar flex snap-x snap-mandatory flex-row gap-2 overflow-x-scroll overscroll-x-none">
+              <div className="no-scrollbar flex snap-x snap-mandatory flex-row gap-2 overflow-x-scroll overscroll-x-none scroll-smooth">
                 <div className="snap-end snap-always">
                   <Sidebar
                     onRoomChange={(room) => {
