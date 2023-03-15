@@ -166,7 +166,7 @@ const addCardToSection: Mutation<{
   factID: string;
   cardEntity: string;
   parent: string;
-  section: string;
+  section: keyof ReferenceAttributes;
   positions: { [k: string]: string };
 }> = async (args, ctx) => {
   let existingCards = await ctx.scanIndex.eav(

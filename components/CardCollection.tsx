@@ -35,7 +35,7 @@ export const CardCollection = (props: {
         attribute={props.attribute}
         entityID={props.entityID}
         cards={cards}
-        size={collectionType?.value === "list" ? "small" : "big"}
+        size={collectionType?.value === "cardpreview" ? "big" : "small"}
       />
     </>
   );
