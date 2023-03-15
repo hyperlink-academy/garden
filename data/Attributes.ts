@@ -195,6 +195,11 @@ export const DefaultAttributes = {
     unique: true,
     cardinality: "one",
   },
+  "space/display_name": {
+    type: "string",
+    unique: true,
+    cardinality: "one",
+  },
   "space/description": {
     type: "string",
     unique: false,
