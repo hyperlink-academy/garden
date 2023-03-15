@@ -76,8 +76,14 @@ export const join_route = makeRoute({
       "space/community"
     );
 
+    let display_name = await env.factStore.scanIndex.eav(
+      thisEntity,
+      "space/display_name"
+    );
+
     await privateSpaceAPI(memberStudio)("http://internal", "add_space_data", {
       spaceID: env.id,
+      name: name[0].value,
       data: {
         publish_on_listings_page: !!community,
         image: image?.value,
@@ -85,7 +91,7 @@ export const join_route = makeRoute({
         start_date: start_date?.value.value || "",
         end_date: end_date?.value.value || "",
         studio: msg.studio,
-        name: name[0].value,
+        display_name: display_name?.value || "",
       },
     });
     env.poke();

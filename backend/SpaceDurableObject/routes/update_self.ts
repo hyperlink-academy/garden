@@ -10,7 +10,7 @@ export const update_self_route = makeRoute({
   route: "update_self",
   input: z.object({
     token: z.string(),
-    data: space_input.omit({ name: true }),
+    data: space_input,
   }),
   handler: async (msg, env: Env) => {
     let fauna = new Client({
@@ -63,8 +63,8 @@ export const update_self_route = makeRoute({
         "add_space_data",
         {
           spaceID: env.id,
+          name: thisEntity.value,
           data: {
-            name: thisEntity.value,
             studio: session.username,
             ...msg.data,
           },

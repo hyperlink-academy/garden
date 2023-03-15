@@ -9,7 +9,7 @@ import { SpaceCreate } from "./Icons";
 import { Modal } from "./Layout";
 
 type FormState = {
-  name: string;
+  display_name: string;
   description: string;
   start_date: string;
   end_date: string;
@@ -20,7 +20,7 @@ const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export const CreateSpace = (props: { studioSpaceID: string }) => {
   let [open, setOpen] = useState(false);
   let [formState, setFormState] = useState<FormState>({
-    name: "",
+    display_name: "",
     description: "",
     start_date: "",
     end_date: "",
@@ -50,9 +50,9 @@ export const CreateSpace = (props: { studioSpaceID: string }) => {
 
             <ButtonPrimary
               content="Create!"
-              disabled={!formState.name || !formState.image}
+              disabled={!formState.display_name || !formState.image}
               onClick={async () => {
-                if (!auth.session.loggedIn || !formState.name) return;
+                if (!auth.session.loggedIn || !formState.display_name) return;
                 await spaceAPI(
                   `${WORKER_URL}/space/${props.studioSpaceID}`,
                   "create_space",
@@ -62,7 +62,7 @@ export const CreateSpace = (props: { studioSpaceID: string }) => {
                   }
                 );
                 setFormState({
-                  name: "",
+                  display_name: "",
                   description: "",
                   start_date: "",
                   end_date: "",
@@ -102,7 +102,7 @@ export const EditSpaceModal = (props: {
 
   let [status, setStatus] = useState<"normal" | "loading">("normal");
   let [formState, setFormState] = useState<FormState>({
-    name: "",
+    display_name: "",
     description: "",
     start_date: "",
     end_date: "",
@@ -110,7 +110,7 @@ export const EditSpaceModal = (props: {
     image: undefined as Door | undefined,
   });
   let modified =
-    formState.name !== (name?.value || "") ||
+    formState.display_name !== (name?.value || "") ||
     formState.description !== (description?.value || "") ||
     formState.start_date !== (start_date?.value.value || "") ||
     formState.end_date !== (end_date?.value.value || "") ||
@@ -123,7 +123,7 @@ export const EditSpaceModal = (props: {
         start_date: start_date?.value.value || "",
         end_date: end_date?.value.value || "",
         description: description?.value || "",
-        name: name?.value || "",
+        display_name: name?.value || "",
         image: uploadedDoor?.value,
         publish_on_listings_page: !!community,
       };
@@ -255,17 +255,17 @@ const CreateSpaceForm = ({
         <div className="flex flex-col gap-1">
           <p className="font-bold">Name this Space</p>
           {disableName ? (
-            <h3>{formState.name}</h3>
+            <h3>{formState.display_name}</h3>
           ) : (
             <input
               className="w-full"
-              value={formState.name}
+              value={formState.display_name}
               placeholder=""
               onChange={(e) => {
                 let value = e.currentTarget.value;
                 setFormState((form) => ({
                   ...form,
-                  name: value,
+                  display_name: value,
                 }));
               }}
             />
@@ -337,7 +337,7 @@ const CreateSpaceForm = ({
                 !(
                   formState.start_date &&
                   formState.end_date &&
-                  formState.name &&
+                  formState.display_name &&
                   formState.description &&
                   formState.image
                 )

@@ -18,10 +18,9 @@ import { sortByPosition } from "src/position_helpers";
 import { SearchRoom } from "components/SearchRoom";
 import { CalendarRoom } from "components/CalendarRoom";
 import { useUndoableState } from "hooks/useUndoableState";
-import { Fact } from "data/Facts";
 
 export default function SpacePage() {
-  let spaceName = useIndex.aev("this/name")[0];
+  let spaceName = useIndex.aev("space/display_name")[0];
 
   // get first room = your room
   // OR if viewing anon, get first room based on room id

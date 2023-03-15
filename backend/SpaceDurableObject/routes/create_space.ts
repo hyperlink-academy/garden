@@ -7,7 +7,7 @@ import { z } from "zod";
 import { Env } from "..";
 
 export const space_input = z.object({
-  name: z.string().trim().max(64),
+  display_name: z.string().trim().max(64),
   start_date: z.string(),
   end_date: z.string(),
   description: z.string().max(256),
@@ -41,21 +41,15 @@ export const create_space_route = makeRoute({
     });
     let creator = await env.storage.get("meta-creator");
     let session = await getSessionById(fauna, { id: msg.token });
-    console.log(session);
-    console.log(creator);
+
     if (!session || session.studio !== creator || !creator)
       return {
         data: { success: false, error: "unauthorized" },
       } as const;
 
-    // TODO Check if this a space you joined or a space in your studio
-    let existingSpace = await env.factStore.scanIndex.ave(
-      "space/name",
-      msg.name
-    );
-
-    if (existingSpace)
-      return { data: { success: false, error: "existing space" } } as const;
+    let spaceIndex =
+      (await env.storage.get<number>("meta-space-created-index")) || 0;
+    await env.storage.put("meta-space-created-index", spaceIndex + 1);
 
     //Eventually we want this to be choosable!
     let community;
@@ -72,6 +66,7 @@ export const create_space_route = makeRoute({
 
     let data = {
       spaceID: newSpace.toString(),
+      name: (spaceIndex + 1).toString(),
       data: {
         ...msg,
         studio: session.username,
@@ -81,8 +76,8 @@ export const create_space_route = makeRoute({
 
     await internalSpaceAPI(stub)("http://internal", "claim", {
       data: data.data,
+      name: (spaceIndex + 1).toString(),
       ownerID: session.studio,
-      name: msg.name,
       ownerName: session.username,
     });
 

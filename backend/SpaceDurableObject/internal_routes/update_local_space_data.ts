@@ -10,7 +10,6 @@ export const update_local_space_data_route = makeRoute({
   input: z.object({
     spaceID: z.string(),
     data: space_input
-      .omit({ name: true })
       .merge(
         z.object({
           deleted: z.boolean().optional(),
@@ -96,6 +95,15 @@ export const update_local_space_data_route = makeRoute({
       if (community && !msg.data.publish_on_listings_page) {
         env.factStore.retractFact(community.id);
       }
+    }
+
+    if (msg.data.display_name !== undefined) {
+      await env.factStore.assertFact({
+        entity: spaceEntity,
+        attribute: "space/display_name",
+        value: msg.data.display_name,
+        positions: {},
+      });
     }
 
     if (msg.data.description !== undefined) {

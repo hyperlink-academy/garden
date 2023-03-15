@@ -91,6 +91,7 @@ export const claimRoute = makeRoute({
     await privateSpaceAPI(selfStub)("http://internal", "add_space_data", {
       entityID: thisEntity,
       spaceID: env.id,
+      name: msg.name,
       data: msg.data,
     });
     return { data: { success: true } };

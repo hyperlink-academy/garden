@@ -19,7 +19,9 @@ export function JoinSpace() {
   let router = useRouter();
   let code = router.query.code as string | undefined;
   let isMember = useIndex.ave("space/member", session.session?.studio);
-  let spaceName = useIndex.aev("this/name")[0];
+  let thisEntity = useIndex.aev("this/name")[0]?.entity;
+  let spaceName = useIndex.eav(thisEntity, "space/display_name");
+
   let [isOpen, setLogInModal] = useState(false);
 
   const onClick = async () => {

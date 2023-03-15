@@ -21,14 +21,12 @@ export const CalendarList = (props: {
 
 const CalendarSpace = (props: { entity: string }) => {
   let studio = useIndex.eav(props.entity, "space/studio");
-  let spaceID = useIndex.eav(props.entity, "space/id");
 
-  let name = useIndex.eav(props.entity, "space/name");
+  let name = useIndex.eav(props.entity, "space/display_name");
   let description = useIndex.eav(props.entity, "space/description");
   let start_date = useIndex.eav(props.entity, "space/start-date");
   let end_date = useIndex.eav(props.entity, "space/end-date");
   let creator = useIndex.eav(props.entity, "space/studio");
-  let prefetched = useRef(false);
 
   const { width } = useWindowDimensions();
 

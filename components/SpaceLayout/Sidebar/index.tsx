@@ -74,8 +74,9 @@ export const Sidebar = (props: {
   );
 };
 const SpaceName = () => {
-  let spaceName = useIndex.aev("this/name")[0];
-  let studio = useIndex.eav(spaceName?.entity, "space/studio");
+  let thisEntity = useIndex.aev("this/name")[0]?.entity;
+  let spaceName = useIndex.eav(thisEntity, "space/display_name");
+  let studio = useIndex.eav(thisEntity, "space/studio");
   let router = useRouter();
   let { session } = useAuth();
   let authorized =
@@ -96,7 +97,7 @@ const SpaceName = () => {
         )}
       </div>
       <SpaceStatus
-        entityID={spaceName?.entity}
+        entityID={thisEntity}
         openEditModal={() => setEditModal(true)}
       />
       <EditSpaceModal
@@ -106,7 +107,7 @@ const SpaceName = () => {
           router.push(`/s/${session.session.username}`);
         }}
         onClose={() => setEditModal(false)}
-        spaceEntity={spaceName?.entity}
+        spaceEntity={thisEntity}
       />
     </div>
   );

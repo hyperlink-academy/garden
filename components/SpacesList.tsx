@@ -36,7 +36,7 @@ export const SpaceList = (props: {
 const Space = (props: { entity: string }) => {
   let { session } = useAuth();
   let studio = useIndex.eav(props.entity, "space/studio");
-  let name = useIndex.eav(props.entity, "space/name");
+  let name = useIndex.eav(props.entity, "space/display_name");
   let description = useIndex.eav(props.entity, "space/description");
   let unreads = useIndex.eav(props.entity, "space/unread-notifications");
 

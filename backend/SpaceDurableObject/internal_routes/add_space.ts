@@ -8,6 +8,7 @@ export const add_space_data_route = makeRoute({
   input: z.object({
     entityID: z.string().optional(),
     spaceID: z.string(),
+    name: z.string(),
     data: space_input.merge(
       z.object({
         studio: z.string().optional(),
@@ -22,7 +23,13 @@ export const add_space_data_route = makeRoute({
       env.factStore.assertFact({
         entity: entityID,
         attribute: "space/name",
-        value: msg.data.name,
+        value: msg.name,
+        positions: {},
+      }),
+      env.factStore.assertFact({
+        entity: entityID,
+        attribute: "space/display_name",
+        value: msg.data.display_name,
         positions: {},
       }),
       env.factStore.assertFact({
