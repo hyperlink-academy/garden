@@ -44,8 +44,8 @@ export type MutationContext = {
 
 type UniqueFacts = {
   [A in keyof Attribute as Attribute[A]["unique"] extends true
-  ? A
-  : never]: Attribute[A];
+    ? A
+    : never]: Attribute[A];
 };
 
 type OptionalAttribute<A extends keyof Attribute | null> =
@@ -53,8 +53,8 @@ type OptionalAttribute<A extends keyof Attribute | null> =
 export type CardinalityResult<A extends keyof Attribute | null> = null extends A
   ? Fact<keyof Attribute>[]
   : Attribute[OptionalAttribute<A>] extends {
-    cardinality: "one";
-  }
+      cardinality: "one";
+    }
   ? Fact<OptionalAttribute<A>> | null
   : Fact<OptionalAttribute<A>>[];
 
@@ -163,6 +163,7 @@ const updatePositions: Mutation<{
 };
 
 const addCardToSection: Mutation<{
+  factID: string;
   cardEntity: string;
   parent: string;
   section: string;
@@ -175,6 +176,7 @@ const addCardToSection: Mutation<{
   let existing = existingCards.find((f) => f.value.value === args.cardEntity);
   if (existing && !existing.retracted) return;
   await ctx.assertFact({
+    factID: args.factID,
     entity: args.parent,
     attribute: args.section as "arbitrarySectionReferenceType",
     value: ref(args.cardEntity),

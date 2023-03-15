@@ -1,3 +1,4 @@
+import { pointerWithin, rectIntersection } from "@dnd-kit/core";
 import {
   ClientRect,
   CollisionDetection,
@@ -107,3 +108,18 @@ export const cardStackCollisionDetection: CollisionDetection = ({
 
   return collisions.sort((a, b) => b.data.top - a.data.top);
 };
+
+export function pointerWithinOrRectIntersection(
+  args: Parameters<CollisionDetection>[0]
+) {
+  // First, let's see if there are any collisions with the pointer
+  const pointerCollisions = pointerWithin(args);
+
+  // Collision detection algorithms return an array of collisions
+  if (pointerCollisions.length > 0) {
+    return pointerCollisions;
+  }
+
+  // If there are no collisions with the pointer, return rectangle intersections
+  return rectIntersection(args);
+}

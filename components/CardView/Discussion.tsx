@@ -29,7 +29,7 @@ export const Discussion = (props: { close: () => void; entityID: string }) => {
           </div>
         </button>
 
-        <Thought entityID={props.entityID} open={() => { }} />
+        <Thought entityID={props.entityID} open={() => {}} />
       </div>
       <Messages entityID={props.entityID} />
       <MessageInput entityID={props.entityID} />
@@ -72,8 +72,9 @@ const MessageInput = (props: { entityID: string }) => {
         placeholder="add your response..."
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
-        className={`${focused || value ? "test-bg-pink h-32" : "h-10"
-          } w-full resize-none overflow-hidden border-grey-80`}
+        className={`${
+          focused || value ? "test-bg-pink h-32" : "h-10"
+        } w-full resize-none overflow-hidden border-grey-80`}
         id="thoughtInput"
       ></textarea>
       {!focused && !value ? null : (
@@ -93,7 +94,7 @@ const Messages = (props: { entityID: string }) => {
       style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
     >
       {messages.map((m) => (
-        <Reply author={m.sender} date={m.ts} content={m.content} />
+        <Reply author={m.sender} date={m.ts} content={m.content} key={m.id} />
       ))}
     </div>
   );
@@ -107,10 +108,10 @@ export const Thought = (props: { entityID: string; open: () => void }) => {
 
   let time = createdAt
     ? new Date(createdAt?.value.value).toLocaleDateString(undefined, {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    })
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      })
     : "";
   return (
     <button

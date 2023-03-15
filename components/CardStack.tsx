@@ -114,6 +114,7 @@ const create = async (
   }
 
   await mutate("addCardToSection", {
+    factID: ulid(),
     cardEntity: entity,
     parent: props.parent,
     section: props.attribute,

@@ -178,6 +178,7 @@ const Discussions = (props: {
     <>
       {discussions.map((f) => (
         <Thought
+          key={f.id}
           entityID={f.value.value}
           open={() => props.open(f.value.value)}
         />

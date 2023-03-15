@@ -4,24 +4,13 @@ import {
   useIndex,
   useMutations,
 } from "hooks/useReplicache";
-import {
-  DndContext,
-  MouseSensor,
-  TouchSensor,
-  useDraggable,
-  useDroppable,
-  useSensor,
-  useSensors,
-} from "@dnd-kit/core";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import { CardPreview } from "./CardPreview";
-import { customCollisionDetection } from "src/customCollisionDetection";
-import { restrictToParentElement } from "@dnd-kit/modifiers";
 import { ulid } from "src/ulid";
 import { FindOrCreate, useAllItems } from "./FindOrCreateEntity";
 import { useSubscribe } from "replicache-react";
-import { ActionBar } from "./ActionBar";
 import { useCardViewer } from "./CardViewerContext";
+import { useDraggableCard, useDroppableZone } from "./DragContext";
 
 const GRID_SIZE = 16;
 const snap = (x: number) => Math.ceil(x / GRID_SIZE) * GRID_SIZE;
@@ -29,105 +18,67 @@ const snap = (x: number) => Math.ceil(x / GRID_SIZE) * GRID_SIZE;
 export const Desktop = (props: { entityID: string }) => {
   let cards = useIndex.eav(props.entityID, "desktop/contains");
   let height = useHeight(props.entityID) + 500;
-  const mouseSensor = useSensor(MouseSensor, {
-    activationConstraint: { distance: 16 },
-  });
-  const touchSensor = useSensor(TouchSensor, {
-    activationConstraint: { distance: 16 },
-  });
-  const sensors = useSensors(mouseSensor, touchSensor);
   let { mutate, action, authorized } = useMutations();
+  let rep = useContext(ReplicacheContext);
+  let [draggingHeight, setDraggingHeight] = useState(0);
   let [createCard, setCreateCard] = useState<null | { x: number; y: number }>(
     null
   );
-  let [draggingHeight, setDraggingHeight] = useState(0);
-  let [selection, setSelection] = useState<string[]>([]);
-  let [selectionDragTransform, setSelectionDragTransform] =
-    useState<string>("");
-
-  useEffect(() => {
-    let handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setSelection([]);
+  let { setNodeRef, rect: droppableRect } = useDroppableZone({
+    type: "dropzone",
+    id: props.entityID,
+    entityID: props.entityID,
+    onDragMove: (_data, rect) => {
+      if (!rect || !droppableRect.current) return;
+      let newHeight = rect.top - droppableRect.current.top;
+      if (newHeight > height)
+        setDraggingHeight((oldValue) => {
+          let newValue = newHeight + 200;
+          return newValue > oldValue ? newValue : oldValue;
+        });
+    },
+    onDragEnd: async (data, rect) => {
+      if (!rect || !droppableRect.current || !rep || data.type !== "card")
+        return;
+      let newPosition = {
+        y: snap(rect.top - droppableRect.current?.top),
+        x: snap(rect.left - droppableRect.current.left),
+      };
+      if (data.parent !== props.entityID) {
+        await mutate("retractFact", { id: data.id });
+        await mutate("addCardToDesktop", {
+          factID: ulid(),
+          entity: data.entityID,
+          desktop: props.entityID,
+          position: {
+            ...newPosition,
+            rotation: 0,
+            size:
+              data.size === "small"
+                ? "small"
+                : data.hideContent
+                ? "small"
+                : "big",
+          },
+        });
+      } else {
+        let position = await rep.rep.query((tx) => {
+          return scanIndex(tx).eav(data.id, "card/position-in");
+        });
+        if (!position) return;
+        await mutate("updatePositionInDesktop", {
+          factID: data.id,
+          parent: props.entityID,
+          dx: newPosition.x - position?.value.x,
+          dy: newPosition.y - position.value.y,
+          da: 0,
+        });
       }
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, []);
+    },
+  });
 
   return (
-    <DndContext
-      autoScroll={false}
-      sensors={sensors}
-      modifiers={[
-        (args) => {
-          let { transform } = args;
-          return {
-            ...transform,
-            x: snap(transform.x),
-            y: snap(transform.y),
-          };
-        },
-        restrictToParentElement,
-      ]}
-      collisionDetection={customCollisionDetection}
-      onDragMove={({ delta, active }) => {
-        let transform = `translate3d(${delta.x}px, ${delta.y}px, 0px)`;
-        setSelectionDragTransform(transform);
-
-        if (selection.length > 0 && !selection.includes(active.id as string)) {
-          setSelection((oldValue) => {
-            return [...oldValue, active.id as string];
-          });
-        }
-
-        let position: { y: number } = active.data.current?.position;
-        if (!position) return;
-        let h = height;
-        if (position.y + delta.y + 200 > h)
-          setDraggingHeight((oldValue) => {
-            let newValue = position.y + delta.y + 200;
-            return newValue > oldValue ? newValue : oldValue;
-          });
-      }}
-      onDragEnd={async (dragProps) => {
-        let { active, delta, over } = dragProps;
-
-        setSelectionDragTransform("");
-
-        action.start();
-
-        setDraggingHeight(0);
-
-        let elementsToUpdate = selection.length > 0 ? selection : [active.id];
-
-        for (let id of elementsToUpdate) {
-          if (over && !selection.includes(over.id as string)) {
-            let entityID = cards?.find((f) => f.id == id)?.value.value;
-
-            if (entityID) {
-              await mutate("addToOrCreateDeck", {
-                droppedCardPositionFact: id as string,
-                droppedCardEntity: entityID,
-                targetCardEntity: over.data.current?.entityID,
-                desktop: props.entityID,
-                factID: ulid(),
-              });
-            }
-          } else {
-            await mutate("updatePositionInDesktop", {
-              factID: id as string,
-              parent: props.entityID,
-              dx: delta.x,
-              dy: delta.y,
-              da: 0,
-            });
-          }
-        }
-
-        action.end();
-      }}
-    >
+    <>
       <AddCard
         position={createCard}
         onClose={() => setCreateCard(null)}
@@ -135,11 +86,11 @@ export const Desktop = (props: { entityID: string }) => {
       />
       {/* Handles Double CLick to Create */}
       <div
+        ref={setNodeRef}
         onClick={(e) => {
           if (!authorized) return;
           if (e.currentTarget !== e.target) return;
           let parentRect = e.currentTarget.getBoundingClientRect();
-          setSelection([]);
           if (e.ctrlKey || e.metaKey) {
             action.start();
             mutate("addCardToDesktop", {
@@ -174,19 +125,11 @@ export const Desktop = (props: { entityID: string }) => {
             relationshipID={card.id}
             entityID={card.value.value}
             parent={props.entityID}
-            setSelection={setSelection}
-            isSelected={selection.includes(card.id)}
-            selectionMode={selection.length > 0}
-            dragTransform={
-              selection.includes(card.id) ? selectionDragTransform : ""
-            }
           />
         ))}
       </div>
       {/* <HelpToast helpText={`double click/tap to create new`} /> */}
-
-      <ActionBar selection={selection} setSelection={setSelection} />
-    </DndContext>
+    </>
   );
 };
 
@@ -212,118 +155,86 @@ const DraggableCard = (props: {
   entityID: string;
   parent: string;
   relationshipID: string;
-  isSelected: boolean;
-  selectionMode: boolean;
-  dragTransform: string;
-  setSelection: React.Dispatch<React.SetStateAction<string[]>>;
 }) => {
   let position = useIndex.eav(props.relationshipID, "card/position-in");
   let { mutate } = useMutations();
-  const { attributes, listeners, setNodeRef, transform, isDragging } =
-    useDraggable({
-      id: props.relationshipID,
-      data: { entityID: props.entityID, position: position?.value },
-    });
-  let { setNodeRef: draggableRef, isOver: _isOver } = useDroppable({
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggableCard({
     id: props.relationshipID,
-    disabled: isDragging,
-    data: { entityID: props.entityID },
+    entityID: props.entityID,
+    parent: props.parent,
+    type: "card",
+    size: position?.value.size || "small",
+    hideContent: false,
   });
-  let isOver = _isOver && !props.isSelected;
-  let refs = useCombinedRefs(setNodeRef, draggableRef);
+  let refs = useCombinedRefs(setNodeRef);
   let { close } = useCardViewer();
-
-  const style =
-    transform && (Math.abs(transform.x) > 0 || Math.abs(transform.y) > 0)
-      ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
-      : "";
-
-  let dragTransform = props.dragTransform || style;
-  let hasMoved = dragTransform != "";
-
-  let toggleSelection = () => {
-    props.setSelection?.((oldValue: string[]) => {
-      if (oldValue.includes(props.relationshipID)) {
-        return oldValue.filter((id) => id !== props.relationshipID);
-      } else {
-        return [...oldValue, props.relationshipID];
-      }
-    });
-  };
-
-  let pointerUpHandler = (e: React.PointerEvent) => {
-    if (!hasMoved && props.selectionMode && e.button === 0) toggleSelection();
-  };
 
   let y = position?.value.y || 0;
   let x = position?.value.x || 0;
   return (
     <>
       {/* This handles the canvas position and card size*/}
-      <div
-        style={{
-          zIndex: isDragging
-            ? 100000
-            : Math.floor(y / 10) * 100 + Math.floor(x / 10),
-          transform: dragTransform,
-          top: snap(y) + "px",
-          left: snap(x) + "px",
-          width: position?.value.size === "big" ? "288px" : "fit-content",
-        }}
-        ref={refs}
-        className="absolute touch-none"
-      >
-        {/* This handles the rotation */}
+      {!isDragging && (
         <div
-          className={`${isOver ? "scale-105" : ""}`}
           style={{
-            transform: `rotate(${
-              !position
-                ? 0
-                : (
-                    Math.floor(position.value.rotation / (Math.PI / 24)) *
-                    (Math.PI / 24)
-                  ).toFixed(2)
-            }rad) ${isOver ? "scale(1.05)" : ""}`,
+            zIndex: isDragging
+              ? 100000
+              : Math.floor(y / 10) * 100 + Math.floor(x / 10),
+            top: snap(y) + "px",
+            left: snap(x) + "px",
+            width: position?.value.size === "big" ? "288px" : "fit-content",
           }}
+          ref={refs}
+          className="absolute touch-none"
         >
-          {/* This is the actual card and its buttons. It also handles size */}
-          <CardPreview
-            outerControls
-            factID={props.relationshipID}
-            onRotateDrag={(da) => {
-              mutate("updatePositionInDesktop", {
-                factID: props.relationshipID,
-                parent: props.parent,
-                dx: 0,
-                dy: 0,
-                da,
-              });
+          {/* This handles the rotation */}
+          <div
+            className={``}
+            style={{
+              transform: `rotate(${
+                !position
+                  ? 0
+                  : (
+                      Math.floor(position.value.rotation / (Math.PI / 24)) *
+                      (Math.PI / 24)
+                    ).toFixed(2)
+              }rad)`,
             }}
-            onDelete={() => {
-              mutate("retractFact", { id: props.relationshipID });
-              close({ entityID: props.entityID });
-            }}
-            dragHandleProps={{ listeners, attributes }}
-            size={position?.value.size || "small"}
-            onResize={async (size) => {
-              return await mutate("updatePositionInDesktop", {
-                factID: props.relationshipID,
-                size: size,
-                parent: props.parent,
-                dx: 0,
-                dy: 0,
-                da: 0,
-              });
-            }}
-            isOver={isOver}
-            isDragging={hasMoved}
-            onLongPress={toggleSelection}
-            pointerUpHandler={pointerUpHandler}
-            {...props}
-          />
+          >
+            {/* This is the actual card and its buttons. It also handles size */}
+            <CardPreview
+              outerControls
+              factID={props.relationshipID}
+              onRotateDrag={(da) => {
+                mutate("updatePositionInDesktop", {
+                  factID: props.relationshipID,
+                  parent: props.parent,
+                  dx: 0,
+                  dy: 0,
+                  da,
+                });
+              }}
+              onDelete={() => {
+                mutate("retractFact", { id: props.relationshipID });
+                close({ entityID: props.entityID });
+              }}
+              dragHandleProps={{ listeners, attributes }}
+              size={position?.value.size || "small"}
+              onResize={async (size) => {
+                return await mutate("updatePositionInDesktop", {
+                  factID: props.relationshipID,
+                  size: size,
+                  parent: props.parent,
+                  dx: 0,
+                  dy: 0,
+                  da: 0,
+                });
+              }}
+              {...props}
+            />
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 };

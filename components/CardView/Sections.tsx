@@ -29,7 +29,6 @@ export const SingleTextSection = (
     <Textarea
       focused={props.focused}
       previewOnly={props.previewOnly || !authorized}
-      autoFocus={props.new}
       placeholderOnHover={props.placeholderOnHover}
       placeholder={authorized ? props.placeholder || "write something..." : ""}
       className={`w-full bg-inherit ${props.className || ""}`}

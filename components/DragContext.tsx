@@ -1,24 +1,18 @@
 import {
-  Active,
-  closestCorners,
+  ClientRect,
   DndContext,
   DragOverlay,
   MouseSensor,
   TouchSensor,
+  useDraggable,
+  useDroppable,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import {
-  ReplicacheContext,
-  scanIndex,
-  useMutations,
-} from "hooks/useReplicache";
-import { useContext, useState } from "react";
-import { sortByPosition, updatePositions } from "src/position_helpers";
-import { StackData } from "./CardStack";
-import { createPortal } from "react-dom";
-import { useSortable } from "@dnd-kit/sortable";
+import { useRef, useState } from "react";
 import { CardPreview } from "./CardPreview";
+import { RoomListPreview } from "./SpaceLayout/Sidebar/SharedRoomList";
+import { pointerWithinOrRectIntersection } from "src/customCollisionDetection";
 
 export const SmallCardDragContext = (props: {
   children: React.ReactNode;
@@ -27,7 +21,7 @@ export const SmallCardDragContext = (props: {
     | { distance: number };
   noDeleteZone?: boolean;
 }) => {
-  let [activeCard, setActiveCard] = useState<Active | null>(null);
+  let [active, setActiveCard] = useState<DraggableData | null>(null);
   const mouseSensor = useSensor(MouseSensor, {
     activationConstraint: props.activationConstraints,
   });
@@ -36,80 +30,116 @@ export const SmallCardDragContext = (props: {
   });
   const sensors = useSensors(mouseSensor, touchSensor);
 
-  let { mutate } = useMutations();
-  let rep = useContext(ReplicacheContext);
+  let previouslyOver = useRef<DroppableData | null>(null);
   return (
     <DndContext
-      collisionDetection={closestCorners}
+      collisionDetection={pointerWithinOrRectIntersection}
       sensors={sensors}
       onDragStart={({ active }) => {
-        setActiveCard(active);
+        let activeData = active?.data.current as DraggableData;
+        setActiveCard(activeData);
       }}
-      onDragOver={({}) => {}}
-      onDragEnd={async (data) => {
-        let { over, active } = data;
+      onDragOver={({ over }) => {
+        let overData = (over?.data.current as DroppableData) || null;
+        if (
+          active &&
+          previouslyOver.current &&
+          previouslyOver.current.id !== overData?.id
+        ) {
+          previouslyOver.current.onDragExit?.(active);
+        }
+        if (active && overData) overData.onDragEnter?.(active);
+        previouslyOver.current = overData;
+      }}
+      onDragCancel={({ active }) => {
+        let activeData = active?.data.current as DraggableData;
+        if (previouslyOver.current)
+          previouslyOver.current.onDragExit?.(activeData);
+      }}
+      onDragEnd={async ({ over, active: activeData }) => {
+        let overData = over?.data.current as DroppableData;
+        if (active)
+          overData?.onDragEnd?.(active, activeData.rect.current.translated);
         setActiveCard(null);
-        if (!over || !rep?.rep) return;
-        if (!active.data.current) return;
-        let overData = over.data.current as Data;
-        let activeData = active.data.current as Data;
-        if (over.id === "delete") {
-          mutate("retractFact", { id: activeData.factID });
-          return;
-        }
-        let siblings;
-        if (!overData.parent) {
-          siblings = (
-            await rep.rep.query((tx) => {
-              return scanIndex(tx).aev(overData.attribute);
-            })
-          ).sort(sortByPosition(overData.positionKey));
-        } else {
-          siblings = (
-            await rep.rep.query((tx) => {
-              return scanIndex(tx).eav(overData.parent, overData.attribute);
-            })
-          ).sort(sortByPosition(overData.positionKey));
-        }
-        let currentIndex = siblings.findIndex((f) =>
-          !overData.parent
-            ? f.entity === activeData.entityID
-            : f.value.value === activeData.entityID
-        );
-        let newIndex = siblings.findIndex((f) =>
-          !overData.parent
-            ? f.entity === overData.entityID
-            : f.value.value === overData.entityID
-        );
-        let newPositions = updatePositions(overData.positionKey, siblings, [
-          [
-            siblings[currentIndex].id,
-            currentIndex < newIndex ? newIndex : newIndex - 1,
-          ],
-        ]);
-        mutate("updatePositions", {
-          positionKey: overData.positionKey,
-          newPositions,
-        });
+      }}
+      onDragMove={async ({ over, active: activeData }) => {
+        let overData = over?.data.current as DroppableData;
+        if (active)
+          overData?.onDragMove?.(active, activeData.rect.current.translated);
       }}
     >
       {props.children}
-      <DragOverlayCard entityID={activeCard?.data.current?.entityID} />
+
+      <DragOverlay dropAnimation={null}>
+        {active?.entityID ? (
+          <div className="relative">
+            {active.type === "card" ? (
+              <CardPreview
+                entityID={active.entityID}
+                size={active.size}
+                hideContent={active.hideContent}
+              />
+            ) : (
+              <RoomListPreview entityID={active.entityID} />
+            )}
+          </div>
+        ) : null}
+      </DragOverlay>
     </DndContext>
   );
 };
 
-const DragOverlayCard = (props: { entityID?: string }) => {
-  return (
-    <DragOverlay dropAnimation={null}>
-      {props.entityID ? <div className="relative top-2"></div> : null}
-    </DragOverlay>
-  );
+export type DraggableData = {
+  id: string;
+  entityID: string;
+} & (
+  | {
+      type: "card";
+      parent: string;
+      hideContent: boolean;
+      size: "big" | "small";
+    }
+  | { type: "room" }
+);
+
+export type DroppableData = {
+  id: string;
+  entityID: string;
+  type: "card" | "room" | "dropzone";
+  onDragEnter?: (data: DraggableData) => void;
+  onDragExit?: (data: DraggableData) => void;
+  onDragEnd?: (data: DraggableData, rect: ClientRect | null) => void;
+  onDragMove?: (data: DraggableData, rect: ClientRect | null) => void;
 };
 
-type Data = StackData & {
-  entityID: string;
-  factID: string;
+export const useDraggableCard = (data: DraggableData) => {
+  let draggable = useDraggable({ id: data.id, data });
+  let isOverSomethingElse =
+    draggable.isDragging &&
+    draggable.over &&
+    draggable.over?.data.current?.entityID !== data.entityID;
+  return { ...draggable, isOverSomethingElse };
 };
-export const useSortableCard = (c: { id: string; data: Data }) =>
-  useSortable(c);
+
+export const useDroppableZone = (data: DroppableData) => {
+  let [over, setOver] = useState<DraggableData | null>(null);
+  let droppable = useDroppable({
+    id: data.id,
+    data: {
+      ...data,
+      onDragExit: (d: DraggableData) => {
+        data.onDragExit?.(d);
+        setOver(null);
+      },
+      onDragEnter: (d: DraggableData) => {
+        data.onDragEnter?.(d);
+        setOver(d);
+      },
+      onDragEnd: (d: DraggableData, rect: ClientRect | null) => {
+        data.onDragEnd?.(d, rect);
+        setOver(null);
+      },
+    },
+  });
+  return { ...droppable, over };
+};

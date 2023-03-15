@@ -1,4 +1,3 @@
-import { Popover } from "@headlessui/react";
 import { ButtonPrimary } from "components/Buttons";
 import { Modal, Divider } from "components/Layout";
 import { Fact } from "data/Facts";
