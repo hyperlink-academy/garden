@@ -467,6 +467,7 @@ export const useMutations = () => {
   // if (rep == null) throw "Cannot call useMutations() if not nested within a ReplicacheContext context"
 
   return {
+    rep: rep?.rep,
     authorized: !!auth,
     memberEntity: auth?.entity || null,
     mutate<T extends keyof typeof Mutations>(

@@ -9,7 +9,12 @@ import {
   Send,
 } from "components/Icons";
 import { Divider, MenuContainer, MenuItem } from "components/Layout";
-import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
+import {
+  scanIndex,
+  useIndex,
+  useMutations,
+  useSpaceID,
+} from "hooks/useReplicache";
 
 import {
   AttachedCardSection,
@@ -30,6 +35,9 @@ import { ulid } from "src/ulid";
 import { animated, useSpring } from "@react-spring/web";
 import { RenderedText } from "components/Textarea/RenderedText";
 import { ReactionList, Reactions } from "./Reactions";
+import { useDroppableZone } from "components/DragContext";
+import { sortByPosition } from "src/position_helpers";
+import { generateKeyBetween } from "src/fractional-indexing";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 const borderStyles = (args: { member: boolean }) => {
@@ -60,10 +68,41 @@ export const CardView = (props: {
   let memberName = useIndex.eav(props.entityID, "member/name");
   let { ref } = usePreserveScroll<HTMLDivElement>(props.entityID);
 
+  let { mutate, rep } = useMutations();
+  let { setNodeRef } = useDroppableZone({
+    id: props.referenceFactID + "-dropzone",
+    entityID: props.entityID,
+    type: "linkCard",
+    onDragEnd: async (data) => {
+      if (!rep) return;
+      mutate("retractFact", { id: data.id });
+
+      let siblings =
+        (await rep.query((tx) => {
+          return scanIndex(tx).eav(props.entityID, "deck/contains");
+        })) || [];
+
+      let firstPosition = siblings.sort(sortByPosition("eav"))[0]?.positions[
+        "eav"
+      ];
+      let position = generateKeyBetween(null, firstPosition || null);
+      await mutate("addCardToSection", {
+        factID: ulid(),
+        cardEntity: data.entityID,
+        parent: props.entityID,
+        section: "deck/contains",
+        positions: {
+          eav: position,
+        },
+      });
+    },
+  });
+
   return (
     <div className="flex h-full flex-col items-stretch">
       <Backlinks entityID={props.entityID} />
       <div
+        ref={setNodeRef}
         className={`
       card
       no-scrollbar

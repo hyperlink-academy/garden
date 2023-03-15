@@ -9,6 +9,7 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
+import { AddSmall } from "components/Icons";
 import { useRef, useState } from "react";
 import { CardPreview } from "./CardPreview";
 import { RoomListPreview } from "./SpaceLayout/Sidebar/SharedRoomList";
@@ -22,6 +23,7 @@ export const SmallCardDragContext = (props: {
   noDeleteZone?: boolean;
 }) => {
   let [active, setActiveCard] = useState<DraggableData | null>(null);
+  let [over, setOver] = useState<DroppableData | null>(null);
   const mouseSensor = useSensor(MouseSensor, {
     activationConstraint: props.activationConstraints,
   });
@@ -49,6 +51,7 @@ export const SmallCardDragContext = (props: {
           previouslyOver.current.onDragExit?.(active);
         }
         if (active && overData) overData.onDragEnter?.(active);
+        setOver(overData);
         previouslyOver.current = overData;
       }}
       onDragCancel={({ active }) => {
@@ -61,6 +64,7 @@ export const SmallCardDragContext = (props: {
         if (active)
           overData?.onDragEnd?.(active, activeData.rect.current.translated);
         setActiveCard(null);
+        setOver(null);
       }}
       onDragMove={async ({ over, active: activeData }) => {
         let overData = over?.data.current as DroppableData;
@@ -74,11 +78,18 @@ export const SmallCardDragContext = (props: {
         {active?.entityID ? (
           <div className="relative">
             {active.type === "card" ? (
-              <CardPreview
-                entityID={active.entityID}
-                size={active.size}
-                hideContent={active.hideContent}
-              />
+              <>
+                <CardPreview
+                  entityID={active.entityID}
+                  size={active.size}
+                  hideContent={active.hideContent}
+                />
+                {over?.type === "linkCard" && (
+                  <span className="absolute -top-2 -left-2 text-accent-blue">
+                    <AddSmall />
+                  </span>
+                )}
+              </>
             ) : (
               <RoomListPreview entityID={active.entityID} />
             )}
@@ -105,7 +116,7 @@ export type DraggableData = {
 export type DroppableData = {
   id: string;
   entityID: string;
-  type: "card" | "room" | "dropzone";
+  type: "card" | "room" | "dropzone" | "linkCard";
   onDragEnter?: (data: DraggableData) => void;
   onDragExit?: (data: DraggableData) => void;
   onDragEnd?: (data: DraggableData, rect: ClientRect | null) => void;

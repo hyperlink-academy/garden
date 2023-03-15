@@ -11,6 +11,8 @@ import { FindOrCreate, useAllItems } from "./FindOrCreateEntity";
 import { useSubscribe } from "replicache-react";
 import { useCardViewer } from "./CardViewerContext";
 import { useDraggableCard, useDroppableZone } from "./DragContext";
+import { sortByPosition } from "src/position_helpers";
+import { generateKeyBetween } from "src/fractional-indexing";
 
 const GRID_SIZE = 16;
 const snap = (x: number) => Math.ceil(x / GRID_SIZE) * GRID_SIZE;
@@ -157,7 +159,7 @@ const DraggableCard = (props: {
   relationshipID: string;
 }) => {
   let position = useIndex.eav(props.relationshipID, "card/position-in");
-  let { mutate } = useMutations();
+  let { mutate, rep } = useMutations();
   const { attributes, listeners, setNodeRef, isDragging } = useDraggableCard({
     id: props.relationshipID,
     entityID: props.entityID,
@@ -166,7 +168,36 @@ const DraggableCard = (props: {
     size: position?.value.size || "small",
     hideContent: false,
   });
-  let refs = useCombinedRefs(setNodeRef);
+
+  let { setNodeRef: setNodeRef2 } = useDroppableZone({
+    id: props.relationshipID,
+    entityID: props.entityID,
+    type: "linkCard",
+    onDragEnd: async (data) => {
+      if (!rep) return;
+      mutate("retractFact", { id: data.id });
+
+      let siblings =
+        (await rep.query((tx) => {
+          return scanIndex(tx).eav(props.entityID, "deck/contains");
+        })) || [];
+
+      let firstPosition = siblings.sort(sortByPosition("eav"))[0]?.positions[
+        "eav"
+      ];
+      let position = generateKeyBetween(null, firstPosition || null);
+      await mutate("addCardToSection", {
+        factID: ulid(),
+        cardEntity: data.entityID,
+        parent: props.entityID,
+        section: "deck/contains",
+        positions: {
+          eav: position,
+        },
+      });
+    },
+  });
+  let refs = useCombinedRefs(setNodeRef, setNodeRef2);
   let { close } = useCardViewer();
 
   let y = position?.value.y || 0;
