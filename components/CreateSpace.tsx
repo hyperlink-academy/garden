@@ -90,7 +90,7 @@ export const EditSpaceModal = (props: {
   let spaceID = useIndex.eav(props.spaceEntity, "space/id");
   let community = useIndex.eav(props.spaceEntity, "space/community");
 
-  let name = useIndex.eav(props.spaceEntity, "space/name");
+  let name = useIndex.eav(props.spaceEntity, "space/display_name");
   let description = useIndex.eav(props.spaceEntity, "space/description");
   let start_date = useIndex.eav(props.spaceEntity, "space/start-date");
   let end_date = useIndex.eav(props.spaceEntity, "space/end-date");
@@ -135,11 +135,7 @@ export const EditSpaceModal = (props: {
     <Modal open={props.open} onClose={props.onClose}>
       {mode === "normal" ? (
         <>
-          <CreateSpaceForm
-            disableName
-            formState={formState}
-            setFormState={setFormState}
-          />
+          <CreateSpaceForm formState={formState} setFormState={setFormState} />
 
           <div className="flex gap-4 place-self-end">
             <ButtonPrimary
@@ -194,7 +190,7 @@ const DeleteSpaceForm = (props: {
   let [state, setState] = useState({ spaceName: "" });
   let [status, setStatus] = useState<"normal" | "loading">("normal");
   let { session } = useAuth();
-  let name = useIndex.eav(props.spaceEntity, "space/name");
+  let name = useIndex.eav(props.spaceEntity, "space/display_name");
   let spaceID = useIndex.eav(props.spaceEntity, "space/id");
   return (
     <>

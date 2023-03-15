@@ -1,8 +1,6 @@
 import { useIndex } from "hooks/useReplicache";
 import Link from "next/link";
-import { useRef } from "react";
 import { DoorImage } from "./Doors";
-import { prefetchSpaceId } from "./ReplicacheProvider";
 import { spacePath } from "hooks/utils";
 import { Fact } from "data/Facts";
 import useWindowDimensions from "hooks/useWindowDimensions";
@@ -22,7 +20,8 @@ export const CalendarList = (props: {
 const CalendarSpace = (props: { entity: string }) => {
   let studio = useIndex.eav(props.entity, "space/studio");
 
-  let name = useIndex.eav(props.entity, "space/display_name");
+  let display_name = useIndex.eav(props.entity, "space/display_name");
+  let name = useIndex.eav(props.entity, "space/name");
   let description = useIndex.eav(props.entity, "space/description");
   let start_date = useIndex.eav(props.entity, "space/start-date");
   let end_date = useIndex.eav(props.entity, "space/end-date");
@@ -48,7 +47,7 @@ const CalendarSpace = (props: { entity: string }) => {
                 }}
                 className="text-xl"
               >
-                {name?.value}
+                {display_name?.value}
               </h3>
             </Link>
           </div>

@@ -36,7 +36,8 @@ export const SpaceList = (props: {
 const Space = (props: { entity: string }) => {
   let { session } = useAuth();
   let studio = useIndex.eav(props.entity, "space/studio");
-  let name = useIndex.eav(props.entity, "space/display_name");
+  let display_name = useIndex.eav(props.entity, "space/display_name");
+  let name = useIndex.eav(props.entity, "space/name");
   let description = useIndex.eav(props.entity, "space/description");
   let unreads = useIndex.eav(props.entity, "space/unread-notifications");
 
@@ -85,7 +86,7 @@ const Space = (props: { entity: string }) => {
           ) : (
             <SpaceInfo
               studio={studio?.value}
-              name={name?.value}
+              name={display_name?.value}
               description={description?.value}
             />
           )}
@@ -101,7 +102,7 @@ const Space = (props: { entity: string }) => {
               }}
               className="text-xl"
             >
-              {name?.value}
+              {display_name?.value}
             </h3>
             {start_date?.value.value ? (
               <div className="text-sm text-grey-35">
