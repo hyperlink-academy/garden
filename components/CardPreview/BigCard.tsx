@@ -49,16 +49,14 @@ export const BigCardBody = (props: { entityID: string } & Props) => {
         wordBreak: "break-word",
         background: props.hideContent && imageUrl ? `url(${imageUrl})` : "",
       }} //no tailwind equiv - need for long titles to wrap
+      onClick={() => {
+        let cardView = document.getElementById("cardViewerWrapper");
+        open({ entityID: props.entityID });
+        cardView ? cardView.scrollIntoView({ behavior: "smooth" }) : null;
+      }}
     >
       {/* Big Card Preview Content Wrapper */}
-      <div
-        className="cardPreview flex w-full flex-col hover:cursor-pointer"
-        onClick={() => {
-          let cardView = document.getElementById("cardViewerWrapper");
-          open({ entityID: props.entityID });
-          cardView ? cardView.scrollIntoView({ behavior: "smooth" }) : null;
-        }}
-      >
+      <div className="cardPreview flex w-full flex-col hover:cursor-pointer">
         {/* Big Card Preview Title and GoTo Button*/}
         <div
           className={`cardPreviewHeader items-top flex justify-between gap-2`}
