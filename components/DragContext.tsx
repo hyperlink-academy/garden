@@ -12,14 +12,14 @@ import {
 import { AddSmall } from "components/Icons";
 import { useRef, useState } from "react";
 import { CardPreview } from "./CardPreview";
-import { RoomListPreview } from "./SpaceLayout/Sidebar/SharedRoomList";
 import { pointerWithinOrRectIntersection } from "src/customCollisionDetection";
+import { RoomListPreview } from "./SpaceLayout/Sidebar/RoomListLayout";
 
 export const SmallCardDragContext = (props: {
   children: React.ReactNode;
   activationConstraints?:
-    | { delay: number; tolerance: number }
-    | { distance: number };
+  | { delay: number; tolerance: number }
+  | { distance: number };
   noDeleteZone?: boolean;
 }) => {
   let [active, setActiveCard] = useState<DraggableData | null>(null);
@@ -103,15 +103,16 @@ export const SmallCardDragContext = (props: {
 export type DraggableData = {
   id: string;
   entityID: string;
+  disabled?: boolean;
 } & (
-  | {
+    | {
       type: "card";
       parent: string;
       hideContent: boolean;
       size: "big" | "small";
     }
-  | { type: "room" }
-);
+    | { type: "room" }
+  );
 
 export type DroppableData = {
   id: string;
@@ -124,7 +125,7 @@ export type DroppableData = {
 };
 
 export const useDraggableCard = (data: DraggableData) => {
-  let draggable = useDraggable({ id: data.id, data });
+  let draggable = useDraggable({ id: data.id, data, disabled: data.disabled });
   let isOverSomethingElse =
     draggable.isDragging &&
     draggable.over &&

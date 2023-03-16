@@ -18,6 +18,9 @@ import {
 } from "hooks/useReplicache";
 import { useState, useEffect, useContext } from "react";
 import { useSubscribe } from "replicache-react";
+import { useDraggableCard, useDroppableZone } from "components/DragContext";
+import { sortByPosition, updatePositions } from "src/position_helpers";
+import { useCombinedRefs } from "components/Desktop";
 
 export const RoomListLabel = (props: { label: string }) => {
   return <div className="px-2 pb-1 font-bold text-grey-35">{props.label}</div>;
@@ -146,11 +149,10 @@ export const RoomListItem = (props: {
 
   return (
     <div
-      className={`relative select-none rounded-md border border-transparent ${
-        props.roomEntity === props.currentRoom
-          ? "rounded-md bg-accent-blue font-bold text-white"
-          : " text-grey-35 hover:border-grey-80"
-      }`}
+      className={`relative select-none rounded-md border border-transparent ${props.roomEntity === props.currentRoom
+        ? "rounded-md bg-accent-blue font-bold text-white"
+        : " text-grey-35 hover:border-grey-80"
+        }`}
     >
       {/* buttom = name + either edit button OR room type icon */}
       <button
@@ -164,8 +166,8 @@ export const RoomListItem = (props: {
         }
       >
         {props.roomEntity === props.currentRoom &&
-        authorized &&
-        props.setRoomEditOpen ? (
+          authorized &&
+          props.setRoomEditOpen ? (
           // edit options - only if auth-ed AND on current room
           <div className=" roomListItemSettings flex w-5 shrink-0 place-content-center pt-0.5">
             <button
@@ -179,11 +181,10 @@ export const RoomListItem = (props: {
           // when not on room, show room type icon
           <div
             className={` roomListItemIcon mt-[2px] h-5 w-5 shrink-0 pt-[1px] pl-[2px]
-             ${
-               props.roomEntity === props.currentRoom
-                 ? "text-white"
-                 : "text-grey-55"
-             }`}
+             ${props.roomEntity === props.currentRoom
+                ? "text-white"
+                : "text-grey-55"
+              }`}
           >
             {props.roomEntity === memberEntity || isMember ? (
               <RoomMember />
@@ -204,5 +205,95 @@ export const RoomListItem = (props: {
         )}
       </button>
     </div>
+  );
+};
+
+export const DraggableRoomListItem = (props: {
+  draggable: boolean;
+  entityID: string;
+  factID: string;
+  children: React.ReactNode
+  onRoomChange: (room: string) => void;
+  currentRoom: string | null;
+  setRoomEditOpen: () => void;
+}) => {
+  let rep = useContext(ReplicacheContext);
+  const { attributes, listeners, setNodeRef, isOverSomethingElse } =
+    useDraggableCard({
+      disabled: !props.draggable,
+      type: "room",
+      entityID: props.entityID,
+      id: props.factID,
+    });
+
+  let { mutate } = useMutations();
+  let { setNodeRef: droppableRef, over } = useDroppableZone({
+    type: "room",
+    entityID: props.entityID,
+    id: props.factID,
+    onDragEnd: async (data) => {
+      if (!rep) return;
+      if (data.type !== "room") return;
+      let siblings = (
+        await rep.rep.query((tx) => {
+          return scanIndex(tx).aev("room/name");
+        })
+      ).sort(sortByPosition("roomList"));
+      let currentIndex = siblings.findIndex((f) => f.entity === data.entityID);
+      let newIndex = siblings.findIndex((f) => f.entity === props.entityID);
+      let newPositions = updatePositions("roomList", siblings, [
+        [siblings[currentIndex].id, newIndex - 1],
+      ]);
+      mutate("updatePositions", {
+        positionKey: "roomList",
+        newPositions,
+      });
+    },
+  });
+  useEffect(() => {
+    if (over?.type === "room" || !over) return;
+    let timeout = window.setTimeout(() => {
+      props.onRoomChange(props.entityID);
+    }, 500);
+    return () => window.clearTimeout(timeout);
+  }, [over]);
+
+
+  let refs = useCombinedRefs(setNodeRef, droppableRef);
+
+  let obj =
+    { ...listeners, ...attributes };
+  return (
+    <div {...obj} ref={refs} className={``}>
+      {over && over.entityID !== props.entityID && over.type === "room" && (
+        <div className="opacity-60">
+          <RoomListPreview entityID={over.entityID} />
+        </div>
+      )}
+      {isOverSomethingElse ? null : (
+        <RoomListItem
+          onRoomChange={props.onRoomChange}
+          currentRoom={props.currentRoom}
+          roomEntity={props.entityID}
+          setRoomEditOpen={props.setRoomEditOpen}
+        >
+          {props.children}
+        </RoomListItem>
+      )}
+    </div>
+  );
+};
+
+
+export const RoomListPreview = (props: { entityID: string }) => {
+  let name = useIndex.eav(props.entityID, "room/name");
+  return (
+    <RoomListItem
+      roomEntity={props.entityID}
+      onRoomChange={() => { }}
+      currentRoom={null}
+    >
+      {name?.value}
+    </RoomListItem>
   );
 };

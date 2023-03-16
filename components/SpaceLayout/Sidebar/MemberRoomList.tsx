@@ -7,7 +7,7 @@ import { useSmoker } from "components/Smoke";
 import { useAuth } from "hooks/useAuth";
 import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
 import { useState } from "react";
-import { RoomListItem, RoomListLabel } from "./RoomListLayout";
+import { DraggableRoomListItem, RoomListItem, RoomListLabel } from "./RoomListLayout";
 import { AddTiny } from "components/Icons";
 
 export const MemberRoomList = (props: {
@@ -23,28 +23,32 @@ export const MemberRoomList = (props: {
       <RoomListLabel label="Members" />
       <ul className="sidebarMemberRoomList flex flex-col gap-0.5">
         {!memberEntity ? null : (
-          <RoomListItem
+          <DraggableRoomListItem
+            draggable={false}
+            factID={members.find(m => m.entity === memberEntity)?.id as string}
             onRoomChange={props.onRoomChange}
             currentRoom={props.currentRoom}
-            roomEntity={memberEntity}
+            entityID={memberEntity}
             setRoomEditOpen={() => props.setRoomEditOpen}
           >
             <div className="font-bold">You</div>
-          </RoomListItem>
+          </DraggableRoomListItem>
         )}
         {members
           .filter((f) => f.entity !== memberEntity)
           .map((member) => {
             return (
-              <RoomListItem
+              <DraggableRoomListItem
+                factID={member.id}
+                draggable={false}
                 key={member.id}
                 onRoomChange={props.onRoomChange}
                 currentRoom={props.currentRoom}
-                roomEntity={member.entity}
+                entityID={member.entity}
                 setRoomEditOpen={props.setRoomEditOpen}
               >
                 {member?.value}
-              </RoomListItem>
+              </DraggableRoomListItem>
             );
           })}
         {!authorized ? null : (

@@ -9,16 +9,10 @@ import {
 } from "hooks/useReplicache";
 import { useContext, useEffect, useState } from "react";
 import { ulid } from "src/ulid";
-import { RoomListLabel, RoomListItem } from "./RoomListLayout";
+import { RoomListLabel, DraggableRoomListItem, RoomListPreview } from "./RoomListLayout";
 import { sortByPosition, updatePositions } from "src/position_helpers";
-import {
-  SortableContext,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { useLongPress } from "hooks/useLongPress";
-import { useDraggableCard, useDroppableZone } from "components/DragContext";
+import { useDroppableZone } from "components/DragContext";
 import { AddTiny } from "components/Icons";
-import { useCombinedRefs } from "components/Desktop";
 
 export const SharedRoomList = (props: {
   onRoomChange: (room: string) => void;
@@ -26,7 +20,6 @@ export const SharedRoomList = (props: {
   setRoomEditOpen: () => void;
 }) => {
   let rooms = useIndex.aev("room/name").sort(sortByPosition("roomList"));
-  let [mode, setMode] = useState<"normal" | "edit">("normal");
 
   useEffect(() => {
     let listener = (e: KeyboardEvent) => {
@@ -65,110 +58,18 @@ export const SharedRoomList = (props: {
             return (
               <DraggableRoomListItem
                 {...props}
-                mode={mode}
-                setEditMode={() => setMode("edit")}
+                draggable
                 key={room.id}
-                name={room.value}
                 entityID={room.entity}
                 factID={room.id}
-              />
+              >
+                {room.value || <i>Untitled Room</i>}
+              </DraggableRoomListItem>
             );
           })}
         <CreateRoom />
       </ul>
     </div>
-  );
-};
-
-const DraggableRoomListItem = (props: {
-  mode: "normal" | "edit";
-  setEditMode: () => void;
-  entityID: string;
-  factID: string;
-  name: string;
-  onRoomChange: (room: string) => void;
-  currentRoom: string | null;
-  setRoomEditOpen: () => void;
-}) => {
-  let rep = useContext(ReplicacheContext);
-  const { attributes, listeners, setNodeRef, isOverSomethingElse } =
-    useDraggableCard({
-      type: "room",
-      entityID: props.entityID,
-      id: props.factID,
-    });
-
-  let { mutate } = useMutations();
-  let { setNodeRef: droppableRef, over } = useDroppableZone({
-    type: "room",
-    entityID: props.entityID,
-    id: props.factID,
-    onDragEnd: async (data) => {
-      if (!rep) return;
-      if (data.type !== "room") return;
-      let siblings = (
-        await rep.rep.query((tx) => {
-          return scanIndex(tx).aev("room/name");
-        })
-      ).sort(sortByPosition("roomList"));
-      let currentIndex = siblings.findIndex((f) => f.entity === data.entityID);
-      let newIndex = siblings.findIndex((f) => f.entity === props.entityID);
-      let newPositions = updatePositions("roomList", siblings, [
-        [siblings[currentIndex].id, newIndex - 1],
-      ]);
-      mutate("updatePositions", {
-        positionKey: "roomList",
-        newPositions,
-      });
-    },
-  });
-  useEffect(() => {
-    if (over?.type === "room" || !over) return;
-    let timeout = window.setTimeout(() => {
-      props.onRoomChange(props.entityID);
-    }, 500);
-    return () => window.clearTimeout(timeout);
-  }, [over]);
-
-  let { handlers } = useLongPress(() => {
-    props.setEditMode();
-  });
-
-  let refs = useCombinedRefs(setNodeRef, droppableRef);
-
-  let obj =
-    props.mode === "normal" ? handlers : { ...listeners, ...attributes };
-  return (
-    <div {...obj} ref={refs} className={``}>
-      {over && over.entityID !== props.entityID && over.type === "room" && (
-        <div className="opacity-60">
-          <RoomListPreview entityID={over.entityID} />
-        </div>
-      )}
-      {isOverSomethingElse ? null : (
-        <RoomListItem
-          onRoomChange={props.onRoomChange}
-          currentRoom={props.currentRoom}
-          roomEntity={props.entityID}
-          setRoomEditOpen={props.setRoomEditOpen}
-        >
-          {props.name || <i>Untitled Room</i>}
-        </RoomListItem>
-      )}
-    </div>
-  );
-};
-
-export const RoomListPreview = (props: { entityID: string }) => {
-  let name = useIndex.eav(props.entityID, "room/name");
-  return (
-    <RoomListItem
-      roomEntity={props.entityID}
-      onRoomChange={() => {}}
-      currentRoom={null}
-    >
-      {name?.value}
-    </RoomListItem>
   );
 };
 
@@ -271,9 +172,8 @@ const CreateRoom = () => {
                 <RadioGroup.Option value="canvas">
                   {({ checked }) => (
                     <div
-                      className={`${
-                        checked ? "bg-bg-blue" : ""
-                      } rounded-md border border-grey-15 p-4 hover:cursor-pointer`}
+                      className={`${checked ? "bg-bg-blue" : ""
+                        } rounded-md border border-grey-15 p-4 hover:cursor-pointer`}
                     >
                       Canvas
                     </div>
@@ -282,9 +182,8 @@ const CreateRoom = () => {
                 <RadioGroup.Option value="collection">
                   {({ checked }) => (
                     <div
-                      className={`${
-                        checked ? "bg-bg-blue" : ""
-                      } rounded-md border border-grey-15 p-4 hover:cursor-pointer`}
+                      className={`${checked ? "bg-bg-blue" : ""
+                        } rounded-md border border-grey-15 p-4 hover:cursor-pointer`}
                     >
                       Collection
                     </div>
