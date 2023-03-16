@@ -8,7 +8,7 @@ export const DoorImage = (props: {
   glow?: boolean;
 }) => {
   let uploadedDoor = useIndex.eav(props.entityID, "space/door/uploaded-image");
-  let spaceName = useIndex.eav(props.entityID, "space/name");
+  let spaceName = useIndex.eav(props.entityID, "space/display_name");
 
   let image = uploadedDoor?.value
     ? uploadedDoor.value.filetype === "image"
