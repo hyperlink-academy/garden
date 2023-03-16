@@ -55,12 +55,12 @@ const AddReaction = (props: { entityID: string; close: () => void }) => {
   let [newReaction, setNewReaction] = useState("");
   if (!authorized) return null;
   return (
-    <div className="flex flex-wrap gap-4 rounded-md border border-grey-80 py-1 px-2">
+    <div className="flex flex-wrap gap-x-4 gap-y-2 rounded-md border border-grey-80 py-1 px-2">
       {reactions
         .filter((f) => !!f.value) // strip empty strings
         .map((r) => (
           <button
-            className="text-xl"
+            className="font-bold"
             onClick={async () => {
               if (!memberEntity) return;
               mutate("addReaction", {
