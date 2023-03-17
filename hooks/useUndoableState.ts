@@ -3,7 +3,7 @@ import { useMutations } from "hooks/useReplicache";
 
 export function useUndoableState<S>(
   initialState: S | (() => S)
-): [S, React.Dispatch<React.SetStateAction<S>>] {
+): [S, React.Dispatch<React.SetStateAction<S>>, (state: S) => void] {
   let [state, dispatch] = useState(initialState);
   let ref = useRef(initialState);
   let { action } = useMutations();
@@ -34,5 +34,8 @@ export function useUndoableState<S>(
 
       ref.current = current;
     },
+    (newState) => {
+      dispatch(newState)
+    }
   ];
 }
