@@ -71,7 +71,9 @@ export class SpaceDurableObject implements DurableObject {
       if (pendingMigrations.length === 0) return;
       try {
         for (let i = 0; i < pendingMigrations.length; i++) {
-          await pendingMigrations[i].run(this.state.storage);
+          await pendingMigrations[i].run(this.state.storage, {
+            id: this.state.id.toString(),
+          });
         }
       } catch (e) {
         console.log("CONSTRUCTOR ERROR", e);
