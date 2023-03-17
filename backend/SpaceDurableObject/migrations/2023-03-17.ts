@@ -1,7 +1,7 @@
 import { store } from "../fact_store";
 
 export default {
-  date: "2023-03-15",
+  date: "2023-03-17",
   run: async function(storage: DurableObjectStorage) {
     // This migration changes all prompt rooms to just normal rooms with type
     let fact_store = store(storage, { id: "" });
