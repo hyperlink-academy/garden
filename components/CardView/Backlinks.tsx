@@ -15,7 +15,8 @@ export const Backlinks = (props: { entityID: string }) => {
   return (
     <div className="grid grid-cols-[auto_max-content] gap-0">
       <Disclosure>
-        {({ open }) => (
+        {({ open }) => (cards.length === 1 ? <div className="mb-3">
+          <CardPreview entityID={cards[0].entity} factID={cards[0].id} hideContent size="big" /> </div> :
           <div className="mb-3 rounded-md border border-grey-90 bg-bg-blue px-4 py-2">
             <Disclosure.Button className="flex w-full flex-row justify-between text-grey-55 outline-none">
               <h4 className="font-bold text-grey-55">
@@ -36,7 +37,6 @@ export const Backlinks = (props: { entityID: string }) => {
                           onDelete={() => {
                             mutate("retractFact", { id: c.id });
                           }}
-                          showRelated={true}
                           entityID={c.entity}
                           size={"big"}
                         />
