@@ -100,7 +100,7 @@ const CollectionList = (props: {
   return (
     <div
       ref={setNodeRef}
-      className="z-10 flex min-h-[calc(100vh-132px)] flex-col gap-y-2"
+      className="z-10 flex h-full flex-col gap-y-2"
     >
       {props.cards.length > 0 && (
         <AddAttachedCard
