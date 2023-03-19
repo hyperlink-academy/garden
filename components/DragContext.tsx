@@ -14,6 +14,7 @@ import { useRef, useState } from "react";
 import { CardPreview } from "./CardPreview";
 import { pointerWithinOrRectIntersection } from "src/customCollisionDetection";
 import { RoomListPreview } from "./SpaceLayout/Sidebar/RoomListLayout";
+import { animated, useSpring } from "@react-spring/web";
 
 export const SmallCardDragContext = (props: {
   children: React.ReactNode;
@@ -74,12 +75,24 @@ export const SmallCardDragContext = (props: {
     >
       {props.children}
 
-      <DragOverlay dropAnimation={null}>
+      <DragOverlay dropAnimation={null} adjustScale={false} >
         {active?.entityID ? (
-          <div className="relative">
+          <AnimatedPickup >
             {active.type === "card" ? (
-              <>
+              <div
+                className={``}
+                style={{
+                  transform: `rotate(${!active.rotation
+                    ? 0
+                    : (
+                      Math.floor(active.rotation / (Math.PI / 24)) *
+                      (Math.PI / 24)
+                    ).toFixed(2)
+                    }rad)`,
+                }}
+              >
                 <CardPreview
+                  outerControls
                   entityID={active.entityID}
                   size={active.size}
                   hideContent={active.hideContent}
@@ -89,16 +102,21 @@ export const SmallCardDragContext = (props: {
                     <AddSmall />
                   </span>
                 )}
-              </>
+              </div>
             ) : (
               <RoomListPreview entityID={active.entityID} />
             )}
-          </div>
+          </AnimatedPickup>
         ) : null}
       </DragOverlay>
     </DndContext>
   );
 };
+
+const AnimatedPickup = (props: { children: React.ReactNode }) => {
+  let spring = useSpring({ from: { scale: 1 }, to: { scale: 1.02 } })
+  return <animated.div className="relative text-sm drop-shadow" style={spring}>{props.children}</animated.div>
+}
 
 export type DraggableData = {
   id: string;
@@ -109,6 +127,7 @@ export type DraggableData = {
       type: "card";
       parent: string;
       hideContent: boolean;
+      rotation?: number;
       size: "big" | "small";
     }
     | { type: "room" }

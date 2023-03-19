@@ -164,6 +164,7 @@ const DraggableCard = (props: {
     id: props.relationshipID,
     entityID: props.entityID,
     parent: props.parent,
+    rotation: position?.value.rotation,
     type: "card",
     size: position?.value.size || "small",
     hideContent: false,

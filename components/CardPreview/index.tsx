@@ -214,7 +214,7 @@ export const HoverControls = (
             )}
           </div>
         </div>
-      ) : null}
+      ) : <div className="w-[12px]"> </div>}
       {/* End Rotate and Resize Handle */}
     </div>
   );

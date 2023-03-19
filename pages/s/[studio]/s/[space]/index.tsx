@@ -41,6 +41,7 @@ export default function SpacePage() {
   useEffect(() => {
     if (r && spaceID) window.localStorage.setItem(`space/${spaceID}/room`, r)
   }, [r, spaceID])
+
   let room = r || firstRoom;
   let roomType = useIndex.eav(room, "room/type")?.value;
   const { width } = useWindowDimensions();
@@ -86,7 +87,6 @@ export default function SpacePage() {
   useEffect(() => {
     window.requestAnimationFrame(() => {
       let roomPane = document.getElementById("desktopWrapper");
-      console.log(roomPane);
       roomPane?.scrollIntoView();
     });
   }, []);
@@ -110,7 +110,7 @@ export default function SpacePage() {
           md:py-6 md:px-4 `}
         >
           <SmallCardDragContext
-            activationConstraints={{ delay: 300, tolerance: 100 }}
+            activationConstraints={{ delay: 200, tolerance: 100 }}
           >
             {width > 960 ? (
               <div
