@@ -98,6 +98,7 @@ export const CardPreview = (
         } relative grow overflow-hidden ${borderStyles({ isMember })} ${
           props.isSelected ? "selectedCardGlow" : ""
         } ${props.isOver ? "rounded-[24px] shadow-[0_0_16px_0_#cccccc]" : ""}`}
+        style={{ WebkitTapHighlightColor: "transparent" }}
       >
         {props.size === "small" ? (
           <SmallCardBody {...props} />
