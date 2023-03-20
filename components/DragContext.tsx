@@ -92,7 +92,7 @@ export const SmallCardDragContext = (props: {
                 }}
               >
                 <CardPreview
-                  outerControls
+                  outerControls={active.outerControls}
                   entityID={active.entityID}
                   size={active.size}
                   hideContent={active.hideContent}
@@ -125,6 +125,7 @@ export type DraggableData = {
 } & (
     | {
       type: "card";
+      outerControls?: boolean;
       parent: string;
       hideContent: boolean;
       rotation?: number;

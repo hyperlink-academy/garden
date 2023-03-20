@@ -170,9 +170,9 @@ export const HoverControls = (
 
       {/* Rotate and Resize Handle */}
 
-      {authorized &&
-      props.outerControls &&
-      (props.onDelete || props.onResize || props.onRotateDrag) ? (
+      {authorized && !props.outerControls ? null : props.onDelete ||
+        props.onResize ||
+        props.onRotateDrag ? (
         <div className="z-50 flex flex-col justify-between gap-1 pb-1 text-grey-80 opacity-0 group-hover:opacity-100">
           {authorized && props.onDelete ? (
             <button
@@ -215,7 +215,9 @@ export const HoverControls = (
             )}
           </div>
         </div>
-      ) : <div className="w-[12px]"> </div>}
+      ) : (
+        <div className="w-[12px]"> </div>
+      )}
       {/* End Rotate and Resize Handle */}
     </div>
   );

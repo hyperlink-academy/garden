@@ -162,6 +162,7 @@ const DraggableCard = (props: {
   let { mutate, rep } = useMutations();
   const { attributes, listeners, setNodeRef, isDragging } = useDraggableCard({
     id: props.relationshipID,
+    outerControls: true,
     entityID: props.entityID,
     parent: props.parent,
     rotation: position?.value.rotation,
