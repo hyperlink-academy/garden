@@ -266,9 +266,7 @@ const StartDiscussion = (props: { entityID: string }) => {
       />
       {!thoughtInputFocus && !value ? null : (
         <div className="flex items-center justify-between text-grey-55 ">
-          <div className="hover:text-accent-blue">
-            <CardAdd />
-          </div>
+          <div className="hover:text-accent-blue"></div>
           <ButtonPrimary
             disabled={!value}
             icon={<Send />}
