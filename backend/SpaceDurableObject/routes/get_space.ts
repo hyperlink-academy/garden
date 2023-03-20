@@ -6,7 +6,10 @@ export const get_space_route = makeRoute({
   route: "get_space",
   input: z.object({ space: z.string() }),
   handler: async (msg, env: Env) => {
-    let name = await env.factStore.scanIndex.ave("space/name", msg.space);
+    let name = await env.factStore.scanIndex.ave(
+      "space/local-unique-name",
+      msg.space
+    );
     if (!name)
       return {
         data: { success: false, error: "no space with name found" },

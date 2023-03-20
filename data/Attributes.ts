@@ -192,12 +192,17 @@ export const DefaultAttributes = {
   },
   "space/name": {
     type: "string",
+    unique: false,
+    cardinality: "one",
+  },
+  ["space/local-unique-name"]: {
+    type: "string",
     unique: true,
     cardinality: "one",
   },
   "space/display_name": {
     type: "string",
-    unique: true,
+    unique: false,
     cardinality: "one",
   },
   "space/description": {
@@ -258,20 +263,20 @@ export const Attribute = { ...DefaultAttributes, ...BaseAttributes };
 export type Attribute = typeof Attribute;
 export type UniqueAttributes = {
   [A in keyof Attribute as Attribute[A]["unique"] extends true
-    ? A
-    : never]: Attribute[A];
+  ? A
+  : never]: Attribute[A];
 };
 
 export type ReferenceAttributes = {
   [A in keyof Attribute as Attribute[A]["type"] extends "reference"
-    ? A
-    : never]: Attribute[A];
+  ? A
+  : never]: Attribute[A];
 };
 
 export type FilterAttributes<F extends Attribute[keyof Attribute]> = {
   [A in keyof Attribute as Attribute[A]["type"] extends F["type"]
-    ? Attribute[A]["cardinality"] extends F["cardinality"]
-      ? A
-      : never
-    : never]: Attribute[A];
+  ? Attribute[A]["cardinality"] extends F["cardinality"]
+  ? A
+  : never
+  : never]: Attribute[A];
 };

@@ -82,7 +82,10 @@ export const create_space_route = makeRoute({
     });
 
     let thisStub = env.env.SPACES.get(env.env.SPACES.idFromString(env.id));
-    await privateSpaceAPI(thisStub)("http://internal", "add_space_data", data);
+    await privateSpaceAPI(thisStub)("http://internal", "add_space_data", {
+      ...data,
+      isOwner: true,
+    });
 
     if (community) {
       let communitySpaceID = env.env.SPACES.idFromString(community.spaceID);
