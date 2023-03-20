@@ -19,6 +19,8 @@ import { sortByPosition } from "src/position_helpers";
 import { SearchRoom } from "components/SearchRoom";
 import { CalendarRoom } from "components/CalendarRoom";
 import { useUndoableState } from "hooks/useUndoableState";
+import { useRouter } from "next/router";
+import { slugify } from "src/utils";
 
 export default function SpacePage() {
   let spaceName = useIndex.aev("space/display_name")[0];
@@ -90,6 +92,15 @@ export default function SpacePage() {
       roomPane?.scrollIntoView();
     });
   }, []);
+  let router = useRouter();
+  useEffect(() => {
+    if (spaceName)
+      router.replace(
+        `/s/${router.query.studio}/s/${router.query.space}/${slugify(
+          spaceName?.value
+        )}`
+      );
+  }, [spaceName]);
 
   return (
     <>

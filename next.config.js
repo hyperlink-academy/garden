@@ -9,6 +9,14 @@ const withPWA = require("next-pwa")({
 const nextConfig = {
   /* config options here */
   reactStrictMode: true,
+  async rewrites() {
+    return [
+      {
+        source: "/s/:studio/s/:space/:slug",
+        destination: "/s/:studio/s/:space",
+      },
+    ];
+  },
   async redirects() {
     return [
       {
