@@ -97,7 +97,9 @@ export default function SpacePage() {
   let router = useRouter();
   useEffect(() => {
     if (spaceName)
-      router.replace(
+      history.replaceState(
+        null,
+        "",
         `/s/${router.query.studio}/s/${router.query.space}/${slugify(
           spaceName?.value
         )}`
