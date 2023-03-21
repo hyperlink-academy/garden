@@ -35,6 +35,8 @@ export const SpaceList = (props: {
 
 const Space = (props: { entity: string }) => {
   let { session } = useAuth();
+  let { authorized } = useMutations();
+
   let studio = useIndex.eav(props.entity, "space/studio");
   let display_name = useIndex.eav(props.entity, "space/display_name");
   let name = useIndex.eav(props.entity, "space/name");
@@ -77,7 +79,7 @@ const Space = (props: { entity: string }) => {
         <Link href={`${spacePath(studio?.value, name?.value)}`}>
           <DoorImage
             entityID={props.entity}
-            glow={!!unreads && unreads.value > 0}
+            glow={!!unreads && !!authorized && unreads.value > 0}
           />
         </Link>
         <div className="flex w-[20px] flex-col gap-4 pb-[92px]">
