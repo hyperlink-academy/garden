@@ -341,6 +341,6 @@ export function useCombinedRefs<T>(
     () => (node: T) => {
       refs.forEach((ref) => ref(node));
     },
-    refs
+    [refs]
   );
 }

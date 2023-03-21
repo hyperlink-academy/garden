@@ -34,7 +34,7 @@ export const Textarea = (
     textarea.current.focus({ preventScroll: true });
     if (initialCursor)
       textarea.current.setSelectionRange(initialCursor[0], initialCursor[1]);
-  }, [initialCursor, focused, textarea.current]);
+  }, [initialCursor, focused]);
 
   if ((!focused || props.previewOnly) && typeof props.value === "string") {
     return (

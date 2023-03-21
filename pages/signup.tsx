@@ -1,6 +1,7 @@
 import { workerAPI } from "backend/lib/api";
 import { ButtonPrimary } from "components/Buttons";
 import { FloatingContainer } from "components/Layout";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { ReactChild, useEffect, useState } from "react";
 import useSWR from "swr";
@@ -57,25 +58,25 @@ export default function SignupPage() {
       </div>
     );
   return (
-    <div className="grid grid-rows-max gap-8 mx-auto max-w-md">
-      <div className="grid grid-auto-rows gap-2">
+    <div className="grid-rows-max mx-auto grid max-w-md gap-8">
+      <div className="grid-auto-rows grid gap-2">
         <h1>Hello and Welcome!</h1>
         <p className="text-grey-35">
-          <a className="text-accent-blue" href="/login">
+          <Link className="text-accent-blue" href="/login">
             Log in
-          </a>{" "}
+          </Link>{" "}
           instead
         </p>
       </div>
 
       {signup_token.signup_token.message ? (
-        <FloatingContainer className="max-w-sm m-auto">
+        <FloatingContainer className="m-auto max-w-sm">
           <pre className="whitespace-pre-wrap font-[Quattro] italic text-grey-35">
             {signup_token.signup_token.message}
           </pre>
         </FloatingContainer>
       ) : null}
-      <form onSubmit={onSubmit} className="grid gap-4 w-full">
+      <form onSubmit={onSubmit} className="grid w-full gap-4">
         {status === "normal" ? null : (
           <div className="text-accent-red">
             {status === "invalidToken" ? (
@@ -85,7 +86,7 @@ export default function SignupPage() {
             )}
           </div>
         )}
-        <label className="grid grid-flow-rows gap-2 font-bold">
+        <label className="grid-flow-rows grid gap-2 font-bold">
           Username
           <input
             type="text"
@@ -95,7 +96,7 @@ export default function SignupPage() {
             }
           />
         </label>
-        <label className="grid grid-flow-rows gap-2 font-bold">
+        <label className="grid-flow-rows grid gap-2 font-bold">
           Email
           <input
             type="email"
@@ -103,7 +104,7 @@ export default function SignupPage() {
             onChange={(e) => setData({ ...data, email: e.currentTarget.value })}
           />
         </label>
-        <label className="grid grid-flow-rows gap-2 font-bold">
+        <label className="grid-flow-rows grid gap-2 font-bold">
           Password
           <PasswordInput
             value={data.password}
@@ -124,7 +125,7 @@ function PasswordInput(props: {
   return (
     <div>
       <input
-        className="w-full relative"
+        className="relative w-full"
         value={props.value}
         type={visible ? "text" : "password"}
         onChange={(e) => props.onChange(e.currentTarget.value)}
@@ -136,11 +137,11 @@ function PasswordInput(props: {
         }}
         className={`
         relative
-        cursor-pointer
-        hover:cursor-pointer
         top-[-32px]
         left-[-16px]
-        float-right`}
+        float-right
+        cursor-pointer
+        hover:cursor-pointer`}
       >
         {visible ? "hide" : "show"}
       </button>

@@ -13,11 +13,10 @@ import { getCurrentDate } from "src/utils";
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 type Props = InferGetStaticPropsType<typeof getStaticProps>;
 export default function StudioPage(props: Props) {
-  if (props.notFound) return <div>404 - studio not found!</div>;
-  if (!props.id) return <div>loading </div>;
-
   let { session } = useAuth();
   let { query } = useRouter();
+  if (props.notFound) return <div>404 - studio not found!</div>;
+  if (!props.id) return <div>loading </div>;
 
   let myStudioName = session.session?.username;
   let currentStudioName = query.studio;

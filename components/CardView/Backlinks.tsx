@@ -15,39 +15,50 @@ export const Backlinks = (props: { entityID: string }) => {
   return (
     <div className="grid grid-cols-[auto_max-content] gap-0">
       <Disclosure>
-        {({ open }) => (cards.length === 1 ? <div className="mb-3">
-          <CardPreview entityID={cards[0].entity} factID={cards[0].id} hideContent size="big" /> </div> :
-          <div className="mb-3 rounded-md border border-grey-90 bg-bg-blue px-4 py-2">
-            <Disclosure.Button className="flex w-full flex-row justify-between text-grey-55 outline-none">
-              <h4 className="font-bold text-grey-55">
-                Attached to {cards.length}{" "}
-                {cards.length === 1 ? "Card" : "Cards"}
-              </h4>
-              <DropdownArrow open={open} />
-            </Disclosure.Button>
-            <Drawer open={open}>
-              <Disclosure.Panel static>
-                {open && (
-                  <div className="flex flex-col gap-2">
-                    {cards.map((c) => {
-                      return (
-                        <CardPreview
-                          hideContent
-                          factID={c.id}
-                          onDelete={() => {
-                            mutate("retractFact", { id: c.id });
-                          }}
-                          entityID={c.entity}
-                          size={"big"}
-                        />
-                      );
-                    })}
-                  </div>
-                )}
-              </Disclosure.Panel>
-            </Drawer>
-          </div>
-        )}
+        {({ open }) =>
+          cards.length === 1 ? (
+            <div className="mb-3">
+              <CardPreview
+                entityID={cards[0].entity}
+                factID={cards[0].id}
+                hideContent
+                size="big"
+              />{" "}
+            </div>
+          ) : (
+            <div className="mb-3 rounded-md border border-grey-90 bg-bg-blue px-4 py-2">
+              <Disclosure.Button className="flex w-full flex-row justify-between text-grey-55 outline-none">
+                <h4 className="font-bold text-grey-55">
+                  Attached to {cards.length}{" "}
+                  {cards.length === 1 ? "Card" : "Cards"}
+                </h4>
+                <DropdownArrow open={open} />
+              </Disclosure.Button>
+              <Drawer open={open}>
+                <Disclosure.Panel static>
+                  {open && (
+                    <div className="flex flex-col gap-2">
+                      {cards.map((c) => {
+                        return (
+                          <CardPreview
+                            key={c.id}
+                            hideContent
+                            factID={c.id}
+                            onDelete={() => {
+                              mutate("retractFact", { id: c.id });
+                            }}
+                            entityID={c.entity}
+                            size={"big"}
+                          />
+                        );
+                      })}
+                    </div>
+                  )}
+                </Disclosure.Panel>
+              </Drawer>
+            </div>
+          )
+        }
       </Disclosure>
       <div className=" border-t-1 border-r-1 mr-3 h-8 w-3 self-end rounded-tr-md border-t border-r border-dashed border-r-grey-55 " />
     </div>

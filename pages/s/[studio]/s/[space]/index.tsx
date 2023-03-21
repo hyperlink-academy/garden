@@ -33,16 +33,18 @@ export default function SpacePage() {
     .sort(sortByPosition("roomList"))[0]?.entity;
   let firstRoom = firstRoomByID;
 
-  let spaceID = useSpaceID()
-  let [r, setRoom, setRoomWithoutHistory] = useUndoableState<string | null>(null);
+  let spaceID = useSpaceID();
+  let [r, setRoom, setRoomWithoutHistory] = useUndoableState<string | null>(
+    null
+  );
   useEffect(() => {
-    if (!spaceID) return
-    let room = window.localStorage.getItem(`space/${spaceID}/room`)
-    if (room) setRoomWithoutHistory(room)
-  }, [spaceID])
+    if (!spaceID) return;
+    let room = window.localStorage.getItem(`space/${spaceID}/room`);
+    if (room) setRoomWithoutHistory(room);
+  }, [spaceID, setRoomWithoutHistory]);
   useEffect(() => {
-    if (r && spaceID) window.localStorage.setItem(`space/${spaceID}/room`, r)
-  }, [r, spaceID])
+    if (r && spaceID) window.localStorage.setItem(`space/${spaceID}/room`, r);
+  }, [r, spaceID]);
 
   let room = r || firstRoom;
   let roomType = useIndex.eav(room, "room/type")?.value;
@@ -100,13 +102,14 @@ export default function SpacePage() {
           spaceName?.value
         )}`
       );
-  }, [spaceName]);
+  }, [spaceName, router]);
 
   return (
     <>
       <Head>
-        <title key="title">{`${unreadCount && unreadCount > 0 ? `(${unreadCount})` : ""
-          } ${spaceName?.value}`}</title>
+        <title key="title">{`${
+          unreadCount && unreadCount > 0 ? `(${unreadCount})` : ""
+        } ${spaceName?.value}`}</title>
       </Head>
 
       <div className="pageWrapperflex safari-pwa-height h-[100dvh] flex-col items-stretch justify-items-center gap-2 overflow-hidden sm:gap-4">
@@ -133,9 +136,9 @@ export default function SpacePage() {
               sm:justify-center
               sm:gap-4 
 `}
-              // you need to add this to the contentSplitLayout class if you are going to scroll across more than 2 panes
-              // it prevents the last pane from sticking to the end
-              // after:content-[""] after:h-full after:w-2 after:block after:shrink-0
+                // you need to add this to the contentSplitLayout class if you are going to scroll across more than 2 panes
+                // it prevents the last pane from sticking to the end
+                // after:content-[""] after:h-full after:w-2 after:block after:shrink-0
               >
                 <div className="roomWrapper flex flex-row rounded-md border border-grey-90">
                   <Sidebar

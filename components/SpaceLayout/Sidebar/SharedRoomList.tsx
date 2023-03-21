@@ -9,7 +9,11 @@ import {
 } from "hooks/useReplicache";
 import { useContext, useEffect, useState } from "react";
 import { ulid } from "src/ulid";
-import { RoomListLabel, DraggableRoomListItem, RoomListPreview } from "./RoomListLayout";
+import {
+  RoomListLabel,
+  DraggableRoomListItem,
+  RoomListPreview,
+} from "./RoomListLayout";
 import { sortByPosition, updatePositions } from "src/position_helpers";
 import { useDroppableZone } from "components/DragContext";
 import { AddTiny } from "components/Icons";
@@ -20,25 +24,22 @@ export const SharedRoomList = (props: {
   setRoomEditOpen: () => void;
 }) => {
   let rooms = useIndex.aev("room/name").sort(sortByPosition("roomList"));
+  let { onRoomChange, currentRoom } = props;
 
   useEffect(() => {
     let listener = (e: KeyboardEvent) => {
       if (e.key === "ArrowUp" && e.altKey) {
-        let currentIndex = rooms.findIndex(
-          (r) => r.entity === props.currentRoom
-        );
+        let currentIndex = rooms.findIndex((r) => r.entity === currentRoom);
         if (currentIndex === -1) return;
         if (currentIndex > 0) {
-          props.onRoomChange(rooms[currentIndex - 1].entity);
+          onRoomChange(rooms[currentIndex - 1].entity);
         }
       }
       if (e.key === "ArrowDown" && e.altKey) {
-        let currentIndex = rooms.findIndex(
-          (r) => r.entity === props.currentRoom
-        );
+        let currentIndex = rooms.findIndex((r) => r.entity === currentRoom);
         if (currentIndex === -1) return;
         if (currentIndex < rooms.length) {
-          props.onRoomChange(rooms[currentIndex + 1].entity);
+          onRoomChange(rooms[currentIndex + 1].entity);
         }
       }
     };
@@ -46,7 +47,7 @@ export const SharedRoomList = (props: {
     return () => {
       window.removeEventListener("keydown", listener);
     };
-  }, [props.currentRoom]);
+  }, [currentRoom, onRoomChange, rooms]);
 
   return (
     <div className="flex flex-col gap-0.5">
@@ -172,8 +173,9 @@ const CreateRoom = () => {
                 <RadioGroup.Option value="canvas">
                   {({ checked }) => (
                     <div
-                      className={`${checked ? "bg-bg-blue" : ""
-                        } rounded-md border border-grey-15 p-4 hover:cursor-pointer`}
+                      className={`${
+                        checked ? "bg-bg-blue" : ""
+                      } rounded-md border border-grey-15 p-4 hover:cursor-pointer`}
                     >
                       Canvas
                     </div>
@@ -182,8 +184,9 @@ const CreateRoom = () => {
                 <RadioGroup.Option value="collection">
                   {({ checked }) => (
                     <div
-                      className={`${checked ? "bg-bg-blue" : ""
-                        } rounded-md border border-grey-15 p-4 hover:cursor-pointer`}
+                      className={`${
+                        checked ? "bg-bg-blue" : ""
+                      } rounded-md border border-grey-15 p-4 hover:cursor-pointer`}
                     >
                       Collection
                     </div>

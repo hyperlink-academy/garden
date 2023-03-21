@@ -12,7 +12,7 @@ import {
   Mutations,
   FactInput,
 } from "data/mutations";
-import { createContext, useContext } from "react";
+import { createContext, useCallback, useContext, useMemo } from "react";
 import {
   Puller,
   Pusher,
@@ -463,21 +463,18 @@ export const useMutations = () => {
     null,
     [session.session?.studio]
   );
-
-  // if (rep == null) throw "Cannot call useMutations() if not nested within a ReplicacheContext context"
-
-  return {
-    rep: rep?.rep,
-    authorized: !!auth,
-    memberEntity: auth?.entity || null,
-    mutate<T extends keyof typeof Mutations>(
+  let mutate = useCallback(
+    function mutate<T extends keyof typeof Mutations>(
       mutation: T,
       args: Parameters<(typeof Mutations)[T]>[0]
     ) {
       if (!session || !auth) return;
       return rep?.rep.mutate[mutation](args);
     },
-    action: {
+    [session, auth, rep]
+  );
+  let action = useMemo(
+    () => ({
       start() {
         rep?.undoManager.startGroup();
       },
@@ -490,6 +487,17 @@ export const useMutations = () => {
       }) {
         rep?.undoManager.add(opts);
       },
-    },
+    }),
+    [rep?.undoManager]
+  );
+
+  // if (rep == null) throw "Cannot call useMutations() if not nested within a ReplicacheContext context"
+
+  return {
+    rep: rep?.rep,
+    authorized: !!auth,
+    memberEntity: auth?.entity || null,
+    mutate,
+    action,
   };
 };

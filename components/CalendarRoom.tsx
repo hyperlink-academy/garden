@@ -49,7 +49,7 @@ export function CalendarRoom() {
           let day = dateParts.find((f) => f.type === "day");
           let weekday = dateParts.find((f) => f.type === "weekday");
           return (
-            <>
+            <div key={index}>
               <div className="calendarItem flex flex-row gap-3" key={d}>
                 <div className="flex h-fit flex-col gap-0.5 rounded-md bg-grey-35 pb-0.5 text-center text-sm text-grey-55">
                   <div className="calendarDateBox -gap-1 flex h-fit w-fit flex-col rounded-md border border-grey-55 bg-white py-1 px-2 ">
@@ -70,7 +70,7 @@ export function CalendarRoom() {
                   ) : (
                     <>
                       {cardsWithDate[d]?.map((card) => (
-                        <div className="h-fit">
+                        <div key={card.entity} className="h-fit">
                           <CardPreview
                             entityID={card.entity}
                             key={card.entity}
@@ -85,7 +85,7 @@ export function CalendarRoom() {
                 </div>
               </div>
               {index + 1 === days.length ? null : <Divider />}
-            </>
+            </div>
           );
         })}
       </div>

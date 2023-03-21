@@ -27,7 +27,7 @@ export default function App({ Component, pageProps }: AppProps) {
     return (
       <SharedProviders>
         <SpaceSpaceProvider
-          notFound={<div className="p-4">404'd space</div>}
+          notFound={<div className="p-4">404d space</div>}
           loading={<></>}
         >
           <Component {...pageProps} />

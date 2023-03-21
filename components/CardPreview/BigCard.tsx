@@ -1,18 +1,11 @@
 import { Backlinks } from "components/CardView/Backlinks";
-import {
-  SingleReaction,
-  SingleReactionPreview,
-} from "components/CardView/Reactions";
+import { SingleReactionPreview } from "components/CardView/Reactions";
 import { SingleTextSection } from "components/CardView/Sections";
 import { useCardViewer } from "components/CardViewerContext";
-import { GripperBG } from "components/Gripper";
 import { CloseLinedTiny } from "components/Icons";
-import { Textarea } from "components/Textarea";
 import { RenderedText } from "components/Textarea/RenderedText";
-import { FilterAttributes } from "data/Attributes";
 import { useReactions } from "hooks/useReactions";
 import { useIndex, useMutations } from "hooks/useReplicache";
-import { useRef } from "react";
 import { Props } from "./index";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;

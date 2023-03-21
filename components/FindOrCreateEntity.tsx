@@ -65,7 +65,7 @@ export const FindOrCreate = (props: {
           setInput("");
           isMultiSelect.current = false;
         }}
-        className="fixed z-10 inset-0 overflow-y-hidden"
+        className="fixed inset-0 z-10 overflow-y-hidden"
       >
         <Dialog.Overlay className="overlay" />
 
@@ -110,12 +110,12 @@ export const FindOrCreate = (props: {
           as="div"
           className={`
               relative
-              max-w-md h-fit max-h-[calc(100vh-160px)]
-              w-[calc(100vw-2.5rem)]
-              z-10 
-              mx-auto mb-20 mt-10
-              flex flex-col items-stretch 
-              bg-white shadow-drop border border-grey-80 rounded-md
+              z-10 mx-auto mb-20
+              mt-10
+              flex 
+              h-fit max-h-[calc(100vh-160px)] w-[calc(100vw-2.5rem)]
+              max-w-md flex-col items-stretch 
+              rounded-md border border-grey-80 bg-white shadow-drop
               `}
         >
           {({ activeOption }) => (
@@ -144,7 +144,7 @@ export const FindOrCreate = (props: {
               {/* if isMultiselect = true, take all the stuff in the added[] and display it at the top, with a submit button. If not, show nothing! */}
               {isMultiSelect.current === false ? (
                 <div className="mx-3 mt-2 mb-2">
-                  <small className="italic text-grey-55 hidden sm:block">
+                  <small className="hidden italic text-grey-55 sm:block">
                     SHIFT + click to select multiple cards!
                   </small>
                   <small className="italic text-grey-55  sm:hidden ">
@@ -152,16 +152,19 @@ export const FindOrCreate = (props: {
                   </small>
                 </div>
               ) : (
-                <div className="addedList flex flex-col gap-2 mx-3 mt-2 mb-3">
+                <div className="addedList mx-3 mt-2 mb-3 flex flex-col gap-2">
                   {addedItemsList === false ? null : (
-                    <ul className="flex flex-col gap-2 p-3 lightBorder bg-bg-blue no-scrollbar">
+                    <ul className="lightBorder no-scrollbar flex flex-col gap-2 bg-bg-blue p-3">
                       {added.length === 0 ? (
-                        <div className="text-grey-55 italic ">
+                        <div className="italic text-grey-55 ">
                           no cards selected yet!
                         </div>
                       ) : (
-                        added.map((addedItem) => (
-                          <li className="addedListItem grid grid-cols-[max-content_auto_max-content] gap-2 ">
+                        added.map((addedItem, index) => (
+                          <li
+                            key={index}
+                            className="addedListItem grid grid-cols-[max-content_auto_max-content] gap-2 "
+                          >
                             <div className="pt-[1px]">
                               {addedItem.type === "create" ? (
                                 <CardSmall />
@@ -224,7 +227,7 @@ export const FindOrCreate = (props: {
               <Divider />
               <Combobox.Options
                 static
-                className="w-full pt-2 pb-2 flex-col flex gap-2 h-min overflow-y-auto"
+                className="flex h-min w-full flex-col gap-2 overflow-y-auto pt-2 pb-2"
               >
                 {!input && !props.allowBlank ? null : (
                   <CreateButton
@@ -252,9 +255,10 @@ export const FindOrCreate = (props: {
                     }}
                   />
                 )}
-                {items.map((item) => {
+                {items.map((item, index) => {
                   return (
                     <SearchResult
+                      key={index}
                       {...item}
                       addItem={(optionValue) => {
                         if (
@@ -323,11 +327,11 @@ const CreateButton = (props: {
             >
               {!props.inputExists || props.value === "" ? (
                 <div
-                  className={`py-1 w-full
-                          text-accent-blue font-bold 
-                          flex flex-row justify-between
-                          flex-grow
-                          cursor-pointer`}
+                  className={`flex w-full
+                          flex-grow cursor-pointer 
+                          flex-row justify-between py-1
+                          font-bold
+                          text-accent-blue`}
                 >
                   <div className="flex flex-row gap-2">
                     <AddSmall />
@@ -340,12 +344,12 @@ const CreateButton = (props: {
                 </div>
               ) : (
                 <div
-                  className={`py-1 w-full
-                          text-grey-55 font-bold 
-                          grid grid-cols-[min-content_auto] gap-2`}
+                  className={`grid w-full
+                          grid-cols-[min-content_auto] gap-2 
+                          py-1 font-bold text-grey-55`}
                 >
                   <AddSmall />
-                  <div>"{props.value}" already exists</div>
+                  <div>{`"${props.value}"`} already exists</div>
                 </div>
               )}
             </SearchItem>
@@ -382,21 +386,21 @@ const SearchResult = (
               `}
             </style>
             <div
-              className={`searchResult select-none gap-2 grid grid-cols-[min-content_auto_min-content] ${
+              className={`searchResult grid select-none grid-cols-[min-content_auto_min-content] gap-2 ${
                 props.disabled
-                  ? " text-grey-80 cursor-default"
+                  ? " cursor-default text-grey-80"
                   : "cursor-pointer"
               }`}
             >
               <div className="searchResultIcon mt-[1px]">{props.icon}</div>
               <div className="searchResultName">{props.display}</div>
               {props.disabled ? (
-                <Checkmark className="searchReultSelectedCheck text-grey-90 justify-self-end mt-[5px]" />
+                <Checkmark className="searchReultSelectedCheck mt-[5px] justify-self-end text-grey-90" />
               ) : props.added ? (
-                <Checkmark className="searchResultAddedCheck text-accent-blue mt-[5px]" />
+                <Checkmark className="searchResultAddedCheck mt-[5px] text-accent-blue" />
               ) : (
                 <div
-                  className="searchResultEmptyCheck w-4 h-4 mt-[5px] rounded-full border border-dashed text-grey-55 hover:text-accent-blue hover:border-2 sm:hidden"
+                  className="searchResultEmptyCheck mt-[5px] h-4 w-4 rounded-full border border-dashed text-grey-55 hover:border-2 hover:text-accent-blue sm:hidden"
                   onClick={() => props.setMultiSelect()}
                 />
               )}

@@ -22,14 +22,13 @@ export function CardViewer(props: {
   let [history, setHistory] = useUndoableState<{ [k: string]: string[] }>({});
   let ref = useRef<HTMLDivElement | null>(null);
   let { mutate, memberEntity } = useMutations();
-  let unreadBy =
-    useIndex.eav(
-      props.room ? history[props.room]?.[0] || null : null,
-      "card/unread-by"
-    ) || [];
+  let unreadBy = useIndex.eav(
+    props.room ? history[props.room]?.[0] || null : null,
+    "card/unread-by"
+  );
   useEffect(() => {
     if (props.room && history[props.room]?.[0] && memberEntity) {
-      let unread = unreadBy.find((f) => f.value.value === memberEntity);
+      let unread = unreadBy?.find((f) => f.value.value === memberEntity);
       if (unread)
         mutate("markRead", {
           memberEntity,
@@ -37,7 +36,7 @@ export function CardViewer(props: {
           attribute: "card/unread-by",
         });
     }
-  }, [history, props.room, unreadBy, memberEntity]);
+  }, [history, props.room, unreadBy, memberEntity, mutate]);
 
   useAppEventListener(
     "cardviewer.open-card",

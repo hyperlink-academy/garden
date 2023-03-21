@@ -6,7 +6,7 @@ import { GetServerSideProps } from "next";
 import { useState } from "react";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
-export default (props: { id: string }) => {
+export default function CardPage(props: { id: string }) {
   let [link, setLink] = useState("");
   return (
     <form
@@ -28,7 +28,7 @@ export default (props: { id: string }) => {
       <ButtonPrimary content="submit" type="submit" />
     </form>
   );
-};
+}
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   let fauna = new Client({

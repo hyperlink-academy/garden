@@ -36,6 +36,7 @@ export const DoorSelector = (props: {
         {defaultDoorImages.map((f) => {
           return (
             <button
+              key={f}
               className={`${
                 props.selected?.filetype === "external_image" &&
                 props.selected?.url === f
@@ -68,6 +69,7 @@ export const DoorSelector = (props: {
             href="https://museo.app/"
             className="text-accent-blue"
             target="_blank"
+            rel="noreferrer"
           >
             Museo
           </a>{" "}

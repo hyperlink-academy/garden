@@ -60,6 +60,7 @@ const AddReaction = (props: { entityID: string; close: () => void }) => {
         .filter((f) => !!f.value) // strip empty strings
         .map((r) => (
           <button
+            key={r.id}
             className="font-bold"
             onClick={async () => {
               if (!memberEntity) return;

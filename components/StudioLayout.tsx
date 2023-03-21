@@ -15,10 +15,10 @@ export const StudioName = () => {
   return (
     <>
       <Head>
-        <title key="title">{name?.value}'s studio</title>
+        <title key="title">{name?.value + "'s studio'"}</title>
       </Head>
       <div>
-        <h1>{name?.value}'s studio</h1>
+        <h1>{name?.value + "'s studio'"}</h1>
       </div>
       <div className="flex flex-row gap-4">
         {/* someone ELSE'S studio: active + history */}

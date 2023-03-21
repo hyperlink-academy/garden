@@ -42,12 +42,12 @@ export function JoinSpace() {
     return (
       <>
         <Head>
-          <title key="title">{spaceName?.value}: you're invited!</title>
+          <title key="title">{spaceName?.value}: you&apos;re invited!</title>
         </Head>
 
         <div className=" mx-auto mt-6 flex max-w-3xl flex-col place-items-center gap-6">
           <div className="flex flex-col gap-2 text-center ">
-            <h2>You've been invited to {spaceName?.value}</h2>
+            <h2>You&apos;ve been invited to {spaceName?.value}</h2>
             <p>A new membership card is waiting for you!</p>
           </div>
           <div className="relative">
@@ -85,8 +85,8 @@ export function JoinSpace() {
       />
       <LogInModal isOpen={isOpen} onClose={() => setLogInModal(false)} />
       <p>
-        We're still in early alpha! If you'd like to make an account, email us
-        at{" "}
+        We&apos;re still in early alpha! If you&apos;d like to make an account,
+        email us at{" "}
         <a href="mailto:contact@hyperlink.academy" className="text-accent-blue">
           contact@hyperlink.academy
         </a>{" "}

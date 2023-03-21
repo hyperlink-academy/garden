@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import { useMutations } from "hooks/useReplicache";
 
 export function useUndoableState<S>(
@@ -7,9 +7,7 @@ export function useUndoableState<S>(
   let [state, dispatch] = useState(initialState);
   let ref = useRef(initialState);
   let { action } = useMutations();
-
-  return [
-    state,
+  let update: React.Dispatch<React.SetStateAction<S>> = useCallback(
     (newState) => {
       let current: S,
         past = ref.current as S;
@@ -34,8 +32,12 @@ export function useUndoableState<S>(
 
       ref.current = current;
     },
-    (newState) => {
-      dispatch(newState)
-    }
-  ];
+    [dispatch, action]
+  );
+
+  let updateWithoutUndo = useCallback(
+    (newState: S) => dispatch(newState),
+    [dispatch]
+  );
+  return [state, update, updateWithoutUndo];
 }

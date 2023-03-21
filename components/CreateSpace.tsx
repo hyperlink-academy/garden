@@ -128,7 +128,7 @@ export const EditSpaceModal = (props: {
         publish_on_listings_page: !!community,
       };
     });
-  }, [uploadedDoor, description, start_date, end_date, name, community, open]);
+  }, [uploadedDoor, description, start_date, end_date, name, community]);
 
   let [mode, setMode] = useState<"normal" | "delete">("normal");
   return (

@@ -30,7 +30,7 @@ export const SearchRoom = () => {
           )
           .map((item) => {
             return (
-              <div>
+              <div key={item.entity}>
                 <CardPreview
                   entityID={item.entity}
                   size={"big"}

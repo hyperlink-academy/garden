@@ -143,14 +143,14 @@ const InfoModal = (props: { open: boolean; onClose: () => void }) => {
       <div className="editRoomModal flex flex-col gap-3 text-grey-35">
         <h3>Hyperlink Help Center 🌱</h3>
         <p>
-          You're viewing a Space on{" "}
+          You&apos;re viewing a Space on{" "}
           <a className="text-accent-blue" href="https://hyperlink.academy/">
             Hyperlink
           </a>
           .
         </p>
         <p>
-          Question? Bug report? We'd love to hear from you —{" "}
+          Question? Bug report? We&apos;d love to hear from you —{" "}
           <a
             className="text-accent-blue"
             href="mailto:contact@hyperlink.academy"

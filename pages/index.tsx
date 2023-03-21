@@ -59,8 +59,8 @@ export default function IndexPage() {
             and dug research rabbitholes.
           </p>
           <p>
-            🌱 Now, we're making something new — a place to bring people into
-            purpose-built spaces to create and collaborate.
+            {`🌱 Now, we're making something new — a place to bring people into
+            purpose-built spaces to create and collaborate.`}
           </p>
         </div>
 
@@ -101,16 +101,16 @@ export default function IndexPage() {
         <div className="m-auto max-w-xl">
           <div className="space-y-8">
             <p className="text-lg font-bold">
-              Hyperlink's new platform is in alpha, open by invitation.
+              {`Hyperlink's new platform is in alpha, open by invitation.`}
             </p>
             <p>
-              We're curating book collections, organizing recipes, cultivating
-              writing practices, making music & more…
+              We&apos;re curating book collections, organizing recipes,
+              cultivating writing practices, making music & more…
             </p>
             <p>Want to build learning worlds with us?</p>
             <p>
-              We're rolling out invites slowly, but as quickly as we can :) Drop
-              your email and we'll keep you posted.
+              We&apos;re rolling out invites slowly, but as quickly as we can :)
+              Drop your email and we&apos;ll keep you posted.
             </p>
           </div>
           {/* newsletter signup! */}
@@ -124,7 +124,7 @@ export default function IndexPage() {
               >
                 tell us about
               </a>{" "}
-              a Space you'd like to make, and we can talk more!
+              a Space you&apos;d like to make, and we can talk more!
             </p>
             <p>—Hyperlink Team (Jared + Celine + Brendan)</p>
           </div>
