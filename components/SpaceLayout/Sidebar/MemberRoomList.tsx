@@ -7,7 +7,11 @@ import { useSmoker } from "components/Smoke";
 import { useAuth } from "hooks/useAuth";
 import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
 import { useState } from "react";
-import { DraggableRoomListItem, RoomListItem, RoomListLabel } from "./RoomListLayout";
+import {
+  DraggableRoomListItem,
+  RoomListItem,
+  RoomListLabel,
+} from "./RoomListLayout";
 import { AddTiny } from "components/Icons";
 
 export const MemberRoomList = (props: {
@@ -17,21 +21,31 @@ export const MemberRoomList = (props: {
 }) => {
   let members = useIndex.aev("member/name");
   let { memberEntity, authorized } = useMutations();
+  let auth = useAuth();
+  let yourUsername = auth.session.session?.username;
+
   let [inviteOpen, setInviteOpen] = useState(false);
   return (
     <div className="flex flex-col gap-0.5">
       <RoomListLabel label="Members" />
       <ul className="sidebarMemberRoomList flex flex-col gap-0.5">
-        {!memberEntity ? null : (
+        {!memberEntity || !yourUsername ? null : (
           <DraggableRoomListItem
             draggable={false}
-            factID={members.find(m => m.entity === memberEntity)?.id as string}
+            factID={
+              members.find((m) => m.entity === memberEntity)?.id as string
+            }
             onRoomChange={props.onRoomChange}
             currentRoom={props.currentRoom}
             entityID={memberEntity}
             setRoomEditOpen={() => props.setRoomEditOpen}
           >
-            <div className="font-bold">You</div>
+            <div className="flex justify-between">
+              <span>{yourUsername} </span>
+              <span className="self-center rounded-md bg-grey-90 px-1 py-0.5 text-xs text-grey-35">
+                you
+              </span>
+            </div>
           </DraggableRoomListItem>
         )}
         {members
