@@ -7,6 +7,8 @@ import {
   CalendarMedium,
   CardAdd,
   Send,
+  Checkmark,
+  CloseLinedTiny,
 } from "components/Icons";
 import { Divider, MenuContainer, MenuItem } from "components/Layout";
 import {
@@ -16,18 +18,14 @@ import {
   useSpaceID,
 } from "hooks/useReplicache";
 
-import {
-  AttachedCardSection,
-  DateSection,
-  SingleTextSection,
-} from "./Sections";
+import { AttachedCardSection, SingleTextSection } from "./Sections";
 import { Backlinks } from "./Backlinks";
 import { usePreserveScroll } from "hooks/utils";
 import Link from "next/link";
 import { useAuth } from "hooks/useAuth";
 import { MakeImage, ImageSection } from "./ImageSection";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AddAttachedCard } from "components/CardStack";
 import { ButtonPrimary } from "components/Buttons";
 import { Discussion } from "./Discussion";
@@ -38,6 +36,8 @@ import { ReactionList, Reactions } from "./Reactions";
 import { useDroppableZone } from "components/DragContext";
 import { sortByPosition } from "src/position_helpers";
 import { generateKeyBetween } from "src/fractional-indexing";
+import { useUndoableState } from "hooks/useUndoableState";
+import { Fact } from "data/Facts";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 const borderStyles = (args: { member: boolean }) => {
@@ -163,13 +163,19 @@ export const CardContent = (props: {
     cardCreator?.value.value as string,
     "member/name"
   )?.value;
+  let [dateEditing, setDateEditing] = useUndoableState(false);
+
+  let { session } = useAuth();
+  let { mutate, authorized } = useMutations();
+
+  let date = useIndex.eav(props.entityID, "card/date");
 
   return (
     <>
       {/* START CARD CONTENT */}
       <div className="cardContent grid-auto-rows grid gap-3">
-        <div>
-          <div className="cardHeader grid grid-cols-[auto_max-content_max-content] gap-2">
+        <div className="cardHeader flex flex-col gap-0">
+          <div className="cardTitle grid grid-cols-[auto_max-content_max-content] gap-2">
             <Title entityID={props.entityID} />
             {cardCreatorName ? (
               <div className="lightBorder self-start rounded-md py-1 px-2 text-sm text-grey-35">
@@ -181,10 +187,23 @@ export const CardContent = (props: {
                 onDelete={props.onDelete}
                 entityID={props.entityID}
                 referenceFactID={props?.referenceFactID}
+                setDateEditing={() => {
+                  setDateEditing(true);
+                }}
+                date={date}
               />
             </div>
           </div>
-          <DateSection entityID={props.entityID} />
+
+          <ScheduledDate
+            entityID={props.entityID}
+            date={date}
+            dateEditing={dateEditing}
+            closeDateEditing={() => setDateEditing(false)}
+            openDateEditing={() => setDateEditing(true)}
+          />
+
+          {/* <DateSection entityID={props.entityID} /> */}
         </div>
 
         <DefaultTextSection entityID={props.entityID} />
@@ -303,6 +322,8 @@ const CardMoreOptionsMenu = (props: {
   entityID: string;
   referenceFactID?: string;
   onDelete?: () => void;
+  setDateEditing: () => void;
+  date: Fact<"card/date"> | null;
 }) => {
   let { authorized, mutate, action } = useMutations();
   let memberName = useIndex.eav(props.entityID, "member/name");
@@ -315,6 +336,21 @@ const CardMoreOptionsMenu = (props: {
         <MoreOptionsTiny />
       </Menu.Button>
       <MenuContainer>
+        <MenuItem
+          onClick={() => {
+            if (props.date !== null) {
+              mutate("retractFact", { id: props.date.id });
+            } else {
+              props.setDateEditing();
+            }
+          }}
+        >
+          {props.date ? <p>Remove Schedule</p> : <p>Schedule Card</p>}
+          <CalendarMedium />
+        </MenuItem>
+        <div className="py-2">
+          <Divider />
+        </div>{" "}
         <MenuItem
           onClick={async () => {
             action.start();
@@ -332,6 +368,96 @@ const CardMoreOptionsMenu = (props: {
         </MenuItem>
       </MenuContainer>
     </Menu>
+  );
+};
+
+const ScheduledDate = (props: {
+  entityID: string;
+  date: Fact<"card/date"> | null;
+  dateEditing: boolean;
+  closeDateEditing: () => void;
+  openDateEditing: () => void;
+}) => {
+  let { session } = useAuth();
+  let { mutate, authorized } = useMutations();
+
+  let [dateInputValue, setDateInputValue] = useState("");
+  useEffect(() => {
+    setDateInputValue(props.date?.value.value || "");
+  }, [props.date]);
+
+  let date = useMemo(() => {
+    if (!props.date) return null;
+    let dateParts = Intl.DateTimeFormat("en", {
+      timeZone: "UTC",
+      month: "short",
+      year: "numeric",
+      day: "numeric",
+    }).formatToParts(new Date(props.date.value.value));
+    let month = dateParts.find((f) => f.type === "month")?.value;
+    let day = dateParts.find((f) => f.type === "day")?.value;
+    let year = dateParts.find((f) => f.type === "year")?.value;
+    return { month, day, year };
+  }, [props.date]);
+
+  return (
+    <div className="flex place-items-center gap-2  text-sm text-grey-55">
+      {props.dateEditing ? (
+        <>
+          <input
+            className="-ml-1 border-grey-80 py-[2px] px-1 text-grey-55 "
+            onBlur={() => {
+              props.closeDateEditing();
+            }}
+            onChange={(e) => {
+              setDateInputValue(e.currentTarget.value);
+              mutate("assertFact", {
+                factID: ulid(),
+                entity: props.entityID,
+                attribute: "card/date",
+                value: {
+                  type: "yyyy-mm-dd",
+                  value: e.currentTarget.value,
+                },
+                positions: {},
+              });
+              props.closeDateEditing();
+            }}
+            value={dateInputValue}
+            type="date"
+          />
+
+          <div className="h-6 w-[2px] border-l border-grey-55" />
+
+          <button
+            className=" justify-self-center text-sm text-grey-55 hover:text-accent-blue"
+            onClick={() => {
+              if (!session.token) return;
+              if (props.date) {
+                mutate("retractFact", { id: props.date.id });
+                setDateInputValue("");
+                props.closeDateEditing();
+              } else {
+                props.closeDateEditing();
+              }
+            }}
+          >
+            remove
+          </button>
+        </>
+      ) : (
+        date && (
+          <button
+            className="-ml-[6px] border border-transparent py-[3px] px-1 text-sm text-grey-55 hover:underline"
+            onClick={() => {
+              props.openDateEditing();
+            }}
+          >
+            {date.month} {date.day}, {date.year}
+          </button>
+        )
+      )}
+    </div>
   );
 };
 
@@ -383,16 +509,6 @@ export const SectionAdder = (props: { entityID: string }) => {
     <div className="flex flex-col gap-2 text-grey-55">
       <div className="flex gap-2 pt-2">
         <MakeImage entity={props.entityID} />
-        {!date && (
-          <button
-            className="hover:text-accent-blue"
-            onClick={() => {
-              setOpen(!open);
-            }}
-          >
-            <CalendarMedium />
-          </button>
-        )}
 
         {attachedCards && attachedCards.length !== 0 ? null : (
           <AddAttachedCard
@@ -406,19 +522,6 @@ export const SectionAdder = (props: { entityID: string }) => {
           </AddAttachedCard>
         )}
       </div>
-      {open && !date && (
-        <input
-          onChange={(e) => {
-            mutate("assertFact", {
-              entity: props.entityID,
-              attribute: "card/date",
-              value: { type: "yyyy-mm-dd", value: e.currentTarget.value },
-              positions: {},
-            });
-          }}
-          type="date"
-        />
-      )}
     </div>
   );
 };
