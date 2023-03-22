@@ -7,8 +7,6 @@ import {
   CalendarMedium,
   CardAdd,
   Send,
-  Checkmark,
-  CloseLinedTiny,
 } from "components/Icons";
 import { Divider, MenuContainer, MenuItem } from "components/Layout";
 import {
@@ -32,7 +30,7 @@ import { Discussion } from "./Discussion";
 import { ulid } from "src/ulid";
 import { animated, useSpring } from "@react-spring/web";
 import { RenderedText } from "components/Textarea/RenderedText";
-import { ReactionList, Reactions } from "./Reactions";
+import { Reactions } from "./Reactions";
 import { useDroppableZone } from "components/DragContext";
 import { sortByPosition } from "src/position_helpers";
 import { generateKeyBetween } from "src/fractional-indexing";

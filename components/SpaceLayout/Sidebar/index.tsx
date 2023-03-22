@@ -16,7 +16,8 @@ import { RoomListItem, EditRoomModal } from "./RoomListLayout";
 import { SharedRoomList } from "./SharedRoomList";
 import { MemberRoomList } from "./MemberRoomList";
 import { Popover } from "@headlessui/react";
-import { ButtonLink } from "components/Buttons";
+import { ButtonLink, ButtonPrimary, ButtonSecondary } from "components/Buttons";
+import { LogInModal } from "components/LoginModal";
 
 export const Sidebar = (props: {
   onRoomChange: (room: string) => void;
@@ -115,16 +116,27 @@ const SpaceName = () => {
 
 const SidebarFooter = (props: { studio?: string }) => {
   let [infoOpen, setInfoOpen] = useState(false);
-  if (!props.studio) return <div className="shrink-0" />;
+  let [logInOpen, setLogInOpen] = useState(false);
 
   return (
-    <div className="sidebarBackToStudio z-10 flex shrink-0 items-center justify-between">
-      <Link
-        className="flex place-items-center gap-2 rounded-md border border-transparent px-2 py-1 hover:border-accent-blue  hover:text-accent-blue"
-        href={`/s/${props.studio}`}
-      >
-        <BackToStudioIcon /> To Studio
-      </Link>
+    <div className="sidebarBackToStudio z-10 flex items-center gap-2 ">
+      {!props.studio ? (
+        <div className="grow">
+          <ButtonPrimary
+            content="Log In"
+            onClick={() => setLogInOpen(!logInOpen)}
+          />
+          <LogInModal isOpen={logInOpen} onClose={() => setLogInOpen(false)} />
+        </div>
+      ) : (
+        <Link
+          className="flex grow place-items-center gap-2 rounded-md border border-transparent px-2 py-1 hover:border-accent-blue  hover:text-accent-blue"
+          href={`/s/${props.studio}`}
+        >
+          <BackToStudioIcon /> To Studio
+        </Link>
+      )}
+
       <button
         className="hover:text-accent-blue"
         onClick={() => setInfoOpen(true)}

@@ -8,7 +8,7 @@ import {
   useSpaceID,
 } from "hooks/useReplicache";
 import { SmallCardDragContext } from "components/DragContext";
-import { SpaceHeader, Sidebar } from "components/SpaceLayout";
+import { Sidebar } from "components/SpaceLayout";
 import Head from "next/head";
 import { useContext, useEffect, useState } from "react";
 import useWindowDimensions from "hooks/useWindowDimensions";
@@ -161,7 +161,6 @@ export default function SpacePage() {
                   `}
                   >
                     <Room entityID={room} />
-                    <SpaceHeader />
                   </div>
                 </div>
 
@@ -200,7 +199,6 @@ export default function SpacePage() {
                       `}
                   >
                     <Room entityID={room} />
-                    <SpaceHeader />
                   </div>
                 </div>
 
