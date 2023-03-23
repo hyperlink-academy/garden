@@ -102,15 +102,7 @@ const AddAttachedCard = (props: { day: string; children: React.ReactNode }) => {
   return (
     <>
       {/* decide styling of button via children */}
-      <button onClick={() => setOpen(true)}>
-        {props.children}
-        {/* <div
-          className={`relative flex h-10
-          w-full items-center justify-center rounded-lg border border-dashed text-grey-35`}
-        >
-          <AddSmall />
-        </div> */}
-      </button>
+      <button onClick={() => setOpen(true)}>{props.children}</button>
       <FindOrCreate
         allowBlank={true}
         onClose={() => setOpen(false)}
@@ -182,11 +174,11 @@ const AddCardToCalendar = (props: { day: string }) => {
       >
         <p className="font-bold hover:text-accent-blue">create new</p>
       </button>
-      <div className="h-full border-l text-grey-80" />
+      <div className="h-4 w-[1px] border-l border-dashed text-grey-80" />
       <AddAttachedCard day={props.day}>
         <div className="hover:text-accent-blue">
           <CardSearch />
-        </div>{" "}
+        </div>
       </AddAttachedCard>
     </div>
   );

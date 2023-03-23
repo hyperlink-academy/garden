@@ -13,17 +13,70 @@ import { sortByPosition } from "src/position_helpers";
 import { generateKeyBetween } from "src/fractional-indexing";
 import { useLongPress } from "hooks/useLongPress";
 import { Replicache } from "replicache";
+import { useCardViewer } from "./CardViewerContext";
+import { CardSearch } from "./Icons";
 
 export type StackData = {
-  parent: string;
+  parentID: string;
   attribute: keyof ReferenceAttributes;
   positionKey: string;
+  addToEnd?: boolean | undefined;
 };
 
-export const AddAttachedCard = (
+export const CardAdder = (props: { addToEnd?: boolean } & StackData) => {
+  let { authorized, mutate, memberEntity, action } = useMutations();
+  let rep = useContext(ReplicacheContext);
+  let { open } = useCardViewer();
+
+  if (!authorized) {
+    return null;
+  } else
+    return (
+      <div className="justify-left flex w-full shrink-0 items-center gap-2 rounded-lg border  border-dashed border-grey-80 px-2 py-1 text-sm text-grey-55 group-hover:border-accent-blue">
+        <button
+          className="group grow text-left font-bold hover:text-accent-blue"
+          onClick={async () => {
+            if (!memberEntity) return;
+            action.start();
+            let entity = ulid();
+            await mutate("createCard", {
+              entityID: entity,
+              title: "",
+              memberEntity,
+            });
+            open({ entityID: entity });
+            if (rep === null) {
+              return;
+            } else {
+              create(entity, props, rep.rep, mutate);
+            }
+
+            action.end();
+          }}
+        >
+          <p>create new</p>
+        </button>
+        <div className=" h-4 w-[1px] border-l border-dashed text-grey-80" />
+        <AddExistingCard
+          onAdd={(entity) => {
+            open({ entityID: entity });
+          }}
+          addToEnd={props.addToEnd}
+          parentID={props.parentID}
+          positionKey="eav"
+          attribute={props.attribute}
+        >
+          <div className={`text-grey-55 hover:text-accent-blue`}>
+            <CardSearch />
+          </div>
+        </AddExistingCard>
+      </div>
+    );
+};
+
+export const AddExistingCard = (
   props: {
     expanded?: boolean;
-    end?: boolean;
     onAdd?: (entity: string) => void;
     children: React.ReactNode;
   } & StackData
@@ -36,7 +89,7 @@ export const AddAttachedCard = (
   });
   let items = useAllItems(open);
 
-  const alreadyInEAV = useIndex.eav(props.parent, props.attribute);
+  const alreadyInEAV = useIndex.eav(props.parentID, props.attribute);
 
   let rep = useContext(ReplicacheContext);
   let { authorized, mutate, memberEntity, action } = useMutations();
@@ -90,7 +143,7 @@ export const AddAttachedCard = (
 
 const create = async (
   entity: string,
-  props: StackData & { end?: boolean | undefined },
+  props: StackData,
   rep: Replicache<ReplicacheMutators>,
   mutate: ReturnType<typeof useMutations>["mutate"]
 ) => {
@@ -99,10 +152,10 @@ const create = async (
 
   let siblings =
     (await rep.query((tx) => {
-      return scanIndex(tx).eav(props.parent, props.attribute);
+      return scanIndex(tx).eav(props.parentID, props.attribute);
     })) || [];
 
-  if (props.end) {
+  if (props.addToEnd) {
     let lastPosition = siblings.sort(sortByPosition(positionKey))[
       siblings.length - 1
     ]?.positions[positionKey];
@@ -116,7 +169,7 @@ const create = async (
   await mutate("addCardToSection", {
     factID: ulid(),
     cardEntity: entity,
-    parent: props.parent,
+    parent: props.parentID,
     section: props.attribute,
     positions: {
       eav: position,

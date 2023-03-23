@@ -10,12 +10,11 @@ import { generateKeyBetween } from "src/fractional-indexing";
 import { sortByPosition, updatePositions } from "src/position_helpers";
 import { ulid } from "src/ulid";
 import { CardPreview } from "./CardPreview";
-import { AddAttachedCard } from "./CardStack";
+import { CardAdder } from "./CardStack";
 import { useCardViewer } from "./CardViewerContext";
 import { useCombinedRefs } from "./Desktop";
 import { useDraggableCard, useDroppableZone } from "./DragContext";
 import {
-  AddSmall,
   CollectionList as CollectionListIcon,
   CollectionPreview as CollectionPreviewIcon,
 } from "./Icons";
@@ -100,25 +99,14 @@ const CollectionList = (props: {
   return (
     <div
       ref={setNodeRef}
-      className="z-10 flex h-full flex-col gap-y-2"
+      className="collectionCardList z-10 flex h-full flex-col gap-y-2"
     >
-      {props.cards.length > 0 && (
-        <AddAttachedCard
-          onAdd={(entity) => {
-            open({ entityID: entity });
-          }}
-          parent={props.entityID}
-          positionKey="eav"
+      {props.cards.length > 5 && (
+        <CardAdder
+          parentID={props.entityID}
           attribute={props.attribute}
-        >
-          <div
-            className={`relative mr-4 flex ${
-              props.size === "big" ? "h-24" : "h-10"
-            } w-full items-center justify-center rounded-lg border border-dashed text-grey-35`}
-          >
-            <AddSmall />
-          </div>
-        </AddAttachedCard>
+          positionKey="eav"
+        />
       )}
       {props.cards?.map((card) => (
         <DraggableCard
@@ -141,23 +129,12 @@ const CollectionList = (props: {
           />
         </div>
       )}
-      <AddAttachedCard
-        onAdd={(entity) => {
-          open({ entityID: entity });
-        }}
-        end
-        parent={props.entityID}
-        positionKey="eav"
+      <CardAdder
+        parentID={props.entityID}
         attribute={props.attribute}
-      >
-        <div
-          className={`relative mr-4 flex ${
-            props.size === "big" ? "h-24" : "h-10"
-          } w-full items-center justify-center rounded-lg border border-dashed text-grey-35`}
-        >
-          <AddSmall />
-        </div>
-      </AddAttachedCard>
+        positionKey="eav"
+        addToEnd
+      />
     </div>
   );
 };
@@ -177,14 +154,14 @@ const CollectionHeader = (props: { entityID: string }) => {
     });
   };
   const className = (typeName: Fact<"collection/type">["value"]) =>
-    `p-1 text-grey-55 ${
+    `p-0.5 text-grey-55 ${
       type === typeName
         ? "rounded-md border border-grey-55"
         : "border border-transparent"
     }`;
 
   return (
-    <div className="collectionTypeSelector flex flex-row gap-1 place-self-end">
+    <div className="collectionTypeSelector flex flex-row gap-0.5 place-self-end">
       <button
         className={`${className("list")} shrink-0`}
         onClick={onClick("list")}

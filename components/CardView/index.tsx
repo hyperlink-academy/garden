@@ -24,7 +24,7 @@ import { useAuth } from "hooks/useAuth";
 import { MakeImage, ImageSection } from "./ImageSection";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
-import { AddAttachedCard } from "components/CardStack";
+import { AddExistingCard } from "components/CardStack";
 import { ButtonPrimary } from "components/Buttons";
 import { Discussion } from "./Discussion";
 import { ulid } from "src/ulid";
@@ -509,15 +509,15 @@ export const SectionAdder = (props: { entityID: string }) => {
         <MakeImage entity={props.entityID} />
 
         {attachedCards && attachedCards.length !== 0 ? null : (
-          <AddAttachedCard
-            parent={props.entityID}
+          <AddExistingCard
+            parentID={props.entityID}
             attribute="deck/contains"
             positionKey="eav"
           >
             <div className="hover:text-accent-blue">
               <CardAdd />
             </div>
-          </AddAttachedCard>
+          </AddExistingCard>
         )}
       </div>
     </div>

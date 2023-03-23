@@ -33,7 +33,7 @@ export const ReactionList = (props: { entityID: string }) => {
   let reactions = useReactions(props.entityID);
 
   return (
-    <div className="flex w-full flex-row flex-wrap items-center gap-2">
+    <div className="reactionAddedReactions flex w-full flex-row flex-wrap items-center gap-2">
       {reactions?.map(([reaction, data]) => {
         return (
           <SingleReaction
@@ -55,7 +55,7 @@ const AddReaction = (props: { entityID: string; close: () => void }) => {
   let [newReaction, setNewReaction] = useState("");
   if (!authorized) return null;
   return (
-    <div className="flex flex-wrap gap-x-4 gap-y-2 rounded-md border border-grey-80 py-1 px-2">
+    <div className="reactionPicker flex flex-wrap gap-x-4 gap-y-2 rounded-md border border-grey-80 py-1 px-2">
       {reactions
         .filter((f) => !!f.value) // strip empty strings
         .map((r) => (
