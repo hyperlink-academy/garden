@@ -35,7 +35,7 @@ export const BigCardBody = (props: { entityID: string } & Props) => {
   return (
     <div
       {...listenersAndAttributes}
-      className={`CardPreviewContent flex h-full  grow flex-row overflow-hidden !bg-cover !bg-center !bg-no-repeat pl-2 ${
+      className={`CardPreviewContent flex h-full grow  flex-row overflow-hidden !bg-cover !bg-center !bg-no-repeat pl-2 text-sm ${
         isMember ? "py-2 pr-2" : "py-2 pr-3"
       }`}
       style={{
