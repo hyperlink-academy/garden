@@ -106,6 +106,7 @@ const CollectionList = (props: {
           parentID={props.entityID}
           attribute={props.attribute}
           positionKey="eav"
+          openOnAdd
         />
       )}
       {props.cards?.map((card) => (
@@ -134,6 +135,7 @@ const CollectionList = (props: {
         attribute={props.attribute}
         positionKey="eav"
         addToEnd
+        openOnAdd
       />
     </div>
   );

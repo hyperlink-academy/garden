@@ -23,7 +23,9 @@ export type StackData = {
   addToEnd?: boolean | undefined;
 };
 
-export const CardAdder = (props: { addToEnd?: boolean } & StackData) => {
+export const CardAdder = (
+  props: { openOnAdd?: boolean | undefined; addToEnd?: boolean } & StackData
+) => {
   let { authorized, mutate, memberEntity, action } = useMutations();
   let rep = useContext(ReplicacheContext);
   let { open } = useCardViewer();
@@ -44,7 +46,9 @@ export const CardAdder = (props: { addToEnd?: boolean } & StackData) => {
               title: "",
               memberEntity,
             });
-            open({ entityID: entity });
+            if (props.openOnAdd) {
+              open({ entityID: entity });
+            } else null;
             if (rep === null) {
               return;
             } else {
@@ -59,7 +63,9 @@ export const CardAdder = (props: { addToEnd?: boolean } & StackData) => {
         <div className=" h-4 w-[1px] border-l border-dashed text-grey-80" />
         <AddExistingCard
           onAdd={(entity) => {
-            open({ entityID: entity });
+            if (props.openOnAdd) {
+              open({ entityID: entity });
+            } else null;
           }}
           addToEnd={props.addToEnd}
           parentID={props.parentID}
