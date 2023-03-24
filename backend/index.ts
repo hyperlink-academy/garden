@@ -36,6 +36,7 @@ let router = makeRouter(Routes);
 export type Bindings = {
   APP_EVENT_ANALYTICS: AnalyticsEngineDataset;
   FAUNA_KEY: string;
+  SUPABASE_API_TOKEN: string;
   SPACES: DurableObjectNamespace;
   USER_UPLOADS: R2Bucket;
 };

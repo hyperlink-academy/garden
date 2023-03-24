@@ -34,7 +34,12 @@ export const AuthProvider: React.FC<React.PropsWithChildren<unknown>> = (
         session: data,
         login: async (login_data: { username: string; password: string }) => {
           if (data?.loggedIn)
-            return { success: true, token: data.token, session: data.session };
+            return {
+              success: true,
+              token: data.token,
+              session: data.session,
+              supabaseLogin: undefined,
+            };
           let res = await workerAPI(WORKER_URL, "login", login_data);
           if (res.success) {
             localStorage.setItem("auth", res.token);
