@@ -45,22 +45,38 @@ export const SpaceProvider: React.FC<
 
     return () => window.removeEventListener("keydown", handler);
   }, [undoManager]);
-
+  let socket = useRef<WebSocket>();
+  useEffect(() => {
+    if (!props.id || !rep) return;
+    socket.current = new WebSocket(`${SOCKET_URL}/space/${props.id}/socket`);
+    socket.current.addEventListener("message", () => {
+      rep?.pull();
+    });
+    return () => {
+      socket.current?.close();
+    };
+  }, [props.id, rep, reconnectSocket]);
   let { session, authToken } = useAuth();
   useEffect(() => {
-    console.log("making replicache");
-    let rep = makeSpaceReplicache({
+    let newRep = makeSpaceReplicache({
       id: props.id,
-      session: session.session?.studio,
+      session: session.session?.studio || "unauthorized",
       authToken,
       undoManager: undoManager,
+      onPull: () => {
+        if (socket.current) {
+          if (socket.current.readyState > 1) {
+            setReconnect({});
+          }
+        }
+      },
     });
-    setRep(rep);
+    setRep(newRep);
     return () => {
-      console.log("closing replicache");
-      rep.close();
+      newRep.close();
     };
   }, [props.id, authToken, session.session?.studio, undoManager]);
+
   return (
     <ReplicacheContext.Provider
       value={rep ? { rep, id: props.id, undoManager } : null}
