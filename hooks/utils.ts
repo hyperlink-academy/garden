@@ -28,6 +28,16 @@ export function usePreserveScroll<T extends HTMLElement>(key: string | null) {
   return { ref };
 }
 
+export function useDebouncedEffect(cb: () => void, delay: number, deps: any[]) {
+  let timeout = useRef<number | null>(null);
+  useEffect(() => {
+    if (timeout.current) {
+      clearTimeout(timeout.current);
+    }
+    timeout.current = window.setTimeout(cb, delay);
+  }, [cb, delay, ...deps]);
+}
+
 export function spacePath(
   studio: string | string[] | undefined,
   space: string | string[] | undefined

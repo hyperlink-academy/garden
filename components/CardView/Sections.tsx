@@ -72,7 +72,7 @@ export const DateSection = (props: { entityID: string }) => {
         <button
           className="justify-self-center text-sm text-grey-55 hover:text-accent-blue"
           onClick={() => {
-            if (!date || !session.token) return;
+            if (!date) return;
             mutate("retractFact", { id: date.id });
           }}
         >

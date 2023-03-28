@@ -1,56 +1,29 @@
-type SignedToken = {
-  signature: string;
-  data: string;
-};
+import { createClient } from "@supabase/supabase-js";
+import { Bindings } from "backend";
+import z from "zod";
+export type authToken = z.infer<typeof authTokenVerifier>;
 
-type Token = {
-  studio: string;
-  username: string;
-};
+export const authTokenVerifier = z.object({
+  access_token: z.string(),
+  refresh_token: z.string(),
+});
 
-function stringToUint8Array(str: string) {
-  let byteString = atob(str);
-  const ui = new Uint8Array(byteString.length);
-  for (let i = 0; i < byteString.length; ++i) {
-    ui[i] = byteString.charCodeAt(i);
+export const verifyIdentity = async (env: Bindings, token: authToken) => {
+  const supabase = createClient(
+    "http://localhost:54321",
+    env.SUPABASE_API_TOKEN
+  );
+  let { data: session } = await supabase.auth.setSession(token);
+  if (
+    session.user?.user_metadata.studio &&
+    session.user.user_metadata.username
+  ) {
+    let metadata = session.user.user_metadata as {
+      username: string;
+      studio: string;
+    };
+
+    return { ...metadata, id: session.user.id };
   }
-  return ui;
-}
-
-export async function ValidateToken(t: SignedToken, key: CryptoKey) {
-  let signature = stringToUint8Array(t.signature);
-  return await crypto.subtle.verify(
-    "HMAC",
-    key,
-    signature,
-    new TextEncoder().encode(t.data)
-  );
-}
-
-export function importKey(secret: string) {
-  let keyData = new TextEncoder().encode(secret);
-  let key = crypto.subtle.importKey(
-    "raw",
-    keyData,
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign", "verify"]
-  );
-  return key;
-}
-
-export async function SignToken(
-  t: Token,
-  secret: CryptoKey
-): Promise<SignedToken> {
-  let data = JSON.stringify(t);
-  let signature = await crypto.subtle.sign(
-    "HMAC",
-    secret,
-    new TextEncoder().encode(data)
-  );
-  return {
-    signature: btoa(String.fromCharCode(...new Uint8Array(signature))),
-    data,
-  };
-}
+  return null;
+};

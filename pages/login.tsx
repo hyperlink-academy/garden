@@ -1,4 +1,3 @@
-import { Session } from "backend/fauna/resources/sessions/session_collection";
 import { ButtonPrimary } from "components/Buttons";
 import { useAuth } from "hooks/useAuth";
 import { useRouter } from "next/router";
@@ -15,9 +14,12 @@ export default function LoginPage() {
     />
   );
 }
-export function LoginForm(props: { onLogin: (s: Session) => void }) {
+
+export function LoginForm(props: {
+  onLogin: (s: { username: string }) => void;
+}) {
   let [data, setData] = useState({
-    username: "",
+    email: "",
     password: "",
   });
 
@@ -27,16 +29,16 @@ export function LoginForm(props: { onLogin: (s: Session) => void }) {
   );
   useEffect(() => {
     setStatus("normal");
-  }, [data.username, data.password]);
+  }, [data.email, data.password]);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus("loading");
     let result = await login(data);
-    if (!result.success) setStatus("incorrect");
-    if (result.success) {
+    if (!result?.user) setStatus("incorrect");
+    else {
       setStatus("normal");
-      props.onLogin(result.session);
+      props.onLogin(result.user.user_metadata as { username: string });
     }
   };
   return (
@@ -45,19 +47,17 @@ export function LoginForm(props: { onLogin: (s: Session) => void }) {
       <form className="grid w-full gap-4" onSubmit={onSubmit}>
         {status !== "incorrect" ? null : (
           <div className="text-accent-red">
-            Your username or password is incorrect
+            Your email or password is incorrect
           </div>
         )}
         <label className="grid-flow-rows grid gap-2 font-bold">
           Username
           <input
             className="w-[100%]]"
-            type="text"
+            type="email"
             required
-            value={data.username}
-            onChange={(e) =>
-              setData({ ...data, username: e.currentTarget.value })
-            }
+            value={data.email}
+            onChange={(e) => setData({ ...data, email: e.currentTarget.value })}
           />
         </label>
         <label className="grid-flow-rows grid gap-2 font-bold">

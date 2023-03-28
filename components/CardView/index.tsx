@@ -111,8 +111,8 @@ export const CardView = (props: {
       max-w-3xl grow
       flex-col items-stretch overflow-y-scroll
       ${borderStyles({
-        member: !!memberName,
-      })}
+          member: !!memberName,
+        })}
       `}
       >
         {/* IF MEMBER CARD, INCLUDE LINK TO STUDIO  */}
@@ -134,8 +134,8 @@ export const CardView = (props: {
             gap-4
             overflow-scroll
             ${contentStyles({
-              member: !!memberName,
-            })}
+            member: !!memberName,
+          })}
             `}
         >
           {cardState === null ? (
@@ -376,7 +376,6 @@ const ScheduledDate = (props: {
   closeDateEditing: () => void;
   openDateEditing: () => void;
 }) => {
-  let { session } = useAuth();
   let { mutate, authorized } = useMutations();
 
   let [dateInputValue, setDateInputValue] = useState("");
@@ -430,7 +429,6 @@ const ScheduledDate = (props: {
           <button
             className=" justify-self-center text-sm text-grey-55 hover:text-accent-blue"
             onClick={() => {
-              if (!session.token) return;
               if (props.date) {
                 mutate("retractFact", { id: props.date.id });
                 setDateInputValue("");
@@ -460,7 +458,7 @@ const ScheduledDate = (props: {
 };
 
 const DefaultTextSection = (props: { entityID: string }) => {
-  let { session } = useAuth();
+  let { authToken } = useAuth();
   let { mutate } = useMutations();
   let spaceID = useSpaceID();
   return (
@@ -468,13 +466,14 @@ const DefaultTextSection = (props: { entityID: string }) => {
       id={`${props.entityID}-default-text-section}`}
       onPaste={async (e) => {
         let items = e.clipboardData.items;
-        if (!items[0].type.includes("image") || !session.session) return;
+        if (!items[0].type.includes("image") || !authToken) return;
         let image = items[0].getAsFile();
         if (!image) return;
 
         let res = await fetch(`${WORKER_URL}/space/${spaceID}/upload_file`, {
           headers: {
-            "X-Authorization": session.session.id,
+            "X-Authorization-Access-Token": authToken.access_token,
+            "X-Authorization-Refresh-Token": authToken.refresh_token,
           },
           method: "POST",
           body: image,
@@ -539,10 +538,10 @@ export const Thought = (props: { entityID: string; open: () => void }) => {
 
   let time = createdAt
     ? new Date(createdAt?.value.value).toLocaleDateString(undefined, {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      })
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    })
     : "";
   return (
     <button
@@ -572,9 +571,8 @@ export const Thought = (props: { entityID: string; open: () => void }) => {
         className={`place-self-end  ${"underline group-hover:text-accent-blue"}`}
       >
         {replyCount?.value
-          ? `${replyCount.value} ${
-              replyCount.value === 1 ? "reply" : "replies"
-            }`
+          ? `${replyCount.value} ${replyCount.value === 1 ? "reply" : "replies"
+          }`
           : "reply"}
       </small>
     </button>

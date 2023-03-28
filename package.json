@@ -29,6 +29,8 @@
     "@radix-ui/react-slider": "^1.0.0",
     "@react-spring/web": "^9.5.0",
     "@rocicorp/undo": "^0.2.0",
+    "@supabase/auth-helpers-nextjs": "^0.5.6",
+    "@supabase/auth-helpers-react": "^0.3.1",
     "@supabase/supabase-js": "^2.12.0",
     "@use-gesture/react": "^10.2.18",
     "@vercel/analytics": "^0.1.5",
@@ -71,6 +73,7 @@
     "postcss": "^8.4.12",
     "prettier": "^2.8.3",
     "prettier-plugin-tailwindcss": "^0.2.1",
+    "supabase": "^1.45.2",
     "tailwindcss": "^3.0.23",
     "ts-jest": "^28.0.5",
     "wrangler": "^2.9.0"

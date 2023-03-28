@@ -1,19 +1,14 @@
 import { z } from "zod";
-import { Client } from "faunadb";
 import { makeRoute } from "backend/lib/api";
-import { getSessionById } from "backend/fauna/resources/functions/get_session_by_id";
 import { Env } from "..";
 import { generateShareCode } from "../lib/generate_share_code";
+import { authTokenVerifier, verifyIdentity } from "backend/lib/auth";
 
 export const get_share_code_route = makeRoute({
   route: "get_share_code",
-  input: z.object({ token: z.string() }),
+  input: z.object({ authToken: authTokenVerifier }),
   handler: async (msg, env: Env) => {
-    let fauna = new Client({
-      secret: env.env.FAUNA_KEY,
-      domain: "db.us.fauna.com",
-    });
-    let session = await getSessionById(fauna, { id: msg.token });
+    let session = await verifyIdentity(env.env, msg.authToken);
     if (!session)
       return {
         data: { success: false, error: "Invalid session token" },

@@ -20,12 +20,12 @@ export const DoorSelector = (props: {
   selected?: Door;
 }) => {
   let spaceID = useSpaceID();
-  let { session } = useAuth();
+  let { session, authToken } = useAuth();
 
   const cleanup = (id: string) => {
-    if (!session.token) return;
+    if (!authToken) return;
     spaceAPI(`${WORKER_URL}/space/${spaceID}`, "delete_file_upload", {
-      token: session.token,
+      authToken,
       fileID: id,
     });
   };

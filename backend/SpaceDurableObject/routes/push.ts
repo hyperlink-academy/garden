@@ -7,11 +7,12 @@ import { Mutations } from "data/mutations";
 import { store } from "../fact_store";
 import { CachedStorage } from "../storage_cache";
 import { app_event } from "backend/lib/analytics";
+import { authTokenVerifier, verifyIdentity } from "backend/lib/auth";
 
 export const push_route = makeRoute({
   route: "push",
   input: z.object({
-    token: z.string(),
+    authToken: authTokenVerifier,
     clientID: z.string(),
     mutations: z.array(
       z.object({
@@ -27,12 +28,8 @@ export const push_route = makeRoute({
   handler: async (msg, env: Env) => {
     let lastMutationID =
       (await env.storage.get<number>(`lastMutationID-${msg.clientID}`)) || 0;
-    let fauna = new Client({
-      secret: env.env.FAUNA_KEY,
-      domain: "db.us.fauna.com",
-    });
 
-    let session = await getSessionById(fauna, { id: msg.token });
+    let session = await verifyIdentity(env.env, msg.authToken);
     if (!session)
       return {
         data: { success: false, error: "Invalid session token" },

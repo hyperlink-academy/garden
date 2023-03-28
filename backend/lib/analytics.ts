@@ -12,7 +12,7 @@ export const app_event = (
   env: Pick<Bindings, "APP_EVENT_ANALYTICS">,
   event: { event: AppEvents; user: string; spaceID: string }
 ) => {
-  env.APP_EVENT_ANALYTICS.writeDataPoint({
+  env.APP_EVENT_ANALYTICS?.writeDataPoint({
     blobs: [event.event, event.spaceID, event.user],
     doubles: [],
     indexes: [hexToArrayBuffer(event.spaceID)],

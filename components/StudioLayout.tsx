@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import { ButtonLink } from "./Buttons";
 
 export const StudioName = () => {
-  let name = useIndex.aev("this/name", "")[0];
+  let name = useIndex.aev("this/name")[0];
   let { query } = useRouter();
   if (!name) return null;
   let currentStudioName = query.studio;

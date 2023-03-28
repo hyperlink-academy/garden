@@ -1,43 +1,69 @@
 import { z } from "zod";
 import { Bindings } from "backend";
-import { Client } from "faunadb";
-import bcrypt from "bcryptjs";
-import { CreateNewIdentity } from "backend/fauna/resources/functions/create_identity";
 import { internalSpaceAPI, makeRoute } from "backend/lib/api";
 import { app_event } from "backend/lib/analytics";
+import { createClient } from "@supabase/supabase-js";
+import { Database } from "backend/lib/database.types";
 
 export const SignupRoute = makeRoute({
   route: "signup",
   input: z.object({
-    email: z.string().email(),
     username: z.string(),
-    password: z.string(),
-    code: z.string(),
+    tokens: z.object({ access_token: z.string(), refresh_token: z.string() }),
   }),
   handler: async (msg, env: Bindings) => {
-    let fauna = new Client({
-      secret: env.FAUNA_KEY,
-      domain: "db.us.fauna.com",
-    });
+    let storage: { [k: string]: any } = {};
+    const admin_supabase = createClient<Database>(
+      "http://localhost:54321",
+      env.SUPABASE_API_TOKEN
+    );
+    const user_supabase = createClient<Database>(
+      "http://localhost:54321",
+      env.SUPABASE_API_TOKEN,
+      {
+        auth: {
+          storage: {
+            getItem: (key) => storage[key],
+            setItem: (key, value) => {
+              storage[key] = value;
+            },
+            removeItem: (key) => {
+              delete storage[key];
+            },
+          },
+        },
+      }
+    );
+    let { data: session } = await user_supabase.auth.setSession(msg.tokens);
+    if (!session?.user) return { data: { success: false } } as const;
 
-    // Validate their signup token
-    let salt = await bcrypt.genSalt();
-    let hashedPassword = await bcrypt.hash(msg.password, salt);
+    // If the user has already been initialized, don't do it again
+    if (session.user.user_metadata.username)
+      return {
+        data: { success: false, error: "user already initialized" },
+      } as const;
+
     let newSpaceID = env.SPACES.newUniqueId();
-    let result = await CreateNewIdentity(fauna, {
-      ...msg,
-      salt,
+    // I should make a table and check that this doesn't conflict with old
+    // usernames either
+    const { error } = await admin_supabase.from("identity_data").insert({
+      id: session.user.id,
       studio: newSpaceID.toString(),
-      hashedPassword,
+      username: msg.username.toLowerCase(),
     });
 
-    if (!result.success) {
-      return { data: { success: false, error: result.error } } as const;
-    }
+    if (error)
+      return {
+        data: { success: false, error: "username already exists" },
+      } as const;
+
+    await user_supabase.auth.updateUser({
+      data: { username: msg.username, studio: newSpaceID.toString() },
+    });
 
     let stub = env.SPACES.get(newSpaceID);
     let newSpace = internalSpaceAPI(stub);
-    let res = await newSpace("http://internal", "claim", {
+    await newSpace("http://internal", "claim", {
       data: {
         display_name: msg.username,
         publish_on_listings_page: false,

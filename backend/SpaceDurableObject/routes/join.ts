@@ -1,20 +1,19 @@
-import { getSessionById } from "backend/fauna/resources/functions/get_session_by_id";
 import { app_event } from "backend/lib/analytics";
 import { makeRoute, privateSpaceAPI } from "backend/lib/api";
-import { Client } from "faunadb";
+import { authTokenVerifier, verifyIdentity } from "backend/lib/auth";
 import { ulid } from "src/ulid";
 import { z } from "zod";
 import { Env } from "..";
 
 export const join_route = makeRoute({
   route: "join",
-  input: z.object({ code: z.string(), token: z.string(), studio: z.string() }),
+  input: z.object({
+    code: z.string(),
+    authToken: authTokenVerifier,
+    studio: z.string(),
+  }),
   handler: async (msg, env: Env) => {
-    let fauna = new Client({
-      secret: env.env.FAUNA_KEY,
-      domain: "db.us.fauna.com",
-    });
-    let session = await getSessionById(fauna, { id: msg.token });
+    let session = await verifyIdentity(env.env, msg.authToken);
     if (!session)
       return {
         data: { success: false, error: "Invalid session token" },

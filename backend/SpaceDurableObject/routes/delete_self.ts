@@ -1,18 +1,18 @@
 import { Env } from "..";
 import { makeRoute, privateSpaceAPI } from "backend/lib/api";
 import { z } from "zod";
-import { Client } from "faunadb";
-import { getSessionById } from "backend/fauna/resources/functions/get_session_by_id";
-import { deleteFileUploadBySpace } from "backend/fauna/resources/functions/delete_space_uploads";
+import { authTokenVerifier, verifyIdentity } from "backend/lib/auth";
+import { createClient } from "@supabase/supabase-js";
+import { Database } from "backend/lib/database.types";
 export const delete_self_route = makeRoute({
   route: "delete_self",
-  input: z.object({ token: z.string(), name: z.string() }),
+  input: z.object({ authToken: authTokenVerifier, name: z.string() }),
   handler: async (msg, env: Env) => {
-    let fauna = new Client({
-      secret: env.env.FAUNA_KEY,
-      domain: "db.us.fauna.com",
-    });
-    let session = await getSessionById(fauna, { id: msg.token });
+    let session = await verifyIdentity(env.env, msg.authToken);
+    const supabase = createClient<Database>(
+      env.env.SUPABASE_URL,
+      env.env.SUPABASE_API_TOKEN
+    );
     if (!session)
       return {
         data: { success: false, error: "Invalid session token" },
@@ -22,10 +22,10 @@ export const delete_self_route = makeRoute({
     if (creator !== session.studio)
       return { data: { success: false } } as const;
 
-    await deleteFileUploadBySpace(fauna, {
-      spaceID: env.id,
-      token: msg.token,
-    });
+    await supabase
+      .from("file_uploads")
+      .update({ deleted: true })
+      .eq("space", env.id);
 
     let members = await env.factStore.scanIndex.aev("space/member");
     let communities = await env.factStore.scanIndex.aev("space/community");
