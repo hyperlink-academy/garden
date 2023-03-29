@@ -9,14 +9,14 @@ export default function LoginPage() {
   return (
     <LoginForm
       onLogin={(s) => {
-        router.push(`/s/${s.username}`);
+        s.username ? router.push(`/s/${s.username}`) : router.push("/setup");
       }}
     />
   );
 }
 
 export function LoginForm(props: {
-  onLogin: (s: { username: string }) => void;
+  onLogin: (s: { username?: string }) => void;
 }) {
   let [data, setData] = useState({
     email: "",
@@ -38,7 +38,7 @@ export function LoginForm(props: {
     if (!result?.user) setStatus("incorrect");
     else {
       setStatus("normal");
-      props.onLogin(result.user.user_metadata as { username: string });
+      props.onLogin(result.user.user_metadata as { username?: string });
     }
   };
   return (
@@ -51,7 +51,7 @@ export function LoginForm(props: {
           </div>
         )}
         <label className="grid-flow-rows grid gap-2 font-bold">
-          Username
+          Email
           <input
             className="w-[100%]]"
             type="email"

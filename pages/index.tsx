@@ -158,7 +158,13 @@ const LoginBox = () => {
             Invite-only for now — read below for details ✨
           </p>
           <Modal open={isOpen} onClose={() => setIsOpen(false)}>
-            <LoginForm onLogin={(s) => router.push(`/s/${s.username}`)} />
+            <LoginForm
+              onLogin={(s) =>
+                s.username
+                  ? router.push(`/s/${s.username}`)
+                  : router.push("/setup")
+              }
+            />
           </Modal>
         </div>
       ) : session.session?.username ? (
