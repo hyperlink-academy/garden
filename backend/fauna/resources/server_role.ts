@@ -14,7 +14,6 @@ import { deleteFileUploadFunctionName } from "./functions/delete_file_upload";
 import { deleteFileUploadsBySpaceFunctionName } from "./functions/delete_space_uploads";
 import { createSignupCodeFunctionName } from "./functions/create_signup_code";
 import { CreateCommunityFunctionName } from "./functions/create_new_community";
-import { getCommunityByNameFunctionName } from "./functions/get_community_by_name";
 
 const Functions = [
   deleteSessionFunctionName,
@@ -31,7 +30,6 @@ const Functions = [
   deleteFileUploadsBySpaceFunctionName,
   createSignupCodeFunctionName,
   CreateCommunityFunctionName,
-  getCommunityByNameFunctionName,
 ];
 const definition: RoleDefinition = {
   name: "server_role",

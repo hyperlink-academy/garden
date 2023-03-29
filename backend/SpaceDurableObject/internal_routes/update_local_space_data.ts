@@ -2,8 +2,8 @@ import { Env } from "..";
 import { makeRoute } from "backend/lib/api";
 import { z } from "zod";
 import { space_input } from "../routes/create_space";
-import { getCommunityByName } from "backend/fauna/resources/functions/get_community_by_name";
-import { Client } from "faunadb";
+import { createClient } from "@supabase/supabase-js";
+import { Database } from "backend/lib/database.types";
 
 export const update_local_space_data_route = makeRoute({
   route: "update_local_space_data",
@@ -18,10 +18,10 @@ export const update_local_space_data_route = makeRoute({
       .partial(),
   }),
   handler: async (msg, env: Env) => {
-    let fauna = new Client({
-      secret: env.env.FAUNA_KEY,
-      domain: "db.us.fauna.com",
-    });
+    const supabase = createClient<Database>(
+      env.env.SUPABASE_URL,
+      env.env.SUPABASE_API_TOKEN
+    );
     let spaceEntity = (
       await env.factStore.scanIndex.ave("space/id", msg.spaceID)
     )?.entity;
@@ -81,9 +81,11 @@ export const update_local_space_data_route = makeRoute({
         "space/community"
       );
       if (!community && msg.data.publish_on_listings_page) {
-        let communityData = await getCommunityByName(fauna, {
-          name: "hyperlink",
-        });
+        let { data: communityData } = await supabase
+          .from("communities")
+          .select("*")
+          .eq("name", "hyperlink")
+          .single();
         if (communityData)
           env.factStore.assertFact({
             entity: spaceEntity,

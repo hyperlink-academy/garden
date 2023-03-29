@@ -1,10 +1,10 @@
 import { Env } from "..";
 import { makeRoute, privateSpaceAPI } from "backend/lib/api";
 import { z } from "zod";
-import { Client } from "faunadb";
 import { space_input } from "./create_space";
-import { getCommunityByName } from "backend/fauna/resources/functions/get_community_by_name";
 import { authTokenVerifier, verifyIdentity } from "backend/lib/auth";
+import { createClient } from "@supabase/supabase-js";
+import { Database } from "backend/lib/database.types";
 
 export const update_self_route = makeRoute({
   route: "update_self",
@@ -13,10 +13,10 @@ export const update_self_route = makeRoute({
     data: space_input,
   }),
   handler: async (msg, env: Env) => {
-    let fauna = new Client({
-      secret: env.env.FAUNA_KEY,
-      domain: "db.us.fauna.com",
-    });
+    const supabase = createClient<Database>(
+      env.env.SUPABASE_URL,
+      env.env.SUPABASE_API_TOKEN
+    );
     let session = await verifyIdentity(env.env, msg.authToken);
     if (!session)
       return {
@@ -49,9 +49,11 @@ export const update_self_route = makeRoute({
       );
     }
     if (msg.data.publish_on_listings_page && !community) {
-      let communityData = await getCommunityByName(fauna, {
-        name: "hyperlink",
-      });
+      let { data: communityData } = await supabase
+        .from("communities")
+        .select("*")
+        .eq("name", "hyperlink")
+        .single();
       if (!communityData)
         return {
           data: { success: false, error: "no hyperlink community" },

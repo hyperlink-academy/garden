@@ -34,6 +34,23 @@ export interface Database {
   };
   public: {
     Tables: {
+      communities: {
+        Row: {
+          id: number;
+          name: string;
+          spaceID: string;
+        };
+        Insert: {
+          id?: number;
+          name: string;
+          spaceID: string;
+        };
+        Update: {
+          id?: number;
+          name?: string;
+          spaceID?: string;
+        };
+      };
       file_uploads: {
         Row: {
           created_at: string;

@@ -1,8 +1,8 @@
-import { getCommunityByName } from "backend/fauna/resources/functions/get_community_by_name";
+import { createClient } from "@supabase/supabase-js";
 import { app_event } from "backend/lib/analytics";
 import { internalSpaceAPI, makeRoute, privateSpaceAPI } from "backend/lib/api";
 import { verifyIdentity, authTokenVerifier } from "backend/lib/auth";
-import { Client } from "faunadb";
+import { Database } from "backend/lib/database.types";
 import { z } from "zod";
 import { Env } from "..";
 
@@ -35,10 +35,10 @@ export const create_space_route = makeRoute({
     })
     .merge(space_input),
   handler: async (msg, env: Env) => {
-    let fauna = new Client({
-      secret: env.env.FAUNA_KEY,
-      domain: "db.us.fauna.com",
-    });
+    const supabase = createClient<Database>(
+      env.env.SUPABASE_URL,
+      env.env.SUPABASE_API_TOKEN
+    );
     let creator = await env.storage.get("meta-creator");
     let session = await verifyIdentity(env.env, msg.authToken);
 
@@ -54,11 +54,16 @@ export const create_space_route = makeRoute({
     //Eventually we want this to be choosable!
     let community;
     if (msg.publish_on_listings_page) {
-      community = await getCommunityByName(fauna, { name: "hyperlink" });
-      if (!community)
+      let { data } = await supabase
+        .from("communities")
+        .select("*")
+        .eq("name", "hyperlink")
+        .single();
+      if (!data)
         return {
           data: { success: false, error: "no hyperlink community" },
         } as const;
+      community = data;
     }
 
     let newSpace = env.env.SPACES.newUniqueId();
