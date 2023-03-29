@@ -36,9 +36,9 @@ export const MemberRoomList = (props: {
             entityID={memberEntity}
             setRoomEditOpen={() => props.setRoomEditOpen}
           >
-            <div className="flex justify-between">
-              <span>{yourUsername} </span>
-              <span className="self-center rounded-md bg-grey-90 px-1 py-0.5 text-xs text-grey-35">
+            <div className="flex justify-between gap-2">
+              <span className="">{yourUsername}</span>
+              <span className="flex-shrink-0 self-center rounded-md bg-grey-90 px-1 py-0.5 text-xs text-grey-35">
                 you
               </span>
             </div>
