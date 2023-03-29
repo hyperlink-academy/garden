@@ -4,10 +4,9 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
+type Status = "normal" | "invalidEmail" | "confirm";
 export default function SignupPage() {
-  let [status, setStatus] = useState<
-    "normal" | "invalidUsernameOrEmail" | "invalidToken" | "confirm"
-  >("normal");
+  let [status, setStatus] = useState<Status>("normal");
   let [input, setInput] = useState({
     password: "",
     email: "",
@@ -25,10 +24,11 @@ export default function SignupPage() {
   }, [session, router]);
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    let { data } = await signup({
+    let { data, error } = await signup({
       email: input.email,
       password: input.password,
     });
+    if (error?.message === "User already registered") setStatus("invalidEmail");
     if (data.user && !data.session) setStatus("confirm");
   };
   if (status === "confirm")
@@ -55,19 +55,12 @@ export default function SignupPage() {
       </div>
 
       <form onSubmit={onSubmit} className="grid w-full gap-4">
-        {status === "normal" ? null : (
-          <div className="text-accent-red">
-            {status === "invalidToken" ? (
-              <span> Your invite code is invalid</span>
-            ) : (
-              <span> That username or email is taken</span>
-            )}
-          </div>
-        )}
+        <ErrorMessage status={status} />
         <label className="grid-flow-rows grid gap-2 font-bold">
           Email
           <input
             required
+            minLength={7}
             type="email"
             value={input.email}
             onChange={(e) =>
@@ -88,6 +81,21 @@ export default function SignupPage() {
   );
 }
 
+function ErrorMessage(props: { status: Status }) {
+  switch (props.status) {
+    case "normal":
+      return null;
+    case "invalidEmail":
+      return (
+        <div className="text-accent-red">
+          <span> An account already exists with that email</span>
+        </div>
+      );
+    default:
+      return null;
+  }
+}
+
 function PasswordInput(props: {
   value: string;
   onChange: (value: string) => void;
@@ -97,6 +105,7 @@ function PasswordInput(props: {
     <div>
       <input
         required
+        minLength={8}
         className="relative w-full"
         autoComplete="new-password"
         value={props.value}
