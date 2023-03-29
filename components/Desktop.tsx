@@ -3,6 +3,7 @@ import {
   scanIndex,
   useIndex,
   useMutations,
+  useSpaceID,
 } from "hooks/useReplicache";
 import { useContext, useMemo, useState } from "react";
 import { CardPreview } from "./CardPreview";
@@ -13,15 +14,20 @@ import { useCardViewer } from "./CardViewerContext";
 import { useDraggableCard, useDroppableZone } from "./DragContext";
 import { sortByPosition } from "src/position_helpers";
 import { generateKeyBetween } from "src/fractional-indexing";
+import { useAuth } from "hooks/useAuth";
+import { getAndUploadFile } from "src/getAndUploadFile";
 
 const GRID_SIZE = 16;
 const snap = (x: number) => Math.ceil(x / GRID_SIZE) * GRID_SIZE;
 
+const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export const Desktop = (props: { entityID: string }) => {
   let cards = useIndex.eav(props.entityID, "desktop/contains");
   let height = useHeight(props.entityID) + 500;
+  let { authToken } = useAuth();
   let { mutate, action, authorized } = useMutations();
   let rep = useContext(ReplicacheContext);
+  let spaceID = useSpaceID();
   let [draggingHeight, setDraggingHeight] = useState(0);
   let [createCard, setCreateCard] = useState<null | { x: number; y: number }>(
     null
@@ -114,6 +120,39 @@ export const Desktop = (props: { entityID: string }) => {
               y: e.clientY - parentRect.top,
             });
           }
+        }}
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={async (e) => {
+          e.preventDefault();
+          if (!authToken || !spaceID) return;
+          let parentRect = e.currentTarget.getBoundingClientRect();
+          let data = await getAndUploadFile(
+            e.dataTransfer.items,
+            authToken,
+            spaceID
+          );
+          if (!data.success) return;
+
+          let entity = ulid();
+          await mutate("assertFact", {
+            entity,
+            factID: ulid(),
+            attribute: "card/image",
+            value: { type: "file", id: data.data.id, filetype: "image" },
+            positions: {},
+          });
+
+          await mutate("addCardToDesktop", {
+            entity,
+            factID: ulid(),
+            desktop: props.entityID,
+            position: {
+              rotation: 0,
+              size: "small",
+              x: Math.max(e.clientX - parentRect.left - 128, 0),
+              y: Math.max(e.clientY - parentRect.top - 42, 0),
+            },
+          });
         }}
         style={{
           zIndex: 1,
@@ -218,7 +257,7 @@ const DraggableCard = (props: {
             width: position?.value.size === "big" ? "288px" : "fit-content",
           }}
           ref={refs}
-          className="absolute touch-none"
+          className="absolute"
         >
           {/* This handles the rotation */}
           <div

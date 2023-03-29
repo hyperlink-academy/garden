@@ -36,6 +36,7 @@ import { sortByPosition } from "src/position_helpers";
 import { generateKeyBetween } from "src/fractional-indexing";
 import { useUndoableState } from "hooks/useUndoableState";
 import { Fact } from "data/Facts";
+import { getAndUploadFile } from "src/getAndUploadFile";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 const borderStyles = (args: { member: boolean }) => {
@@ -63,6 +64,8 @@ export const CardView = (props: {
   referenceFactID?: string;
 }) => {
   let [cardState, setCardState] = useState<null | string>(null);
+  let { authToken } = useAuth();
+  let spaceID = useSpaceID();
   let memberName = useIndex.eav(props.entityID, "member/name");
   let { ref } = usePreserveScroll<HTMLDivElement>(props.entityID);
 
@@ -111,9 +114,27 @@ export const CardView = (props: {
       max-w-3xl grow
       flex-col items-stretch overflow-y-scroll
       ${borderStyles({
-          member: !!memberName,
-        })}
+        member: !!memberName,
+      })}
       `}
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={async (e) => {
+          if (!authToken || !spaceID) return;
+          let data = await getAndUploadFile(
+            e.dataTransfer.items,
+            authToken,
+            spaceID
+          );
+          if (!data.success) return;
+
+          await mutate("assertFact", {
+            entity: props.entityID,
+            factID: ulid(),
+            attribute: "card/image",
+            value: { type: "file", id: data.data.id, filetype: "image" },
+            positions: {},
+          });
+        }}
       >
         {/* IF MEMBER CARD, INCLUDE LINK TO STUDIO  */}
         {!memberName ? null : (
@@ -134,8 +155,8 @@ export const CardView = (props: {
             gap-4
             overflow-scroll
             ${contentStyles({
-            member: !!memberName,
-          })}
+              member: !!memberName,
+            })}
             `}
         >
           {cardState === null ? (
@@ -465,22 +486,12 @@ const DefaultTextSection = (props: { entityID: string }) => {
     <SingleTextSection
       id={`${props.entityID}-default-text-section}`}
       onPaste={async (e) => {
-        let items = e.clipboardData.items;
-        if (!items[0].type.includes("image") || !authToken) return;
-        let image = items[0].getAsFile();
-        if (!image) return;
-
-        let res = await fetch(`${WORKER_URL}/space/${spaceID}/upload_file`, {
-          headers: {
-            "X-Authorization-Access-Token": authToken.access_token,
-            "X-Authorization-Refresh-Token": authToken.refresh_token,
-          },
-          method: "POST",
-          body: image,
-        });
-        let data = (await res.json()) as
-          | { success: false }
-          | { success: true; data: { id: string } };
+        if (!authToken || !spaceID) return;
+        let data = await getAndUploadFile(
+          e.clipboardData.items,
+          authToken,
+          spaceID
+        );
         if (!data.success) return;
         await mutate("assertFact", {
           entity: props.entityID,
@@ -538,10 +549,10 @@ export const Thought = (props: { entityID: string; open: () => void }) => {
 
   let time = createdAt
     ? new Date(createdAt?.value.value).toLocaleDateString(undefined, {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    })
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      })
     : "";
   return (
     <button
@@ -571,8 +582,9 @@ export const Thought = (props: { entityID: string; open: () => void }) => {
         className={`place-self-end  ${"underline group-hover:text-accent-blue"}`}
       >
         {replyCount?.value
-          ? `${replyCount.value} ${replyCount.value === 1 ? "reply" : "replies"
-          }`
+          ? `${replyCount.value} ${
+              replyCount.value === 1 ? "reply" : "replies"
+            }`
           : "reply"}
       </small>
     </button>

@@ -5,6 +5,7 @@ import {
   scanIndex,
   useIndex,
   useMutations,
+  useSpaceID,
 } from "hooks/useReplicache";
 import {
   CloseLinedTiny,
@@ -18,6 +19,9 @@ import { SmallCardBody } from "./SmallCard";
 import { BigCardBody } from "./BigCard";
 import { useLongPress } from "hooks/useLongPress";
 import { useSubscribe } from "replicache-react";
+import { useAuth } from "hooks/useAuth";
+import { ulid } from "src/ulid";
+import { getAndUploadFile } from "src/getAndUploadFile";
 
 const borderStyles = (args: { isMember: boolean }) => {
   switch (true) {
@@ -50,16 +54,19 @@ export type Props = {
   pointerUpHandler?: (e: React.PointerEvent) => void;
 };
 
+const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export const CardPreview = (
   props: {
     entityID: string;
   } & Props
 ) => {
   let isMember = !!useIndex.eav(props.entityID, "member/name");
-  let { memberEntity } = useMutations();
+  let { memberEntity, mutate } = useMutations();
   let unreadBy = useIndex.eav(props.entityID, "card/unread-by") || [];
   let isUnread = unreadBy.find((f) => f.value.value === memberEntity);
   let rep = useContext(ReplicacheContext);
+  let { authToken } = useAuth();
+  let spaceID = useSpaceID();
   let unreadDiscussions = useSubscribe(
     rep?.rep,
     async (tx) => {
@@ -92,6 +99,26 @@ export const CardPreview = (
         {...handlers}
         onPointerUp={(e) => {
           if (!isLongPress.current) props.pointerUpHandler?.(e);
+        }}
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={async (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (!authToken || !spaceID) return;
+          let data = await getAndUploadFile(
+            e.dataTransfer.items,
+            authToken,
+            spaceID
+          );
+          if (!data.success) return;
+
+          await mutate("assertFact", {
+            entity: props.entityID,
+            factID: ulid(),
+            attribute: "card/image",
+            value: { type: "file", id: data.data.id, filetype: "image" },
+            positions: {},
+          });
         }}
         className={`cardPreviewBorder select-none ${
           isUnread ? "unreadCardGlow" : ""

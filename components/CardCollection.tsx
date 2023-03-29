@@ -1,12 +1,15 @@
 import { Fact } from "data/Facts";
+import { useAuth } from "hooks/useAuth";
 import {
   ReplicacheContext,
   scanIndex,
   useIndex,
   useMutations,
+  useSpaceID,
 } from "hooks/useReplicache";
 import { useContext } from "react";
 import { generateKeyBetween } from "src/fractional-indexing";
+import { getAndUploadFile } from "src/getAndUploadFile";
 import { sortByPosition, updatePositions } from "src/position_helpers";
 import { ulid } from "src/ulid";
 import { CardPreview } from "./CardPreview";
@@ -46,8 +49,9 @@ const CollectionList = (props: {
   attribute: "desktop/contains" | "deck/contains";
   cards: Fact<"desktop/contains" | "deck/contains">[];
 }) => {
-  let { open } = useCardViewer();
   let rep = useContext(ReplicacheContext);
+  let spaceID = useSpaceID();
+  let { authToken } = useAuth();
   let { mutate, action } = useMutations();
   let { setNodeRef, over } = useDroppableZone({
     type: "dropzone",
@@ -100,6 +104,46 @@ const CollectionList = (props: {
     <div
       ref={setNodeRef}
       className="collectionCardList z-10 flex h-full flex-col gap-y-2"
+      onDragOver={(e) => e.preventDefault()}
+      onDrop={async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!rep || !authToken || !spaceID) return;
+        let data = await getAndUploadFile(
+          e.dataTransfer.items,
+          authToken,
+          spaceID
+        );
+        if (!data.success) return;
+
+        let entity = ulid();
+        await mutate("assertFact", {
+          entity,
+          factID: ulid(),
+          attribute: "card/image",
+          value: { type: "file", id: data.data.id, filetype: "image" },
+          positions: {},
+        });
+
+        let siblings =
+          (await rep.rep.query((tx) => {
+            return scanIndex(tx).eav(props.entityID, props.attribute);
+          })) || [];
+
+        let lastPosition = siblings.sort(sortByPosition("eav"))[
+          siblings.length - 1
+        ]?.positions["eav"];
+        let position = generateKeyBetween(lastPosition || null, null);
+        await mutate("addCardToSection", {
+          factID: ulid(),
+          cardEntity: entity,
+          parent: props.entityID,
+          section: props.attribute,
+          positions: {
+            eav: position,
+          },
+        });
+      }}
     >
       {props.cards.length > 5 && (
         <CardAdder
