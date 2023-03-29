@@ -4,9 +4,11 @@
 /node_modules
 .env
 .env.local
+.dev.vars
 TODO.md
 *.code-workspace
 public/sw.*
 public/workbox-*
 .vscode/
 .DS_Store
+.wrangler
