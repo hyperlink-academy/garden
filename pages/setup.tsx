@@ -6,7 +6,7 @@ import { useAuth } from "hooks/useAuth";
 import { useDebouncedEffect } from "hooks/utils";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export default function SignupPage() {
@@ -37,7 +37,13 @@ export default function SignupPage() {
     [data.username]
   );
 
-  let { authToken: tokens } = useAuth();
+  let { authToken: tokens, session } = useAuth();
+  useEffect(() => {
+    if (session.loggedIn) {
+      if (!session?.session?.username) router.push("/setup");
+      else router.push(`/s/${session?.session?.username}`);
+    }
+  }, [session, router]);
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!tokens) return;
