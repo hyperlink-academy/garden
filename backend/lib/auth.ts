@@ -9,10 +9,7 @@ export const authTokenVerifier = z.object({
 });
 
 export const verifyIdentity = async (env: Bindings, token: authToken) => {
-  const supabase = createClient(
-    "http://localhost:54321",
-    env.SUPABASE_API_TOKEN
-  );
+  const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_API_TOKEN);
   let { data: session } = await supabase.auth.setSession(token);
   if (
     session.user?.user_metadata.studio &&

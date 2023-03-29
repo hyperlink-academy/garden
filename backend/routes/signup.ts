@@ -14,11 +14,11 @@ export const SignupRoute = makeRoute({
   handler: async (msg, env: Bindings) => {
     let storage: { [k: string]: any } = {};
     const admin_supabase = createClient<Database>(
-      "http://localhost:54321",
+      env.SUPABASE_URL,
       env.SUPABASE_API_TOKEN
     );
     const user_supabase = createClient<Database>(
-      "http://localhost:54321",
+      env.SUPABASE_URL,
       env.SUPABASE_API_TOKEN,
       {
         auth: {

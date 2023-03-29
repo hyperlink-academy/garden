@@ -11,7 +11,7 @@ export const getStudioRoute = makeRoute({
   input: z.object({ name: z.string() }),
   handler: async (msg, env: Bindings) => {
     const supabase = createClient<Database>(
-      "http://localhost:54321",
+      env.SUPABASE_URL,
       env.SUPABASE_API_TOKEN
     );
     let { data } = await supabase

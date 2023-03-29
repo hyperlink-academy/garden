@@ -26,7 +26,7 @@ export const LoginRoute = makeRoute({
       domain: "db.us.fauna.com",
     });
     const supabase = createClient<Database>(
-      "http://localhost:54321",
+      env.SUPABASE_URL,
       env.SUPABASE_API_TOKEN
     );
 
