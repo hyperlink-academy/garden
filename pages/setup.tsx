@@ -1,6 +1,7 @@
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { workerAPI } from "backend/lib/api";
 import { ButtonPrimary } from "components/Buttons";
+import { DotLoader } from "components/DotLoader";
 import { useAuth } from "hooks/useAuth";
 import { useDebouncedEffect } from "hooks/utils";
 import Link from "next/link";
@@ -11,7 +12,9 @@ const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export default function SignupPage() {
   let router = useRouter();
   let supabase = useSupabaseClient();
-  let [status, setStatus] = useState<"valid" | "invalidUsername">("valid");
+  let [status, setStatus] = useState<
+    "valid" | "invalidUsername" | "complete" | "loading"
+  >("valid");
   let [data, setData] = useState({
     username: "",
   });
@@ -23,28 +26,39 @@ export default function SignupPage() {
         .select("username")
         .eq("username", data.username)
         .single();
-      if (existingUsername) {
-        setStatus("invalidUsername");
-      } else setStatus("valid");
+      setStatus((previousStatus) => {
+        if (previousStatus !== "valid" && previousStatus !== "invalidUsername")
+          return previousStatus;
+        if (existingUsername) return "invalidUsername";
+        return "valid";
+      });
     },
     300,
-    [data]
+    [data.username]
   );
 
   let { authToken: tokens } = useAuth();
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!tokens) return;
+    setStatus("loading");
     let res = await workerAPI(WORKER_URL, "signup", {
       username: data.username,
       tokens,
     });
+    if (!res.success) {
+      if (res.error === "username already exists") setStatus("invalidUsername");
+      if (res.error === "user already initialized") {
+        router.push(`/s/${data.username}`);
+      }
+    }
     if (res.success) {
       let { data } = await supabase.auth.refreshSession();
       if (data.session) {
         await supabase.auth.setSession(data?.session);
         router.push(`/s/${data.user?.user_metadata.username}`);
       }
+      setStatus("complete");
     }
   };
 
@@ -72,11 +86,11 @@ export default function SignupPage() {
       </div>
 
       <form onSubmit={onSubmit} className="grid w-full gap-4">
-        {status === "valid" ? null : (
+        {status === "invalidUsername" ? (
           <div className="text-accent-red">
             <span>Sorry, that username is not available</span>
           </div>
-        )}
+        ) : null}
         <p>
           Pick a name for your Studio — your Hyperlink homepage, where all your
           Spaces will live.
@@ -103,7 +117,9 @@ export default function SignupPage() {
             data.username.match(/^[A-Za-z_0-9]+$/) === null
           }
           type="submit"
-          content="Construct your Studio!"
+          content={
+            status === "loading" ? <DotLoader /> : "Construct your Studio!"
+          }
         />
       </form>
     </div>

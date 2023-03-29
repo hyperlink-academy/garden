@@ -40,7 +40,11 @@ export const SignupRoute = makeRoute({
     // If the user has already been initialized, don't do it again
     if (session.user.user_metadata.username)
       return {
-        data: { success: false, error: "user already initialized" },
+        data: {
+          success: false,
+          error: "user already initialized",
+          username: session.user.user_metadata.username,
+        },
       } as const;
 
     let newSpaceID = env.SPACES.newUniqueId();
