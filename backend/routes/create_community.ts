@@ -3,17 +3,18 @@ import { createCommunity } from "backend/fauna/resources/functions/create_new_co
 import { getSessionById } from "backend/fauna/resources/functions/get_session_by_id";
 import { Session } from "backend/fauna/resources/sessions/session_collection";
 import { internalSpaceAPI, makeRoute } from "backend/lib/api";
+import { authTokenVerifier, verifyIdentity } from "backend/lib/auth";
 import { Client } from "faunadb";
 import { z } from "zod";
 export const create_community_route = makeRoute({
   route: "create_community",
-  input: z.object({ communityName: z.string(), token: z.string() }),
+  input: z.object({ communityName: z.string(), authToken: authTokenVerifier }),
   handler: async (msg, env: Bindings) => {
     let fauna = new Client({
       secret: env.FAUNA_KEY,
       domain: "db.us.fauna.com",
     });
-    let session = await getSessionById(fauna, { id: msg.token });
+    let session = await verifyIdentity(env, msg.authToken);
     if (!session || !checkPermission(session))
       return {
         data: { success: false, error: "Unauthorized" },
@@ -37,7 +38,7 @@ export const create_community_route = makeRoute({
   },
 });
 
-const checkPermission = (s: Session) => {
+const checkPermission = (s: { username: string }) => {
   let usernames = ["jared", "brendan", "celine"];
   return usernames.includes(s.username);
 };

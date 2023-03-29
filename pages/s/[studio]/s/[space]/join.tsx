@@ -15,7 +15,7 @@ export default function JoinSpacePage() {
 }
 export function JoinSpace() {
   let id = useSpaceID();
-  let { session } = useAuth();
+  let { session, authToken } = useAuth();
   let router = useRouter();
   let code = router.query.code as string | undefined;
   let isMember = useIndex.ave("space/member", session.session?.studio);
@@ -25,9 +25,9 @@ export function JoinSpace() {
   let [isOpen, setLogInModal] = useState(false);
 
   const onClick = async () => {
-    if (!session.token || !code || isMember || !id) return;
+    if (!authToken || !code || isMember || !id) return;
     let data = await spaceAPI(`${WORKER_URL}/space/${id}`, "join", {
-      token: session.token,
+      authToken,
       code,
       studio: router.query.studio as string,
     });

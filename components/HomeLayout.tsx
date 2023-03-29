@@ -5,7 +5,6 @@ import { LoginForm } from "pages/login";
 import { useState } from "react";
 import { ButtonLink } from "./Buttons";
 import { Modal } from "./Layout";
-import { SpaceProvider } from "./ReplicacheProvider";
 
 export const HomeLayout = (props: {
   id: string;
@@ -66,7 +65,11 @@ const Login = () => {
     <>
       <ButtonLink content="log in" onClick={() => setIsOpen(true)} />
       <Modal open={isOpen} onClose={() => setIsOpen(false)}>
-        <LoginForm onLogin={(s) => router.push(`/s/${s.username}`)} />
+        <LoginForm
+          onLogin={(s) =>
+            s.username ? router.push(`/s/${s.username}`) : router.push("/setup")
+          }
+        />
       </Modal>
     </>
   );

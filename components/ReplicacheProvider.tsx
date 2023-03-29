@@ -13,6 +13,7 @@ import { useAuth } from "hooks/useAuth";
 import { useRouter } from "next/router";
 import useSWR, { mutate } from "swr";
 import { UndoManager } from "@rocicorp/undo";
+import { authToken } from "backend/lib/auth";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL as string;
@@ -22,17 +23,6 @@ export const SpaceProvider: React.FC<
   let [rep, setRep] = useState<ReturnType<typeof makeReplicache>>();
   const [reconnectSocket, setReconnect] = useState({});
   let [undoManager] = useState(new UndoManager());
-  let socket = useRef<WebSocket>();
-  useEffect(() => {
-    if (!props.id || !rep) return;
-    socket.current = new WebSocket(`${SOCKET_URL}/space/${props.id}/socket`);
-    socket.current.addEventListener("message", () => {
-      rep?.pull();
-    });
-    return () => {
-      socket.current?.close();
-    };
-  }, [props.id, rep, reconnectSocket]);
 
   useEffect(() => {
     let handler = (e: KeyboardEvent) => {
@@ -55,11 +45,24 @@ export const SpaceProvider: React.FC<
 
     return () => window.removeEventListener("keydown", handler);
   }, [undoManager]);
-
-  let { session } = useAuth();
+  let socket = useRef<WebSocket>();
   useEffect(() => {
-    let rep = makeSpaceReplicache({
+    if (!props.id || !rep) return;
+    socket.current = new WebSocket(`${SOCKET_URL}/space/${props.id}/socket`);
+    socket.current.addEventListener("message", () => {
+      rep?.pull();
+    });
+    return () => {
+      socket.current?.close();
+    };
+  }, [props.id, rep, reconnectSocket]);
+  let { session, authToken } = useAuth();
+  useEffect(() => {
+    let newRep = makeSpaceReplicache({
       id: props.id,
+      session: session.session?.studio || "unauthorized",
+      authToken,
+      undoManager: undoManager,
       onPull: () => {
         if (socket.current) {
           if (socket.current.readyState > 1) {
@@ -67,15 +70,13 @@ export const SpaceProvider: React.FC<
           }
         }
       },
-      session: session.session?.studio,
-      token: session.token,
-      undoManager: undoManager,
     });
-    setRep(rep);
+    setRep(newRep);
     return () => {
-      rep.close();
+      newRep.close();
     };
-  }, [props.id, session.token, session.session?.studio, undoManager]);
+  }, [props.id, authToken, session.session?.studio, undoManager]);
+
   return (
     <ReplicacheContext.Provider
       value={rep ? { rep, id: props.id, undoManager } : null}
@@ -120,24 +121,24 @@ export const makeSpaceReplicache = ({
   id,
   session,
   onPull,
-  token,
+  authToken,
   undoManager,
 }: {
   id: string;
   session?: string;
   onPull?: () => void;
-  token?: string;
+  authToken?: authToken | null;
   undoManager: UndoManager;
 }) =>
   makeReplicache({
     name: `space-${id}-${session}-${WORKER_URL}`,
     pusher: async (request) => {
       let data: PushRequest = await request.json();
-      if (!token)
+      if (!authToken)
         return { httpStatusCode: 200, errorMessage: "no user logged in" };
       await spaceAPI(`${WORKER_URL}/space/${id}`, "push", {
         ...data,
-        token: token,
+        authToken,
       });
       return { httpStatusCode: 200, errorMessage: "" };
     },

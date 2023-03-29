@@ -1,15 +1,15 @@
 import { Env } from "..";
-import { ExtractResponse, makeRoute, privateSpaceAPI } from "backend/lib/api";
+import { makeRoute, privateSpaceAPI } from "backend/lib/api";
 import { z } from "zod";
 import { Client } from "faunadb";
-import { getSessionById } from "backend/fauna/resources/functions/get_session_by_id";
 import { space_input } from "./create_space";
 import { getCommunityByName } from "backend/fauna/resources/functions/get_community_by_name";
+import { authTokenVerifier, verifyIdentity } from "backend/lib/auth";
 
 export const update_self_route = makeRoute({
   route: "update_self",
   input: z.object({
-    token: z.string(),
+    authToken: authTokenVerifier,
     data: space_input,
   }),
   handler: async (msg, env: Env) => {
@@ -17,7 +17,7 @@ export const update_self_route = makeRoute({
       secret: env.env.FAUNA_KEY,
       domain: "db.us.fauna.com",
     });
-    let session = await getSessionById(fauna, { id: msg.token });
+    let session = await verifyIdentity(env.env, msg.authToken);
     if (!session)
       return {
         data: { success: false, error: "Invalid session token" },

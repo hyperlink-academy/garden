@@ -140,33 +140,6 @@ const Divider = (props: { marginTop: string; marginBottom: string }) => (
   />
 );
 
-const LoginBar = () => {
-  let [isOpen, setLogInModal] = useState(false);
-  let { session } = useAuth();
-
-  return (
-    <div className="sticky top-0 z-10 border border-accent-gold bg-white p-4">
-      {!session?.loggedIn ? (
-        <>
-          <ButtonLink
-            className="justify-self-start"
-            content="Hypernaut Entry Portal --> Log In!"
-            onClick={() => setLogInModal(true)}
-          />
-          <LogInModal isOpen={isOpen} onClose={() => setLogInModal(false)} />
-        </>
-      ) : (
-        <Link href={`/s/${session.session.username}`}>
-          <div className="flex items-center gap-2 justify-self-start">
-            <BackToStudio />
-            <span>Visit my Studio</span>
-          </div>
-        </Link>
-      )}
-    </div>
-  );
-};
-
 const LoginBox = () => {
   let [isOpen, setIsOpen] = useState(false);
   let { session } = useAuth();
@@ -185,16 +158,26 @@ const LoginBox = () => {
             Invite-only for now — read below for details ✨
           </p>
           <Modal open={isOpen} onClose={() => setIsOpen(false)}>
-            <LoginForm onLogin={(s) => router.push(`/s/${s.username}`)} />
+            <LoginForm
+              onLogin={(s) =>
+                s.username
+                  ? router.push(`/s/${s.username}`)
+                  : router.push("/setup")
+              }
+            />
           </Modal>
         </div>
-      ) : (
+      ) : session.session?.username ? (
         <Link
           href={`/s/${session.session.username}`}
           className="mx-auto flex justify-center gap-2"
         >
           <BackToStudio />
           <span>Visit my Studio</span>
+        </Link>
+      ) : (
+        <Link href={`/setup`} className="mx-auto flex justify-center gap-2">
+          <span>Finishing setting up your account</span>
         </Link>
       )}
     </div>

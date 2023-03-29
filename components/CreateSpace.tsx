@@ -52,12 +52,17 @@ export const CreateSpace = (props: { studioSpaceID: string }) => {
               content="Create!"
               disabled={!formState.display_name || !formState.image}
               onClick={async () => {
-                if (!auth.session.loggedIn || !formState.display_name) return;
+                if (
+                  !auth.session.loggedIn ||
+                  !auth.authToken ||
+                  !formState.display_name
+                )
+                  return;
                 await spaceAPI(
                   `${WORKER_URL}/space/${props.studioSpaceID}`,
                   "create_space",
                   {
-                    token: auth.session.token,
+                    authToken: auth.authToken,
                     ...formState,
                   }
                 );
@@ -86,7 +91,7 @@ export const EditSpaceModal = (props: {
   onClose: () => void;
   spaceEntity: string;
 }) => {
-  let { session } = useAuth();
+  let { authToken } = useAuth();
   let spaceID = useIndex.eav(props.spaceEntity, "space/id");
   let community = useIndex.eav(props.spaceEntity, "space/community");
 
@@ -147,14 +152,14 @@ export const EditSpaceModal = (props: {
               content={status === "normal" ? "Update" : <DotLoader />}
               disabled={!modified}
               onClick={async () => {
-                if (!session.loggedIn || !spaceID?.value) return;
+                if (!authToken || !spaceID?.value) return;
                 setStatus("loading");
                 console.log(
                   await spaceAPI(
                     `${WORKER_URL}/space/${spaceID.value}`,
                     "update_self",
                     {
-                      token: session.token,
+                      authToken,
                       data: formState,
                     }
                   )
@@ -189,7 +194,7 @@ const DeleteSpaceForm = (props: {
 }) => {
   let [state, setState] = useState({ spaceName: "" });
   let [status, setStatus] = useState<"normal" | "loading">("normal");
-  let { session } = useAuth();
+  let { session, authToken } = useAuth();
   let name = useIndex.eav(props.spaceEntity, "space/display_name");
   let spaceID = useIndex.eav(props.spaceEntity, "space/id");
   return (
@@ -212,12 +217,12 @@ const DeleteSpaceForm = (props: {
           <ButtonPrimary
             onClick={async () => {
               if (name?.value !== state.spaceName) return;
-              if (!spaceID || !session.token) return;
+              if (!spaceID || !authToken) return;
               setStatus("loading");
               await spaceAPI(
                 `${WORKER_URL}/space/${spaceID.value}`,
                 "delete_self",
-                { token: session.token, name: state.spaceName }
+                { authToken, name: state.spaceName }
               );
               setStatus("normal");
               props.onDelete();

@@ -1,7 +1,7 @@
-import { Client } from "faunadb";
-import { createFileUpload } from "backend/fauna/resources/functions/create_file_upload";
-import { getSessionById } from "backend/fauna/resources/functions/get_session_by_id";
 import { Env } from ".";
+import { verifyIdentity } from "backend/lib/auth";
+import { createClient } from "@supabase/supabase-js";
+import { Database } from "backend/lib/database.types";
 
 async function computeHash(data: ArrayBuffer): Promise<string> {
   const buf = await crypto.subtle.digest("SHA-256", data);
@@ -22,20 +22,22 @@ export const handleFileUpload = async (req: Request, env: Env) => {
   let body = await req.arrayBuffer();
   if (!body)
     return new Response(JSON.stringify({ success: false }), { headers });
-  let token = req.headers.get("X-Authorization");
-  if (!token)
+  let access_token = req.headers.get("X-Authorization-Access-Token");
+  let refresh_token = req.headers.get("X-Authorization-Refresh-Token");
+
+  const supabase = createClient<Database>(
+    env.env.SUPABASE_URL,
+    env.env.SUPABASE_API_TOKEN
+  );
+  if (!access_token || !refresh_token)
     return new Response(
       JSON.stringify({
         success: false,
-        error: "missing X-Authorization header",
+        error: "missing X-Authorization headers",
       }),
       { headers, status: 401 }
     );
-  let fauna = new Client({
-    secret: env.env.FAUNA_KEY,
-    domain: "db.us.fauna.com",
-  });
-  let session = await getSessionById(fauna, { id: token });
+  let session = await verifyIdentity(env.env, { access_token, refresh_token });
   try {
     let hash = await computeHash(body);
 
@@ -52,19 +54,22 @@ export const handleFileUpload = async (req: Request, env: Env) => {
         { headers }
       );
 
-    let res = await createFileUpload(fauna, {
-      hash: hash,
-      space: env.id,
-      createdAt: Date.now().toString(),
-      token: token,
-    });
-    if (!res.success) {
+    let { data } = await supabase
+      .from("file_uploads")
+      .insert({
+        hash: hash,
+        space: env.id,
+        user_id: session.id,
+      })
+      .select()
+      .single();
+    if (!data) {
       await env.env.USER_UPLOADS.delete(hash);
       return new Response(JSON.stringify({ success: false }), { headers });
     }
-    await env.env.USER_UPLOADS.put(res.data.id, body);
+    await env.env.USER_UPLOADS.put(data.id, body);
     return new Response(
-      JSON.stringify({ success: true, data: { id: res.data.id } }),
+      JSON.stringify({ success: true, data: { id: data.id } }),
       { headers }
     );
   } catch (e) {

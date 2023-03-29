@@ -1,120 +1,99 @@
-import { workerAPI } from "backend/lib/api";
 import { ButtonPrimary } from "components/Buttons";
-import { FloatingContainer } from "components/Layout";
+import { useAuth } from "hooks/useAuth";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { ReactChild, useEffect, useState } from "react";
-import useSWR from "swr";
+import { useEffect, useState } from "react";
 
-const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
+type Status = "normal" | "invalidEmail" | "confirm";
 export default function SignupPage() {
-  let router = useRouter();
-  let [status, setStatus] = useState<
-    "normal" | "invalidUsernameOrEmail" | "invalidToken"
-  >("normal");
-  let [data, setData] = useState({
-    username: "",
+  let [status, setStatus] = useState<Status>("normal");
+  let [input, setInput] = useState({
     password: "",
     email: "",
   });
   useEffect(() => {
     setStatus("normal");
-  }, [data]);
-  const code = router.query.signupCode as string | undefined;
-  let { data: signup_token } = useSWR(code || "", async (c) => {
-    if (!code) return { success: false } as const;
-    let data = await workerAPI(WORKER_URL, "get_signup_token", { code: c });
-    return data;
-  });
+  }, [input]);
+  let { signup, session } = useAuth();
+  let router = useRouter();
+  useEffect(() => {
+    if (session.loggedIn) {
+      if (!session?.session?.username) router.push("/setup");
+      else router.push(`/s/${session?.session?.username}`);
+    }
+  }, [session, router]);
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!code) return;
-    let res = await workerAPI(WORKER_URL, "signup", {
-      code: code,
-      email: data.email,
-      password: data.password,
-      username: data.username,
+    let { data, error } = await signup({
+      email: input.email,
+      password: input.password,
     });
-    if (res.success) return router.push("/login");
-    setStatus(res.error);
+    if (error?.message === "User already registered") setStatus("invalidEmail");
+    if (data.user && !data.session) setStatus("confirm");
   };
-
-  if (!signup_token?.success)
+  if (status === "confirm")
     return (
-      <div>
-        <h2 className="pb-2">
-          The Garden is currently open by invitation only!
-        </h2>
+      <div className="mx-auto max-w-md">
         <p>
-          You need an invite code to sign up — please{" "}
-          <a
-            className="text-accent-blue"
-            href="mailto:contact@hyperlink.academy"
-          >
-            email us
-          </a>{" "}
-          any ideas for experiments :)
+          Great — please check your email to confirm your account & pick a
+          username!
         </p>
       </div>
     );
+
   return (
     <div className="grid-rows-max mx-auto grid max-w-md gap-8">
       <div className="grid-auto-rows grid gap-2">
-        <h1>Hello and Welcome!</h1>
+        <h1>Hello, welcome to Hyperlink!</h1>
         <p className="text-grey-35">
+          Already have an account?{" "}
           <Link className="text-accent-blue" href="/login">
             Log in
           </Link>{" "}
-          instead
+          instead ✨
         </p>
       </div>
 
-      {signup_token.signup_token.message ? (
-        <FloatingContainer className="m-auto max-w-sm">
-          <pre className="whitespace-pre-wrap font-[Quattro] italic text-grey-35">
-            {signup_token.signup_token.message}
-          </pre>
-        </FloatingContainer>
-      ) : null}
       <form onSubmit={onSubmit} className="grid w-full gap-4">
-        {status === "normal" ? null : (
-          <div className="text-accent-red">
-            {status === "invalidToken" ? (
-              <span> Your invite code is invalid</span>
-            ) : (
-              <span> That username or email is taken</span>
-            )}
-          </div>
-        )}
-        <label className="grid-flow-rows grid gap-2 font-bold">
-          Username
-          <input
-            type="text"
-            value={data.username}
-            onChange={(e) =>
-              setData({ ...data, username: e.currentTarget.value })
-            }
-          />
-        </label>
+        <ErrorMessage status={status} />
         <label className="grid-flow-rows grid gap-2 font-bold">
           Email
           <input
+            required
+            minLength={7}
             type="email"
-            value={data.email}
-            onChange={(e) => setData({ ...data, email: e.currentTarget.value })}
+            value={input.email}
+            onChange={(e) =>
+              setInput({ ...input, email: e.currentTarget.value })
+            }
           />
         </label>
         <label className="grid-flow-rows grid gap-2 font-bold">
           Password
           <PasswordInput
-            value={data.password}
-            onChange={(e) => setData({ ...data, password: e })}
+            value={input.password}
+            onChange={(e) => setInput({ ...input, password: e })}
           />
         </label>
         <ButtonPrimary type="submit" content="Sign Up!" />
       </form>
     </div>
   );
+}
+
+function ErrorMessage(props: { status: Status }) {
+  switch (props.status) {
+    case "normal":
+      return null;
+    case "invalidEmail":
+      return (
+        <div className="text-accent-red">
+          <span> An account already exists with that email</span>
+        </div>
+      );
+    default:
+      return null;
+  }
 }
 
 function PasswordInput(props: {
@@ -125,7 +104,10 @@ function PasswordInput(props: {
   return (
     <div>
       <input
+        required
+        minLength={8}
         className="relative w-full"
+        autoComplete="new-password"
         value={props.value}
         type={visible ? "text" : "password"}
         onChange={(e) => props.onChange(e.currentTarget.value)}

@@ -9,6 +9,7 @@ import { sortByPosition } from "src/position_helpers";
 import { useAuth } from "hooks/useAuth";
 import { useRouter } from "next/router";
 import { getCurrentDate } from "src/utils";
+import { string } from "zod";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 type Props = InferGetStaticPropsType<typeof getStaticProps>;
@@ -25,6 +26,7 @@ export default function StudioPage(props: Props) {
     <SpaceProvider id={props.id}>
       <StudioName />
       {query.history !== undefined ? <HistoryList /> : <List id={props.id} />}
+      {/* main CreateSpace button, after all Space lists */}
       {!session?.loggedIn || myStudioName != currentStudioName ? null : (
         <CreateSpace studioSpaceID={props.id} />
       )}
@@ -122,14 +124,28 @@ const List = (props: { id: string }) => {
           </div>
         </div>
       ) : null}
-      {/* not logged in or not my studio */}
-      {/* OR no active spaces OR no others, to avoid duplicate CreateSpace */}
+      {/* extra CreateSpace just below 'Active' */}
+      {/* NOT if not logged in or not on your studio */}
+      {/* NOT if no active spaces OR no others, to avoid duplicate CreateSpace */}
       {!session?.loggedIn ||
       myStudioName != currentStudioName ||
       spacesActive.length == 0 ||
       !(spacesUpcoming.length > 0 || spacesUnscheduled.length > 0) ? null : (
         <CreateSpace studioSpaceID={props.id} />
       )}
+      {/* empty state - if studio has NO ACTIVE SPACES */}
+      {/* different messages for logged in user vs. viewing someone else's studio */}
+      {spacesActive.length == 0 &&
+      spacesUpcoming.length == 0 &&
+      spacesUnscheduled.length == 0 ? (
+        session?.loggedIn && myStudioName == currentStudioName ? (
+          <MyStudioEmpty /> /* me as in the logged in user who can make spaces here */
+        ) : (
+          <YourStudioEmpty
+            username={currentStudioName as string}
+          /> /* you as in a studio that's not mine-the-authed-user's */
+        )
+      ) : null}
       {spacesUpcoming.length > 0 ? (
         <div className="my-4 rounded-lg border border-grey-55">
           <h2 className=" rounded-t-md bg-[darkgoldenrod] py-2 px-4 text-white">
@@ -168,3 +184,25 @@ export async function getStaticProps(ctx: GetStaticPropsContext) {
     return { props: { notFound: true }, revalidate: 10 } as const;
   return { props: { notFound: false, id: id.id } };
 }
+
+const MyStudioEmpty = () => {
+  return (
+    <div className="my-4 flex flex-col gap-4 rounded-md border p-4">
+      <p>
+        Spaces are containers for doing things together: projects, experiments,
+        and other collaborative activity.
+      </p>
+      <p>Each Space has its own timeline, content, and set of members.</p>
+      <p>To get started, make a new Space & invite a friend to join!</p>
+    </div>
+  );
+};
+
+const YourStudioEmpty = (props: { username: string }) => {
+  return (
+    <div className="my-4 flex flex-col gap-4 rounded-md border p-4">
+      <p>This Studio has no active Spaces.</p>
+      <p>Check back later, or invite {props.username} to collaborate!</p>
+    </div>
+  );
+};

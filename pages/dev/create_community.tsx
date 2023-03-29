@@ -18,18 +18,18 @@ function Page() {
   const [status, setStatus] = useState<
     { status: "normal" } | { status: "error" } | { status: "success" }
   >({ status: "normal" });
-  let { session } = useAuth();
+  let { session, authToken } = useAuth();
   if (!session.loggedIn) return <Link href="/login">login</Link>;
   return (
-    <div className="max-w-3xl py-16 mx-auto p-4 flex flex-col gap-3">
+    <div className="mx-auto flex max-w-3xl flex-col gap-3 p-4 py-16">
       <h1>Create a community</h1>
       <form
-        className="flex gap-2 w-full"
+        className="flex w-full gap-2"
         onSubmit={async (e) => {
           e.preventDefault();
-          if (!session?.token) return;
+          if (!authToken) return;
           let res = await workerAPI(WORKER_URL, "create_community", {
-            token: session.token,
+            authToken,
             communityName,
           });
           console.log(res);
@@ -38,7 +38,7 @@ function Page() {
         }}
       >
         <input
-          className="border-2 bg-white p-2 w-full"
+          className="w-full border-2 bg-white p-2"
           placeholder="community name"
           value={communityName}
           onChange={(e) => setCommunityName(e.currentTarget.value)}

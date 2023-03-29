@@ -7,11 +7,7 @@ import { useSmoker } from "components/Smoke";
 import { useAuth } from "hooks/useAuth";
 import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
 import { useState } from "react";
-import {
-  DraggableRoomListItem,
-  RoomListItem,
-  RoomListLabel,
-} from "./RoomListLayout";
+import { DraggableRoomListItem, RoomListLabel } from "./RoomListLayout";
 import { AddTiny } from "components/Icons";
 
 export const MemberRoomList = (props: {
@@ -40,9 +36,9 @@ export const MemberRoomList = (props: {
             entityID={memberEntity}
             setRoomEditOpen={() => props.setRoomEditOpen}
           >
-            <div className="flex justify-between">
-              <span>{yourUsername} </span>
-              <span className="self-center rounded-md bg-grey-90 px-1 py-0.5 text-xs text-grey-35">
+            <div className="flex justify-between gap-2">
+              <span className="">{yourUsername}</span>
+              <span className="flex-shrink-0 self-center rounded-md bg-grey-90 px-1 py-0.5 text-xs text-grey-35">
                 you
               </span>
             </div>
@@ -90,20 +86,18 @@ export const MemberRoomList = (props: {
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 
 const InviteMember = (props: { open: boolean; onClose: () => void }) => {
-  let { session } = useAuth();
+  let { authToken, session } = useAuth();
   let isMember = useIndex.ave("space/member", session.session?.studio);
   let smoker = useSmoker();
   const spaceID = useSpaceID();
   let { data: inviteLink } = useSWR(
     !isMember ? null : `${WORKER_URL}/space/${spaceID}/get_share_code`,
     async () => {
-      if (!spaceID || !session.token) return;
+      if (!spaceID || !authToken) return;
       let code = await spaceAPI(
         `${WORKER_URL}/space/${spaceID}`,
         "get_share_code",
-        {
-          token: session.token,
-        }
+        { authToken }
       );
       if (code.success) {
         return `${document.location.href}/join?code=${code.code}`;

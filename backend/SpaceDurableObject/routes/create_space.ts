@@ -1,7 +1,7 @@
 import { getCommunityByName } from "backend/fauna/resources/functions/get_community_by_name";
-import { getSessionById } from "backend/fauna/resources/functions/get_session_by_id";
 import { app_event } from "backend/lib/analytics";
 import { internalSpaceAPI, makeRoute, privateSpaceAPI } from "backend/lib/api";
+import { verifyIdentity, authTokenVerifier } from "backend/lib/auth";
 import { Client } from "faunadb";
 import { z } from "zod";
 import { Env } from "..";
@@ -31,7 +31,7 @@ export const create_space_route = makeRoute({
   route: "create_space",
   input: z
     .object({
-      token: z.string(),
+      authToken: authTokenVerifier,
     })
     .merge(space_input),
   handler: async (msg, env: Env) => {
@@ -40,7 +40,7 @@ export const create_space_route = makeRoute({
       domain: "db.us.fauna.com",
     });
     let creator = await env.storage.get("meta-creator");
-    let session = await getSessionById(fauna, { id: msg.token });
+    let session = await verifyIdentity(env.env, msg.authToken);
 
     if (!session || session.studio !== creator || !creator)
       return {

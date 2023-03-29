@@ -145,7 +145,7 @@ function makeMutators(
     ) => {
       let q = scanIndex(tx);
       let context: MutationContext = {
-        runOnServer: async () => {},
+        runOnServer: async () => { },
         scanIndex: q,
         postMessage: async (m) => {
           await tx.put(m.id, MessageWithIndexes(m));
@@ -295,7 +295,7 @@ export const makeReplicache = (args: {
   name: string;
   undoManager: UndoManager;
 }) => {
-  let grabData = function (): {
+  let grabData = function(): {
     rep: Replicache<ReplicacheMutators>;
     undoManager: UndoManager;
   } {
@@ -382,7 +382,7 @@ export const useIndex = {
         return (await scanIndex(tx).ave(attribute, value)) || null;
       },
       null,
-      [attribute, value]
+      [rep, attribute, value]
     );
   },
   aev<A extends keyof Attribute>(attribute: A | null, entity?: string) {
@@ -419,7 +419,7 @@ export const useIndex = {
         return results as Fact<A>[];
       },
       [],
-      [entity, attribute]
+      [rep, entity, attribute]
     );
   },
   messages(topic: string) {
@@ -449,7 +449,8 @@ export const useMutations = () => {
   let auth = useSubscribe(
     rep?.rep,
     async (tx) => {
-      if (!session || !session.loggedIn) return null;
+      if (!session || !session.loggedIn || !session.session?.studio)
+        return null;
       let fact = (await tx
         .scan({
           indexName: "ave",

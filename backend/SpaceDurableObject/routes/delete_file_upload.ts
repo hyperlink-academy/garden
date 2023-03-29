@@ -1,29 +1,26 @@
-import { Bindings } from "backend";
 import { z } from "zod";
-import { getSessionById } from "backend/fauna/resources/functions/get_session_by_id";
 import { makeRoute } from "backend/lib/api";
-import { Client } from "faunadb";
 import { Env } from "..";
-import { deleteFileUpload } from "backend/fauna/resources/functions/delete_file_upload";
+import { authTokenVerifier, verifyIdentity } from "backend/lib/auth";
+import { createClient } from "@supabase/supabase-js";
+import { Database } from "backend/lib/database.types";
 
 export const delete_file_upload_route = makeRoute({
   route: "delete_file_upload",
   input: z.object({
-    token: z.string(),
+    authToken: authTokenVerifier,
     fileID: z.string(),
   }),
   handler: async (msg, env: Env) => {
-    let fauna = new Client({
-      secret: env.env.FAUNA_KEY,
-      domain: "db.us.fauna.com",
-    });
-    let session = await getSessionById(fauna, { id: msg.token });
+    let session = await verifyIdentity(env.env, msg.authToken);
+    const supabase = createClient<Database>(
+      env.env.SUPABASE_URL,
+      env.env.SUPABASE_API_TOKEN
+    );
     if (!session)
       return {
         data: { success: false },
       } as const;
-
-    if (!session) return { data: { success: false } };
 
     let isMember = await env.factStore.scanIndex.ave(
       "space/member",
@@ -31,7 +28,10 @@ export const delete_file_upload_route = makeRoute({
     );
     if (!isMember)
       return { data: { success: false, error: "user is not a member" } };
-    await deleteFileUpload(fauna, { id: msg.fileID, token: msg.token });
+    await supabase
+      .from("file_uploads")
+      .update({ deleted: true })
+      .eq("id", msg.fileID);
 
     return { data: { success: true } };
   },

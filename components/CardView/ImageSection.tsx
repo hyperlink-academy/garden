@@ -27,7 +27,7 @@ export const MakeImage = (props: { entity: string }) => {
 };
 
 export const ImageSection = (props: { entityID: string }) => {
-  let { session } = useAuth();
+  let { session, authToken } = useAuth();
   let { mutate, authorized } = useMutations();
   let spaceID = useSpaceID();
   let image = useIndex.eav(props.entityID, "card/image");
@@ -47,11 +47,11 @@ export const ImageSection = (props: { entityID: string }) => {
           <button
             className="justify-self-center text-sm text-grey-55 hover:text-accent-blue"
             onClick={() => {
-              if (!image || !session.token) return;
+              if (!image || !authToken) return;
               mutate("retractFact", { id: image.id });
               if (image.value.filetype === "external_image") return;
               spaceAPI(`${WORKER_URL}/space/${spaceID}`, "delete_file_upload", {
-                token: session.token,
+                authToken,
                 fileID: image.value.id,
               });
             }}
@@ -67,7 +67,7 @@ export const ImageSection = (props: { entityID: string }) => {
 export const AddImage: React.FC<
   React.PropsWithChildren<{ onUpload: (imageID: string) => void }>
 > = (props) => {
-  let { session } = useAuth();
+  let { session, authToken } = useAuth();
   let spaceID = useSpaceID();
   let [state, setState] = useState<"normal" | "uploading">("normal");
 
@@ -80,11 +80,12 @@ export const AddImage: React.FC<
         className="hidden"
         onChange={async (e) => {
           let files = e.currentTarget.files;
-          if (!files || !session.session || !spaceID) return;
+          if (!files || !authToken || !spaceID) return;
           setState("uploading");
           let res = await fetch(`${WORKER_URL}/space/${spaceID}/upload_file`, {
             headers: {
-              "X-Authorization": session.session.id,
+              "X-Authorization-Access-Token": authToken.access_token,
+              "X-Authorization-Refresh-Token": authToken.refresh_token,
             },
             method: "POST",
             body: files[0],
