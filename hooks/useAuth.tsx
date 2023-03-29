@@ -68,7 +68,7 @@ export const useAuth = () => {
         return supabaseClient.auth.signUp({
           email: input.email,
           password: input.password,
-          options: { emailRedirectTo: "/setup" },
+          options: { emailRedirectTo: `${window.location.origin}/setup` },
         });
       },
     }),
