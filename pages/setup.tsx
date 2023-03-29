@@ -3,6 +3,7 @@ import { workerAPI } from "backend/lib/api";
 import { ButtonPrimary } from "components/Buttons";
 import { useAuth } from "hooks/useAuth";
 import { useDebouncedEffect } from "hooks/utils";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
 
@@ -47,20 +48,39 @@ export default function SignupPage() {
     }
   };
 
-  if (!tokens) return <div>you need to signup or login</div>;
+  if (!tokens)
+    return (
+      <div className="grid-rows-max mx-auto grid max-w-md gap-4">
+        <h1>Set up your Studio!</h1>
+        <p>
+          To continue,{" "}
+          <Link className="text-accent-blue" href="/signup">
+            sign up
+          </Link>{" "}
+          or{" "}
+          <Link className="text-accent-blue" href="/login">
+            log in
+          </Link>
+        </p>
+      </div>
+    );
 
   return (
-    <div className="grid-rows-max mx-auto grid max-w-md gap-8">
+    <div className="grid-rows-max mx-auto grid max-w-md gap-4">
       <div className="grid-auto-rows grid gap-2">
-        <h1>Hello and Welcome!</h1>
+        <h1>Set up your Studio</h1>
       </div>
 
       <form onSubmit={onSubmit} className="grid w-full gap-4">
         {status === "valid" ? null : (
           <div className="text-accent-red">
-            <span> That username is taken</span>
+            <span>Sorry, that username is not available</span>
           </div>
         )}
+        <p>
+          Pick a name for your Studio — your Hyperlink homepage, where all your
+          Spaces will live.
+        </p>
         <label className="grid-flow-rows grid gap-2 font-bold">
           <span>
             Username{" "}
@@ -83,7 +103,7 @@ export default function SignupPage() {
             data.username.match(/^[A-Za-z_0-9]+$/) === null
           }
           type="submit"
-          content="Construct your studio!"
+          content="Construct your Studio!"
         />
       </form>
     </div>

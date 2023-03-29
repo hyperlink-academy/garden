@@ -41,9 +41,9 @@ export const useAuth = () => {
       authToken: !session
         ? null
         : {
-          access_token: session.access_token,
-          refresh_token: session.refresh_token,
-        },
+            access_token: session.access_token,
+            refresh_token: session.refresh_token,
+          },
       session: {
         loggedIn: !!session,
         session: session?.user?.user_metadata as {
@@ -72,6 +72,6 @@ export const useAuth = () => {
         });
       },
     }),
-    [session]
+    [session, supabaseClient.auth]
   );
 };

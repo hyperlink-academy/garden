@@ -22,7 +22,7 @@ export default function SignupPage() {
       if (!session?.session?.username) router.push("/setup");
       else router.push(`/s/${session?.session?.username}`);
     }
-  }, [session]);
+  }, [session, router]);
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     let { data } = await signup({
@@ -32,17 +32,25 @@ export default function SignupPage() {
     if (data.user && !data.session) setStatus("confirm");
   };
   if (status === "confirm")
-    return <div>Check your email to confirm your account</div>;
+    return (
+      <div className="mx-auto max-w-md">
+        <p>
+          Great — please check your email to confirm your account & pick a
+          username!
+        </p>
+      </div>
+    );
 
   return (
     <div className="grid-rows-max mx-auto grid max-w-md gap-8">
       <div className="grid-auto-rows grid gap-2">
-        <h1>Hello and Welcome!</h1>
+        <h1>Hello, welcome to Hyperlink!</h1>
         <p className="text-grey-35">
+          Already have an account?{" "}
           <Link className="text-accent-blue" href="/login">
             Log in
           </Link>{" "}
-          instead
+          instead ✨
         </p>
       </div>
 
@@ -59,6 +67,7 @@ export default function SignupPage() {
         <label className="grid-flow-rows grid gap-2 font-bold">
           Email
           <input
+            required
             type="email"
             value={input.email}
             onChange={(e) =>
@@ -87,6 +96,7 @@ function PasswordInput(props: {
   return (
     <div>
       <input
+        required
         className="relative w-full"
         autoComplete="new-password"
         value={props.value}
