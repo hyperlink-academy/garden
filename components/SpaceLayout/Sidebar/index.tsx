@@ -184,7 +184,6 @@ const SpaceStatus = (props: {
   let start_date = useIndex.eav(props.entityID, "space/start-date")?.value
     .value;
   let end_date = useIndex.eav(props.entityID, "space/end-date")?.value.value;
-  console.log({ start_date, end_date });
 
   let studio = useIndex.eav(props.entityID, "space/studio");
   let { session } = useAuth();

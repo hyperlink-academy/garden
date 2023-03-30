@@ -19,8 +19,6 @@ export function CalendarRoom() {
       date.setTime(date.getTime() + 24 * 60 * 60 * 1000);
     }
   }
-  console.log(days, start_date?.value, end_date?.value);
-  //get number of days between start and end date
 
   let cardsWithDate = useIndex.at("card/date").reduce((acc, card) => {
     let key = card.value.value;
