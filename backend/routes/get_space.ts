@@ -11,26 +11,16 @@ export const get_space_route = makeRoute({
       env.SUPABASE_URL,
       env.SUPABASE_API_TOKEN
     );
-    let studio;
     let { data } = await supabase
       .from("identity_data")
       .select("*")
       .eq("username", msg.studio.toLowerCase())
       .single();
 
-    if (data) studio = data.studio;
-    else {
-      let { data: identity } = await supabase
-        .from("old_identities")
-        .select("*")
-        .eq("username", msg.studio.toLowerCase())
-        .single();
-      if (identity) studio = identity.studio;
-      else
-        return { data: { success: false, error: "no studio found" } } as const;
-    }
+    if (!data)
+      return { data: { success: false, error: "no studio found" } } as const;
 
-    let stub = env.SPACES.get(env.SPACES.idFromString(studio));
+    let stub = env.SPACES.get(env.SPACES.idFromString(data.studio));
     let space = await internalSpaceAPI(stub)("http://local", "get_space", {
       space: msg.space,
     });

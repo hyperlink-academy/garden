@@ -19,13 +19,7 @@ export const getStudioRoute = makeRoute({
       return { data: { success: true, id: data[0].studio } } as const;
     }
 
-    let { data: identity } = await supabase
-      .from("old_identities")
-      .select("*")
-      .eq("username", msg.name.toLowerCase())
-      .single();
-    if (!identity) return { data: { success: false } } as const;
-    return { data: { success: true, id: identity.studio } } as const;
+    return { data: { success: false } } as const;
   },
 });
 

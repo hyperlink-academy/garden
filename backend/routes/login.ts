@@ -41,26 +41,32 @@ export const LoginRoute = makeRoute({
         msg.password,
         existingUser.hashed_password
       );
+
       if (!compare)
         return {
           data: { success: false, error: Errors.incorrectPassword },
         } as const;
 
-      let { data } = await supabase.auth.admin.createUser({
-        email: existingUser.email,
+      let { data: existingUserData } = await supabase
+        .from("identity_data")
+        .select("*")
+        .eq("username", existingUser.username)
+        .single();
+
+      if (!existingUserData)
+        return {
+          data: {
+            success: false,
+            error: "Un migrated user please contact the hyperlink team",
+          },
+        } as const;
+
+      await supabase.auth.admin.updateUserById(existingUserData.id, {
         password: msg.password,
-        email_confirm: true,
-        user_metadata: {
-          username: existingUser.username,
-          studio: existingUser.studio,
-        },
       });
-      if (data.user)
-        await supabase.from("identity_data").insert({
-          id: data.user.id,
-          username: existingUser.username,
-          studio: existingUser.studio,
-        });
+
+      await supabase.from("old_identities").delete().eq("email", msg.email);
+
       supabaseLogin = await supabase.auth.signInWithPassword({
         email: existingUser.email,
         password: msg.password,
