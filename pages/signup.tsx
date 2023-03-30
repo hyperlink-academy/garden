@@ -75,8 +75,27 @@ export default function SignupPage() {
             onChange={(e) => setInput({ ...input, password: e })}
           />
         </label>
-        <ButtonPrimary type="submit" content="Sign Up!" />
+        {/* fix for gap added by PasswordInput hide/show button */}
+        <div className="-mt-4">
+          <ButtonPrimary type="submit" content="Sign Up!" />
+        </div>
       </form>
+      <div className="flex flex-col gap-2 rounded-md bg-bg-gold p-4 text-center">
+        <p className="text-grey-15">
+          we will <strong>only</strong> email you about your account
+        </p>
+        <p>
+          to receive our newsletter too,{" "}
+          <a
+            href="https://buttondown.email/hyperlink/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-accent-blue"
+          >
+            subscribe here 💌
+          </a>
+        </p>
+      </div>
     </div>
   );
 }
@@ -129,39 +148,4 @@ function PasswordInput(props: {
       </button>
     </div>
   );
-
-  // position: relative;
-  // &:hover {
-  // cursor: pointer;
-  // }
-  // top: -30px;
-  // left: -16px;
-  // float: right;
-
-  // h("div", { style: { width: "100%", marginBottom: "-16px" } }, [
-  //   h(Input, {
-  //     ...props,
-  //     type: visible ? "text" : "password",
-  //     style: { width: "100%", boxSizing: "border-box" },
-  //   }),
-  //   h(
-  //     ToggleButton,
-  //     {
-  //       onClick: (e) => {
-  //         e.preventDefault();
-  //         setVisible(!visible);
-  //       },
-  //     },
-  //     visible ? "hide" : "show"
-  //   ),
-  // ]);
 }
-
-// let ToggleButton = styled('button')`
-// font-family: 'Roboto Mono', monospace;
-// color: ${colors.textSecondary};
-// outline: none;
-// background-color: inherit;
-// border: none;
-
-// `
