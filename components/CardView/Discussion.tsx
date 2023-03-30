@@ -29,7 +29,7 @@ export const Discussion = (props: { close: () => void; entityID: string }) => {
           </div>
         </button>
 
-        <Thought entityID={props.entityID} open={() => {}} />
+        <Thought entityID={props.entityID} />
       </div>
       <Messages entityID={props.entityID} />
       <MessageInput entityID={props.entityID} />
@@ -100,7 +100,7 @@ const Messages = (props: { entityID: string }) => {
   );
 };
 
-export const Thought = (props: { entityID: string; open: () => void }) => {
+export const Thought = (props: { entityID: string }) => {
   let content = useIndex.eav(props.entityID, "discussion/content");
   let author = useIndex.eav(props.entityID, "discussion/author");
   let authorName = useIndex.eav(author?.value.value || null, "member/name");
@@ -114,11 +114,8 @@ export const Thought = (props: { entityID: string; open: () => void }) => {
       })
     : "";
   return (
-    <button
-      onClick={() => {
-        props.open();
-      }}
-      className={`group flex flex-col gap-1 rounded-md border py-2 px-3 text-left ${"border-grey-80 bg-bg-blue text-grey-35"} `}
+    <div
+      className="flex flex-col gap-1 rounded-md border border-grey-80 bg-white py-2 px-3 text-left text-grey-35"
       style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
     >
       <div className="flex w-full items-baseline gap-2">
@@ -134,7 +131,7 @@ export const Thought = (props: { entityID: string; open: () => void }) => {
           }}
         />
       )}
-    </button>
+    </div>
   );
 };
 

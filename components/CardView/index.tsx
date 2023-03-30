@@ -541,9 +541,8 @@ export const SectionAdder = (props: { entityID: string }) => {
 };
 
 export const Thought = (props: { entityID: string; open: () => void }) => {
-  let { memberEntity } = useMutations();
+  let { memberEntity, authorized } = useMutations();
   let unreadBy = useIndex.eav(props.entityID, "discussion/unread-by");
-
   let content = useIndex.eav(props.entityID, "discussion/content");
   let author = useIndex.eav(props.entityID, "discussion/author");
   let authorName = useIndex.eav(author?.value.value || null, "member/name");
@@ -565,7 +564,7 @@ export const Thought = (props: { entityID: string; open: () => void }) => {
       onClick={() => {
         props.open();
       }}
-      className={`group flex flex-col gap-1 rounded-md border py-2 px-3 text-left ${" border-transparent text-grey-55 hover:border-accent-blue hover:bg-bg-blue hover:text-grey-35"} `}
+      className="group flex flex-col gap-1 rounded-md border border-transparent py-2 px-3 text-left text-grey-55 hover:border-accent-blue hover:bg-bg-blue hover:text-grey-35"
       style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
     >
       <div className="flex w-full items-baseline gap-2">
@@ -584,14 +583,14 @@ export const Thought = (props: { entityID: string; open: () => void }) => {
           }}
         />
       )}
-      <small
-        className={`place-self-end  ${"underline group-hover:text-accent-blue"}`}
-      >
+      <small className="place-self-end underline group-hover:text-accent-blue">
         {replyCount?.value
           ? `${replyCount.value} ${
               replyCount.value === 1 ? "reply" : "replies"
             }`
-          : "reply"}
+          : authorized
+          ? "reply"
+          : "view"}
       </small>
     </button>
   );
