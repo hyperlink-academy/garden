@@ -1,9 +1,0 @@
-CreateIndex({
-  "name": "communities_by_name",
-  "source": Collection("communities"),
-  "terms": [{
-    "field": ["data", "name"]
-  }],
-  "unique": true,
-  "values": []
-})

@@ -1,7 +1,5 @@
 import { workerAPI } from "backend/lib/api";
-import { LoginResponse } from "backend/routes/login";
-import { SessionResponse } from "backend/routes/session";
-import { createContext, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   SessionContextProvider,
   useSession,
@@ -10,16 +8,6 @@ import {
 import { createBrowserSupabaseClient } from "@supabase/auth-helpers-nextjs";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
-
-export const AuthContext = createContext({
-  session: { loggedIn: false } as SessionResponse,
-  login: async (_data: { username: string; password: string }) => {
-    return {} as unknown as LoginResponse;
-  },
-  logout: async () => {
-    return false as boolean;
-  },
-});
 
 export const AuthProvider: React.FC<React.PropsWithChildren<unknown>> = (
   props

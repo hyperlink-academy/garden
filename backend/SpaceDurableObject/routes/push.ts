@@ -1,8 +1,6 @@
 import { z } from "zod";
 import { makeRoute } from "backend/lib/api";
 import { Env } from "..";
-import { Client } from "faunadb";
-import { getSessionById } from "backend/fauna/resources/functions/get_session_by_id";
 import { Mutations } from "data/mutations";
 import { store } from "../fact_store";
 import { CachedStorage } from "../storage_cache";

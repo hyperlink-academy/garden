@@ -1,7 +1,0 @@
-CreateFunction({
-  "name": "get_community_by_name",
-  "role": "server",
-  "body": Query(Lambda("args", Let([{
-    "indexEntry": Match(Index("communities_by_name"), [Select("name", Var("args"))])
-  }], If(Exists(Var("indexEntry")), Select("data", Get(Var("indexEntry"))), null))))
-})

@@ -1,9 +1,0 @@
-CreateIndex({
-  "name": "physical_cards_by_id",
-  "source": Collection("physical_cards"),
-  "terms": [{
-    "field": ["data", "username"]
-  }],
-  "unique": true,
-  "values": []
-})

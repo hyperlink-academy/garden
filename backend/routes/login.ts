@@ -1,9 +1,7 @@
 import { z } from "zod";
 import { Bindings } from "backend";
-import { Client } from "faunadb";
 import bcrypt from "bcryptjs";
 import { ExtractResponse, makeRoute } from "backend/lib/api";
-import { getIdentityByUsername } from "backend/fauna/resources/functions/get_identity_by_username";
 import { AuthResponse, createClient } from "@supabase/supabase-js";
 import { Database } from "backend/lib/database.types";
 
@@ -21,10 +19,6 @@ export const LoginRoute = makeRoute({
     password: z.string(),
   }),
   handler: async (msg, env: Bindings, _request: Request) => {
-    let fauna = new Client({
-      secret: env.FAUNA_KEY,
-      domain: "db.us.fauna.com",
-    });
     const supabase = createClient<Database>(
       env.SUPABASE_URL,
       env.SUPABASE_API_TOKEN
@@ -35,14 +29,19 @@ export const LoginRoute = makeRoute({
       password: msg.password,
     });
     if (supabaseLogin.error) {
-      let existingUser = await getIdentityByUsername(fauna, {
-        username: msg.email.toLowerCase(),
-      });
+      let { data: existingUser } = await supabase
+        .from("old_identities")
+        .select("*")
+        .eq("email", msg.email)
+        .single();
       if (!existingUser)
         return { data: { success: false, error: Errors.noUser } } as const;
 
-      let hashedPassword = await bcrypt.hash(msg.password, existingUser.salt);
-      if (hashedPassword !== existingUser.hashedPassword)
+      let compare = await bcrypt.compare(
+        msg.password,
+        existingUser.hashed_password
+      );
+      if (!compare)
         return {
           data: { success: false, error: Errors.incorrectPassword },
         } as const;

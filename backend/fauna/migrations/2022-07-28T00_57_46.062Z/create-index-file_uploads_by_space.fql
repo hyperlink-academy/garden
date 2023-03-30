@@ -1,8 +1,0 @@
-CreateIndex({
-  "name": "file_uploads_by_space",
-  "source": Collection("file_uploads"),
-  "terms": [{
-    "field": ["data", "space"]
-  }],
-  "values": []
-})

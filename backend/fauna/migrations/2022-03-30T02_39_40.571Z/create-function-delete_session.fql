@@ -1,7 +1,0 @@
-CreateFunction({
-  "name": "delete_session",
-  "role": "server",
-  "body": Query(Lambda("args", Let([{
-    "indexEntry": Match(Index("sessions_by_id"), [Select("id", Var("args"))])
-  }], If(Exists(Var("indexEntry")), Delete(Select("ref", Get(Var("indexEntry")))), null))))
-})

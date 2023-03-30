@@ -4,8 +4,6 @@ import { create_community_route } from "./routes/create_community";
 import { get_space_route } from "./routes/get_space";
 import { getStudioRoute, get_community_route } from "./routes/get_studio";
 import { LoginRoute } from "./routes/login";
-import { LogoutRoute } from "./routes/logout";
-import { SessionRoute } from "./routes/session";
 import { SignupRoute } from "./routes/signup";
 export { SpaceDurableObject } from "./SpaceDurableObject";
 
@@ -16,8 +14,6 @@ export default {
 const Routes = [
   SignupRoute,
   LoginRoute,
-  LogoutRoute,
-  SessionRoute,
   getStudioRoute,
   get_community_route,
   get_space_route,
@@ -29,7 +25,6 @@ let router = makeRouter(Routes);
 
 export type Bindings = {
   APP_EVENT_ANALYTICS: AnalyticsEngineDataset;
-  FAUNA_KEY: string;
   SUPABASE_API_TOKEN: string;
   SUPABASE_URL: string;
   SPACES: DurableObjectNamespace;

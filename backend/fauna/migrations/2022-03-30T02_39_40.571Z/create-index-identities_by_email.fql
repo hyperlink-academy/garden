@@ -1,9 +1,0 @@
-CreateIndex({
-  "name": "identities_by_email",
-  "source": Collection("identities"),
-  "terms": [{
-    "field": ["data", "email"]
-  }],
-  "unique": true,
-  "values": []
-})

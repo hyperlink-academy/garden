@@ -1,9 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { Bindings } from "backend";
-import { getIdentityByUsername } from "backend/fauna/resources/functions/get_identity_by_username";
 import { internalSpaceAPI, makeRoute } from "backend/lib/api";
 import { Database } from "backend/lib/database.types";
-import { Client } from "faunadb";
 import { z } from "zod";
 export const get_space_route = makeRoute({
   route: "get_space",
@@ -22,13 +20,11 @@ export const get_space_route = makeRoute({
 
     if (data) studio = data.studio;
     else {
-      let fauna = new Client({
-        secret: env.FAUNA_KEY,
-        domain: "db.us.fauna.com",
-      });
-      let identity = await getIdentityByUsername(fauna, {
-        username: msg.studio.toLowerCase(),
-      });
+      let { data: identity } = await supabase
+        .from("old_identities")
+        .select("*")
+        .eq("username", msg.studio.toLowerCase())
+        .single();
       if (identity) studio = identity.studio;
       else
         return { data: { success: false, error: "no studio found" } } as const;
