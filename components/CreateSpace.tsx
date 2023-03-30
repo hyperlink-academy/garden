@@ -148,6 +148,13 @@ export const EditSpaceModal = (props: {
               destructive
               onClick={() => setMode("delete")}
             />
+
+            <ButtonSecondary
+              content={"Nevermind"}
+              onClick={async () => {
+                props.onClose();
+              }}
+            />
             <ButtonPrimary
               content={status === "normal" ? "Update" : <DotLoader />}
               disabled={!modified}
