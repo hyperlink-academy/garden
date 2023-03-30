@@ -418,6 +418,8 @@ const ScheduledDate = (props: {
     return { month, day, year };
   }, [props.date]);
 
+  if (!props.dateEditing && !date) return null;
+
   return (
     <div className="flex place-items-center gap-2  text-sm text-grey-55">
       {props.dateEditing ? (
@@ -462,18 +464,22 @@ const ScheduledDate = (props: {
             remove
           </button>
         </>
-      ) : (
-        date && (
+      ) : date ? (
+        authorized ? (
           <button
-            className="-ml-[6px] border border-transparent py-[3px] px-1 text-sm text-grey-55 hover:underline"
+            className="-ml-[5px] border border-transparent py-[3px] px-1 text-sm text-grey-55 hover:underline"
             onClick={() => {
               props.openDateEditing();
             }}
           >
             {date.month} {date.day}, {date.year}
           </button>
+        ) : (
+          <div className="-ml-[4px] py-1 px-1 text-sm text-grey-55">
+            {date.month} {date.day}, {date.year}
+          </div>
         )
-      )}
+      ) : null}
     </div>
   );
 };
