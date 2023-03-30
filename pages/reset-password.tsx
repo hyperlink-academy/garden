@@ -44,10 +44,19 @@ export function ResetPasswordForm() {
 
   if (status === "sent")
     return (
-      <div className="grid-auto-rows grid gap-2">
+      <div className="grid-auto-rows grid gap-4">
         <h1 className="text-2xl font-bold">Password Reset</h1>
-        <p className="text-gray-500">
-          We've sent you an email with a link to reset your password.
+        <p className="text-grey-15">
+          We sent you an email with a link to reset your password.
+        </p>
+        <p className="text-grey-15">
+          Not seeing it within a few minutes?{" "}
+          <a
+            href="mailto:contact@hyperlink.academy"
+            className="text-accent-blue"
+          >
+            Email us!
+          </a>
         </p>
       </div>
     );

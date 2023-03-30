@@ -40,6 +40,8 @@ module.exports = {
 
       //BG COLORS
       "bg-blue": "#F0F7FA",
+      "bg-red": "#FFEAEA",
+      "bg-gold": "#FFF3CE",
 
       //DO NOT USE IN PRODUCTION. Test colors to aid development, ie, setting bg color on element to see edges of div. DO. NOT. USE. IN. PRODUCTION
       "test-pink": "#E18181",

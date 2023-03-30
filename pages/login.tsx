@@ -3,6 +3,9 @@ import { useAuth } from "hooks/useAuth";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { DotLoader } from "components/DotLoader";
+import Link from "next/link";
+import { Divide } from "faunadb";
+import { Divider } from "components/Layout";
 
 export default function LoginPage() {
   let router = useRouter();
@@ -71,22 +74,36 @@ export function LoginForm(props: {
             }
           />
         </label>
-        <div className="grid-rows-max grid justify-items-end gap-2 text-right">
+        <div className="grid-rows-max grid justify-items-end">
           <ButtonPrimary
+            className="content-end items-end justify-end justify-items-end self-end justify-self-end"
             content={status === "loading" ? "" : "Log In!"}
             icon={status === "loading" ? <DotLoader /> : undefined}
             type="submit"
           />
-          <p className="text-grey-35">
-            {" "}
-            or email us about signing up{" "}
-            <a
-              href="mailto:contact@hyperlink.academy"
-              className="text-accent-blue"
-            >
-              contact@hyperlink.academy
-            </a>
-          </p>
+        </div>
+        {/* <Divider /> */}
+        <div className="mt-4 flex gap-2">
+          <div className="rounded-md bg-bg-red p-4">
+            <p className="text-grey-15">
+              lost your password?{" "}
+              <Link className="text-accent-blue" href={`/reset-password`}>
+                reset it here
+              </Link>
+            </p>
+          </div>
+          <div className="rounded-md bg-bg-gold p-4">
+            <p className="text-grey-15">
+              {" "}
+              looking to sign up?{" "}
+              <a
+                href="mailto:contact@hyperlink.academy"
+                className="text-accent-blue"
+              >
+                email us!
+              </a>
+            </p>
+          </div>
         </div>
       </form>
     </div>
