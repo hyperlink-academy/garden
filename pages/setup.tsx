@@ -105,7 +105,6 @@ export default function SignupPage() {
       <div className="grid-auto-rows grid gap-2">
         <h1>Set up your Studio</h1>
       </div>
-      {router.query.redirectTo}
 
       <form onSubmit={onSubmit} className="grid w-full gap-4">
         {status === "invalidUsername" ? (
@@ -135,13 +134,6 @@ export default function SignupPage() {
             }
           />
         </label>
-        <ButtonPrimary
-          content="test"
-          onClick={() => {
-            console.log(router.query.redirectTo);
-            router.push("/s/jared/s/2/join?code=R3366Q20");
-          }}
-        />
         <ButtonPrimary
           disabled={
             status === "invalidUsername" ||
