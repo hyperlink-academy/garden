@@ -136,6 +136,7 @@ function PasswordInput(props: {
         onChange={(e) => props.onChange(e.currentTarget.value)}
       />
       <button
+        type="button"
         onClick={(e) => {
           e.preventDefault();
           setVisible(!visible);
