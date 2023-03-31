@@ -45,7 +45,7 @@ export function JoinSpace() {
           <title key="title">{spaceName?.value}: you&apos;re invited!</title>
         </Head>
 
-        <div className=" mx-auto mt-6 flex max-w-3xl flex-col place-items-center gap-6">
+        <div className="mx-auto flex max-w-3xl flex-col place-items-center gap-6 p-8">
           <div className="flex flex-col gap-2 text-center ">
             <h2>You&apos;ve been invited to {spaceName?.value}</h2>
             <p>A new membership card is waiting for you!</p>
@@ -76,39 +76,48 @@ export function JoinSpace() {
     );
   }
   return (
-    <div className="lightBorder flex flex-col place-items-center gap-4 p-5 text-center">
-      <div className="flex flex-col gap-2 text-center ">
-        <h2>You&apos;ve been invited to {spaceName?.value}</h2>
-      </div>
-      <div className="display flex flex-row gap-2">
-        <ButtonPrimary
-          content="Log In"
-          onClick={() => setState("login")}
-          className="justify-self-center"
+    <>
+      <Head>
+        <title key="title">{spaceName?.value}: you&apos;re invited!</title>
+      </Head>
+
+      <div className="mx-auto flex max-w-3xl flex-col place-items-center gap-6 p-8">
+        <div className="flex flex-col gap-2 text-center ">
+          <h2>You&apos;ve been invited to {spaceName?.value}</h2>
+        </div>
+        <div className="display flex flex-row gap-2">
+          <ButtonPrimary
+            content="Log In"
+            onClick={() => setState("login")}
+            className="justify-self-center"
+          />
+          <ButtonSecondary
+            content="Sign up"
+            onClick={() => setState("signup")}
+            className="justify-self-center"
+          />
+        </div>
+        <LogInModal
+          isOpen={state === "login"}
+          onClose={() => setState("normal")}
         />
-        <ButtonSecondary
-          content="Sign up"
-          onClick={() => setState("signup")}
-          className="justify-self-center"
+        <SignupModal
+          redirectTo={`/s/${router.query.studio}/s/${router.query.space}/${spaceName?.value}/join?code=${router.query.code}`}
+          isOpen={state === "signup"}
+          onClose={() => setState("normal")}
         />
+        <p className="text-center">
+          We&apos;re still in early alpha! If you&apos;d have any questions,
+          email us at{" "}
+          <a
+            href="mailto:contact@hyperlink.academy"
+            className="text-accent-blue"
+          >
+            contact@hyperlink.academy
+          </a>{" "}
+        </p>
       </div>
-      <LogInModal
-        isOpen={state === "login"}
-        onClose={() => setState("normal")}
-      />
-      <SignupModal
-        redirectTo={`/s/${router.query.studio}/s/${router.query.space}/${spaceName?.value}/join?code=${router.query.code}`}
-        isOpen={state === "signup"}
-        onClose={() => setState("normal")}
-      />
-      <p>
-        We&apos;re still in early alpha! If you&apos;d have any questions, email
-        us at{" "}
-        <a href="mailto:contact@hyperlink.academy" className="text-accent-blue">
-          contact@hyperlink.academy
-        </a>{" "}
-      </p>
-    </div>
+    </>
   );
 }
 
