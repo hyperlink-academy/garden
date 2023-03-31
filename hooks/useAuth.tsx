@@ -52,11 +52,19 @@ export const useAuth = () => {
       logout: () => {
         supabaseClient.auth.signOut();
       },
-      signup: (input: { email: string; password: string }) => {
+      signup: (input: {
+        email: string;
+        password: string;
+        redirectTo?: string;
+      }) => {
         return supabaseClient.auth.signUp({
           email: input.email,
           password: input.password,
-          options: { emailRedirectTo: `${window.location.origin}/setup` },
+          options: {
+            emailRedirectTo: `${window.location.origin}/setup${
+              input.redirectTo ? `?redirectTo=${input.redirectTo}` : ""
+            }`,
+          },
         });
       },
     }),

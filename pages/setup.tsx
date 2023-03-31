@@ -39,8 +39,12 @@ export default function SignupPage() {
 
   let { authToken: tokens, session } = useAuth();
   useEffect(() => {
-    if (session.loggedIn) {
-      if (!session?.session?.username) router.push("/setup");
+    if (session?.session?.username) {
+      if (router.query.redirectTo)
+        router.push(
+          router.query.redirectTo as string,
+          router.query.redirectTo as string
+        );
       else router.push(`/s/${session?.session?.username}`);
     }
   }, [session, router]);
@@ -52,17 +56,28 @@ export default function SignupPage() {
       username: data.username,
       tokens,
     });
+    console.log(res, router.query.redirectTo);
     if (!res.success) {
       if (res.error === "username already exists") setStatus("invalidUsername");
       if (res.error === "user already initialized") {
-        router.push(`/s/${data.username}`);
+        if (router.query.redirectTo)
+          router.push(
+            router.query.redirectTo as string,
+            router.query.redirectTo as string
+          );
+        else router.push(`/s/${data.username}`);
       }
     }
     if (res.success) {
       let { data } = await supabase.auth.refreshSession();
       if (data.session) {
         await supabase.auth.setSession(data?.session);
-        router.push(`/s/${data.user?.user_metadata.username}`);
+        if (router.query.redirectTo)
+          router.push(
+            router.query.redirectTo as string,
+            router.query.redirectTo as string
+          );
+        else router.push(`/s/${data.user?.user_metadata.username}`);
       }
       setStatus("complete");
     }
@@ -90,6 +105,7 @@ export default function SignupPage() {
       <div className="grid-auto-rows grid gap-2">
         <h1>Set up your Studio</h1>
       </div>
+      {router.query.redirectTo}
 
       <form onSubmit={onSubmit} className="grid w-full gap-4">
         {status === "invalidUsername" ? (
@@ -110,6 +126,8 @@ export default function SignupPage() {
           </span>
           <input
             type="text"
+            minLength={3}
+            required
             pattern="[A-Za-z_0-9]+"
             value={data.username}
             onChange={(e) =>
@@ -117,6 +135,13 @@ export default function SignupPage() {
             }
           />
         </label>
+        <ButtonPrimary
+          content="test"
+          onClick={() => {
+            console.log(router.query.redirectTo);
+            router.push("/s/jared/s/2/join?code=R3366Q20");
+          }}
+        />
         <ButtonPrimary
           disabled={
             status === "invalidUsername" ||

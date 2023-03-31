@@ -6,6 +6,9 @@ import { useEffect, useState } from "react";
 
 type Status = "normal" | "invalidEmail" | "confirm";
 export default function SignupPage() {
+  return <SignupForm />;
+}
+export function SignupForm(props: { redirectTo?: string }) {
   let [status, setStatus] = useState<Status>("normal");
   let [input, setInput] = useState({
     password: "",
@@ -25,6 +28,7 @@ export default function SignupPage() {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     let { data, error } = await signup({
+      redirectTo: props.redirectTo,
       email: input.email,
       password: input.password,
     });

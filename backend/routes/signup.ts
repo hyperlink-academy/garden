@@ -8,7 +8,7 @@ import { Database } from "backend/lib/database.types";
 export const SignupRoute = makeRoute({
   route: "signup",
   input: z.object({
-    username: z.string(),
+    username: z.string().min(3),
     tokens: z.object({ access_token: z.string(), refresh_token: z.string() }),
   }),
   handler: async (msg, env: Bindings) => {

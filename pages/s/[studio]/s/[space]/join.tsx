@@ -1,12 +1,12 @@
 import { spaceAPI } from "backend/lib/api";
-import { ButtonPrimary } from "components/Buttons";
+import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
 import { Member } from "components/Icons";
 import { BaseSmallCard } from "components/CardPreview/SmallCard";
 import { useAuth } from "hooks/useAuth";
 import { useIndex, useSpaceID } from "hooks/useReplicache";
 import { useRouter } from "next/router";
 import { SVGProps, useState } from "react";
-import { LogInModal } from "components/LoginModal";
+import { LogInModal, SignupModal } from "components/LoginModal";
 import Head from "next/head";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
@@ -22,7 +22,7 @@ export function JoinSpace() {
   let thisEntity = useIndex.aev("this/name")[0]?.entity;
   let spaceName = useIndex.eav(thisEntity, "space/display_name");
 
-  let [isOpen, setLogInModal] = useState(false);
+  let [state, setState] = useState<"normal" | "signup" | "login">("normal");
 
   const onClick = async () => {
     if (!authToken || !code || isMember || !id) return;
@@ -77,16 +77,33 @@ export function JoinSpace() {
   }
   return (
     <div className="lightBorder flex flex-col place-items-center gap-4 p-5 text-center">
-      <h3>Log in to join this space!</h3>
-      <ButtonPrimary
-        content="Log In"
-        onClick={() => setLogInModal(true)}
-        className="justify-self-center"
+      <div className="flex flex-col gap-2 text-center ">
+        <h2>You&apos;ve been invited to {spaceName?.value}</h2>
+      </div>
+      <div className="display flex flex-row gap-2">
+        <ButtonPrimary
+          content="Log In"
+          onClick={() => setState("login")}
+          className="justify-self-center"
+        />
+        <ButtonSecondary
+          content="Sign up"
+          onClick={() => setState("signup")}
+          className="justify-self-center"
+        />
+      </div>
+      <LogInModal
+        isOpen={state === "login"}
+        onClose={() => setState("normal")}
       />
-      <LogInModal isOpen={isOpen} onClose={() => setLogInModal(false)} />
+      <SignupModal
+        redirectTo={`/s/${router.query.studio}/s/${router.query.space}/${spaceName?.value}/join?code=${router.query.code}`}
+        isOpen={state === "signup"}
+        onClose={() => setState("normal")}
+      />
       <p>
-        We&apos;re still in early alpha! If you&apos;d like to make an account,
-        email us at{" "}
+        We&apos;re still in early alpha! If you&apos;d have any questions, email
+        us at{" "}
         <a href="mailto:contact@hyperlink.academy" className="text-accent-blue">
           contact@hyperlink.academy
         </a>{" "}
