@@ -19,17 +19,17 @@ import { animated, useSpring } from "@react-spring/web";
 export const SmallCardDragContext = (props: {
   children: React.ReactNode;
   activationConstraints?:
-  | { delay: number; tolerance: number }
-  | { distance: number };
+    | { delay: number; tolerance: number }
+    | { distance: number };
   noDeleteZone?: boolean;
 }) => {
   let [active, setActiveCard] = useState<DraggableData | null>(null);
   let [over, setOver] = useState<DroppableData | null>(null);
   const mouseSensor = useSensor(MouseSensor, {
-    activationConstraint: props.activationConstraints,
+    activationConstraint: { distance: 4 },
   });
   const touchSensor = useSensor(TouchSensor, {
-    activationConstraint: props.activationConstraints,
+    activationConstraint: { delay: 264, tolerance: 4 },
   });
   const sensors = useSensors(mouseSensor, touchSensor);
 
@@ -75,20 +75,21 @@ export const SmallCardDragContext = (props: {
     >
       {props.children}
 
-      <DragOverlay dropAnimation={null} adjustScale={false} >
+      <DragOverlay dropAnimation={null} adjustScale={false}>
         {active?.entityID ? (
-          <AnimatedPickup >
+          <AnimatedPickup>
             {active.type === "card" ? (
               <div
                 className={``}
                 style={{
-                  transform: `rotate(${!active.rotation
-                    ? 0
-                    : (
-                      Math.floor(active.rotation / (Math.PI / 24)) *
-                      (Math.PI / 24)
-                    ).toFixed(2)
-                    }rad)`,
+                  transform: `rotate(${
+                    !active.rotation
+                      ? 0
+                      : (
+                          Math.floor(active.rotation / (Math.PI / 24)) *
+                          (Math.PI / 24)
+                        ).toFixed(2)
+                  }rad)`,
                 }}
               >
                 <CardPreview
@@ -114,16 +115,20 @@ export const SmallCardDragContext = (props: {
 };
 
 const AnimatedPickup = (props: { children: React.ReactNode }) => {
-  let spring = useSpring({ from: { scale: 1 }, to: { scale: 1.02 } })
-  return <animated.div className="relative text-sm drop-shadow" style={spring}>{props.children}</animated.div>
-}
+  let spring = useSpring({ from: { scale: 1 }, to: { scale: 1.02 } });
+  return (
+    <animated.div className="relative text-sm drop-shadow" style={spring}>
+      {props.children}
+    </animated.div>
+  );
+};
 
 export type DraggableData = {
   id: string;
   entityID: string;
   disabled?: boolean;
 } & (
-    | {
+  | {
       type: "card";
       outerControls?: boolean;
       parent: string;
@@ -131,8 +136,8 @@ export type DraggableData = {
       rotation?: number;
       size: "big" | "small";
     }
-    | { type: "room" }
-  );
+  | { type: "room" }
+);
 
 export type DroppableData = {
   id: string;
