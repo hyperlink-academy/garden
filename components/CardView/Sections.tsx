@@ -27,6 +27,7 @@ export const SingleTextSection = (
 
   return (
     <Textarea
+      {...props}
       focused={props.focused}
       previewOnly={props.previewOnly || !authorized}
       placeholderOnHover={props.placeholderOnHover}
