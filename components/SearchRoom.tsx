@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CardPreview } from "./CardPreview";
+import { CardPreview, CardPreviewWithData } from "./CardPreview";
 import { useAllItems } from "./FindOrCreateEntity";
 import { RoomSearch } from "./Icons";
 import { Divider } from "./Layout";
@@ -31,7 +31,7 @@ export const SearchRoom = () => {
           .map((item) => {
             return (
               <div key={item.entity}>
-                <CardPreview
+                <CardPreviewWithData
                   entityID={item.entity}
                   size={"big"}
                   hideContent={true}

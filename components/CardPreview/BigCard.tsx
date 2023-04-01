@@ -10,20 +10,8 @@ import { Props } from "./index";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export const BigCardBody = (props: { entityID: string } & Props) => {
-  let isMember = !!useIndex.eav(props.entityID, "member/name");
-  let image = useIndex.eav(props.entityID, "card/image");
-  let fact = useIndex.eav(props.entityID, "card/content");
-
-  let reactions = useReactions(props.entityID);
-
   let { authorized } = useMutations();
   let { open } = useCardViewer();
-
-  let imageUrl = !image
-    ? undefined
-    : image.value.filetype === "image"
-    ? `${WORKER_URL}/static/${image.value.id}`
-    : image.value.url;
 
   let listenersAndAttributes = authorized
     ? {
@@ -36,11 +24,14 @@ export const BigCardBody = (props: { entityID: string } & Props) => {
     <div
       {...listenersAndAttributes}
       className={`CardPreviewContent flex h-full grow  flex-row overflow-hidden !bg-cover !bg-center !bg-no-repeat pl-2 text-sm ${
-        isMember ? "py-2 pr-2" : "py-2 pr-3"
+        props.data.isMember ? "py-2 pr-2" : "py-2 pr-3"
       }`}
       style={{
         wordBreak: "break-word",
-        background: props.hideContent && imageUrl ? `url(${imageUrl})` : "",
+        background:
+          props.hideContent && props.data.imageUrl
+            ? `url(${props.data.imageUrl})`
+            : "",
       }} //no tailwind equiv - need for long titles to wrap
       onClick={() => {
         let cardView = document.getElementById("cardViewerWrapper");
@@ -54,17 +45,19 @@ export const BigCardBody = (props: { entityID: string } & Props) => {
         <div
           className={`cardPreviewHeader items-top flex justify-between gap-2`}
         >
-          <SingleTextSection
-            entityID={props.entityID}
-            previewOnly
-            section={isMember ? "member/name" : "card/title"}
+          <RenderedText
+            text={props.data.title?.value || ""}
             placeholderOnHover={true}
             placeholder="Untitled"
             className={`cardPreviewTitle text-md !w-fit font-bold ${
-              isMember ? "text-white" : "text-grey-35"
-            } ${!imageUrl ? "" : "rounded-[3px] !bg-white px-1"}`}
+              props.data.isMember ? "text-white" : "text-grey-35"
+            } ${!props.data.imageUrl ? "" : "rounded-[3px] !bg-white px-1"}`}
           />
-          {isMember ? <div className="shrink-0 text-white ">member</div> : ""}
+          {props.data.isMember ? (
+            <div className="shrink-0 text-white ">member</div>
+          ) : (
+            ""
+          )}
           {!props.outerControls && props.onDelete && authorized ? (
             <button
               className="h-fit pt-1 text-grey-80 hover:text-grey-15"
@@ -82,30 +75,32 @@ export const BigCardBody = (props: { entityID: string } & Props) => {
         {/* Big Card Preview Default Content */}
         <div
           className={` cardPreviewDefaultContent ${
-            isMember && !props.hideContent && fact?.value
+            props.data.isMember &&
+            !props.hideContent &&
+            props.data.content?.value
               ? "mt-1 rounded-md bg-white p-2 pt-1 text-accent-red"
               : ""
           }`}
         >
-          {!imageUrl || props.hideContent ? null : (
+          {!props.data.imageUrl || props.hideContent ? null : (
             <img
-              src={`${imageUrl}`}
+              src={`${props.data.imageUrl}`}
               className="max-h-[600px] max-w-full  py-2 px-1"
             />
           )}
-          {!props.hideContent && fact?.value && (
+          {!props.hideContent && props.data.content?.value && (
             <RenderedText
               className={`cardPreviewDefaultTextContent truncate whitespace-pre-wrap pt-1 leading-tight  ${
-                !imageUrl ? "" : "rounded-[3px] bg-white/75 px-1"
+                !props.data.imageUrl ? "" : "rounded-[3px] bg-white/75 px-1"
               } `}
-              text={(fact?.value as string) || ""}
+              text={(props.data.content?.value as string) || ""}
             />
           )}
         </div>
         {/* Reactions */}
-        {reactions.length > 0 ? (
+        {props.data.reactions.length > 0 ? (
           <div className="flex w-full flex-row items-center gap-1 pt-2">
-            {reactions.slice(0, 3).map(([reaction, data]) => {
+            {props.data.reactions.slice(0, 3).map(([reaction, data]) => {
               return (
                 <SingleReactionPreview
                   key={reaction}
@@ -115,9 +110,9 @@ export const BigCardBody = (props: { entityID: string } & Props) => {
                 />
               );
             })}
-            {reactions.length > 3 ? (
+            {props.data.reactions.length > 3 ? (
               <span className="rounded-md border border-grey-80 bg-white py-0.5 px-2 text-sm">
-                <em>{`+${reactions.length - 3}…`}</em>
+                <em>{`+${props.data.reactions.length - 3}…`}</em>
               </span>
             ) : (
               ""

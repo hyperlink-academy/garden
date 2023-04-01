@@ -1,4 +1,5 @@
 import { Fact } from "data/Facts";
+import { useCardPreviewData } from "hooks/CardPreviewData";
 import { useAuth } from "hooks/useAuth";
 import {
   ReplicacheContext,
@@ -168,6 +169,7 @@ const CollectionList = (props: {
       {over && over.type === "card" && (
         <div className="opacity-60">
           <CardPreview
+            data={over.data}
             entityID={over.entityID}
             size={"big"}
             hideContent={props.size === "small"}
@@ -236,8 +238,10 @@ const DraggableCard = (props: {
   id: string;
   parent: string;
 }) => {
+  let data = useCardPreviewData(props.entityID);
   const { attributes, listeners, setNodeRef, isDragging, isOverSomethingElse } =
     useDraggableCard({
+      data: data,
       type: "card",
       id: props.id,
       parent: props.parent,
@@ -313,6 +317,7 @@ const DraggableCard = (props: {
         {over && over.entityID !== props.entityID && over.type === "card" && (
           <div className="pb-2 opacity-60">
             <CardPreview
+              data={data}
               entityID={over.entityID}
               size={"big"}
               hideContent={props.hideContent}
@@ -321,6 +326,7 @@ const DraggableCard = (props: {
         )}
         {isOverSomethingElse ? null : (
           <CardPreview
+            data={data}
             entityID={props.entityID}
             size={props.size}
             dragHandleProps={{ listeners, attributes }}

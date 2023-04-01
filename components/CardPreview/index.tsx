@@ -22,6 +22,7 @@ import { useSubscribe } from "replicache-react";
 import { useAuth } from "hooks/useAuth";
 import { ulid } from "src/ulid";
 import { getAndUploadFile } from "src/getAndUploadFile";
+import { CardPreviewData, useCardPreviewData } from "hooks/CardPreviewData";
 
 const borderStyles = (args: { isMember: boolean }) => {
   switch (true) {
@@ -52,6 +53,7 @@ export type Props = {
   isDragging?: boolean;
   onLongPress?: () => void;
   pointerUpHandler?: (e: React.PointerEvent) => void;
+  data: CardPreviewData;
 };
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
@@ -248,6 +250,15 @@ export const HoverControls = (
       {/* End Rotate and Resize Handle */}
     </div>
   );
+};
+
+export const CardPreviewWithData = (
+  props: {
+    entityID: string;
+  } & Omit<Props, "data">
+) => {
+  let data = useCardPreviewData(props.entityID);
+  return <CardPreview {...props} data={data} />;
 };
 
 type P = { x: number; y: number };

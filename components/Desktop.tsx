@@ -16,6 +16,7 @@ import { sortByPosition } from "src/position_helpers";
 import { generateKeyBetween } from "src/fractional-indexing";
 import { useAuth } from "hooks/useAuth";
 import { getAndUploadFile } from "src/getAndUploadFile";
+import { useCardPreviewData } from "hooks/CardPreviewData";
 
 const GRID_SIZE = 16;
 const snap = (x: number) => Math.ceil(x / GRID_SIZE) * GRID_SIZE;
@@ -199,7 +200,9 @@ const DraggableCard = (props: {
 }) => {
   let position = useIndex.eav(props.relationshipID, "card/position-in");
   let { mutate, rep } = useMutations();
+  let data = useCardPreviewData(props.entityID);
   const { attributes, listeners, setNodeRef, isDragging } = useDraggableCard({
+    data: data,
     id: props.relationshipID,
     outerControls: true,
     entityID: props.entityID,
@@ -275,6 +278,7 @@ const DraggableCard = (props: {
           >
             {/* This is the actual card and its buttons. It also handles size */}
             <CardPreview
+              data={data}
               outerControls
               factID={props.relationshipID}
               onRotateDrag={(da) => {

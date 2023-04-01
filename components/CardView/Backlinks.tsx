@@ -1,6 +1,6 @@
 import { Disclosure } from "@headlessui/react";
 import { useSpring, animated } from "@react-spring/web";
-import { CardPreview } from "components/CardPreview";
+import { CardPreview, CardPreviewWithData } from "components/CardPreview";
 import { DisclosureExpandTiny } from "components/Icons";
 import { useIndex, useMutations } from "hooks/useReplicache";
 import useMeasure from "react-use-measure";
@@ -18,7 +18,7 @@ export const Backlinks = (props: { entityID: string }) => {
         {({ open }) =>
           cards.length === 1 ? (
             <div className="mb-3">
-              <CardPreview
+              <CardPreviewWithData
                 entityID={cards[0].entity}
                 factID={cards[0].id}
                 hideContent
@@ -40,7 +40,7 @@ export const Backlinks = (props: { entityID: string }) => {
                     <div className="flex flex-col gap-2">
                       {cards.map((c) => {
                         return (
-                          <CardPreview
+                          <CardPreviewWithData
                             key={c.id}
                             hideContent
                             factID={c.id}

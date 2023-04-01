@@ -1,7 +1,7 @@
 import { useIndex, useMutations } from "hooks/useReplicache";
 import { useState } from "react";
 import { ulid } from "src/ulid";
-import { CardPreview } from "./CardPreview";
+import { CardPreview, CardPreviewWithData } from "./CardPreview";
 import { FindOrCreate, useAllItems } from "./FindOrCreateEntity";
 import { AddSmall, CardSearch } from "./Icons";
 import { Divider } from "./Layout";
@@ -72,7 +72,7 @@ export function CalendarRoom() {
                       <>
                         {cardsWithDate[d]?.map((card) => (
                           <div key={card.entity} className="h-fit">
-                            <CardPreview
+                            <CardPreviewWithData
                               entityID={card.entity}
                               key={card.entity}
                               size="big"

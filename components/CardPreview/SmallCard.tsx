@@ -1,40 +1,22 @@
-import {
-  SingleReaction,
-  SingleReactionPreview,
-} from "components/CardView/Reactions";
+import { SingleReactionPreview } from "components/CardView/Reactions";
 import { useCardViewer } from "components/CardViewerContext";
-import { GripperBG } from "components/Gripper";
-import { CalendarMedium, ExternalLink, Member } from "components/Icons";
+import { ExternalLink, Member } from "components/Icons";
 import { useReactions } from "hooks/useReactions";
-import { useIndex, useMutations } from "hooks/useReplicache";
+import { useMutations } from "hooks/useReplicache";
 import { isUrl } from "src/isUrl";
 import { Props } from "./index";
 
-const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export const SmallCardBody = (props: { entityID: string } & Props) => {
-  let isMember = !!useIndex.eav(props.entityID, "member/name");
-
-  let member = useIndex.eav(props.entityID, "member/name");
-  let title = useIndex.eav(props.entityID, "card/title");
-  let content = useIndex.eav(props.entityID, "card/content");
-  let image = useIndex.eav(props.entityID, "card/image");
-  let date = useIndex.eav(props.entityID, "card/date");
-
-  let imageUrl = !image
-    ? undefined
-    : image.value.filetype === "image"
-    ? `${WORKER_URL}/static/${image.value.id}`
-    : image.value.url;
-
   return (
     <BaseSmallCard
       {...props}
-      title={title?.value}
-      content={content?.value}
-      imageUrl={imageUrl}
-      isMember={isMember}
-      memberName={member?.value}
-      date={date?.value.value}
+      reactions={props.data.reactions}
+      title={props.data.title?.value}
+      content={props.data.content?.value}
+      imageUrl={props.data.imageUrl}
+      isMember={props.data.isMember}
+      memberName={props.data.member?.value}
+      date={props.data.date?.value.value}
     />
   );
 };
@@ -49,10 +31,10 @@ export const BaseSmallCard = (
     memberName?: string;
     date?: string;
     entityID?: string;
-  } & Omit<Props, "size" | "href">
+    reactions?: ReturnType<typeof useReactions>;
+  } & Omit<Props, "size" | "href" | "data">
 ) => {
   let url = props.content ? isUrl(props.content) : false;
-  let reactions = useReactions(props.entityID);
 
   let { authorized } = useMutations();
   let { open } = useCardViewer();
@@ -130,9 +112,9 @@ export const BaseSmallCard = (
           ) : null} */}
 
           {/* Small Card Preview - Reactions */}
-          {reactions && reactions.length > 0 ? (
+          {props.reactions && props.reactions.length > 0 ? (
             <div className="fixed -bottom-[12px] right-[24px] flex items-center gap-1">
-              {reactions.slice(0, 1).map(([reaction, data]) => {
+              {props.reactions.slice(0, 1).map(([reaction, data]) => {
                 if (props.entityID)
                   return (
                     <SingleReactionPreview
@@ -143,9 +125,9 @@ export const BaseSmallCard = (
                     />
                   );
               })}
-              {reactions.length > 1 ? (
+              {props.reactions.length > 1 ? (
                 <span className="rounded-md border border-grey-80 bg-white py-0.5 px-2 text-sm text-grey-55">
-                  {`+${reactions.length - 1}`}
+                  {`+${props.reactions.length - 1}`}
                 </span>
               ) : (
                 ""

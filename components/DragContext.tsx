@@ -15,6 +15,7 @@ import { CardPreview } from "./CardPreview";
 import { pointerWithinOrRectIntersection } from "src/customCollisionDetection";
 import { RoomListPreview } from "./SpaceLayout/Sidebar/RoomListLayout";
 import { animated, useSpring } from "@react-spring/web";
+import { CardPreviewData } from "hooks/CardPreviewData";
 
 export const SmallCardDragContext = (props: {
   children: React.ReactNode;
@@ -93,6 +94,7 @@ export const SmallCardDragContext = (props: {
                 }}
               >
                 <CardPreview
+                  data={active.data}
                   outerControls={active.outerControls}
                   entityID={active.entityID}
                   size={active.size}
@@ -135,6 +137,7 @@ export type DraggableData = {
       hideContent: boolean;
       rotation?: number;
       size: "big" | "small";
+      data: CardPreviewData;
     }
   | { type: "room" }
 );
