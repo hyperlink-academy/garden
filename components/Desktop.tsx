@@ -18,8 +18,8 @@ import { useAuth } from "hooks/useAuth";
 import { getAndUploadFile } from "src/getAndUploadFile";
 import { useCardPreviewData } from "hooks/CardPreviewData";
 
-const GRID_SIZE = 16;
-const snap = (x: number) => Math.ceil(x / GRID_SIZE) * GRID_SIZE;
+const GRID_SIZE = 8;
+const snap = (x: number) => Math.round(x / GRID_SIZE) * GRID_SIZE;
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export const Desktop = (props: { entityID: string }) => {
