@@ -315,7 +315,7 @@ const DraggableCard = (props: {
         {over && over.entityID !== props.entityID && over.type === "card" && (
           <div className="pb-2 opacity-60">
             <CardPreview
-              data={data}
+              data={over.data}
               entityID={over.entityID}
               size={"big"}
               hideContent={props.hideContent}
