@@ -21,7 +21,6 @@ import { useCardPreviewData } from "hooks/CardPreviewData";
 const GRID_SIZE = 8;
 const snap = (x: number) => Math.round(x / GRID_SIZE) * GRID_SIZE;
 
-const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export const Desktop = (props: { entityID: string }) => {
   let cards = useIndex.eav(props.entityID, "desktop/contains");
   let height = useHeight(props.entityID) + 500;
@@ -207,6 +206,15 @@ const DraggableCard = (props: {
     parent: props.parent,
     position: position?.value,
     type: "card",
+    onDragStart: async () => {
+      await mutate("updatePositionInDesktop", {
+        factID: props.relationshipID,
+        parent: props.parent,
+        dx: 0,
+        dy: 0,
+        da: 0,
+      });
+    },
     hideContent: false,
   });
 
