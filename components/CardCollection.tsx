@@ -104,7 +104,7 @@ const CollectionList = (props: {
   return (
     <div
       ref={setNodeRef}
-      className="collectionCardList z-10 flex h-full flex-col gap-y-2"
+      className="collectionCardList z-10 flex h-full flex-col"
       onDragOver={(e) => e.preventDefault()}
       onDrop={async (e) => {
         e.preventDefault();
@@ -147,12 +147,14 @@ const CollectionList = (props: {
       }}
     >
       {props.cards.length > 5 && (
-        <CardAdder
-          parentID={props.entityID}
-          attribute={props.attribute}
-          positionKey="eav"
-          openOnAdd
-        />
+        <div className="pb-2">
+          <CardAdder
+            parentID={props.entityID}
+            attribute={props.attribute}
+            positionKey="eav"
+            openOnAdd
+          />
+        </div>
       )}
       {props.cards?.map((card) => (
         <DraggableCard
@@ -308,7 +310,7 @@ const DraggableCard = (props: {
       <div
         ref={refs}
         style={{}}
-        className={`${
+        className={`pb-2 ${
           isDragging ? `opacity-60 ${isOverSomethingElse ? "-mt-2" : ""}` : ""
         }`}
       >

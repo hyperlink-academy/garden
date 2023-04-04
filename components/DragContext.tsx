@@ -182,6 +182,10 @@ export const useDroppableZone = (data: DroppableData) => {
   let [over, setOver] = useState<DraggableData | null>(null);
   let droppable = useDroppable({
     id: data.id,
+    resizeObserverConfig: {
+      updateMeasurementsFor: [],
+      timeout: 50,
+    },
     data: {
       ...data,
       onDragExit: (d: DraggableData) => {
