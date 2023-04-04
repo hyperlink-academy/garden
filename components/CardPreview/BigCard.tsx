@@ -46,6 +46,11 @@ export const BigCardBody = (props: { entityID: string } & Props) => {
           className={`cardPreviewHeader items-top flex justify-between gap-2`}
         >
           <RenderedText
+            style={{
+              whiteSpace: "pre-wrap",
+              fontFamily: "inherit",
+              width: "100%",
+            }}
             text={props.data.title?.value || ""}
             placeholderOnHover={true}
             placeholder="Untitled"
