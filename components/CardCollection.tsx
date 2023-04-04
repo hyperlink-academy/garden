@@ -156,7 +156,6 @@ const CollectionList = (props: {
       )}
       {props.cards?.map((card) => (
         <DraggableCard
-          size="big"
           attribute={props.attribute}
           hideContent={props.size === "small"}
           parent={props.entityID}
@@ -233,7 +232,6 @@ const CollectionHeader = (props: { entityID: string }) => {
 const DraggableCard = (props: {
   entityID: string;
   attribute: "desktop/contains" | "deck/contains";
-  size: "big" | "small";
   hideContent?: boolean;
   id: string;
   parent: string;
@@ -247,7 +245,7 @@ const DraggableCard = (props: {
       parent: props.parent,
       entityID: props.entityID,
       hideContent: !!props.hideContent,
-      size: props.size,
+      size: "big",
     });
 
   let rep = useContext(ReplicacheContext);
@@ -328,7 +326,7 @@ const DraggableCard = (props: {
           <CardPreview
             data={data}
             entityID={props.entityID}
-            size={props.size}
+            size="big"
             dragHandleProps={{ listeners, attributes }}
             hideContent={props.hideContent}
             onDelete={() => {

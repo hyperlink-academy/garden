@@ -63,7 +63,7 @@ export const Desktop = (props: { entityID: string }) => {
             ...newPosition,
             rotation: 0,
             size:
-              data.size === "small"
+              data.position?.size === "small"
                 ? "small"
                 : data.hideContent
                 ? "small"
@@ -71,15 +71,13 @@ export const Desktop = (props: { entityID: string }) => {
           },
         });
       } else {
-        let position = await rep.rep.query((tx) => {
-          return scanIndex(tx).eav(data.id, "card/position-in");
-        });
+        let position = data.position;
         if (!position) return;
         await mutate("updatePositionInDesktop", {
           factID: data.id,
           parent: props.entityID,
-          dx: newPosition.x - position?.value.x,
-          dy: newPosition.y - position.value.y,
+          dx: newPosition.x - position.x,
+          dy: newPosition.y - position.y,
           da: 0,
         });
       }
@@ -207,9 +205,8 @@ const DraggableCard = (props: {
     outerControls: true,
     entityID: props.entityID,
     parent: props.parent,
-    rotation: position?.value.rotation,
+    position: position?.value,
     type: "card",
-    size: position?.value.size || "small",
     hideContent: false,
   });
 

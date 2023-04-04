@@ -16,6 +16,7 @@ import { pointerWithinOrRectIntersection } from "src/customCollisionDetection";
 import { RoomListPreview } from "./SpaceLayout/Sidebar/RoomListLayout";
 import { animated, useSpring } from "@react-spring/web";
 import { CardPreviewData } from "hooks/CardPreviewData";
+import { Fact } from "data/Facts";
 
 export const SmallCardDragContext = (props: {
   children: React.ReactNode;
@@ -41,37 +42,44 @@ export const SmallCardDragContext = (props: {
       sensors={sensors}
       onDragStart={({ active }) => {
         let activeData = active?.data.current as DraggableData;
+        activeData.onDragStart?.(activeData);
         setActiveCard(activeData);
       }}
-      onDragOver={({ over }) => {
+      onDragOver={async ({ over }) => {
         let overData = (over?.data.current as DroppableData) || null;
         if (
           active &&
           previouslyOver.current &&
           previouslyOver.current.id !== overData?.id
         ) {
-          previouslyOver.current.onDragExit?.(active);
+          await previouslyOver.current.onDragExit?.(active);
         }
-        if (active && overData) overData.onDragEnter?.(active);
+        if (active && overData) await overData.onDragEnter?.(active);
         setOver(overData);
         previouslyOver.current = overData;
       }}
-      onDragCancel={({ active }) => {
+      onDragCancel={async ({ active }) => {
         let activeData = active?.data.current as DraggableData;
         if (previouslyOver.current)
-          previouslyOver.current.onDragExit?.(activeData);
+          await previouslyOver.current.onDragExit?.(activeData);
       }}
       onDragEnd={async ({ over, active: activeData }) => {
         let overData = over?.data.current as DroppableData;
         if (active)
-          overData?.onDragEnd?.(active, activeData.rect.current.translated);
+          await overData?.onDragEnd?.(
+            active,
+            activeData.rect.current.translated
+          );
         setActiveCard(null);
         setOver(null);
       }}
       onDragMove={async ({ over, active: activeData }) => {
         let overData = over?.data.current as DroppableData;
         if (active)
-          overData?.onDragMove?.(active, activeData.rect.current.translated);
+          await overData?.onDragMove?.(
+            active,
+            activeData.rect.current.translated
+          );
       }}
     >
       {props.children}
@@ -84,10 +92,12 @@ export const SmallCardDragContext = (props: {
                 className={``}
                 style={{
                   transform: `rotate(${
-                    !active.rotation
+                    !active.position?.rotation
                       ? 0
                       : (
-                          Math.floor(active.rotation / (Math.PI / 24)) *
+                          Math.floor(
+                            active.position?.rotation / (Math.PI / 24)
+                          ) *
                           (Math.PI / 24)
                         ).toFixed(2)
                   }rad)`,
@@ -97,7 +107,7 @@ export const SmallCardDragContext = (props: {
                   data={active.data}
                   outerControls={active.outerControls}
                   entityID={active.entityID}
-                  size={active.size}
+                  size={active.position?.size || active.size || "small"}
                   hideContent={active.hideContent}
                 />
                 {over?.type === "linkCard" && (
@@ -129,14 +139,15 @@ export type DraggableData = {
   id: string;
   entityID: string;
   disabled?: boolean;
+  onDragStart?: (data: DraggableData) => void | Promise<void>;
 } & (
   | {
       type: "card";
+      position?: Fact<"card/position-in">["value"];
+      size?: "big" | "small";
       outerControls?: boolean;
       parent: string;
       hideContent: boolean;
-      rotation?: number;
-      size: "big" | "small";
       data: CardPreviewData;
     }
   | { type: "room" }
@@ -146,10 +157,16 @@ export type DroppableData = {
   id: string;
   entityID: string;
   type: "card" | "room" | "dropzone" | "linkCard";
-  onDragEnter?: (data: DraggableData) => void;
-  onDragExit?: (data: DraggableData) => void;
-  onDragEnd?: (data: DraggableData, rect: ClientRect | null) => void;
-  onDragMove?: (data: DraggableData, rect: ClientRect | null) => void;
+  onDragEnter?: (data: DraggableData) => void | Promise<void>;
+  onDragExit?: (data: DraggableData) => void | Promise<void>;
+  onDragEnd?: (
+    data: DraggableData,
+    rect: ClientRect | null
+  ) => void | Promise<void>;
+  onDragMove?: (
+    data: DraggableData,
+    rect: ClientRect | null
+  ) => void | Promise<void>;
 };
 
 export const useDraggableCard = (data: DraggableData) => {
