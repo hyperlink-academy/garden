@@ -22,9 +22,7 @@ export const parseLine = (input: string) => {
   };
   while (position < input.length) {
     matchPairedToken("**", (content) => <strong key={key}>{content}</strong>);
-    matchPairedToken("__", (content) => <strong key={key}>{content}</strong>);
     matchPairedToken("*", (content) => <em key={key}>{content}</em>);
-    matchPairedToken("_", (content) => <em key={key}>{content}</em>);
     position++;
   }
   output.push(input.slice(lastTokenPosition, position));
