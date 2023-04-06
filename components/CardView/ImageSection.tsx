@@ -2,23 +2,30 @@ import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
 import { useAuth } from "hooks/useAuth";
 import { spaceAPI } from "backend/lib/api";
 import { SectionImageAdd } from "components/Icons";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { DotLoader } from "components/DotLoader";
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 
 export const MakeImage = (props: { entity: string }) => {
   let { mutate, authorized } = useMutations();
   let image = useIndex.eav(props.entity, "card/image");
+  let [imageID, setState] = useState<null | string>(null);
+  useEffect(() => {
+    if (imageID) {
+      mutate("assertFact", {
+        entity: props.entity,
+        attribute: "card/image",
+        value: { type: "file", id: imageID, filetype: "image" },
+        positions: {},
+      });
+      setState(null);
+    }
+  }, [imageID]);
 
   return !authorized || image ? null : (
     <AddImage
       onUpload={async (imageID) => {
-        await mutate("assertFact", {
-          entity: props.entity,
-          attribute: "card/image",
-          value: { type: "file", id: imageID, filetype: "image" },
-          positions: {},
-        });
+        setState(imageID);
       }}
     >
       <SectionImageAdd />
