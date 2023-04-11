@@ -10,7 +10,7 @@ import {
 import { SmallCardDragContext } from "components/DragContext";
 import { Sidebar } from "components/SpaceLayout";
 import Head from "next/head";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import useWindowDimensions from "hooks/useWindowDimensions";
 import { CardCollection } from "components/CardCollection";
 import { useSubscribe } from "replicache-react";
@@ -21,7 +21,7 @@ import { CalendarRoom } from "components/CalendarRoom";
 import { useUndoableState } from "hooks/useUndoableState";
 import { useRouter } from "next/router";
 import { slugify } from "src/utils";
-import { MessageInput, Messages } from "components/CardView/Discussion";
+import { Discussion } from "components/CardView/Discussion";
 
 export default function SpacePage() {
   let spaceName = useIndex.aev("space/display_name")[0];
@@ -242,21 +242,12 @@ const Room = (props: { entityID: string | null }) => {
               />
             </div>
           ) : roomType?.value === "chat" ? (
-            <ChatRoom entityID={props.entityID} />
+            <Discussion entityID={props.entityID} />
           ) : (
             <Desktop entityID={props.entityID} />
           )
         ) : null}
       </div>
-    </div>
-  );
-};
-
-const ChatRoom = (props: { entityID: string }) => {
-  return (
-    <div>
-      <Messages entityID={props.entityID} />
-      <MessageInput entityID={props.entityID} />
     </div>
   );
 };

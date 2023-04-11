@@ -4,5 +4,6 @@ export type Message = {
   sender: string;
   content: string;
   entity?: string;
+  replyTo?: string;
   ts: string;
 };
