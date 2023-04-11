@@ -6,6 +6,7 @@ import {
   MoreOptionsTiny,
   RoomCalendar,
   RoomCanvas,
+  RoomChat,
   RoomCollection,
   RoomMember,
   RoomSearch,
@@ -149,10 +150,11 @@ export const RoomListItem = (props: {
 
   return (
     <div
-      className={`relative select-none rounded-md border border-transparent ${props.roomEntity === props.currentRoom
-        ? "rounded-md bg-accent-blue font-bold text-white"
-        : " text-grey-35 hover:border-grey-80"
-        }`}
+      className={`relative select-none rounded-md border border-transparent ${
+        props.roomEntity === props.currentRoom
+          ? "rounded-md bg-accent-blue font-bold text-white"
+          : " text-grey-35 hover:border-grey-80"
+      }`}
     >
       {/* buttom = name + either edit button OR room type icon */}
       <button
@@ -166,8 +168,8 @@ export const RoomListItem = (props: {
         }
       >
         {props.roomEntity === props.currentRoom &&
-          authorized &&
-          props.setRoomEditOpen ? (
+        authorized &&
+        props.setRoomEditOpen ? (
           // edit options - only if auth-ed AND on current room
           <div className=" roomListItemSettings flex w-5 shrink-0 place-content-center pt-0.5">
             <button
@@ -181,10 +183,11 @@ export const RoomListItem = (props: {
           // when not on room, show room type icon
           <div
             className={` roomListItemIcon mt-[2px] h-5 w-5 shrink-0 pt-[1px] pl-[2px]
-             ${props.roomEntity === props.currentRoom
-                ? "text-white"
-                : "text-grey-55"
-              }`}
+             ${
+               props.roomEntity === props.currentRoom
+                 ? "text-white"
+                 : "text-grey-55"
+             }`}
           >
             {props.roomEntity === memberEntity || isMember ? (
               <RoomMember />
@@ -192,6 +195,8 @@ export const RoomListItem = (props: {
               <RoomCollection />
             ) : roomType?.value === "canvas" ? (
               <RoomCanvas />
+            ) : roomType?.value === "chat" ? (
+              <RoomChat />
             ) : props.roomEntity === "search" ? (
               <RoomSearch />
             ) : props.roomEntity === "calendar" ? (
@@ -212,7 +217,7 @@ export const DraggableRoomListItem = (props: {
   draggable: boolean;
   entityID: string;
   factID: string;
-  children: React.ReactNode
+  children: React.ReactNode;
   onRoomChange: (room: string) => void;
   currentRoom: string | null;
   setRoomEditOpen: () => void;
@@ -258,11 +263,9 @@ export const DraggableRoomListItem = (props: {
     return () => window.clearTimeout(timeout);
   }, [over]);
 
-
   let refs = useCombinedRefs(setNodeRef, droppableRef);
 
-  let obj =
-    { ...listeners, ...attributes };
+  let obj = { ...listeners, ...attributes };
   return (
     <div {...obj} ref={refs} className={``}>
       {over && over.entityID !== props.entityID && over.type === "room" && (
@@ -284,13 +287,12 @@ export const DraggableRoomListItem = (props: {
   );
 };
 
-
 export const RoomListPreview = (props: { entityID: string }) => {
   let name = useIndex.eav(props.entityID, "room/name");
   return (
     <RoomListItem
       roomEntity={props.entityID}
-      onRoomChange={() => { }}
+      onRoomChange={() => {}}
       currentRoom={null}
     >
       {name?.value}

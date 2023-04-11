@@ -79,7 +79,7 @@ const CreateRoom = () => {
   let [open, setOpen] = useState(false);
   let [roomState, setRoomState] = useState({
     name: "",
-    type: "canvas" as "canvas" | "collection",
+    type: "canvas" as "canvas" | "collection" | "chat",
   });
 
   let rep = useContext(ReplicacheContext);
@@ -189,6 +189,17 @@ const CreateRoom = () => {
                       } rounded-md border border-grey-15 p-4 hover:cursor-pointer`}
                     >
                       Collection
+                    </div>
+                  )}
+                </RadioGroup.Option>
+                <RadioGroup.Option value="chat">
+                  {({ checked }) => (
+                    <div
+                      className={`${
+                        checked ? "bg-bg-blue" : ""
+                      } rounded-md border border-grey-15 p-4 hover:cursor-pointer`}
+                    >
+                      Chat
                     </div>
                   )}
                 </RadioGroup.Option>

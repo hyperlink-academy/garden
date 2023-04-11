@@ -37,7 +37,7 @@ export const Discussion = (props: { close: () => void; entityID: string }) => {
   );
 };
 
-const MessageInput = (props: { entityID: string }) => {
+export const MessageInput = (props: { entityID: string }) => {
   let [focused, setFocused] = useState(false);
   let [value, setValue] = useState("");
   let { mutate, memberEntity, authorized } = useMutations();
@@ -86,7 +86,7 @@ const MessageInput = (props: { entityID: string }) => {
   );
 };
 
-const Messages = (props: { entityID: string }) => {
+export const Messages = (props: { entityID: string }) => {
   let messages = useIndex.messages(props.entityID);
   return (
     <div

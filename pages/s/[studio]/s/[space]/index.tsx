@@ -21,6 +21,10 @@ import { CalendarRoom } from "components/CalendarRoom";
 import { useUndoableState } from "hooks/useUndoableState";
 import { useRouter } from "next/router";
 import { slugify } from "src/utils";
+import {
+  MessageInput,
+  Messages,
+} from "components/CardView/Discussion";
 
 export default function SpacePage() {
   let spaceName = useIndex.aev("space/display_name")[0];
@@ -228,7 +232,7 @@ const Room = (props: { entityID: string | null }) => {
     >
       <div className="relative m-2 flex w-[336px] flex-col items-stretch gap-0 text-sm sm:m-4">
         {/* remove desktop bg for collections (member rooms still canvas for now) */}
-        {roomType?.value !== "collection" ? (
+        {roomType?.value === "canvas" ? (
           <div className="desktopBackground absolute h-full w-full" />
         ) : null}
         {props.entityID ? (
@@ -239,11 +243,22 @@ const Room = (props: { entityID: string | null }) => {
                 attribute="desktop/contains"
               />
             </div>
+          ) : roomType?.value === "chat" ? (
+            <ChatRoom entityID={props.entityID} />
           ) : (
             <Desktop entityID={props.entityID} />
           )
         ) : null}
       </div>
+    </div>
+  );
+};
+
+const ChatRoom = (props: { entityID: string }) => {
+  return (
+    <div>
+      <Messages entityID={props.entityID} />
+      <MessageInput entityID={props.entityID} />
     </div>
   );
 };
