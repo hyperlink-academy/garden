@@ -247,6 +247,11 @@ export const DefaultAttributes = {
     unique: false,
     "union/value": ["grid", "list", "cardpreview"],
   },
+  "message/attached-card": {
+    type: "reference",
+    cardinality: "many",
+    unique: false,
+  },
 } as const;
 
 export const ShortCodes: { [k in keyof Attribute]?: string | undefined } = {

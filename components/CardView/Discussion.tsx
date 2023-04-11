@@ -1,15 +1,15 @@
-import { ButtonLink, ButtonPrimary } from "components/Buttons";
-import {
-  CloseFilledTiny,
-  CloseLinedTiny,
-  GoBackToPage,
-  Send,
-} from "components/Icons";
+import { ButtonPrimary } from "components/Buttons";
+import * as Popover from "@radix-ui/react-popover";
+import { CardAdd, CloseLinedTiny, Send } from "components/Icons";
 import { RenderedText } from "components/Textarea/RenderedText";
 import { useIndex, useMutations } from "hooks/useReplicache";
 import { useEffect, useState } from "react";
 import { ulid } from "src/ulid";
 import { Message } from "data/Messages";
+import AutosizeTextarea from "components/Textarea/AutosizeTextarea";
+import { FindOrCreate, useAllItems } from "components/FindOrCreateEntity";
+import { ref } from "data/Facts";
+import { CardPreviewWithData } from "components/CardPreview";
 
 export const Discussion = (props: { entityID: string }) => {
   let unreadBy = useIndex.eav(props.entityID, "discussion/unread-by");
@@ -45,14 +45,14 @@ export const MessageInput = (props: {
   reply: string | null;
   setReply: (reply: string | null) => void;
 }) => {
-  let [focused, setFocused] = useState(false);
   let [value, setValue] = useState("");
+  let [attachedCards, setAttachedCards] = useState<string[]>([]);
   let { mutate, memberEntity, authorized } = useMutations();
   let replyMessage = useIndex.messageByID(props.reply);
 
   if (!authorized) return null;
   const send = async () => {
-    if (!memberEntity) return;
+    if (!memberEntity || !value) return;
     let message: Message = {
       id: ulid(),
       topic: props.entityID,
@@ -61,17 +61,31 @@ export const MessageInput = (props: {
       content: value || "",
     };
     if (props.reply) message.replyTo = props.reply;
+    if (attachedCards.length > 0) {
+      let entity = ulid();
+      message.entity = entity;
+      await mutate(
+        "assertFact",
+        attachedCards.map((c) => ({
+          entity,
+          attribute: "message/attached-card",
+          value: ref(c),
+          positions: {},
+        }))
+      );
+    }
     await mutate("replyToDiscussion", {
       discussion: props.entityID,
       message,
     });
     setValue("");
+    setAttachedCards([]);
     props.setReply(null);
     let roomScrollContainer = document.getElementById("roomScrollContainer");
     roomScrollContainer?.scrollTo(0, roomScrollContainer.scrollHeight);
   };
   return (
-    <div className="sticky bottom-0 -mb-2 flex flex-col gap-2 px-2 pb-2 pt-2">
+    <div className="sticky bottom-0 -mb-2 flex w-full flex-col gap-2 px-2 pb-2 pt-2">
       {props.reply && (
         <div className="flex justify-between gap-2 bg-white p-2">
           <div>{replyMessage?.content}</div>{" "}
@@ -80,32 +94,131 @@ export const MessageInput = (props: {
           </button>
         </div>
       )}
-      <div className="flex gap-2">
-        <textarea
-          onKeyDown={(e) => {
-            if (
-              (e.key === "Enter" && e.ctrlKey) ||
-              (e.key === "Enter" && e.metaKey)
-            ) {
-              send();
-            }
-          }}
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          placeholder="add your response..."
-          onFocus={() => setFocused(true)}
-          onBlur={() => setFocused(false)}
-          className="h-10 w-full resize-none overflow-hidden border-grey-80"
-          id="messageInput"
-        ></textarea>
+      <div className="flex w-full gap-2">
+        <div className="z-10 flex w-full gap-1 rounded-md border border-grey-80 bg-white p-1">
+          <AutosizeTextarea
+            onKeyDown={(e) => {
+              if (
+                (e.key === "Enter" && e.ctrlKey) ||
+                (e.key === "Enter" && e.metaKey)
+              ) {
+                send();
+              }
+            }}
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            placeholder=""
+            className="w-full "
+            id="messageInput"
+          />
+          <AttachCard
+            attachedCards={attachedCards}
+            setAttachedCards={setAttachedCards}
+          />
+        </div>
         {/* {!focused && !value ? null : ( */}
-        <div className="flex items-center justify-end text-grey-55">
+        <div className="flex h-min justify-end text-grey-55">
           <ButtonPrimary disabled={!value} onClick={send} icon={<Send />} />
         </div>
       </div>
       {/* )} */}
     </div>
   );
+};
+
+const AttachCard = ({
+  attachedCards,
+  setAttachedCards,
+}: {
+  attachedCards: string[];
+  setAttachedCards: React.Dispatch<React.SetStateAction<string[]>>;
+}) => {
+  let [open, setOpen] = useState(false);
+  let items = useAllItems(open);
+  let { authorized, mutate, memberEntity, action } = useMutations();
+  if (!authorized) return null;
+  return (
+    <>
+      {/* decide styling of button via children */}
+      {attachedCards.length === 0 ? (
+        <button onClick={() => setOpen(true)} className="flex ">
+          {/* {props.expanded ? "Attach Card" : ""} */}
+          <CardAdd />
+        </button>
+      ) : (
+        <Popover.Root>
+          <Popover.Trigger asChild>
+            <button className="flex ">
+              {attachedCards.length} <CardAdd />
+            </button>
+          </Popover.Trigger>
+          <Popover.Portal>
+            <Popover.Content
+              className="PopoverContent"
+              sideOffset={24}
+              side="top"
+            >
+              <div className="flex w-36 flex-col gap-2 rounded-md border bg-white shadow-sm">
+                {attachedCards.map((card) => {
+                  return (
+                    <button
+                      onClick={() =>
+                        setAttachedCards((a) => a.filter((c) => c !== card))
+                      }
+                    >
+                      <AttachedCard entityID={card} />
+                    </button>
+                  );
+                })}
+                <button onClick={() => setOpen(true)} className="flex ">
+                  <CardAdd />
+                </button>
+              </div>
+              <Popover.Arrow className="PopoverArrow" />
+            </Popover.Content>
+          </Popover.Portal>
+        </Popover.Root>
+      )}
+      <FindOrCreate
+        allowBlank={true}
+        onClose={() => setOpen(false)}
+        //START OF ON SELECT LOGIC
+        onSelect={async (cards) => {
+          if (!memberEntity) return;
+          // if youre adding to a backlink section, then the entity is a string
+          // if youre creating a new deck
+
+          action.start();
+
+          for (let d of cards) {
+            let entity: string;
+            if (d.type === "existing") entity = d.entity;
+            else {
+              entity = ulid();
+              await mutate("createCard", {
+                entityID: entity,
+                title: d.name,
+                memberEntity,
+              });
+            }
+            setAttachedCards((a) => [...a, entity]);
+          }
+
+          action.end();
+        }}
+        // END OF ONSELECT LOGIC
+        selected={attachedCards}
+        open={open}
+        items={items}
+      />
+    </>
+  );
+};
+
+const AttachedCard = (props: { entityID: string }) => {
+  let name = useIndex.eav(props.entityID, "card/title");
+  let memberName = useIndex.eav(props.entityID, "member/name");
+  return <div>{memberName?.value || name?.value}</div>;
 };
 
 export const Messages = (props: {
@@ -126,6 +239,7 @@ export const Messages = (props: {
           content={m.content}
           key={m.id}
           id={m.id}
+          entity={m.entity}
           reply={m.replyTo}
           setReply={props.setReply}
         />
@@ -140,11 +254,16 @@ const Message = (props: {
   date: string;
   id: string;
   reply?: string;
+  entity?: string;
   setReply: (reply: string) => void;
 }) => {
   let memberName = useIndex.eav(props.author, "member/name");
   let time = new Date(parseInt(props.date));
   let replyMessage = useIndex.messageByID(props.reply || null);
+  let attachedCards = useIndex.eav(
+    props.entity || null,
+    "message/attached-card"
+  );
   return (
     <div>
       <div className="flex justify-between gap-2 text-grey-55">
@@ -176,6 +295,9 @@ const Message = (props: {
           whiteSpace: "pre-wrap",
         }}
       />
+      {attachedCards?.map((c) => (
+        <CardPreviewWithData entityID={c.value.value} size="big" />
+      ))}
     </div>
   );
 };
