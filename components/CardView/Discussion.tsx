@@ -55,9 +55,11 @@ export const MessageInput = (props: { entityID: string }) => {
       },
     });
     setValue("");
+    let roomScrollContainer = document.getElementById("roomScrollContainer");
+    roomScrollContainer?.scrollTo(0, roomScrollContainer.scrollHeight);
   };
   return (
-    <div className="sticky bottom-0 flex flex-col gap-2 px-2 pt-2">
+    <div className="sticky bottom-0 -mb-2 flex gap-2 px-2 pb-2 pt-2">
       <textarea
         onKeyDown={(e) => {
           if (
@@ -72,16 +74,14 @@ export const MessageInput = (props: { entityID: string }) => {
         placeholder="add your response..."
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
-        className={`${
-          focused || value ? "test-bg-pink h-32" : "h-10"
-        } w-full resize-none overflow-hidden border-grey-80`}
+        className="h-10 w-full resize-none overflow-hidden border-grey-80"
         id="thoughtInput"
       ></textarea>
-      {!focused && !value ? null : (
-        <div className="flex items-center justify-end text-grey-55">
-          <ButtonPrimary disabled={!value} onClick={send} icon={<Send />} />
-        </div>
-      )}
+      {/* {!focused && !value ? null : ( */}
+      <div className="flex items-center justify-end text-grey-55">
+        <ButtonPrimary disabled={!value} onClick={send} icon={<Send />} />
+      </div>
+      {/* )} */}
     </div>
   );
 };
@@ -90,7 +90,7 @@ export const Messages = (props: { entityID: string }) => {
   let messages = useIndex.messages(props.entityID);
   return (
     <div
-      className="flex flex-col gap-6 px-3"
+      className="flex flex-col gap-6 px-3 py-2"
       style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
     >
       {messages.map((m) => (

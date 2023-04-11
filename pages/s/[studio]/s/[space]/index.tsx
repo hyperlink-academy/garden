@@ -21,10 +21,7 @@ import { CalendarRoom } from "components/CalendarRoom";
 import { useUndoableState } from "hooks/useUndoableState";
 import { useRouter } from "next/router";
 import { slugify } from "src/utils";
-import {
-  MessageInput,
-  Messages,
-} from "components/CardView/Discussion";
+import { MessageInput, Messages } from "components/CardView/Discussion";
 
 export default function SpacePage() {
   let spaceName = useIndex.aev("space/display_name")[0];
@@ -227,10 +224,11 @@ const Room = (props: { entityID: string | null }) => {
   return (
     <div
       key={props.entityID}
+      id="roomScrollContainer"
       ref={ref}
       className="no-scrollbar overflow-x-hidden overflow-y-scroll "
     >
-      <div className="relative m-2 flex w-[336px] flex-col items-stretch gap-0 text-sm sm:m-4">
+      <div className="relative m-2 flex w-[336px] flex-col items-stretch gap-0 text-sm sm:m-4 sm:mb-0">
         {/* remove desktop bg for collections (member rooms still canvas for now) */}
         {roomType?.value === "canvas" ? (
           <div className="desktopBackground absolute h-full w-full" />
