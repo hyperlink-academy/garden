@@ -296,7 +296,7 @@ const Message = (props: {
         }}
       />
       {attachedCards?.map((c) => (
-        <CardPreviewWithData entityID={c.value.value} size="big" />
+        <CardPreviewWithData entityID={c.value.value} size="big" key={c.id} />
       ))}
     </div>
   );
