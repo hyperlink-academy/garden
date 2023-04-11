@@ -162,6 +162,7 @@ const AttachCard = ({
                 {attachedCards.map((card) => {
                   return (
                     <button
+                      key={card}
                       onClick={() =>
                         setAttachedCards((a) => a.filter((c) => c !== card))
                       }
