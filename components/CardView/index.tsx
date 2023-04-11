@@ -63,7 +63,6 @@ export const CardView = (props: {
   onDelete?: () => void;
   referenceFactID?: string;
 }) => {
-  let [cardState, setCardState] = useState<null | string>(null);
   let { authToken } = useAuth();
   let spaceID = useSpaceID();
   let memberName = useIndex.eav(props.entityID, "member/name");
@@ -159,11 +158,7 @@ export const CardView = (props: {
             })}
             `}
         >
-          {cardState === null ? (
-            <CardContent open={(id) => setCardState(id)} {...props} />
-          ) : (
-            <Discussion entityID={cardState} close={() => setCardState(null)} />
-          )}
+          <CardContent {...props} />
         </div>
       </div>
     </div>
@@ -174,7 +169,6 @@ export const CardContent = (props: {
   entityID: string;
   onDelete?: () => void;
   referenceFactID?: string;
-  open: (k: string) => void;
 }) => {
   let cardCreator = useIndex.eav(props.entityID, "card/created-by");
   // returns reference…
@@ -239,79 +233,8 @@ export const CardContent = (props: {
       {/* START CARD THOUGHTS */}
       <div className="cardThoughts flex w-full flex-col gap-2">
         <Reactions entityID={props.entityID} />
-        <StartDiscussion entityID={props.entityID} />
       </div>
-      <Discussions entityID={props.entityID} open={props.open} />
-    </>
-  );
-};
-
-const Discussions = (props: {
-  entityID: string;
-  open: (id: string) => void;
-}) => {
-  let discussions = useIndex.eav(props.entityID, "card/discussion") || [];
-  return (
-    <>
-      {discussions.map((f) => (
-        <Thought
-          key={f.id}
-          entityID={f.value.value}
-          open={() => props.open(f.value.value)}
-        />
-      ))}
-    </>
-  );
-};
-
-const StartDiscussion = (props: { entityID: string }) => {
-  let { mutate, memberEntity, authorized } = useMutations();
-  let [thoughtInputFocus, setThoughtInputFocus] = useState(false);
-  let [value, setValue] = useState("");
-  let { height } = useSpring({ height: thoughtInputFocus || value ? 128 : 40 });
-  if (!authorized || !memberEntity) return null;
-
-  const send = async () => {
-    if (!memberEntity) return;
-    let discussionEntity = ulid();
-    await mutate("createDiscussion", {
-      cardEntity: props.entityID,
-      discussionEntity,
-      memberEntity,
-      date: new Date().toISOString(),
-      content: value,
-    });
-    setValue("");
-  };
-  return (
-    <>
-      <animated.textarea
-        value={value}
-        onChange={(e) => setValue(e.currentTarget.value)}
-        placeholder="add a comment..."
-        onFocus={() => setThoughtInputFocus(true)}
-        onBlur={() => setThoughtInputFocus(false)}
-        style={{ height }}
-        className={`w-full resize-none overflow-hidden border-grey-80`}
-        id="thoughtInput"
-        onKeyDown={(e) => {
-          if (
-            (e.key === "Enter" && e.ctrlKey) ||
-            (e.key === "Enter" && e.metaKey)
-          )
-            send();
-        }}
-      />
-      {!thoughtInputFocus && !value ? null : (
-        <div className="flex items-center justify-between text-grey-55 ">
-          <div className="hover:text-accent-blue"></div>
-          <ButtonPrimary
-            disabled={!value}
-            icon={<Send />}
-            onClick={() => send()}
-          />
-        </div>
-      )}
+      <Discussion entityID={props.entityID} />
     </>
   );
 };
@@ -537,61 +460,5 @@ export const SectionAdder = (props: { entityID: string }) => {
         )}
       </div>
     </div>
-  );
-};
-
-export const Thought = (props: { entityID: string; open: () => void }) => {
-  let { memberEntity, authorized } = useMutations();
-  let unreadBy = useIndex.eav(props.entityID, "discussion/unread-by");
-  let content = useIndex.eav(props.entityID, "discussion/content");
-  let author = useIndex.eav(props.entityID, "discussion/author");
-  let authorName = useIndex.eav(author?.value.value || null, "member/name");
-  let createdAt = useIndex.eav(props.entityID, "discussion/created-at");
-  let replyCount = useIndex.eav(props.entityID, "discussion/message-count");
-
-  let unread =
-    memberEntity && unreadBy?.find((u) => u.value.value === memberEntity);
-
-  let time = createdAt
-    ? new Date(createdAt?.value.value).toLocaleDateString(undefined, {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      })
-    : "";
-  return (
-    <button
-      onClick={() => {
-        props.open();
-      }}
-      className="group flex flex-col gap-1 rounded-md border border-transparent py-2 px-3 text-left text-grey-55 hover:border-accent-blue hover:bg-bg-blue hover:text-grey-35"
-      style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
-    >
-      <div className="flex w-full items-baseline gap-2">
-        <div className="font-bold">{authorName?.value}</div>
-        <div className="text-sm">{time}</div>
-        {unread && (
-          <div className="unreadCount mt-[6px] ml-1 h-[12px] w-[12px] shrink-0 rounded-full border  border-white bg-accent-gold"></div>
-        )}
-      </div>
-      {!content?.value ? null : (
-        <RenderedText
-          text={content?.value}
-          tabIndex={0}
-          style={{
-            whiteSpace: "pre-wrap",
-          }}
-        />
-      )}
-      <small className="place-self-end underline group-hover:text-accent-blue">
-        {replyCount?.value
-          ? `${replyCount.value} ${
-              replyCount.value === 1 ? "reply" : "replies"
-            }`
-          : authorized
-          ? "reply"
-          : "view"}
-      </small>
-    </button>
   );
 };

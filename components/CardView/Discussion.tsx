@@ -5,7 +5,7 @@ import { useIndex, useMutations } from "hooks/useReplicache";
 import { useEffect, useState } from "react";
 import { ulid } from "src/ulid";
 
-export const Discussion = (props: { close: () => void; entityID: string }) => {
+export const Discussion = (props: { entityID: string }) => {
   let unreadBy = useIndex.eav(props.entityID, "discussion/unread-by");
 
   let { mutate, memberEntity } = useMutations();
@@ -21,16 +21,7 @@ export const Discussion = (props: { close: () => void; entityID: string }) => {
     }
   }, [props.entityID, unreadBy, memberEntity, mutate]);
   return (
-    <div className="flex flex-col gap-4 ">
-      <div className="flex flex-col gap-2">
-        <button onClick={() => props.close()}>
-          <div className="flex items-center gap-2 text-accent-blue">
-            <GoBackToPage /> back
-          </div>
-        </button>
-
-        <Thought entityID={props.entityID} />
-      </div>
+    <div>
       <Messages entityID={props.entityID} />
       <MessageInput entityID={props.entityID} />
     </div>
@@ -75,7 +66,7 @@ export const MessageInput = (props: { entityID: string }) => {
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         className="h-10 w-full resize-none overflow-hidden border-grey-80"
-        id="thoughtInput"
+        id="messageInput"
       ></textarea>
       {/* {!focused && !value ? null : ( */}
       <div className="flex items-center justify-end text-grey-55">
@@ -88,6 +79,7 @@ export const MessageInput = (props: { entityID: string }) => {
 
 export const Messages = (props: { entityID: string }) => {
   let messages = useIndex.messages(props.entityID);
+  if (messages.length == 0) return null;
   return (
     <div
       className="flex flex-col gap-6 px-3 py-2"
@@ -96,41 +88,6 @@ export const Messages = (props: { entityID: string }) => {
       {messages.map((m) => (
         <Reply author={m.sender} date={m.ts} content={m.content} key={m.id} />
       ))}
-    </div>
-  );
-};
-
-export const Thought = (props: { entityID: string }) => {
-  let content = useIndex.eav(props.entityID, "discussion/content");
-  let author = useIndex.eav(props.entityID, "discussion/author");
-  let authorName = useIndex.eav(author?.value.value || null, "member/name");
-  let createdAt = useIndex.eav(props.entityID, "discussion/created-at");
-
-  let time = createdAt
-    ? new Date(createdAt?.value.value).toLocaleDateString(undefined, {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      })
-    : "";
-  return (
-    <div
-      className="flex flex-col gap-1 rounded-md border border-grey-80 bg-white py-2 px-3 text-left text-grey-35"
-      style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
-    >
-      <div className="flex w-full items-baseline gap-2">
-        <div className="font-bold">{authorName?.value}</div>
-        <div className="text-sm">{time}</div>
-      </div>
-      {!content?.value ? null : (
-        <RenderedText
-          text={content?.value}
-          tabIndex={0}
-          style={{
-            whiteSpace: "pre-wrap",
-          }}
-        />
-      )}
     </div>
   );
 };
