@@ -9,6 +9,7 @@ import { RenderedText } from "components/Textarea/RenderedText";
 import { useIndex, useMutations } from "hooks/useReplicache";
 import { useEffect, useState } from "react";
 import { ulid } from "src/ulid";
+import { Message } from "data/Messages";
 
 export const Discussion = (props: { entityID: string }) => {
   let unreadBy = useIndex.eav(props.entityID, "discussion/unread-by");
@@ -52,16 +53,17 @@ export const MessageInput = (props: {
   if (!authorized) return null;
   const send = async () => {
     if (!memberEntity) return;
+    let message: Message = {
+      id: ulid(),
+      topic: props.entityID,
+      ts: Date.now().toString(),
+      sender: memberEntity,
+      content: value || "",
+    };
+    if (props.reply) message.replyTo = props.reply;
     await mutate("replyToDiscussion", {
       discussion: props.entityID,
-      message: {
-        id: ulid(),
-        topic: props.entityID,
-        ts: Date.now().toString(),
-        sender: memberEntity,
-        content: value,
-        replyTo: props.reply || undefined,
-      },
+      message,
     });
     setValue("");
     props.setReply(null);
