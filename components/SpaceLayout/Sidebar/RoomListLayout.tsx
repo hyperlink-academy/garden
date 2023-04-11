@@ -122,6 +122,11 @@ export const RoomListItem = (props: {
     rep?.rep,
     async (tx) => {
       if (!memberEntity) return false;
+      let unread = (
+        await scanIndex(tx).eav(props.roomEntity, "discussion/unread-by")
+      ).find((f) => f.value.value === memberEntity);
+
+      if (unread) return true;
       // NB - currently collections also use 'desktop/contains'
       let cards = await scanIndex(tx).eav(props.roomEntity, "desktop/contains");
       for (let card of cards) {
