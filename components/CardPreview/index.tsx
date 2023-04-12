@@ -74,20 +74,14 @@ export const CardPreview = (
     async (tx) => {
       if (!memberEntity) return false;
       // NB - currently collections also use 'desktop/contains'
-      let discussions = await scanIndex(tx).eav(
-        props.entityID,
-        "card/discussion"
-      );
-      for (let d of discussions) {
-        let unread = (
-          await scanIndex(tx).eav(d.value.value, "discussion/unread-by")
-        ).find((f) => f.value.value === memberEntity);
-        if (unread) return true;
-      }
+      let unread = (
+        await scanIndex(tx).eav(props.entityID, "discussion/unread-by")
+      ).find((f) => f.value.value === memberEntity);
+      if (unread) return true;
       return false;
     },
     false,
-    [memberEntity]
+    [memberEntity, props.entityID]
   );
 
   let { handlers, isLongPress } = useLongPress(

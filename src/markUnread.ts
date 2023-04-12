@@ -52,11 +52,12 @@ export async function calculateUnreads(
     if (inRooms.length > 0) count++;
   }
   for (let discussion of unreadDiscussions) {
-    let cards = await ctx.scanIndex.vae(discussion.entity, "card/discussion");
-    for (let card of cards) {
-      let inRooms = await ctx.scanIndex.vae(card.entity, "desktop/contains");
-      if (inRooms.length > 0) count++;
-    }
+    let inRooms = await ctx.scanIndex.vae(
+      discussion.entity,
+      "desktop/contains"
+    );
+    let isRoom = await ctx.scanIndex.eav(discussion.entity, "room/name");
+    if (inRooms.length > 0 || isRoom) count++;
   }
   return count;
 }
