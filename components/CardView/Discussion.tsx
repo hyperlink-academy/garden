@@ -13,7 +13,10 @@ import { CardPreviewWithData } from "components/CardPreview";
 import { AddReaction } from "./Reactions";
 import { useReactions } from "hooks/useReactions";
 
-export const Discussion = (props: { entityID: string }) => {
+export const Discussion = (props: {
+  entityID: string;
+  allowReact?: boolean;
+}) => {
   let unreadBy = useIndex.eav(props.entityID, "discussion/unread-by");
   let { mutate, memberEntity } = useMutations();
   useEffect(() => {
@@ -34,6 +37,7 @@ export const Discussion = (props: { entityID: string }) => {
     <div>
       <Messages entityID={props.entityID} setReply={setReply} />
       <MessageInput
+        allowReact={props.allowReact}
         entityID={props.entityID}
         reply={reply}
         setReply={setReply}
@@ -43,6 +47,7 @@ export const Discussion = (props: { entityID: string }) => {
 };
 
 export const MessageInput = (props: {
+  allowReact?: boolean;
   entityID: string;
   reply: string | null;
   setReply: (reply: string | null) => void;
@@ -52,7 +57,7 @@ export const MessageInput = (props: {
   let [mode, setMode] = useState("normal" as "normal" | "focused" | "reacting");
   let { mutate, memberEntity, authorized } = useMutations();
   let replyMessage = useIndex.messageByID(props.reply);
-  let reactions = useReactions();
+  let reactions = useReactions(props.entityID);
 
   if (!authorized) return null;
   const send = async () => {
@@ -130,7 +135,10 @@ export const MessageInput = (props: {
           </div>
         )}
         <div className="flex h-min justify-end text-grey-55">
-          {!value && mode !== "focused" && reactions.length > 0 ? (
+          {!value &&
+          mode !== "focused" &&
+          reactions.length === 0 &&
+          props.allowReact ? (
             <ButtonSecondary
               icon={<ReactionAdd />}
               onClick={() => setMode("reacting")}

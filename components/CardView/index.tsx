@@ -234,7 +234,7 @@ export const CardContent = (props: {
       <div className="cardThoughts flex w-full flex-col gap-2">
         <Reactions entityID={props.entityID} />
       </div>
-      <Discussion entityID={props.entityID} />
+      <Discussion entityID={props.entityID} allowReact />
     </>
   );
 };
