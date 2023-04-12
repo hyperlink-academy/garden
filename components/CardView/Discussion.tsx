@@ -1,6 +1,6 @@
-import { ButtonPrimary } from "components/Buttons";
+import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
 import * as Popover from "@radix-ui/react-popover";
-import { CardAdd, CloseLinedTiny, Send } from "components/Icons";
+import { CardAdd, CloseLinedTiny, ReactionAdd, Send } from "components/Icons";
 import { RenderedText } from "components/Textarea/RenderedText";
 import { useIndex, useMutations } from "hooks/useReplicache";
 import { useEffect, useState } from "react";
@@ -10,6 +10,8 @@ import AutosizeTextarea from "components/Textarea/AutosizeTextarea";
 import { FindOrCreate, useAllItems } from "components/FindOrCreateEntity";
 import { ref } from "data/Facts";
 import { CardPreviewWithData } from "components/CardPreview";
+import { AddReaction } from "./Reactions";
+import { useReactions } from "hooks/useReactions";
 
 export const Discussion = (props: { entityID: string }) => {
   let unreadBy = useIndex.eav(props.entityID, "discussion/unread-by");
@@ -47,8 +49,10 @@ export const MessageInput = (props: {
 }) => {
   let [value, setValue] = useState("");
   let [attachedCards, setAttachedCards] = useState<string[]>([]);
+  let [mode, setMode] = useState("normal" as "normal" | "focused" | "reacting");
   let { mutate, memberEntity, authorized } = useMutations();
   let replyMessage = useIndex.messageByID(props.reply);
+  let reactions = useReactions();
 
   if (!authorized) return null;
   const send = async () => {
@@ -95,33 +99,47 @@ export const MessageInput = (props: {
         </div>
       )}
       <div className="flex w-full gap-2">
-        <div className="z-10 flex w-full gap-1 rounded-md border border-grey-80 bg-white p-1">
-          <AutosizeTextarea
-            onKeyDown={(e) => {
-              if (
-                (e.key === "Enter" && e.ctrlKey) ||
-                (e.key === "Enter" && e.metaKey)
-              ) {
-                send();
-              }
-            }}
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            placeholder=""
-            className="w-full "
-            id="messageInput"
+        {mode === "reacting" ? (
+          <AddReaction
+            entityID={props.entityID}
+            close={() => setMode("normal")}
           />
-          <AttachCard
-            attachedCards={attachedCards}
-            setAttachedCards={setAttachedCards}
-          />
-        </div>
-        {/* {!focused && !value ? null : ( */}
+        ) : (
+          <div className="z-10 flex w-full gap-1 rounded-md border border-grey-80 bg-white p-1">
+            <AutosizeTextarea
+              onKeyDown={(e) => {
+                if (
+                  (e.key === "Enter" && e.ctrlKey) ||
+                  (e.key === "Enter" && e.metaKey)
+                ) {
+                  send();
+                }
+              }}
+              onFocus={() => setMode("focused")}
+              onBlur={() => setMode("normal")}
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              placeholder=""
+              className="w-full "
+              id="messageInput"
+            />
+            <AttachCard
+              attachedCards={attachedCards}
+              setAttachedCards={setAttachedCards}
+            />
+          </div>
+        )}
         <div className="flex h-min justify-end text-grey-55">
-          <ButtonPrimary disabled={!value} onClick={send} icon={<Send />} />
+          {!value && mode !== "focused" && reactions.length > 0 ? (
+            <ButtonSecondary
+              icon={<ReactionAdd />}
+              onClick={() => setMode("reacting")}
+            />
+          ) : (
+            <ButtonPrimary disabled={!value} onClick={send} icon={<Send />} />
+          )}
         </div>
       </div>
-      {/* )} */}
     </div>
   );
 };

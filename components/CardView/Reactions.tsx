@@ -9,6 +9,8 @@ export const Reactions = (props: { entityID: string }) => {
   let { authorized } = useMutations();
   let [open, setOpen] = useState(false);
 
+  let reactions = useReactions(props.entityID);
+  if (reactions.length === 0) return null;
   return (
     <div className="flex w-full flex-col gap-2">
       <div className="flex">
@@ -48,14 +50,14 @@ export const ReactionList = (props: { entityID: string }) => {
   );
 };
 
-const AddReaction = (props: { entityID: string; close: () => void }) => {
+export const AddReaction = (props: { entityID: string; close: () => void }) => {
   let { authorized, mutate, memberEntity } = useMutations();
   let reactions = useIndex.aev("space/reaction");
   let [editing, setEditing] = useState(false);
   let [newReaction, setNewReaction] = useState("");
   if (!authorized) return null;
   return (
-    <div className="reactionPicker flex flex-wrap gap-x-4 gap-y-2 rounded-md border border-grey-80 py-1 px-2">
+    <div className="reactionPicker flex w-full flex-wrap gap-x-4 gap-y-2 rounded-md border border-grey-80 py-1 px-2">
       {reactions
         .filter((f) => !!f.value) // strip empty strings
         .map((r) => (
@@ -64,7 +66,7 @@ const AddReaction = (props: { entityID: string; close: () => void }) => {
             className="font-bold"
             onClick={async () => {
               if (!memberEntity) return;
-              mutate("addReaction", {
+              await mutate("addReaction", {
                 reaction: r.value,
                 reactionFactID: ulid(),
                 reactionAuthorFactID: ulid(),
