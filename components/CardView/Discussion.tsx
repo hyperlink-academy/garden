@@ -3,7 +3,7 @@ import * as Popover from "@radix-ui/react-popover";
 import { CardAdd, CloseLinedTiny, ReactionAdd, Send } from "components/Icons";
 import { RenderedText } from "components/Textarea/RenderedText";
 import { useIndex, useMutations } from "hooks/useReplicache";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ulid } from "src/ulid";
 import { Message } from "data/Messages";
 import AutosizeTextarea from "components/Textarea/AutosizeTextarea";
@@ -58,6 +58,7 @@ export const MessageInput = (props: {
   let { mutate, memberEntity, authorized } = useMutations();
   let replyMessage = useIndex.messageByID(props.reply);
   let reactions = useReactions(props.entityID);
+  let containerRef = useRef<null | HTMLDivElement>(null);
 
   if (!authorized) return null;
   const send = async () => {
@@ -94,7 +95,13 @@ export const MessageInput = (props: {
     roomScrollContainer?.scrollTo(0, roomScrollContainer.scrollHeight);
   };
   return (
-    <div className="sticky bottom-0 -mb-2 flex w-full flex-col gap-2 px-2 pb-2 pt-2">
+    <div
+      className="sticky bottom-0 -mb-2 flex w-full flex-col gap-2 px-2 pb-2 pt-2"
+      onBlur={(e) => {
+        if (e.currentTarget.contains(e.relatedTarget)) return;
+        setMode("normal");
+      }}
+    >
       {props.reply && (
         <div className="flex justify-between gap-2 bg-white p-2">
           <div>{replyMessage?.content}</div>{" "}
@@ -141,7 +148,9 @@ export const MessageInput = (props: {
           props.allowReact ? (
             <ButtonSecondary
               icon={<ReactionAdd />}
-              onClick={() => setMode("reacting")}
+              onClick={() =>
+                setMode(mode === "reacting" ? "normal" : "reacting")
+              }
             />
           ) : (
             <ButtonPrimary disabled={!value} onClick={send} icon={<Send />} />
