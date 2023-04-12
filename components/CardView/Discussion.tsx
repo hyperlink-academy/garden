@@ -96,28 +96,28 @@ export const MessageInput = (props: {
   };
   return (
     <div
-      className="sticky bottom-0 -mb-2 flex w-full flex-col gap-2 px-2 pb-2 pt-2"
+      className="sticky bottom-0 -mb-2 flex w-full flex-col gap-2 py-2"
       onBlur={(e) => {
         if (e.currentTarget.contains(e.relatedTarget)) return;
         setMode("normal");
       }}
     >
       {props.reply && (
-        <div className="flex justify-between gap-2 bg-white p-2">
+        <div className="flex justify-between gap-2 rounded-md bg-bg-blue p-2">
           <div>{replyMessage?.content}</div>{" "}
           <button onClick={() => props.setReply(null)}>
             <CloseLinedTiny />
           </button>
         </div>
       )}
-      <div className="flex w-full gap-2">
+      <div className="flex w-full items-end gap-2">
         {mode === "reacting" ? (
           <AddReaction
             entityID={props.entityID}
             close={() => setMode("normal")}
           />
         ) : (
-          <div className="z-10 flex w-full gap-1 rounded-md border border-grey-80 bg-white p-1">
+          <div className="z-10 flex w-full items-end gap-1 rounded-md border border-grey-80 bg-white p-1 text-base">
             <AutosizeTextarea
               onKeyDown={(e) => {
                 if (
@@ -183,7 +183,7 @@ const AttachCard = ({
       ) : (
         <Popover.Root>
           <Popover.Trigger asChild>
-            <button className="flex ">
+            <button className="flex items-center text-sm">
               {attachedCards.length} <CardAdd />
             </button>
           </Popover.Trigger>
@@ -193,17 +193,22 @@ const AttachCard = ({
               sideOffset={24}
               side="top"
             >
-              <div className="flex w-36 flex-col gap-2 rounded-md border bg-white shadow-sm">
+              <div className="flex w-48 flex-col items-start gap-2 rounded-md border bg-white p-2 shadow-sm">
                 {attachedCards.map((card) => {
                   return (
-                    <button
+                    <div
+                      className="flex w-full justify-between gap-2 text-sm"
                       key={card}
-                      onClick={() =>
-                        setAttachedCards((a) => a.filter((c) => c !== card))
-                      }
                     >
                       <AttachedCard entityID={card} />
-                    </button>
+                      <button
+                        onClick={() =>
+                          setAttachedCards((a) => a.filter((c) => c !== card))
+                        }
+                      >
+                        <CloseLinedTiny />
+                      </button>
+                    </div>
                   );
                 })}
                 <button onClick={() => setOpen(true)} className="flex ">
@@ -265,7 +270,8 @@ export const Messages = (props: {
   if (messages.length == 0) return null;
   return (
     <div
-      className="flex flex-col gap-6 px-3 py-2"
+      // className="flex flex-col gap-6 px-3 py-2"
+      className="flex flex-col gap-6 px-0 pb-2"
       style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
     >
       {messages.map((m) => (
@@ -296,44 +302,58 @@ const Message = (props: {
   let memberName = useIndex.eav(props.author, "member/name");
   let time = new Date(parseInt(props.date));
   let replyMessage = useIndex.messageByID(props.reply || null);
+  let replyToName = useIndex.eav(replyMessage?.sender || null, "member/name");
   let attachedCards = useIndex.eav(
     props.entity || null,
     "message/attached-card"
   );
   return (
-    <div>
+    // <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-0">
       <div className="flex justify-between gap-2 text-grey-55">
         <div className="flex gap-2">
           <small className="font-bold">{memberName?.value}</small>
-          <small>
+          <span className="self-center text-xs">
             {time.toLocaleDateString(undefined, {
               month: "short",
               day: "numeric",
               hour: "2-digit",
               minute: "2-digit",
             })}
-          </small>
+          </span>
         </div>
-        <small>
+        <span className="text-xs">
           <button onClick={() => props.setReply(props.id)}>reply</button>
-        </small>
+        </span>
       </div>
 
       {replyMessage && (
-        <div className="my-2 rounded-md bg-bg-blue p-2">
-          {replyMessage?.content}
+        <div className="my-1 rounded-md border-l-4 border-accent-blue bg-bg-blue p-2">
+          <div className="text-xs font-bold text-grey-55">
+            {replyToName?.value}
+          </div>
+          <div>{replyMessage?.content}</div>
         </div>
       )}
       <RenderedText
+        className="text-base"
         text={props.content}
         tabIndex={0}
         style={{
           whiteSpace: "pre-wrap",
         }}
       />
-      {attachedCards?.map((c) => (
-        <CardPreviewWithData entityID={c.value.value} size="big" key={c.id} />
-      ))}
+      {attachedCards && (
+        <div className="mt-2 flex flex-col gap-1">
+          {attachedCards?.map((c) => (
+            <CardPreviewWithData
+              entityID={c.value.value}
+              size="big"
+              key={c.id}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
