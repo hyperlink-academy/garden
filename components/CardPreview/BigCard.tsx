@@ -51,7 +51,7 @@ export const BigCardBody = (props: { entityID: string } & Props) => {
               fontFamily: "inherit",
               width: "100%",
             }}
-            text={props.data.title?.value || ""}
+            text={props.data.member?.value || props.data.title?.value || ""}
             placeholderOnHover={true}
             placeholder="Untitled"
             className={`cardPreviewTitle text-md !w-fit font-bold ${
