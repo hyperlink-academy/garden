@@ -259,7 +259,13 @@ const AttachCard = ({
 const AttachedCard = (props: { entityID: string }) => {
   let name = useIndex.eav(props.entityID, "card/title");
   let memberName = useIndex.eav(props.entityID, "member/name");
-  return <div>{memberName?.value || name?.value}</div>;
+  return (
+    <div className="w-full rounded-md border border-grey-80 py-1 px-2">
+      {memberName?.value || name?.value || (
+        <span className="italic text-grey-55">untitled</span>
+      )}
+    </div>
+  );
 };
 
 export const Messages = (props: {
@@ -349,6 +355,7 @@ const Message = (props: {
             <CardPreviewWithData
               entityID={c.value.value}
               size="big"
+              hideContent={true}
               key={c.id}
             />
           ))}
