@@ -45,24 +45,26 @@ export const BigCardBody = (props: { entityID: string } & Props) => {
         <div
           className={`cardPreviewHeader items-top flex justify-between gap-2`}
         >
-          <RenderedText
-            style={{
-              whiteSpace: "pre-wrap",
-              fontFamily: "inherit",
-              width: "100%",
-            }}
-            text={props.data.member?.value || props.data.title?.value || ""}
-            placeholderOnHover={true}
-            placeholder="Untitled"
-            className={`cardPreviewTitle text-md !w-fit font-bold ${
-              props.data.isMember ? "text-white" : "text-grey-35"
-            } ${!props.data.imageUrl ? "" : "rounded-[3px] !bg-white px-1"}`}
-          />
-          {props.data.isMember ? (
-            <div className="shrink-0 text-white ">member</div>
-          ) : (
-            ""
-          )}
+          <div className="flex w-full justify-between gap-2">
+            <RenderedText
+              style={{
+                whiteSpace: "pre-wrap",
+                fontFamily: "inherit",
+                width: "100%",
+              }}
+              text={props.data.member?.value || props.data.title?.value || ""}
+              placeholderOnHover={true}
+              placeholder="Untitled"
+              className={`cardPreviewTitle text-md !w-fit font-bold ${
+                props.data.isMember ? "text-white" : "text-grey-35"
+              } ${!props.data.imageUrl ? "" : "rounded-[3px] !bg-white px-1"}`}
+            />
+            {props.data.isMember ? (
+              <div className="shrink-0 italic text-white">member</div>
+            ) : (
+              ""
+            )}
+          </div>
           {!props.outerControls && props.onDelete && authorized ? (
             <button
               className="h-fit pt-1 text-grey-80 hover:text-grey-15"

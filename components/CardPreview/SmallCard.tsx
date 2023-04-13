@@ -140,7 +140,7 @@ export const BaseSmallCard = (
         <div className="flex h-full w-full flex-col items-stretch gap-2 overflow-hidden">
           <div className="grid grid-cols-[auto_max-content] items-end text-white ">
             <Member />
-            <small>member</small>
+            <small className="mr-0.5 italic">member</small>
           </div>
           <div
             className={`
