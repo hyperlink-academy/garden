@@ -34,7 +34,7 @@ export const Discussion = (props: {
   let [reply, setReply] = useState<string | null>(null);
 
   return (
-    <div>
+    <>
       <Messages entityID={props.entityID} setReply={setReply} />
       <MessageInput
         allowReact={props.allowReact}
@@ -42,7 +42,7 @@ export const Discussion = (props: {
         reply={reply}
         setReply={setReply}
       />
-    </div>
+    </>
   );
 };
 
@@ -96,7 +96,7 @@ export const MessageInput = (props: {
   };
   return (
     <div
-      className="sticky bottom-0 -mb-2 flex w-full flex-col gap-2 py-2"
+      className="sticky bottom-4 -mb-2 flex w-full flex-col gap-2 pt-8"
       onBlur={(e) => {
         if (e.currentTarget.contains(e.relatedTarget)) return;
         setMode("normal");
@@ -277,7 +277,8 @@ export const Messages = (props: {
   return (
     <div
       // className="flex flex-col gap-6 px-3 py-2"
-      className="flex flex-col gap-6 px-0 pb-2"
+      // className="flex min-h-[calc(100vh-8rem)] flex-col gap-6"
+      className="flex min-h-[calc(100vh-124px)] flex-col gap-6 sm:min-h-[calc(100vh-132px)] md:min-h-[calc(100vh-148px)]"
       style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
     >
       {messages.map((m) => (

@@ -226,7 +226,7 @@ const Room = (props: { entityID: string | null }) => {
       key={props.entityID}
       id="roomScrollContainer"
       ref={ref}
-      className="no-scrollbar overflow-x-hidden overflow-y-scroll "
+      className="no-scrollbar h-full overflow-x-hidden overflow-y-scroll"
     >
       <div className="relative m-2 flex w-[336px] flex-col items-stretch gap-0 text-sm sm:m-4 sm:mb-0">
         {/* remove desktop bg for collections (member rooms still canvas for now) */}
