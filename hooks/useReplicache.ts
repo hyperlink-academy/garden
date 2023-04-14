@@ -20,7 +20,7 @@ import {
   Replicache,
   WriteTransaction,
 } from "replicache";
-import { useSubscribe } from "replicache-react";
+import { useSubscribe } from "hooks/useSubscribe";
 import { ulid } from "src/ulid";
 import { useAuth } from "./useAuth";
 import { UndoManager } from "@rocicorp/undo";
@@ -351,7 +351,8 @@ export const useIndex = {
         return results as Fact<A>[];
       },
       [],
-      [attribute, rep, start]
+      [attribute, rep, start],
+      "at" + attribute + start
     );
   },
   eav<A extends keyof Attribute>(
@@ -367,7 +368,8 @@ export const useIndex = {
         return (result as CardinalityResult<A>) || null;
       },
       null,
-      [attribute, rep, entity]
+      [attribute, rep, entity],
+      "eav" + entity + attribute
     );
   },
   ave<A extends keyof UniqueAttributes>(
@@ -382,7 +384,8 @@ export const useIndex = {
         return (await scanIndex(tx).ave(attribute, value)) || null;
       },
       null,
-      [rep, attribute, value]
+      [rep, attribute, value],
+      "ave" + attribute + value
     );
   },
   aev<A extends keyof Attribute>(attribute: A | null, entity?: string) {
@@ -401,7 +404,8 @@ export const useIndex = {
         return results as Fact<A>[];
       },
       [],
-      [attribute, entity]
+      [attribute, entity],
+      "aev" + attribute + entity
     );
   },
   vae<A extends keyof ReferenceAttributes>(entity: string, attribute?: A) {
@@ -419,7 +423,8 @@ export const useIndex = {
         return results as Fact<A>[];
       },
       [],
-      [rep, entity, attribute]
+      [rep, entity, attribute],
+      "vae" + entity + attribute
     );
   },
   messages(topic: string) {
@@ -434,7 +439,8 @@ export const useIndex = {
         return messages as Message[];
       },
       [],
-      []
+      [],
+      topic
     );
   },
   messageByID(id: string | null) {
@@ -447,7 +453,8 @@ export const useIndex = {
         return message as Message | null;
       },
       null,
-      [id]
+      [id],
+      "messages" + id
     );
   },
 };
@@ -475,7 +482,8 @@ export const useMutations = () => {
       return fact[0];
     },
     null,
-    [session.session?.studio]
+    [session.session?.studio],
+    "auth"
   );
   let mutate = useCallback(
     function mutate<T extends keyof typeof Mutations>(
