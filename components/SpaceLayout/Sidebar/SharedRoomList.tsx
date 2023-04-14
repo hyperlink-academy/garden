@@ -16,7 +16,12 @@ import {
 } from "./RoomListLayout";
 import { sortByPosition, updatePositions } from "src/position_helpers";
 import { useDroppableZone } from "components/DragContext";
-import { AddTiny } from "components/Icons";
+import {
+  AddTiny,
+  RoomCanvas,
+  RoomChat,
+  RoomCollection,
+} from "components/Icons";
 
 export const SharedRoomList = (props: {
   onRoomChange: (room: string) => void;
@@ -169,15 +174,19 @@ const CreateRoom = () => {
               <RadioGroup.Label className="font-bold">
                 Room Type
               </RadioGroup.Label>
-              <div className="flex flex-row gap-2">
+              <div className="my-2 flex flex-col gap-2">
                 <RadioGroup.Option value="canvas">
                   {({ checked }) => (
                     <div
                       className={`${
                         checked ? "bg-bg-blue" : ""
-                      } rounded-md border border-grey-15 p-4 hover:cursor-pointer`}
+                      } flex items-center justify-between gap-2 rounded-md border border-grey-15 p-2 hover:cursor-pointer`}
                     >
-                      Canvas
+                      <div className="flex items-center gap-2">
+                        <RoomCanvas />
+                        <span className="font-bold">Canvas</span>
+                      </div>
+                      <span className="text-sm italic">spatial workspace</span>
                     </div>
                   )}
                 </RadioGroup.Option>
@@ -186,9 +195,13 @@ const CreateRoom = () => {
                     <div
                       className={`${
                         checked ? "bg-bg-blue" : ""
-                      } rounded-md border border-grey-15 p-4 hover:cursor-pointer`}
+                      } flex items-center justify-between gap-2 rounded-md border border-grey-15 p-2 hover:cursor-pointer`}
                     >
-                      Collection
+                      <div className="flex items-center gap-2">
+                        <RoomCollection />
+                        <span className="font-bold">Collection</span>
+                      </div>
+                      <span className="text-sm italic">ordered list</span>
                     </div>
                   )}
                 </RadioGroup.Option>
@@ -197,9 +210,13 @@ const CreateRoom = () => {
                     <div
                       className={`${
                         checked ? "bg-bg-blue" : ""
-                      } rounded-md border border-grey-15 p-4 hover:cursor-pointer`}
+                      } flex items-center justify-between gap-2 rounded-md border border-grey-15 p-2 hover:cursor-pointer`}
                     >
-                      Chat
+                      <div className="flex items-center gap-2">
+                        <RoomChat />
+                        <span className="font-bold">Chat</span>
+                      </div>
+                      <span className="text-sm italic">group conversation</span>
                     </div>
                   )}
                 </RadioGroup.Option>
