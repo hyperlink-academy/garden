@@ -79,7 +79,9 @@ export default function SpacePage() {
             card.entity,
             "desktop/contains"
           );
-          if (inRooms.length > 0) count++;
+
+          let isRoom = await scanIndex(tx).eav(discussion.entity, "room/name");
+          if (inRooms.length > 0 || isRoom) count++;
         }
       }
 

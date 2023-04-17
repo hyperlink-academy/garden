@@ -18,9 +18,18 @@ export const Discussion = (props: {
   allowReact?: boolean;
 }) => {
   let unreadBy = useIndex.eav(props.entityID, "discussion/unread-by");
+  let [focus, setFocus] = useState(false);
   let { mutate, memberEntity } = useMutations();
   useEffect(() => {
+    let callback = () => setFocus(true);
+    window.addEventListener("focus", callback);
+    return () => {
+      window.removeEventListener("focus", callback);
+    };
+  }, []);
+  useEffect(() => {
     if (props.entityID && memberEntity) {
+      if (!focus) return;
       let unread = unreadBy?.find((f) => f.value.value === memberEntity);
       if (unread)
         mutate("markRead", {
@@ -29,7 +38,7 @@ export const Discussion = (props: {
           attribute: "discussion/unread-by",
         });
     }
-  }, [props.entityID, unreadBy, memberEntity, mutate]);
+  }, [props.entityID, unreadBy, memberEntity, mutate, focus]);
 
   let [reply, setReply] = useState<string | null>(null);
 
@@ -211,7 +220,10 @@ const AttachCard = ({
                     </div>
                   );
                 })}
-                <button onClick={() => setOpen(true)} className="flex ">
+                <button
+                  onClick={() => setOpen(true)}
+                  className="flex text-grey-55"
+                >
                   <CardAdd />
                 </button>
               </div>
