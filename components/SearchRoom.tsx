@@ -1,7 +1,7 @@
+import { useIndex } from "hooks/useReplicache";
 import { useState } from "react";
 import { CardPreview, CardPreviewWithData } from "./CardPreview";
-import { useAllItems } from "./FindOrCreateEntity";
-import { RoomSearch } from "./Icons";
+import { CardSmall, RoomSearch } from "./Icons";
 import { Divider } from "./Layout";
 
 export const SearchRoom = () => {
@@ -42,4 +42,17 @@ export const SearchRoom = () => {
       </div>
     </div>
   );
+};
+
+export const useAllItems = (open: boolean) => {
+  let titles = useIndex.aev(open ? "card/title" : null);
+  return titles
+    .map((t) => {
+      return {
+        entity: t.entity,
+        display: t.value,
+        icon: <CardSmall />,
+      };
+    })
+    .reverse();
 };
