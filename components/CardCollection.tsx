@@ -8,7 +8,8 @@ import {
   useMutations,
   useSpaceID,
 } from "hooks/useReplicache";
-import { useContext } from "react";
+import { useSubscribe } from "hooks/useSubscribe";
+import { useContext, useState } from "react";
 import { generateKeyBetween } from "src/fractional-indexing";
 import { getAndUploadFile } from "src/getAndUploadFile";
 import { sortByPosition, updatePositions } from "src/position_helpers";
@@ -27,21 +28,84 @@ export const CardCollection = (props: {
   entityID: string;
   attribute: "desktop/contains" | "deck/contains";
 }) => {
-  let cards = (useIndex.eav(props.entityID, props.attribute) || []).sort(
-    sortByPosition("eav")
-  );
+  let [filter, setFilter] = useState<null | string>(null);
+  let cards = useCards(props.entityID, props.attribute);
+  let reactions = cards.reduce((acc, card) => {
+    for (let reaction of card.reactions) {
+      if (!acc.includes(reaction)) acc.push(reaction);
+    }
+    return acc;
+  }, [] as string[]);
   let collectionType = useIndex.eav(props.entityID, "collection/type");
   return (
     <>
       <CollectionHeader entityID={props.entityID} />
+      <FilterByReactions
+        reactions={reactions}
+        filter={filter}
+        setFilter={setFilter}
+      />
       <CollectionList
         attribute={props.attribute}
         entityID={props.entityID}
-        cards={cards}
+        cards={cards.filter(
+          (card) => !filter || card.reactions.includes(filter)
+        )}
         size={collectionType?.value === "cardpreview" ? "big" : "small"}
       />
     </>
   );
+};
+
+function FilterByReactions(props: {
+  reactions: string[];
+  filter: string | null;
+  setFilter: (f: string | null) => void;
+}) {
+  return (
+    <div className="no-scrollbar flex flex-row  gap-2 overflow-x-scroll">
+      {props.reactions.map((reaction) => {
+        return (
+          <button
+            key={reaction}
+            onClick={() => {
+              props.setFilter(props.filter === reaction ? null : reaction);
+            }}
+            className={`text-md flex items-center gap-2 rounded-md border px-2 py-0.5 ${
+              props.filter === reaction
+                ? "border-accent-blue bg-bg-blue"
+                : "border-grey-80"
+            }`}
+          >
+            <strong>{reaction}</strong>{" "}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+const useCards = (
+  entityID: string,
+  attribute: "desktop/contains" | "deck/contains"
+) => {
+  let cards = useSubscribe(
+    async (tx) => {
+      let allCards = await scanIndex(tx).eav(entityID, attribute);
+      return Promise.all(
+        allCards.sort(sortByPosition("eav")).map(async (card) => {
+          let reactions = (
+            await scanIndex(tx).eav(card.value.value, "card/reaction")
+          ).map((r) => r.value);
+          return { ...card, reactions };
+        })
+      );
+    },
+    [],
+    [entityID, attribute],
+    `${entityID}-cards`
+  );
+  return cards;
 };
 
 const CollectionList = (props: {
