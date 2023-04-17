@@ -184,6 +184,7 @@ export const store = (storage: BasicStorage, ctx: { id: string }) => {
           return { success: false, error: "Invalid attribute" } as const;
         let factID = f.factID || ulid();
         let lastUpdated = Date.now().toString();
+        let existingFact: Fact<keyof Attribute> | undefined;
         if (schema.cardinality === "one") {
           let existingFact = (await scanIndex.eav(f.entity, f.attribute)) as
             | Fact<keyof Attribute>
@@ -192,7 +193,13 @@ export const store = (storage: BasicStorage, ctx: { id: string }) => {
           if (existingFact) factID = existingFact.id;
         }
         let result = await writeFactToStore(
-          { ...f, id: factID, lastUpdated, schema },
+          {
+            ...f,
+            positions: { ...existingFact?.positions, ...f.positions },
+            id: factID,
+            lastUpdated,
+            schema,
+          },
           schema
         );
         if (result.success) return { success: true, factID };

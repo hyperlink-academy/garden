@@ -230,6 +230,7 @@ function makeMutators(
           let data = FactWithIndexes({
             id: newID,
             ...fact,
+            positions: { ...existingFact?.positions, ...fact.positions },
             lastUpdated,
             schema,
           });
