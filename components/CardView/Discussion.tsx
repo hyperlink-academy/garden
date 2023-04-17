@@ -185,7 +185,7 @@ const AttachCard = ({
     <>
       {/* decide styling of button via children */}
       {attachedCards.length === 0 ? (
-        <button onClick={() => setOpen(true)} className="flex ">
+        <button onClick={() => setOpen(true)} className="flex text-grey-55">
           {/* {props.expanded ? "Attach Card" : ""} */}
           <CardAdd />
         </button>
