@@ -1,8 +1,9 @@
 import type { Replicache } from "replicache";
 import type { ReadonlyJSONValue, ReadTransaction } from "replicache";
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import useSWRImmutable from "swr/immutable";
 import { atom } from "jotai";
+import { ReplicacheContext } from "./useReplicache";
 
 // We wrap all the callbacks in a `unstable_batchedUpdates` call to ensure that
 // we do not render things more than once over all of the changed subscriptions.
@@ -23,12 +24,12 @@ function doCallback() {
 export let suspenseAtom = atom(true);
 
 export function useSubscribe<R extends ReadonlyJSONValue>(
-  rep: Replicache | null | undefined,
   query: (tx: ReadTransaction) => Promise<R>,
   def: R,
   deps: Array<unknown> = [],
   key: string
 ): R {
+  let rep = useContext(ReplicacheContext)?.rep;
   let { data, mutate } = useSWRImmutable(
     rep ? key + rep.name : null,
     () => {

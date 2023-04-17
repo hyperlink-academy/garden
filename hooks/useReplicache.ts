@@ -336,9 +336,7 @@ export const useIndex = {
       cardinality: any;
     }>
   >(attribute: A, start?: string, match?: boolean): Fact<A>[] {
-    let rep = useContext(ReplicacheContext);
     return useSubscribe(
-      rep?.rep,
       async (tx) => {
         let results = await tx
           .scan({
@@ -351,7 +349,7 @@ export const useIndex = {
         return results as Fact<A>[];
       },
       [],
-      [attribute, rep, start],
+      [attribute, start],
       "at" + attribute + start
     );
   },
@@ -359,16 +357,14 @@ export const useIndex = {
     entity: string | null,
     attribute: A
   ): CardinalityResult<A> | null {
-    let rep = useContext(ReplicacheContext);
     return useSubscribe(
-      rep?.rep,
       async (tx) => {
         if (!entity) return null;
         let result = await scanIndex(tx).eav(entity, attribute);
         return (result as CardinalityResult<A>) || null;
       },
       null,
-      [attribute, rep, entity],
+      [attribute, entity],
       "eav" + entity + attribute
     );
   },
@@ -376,22 +372,18 @@ export const useIndex = {
     attribute: A,
     value: string | undefined
   ) {
-    let rep = useContext(ReplicacheContext);
     return useSubscribe(
-      rep?.rep,
       async (tx) => {
         if (!value) return null;
         return (await scanIndex(tx).ave(attribute, value)) || null;
       },
       null,
-      [rep, attribute, value],
+      [attribute, value],
       "ave" + attribute + value
     );
   },
   aev<A extends keyof Attribute>(attribute: A | null, entity?: string) {
-    let rep = useContext(ReplicacheContext);
     return useSubscribe(
-      rep?.rep,
       async (tx) => {
         if (!attribute) return [];
         let results = await tx
@@ -409,9 +401,7 @@ export const useIndex = {
     );
   },
   vae<A extends keyof ReferenceAttributes>(entity: string, attribute?: A) {
-    let rep = useContext(ReplicacheContext);
     return useSubscribe(
-      rep?.rep,
       async (tx) => {
         let results = await tx
           .scan({
@@ -423,14 +413,12 @@ export const useIndex = {
         return results as Fact<A>[];
       },
       [],
-      [rep, entity, attribute],
+      [entity, attribute],
       "vae" + entity + attribute
     );
   },
   messages(topic: string) {
-    let rep = useContext(ReplicacheContext);
     return useSubscribe(
-      rep?.rep,
       async (tx) => {
         let messages = await tx
           .scan({ indexName: "messages", prefix: topic })
@@ -439,14 +427,12 @@ export const useIndex = {
         return messages as Message[];
       },
       [],
-      [],
+      [topic],
       topic
     );
   },
   messageByID(id: string | null) {
-    let rep = useContext(ReplicacheContext);
     return useSubscribe(
-      rep?.rep,
       async (tx) => {
         if (!id) return null;
         let message = await tx.get(id);
@@ -467,7 +453,6 @@ export const useMutations = () => {
   let { session } = useAuth();
   let rep = useContext(ReplicacheContext);
   let auth = useSubscribe(
-    rep?.rep,
     async (tx) => {
       if (!session || !session.loggedIn || !session.session?.studio)
         return null;
