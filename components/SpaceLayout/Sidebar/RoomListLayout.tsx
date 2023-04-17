@@ -75,11 +75,13 @@ export const EditRoomModal = (props: {
             <ButtonPrimary
               content="Edit Room!"
               onClick={async () => {
-                await mutate("assertFact", {
-                  entity: entityID,
-                  attribute: "room/name",
-                  value: formState,
-                  positions: {},
+                if (!currentRoom || currentRoom.attribute === "member/name")
+                  return;
+                await mutate("updateFact", {
+                  id: currentRoom?.id,
+                  data: {
+                    value: formState,
+                  },
                 });
                 setFormState("");
                 props.onClose();
