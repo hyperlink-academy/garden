@@ -47,7 +47,7 @@ export const CardAdder = (
               memberEntity,
             });
             if (props.openOnAdd) {
-              open({ entityID: entity });
+              open({ entityID: entity, focus: "title" });
             } else null;
             if (rep === null) {
               return;
@@ -62,9 +62,17 @@ export const CardAdder = (
         </button>
         <div className=" h-4 w-[1px] border-l border-dashed text-grey-80" />
         <AddExistingCard
-          onAdd={(entity) => {
+          onAdd={(entity, d) => {
             if (props.openOnAdd) {
-              open({ entityID: entity });
+              open({
+                entityID: entity,
+                focus:
+                  d.type === "create"
+                    ? d.name
+                      ? "content"
+                      : "title"
+                    : undefined,
+              });
             } else null;
           }}
           addToEnd={props.addToEnd}
@@ -83,7 +91,12 @@ export const CardAdder = (
 export const AddExistingCard = (
   props: {
     expanded?: boolean;
-    onAdd?: (entity: string) => void;
+    onAdd?: (
+      entity: string,
+      addedItem:
+        | { entity: string; type: "existing" }
+        | { name: string; type: "create"; cardType: "card" }
+    ) => void;
     children: React.ReactNode;
   } & StackData
 ) => {
@@ -133,7 +146,7 @@ export const AddExistingCard = (
               });
             }
             create(entity, props, rep.rep, mutate);
-            props.onAdd?.(entity);
+            props.onAdd?.(entity, d);
           }
 
           action.end();

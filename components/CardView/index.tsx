@@ -245,6 +245,7 @@ const Title = (props: { entityID: string }) => {
   let titleFact = memberName || cardTitle;
   return (
     <SingleTextSection
+      id="card-title"
       onKeyDown={(e) => {
         if (e.key === "Enter") {
           let className = `${props.entityID}-default-text-section}`;
@@ -413,7 +414,7 @@ const DefaultTextSection = (props: { entityID: string }) => {
   let spaceID = useSpaceID();
   return (
     <SingleTextSection
-      id={`${props.entityID}-default-text-section}`}
+      id="default-text-section"
       onPaste={async (e) => {
         if (!authToken || !spaceID) return;
         let data = await getAndUploadFile(

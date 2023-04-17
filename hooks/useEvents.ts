@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 
 type AppEvent = {
-  "cardviewer.open-card": { entityID: string };
+  "cardviewer.open-card": { entityID: string; focus?: "title" | "content" };
   "cardviewer.close-card": { entityID: string };
 };
 let listeners: { callback: Function; event: string }[] = [];

@@ -363,7 +363,11 @@ const AddCard = (props: {
               y: Math.max(props.position.y - 42, 0),
             },
           });
-          open({ entityID: entity });
+          open({
+            entityID: entity,
+            focus:
+              d.type === "create" ? (d.name ? "content" : "title") : undefined,
+          });
         }
         action.end();
       }}

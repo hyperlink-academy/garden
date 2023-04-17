@@ -6,7 +6,7 @@ import { CardView } from "./CardView";
 
 export const useCardViewer = () => {
   return {
-    open: (args: { entityID: string }) => {
+    open: (args: { entityID: string; focus?: "title" | "content" }) => {
       publishAppEvent("cardviewer.open-card", args);
     },
     close: (args: { entityID: string }) => {
@@ -52,6 +52,15 @@ export function CardViewer(props: {
       });
       setTimeout(() => {
         ref.current?.scrollIntoView({ inline: "center", behavior: "smooth" });
+        if (data.focus) {
+          if (data.focus === "content") {
+            let element = document.getElementById("default-text-section");
+            console.log(element);
+            element?.focus();
+          }
+          if (data.focus === "title")
+            document.getElementById("card-title")?.focus();
+        }
       }, 10);
     },
     [props.room]
