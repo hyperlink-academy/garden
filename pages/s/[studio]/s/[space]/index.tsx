@@ -238,7 +238,7 @@ const Room = (props: { entityID: string | null }) => {
               />
             </div>
           ) : roomType?.value === "chat" ? (
-            <Discussion entityID={props.entityID} />
+            <Discussion entityID={props.entityID} isRoom={true} />
           ) : (
             <Desktop entityID={props.entityID} />
           )

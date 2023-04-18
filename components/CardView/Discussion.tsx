@@ -16,6 +16,7 @@ import { useReactions } from "hooks/useReactions";
 export const Discussion = (props: {
   entityID: string;
   allowReact?: boolean;
+  isRoom: boolean;
 }) => {
   let unreadBy = useIndex.eav(props.entityID, "discussion/unread-by");
   let [focus, setFocus] = useState(true);
@@ -44,7 +45,11 @@ export const Discussion = (props: {
 
   return (
     <>
-      <Messages entityID={props.entityID} setReply={setReply} />
+      <Messages
+        entityID={props.entityID}
+        setReply={setReply}
+        isRoom={props.isRoom}
+      />
       <MessageInput
         allowReact={props.allowReact}
         entityID={props.entityID}
@@ -283,9 +288,11 @@ const AttachedCard = (props: { entityID: string }) => {
 export const Messages = (props: {
   entityID: string;
   setReply: (reply: string) => void;
+  isRoom: boolean;
 }) => {
   let messages = useIndex.messages(props.entityID);
-  if (messages.length == 0) return null;
+  // no empty state placeholder if it's a chat room
+  if (props.isRoom === false && messages.length == 0) return null;
   return (
     <div
       // className="flex flex-col gap-6 px-3 py-2"
@@ -293,6 +300,12 @@ export const Messages = (props: {
       className="flex min-h-[calc(100vh-124px)] flex-col gap-6 sm:min-h-[calc(100vh-132px)] md:min-h-[calc(100vh-148px)]"
       style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
     >
+      {messages.length == 0 ? (
+        <div className="flex flex-col gap-2 italic text-grey-55">
+          <p>welcome to the chat! or log, if you like</p>
+          <p>nothing here yet…start the conversation 🌱</p>
+        </div>
+      ) : null}
       {messages.map((m) => (
         <Message
           author={m.sender}
