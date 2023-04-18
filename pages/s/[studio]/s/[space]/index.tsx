@@ -70,19 +70,13 @@ export default function SpacePage() {
         if (inRooms.length > 0) count++;
       }
       for (let discussion of unreadDiscussions) {
-        let cards = await scanIndex(tx).vae(
+        let inRooms = await scanIndex(tx).vae(
           discussion.entity,
-          "card/discussion"
+          "desktop/contains"
         );
-        for (let card of cards) {
-          let inRooms = await scanIndex(tx).vae(
-            card.entity,
-            "desktop/contains"
-          );
 
-          let isRoom = await scanIndex(tx).eav(discussion.entity, "room/name");
-          if (inRooms.length > 0 || isRoom) count++;
-        }
+        let isRoom = await scanIndex(tx).eav(discussion.entity, "room/name");
+        if (inRooms.length > 0 || isRoom) count++;
       }
 
       return count;
