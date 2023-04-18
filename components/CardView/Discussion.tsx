@@ -55,7 +55,6 @@ export const Discussion = (props: {
         entityID={props.entityID}
         reply={reply}
         setReply={setReply}
-        isRoom={props.isRoom}
       />
     </div>
   );
@@ -66,7 +65,6 @@ export const MessageInput = (props: {
   entityID: string;
   reply: string | null;
   setReply: (reply: string | null) => void;
-  isRoom: boolean;
 }) => {
   let [value, setValue] = useState("");
   let [attachedCards, setAttachedCards] = useState<string[]>([]);
@@ -112,9 +110,7 @@ export const MessageInput = (props: {
   };
   return (
     <div
-      className={`sticky ${
-        props.isRoom ? "bottom-0 pt-8" : "bottom-0 pt-4"
-      } flex w-full flex-col gap-2`}
+      className="sticky bottom-0 flex w-full flex-col gap-2 pt-4"
       onBlur={(e) => {
         if (e.currentTarget.contains(e.relatedTarget)) return;
         setMode("normal");
@@ -299,9 +295,6 @@ export const Messages = (props: {
   if (props.isRoom === false && messages.length == 0) return null;
   return (
     <div
-      // className="flex flex-col gap-6 px-3 py-2"
-      // className="flex min-h-[calc(100vh-8rem)] flex-col gap-6"
-      // className="flex min-h-[calc(100vh-124px)] flex-col justify-end gap-6 sm:min-h-[calc(100vh-132px)] md:min-h-[calc(100vh-148px)]"
       className="flex flex-1 flex-col justify-end gap-6"
       style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
     >
@@ -345,7 +338,6 @@ const Message = (props: {
     "message/attached-card"
   );
   return (
-    // <div className="flex flex-col gap-1">
     <div className="flex flex-col gap-0">
       <div className="flex justify-between gap-2 text-grey-55">
         <div className="flex gap-2">

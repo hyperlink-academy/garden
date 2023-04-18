@@ -222,11 +222,9 @@ const Room = (props: { entityID: string | null }) => {
       key={props.entityID}
       id="roomScrollContainer"
       ref={ref}
-      className="no-scrollbar m-2 h-full w-[336px] items-stretch overflow-x-hidden overflow-y-scroll text-sm sm:m-4"
+      className="no-scrollbar m-2 h-full w-[336px] overflow-x-hidden overflow-y-scroll text-sm sm:m-4"
     >
-      {/* <div className="relative m-2 flex w-[336px] flex-col items-stretch gap-0 text-sm sm:m-4 sm:mb-0"> */}
-
-      {/* per-room wrappers + components! */}
+      {/* per-room wrappers + components */}
       {props.entityID ? (
         roomType?.value === "collection" ? (
           <div className="flex min-h-[calc(100vh-132px)] flex-col gap-2">
@@ -242,14 +240,11 @@ const Room = (props: { entityID: string | null }) => {
         ) : (
           <div className="relative flex flex-col">
             <Desktop entityID={props.entityID} />
-            {/* desktop bg - only for canvas rooms (incl member rooms for now) */}
             <div className="desktopBackground absolute h-full w-full" />
           </div>
         )
       ) : null}
     </div>
-
-    // </div>
   );
 };
 
@@ -279,14 +274,23 @@ const EmptyState = (props: { roomType?: string | undefined }) => {
               <em>Drag a card to move it</em>
             </p>
           </>
-        ) : (
-          // if not 'canvas' we can assume room type is 'collection'
+        ) : props.roomType === "collection" ? (
           <>
             <p>
               <em>Click a card to open it here</em>
             </p>
             <p>
               <em>Drag cards to reorder</em>
+            </p>
+          </>
+        ) : (
+          // if not 'canvas' or 'collection', it's chat
+          <>
+            <p>
+              <em>Attach cards to chat messages</em>
+            </p>
+            <p>
+              <em>Click to open them here</em>
             </p>
           </>
         )}
