@@ -37,11 +37,13 @@ module.exports = {
       "accent-blue": "#0000FF", //blue
       "accent-red": "#DC143C", //crimson
       "accent-gold": "#FFD700", //gold
+      "accent-green": "#008000", //green
 
       //BG COLORS
       "bg-blue": "#F0F7FA",
       "bg-red": "#FFEAEA",
       "bg-gold": "#FFF3CE",
+      "bg-green": "#F0FFF0",
 
       //DO NOT USE IN PRODUCTION. Test colors to aid development, ie, setting bg color on element to see edges of div. DO. NOT. USE. IN. PRODUCTION
       "test-pink": "#E18181",

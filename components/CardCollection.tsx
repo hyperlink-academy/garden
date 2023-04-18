@@ -41,12 +41,14 @@ export const CardCollection = (props: {
   let collectionType = useIndex.eav(props.entityID, "collection/type");
   return (
     <>
-      <CollectionHeader entityID={props.entityID} />
-      <FilterByReactions
-        reactions={reactions}
-        filter={filter}
-        setFilter={setFilter}
-      />
+      <div className="flex justify-between gap-2">
+        <FilterByReactions
+          reactions={reactions}
+          filter={filter}
+          setFilter={setFilter}
+        />
+        <CollectionHeader entityID={props.entityID} />
+      </div>
       <CollectionList
         attribute={props.attribute}
         entityID={props.entityID}
@@ -69,7 +71,7 @@ function FilterByReactions(props: {
   setFilter: (f: { reaction: string; not: boolean } | null) => void;
 }) {
   return (
-    <div className="no-scrollbar flex flex-row  gap-2 overflow-x-scroll">
+    <div className="flex flex-row flex-wrap gap-2">
       {props.reactions.map((reaction) => {
         return (
           <button
@@ -82,13 +84,15 @@ function FilterByReactions(props: {
             }}
             className={`text-md flex items-center gap-2 rounded-md border px-2 py-0.5 ${
               props.filter?.reaction === reaction
-                ? "border-accent-blue bg-bg-blue"
+                ? props.filter.not
+                  ? "border-accent-red bg-bg-red"
+                  : "border-accent-green bg-bg-green"
                 : "border-grey-80"
             }`}
           >
             <strong>
               {props.filter?.reaction === reaction &&
-                (props.filter.not ? "-" : "+")}{" "}
+                (props.filter.not ? "−" : "+")}{" "}
               {reaction}
             </strong>{" "}
           </button>
@@ -269,7 +273,7 @@ const CollectionHeader = (props: { entityID: string }) => {
   let collectionType = useIndex.eav(props.entityID, "collection/type");
   let { mutate, authorized } = useMutations();
   if (!authorized) return null;
-  let type = collectionType?.value || "grid";
+  let type = collectionType?.value || "list";
 
   const onClick = (value: Fact<"collection/type">["value"]) => () => {
     mutate("assertFact", {
@@ -287,7 +291,7 @@ const CollectionHeader = (props: { entityID: string }) => {
     }`;
 
   return (
-    <div className="collectionTypeSelector flex flex-row gap-0.5 place-self-end">
+    <div className="collectionTypeSelector flex flex-row gap-0.5 place-self-start">
       <button
         className={`${className("list")} shrink-0`}
         onClick={onClick("list")}
