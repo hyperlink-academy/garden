@@ -24,13 +24,12 @@ import {
   CollectionPreview as CollectionPreviewIcon,
 } from "./Icons";
 
+type Filter = { reaction: string; not: boolean };
 export const CardCollection = (props: {
   entityID: string;
   attribute: "desktop/contains" | "deck/contains";
 }) => {
-  let [filter, setFilter] = useState<null | { reaction: string; not: boolean }>(
-    null
-  );
+  let [filters, setFilters] = useState<Filter[]>([]);
   let cards = useCards(props.entityID, props.attribute);
   let reactions = cards.reduce((acc, card) => {
     for (let reaction of card.reactions) {
@@ -44,21 +43,23 @@ export const CardCollection = (props: {
       <div className="flex justify-between gap-2">
         <FilterByReactions
           reactions={reactions}
-          filter={filter}
-          setFilter={setFilter}
+          filters={filters}
+          setFilters={setFilters}
         />
         <CollectionHeader entityID={props.entityID} />
       </div>
       <CollectionList
         attribute={props.attribute}
         entityID={props.entityID}
-        cards={cards.filter((card) =>
-          !filter
-            ? true
-            : filter.not
-            ? !card.reactions.includes(filter.reaction)
-            : card.reactions.includes(filter.reaction)
-        )}
+        cards={cards.filter((card) => {
+          let passed = true;
+          for (let filter of filters) {
+            if (filter.not)
+              passed = passed && !card.reactions.includes(filter.reaction);
+            else passed = passed && card.reactions.includes(filter.reaction);
+          }
+          return passed;
+        })}
         size={collectionType?.value === "cardpreview" ? "big" : "small"}
       />
     </>
@@ -67,32 +68,41 @@ export const CardCollection = (props: {
 
 function FilterByReactions(props: {
   reactions: string[];
-  filter: { reaction: string; not: boolean } | null;
-  setFilter: (f: { reaction: string; not: boolean } | null) => void;
+  filters: Filter[];
+  setFilters: (f: (old: Filter[]) => Filter[]) => void;
 }) {
   return (
     <div className="flex flex-row flex-wrap gap-2">
       {props.reactions.map((reaction) => {
+        let existingFilter = props.filters.find((f) => f.reaction === reaction);
         return (
           <button
             key={reaction}
             onClick={() => {
-              if (props.filter?.reaction === reaction) {
-                if (props.filter.not) props.setFilter(null);
-                else props.setFilter({ reaction, not: true });
-              } else props.setFilter({ reaction, not: false });
+              props.setFilters((oldFilters) => {
+                let existingFilter = oldFilters.find(
+                  (f) => f.reaction === reaction
+                );
+                if (!existingFilter)
+                  return [...oldFilters, { reaction, not: false }];
+                if (existingFilter.not)
+                  return oldFilters.filter((f) => f.reaction !== reaction);
+                return oldFilters.map((f) =>
+                  f.reaction === reaction ? { ...f, not: true } : f
+                );
+              });
             }}
             className={`text-md flex items-center gap-2 rounded-md border px-2 py-0.5 ${
-              props.filter?.reaction === reaction
-                ? props.filter.not
+              existingFilter
+                ? existingFilter.not
                   ? "border-accent-red bg-bg-red"
                   : "border-accent-green bg-bg-green"
                 : "border-grey-80"
             }`}
           >
             <strong>
-              {props.filter?.reaction === reaction &&
-                (props.filter.not ? "−" : "+")}{" "}
+              {existingFilter?.reaction === reaction &&
+                (existingFilter.not ? "−" : "+")}{" "}
               {reaction}
             </strong>{" "}
           </button>
