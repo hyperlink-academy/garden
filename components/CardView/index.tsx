@@ -229,7 +229,7 @@ export const CardContent = (props: {
         <SectionAdder entityID={props.entityID} />
       </div>
       {/* END CARD CONTENT */}
-      <Divider />
+      {/* <Divider /> */}
       {/* START CARD DISCUSSION + REACTIONS */}
       <div className="flex flex-1 flex-col justify-end gap-4">
         <Reactions entityID={props.entityID} />
@@ -240,12 +240,14 @@ export const CardContent = (props: {
 };
 
 const Title = (props: { entityID: string }) => {
+  let { authorized } = useMutations();
   let memberName = useIndex.eav(props.entityID, "member/name");
   let cardTitle = useIndex.eav(props.entityID, "card/title");
   let titleFact = memberName || cardTitle;
   return (
     <SingleTextSection
       id="card-title"
+      className="bg-inherit text-xl font-bold"
       onKeyDown={(e) => {
         if (e.key === "Enter") {
           let className = `${props.entityID}-default-text-section}`;
@@ -253,10 +255,10 @@ const Title = (props: { entityID: string }) => {
           element?.focus();
         }
       }}
-      previewOnly={titleFact?.attribute === "member/name"}
       entityID={props.entityID}
-      className="bg-inherit text-xl font-bold"
       section={titleFact?.attribute || "card/title"}
+      previewOnly={titleFact?.attribute === "member/name"}
+      placeholder={authorized ? "write something..." : "Untitled"}
     />
   );
 };
@@ -410,7 +412,7 @@ const ScheduledDate = (props: {
 
 const DefaultTextSection = (props: { entityID: string }) => {
   let { authToken } = useAuth();
-  let { mutate } = useMutations();
+  let { authorized, mutate } = useMutations();
   let spaceID = useSpaceID();
   return (
     <SingleTextSection
@@ -432,6 +434,7 @@ const DefaultTextSection = (props: { entityID: string }) => {
       }}
       entityID={props.entityID}
       section={"card/content"}
+      placeholder={authorized ? "write something..." : ""}
     />
   );
 };

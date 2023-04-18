@@ -29,7 +29,7 @@ export const SingleTextSection = (
       {...props}
       focused={props.focused}
       previewOnly={props.previewOnly || !authorized}
-      placeholder={authorized ? props.placeholder || "write something..." : ""}
+      placeholder={props.placeholder}
       className={`w-full bg-inherit ${props.className || ""}`}
       spellCheck={false}
       value={(fact?.value as string) || ""}
