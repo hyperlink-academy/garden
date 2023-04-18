@@ -356,7 +356,21 @@ const Message = (props: {
         </div>
         {authorized ? (
           <span className="text-xs">
-            <button onClick={() => props.setReply(props.id)}>reply</button>
+            <button
+              onClick={() => {
+                props.setReply(props.id);
+                document.getElementById("messageInput")?.focus();
+                let roomScrollContainer = document.getElementById(
+                  "roomScrollContainer"
+                );
+                roomScrollContainer?.scrollTo(
+                  0,
+                  roomScrollContainer.scrollHeight
+                );
+              }}
+            >
+              reply
+            </button>
           </span>
         ) : null}
       </div>
