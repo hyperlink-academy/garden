@@ -138,16 +138,10 @@ export const RoomListItem = (props: {
 
         if (unread) return true;
 
-        let discussions = await scanIndex(tx).eav(
-          card.value.value,
-          "card/discussion"
-        );
-        for (let d of discussions) {
-          let unread = (
-            await scanIndex(tx).eav(d.value.value, "discussion/unread-by")
-          ).find((f) => f.value.value === memberEntity);
-          if (unread) return true;
-        }
+        let unreadDiscussion = (
+          await scanIndex(tx).eav(card.value.value, "discussion/unread-by")
+        ).find((f) => f.value.value === memberEntity);
+        if (unreadDiscussion) return true;
       }
       return false;
     },
