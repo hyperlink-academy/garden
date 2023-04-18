@@ -73,6 +73,9 @@ function FilterByReactions(props: {
 }) {
   return (
     <div className="flex flex-row flex-wrap gap-2">
+      {props.filters.length > 0 && (
+        <button onClick={() => props.setFilters(() => [])}>clear</button>
+      )}
       {props.reactions.map((reaction) => {
         let existingFilter = props.filters.find((f) => f.reaction === reaction);
         return (
