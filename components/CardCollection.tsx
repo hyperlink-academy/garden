@@ -28,7 +28,9 @@ export const CardCollection = (props: {
   entityID: string;
   attribute: "desktop/contains" | "deck/contains";
 }) => {
-  let [filter, setFilter] = useState<null | string>(null);
+  let [filter, setFilter] = useState<null | { reaction: string; not: boolean }>(
+    null
+  );
   let cards = useCards(props.entityID, props.attribute);
   let reactions = cards.reduce((acc, card) => {
     for (let reaction of card.reactions) {
@@ -48,8 +50,12 @@ export const CardCollection = (props: {
       <CollectionList
         attribute={props.attribute}
         entityID={props.entityID}
-        cards={cards.filter(
-          (card) => !filter || card.reactions.includes(filter)
+        cards={cards.filter((card) =>
+          !filter
+            ? true
+            : filter.not
+            ? !card.reactions.includes(filter.reaction)
+            : card.reactions.includes(filter.reaction)
         )}
         size={collectionType?.value === "cardpreview" ? "big" : "small"}
       />
@@ -59,8 +65,8 @@ export const CardCollection = (props: {
 
 function FilterByReactions(props: {
   reactions: string[];
-  filter: string | null;
-  setFilter: (f: string | null) => void;
+  filter: { reaction: string; not: boolean } | null;
+  setFilter: (f: { reaction: string; not: boolean } | null) => void;
 }) {
   return (
     <div className="no-scrollbar flex flex-row  gap-2 overflow-x-scroll">
@@ -69,15 +75,23 @@ function FilterByReactions(props: {
           <button
             key={reaction}
             onClick={() => {
-              props.setFilter(props.filter === reaction ? null : reaction);
+              props.setFilter(
+                !props.filter
+                  ? { reaction, not: false }
+                  : props.filter.not
+                  ? null
+                  : { reaction, not: true }
+              );
             }}
             className={`text-md flex items-center gap-2 rounded-md border px-2 py-0.5 ${
-              props.filter === reaction
+              props.filter?.reaction === reaction
                 ? "border-accent-blue bg-bg-blue"
                 : "border-grey-80"
             }`}
           >
-            <strong>{reaction}</strong>{" "}
+            <strong>
+              {props.filter && (props.filter.not ? "-" : "+")} {reaction}
+            </strong>{" "}
           </button>
         );
       })}
