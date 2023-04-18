@@ -230,11 +230,11 @@ export const CardContent = (props: {
       </div>
       {/* END CARD CONTENT */}
       <Divider />
-      {/* START CARD THOUGHTS */}
-      <div className="cardThoughts flex w-full flex-col gap-2">
+      {/* START CARD DISCUSSION + REACTIONS */}
+      <div className="flex flex-1 flex-col justify-end gap-4">
         <Reactions entityID={props.entityID} />
+        <Discussion entityID={props.entityID} allowReact isRoom={false} />
       </div>
-      <Discussion entityID={props.entityID} allowReact isRoom={false} />
     </>
   );
 };

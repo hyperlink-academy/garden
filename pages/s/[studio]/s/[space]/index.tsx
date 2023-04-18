@@ -222,29 +222,34 @@ const Room = (props: { entityID: string | null }) => {
       key={props.entityID}
       id="roomScrollContainer"
       ref={ref}
-      className="no-scrollbar h-full overflow-x-hidden overflow-y-scroll"
+      className="no-scrollbar m-2 h-full w-[336px] items-stretch overflow-x-hidden overflow-y-scroll text-sm sm:m-4"
     >
-      <div className="relative m-2 flex w-[336px] flex-col items-stretch gap-0 text-sm sm:m-4 sm:mb-0">
-        {/* remove desktop bg for collections (member rooms still canvas for now) */}
-        {roomType?.value === "canvas" ? (
-          <div className="desktopBackground absolute h-full w-full" />
-        ) : null}
-        {props.entityID ? (
-          roomType?.value === "collection" ? (
-            <div className="flex min-h-[calc(100vh-132px)] flex-col gap-2">
-              <CardCollection
-                entityID={props.entityID}
-                attribute="desktop/contains"
-              />
-            </div>
-          ) : roomType?.value === "chat" ? (
+      {/* <div className="relative m-2 flex w-[336px] flex-col items-stretch gap-0 text-sm sm:m-4 sm:mb-0"> */}
+
+      {/* per-room wrappers + components! */}
+      {props.entityID ? (
+        roomType?.value === "collection" ? (
+          <div className="flex min-h-[calc(100vh-132px)] flex-col gap-2">
+            <CardCollection
+              entityID={props.entityID}
+              attribute="desktop/contains"
+            />
+          </div>
+        ) : roomType?.value === "chat" ? (
+          <div className="flex h-full flex-col">
             <Discussion entityID={props.entityID} isRoom={true} />
-          ) : (
+          </div>
+        ) : (
+          <div className="relative flex flex-col">
             <Desktop entityID={props.entityID} />
-          )
-        ) : null}
-      </div>
+            {/* desktop bg - only for canvas rooms (incl member rooms for now) */}
+            <div className="desktopBackground absolute h-full w-full" />
+          </div>
+        )
+      ) : null}
     </div>
+
+    // </div>
   );
 };
 
