@@ -75,13 +75,10 @@ function FilterByReactions(props: {
           <button
             key={reaction}
             onClick={() => {
-              props.setFilter(
-                !props.filter
-                  ? { reaction, not: false }
-                  : props.filter.not
-                  ? null
-                  : { reaction, not: true }
-              );
+              if (props.filter?.reaction === reaction) {
+                if (props.filter.not) props.setFilter(null);
+                else props.setFilter({ reaction, not: true });
+              } else props.setFilter({ reaction, not: false });
             }}
             className={`text-md flex items-center gap-2 rounded-md border px-2 py-0.5 ${
               props.filter?.reaction === reaction
@@ -90,7 +87,9 @@ function FilterByReactions(props: {
             }`}
           >
             <strong>
-              {props.filter && (props.filter.not ? "-" : "+")} {reaction}
+              {props.filter?.reaction === reaction &&
+                (props.filter.not ? "-" : "+")}{" "}
+              {reaction}
             </strong>{" "}
           </button>
         );
