@@ -18,7 +18,7 @@ export const Discussion = (props: {
   allowReact?: boolean;
 }) => {
   let unreadBy = useIndex.eav(props.entityID, "discussion/unread-by");
-  let [focus, setFocus] = useState(false);
+  let [focus, setFocus] = useState(true);
   let { mutate, memberEntity } = useMutations();
   useEffect(() => {
     let callback = () => setFocus(true);
