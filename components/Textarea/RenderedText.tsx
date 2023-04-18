@@ -4,7 +4,7 @@ import { parseLine } from "src/parseMarkdownLine";
 
 export const RenderedText = forwardRef<
   HTMLPreElement,
-  { text: string; placeholderOnHover?: boolean } & JSX.IntrinsicElements["pre"]
+  { text: string } & JSX.IntrinsicElements["pre"]
 >((props, ref) => {
   return (
     <Linkify options={{ className: "text-accent-blue underline" }}>
@@ -53,11 +53,7 @@ export const RenderedText = forwardRef<
             return <p key={key}>{parseLine(t)}</p>;
           })
         ) : (
-          <span
-            className={`${
-              props.placeholderOnHover ? "opacity-0 hover:opacity-100 " : ""
-            } block w-full italic !text-grey-80`}
-          >
+          <span className="block w-full italic !text-grey-80">
             {props.placeholder}
           </span>
         )}

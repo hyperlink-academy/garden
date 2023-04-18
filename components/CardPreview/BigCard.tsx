@@ -53,7 +53,6 @@ export const BigCardBody = (props: { entityID: string } & Props) => {
                 width: "100%",
               }}
               text={props.data.member?.value || props.data.title?.value || ""}
-              placeholderOnHover={true}
               placeholder="Untitled"
               className={`cardPreviewTitle text-md !w-fit font-bold ${
                 props.data.isMember ? "text-white" : "text-grey-35"

@@ -66,25 +66,24 @@ export const BaseSmallCard = (
         >
           {/* Small Card Preview Title Or Content */}
           <a className="h-full overflow-hidden">
-            {!props.title ? (
-              <small>
-                <pre
-                  className={`w-fit truncate whitespace-pre-wrap leading-tight ${
-                    !props.imageUrl ? "" : "rounded-[3px] bg-white/75 px-1"
-                  } `}
-                >
-                  {props?.content}
-                </pre>
-              </small>
-            ) : (
-              <div
-                className={`w-fit text-ellipsis font-bold leading-tight text-grey-35 ${
-                  !props.imageUrl ? "" : "rounded-[3px] bg-white px-1"
-                }`}
-              >
-                {props.title}
-              </div>
-            )}
+            {/* if we have an image, do NOT show title / content / 'Untitled' placeholder */}
+            {!props.imageUrl ? (
+              props.title ? (
+                <div className="w-fit text-ellipsis font-bold leading-tight text-grey-35">
+                  {props.title}
+                </div>
+              ) : props.content ? (
+                <small>
+                  <pre className="w-fit truncate whitespace-pre-wrap leading-tight">
+                    {props?.content}
+                  </pre>
+                </small>
+              ) : (
+                <div className="block w-full font-bold italic !text-grey-80">
+                  Untitled
+                </div>
+              )
+            ) : null}
           </a>
 
           {/* Small Card Preview - External Link */}

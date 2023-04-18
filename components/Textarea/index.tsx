@@ -6,7 +6,6 @@ export const Textarea = (
   props: {
     previewOnly?: boolean;
     focused?: boolean;
-    placeholderOnHover?: boolean;
   } & JSX.IntrinsicElements["textarea"]
 ) => {
   let textarea = useRef<HTMLTextAreaElement | null>(null);
@@ -26,7 +25,6 @@ export const Textarea = (
   let newProps = { ...props };
   delete newProps.previewOnly;
   delete newProps.focused;
-  delete newProps.placeholderOnHover;
 
   useEffect(() => {
     if (!focused || !textarea.current) return;

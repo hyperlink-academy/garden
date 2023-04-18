@@ -17,7 +17,6 @@ export const SingleTextSection = (
     focused?: boolean;
     previewOnly?: boolean;
     className?: string;
-    placeholderOnHover?: boolean;
     new?: boolean;
   } & JSX.IntrinsicElements["textarea"]
 ) => {
@@ -30,7 +29,6 @@ export const SingleTextSection = (
       {...props}
       focused={props.focused}
       previewOnly={props.previewOnly || !authorized}
-      placeholderOnHover={props.placeholderOnHover}
       placeholder={authorized ? props.placeholder || "write something..." : ""}
       className={`w-full bg-inherit ${props.className || ""}`}
       spellCheck={false}
