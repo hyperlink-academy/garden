@@ -1,8 +1,6 @@
 import { privateSpaceAPI } from "backend/lib/api";
 import { Env } from "backend/SpaceDurableObject";
-import { generateKeyBetween } from "src/fractional-indexing";
 import { calculateUnreads, markUnread } from "src/markUnread";
-import { sortByPosition } from "src/position_helpers";
 import { Attribute, ReferenceAttributes } from "./Attributes";
 import { Fact, ref } from "./Facts";
 import { Message } from "./Messages";
@@ -119,38 +117,6 @@ const updatePositionInDesktop: Mutation<{
   }
 };
 
-const addToOrCreateDeck: Mutation<{
-  targetCardEntity: string;
-  droppedCardPositionFact: string;
-  droppedCardEntity: string;
-  desktop: string;
-  factID: string;
-}> = async (args, ctx) => {
-  // This now just adds a reference to a card since all cards are kinda decks
-  let children = await ctx.scanIndex.eav(args.desktop, "deck/contains");
-  let deck = args.targetCardEntity;
-
-  let existingCards = await ctx.scanIndex.eav(deck, "deck/contains");
-  let lastChild = existingCards.sort(sortByPosition("eav"))[
-    existingCards.length - 1
-  ];
-  let newPosition = generateKeyBetween(lastChild?.positions.eav || null, null);
-  await ctx.assertFact({
-    entity: deck,
-    attribute: "deck/contains",
-    value: ref(args.droppedCardEntity),
-    positions: { eav: newPosition },
-    factID: args.factID,
-  });
-
-  let childInDesktop = children.find(
-    (f) => f.value.value === args.droppedCardEntity
-  );
-  await ctx.retractFact(args.droppedCardPositionFact);
-  if (childInDesktop) await ctx.retractFact(childInDesktop?.id);
-  return;
-};
-
 const updatePositions: Mutation<{
   newPositions: [string, string][];
   positionKey: string;
@@ -242,50 +208,6 @@ const updateFact: Mutation<{
   await ctx.updateFact(args.id, args.data, args.undoAction);
 };
 
-const createDiscussion: Mutation<{
-  cardEntity: string;
-  discussionEntity: string;
-  content: string;
-  date: string;
-  memberEntity: string;
-}> = async (args, ctx) => {
-  await ctx.assertFact({
-    entity: args.cardEntity,
-    attribute: "card/discussion",
-    value: ref(args.discussionEntity),
-    positions: {},
-  });
-  await ctx.assertFact({
-    entity: args.discussionEntity,
-    attribute: "discussion/content",
-    value: args.content,
-    positions: {},
-  });
-  await ctx.assertFact({
-    entity: args.discussionEntity,
-    attribute: "discussion/created-at",
-    value: {
-      type: "iso_string",
-      value: args.date,
-    },
-    positions: {},
-  });
-  await ctx.assertFact({
-    entity: args.discussionEntity,
-    attribute: "discussion/author",
-    value: ref(args.memberEntity),
-    positions: {},
-  });
-  await markUnread(
-    {
-      entityID: args.discussionEntity,
-      memberEntity: args.memberEntity,
-      attribute: "discussion/unread-by",
-    },
-    ctx
-  );
-};
-
 const replyToDiscussion: Mutation<{
   discussion: string;
   message: Message;
@@ -318,37 +240,6 @@ const deleteEntity: Mutation<{ entity: string }> = async (args, ctx) => {
   let facts = await ctx.scanIndex.eav(args.entity, null);
   console.log("deleting?");
   await Promise.all(facts.concat(references).map((f) => ctx.retractFact(f.id)));
-};
-
-const drawAPrompt: Mutation<{
-  desktopEntity: string;
-  factID: string;
-  prompts: Fact<"desktop/contains">[];
-  randomSeed: number;
-}> = async (args, ctx) => {
-  let prompt = args.prompts[Math.floor(args.prompts.length * args.randomSeed)];
-
-  if (!prompt) return;
-  let id = await ctx.assertFact({
-    factID: args.factID,
-    entity: args.desktopEntity,
-    attribute: "desktop/contains",
-    value: ref(prompt.value.value),
-    positions: {},
-  });
-  if (!id.success) return;
-  await ctx.assertFact({
-    entity: args.factID,
-    attribute: "card/position-in",
-    value: {
-      type: "position",
-      y: 64,
-      x: 128,
-      size: "small",
-      rotation: ((args.randomSeed * 10000) % 60) / 100 - 0.3,
-    },
-    positions: {},
-  });
 };
 
 const addReaction: Mutation<{
@@ -411,14 +302,11 @@ export const Mutations = {
   createCard,
   updatePositions,
   addCardToSection,
-  drawAPrompt,
-  createDiscussion,
   replyToDiscussion,
   assertFact,
   retractFact,
   updateFact,
   updatePositionInDesktop,
   addCardToDesktop,
-  addToOrCreateDeck,
   addReaction,
 };

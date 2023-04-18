@@ -105,11 +105,6 @@ export const DefaultAttributes = {
     unique: false,
     cardinality: "many",
   },
-  "card/discussion": {
-    type: "reference",
-    unique: false,
-    cardinality: "many",
-  },
   "card/reaction": {
     type: "string",
     unique: false,
@@ -125,28 +120,13 @@ export const DefaultAttributes = {
     unique: true,
     cardinality: "many",
   },
-  "discussion/author": {
-    type: "reference",
-    unique: false,
-    cardinality: "one",
-  },
   "discussion/unread-by": {
     type: "reference",
     unique: false,
     cardinality: "many",
   },
-  "discussion/created-at": {
-    type: "timestamp",
-    unique: false,
-    cardinality: "one",
-  },
   "discussion/message-count": {
     type: "number",
-    unique: false,
-    cardinality: "one",
-  },
-  "discussion/content": {
-    type: "string",
     unique: false,
     cardinality: "one",
   },
