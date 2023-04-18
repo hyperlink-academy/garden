@@ -291,6 +291,7 @@ export const Messages = (props: {
   isRoom: boolean;
 }) => {
   let messages = useIndex.messages(props.entityID);
+  let { authorized } = useMutations();
   // no empty state placeholder if it's a chat room
   if (props.isRoom === false && messages.length == 0) return null;
   return (
@@ -298,10 +299,10 @@ export const Messages = (props: {
       className="flex flex-1 flex-col justify-end gap-6"
       style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
     >
-      {messages.length == 0 ? (
-        <div className="flex flex-col gap-2 italic text-grey-55">
-          <p>welcome to the chat! or log, if you like</p>
-          <p>nothing here yet…start the conversation 🌱</p>
+      {messages.length == 0 && authorized ? (
+        <div className="flex flex-col gap-4 text-base italic text-grey-35">
+          <p>Welcome to the chat!</p>
+          <p>Still quiet…start the conversation 🌱</p>
         </div>
       ) : null}
       {messages.map((m) => (
@@ -329,6 +330,8 @@ const Message = (props: {
   entity?: string;
   setReply: (reply: string) => void;
 }) => {
+  let { authorized } = useMutations();
+
   let memberName = useIndex.eav(props.author, "member/name");
   let time = new Date(parseInt(props.date));
   let replyMessage = useIndex.messageByID(props.reply || null);
@@ -351,9 +354,11 @@ const Message = (props: {
             })}
           </span>
         </div>
-        <span className="text-xs">
-          <button onClick={() => props.setReply(props.id)}>reply</button>
-        </span>
+        {authorized ? (
+          <span className="text-xs">
+            <button onClick={() => props.setReply(props.id)}>reply</button>
+          </span>
+        ) : null}
       </div>
 
       {replyMessage && (

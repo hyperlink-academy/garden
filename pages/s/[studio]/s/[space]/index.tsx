@@ -264,7 +264,7 @@ const EmptyState = (props: { roomType?: string | undefined }) => {
                 text-grey-35
                 `}
     >
-      <div className="m-auto text-center">
+      <div className="m-auto flex flex-col gap-4 text-center">
         {props.roomType === "canvas" ? (
           <>
             <p>
