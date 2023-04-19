@@ -51,8 +51,9 @@ export const Discussion = (props: {
         isRoom={props.isRoom}
       />
       <MessageInput
-        allowReact={props.allowReact}
         entityID={props.entityID}
+        allowReact={props.allowReact}
+        isRoom={props.isRoom}
         reply={reply}
         setReply={setReply}
       />
@@ -61,8 +62,9 @@ export const Discussion = (props: {
 };
 
 export const MessageInput = (props: {
-  allowReact?: boolean;
   entityID: string;
+  allowReact?: boolean;
+  isRoom: boolean;
   reply: string | null;
   setReply: (reply: string | null) => void;
 }) => {
@@ -105,8 +107,12 @@ export const MessageInput = (props: {
     setValue("");
     setAttachedCards([]);
     props.setReply(null);
-    let roomScrollContainer = document.getElementById("roomScrollContainer");
-    roomScrollContainer?.scrollTo(0, roomScrollContainer.scrollHeight);
+    let ScrollContainer = null;
+    if (props.isRoom)
+      ScrollContainer = document.getElementById("roomScrollContainer");
+    else ScrollContainer = document.getElementById("cardContentAndDiscussion");
+    if (ScrollContainer)
+      ScrollContainer?.scrollTo(0, ScrollContainer.scrollHeight);
   };
   return (
     <div
