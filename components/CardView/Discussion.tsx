@@ -360,13 +360,6 @@ const Message = (props: {
               onClick={() => {
                 props.setReply(props.id);
                 document.getElementById("messageInput")?.focus();
-                let roomScrollContainer = document.getElementById(
-                  "roomScrollContainer"
-                );
-                roomScrollContainer?.scrollTo(
-                  0,
-                  roomScrollContainer.scrollHeight
-                );
               }}
             >
               reply
