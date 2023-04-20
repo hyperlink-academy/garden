@@ -22,6 +22,7 @@ import { useSubscribe } from "replicache-react";
 import { useDraggableCard, useDroppableZone } from "components/DragContext";
 import { sortByPosition, updatePositions } from "src/position_helpers";
 import { useCombinedRefs } from "components/Desktop";
+import { ulid } from "src/ulid";
 
 export const RoomListLabel = (props: { label: string }) => {
   return <div className="px-2 pb-1 font-bold text-grey-35">{props.label}</div>;
@@ -32,22 +33,27 @@ export const EditRoomModal = (props: {
   onClose: () => void;
   currentRoom: string | null;
 }) => {
-  let currentRoom: Fact<"room/name"> | Fact<"member/name"> | null = null;
+  let currentRoomName: Fact<"room/name"> | Fact<"member/name"> | null = null;
   let isMember = false;
-  let sharedRoom = useIndex.eav(props.currentRoom, "room/name");
-  let memberRoom = useIndex.eav(props.currentRoom, "member/name");
+  let sharedRoomName = useIndex.eav(props.currentRoom, "room/name");
+  let memberRoomName = useIndex.eav(props.currentRoom, "member/name");
 
-  if (memberRoom) {
-    currentRoom = memberRoom;
+  if (memberRoomName) {
+    currentRoomName = memberRoomName;
     isMember = true;
-  } else currentRoom = sharedRoom;
+  } else currentRoomName = sharedRoomName;
+
+  let currentRoomDescription: Fact<"room/description"> | null = null;
+  currentRoomDescription = useIndex.eav(props.currentRoom, "room/description");
 
   let { mutate } = useMutations();
-  let [formState, setFormState] = useState(currentRoom?.value || "");
+  let [nameState, setNameState] = useState(currentRoomName?.value || "");
+  let [descriptionState, setDescriptionState] = useState(currentRoomDescription?.value || "");
 
   useEffect(() => {
-    setFormState(currentRoom?.value || "");
-  }, [currentRoom?.value, props.open]);
+    setNameState(currentRoomName?.value || "");
+    setDescriptionState(currentRoomDescription?.value || "");
+  }, [currentRoomName?.value, currentRoomDescription?.value, props.open]);
 
   if (!props.currentRoom) return null;
   let entityID = props.currentRoom;
@@ -64,26 +70,44 @@ export const EditRoomModal = (props: {
               <p className="font-bold">Room Name</p>
               <input
                 className="w-full"
-                value={formState}
-                placeholder={currentRoom?.value}
+                value={nameState}
+                placeholder={currentRoomName?.value}
                 onChange={(e) => {
                   let value = e.currentTarget.value;
-                  setFormState(value);
+                  setNameState(value);
+                }}
+              />
+            </div>
+            <div className="editRoomDescription flex flex-col gap-1">
+              <p className="font-bold">Description</p>
+              <input
+                className="w-full"
+                value={descriptionState}
+                placeholder={currentRoomDescription?.value}
+                onChange={(e) => {
+                  let value = e.currentTarget.value;
+                  setDescriptionState(value);
                 }}
               />
             </div>
             <ButtonPrimary
               content="Edit Room!"
               onClick={async () => {
-                if (!currentRoom || currentRoom.attribute === "member/name")
+                if (!currentRoomName || !props.currentRoom || currentRoomName.attribute === "member/name")
                   return;
                 await mutate("updateFact", {
-                  id: currentRoom?.id,
+                  id: currentRoomName?.id,
                   data: {
-                    value: formState,
+                    value: nameState,
                   },
                 });
-                setFormState("");
+                await mutate("assertFact", {
+                  entity: props.currentRoom,
+                  factID: ulid(),
+                  attribute: "room/description",
+                  value: descriptionState,
+                  positions: {},
+                });
                 props.onClose();
               }}
             />

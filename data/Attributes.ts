@@ -210,6 +210,11 @@ export const DefaultAttributes = {
     cardinality: "one",
     unique: false,
   },
+  "room/description": {
+    type: "string",
+    cardinality: "one",
+    unique: false,
+  },
   "room/name": {
     type: "string",
     cardinality: "one",
