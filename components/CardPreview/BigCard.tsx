@@ -2,14 +2,20 @@ import { Backlinks } from "components/CardView/Backlinks";
 import { SingleReactionPreview } from "components/CardView/Reactions";
 import { SingleTextSection } from "components/CardView/Sections";
 import { useCardViewer } from "components/CardViewerContext";
-import { CloseLinedTiny } from "components/Icons";
+import { ChatEmptySmall, ChatSmall, CloseLinedTiny } from "components/Icons";
 import { RenderedText } from "components/Textarea/RenderedText";
 import { useReactions } from "hooks/useReactions";
 import { useIndex, useMutations } from "hooks/useReplicache";
 import { Props } from "./index";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
-export const BigCardBody = (props: { entityID: string } & Props) => {
+export const BigCardBody = (
+  props: {
+    entityID: string;
+    unreadDiscussions: boolean;
+    messagesCount: number;
+  } & Props
+) => {
   let { authorized } = useMutations();
   let { open } = useCardViewer();
 
@@ -64,6 +70,8 @@ export const BigCardBody = (props: { entityID: string } & Props) => {
               ""
             )}
           </div>
+
+          {/* Card "X" to remove button */}
           {!props.outerControls && props.onDelete && authorized ? (
             <button
               className="h-fit pt-1 text-grey-80 hover:text-grey-15"
@@ -103,28 +111,60 @@ export const BigCardBody = (props: { entityID: string } & Props) => {
             />
           )}
         </div>
-        {/* Reactions */}
-        {props.data.reactions.length > 0 ? (
-          <div className="flex w-full flex-row items-center gap-1 pt-2">
-            {props.data.reactions.slice(0, 3).map(([reaction, data]) => {
-              return (
-                <SingleReactionPreview
-                  key={reaction}
-                  {...data}
-                  reaction={reaction}
-                  entityID={props.entityID}
-                />
-              );
-            })}
-            {props.data.reactions.length > 3 ? (
-              <span className="rounded-md border border-grey-80 bg-white py-0.5 px-2 text-sm">
-                <em>{`+${props.data.reactions.length - 3}…`}</em>
-              </span>
-            ) : (
-              ""
-            )}
+
+        {/* Reactions + Discussions WRAPPER */}
+        {/* NB: show ONLY for non-member cards for now */}
+        {!props.data.isMember && (
+          <div className="flex w-full justify-end gap-2 pt-2">
+            {/* Reactions */}
+            {props.data.reactions.length > 0 ? (
+              <div className="flex w-full flex-row items-end gap-1">
+                {props.data.reactions.slice(0, 3).map(([reaction, data]) => {
+                  return (
+                    <SingleReactionPreview
+                      key={reaction}
+                      {...data}
+                      reaction={reaction}
+                      entityID={props.entityID}
+                    />
+                  );
+                })}
+                {props.data.reactions.length > 3 ? (
+                  <span className="rounded-md border border-grey-90 bg-white py-0.5 px-1 text-xs text-grey-55">
+                    {`+${props.data.reactions.length - 3}`}
+                  </span>
+                ) : (
+                  ""
+                )}
+              </div>
+            ) : null}
+
+            {/* Discussions */}
+            {/* three states: unread, existing, none */}
+            {/* clicking = shortcut to focus input for a new message */}
+            <button
+              className={`unreadCount relative -right-[7px] -bottom-[0px] w-fit self-end rounded-md border ${
+                props.unreadDiscussions
+                  ? "unreadCardGlow bg-background text-accent-blue hover:bg-accent-blue hover:text-background"
+                  : props.messagesCount && props.messagesCount > 0
+                  ? "border-grey-80 bg-background text-grey-55 hover:border-accent-blue hover:bg-bg-blue hover:text-accent-blue"
+                  : "border-grey-80 bg-white text-grey-55 hover:border-accent-blue hover:bg-bg-blue hover:text-accent-blue"
+              } `}
+              onClick={() => {
+                props.entityID && open({ entityID: props.entityID });
+                setTimeout(() => {
+                  document.getElementById("messageInput")?.focus();
+                }, 50);
+              }}
+            >
+              {props.messagesCount && props.messagesCount > 0 ? (
+                <ChatSmall />
+              ) : (
+                <ChatEmptySmall />
+              )}
+            </button>
           </div>
-        ) : null}
+        )}
       </div>
     </div>
   );

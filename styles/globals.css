@@ -188,8 +188,11 @@ textarea {
 }
 
 .unreadCardGlow {
-  border: dashed 2px goldenrod;
-  box-shadow: 0px 0px 8px 2px gold;
+  /* testing smaller unread glow - ALSO using for messages as well as cards */
+  /* border: dashed 2px goldenrod; */
+  border: dashed 1px goldenrod;
+  /* box-shadow: 0px 0px 8px 2px gold; */
+  box-shadow: 0px 0px 4px 2px gold;
 }
 
 .selectedCardGlow {

@@ -83,6 +83,7 @@ export const CardPreview = (
     false,
     [memberEntity, props.entityID]
   );
+  let messagesCount = useIndex.messages(props.entityID).length;
 
   let { handlers, isLongPress } = useLongPress(
     () => props.onLongPress?.(),
@@ -124,12 +125,17 @@ export const CardPreview = (
         style={{ WebkitTapHighlightColor: "transparent" }}
       >
         {props.size === "small" ? (
-          <SmallCardBody {...props} />
+          <SmallCardBody
+            {...props}
+            unreadDiscussions={unreadDiscussions}
+            messagesCount={messagesCount}
+          />
         ) : (
-          <BigCardBody {...props} />
-        )}
-        {unreadDiscussions && (
-          <div className="unreadCount absolute bottom-2 right-2 mt-[6px] ml-1 h-[12px] w-[12px] shrink-0 rounded-full border  border-white bg-accent-gold"></div>
+          <BigCardBody
+            {...props}
+            unreadDiscussions={unreadDiscussions}
+            messagesCount={messagesCount}
+          />
         )}
       </div>
     </HoverControls>
