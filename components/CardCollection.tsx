@@ -42,12 +42,14 @@ export const CardCollection = (props: {
   return (
     <>
       <div className="flex justify-between gap-2">
-        {props.filterable && (
+        {props.filterable ? (
           <FilterByReactions
             reactions={reactions}
             filters={filters}
             setFilters={setFilters}
           />
+        ) : (
+          <div /> //empty div annoying hack for CollectionHeader right alignment
         )}
         <CollectionHeader entityID={props.entityID} />
       </div>
