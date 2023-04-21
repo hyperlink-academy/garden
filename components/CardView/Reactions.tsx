@@ -57,7 +57,7 @@ export const AddReaction = (props: { entityID: string; close: () => void }) => {
   let [newReaction, setNewReaction] = useState("");
   if (!authorized) return null;
   return (
-    <div className="reactionPicker flex w-full flex-wrap gap-x-4 gap-y-2 rounded-md border border-grey-80 py-1 px-2">
+    <div className="reactionPicker flex w-full flex-wrap gap-x-4 gap-y-2 rounded-md border border-grey-80 bg-white py-1 px-2">
       {reactions
         .filter((f) => !!f.value) // strip empty strings
         .map((r) => (
