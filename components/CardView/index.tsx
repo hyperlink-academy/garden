@@ -52,9 +52,9 @@ const borderStyles = (args: { member: boolean }) => {
 const contentStyles = (args: { member: boolean }) => {
   switch (true) {
     case args.member:
-      return `bg-white rounded-md ml-2 mr-2 mb-2 mt-0 px-3 pt-3 pb-6`;
+      return `bg-white rounded-md mx-2 mt-1 mb-3 px-4 py-4`;
     default:
-      return `px-3 py-4 sm:px-4 sm:py-6`;
+      return `px-2 py-2 sm:px-4 sm:py-4`;
   }
 };
 
@@ -188,24 +188,24 @@ export const CardContent = (props: {
       {/* START CARD CONTENT */}
       <div className="cardContent grid-auto-rows grid gap-3">
         <div className="cardHeader flex flex-col gap-0">
-          <div className="cardTitle grid grid-cols-[auto_max-content_max-content] gap-2">
-            <Title entityID={props.entityID} />
+          <div className="cardTitle flex flex-col gap-2">
             {cardCreatorName ? (
-              <div className="lightBorder self-start rounded-md py-1 px-2 text-sm text-grey-35">
-                {cardCreatorName}
+              <div className="flex justify-between gap-2">
+                <div className="lightBorder self-start rounded-md py-1 px-2 text-xs text-grey-35">
+                  {cardCreatorName}
+                </div>
+                <CardMoreOptionsMenu
+                  onDelete={props.onDelete}
+                  entityID={props.entityID}
+                  referenceFactID={props?.referenceFactID}
+                  setDateEditing={() => {
+                    setDateEditing(true);
+                  }}
+                  date={date}
+                />
               </div>
             ) : null}
-            <div className="">
-              <CardMoreOptionsMenu
-                onDelete={props.onDelete}
-                entityID={props.entityID}
-                referenceFactID={props?.referenceFactID}
-                setDateEditing={() => {
-                  setDateEditing(true);
-                }}
-                date={date}
-              />
-            </div>
+            <Title entityID={props.entityID} />
           </div>
 
           <ScheduledDate
