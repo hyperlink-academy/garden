@@ -10,7 +10,7 @@ import {
 import { SmallCardDragContext } from "components/DragContext";
 import { Sidebar } from "components/SpaceLayout";
 import Head from "next/head";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import useWindowDimensions from "hooks/useWindowDimensions";
 import { CardCollection } from "components/CardCollection";
 import { useSubscribe } from "replicache-react";
@@ -22,6 +22,7 @@ import { useUndoableState } from "hooks/useUndoableState";
 import { useRouter } from "next/router";
 import { slugify } from "src/utils";
 import { Discussion } from "components/CardView/Discussion";
+import { GoToTop } from "components/Icons";
 
 export default function SpacePage() {
   let spaceName = useIndex.aev("space/display_name")[0];
@@ -148,14 +149,14 @@ export default function SpacePage() {
                   <div
                     className={`
                     desktopWrapper no-scrollbar
-                  relative flex 
-                  h-full 
-                  flex-shrink-0 
+                  relative flex
+                  h-full
+                  flex-shrink-0
                   flex-col
                   gap-0
                   `}
                   >
-                    <Room entityID={room} />
+                    <Room entityID={room} key={room} />
                   </div>
                 </div>
 
@@ -187,13 +188,13 @@ export default function SpacePage() {
                     className={`
                       desktopWrapper no-scrollbar relative  flex
                       h-full
-                      flex-shrink-0 flex-col 
-                      gap-0 
+                      flex-shrink-0 flex-col
+                      gap-0
                       rounded-md
                       border border-grey-90
                       `}
                   >
-                    <Room entityID={room} />
+                    <Room entityID={room} key={room} />
                   </div>
                 </div>
 
@@ -214,16 +215,61 @@ export default function SpacePage() {
 
 const Room = (props: { entityID: string | null }) => {
   let roomType = useIndex.eav(props.entityID, "room/type");
+  let roomDescription = useIndex.eav(props.entityID, "room/description");
+  let roomName = useIndex.eav(props.entityID, "room/name");
   let { ref } = usePreserveScroll<HTMLDivElement>(props.entityID);
   if (props.entityID === "search") return <SearchRoom />;
   if (props.entityID === "calendar") return <CalendarRoom />;
+
+  const [isRoomDescriptionVisible, setIsRoomDescriptionVisible] = useState(true);
+
+  const handleGoToTopClick = () => {
+    const scrollContainer = document.getElementById('roomScrollContainer');
+    const initialPosition = scrollContainer.scrollTop;
+    const step = (timestamp) => {
+      const progress = (timestamp - startTime) / duration;
+      const scrollTop = initialPosition * (1 - progress);
+      scrollContainer.scrollTop = scrollTop;
+      if (progress < 1) {
+        window.requestAnimationFrame(step);
+      }
+    };
+    const duration = 300; // milliseconds
+    const startTime = performance.now();
+    window.requestAnimationFrame(step);
+  };
+
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.target.id === 'roomDescription') {
+          setIsRoomDescriptionVisible(entry.isIntersecting);
+        }
+      });
+    });
+    observer.observe(document.querySelector('#roomDescription'));
+    return () => {
+      observer.disconnect();
+    }
+  }, []);
+
+
   return (
     <div
-      key={props.entityID}
       id="roomScrollContainer"
       ref={ref}
       className="no-scrollbar m-2 h-full w-[336px] overflow-x-hidden overflow-y-scroll text-sm sm:m-4"
     >
+      {/* Room Name and Descrption */}
+      <div className="sticky top-0 z-20 flex justify-between bg-background text-lg font-bold text-grey-35">
+        <p>{ roomName?.value }</p>
+        {!isRoomDescriptionVisible && <button onClick={handleGoToTopClick}><GoToTop /></button>}
+      </div>
+      <div id="roomDescription" >
+        <p className="text-grey-60 text-sm text-grey-35">{ roomDescription?.value }</p>
+      </div>
+      <hr className="sticky top-7 z-20 text-grey-60 mb-1"/>
+
       {/* per-room wrappers + components */}
       {props.entityID ? (
         roomType?.value === "collection" ? (

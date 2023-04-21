@@ -811,6 +811,26 @@ export const GoBackToPage = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
+export const GoToTop = (props: SVGProps<SVGSVGElement>) => {
+  return (
+    <svg
+      width="16"
+      height="16"
+      {...props}
+      viewBox="0 0 16 16"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M16 8C16 3.58172 12.4183 1.48086e-07 8 9.5399e-08C3.58172 4.27116e-08 1.48086e-07 3.58172 9.5399e-08 8C4.27116e-08 12.4183 3.58172 16 8 16C12.4183 16 16 12.4183 16 8ZM7.46967 2.46967L2.6967 7.24264C2.40381 7.53553 2.40381 8.01041 2.6967 8.3033C2.98959 8.59619 3.46447 8.59619 3.75736 8.3033L7.25 4.81066L7.25 13C7.25 13.4142 7.58579 13.75 8 13.75C8.41421 13.75 8.75 13.4142 8.75 13L8.75 4.81066L12.2426 8.3033C12.5355 8.59619 13.0104 8.59619 13.3033 8.3033C13.5962 8.01041 13.5962 7.53553 13.3033 7.24264L8.53033 2.46967C8.23744 2.17678 7.76256 2.17678 7.46967 2.46967Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+};
+
 export const MoreOptionsTiny = (props: SVGProps<SVGSVGElement>) => {
   return (
     <svg
