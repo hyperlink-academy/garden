@@ -146,8 +146,8 @@ export const CardView = (props: {
         )}
         <div
           ref={ref}
+          id="cardContentAndDiscussion"
           className={`
-            cardContentAndDiscussion
             no-scrollbar flex h-full          
             grow
             flex-col

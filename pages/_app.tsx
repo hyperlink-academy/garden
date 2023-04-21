@@ -13,7 +13,7 @@ import { HomeLayout } from "components/HomeLayout";
 export default function App({ Component, pageProps }: AppProps) {
   let router = useRouter();
   // dev routes
-  if (router.pathname.startsWith("/dev")) return <Component {...pageProps} />;
+  // if (router.pathname.startsWith("/dev")) return <Component {...pageProps} />;
   // top level home
   if (router.pathname === "/") {
     return (

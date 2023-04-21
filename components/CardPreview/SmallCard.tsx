@@ -1,12 +1,23 @@
 import { SingleReactionPreview } from "components/CardView/Reactions";
 import { useCardViewer } from "components/CardViewerContext";
-import { ExternalLink, Member } from "components/Icons";
+import {
+  ChatEmptySmall,
+  ChatSmall,
+  ExternalLink,
+  Member,
+} from "components/Icons";
 import { useReactions } from "hooks/useReactions";
 import { useMutations } from "hooks/useReplicache";
 import { isUrl } from "src/isUrl";
 import { Props } from "./index";
 
-export const SmallCardBody = (props: { entityID: string } & Props) => {
+export const SmallCardBody = (
+  props: {
+    entityID: string;
+    unreadDiscussions: boolean;
+    messagesCount: number;
+  } & Props
+) => {
   return (
     <BaseSmallCard
       {...props}
@@ -17,6 +28,8 @@ export const SmallCardBody = (props: { entityID: string } & Props) => {
       isMember={props.data.isMember}
       memberName={props.data.member?.value}
       date={props.data.date?.value.value}
+      unreadDiscussions={props.unreadDiscussions}
+      messagesCount={props.messagesCount}
     />
   );
 };
@@ -32,6 +45,8 @@ export const BaseSmallCard = (
     date?: string;
     entityID?: string;
     reactions?: ReturnType<typeof useReactions>;
+    unreadDiscussions?: boolean;
+    messagesCount?: number;
   } & Omit<Props, "size" | "href" | "data">
 ) => {
   let url = props.content ? isUrl(props.content) : false;
@@ -87,10 +102,10 @@ export const BaseSmallCard = (
           </a>
 
           {/* Small Card Preview - External Link */}
-          {/* NB: we COULD also turn this off */}
-          {url ? (
+          {/* NB: turning this off to simplify! */}
+          {/* {url ? (
             <a
-              className="fixed -bottom-[12px] left-[6px] rounded-md border border-grey-80 bg-white p-1 text-accent-blue"
+              className="fixed -bottom-[12px] right-[52px] rounded-md border border-grey-80 bg-white p-1 text-accent-blue"
               href={props.content}
               target="_blank"
               rel="noopener noreferrer"
@@ -100,7 +115,7 @@ export const BaseSmallCard = (
             >
               <ExternalLink />
             </a>
-          ) : null}
+          ) : null} */}
 
           {/* Small Card Preview - Date */}
           {/* NB: turning off to simplify! */}
@@ -112,7 +127,7 @@ export const BaseSmallCard = (
 
           {/* Small Card Preview - Reactions */}
           {props.reactions && props.reactions.length > 0 ? (
-            <div className="fixed -bottom-[12px] right-[24px] flex items-center gap-1">
+            <div className="fixed -bottom-[10px] left-[8px] flex items-center gap-1">
               {props.reactions.slice(0, 1).map(([reaction, data]) => {
                 if (props.entityID)
                   return (
@@ -125,7 +140,7 @@ export const BaseSmallCard = (
                   );
               })}
               {props.reactions.length > 1 ? (
-                <span className="rounded-md border border-grey-80 bg-white py-0.5 px-2 text-sm text-grey-55">
+                <span className="rounded-md border border-grey-90 bg-white py-0.5 px-1 text-xs text-grey-55">
                   {`+${props.reactions.length - 1}`}
                 </span>
               ) : (
@@ -133,6 +148,31 @@ export const BaseSmallCard = (
               )}
             </div>
           ) : null}
+
+          {/* Discussions */}
+          {/* three states: unread, existing, none */}
+          {/* clicking = shortcut to focus input for a new message */}
+          <button
+            className={`unreadCount fixed -bottom-[12px] right-[24px] z-50 rounded-md border ${
+              props.unreadDiscussions
+                ? "unreadCardGlow bg-background text-accent-blue hover:bg-accent-blue hover:text-background"
+                : props.messagesCount && props.messagesCount > 0
+                ? "border-grey-80 bg-background text-grey-55 hover:border-accent-blue hover:bg-bg-blue hover:text-accent-blue"
+                : "border-grey-80 bg-white text-grey-55 hover:border-accent-blue hover:bg-bg-blue hover:text-accent-blue"
+            } `}
+            onClick={() => {
+              props.entityID && open({ entityID: props.entityID });
+              setTimeout(() => {
+                document.getElementById("messageInput")?.focus();
+              }, 50);
+            }}
+          >
+            {props.messagesCount && props.messagesCount > 0 ? (
+              <ChatSmall />
+            ) : (
+              <ChatEmptySmall />
+            )}
+          </button>
         </div>
       ) : (
         // END OF DEFAULT CARD CONTENT, START OF MEMBER CARD CONTENT

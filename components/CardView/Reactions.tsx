@@ -173,10 +173,10 @@ export const SingleReactionPreview = (props: {
 }) => {
   return (
     <div
-      className={`flex items-center gap-1.5 rounded-md border py-0.5 px-2 text-sm ${
+      className={`flex items-center gap-1.5 rounded-md border py-0.5 px-1 text-xs ${
         props.memberReaction
-          ? "border-grey-80 bg-bg-blue"
-          : "border-grey-80 bg-background"
+          ? "border-grey-90 bg-bg-blue"
+          : "border-grey-90 bg-background"
       }`}
     >
       <strong>{props.reaction}</strong>

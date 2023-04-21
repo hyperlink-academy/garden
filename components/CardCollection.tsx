@@ -26,6 +26,7 @@ import {
 
 type Filter = { reaction: string; not: boolean };
 export const CardCollection = (props: {
+  filterable?: boolean;
   entityID: string;
   attribute: "desktop/contains" | "deck/contains";
 }) => {
@@ -41,11 +42,13 @@ export const CardCollection = (props: {
   return (
     <>
       <div className="flex justify-between gap-2">
-        <FilterByReactions
-          reactions={reactions}
-          filters={filters}
-          setFilters={setFilters}
-        />
+        {props.filterable && (
+          <FilterByReactions
+            reactions={reactions}
+            filters={filters}
+            setFilters={setFilters}
+          />
+        )}
         <CollectionHeader entityID={props.entityID} />
       </div>
       <CollectionList
