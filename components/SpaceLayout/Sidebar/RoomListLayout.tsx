@@ -118,7 +118,7 @@ export const EditRoomModal = (props: {
                 destructive
                 onClick={async () => {
                   await mutate("deleteEntity", { entity: entityID });
-                  setFormState("");
+                  setNameState("");
                   props.onClose();
                 }}
                 content="Delete this room"

@@ -225,8 +225,9 @@ const Room = (props: { entityID: string | null }) => {
 
   const handleGoToTopClick = () => {
     const scrollContainer = document.getElementById('roomScrollContainer');
+    if (!scrollContainer) return;
     const initialPosition = scrollContainer.scrollTop;
-    const step = (timestamp) => {
+    const step = (timestamp:number) => {
       const progress = (timestamp - startTime) / duration;
       const scrollTop = initialPosition * (1 - progress);
       scrollContainer.scrollTop = scrollTop;
@@ -247,7 +248,9 @@ const Room = (props: { entityID: string | null }) => {
         }
       });
     });
-    observer.observe(document.querySelector('#roomDescription'));
+    let roomDescription = document.getElementById('roomDescription');
+    if (!roomDescription) return;
+    observer.observe(roomDescription);
     return () => {
       observer.disconnect();
     }
