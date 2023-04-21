@@ -113,27 +113,11 @@ export default function SpacePage() {
       </Head>
 
       <div className="pageWrapperflex safari-pwa-height h-[100dvh] flex-col items-stretch justify-items-center gap-2 overflow-hidden sm:gap-4">
-        <div
-          className={`
-          pageContent 
-          max-w-screen-xl relative mx-auto 
-          flex
-         h-full w-full
-          grow 
-          items-stretch 
-          md:py-6 md:px-4 `}
-        >
+        <div className="pageContent max-w-screen-xl relative mx-auto flex h-full w-full grow items-stretch md:py-6 md:px-4">
           <SmallCardDragContext>
             {width > 960 ? (
               <div
-                className={`
-              contentLargeSplitLayout
-              no-scrollbar 
-              flex w-full flex-row items-stretch gap-4 
-              overflow-x-scroll
-              sm:justify-center
-              sm:gap-4 
-`}
+                className="contentLargeSplitLayout no-scrollbar flex w-full flex-row items-stretch gap-4 overflow-x-scroll sm:justify-center sm:gap-4"
                 // you need to add this to the contentSplitLayout class if you are going to scroll across more than 2 panes
                 // it prevents the last pane from sticking to the end
                 // after:content-[""] after:h-full after:w-2 after:block after:shrink-0
@@ -146,16 +130,7 @@ export default function SpacePage() {
                     currentRoom={room}
                   />
 
-                  <div
-                    className={`
-                    desktopWrapper no-scrollbar
-                  relative flex
-                  h-full
-                  flex-shrink-0
-                  flex-col
-                  gap-0
-                  `}
-                  >
+                  <div className="desktopWrapper no-scrollbar relative flex h-full flex-shrink-0 flex-col gap-0">
                     <Room entityID={room} key={room} />
                   </div>
                 </div>
@@ -185,14 +160,7 @@ export default function SpacePage() {
                 >
                   <div
                     id="desktopWrapper"
-                    className={`
-                      desktopWrapper no-scrollbar relative  flex
-                      h-full
-                      flex-shrink-0 flex-col
-                      gap-0
-                      rounded-md
-                      border border-grey-90
-                      `}
+                    className="desktopWrapper no-scrollbar relative flex h-full flex-shrink-0 flex-col gap-0 rounded-md border border-grey-90"
                   >
                     <Room entityID={room} key={room} />
                   </div>
@@ -218,16 +186,34 @@ const Room = (props: { entityID: string | null }) => {
   let roomDescription = useIndex.eav(props.entityID, "room/description");
   let roomName = useIndex.eav(props.entityID, "room/name");
   let { ref } = usePreserveScroll<HTMLDivElement>(props.entityID);
+
+  const [isRoomDescriptionVisible, setIsRoomDescriptionVisible] =
+    useState(true);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.target.id === "roomDescription") {
+          setIsRoomDescriptionVisible(entry.isIntersecting);
+        }
+      });
+    });
+    let roomDescription = document.getElementById("roomDescription");
+    if (!roomDescription) return;
+    observer.observe(roomDescription);
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
   if (props.entityID === "search") return <SearchRoom />;
   if (props.entityID === "calendar") return <CalendarRoom />;
 
-  const [isRoomDescriptionVisible, setIsRoomDescriptionVisible] = useState(true);
-
   const handleGoToTopClick = () => {
-    const scrollContainer = document.getElementById('roomScrollContainer');
+    const scrollContainer = document.getElementById("roomScrollContainer");
     if (!scrollContainer) return;
     const initialPosition = scrollContainer.scrollTop;
-    const step = (timestamp:number) => {
+    const step = (timestamp: number) => {
       const progress = (timestamp - startTime) / duration;
       const scrollTop = initialPosition * (1 - progress);
       scrollContainer.scrollTop = scrollTop;
@@ -240,38 +226,25 @@ const Room = (props: { entityID: string | null }) => {
     window.requestAnimationFrame(step);
   };
 
-  useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.target.id === 'roomDescription') {
-          setIsRoomDescriptionVisible(entry.isIntersecting);
-        }
-      });
-    });
-    let roomDescription = document.getElementById('roomDescription');
-    if (!roomDescription) return;
-    observer.observe(roomDescription);
-    return () => {
-      observer.disconnect();
-    }
-  }, []);
-
-
   return (
     <div
       id="roomScrollContainer"
       ref={ref}
-      className="no-scrollbar m-2 h-full w-[336px] overflow-x-hidden overflow-y-scroll text-sm sm:m-4"
+      className="no-scrollbar m-2 flex h-full w-[336px] flex-col gap-2 overflow-x-hidden overflow-y-scroll text-sm sm:m-4"
     >
-      {/* Room Name and Descrption */}
+      {/* Room Name and Description */}
       <div className="sticky top-0 z-20 flex justify-between bg-background text-lg font-bold text-grey-35">
-        <p>{ roomName?.value }</p>
-        {!isRoomDescriptionVisible && <button onClick={handleGoToTopClick}><GoToTop /></button>}
+        <p className="mb-2">{roomName?.value}</p>
+        {!isRoomDescriptionVisible && (
+          <button onClick={handleGoToTopClick}>
+            <GoToTop />
+          </button>
+        )}
       </div>
-      <div id="roomDescription" >
-        <p className="text-grey-60 text-sm text-grey-35">{ roomDescription?.value }</p>
+      <div id="roomDescription" className="-mt-2">
+        <p className="text-sm text-grey-35">{roomDescription?.value}</p>
       </div>
-      <hr className="sticky top-7 z-20 text-grey-60 mb-1"/>
+      <hr className="sticky top-9 z-20 mb-1 text-grey-80" />
 
       {/* per-room wrappers + components */}
       {props.entityID ? (
@@ -300,20 +273,7 @@ const Room = (props: { entityID: string | null }) => {
 
 const EmptyState = (props: { roomType?: string | undefined }) => {
   return (
-    <div
-      className={`
-                no-scrollbar relative
-                flex
-                h-full       
-                w-full
-                max-w-3xl
-                snap-y snap-mandatory snap-start
-                flex-col gap-6 overflow-y-scroll rounded-lg
-                border
-                border-dashed border-grey-80 p-4
-                text-grey-35
-                `}
-    >
+    <div className="no-scrollbar relative flex h-full w-full max-w-3xl snap-y snap-mandatory snap-start flex-col gap-6 overflow-y-scroll rounded-lg border border-dashed border-grey-80 p-4 text-grey-35">
       <div className="m-auto flex flex-col gap-4 text-center">
         {props.roomType === "canvas" ? (
           <>
