@@ -22,7 +22,7 @@ import { useUndoableState } from "hooks/useUndoableState";
 import { useRouter } from "next/router";
 import { slugify } from "src/utils";
 import { Discussion } from "components/CardView/Discussion";
-import { ArrowUp } from "components/Icons";
+import { GoToTop } from "components/Icons";
 
 export default function SpacePage() {
   let spaceName = useIndex.aev("space/display_name")[0];
@@ -149,14 +149,14 @@ export default function SpacePage() {
                   <div
                     className={`
                     desktopWrapper no-scrollbar
-                  relative flex 
-                  h-full 
-                  flex-shrink-0 
+                  relative flex
+                  h-full
+                  flex-shrink-0
                   flex-col
                   gap-0
                   `}
                   >
-                    <Room entityID={room} />
+                    <Room entityID={room} key={room} />
                   </div>
                 </div>
 
@@ -188,13 +188,13 @@ export default function SpacePage() {
                     className={`
                       desktopWrapper no-scrollbar relative  flex
                       h-full
-                      flex-shrink-0 flex-col 
-                      gap-0 
+                      flex-shrink-0 flex-col
+                      gap-0
                       rounded-md
                       border border-grey-90
                       `}
                   >
-                    <Room entityID={room} />
+                    <Room entityID={room} key={room} />
                   </div>
                 </div>
 
@@ -223,7 +223,7 @@ const Room = (props: { entityID: string | null }) => {
 
   const [isRoomDescriptionVisible, setIsRoomDescriptionVisible] = useState(true);
 
-  const handleArrowUpClick = () => {
+  const handleGoToTopClick = () => {
     const scrollContainer = document.getElementById('roomScrollContainer');
     const initialPosition = scrollContainer.scrollTop;
     const step = (timestamp) => {
@@ -248,23 +248,25 @@ const Room = (props: { entityID: string | null }) => {
       });
     });
     observer.observe(document.querySelector('#roomDescription'));
+    return () => {
+      observer.disconnect();
+    }
   }, []);
 
 
   return (
     <div
-      key={props.entityID}
       id="roomScrollContainer"
       ref={ref}
       className="no-scrollbar m-2 h-full w-[336px] overflow-x-hidden overflow-y-scroll text-sm sm:m-4"
     >
       {/* Room Name and Descrption */}
-      <div className="sticky top-0 z-20 flex justify-between bg-green-300">
-        <h2>{ roomName?.value }</h2>
-        {!isRoomDescriptionVisible && <ArrowUp onClick={handleArrowUpClick} />}
+      <div className="sticky top-0 z-20 flex justify-between bg-background text-lg font-bold text-grey-35">
+        <p>{ roomName?.value }</p>
+        {!isRoomDescriptionVisible && <button onClick={handleGoToTopClick}><GoToTop /></button>}
       </div>
       <div id="roomDescription" >
-        <h5 className="text-grey-60">{ roomDescription?.value }</h5>
+        <p className="text-grey-60 text-sm text-grey-35">{ roomDescription?.value }</p>
       </div>
       <hr className="sticky top-7 z-20 text-grey-60 mb-1"/>
 
