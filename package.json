@@ -9,7 +9,8 @@
     "wrangler-dev": "wrangler dev --local --persist",
     "supabase-dev": "supabase start",
     "test": "npm run build-backend && NODE_OPTIONS='--experimental-vm-modules --no-warnings' npx jest",
-    "build-backend": "esbuild ./backend/index.ts --target=esnext --format=esm --bundle --outfile=./out/index.mjs"
+    "build-backend": "esbuild ./backend/index.ts --target=esnext --format=esm --bundle --outfile=./out/index.mjs",
+    "check": "next lint && tsc"
   },
   "repository": {
     "type": "git",
