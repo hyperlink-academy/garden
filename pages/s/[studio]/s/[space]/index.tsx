@@ -189,12 +189,15 @@ const Room = (props: { entityID: string | null }) => {
 
   const [isRoomDescriptionVisible, setIsRoomDescriptionVisible] =
     useState(true);
+  const [isToggleableRoomDescriptionHidden, setIsToggleableRoomDescriptionHidden] =
+    useState(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.target.id === "roomDescription") {
           setIsRoomDescriptionVisible(entry.isIntersecting);
+          setIsToggleableRoomDescriptionHidden(true);
         }
       });
     });
@@ -226,6 +229,12 @@ const Room = (props: { entityID: string | null }) => {
     window.requestAnimationFrame(step);
   };
 
+  const toggleDescriptionVisibility = () => {
+    if (!isRoomDescriptionVisible) {
+    setIsToggleableRoomDescriptionHidden(!isToggleableRoomDescriptionHidden);
+    }
+  };
+
   return (
     <div
       id="roomScrollContainer"
@@ -233,18 +242,27 @@ const Room = (props: { entityID: string | null }) => {
       className="no-scrollbar m-2 flex h-full w-[336px] flex-col gap-2 overflow-x-hidden overflow-y-scroll text-sm sm:m-4"
     >
       {/* Room Name and Description */}
-      <div className="sticky top-0 z-10 flex justify-between bg-background text-lg font-bold text-grey-35">
-        <p className="mb-2">{roomName?.value}</p>
-        {!isRoomDescriptionVisible && (
-          <button onClick={handleGoToTopClick}>
-            <GoToTop />
-          </button>
-        )}
+      <div className="sticky top-0 z-10">
+        <div className="flex justify-between bg-background text-lg font-bold text-grey-35">
+          <p className={!isRoomDescriptionVisible ? 'mb-2 cursor-pointer' : 'mb-2'} onClick={toggleDescriptionVisibility}>{roomName?.value}</p>
+          {!isRoomDescriptionVisible && (
+            <button onClick={handleGoToTopClick}>
+              <GoToTop />
+            </button>
+          )}
+        </div>
+        { !isRoomDescriptionVisible && !isToggleableRoomDescriptionHidden && (
+            <div id="roomDescription2" className="-mt-2 bg-background">
+              <p className="text-sm text-grey-35">{roomDescription?.value}</p>
+              <hr className="sticky top-9 z-20 mb-1 text-grey-80" />
+            </div>
+          )}
       </div>
+
       <div id="roomDescription" className="-mt-2">
         <p className="text-sm text-grey-35">{roomDescription?.value}</p>
       </div>
-      <hr className="sticky top-9 z-20 mb-1 text-grey-80" />
+      {isToggleableRoomDescriptionHidden && (<hr className="sticky top-9 z-20 mb-1 text-grey-80" />)}
 
       {/* per-room wrappers + components */}
       {props.entityID ? (
