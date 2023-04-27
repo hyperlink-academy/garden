@@ -22,7 +22,9 @@ import { useUndoableState } from "hooks/useUndoableState";
 import { useRouter } from "next/router";
 import { slugify } from "src/utils";
 import { Discussion } from "components/CardView/Discussion";
-import { GoToTop } from "components/Icons";
+import { GoToTop, MoreOptionsTiny } from "components/Icons";
+import { RenderedText } from "components/Textarea/RenderedText";
+import { EditRoomModal } from "components/SpaceLayout/Sidebar/RoomListLayout";
 
 export default function SpacePage() {
   let spaceName = useIndex.aev("space/display_name")[0];
@@ -187,6 +189,7 @@ const Room = (props: { entityID: string | null }) => {
   let roomName = useIndex.eav(props.entityID, "room/name");
   let { ref } = usePreserveScroll<HTMLDivElement>(props.entityID);
 
+  const [isRoomEditOpen, setIsRoomEditOpen] = useState(false);
   const [isRoomDescriptionVisible, setIsRoomDescriptionVisible] =
     useState(true);
   const [isToggleableRoomDescriptionHidden, setIsToggleableRoomDescriptionHidden] =
@@ -239,30 +242,57 @@ const Room = (props: { entityID: string | null }) => {
     <div
       id="roomScrollContainer"
       ref={ref}
-      className="no-scrollbar m-2 flex h-full w-[336px] flex-col gap-2 overflow-x-hidden overflow-y-scroll text-sm sm:m-4"
+      className="no-scrollbar m-2 flex h-full w-[336px] flex-col gap-1 overflow-x-hidden overflow-y-scroll text-sm sm:m-4"
     >
       {/* Room Name and Description */}
       <div className="sticky top-0 z-10">
         <div className="flex justify-between bg-background text-lg font-bold text-grey-35">
           <p className={!isRoomDescriptionVisible ? 'mb-2 cursor-pointer' : 'mb-2'} onClick={toggleDescriptionVisibility}>{roomName?.value}</p>
-          {!isRoomDescriptionVisible && (
+          { (isRoomDescriptionVisible || !isToggleableRoomDescriptionHidden) ? (
+            <div className=" roomListItemSettings flex w-5 shrink-0 place-content-center pt-0.5">
+              <button
+                onClick={() => setIsRoomEditOpen(true)}
+                className={` rounded-md border border-transparent pt-[1px] hover:border-white`}
+              >
+                <MoreOptionsTiny />
+              </button>
+            </div>
+          ) : (
             <button onClick={handleGoToTopClick}>
               <GoToTop />
             </button>
           )}
         </div>
         { !isRoomDescriptionVisible && !isToggleableRoomDescriptionHidden && (
-            <div id="roomDescription2" className="-mt-2 bg-background">
-              <p className="text-sm text-grey-35">{roomDescription?.value}</p>
-              <hr className="sticky top-9 z-20 mb-1 text-grey-80" />
+            <div id="roomDescription2" className="-mt-0 bg-background">
+              <RenderedText
+                style={{
+                  whiteSpace: "pre-wrap",
+                  fontFamily: "inherit",
+                  width: "100%",
+                }}
+                className="text-sm text-grey-35 mb-2"
+                text={roomDescription?.value || ""}
+              />
+              <hr className="sticky top-9 z-10 mb-1 text-grey-80" />
             </div>
           )}
       </div>
-
-      <div id="roomDescription" className="-mt-2">
-        <p className="text-sm text-grey-35">{roomDescription?.value}</p>
+      <div id="roomDescription" className="invisible"></div>
+      <div id="roomDescriptionX" className="-mt-2">
+        {/* <p className="text-sm text-grey-35">{roomDescription?.value}</p> */}
+        <RenderedText
+          className="text-sm text-grey-35"
+          id="roomDescriptionY"
+          style={{
+            whiteSpace: "pre-wrap",
+            fontFamily: "inherit",
+            width: "100%",
+          }}
+          text={roomDescription?.value || ""}
+        />
       </div>
-      {isToggleableRoomDescriptionHidden && (<hr className="sticky top-9 z-20 mb-1 text-grey-80" />)}
+      {isToggleableRoomDescriptionHidden && (<hr className="sticky top-9 z-10 mb-1 text-grey-80" />)}
 
       {/* per-room wrappers + components */}
       {props.entityID ? (
@@ -285,6 +315,11 @@ const Room = (props: { entityID: string | null }) => {
           </div>
         )
       ) : null}
+      <EditRoomModal
+        open={isRoomEditOpen}
+        onClose={() => setIsRoomEditOpen(false)}
+        currentRoom={props.entityID}
+      />
     </div>
   );
 };

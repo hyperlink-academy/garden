@@ -3,7 +3,6 @@ import { Modal, Divider } from "components/Layout";
 import { Fact } from "data/Facts";
 import {
   Delete,
-  MoreOptionsTiny,
   RoomCalendar,
   RoomCanvas,
   RoomChat,
@@ -23,6 +22,7 @@ import { useDraggableCard, useDroppableZone } from "components/DragContext";
 import { sortByPosition, updatePositions } from "src/position_helpers";
 import { useCombinedRefs } from "components/Desktop";
 import { ulid } from "src/ulid";
+import { Textarea } from "components/Textarea";
 
 export const RoomListLabel = (props: { label: string }) => {
   return <div className="px-2 pb-1 font-bold text-grey-35">{props.label}</div>;
@@ -80,10 +80,11 @@ export const EditRoomModal = (props: {
             </div>
             <div className="editRoomDescription flex flex-col gap-1">
               <p className="font-bold">Description</p>
-              <input
-                className="w-full"
+              <Textarea
+                className="w-full rounded-md border border-grey-55 p-2 box-border"
                 value={descriptionState}
-                placeholder={currentRoomDescription?.value}
+                maxLength={500}
+                placeholder={currentRoomDescription?.value || "Add a description..."}
                 onChange={(e) => {
                   let value = e.currentTarget.value;
                   setDescriptionState(value);
@@ -192,20 +193,7 @@ export const RoomListItem = (props: {
             : undefined
         }
       >
-        {props.roomEntity === props.currentRoom &&
-        authorized &&
-        props.setRoomEditOpen ? (
-          // edit options - only if auth-ed AND on current room
-          <div className=" roomListItemSettings flex w-5 shrink-0 place-content-center pt-0.5">
-            <button
-              onClick={() => props.setRoomEditOpen?.()}
-              className={` rounded-md border border-transparent pt-[1px] hover:border-white`}
-            >
-              <MoreOptionsTiny />
-            </button>
-          </div>
-        ) : (
-          // when not on room, show room type icon
+        { authorized && (
           <div
             className={` roomListItemIcon mt-[2px] h-5 w-5 shrink-0 pt-[1px] pl-[2px]
              ${
