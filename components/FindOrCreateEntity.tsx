@@ -65,7 +65,7 @@ export const FindOrCreate = (props: {
           setInput("");
           isMultiSelect.current = false;
         }}
-        className="fixed inset-0 z-10 overflow-y-hidden"
+        className="fixed inset-0 z-20 overflow-y-hidden"
       >
         <Dialog.Overlay className="overlay" />
 

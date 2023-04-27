@@ -233,7 +233,7 @@ const Room = (props: { entityID: string | null }) => {
       className="no-scrollbar m-2 flex h-full w-[336px] flex-col gap-2 overflow-x-hidden overflow-y-scroll text-sm sm:m-4"
     >
       {/* Room Name and Description */}
-      <div className="sticky top-0 z-20 flex justify-between bg-background text-lg font-bold text-grey-35">
+      <div className="sticky top-0 z-10 flex justify-between bg-background text-lg font-bold text-grey-35">
         <p className="mb-2">{roomName?.value}</p>
         {!isRoomDescriptionVisible && (
           <button onClick={handleGoToTopClick}>

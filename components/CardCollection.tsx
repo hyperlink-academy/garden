@@ -203,7 +203,7 @@ const CollectionList = (props: {
   return (
     <div
       ref={setNodeRef}
-      className="collectionCardList z-10 flex h-full flex-col"
+      className="collectionCardList z-0 flex h-full flex-col"
       onDragOver={(e) => e.preventDefault()}
       onDrop={async (e) => {
         e.preventDefault();
