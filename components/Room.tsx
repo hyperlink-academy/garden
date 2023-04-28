@@ -1,6 +1,7 @@
 import { useIndex } from "hooks/useReplicache";
 import { usePreserveScroll } from "hooks/utils";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import useMeasure from "react-use-measure";
 import { CalendarRoom } from "./CalendarRoom";
 import { CardCollection } from "./CardCollection";
 import { Discussion } from "./CardView/Discussion";
@@ -12,60 +13,10 @@ import { RenderedText } from "./Textarea/RenderedText";
 
 export const Room = (props: { entityID: string | null }) => {
   let roomType = useIndex.eav(props.entityID, "room/type");
-  let roomDescription = useIndex.eav(props.entityID, "room/description");
-  let roomName = useIndex.eav(props.entityID, "room/name");
   let { ref } = usePreserveScroll<HTMLDivElement>(props.entityID);
-
-  const [isRoomEditOpen, setIsRoomEditOpen] = useState(false);
-  const [isRoomDescriptionVisible, setIsRoomDescriptionVisible] =
-    useState(true);
-  const [
-    isToggleableRoomDescriptionHidden,
-    setIsToggleableRoomDescriptionHidden,
-  ] = useState(false);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.target.id === "roomDescription") {
-          setIsRoomDescriptionVisible(entry.isIntersecting);
-          setIsToggleableRoomDescriptionHidden(true);
-        }
-      });
-    });
-    let roomDescription = document.getElementById("roomDescription");
-    if (!roomDescription) return;
-    observer.observe(roomDescription);
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
 
   if (props.entityID === "search") return <SearchRoom />;
   if (props.entityID === "calendar") return <CalendarRoom />;
-
-  const handleGoToTopClick = () => {
-    const scrollContainer = document.getElementById("roomScrollContainer");
-    if (!scrollContainer) return;
-    const initialPosition = scrollContainer.scrollTop;
-    const step = (timestamp: number) => {
-      const progress = (timestamp - startTime) / duration;
-      const scrollTop = initialPosition * (1 - progress);
-      scrollContainer.scrollTop = scrollTop;
-      if (progress < 1) {
-        window.requestAnimationFrame(step);
-      }
-    };
-    const duration = 300; // milliseconds
-    const startTime = performance.now();
-    window.requestAnimationFrame(step);
-  };
-
-  const toggleDescriptionVisibility = () => {
-    if (!isRoomDescriptionVisible) {
-      setIsToggleableRoomDescriptionHidden(!isToggleableRoomDescriptionHidden);
-    }
-  };
 
   return (
     <div
@@ -73,64 +24,7 @@ export const Room = (props: { entityID: string | null }) => {
       ref={ref}
       className="no-scrollbar m-2 flex h-full w-[336px] flex-col gap-1 overflow-x-hidden overflow-y-scroll text-sm sm:m-4"
     >
-      {/* Room Name and Description */}
-      <div className="sticky top-0 z-10">
-        <div className="flex justify-between bg-background text-lg font-bold text-grey-35">
-          <p
-            className={
-              !isRoomDescriptionVisible ? "mb-2 cursor-pointer" : "mb-2"
-            }
-            onClick={toggleDescriptionVisibility}
-          >
-            {roomName?.value}
-          </p>
-          {isRoomDescriptionVisible || !isToggleableRoomDescriptionHidden ? (
-            <div className=" roomListItemSettings flex w-5 shrink-0 place-content-center pt-0.5">
-              <button
-                onClick={() => setIsRoomEditOpen(true)}
-                className={` rounded-md border border-transparent pt-[1px] hover:border-white`}
-              >
-                <MoreOptionsTiny />
-              </button>
-            </div>
-          ) : (
-            <button onClick={handleGoToTopClick}>
-              <GoToTop />
-            </button>
-          )}
-        </div>
-        {!isRoomDescriptionVisible && !isToggleableRoomDescriptionHidden && (
-          <div id="roomDescription2" className="-mt-0 bg-background">
-            <RenderedText
-              style={{
-                whiteSpace: "pre-wrap",
-                fontFamily: "inherit",
-                width: "100%",
-              }}
-              className="mb-2 text-sm text-grey-35"
-              text={roomDescription?.value || ""}
-            />
-            <hr className="sticky top-9 z-10 mb-1 text-grey-80" />
-          </div>
-        )}
-      </div>
-      <div id="roomDescription" className="invisible"></div>
-      <div id="roomDescriptionX" className="-mt-2">
-        {/* <p className="text-sm text-grey-35">{roomDescription?.value}</p> */}
-        <RenderedText
-          className="text-sm text-grey-35"
-          id="roomDescriptionY"
-          style={{
-            whiteSpace: "pre-wrap",
-            fontFamily: "inherit",
-            width: "100%",
-          }}
-          text={roomDescription?.value || ""}
-        />
-      </div>
-      {isToggleableRoomDescriptionHidden && (
-        <hr className="sticky top-9 z-10 mb-1 text-grey-80" />
-      )}
+      <RoomHeader entityID={props.entityID} />
 
       {/* per-room wrappers + components */}
       {props.entityID ? (
@@ -153,11 +47,122 @@ export const Room = (props: { entityID: string | null }) => {
           </div>
         )
       ) : null}
+    </div>
+  );
+};
+
+function RoomHeader(props: { entityID: string | null }) {
+  const [isRoomDescriptionVisible, setIsRoomDescriptionVisible] =
+    useState(true);
+  const [
+    isToggleableRoomDescriptionHidden,
+    setIsToggleableRoomDescriptionHidden,
+  ] = useState(false);
+  let [titleRef, { height }] = useMeasure();
+
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.target.id === "roomDescription") {
+          setIsRoomDescriptionVisible(entry.isIntersecting);
+          setIsToggleableRoomDescriptionHidden(true);
+        }
+      });
+    });
+    let roomDescription = document.getElementById("roomDescription");
+    if (!roomDescription) return;
+    observer.observe(roomDescription);
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+  const toggleDescriptionVisibility = () => {
+    if (!isRoomDescriptionVisible) {
+      setIsToggleableRoomDescriptionHidden(!isToggleableRoomDescriptionHidden);
+    }
+  };
+  let roomDescription = useIndex.eav(props.entityID, "room/description");
+  let roomName = useIndex.eav(props.entityID, "room/name");
+  let descriptionRef = useRef<null | HTMLDivElement>(null);
+
+  return (
+    <>
+      <div className="sticky top-0 z-10" ref={titleRef}>
+        <div className="flex justify-between bg-background text-lg font-bold text-grey-35">
+          <p
+            className={
+              !isRoomDescriptionVisible ? "mb-2 cursor-pointer" : "mb-2"
+            }
+            onClick={toggleDescriptionVisibility}
+          >
+            {roomName?.value}
+          </p>
+          {isRoomDescriptionVisible || !isToggleableRoomDescriptionHidden ? (
+            <RoomOptions entityID={props.entityID} />
+          ) : (
+            <button
+              onClick={() =>
+                descriptionRef?.current?.scrollIntoView({
+                  behavior: "smooth",
+                  block: "end",
+                })
+              }
+            >
+              <GoToTop />
+            </button>
+          )}
+        </div>
+
+        {!isRoomDescriptionVisible && !isToggleableRoomDescriptionHidden && (
+          <div id="roomDescription2" className="-mt-0 bg-background">
+            <RenderedText
+              style={{
+                whiteSpace: "pre-wrap",
+                fontFamily: "inherit",
+                width: "100%",
+              }}
+              className="mb-2 text-sm text-grey-35"
+              text={roomDescription?.value || ""}
+            />
+          </div>
+        )}
+      </div>
+      <div id="roomDescription" className="-mt-2" ref={descriptionRef}>
+        <RenderedText
+          className="text-sm text-grey-35"
+          id="roomDescriptionY"
+          style={{
+            whiteSpace: "pre-wrap",
+            fontFamily: "inherit",
+            width: "100%",
+          }}
+          text={roomDescription?.value || ""}
+        />
+      </div>
+
+      <hr
+        className="sticky z-10 mb-1 text-grey-80"
+        style={{ top: `${height}px` }}
+      />
+    </>
+  );
+}
+
+function RoomOptions(props: { entityID: string | null }) {
+  const [isRoomEditOpen, setIsRoomEditOpen] = useState(false);
+  return (
+    <>
+      <button
+        onClick={() => setIsRoomEditOpen(true)}
+        className={` rounded-md border border-transparent pt-[1px] hover:border-white`}
+      >
+        <MoreOptionsTiny />
+      </button>
       <EditRoomModal
         open={isRoomEditOpen}
         onClose={() => setIsRoomEditOpen(false)}
         currentRoom={props.entityID}
       />
-    </div>
+    </>
   );
-};
+}
