@@ -25,7 +25,11 @@ import { MakeImage, ImageSection } from "./ImageSection";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
 import { AddExistingCard } from "components/CardStack";
-import { ButtonPrimary } from "components/Buttons";
+import {
+  ButtonPrimary,
+  ButtonSecondary,
+  ButtonTertiary,
+} from "components/Buttons";
 import { Discussion } from "./Discussion";
 import { ulid } from "src/ulid";
 import { animated, useSpring } from "@react-spring/web";
@@ -302,18 +306,18 @@ const CardMoreOptionsMenu = (props: {
             setAreYouSureModalOpen(true);
           }}
         >
-          <p className="font-bold text-accent-red">Delete FOREVER</p>
+          <p className="font-bold text-accent-red">Delete Card</p>
           <div className="text-accent-red">
             <Delete />
           </div>
         </MenuItem>
       </MenuContainer>
-    <AreYouSureModal
-      open={areYouSureModalOpen}
-      onClose={() => setAreYouSureModalOpen(false)}
-      onDelete={props.onDelete}
-      entityID={props.entityID}
-    />
+      <AreYouSureModal
+        open={areYouSureModalOpen}
+        onClose={() => setAreYouSureModalOpen(false)}
+        onDelete={props.onDelete}
+        entityID={props.entityID}
+      />
     </Menu>
   );
 };
@@ -329,35 +333,36 @@ const AreYouSureModal = (props: {
     <Modal open={props.open} onClose={props.onClose}>
       <div className="flex flex-col gap-3 text-grey-35">
         <div className="modal flex flex-col gap-3">
-            <p className="text-lg font-bold">Are you sure?</p>
-            <p className="text-sm">
-              This will delete this card and all of its contents. This cannot be
-              undone.
-            </p>
-            <div className="flex gap-4">
-              <button
-                className="flex-1 py-2 px-4 rounded-md bg-grey-20 hover:bg-grey-30"
-                onClick={() => {
+          <p className="text-lg font-bold">Are you sure?</p>
+          <p className="text-sm">
+            This will permanently delete the card and its contents.
+          </p>
+          <div className="flex justify-end gap-4">
+            <ButtonTertiary
+              content="Cancel"
+              onClick={() => {
                 props.onClose();
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                className="flex-1 py-2 px-4 rounded-md text-white bg-accent-red hover:bg-accent-red-hover"
-                onClick={async () => {
-                  action.start();
+              }}
+            >
+              Cancel
+            </ButtonTertiary>
+            <ButtonPrimary
+              content="Delete Card"
+              icon={<Delete />}
+              destructive={true}
+              onClick={async () => {
+                action.start();
 
-                  await mutate("deleteEntity", { entity: props.entityID });
-                  props.onDelete?.();
+                await mutate("deleteEntity", { entity: props.entityID });
+                props.onDelete?.();
 
-                  action.end();
-                }}
-              >
-                Delete
-              </button>
-            </div>
+                action.end();
+              }}
+            >
+              Delete
+            </ButtonPrimary>
           </div>
+        </div>
       </div>
     </Modal>
   );

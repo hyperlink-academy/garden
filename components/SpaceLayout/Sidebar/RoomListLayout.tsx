@@ -48,7 +48,9 @@ export const EditRoomModal = (props: {
 
   let { mutate } = useMutations();
   let [nameState, setNameState] = useState(currentRoomName?.value || "");
-  let [descriptionState, setDescriptionState] = useState(currentRoomDescription?.value || "");
+  let [descriptionState, setDescriptionState] = useState(
+    currentRoomDescription?.value || ""
+  );
 
   useEffect(() => {
     setNameState(currentRoomName?.value || "");
@@ -81,10 +83,12 @@ export const EditRoomModal = (props: {
             <div className="editRoomDescription flex flex-col gap-1">
               <p className="font-bold">Description</p>
               <Textarea
-                className="w-full rounded-md border border-grey-55 p-2 box-border"
+                className="box-border w-full rounded-md border border-grey-55 p-2"
                 value={descriptionState}
                 maxLength={500}
-                placeholder={currentRoomDescription?.value || "Add a description..."}
+                placeholder={
+                  currentRoomDescription?.value || "Add a description..."
+                }
                 onChange={(e) => {
                   let value = e.currentTarget.value;
                   setDescriptionState(value);
@@ -92,9 +96,13 @@ export const EditRoomModal = (props: {
               />
             </div>
             <ButtonPrimary
-              content="Edit Room!"
+              content="Edit Room"
               onClick={async () => {
-                if (!currentRoomName || !props.currentRoom || currentRoomName.attribute === "member/name")
+                if (
+                  !currentRoomName ||
+                  !props.currentRoom ||
+                  currentRoomName.attribute === "member/name"
+                )
                   return;
                 await mutate("updateFact", {
                   id: currentRoomName?.id,
@@ -122,7 +130,7 @@ export const EditRoomModal = (props: {
                   setNameState("");
                   props.onClose();
                 }}
-                content="Delete this room"
+                content="Delete Room"
                 icon={<Delete />}
               />
             )}
@@ -193,7 +201,7 @@ export const RoomListItem = (props: {
             : undefined
         }
       >
-        { authorized && (
+        {authorized && (
           <div
             className={` roomListItemIcon mt-[2px] h-5 w-5 shrink-0 pt-[1px] pl-[2px]
              ${
