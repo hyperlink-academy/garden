@@ -48,6 +48,11 @@ export default function App({ Component, pageProps }: AppProps) {
       </SharedProviders>
     );
   }
+
+  if (router.pathname.startsWith("/landing")) {
+    return <Component {...pageProps} />;
+  }
+
   // default fallback
   return (
     <SharedProviders>
