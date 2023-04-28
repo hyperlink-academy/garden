@@ -8,7 +8,7 @@ import {
   CardAdd,
   Send,
 } from "components/Icons";
-import { Divider, MenuContainer, MenuItem } from "components/Layout";
+import { Divider, MenuContainer, MenuItem, Modal } from "components/Layout";
 import {
   scanIndex,
   useIndex,
@@ -272,6 +272,7 @@ const CardMoreOptionsMenu = (props: {
 }) => {
   let { authorized, mutate, action } = useMutations();
   let memberName = useIndex.eav(props.entityID, "member/name");
+  let [areYouSureModalOpen, setAreYouSureModalOpen] = useState(false);
 
   let { query: q } = useRouter();
 
@@ -297,13 +298,8 @@ const CardMoreOptionsMenu = (props: {
           <Divider />
         </div>{" "}
         <MenuItem
-          onClick={async () => {
-            action.start();
-
-            await mutate("deleteEntity", { entity: props.entityID });
-            props.onDelete?.();
-
-            action.end();
+          onClick={() => {
+            setAreYouSureModalOpen(true);
           }}
         >
           <p className="font-bold text-accent-red">Delete FOREVER</p>
@@ -312,7 +308,58 @@ const CardMoreOptionsMenu = (props: {
           </div>
         </MenuItem>
       </MenuContainer>
+    <AreYouSureModal
+      open={areYouSureModalOpen}
+      onClose={() => setAreYouSureModalOpen(false)}
+      onDelete={props.onDelete}
+      entityID={props.entityID}
+    />
     </Menu>
+  );
+};
+
+const AreYouSureModal = (props: {
+  open: boolean;
+  onClose: () => void;
+  onDelete?: () => void;
+  entityID: string;
+}) => {
+  let { mutate, action } = useMutations();
+  return (
+    <Modal open={props.open} onClose={props.onClose}>
+      <div className="flex flex-col gap-3 text-grey-35">
+        <div className="modal flex flex-col gap-3">
+            <p className="text-lg font-bold">Are you sure?</p>
+            <p className="text-sm">
+              This will delete this card and all of its contents. This cannot be
+              undone.
+            </p>
+            <div className="flex gap-4">
+              <button
+                className="flex-1 py-2 px-4 rounded-md bg-grey-20 hover:bg-grey-30"
+                onClick={() => {
+                props.onClose();
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                className="flex-1 py-2 px-4 rounded-md text-white bg-accent-red hover:bg-accent-red-hover"
+                onClick={async () => {
+                  action.start();
+
+                  await mutate("deleteEntity", { entity: props.entityID });
+                  props.onDelete?.();
+
+                  action.end();
+                }}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+      </div>
+    </Modal>
   );
 };
 
