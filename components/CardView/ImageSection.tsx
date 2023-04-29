@@ -4,6 +4,8 @@ import { spaceAPI } from "backend/lib/api";
 import { SectionImageAdd } from "components/Icons";
 import { useEffect, useRef, useState } from "react";
 import { DotLoader } from "components/DotLoader";
+import { LightBoxModal, Modal } from "../Layout"
+
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 
 export const MakeImage = (props: { entity: string }) => {
@@ -38,6 +40,7 @@ export const ImageSection = (props: { entityID: string }) => {
   let { mutate, authorized } = useMutations();
   let spaceID = useSpaceID();
   let image = useIndex.eav(props.entityID, "card/image");
+  let [lightBoxOpen, setLightBoxOpen] = useState(false);
   return (
     // FOCUS ON DIV AND PASTE AN IMAGE
     image ? (
@@ -49,6 +52,7 @@ export const ImageSection = (props: { entityID: string }) => {
               ? `${WORKER_URL}/static/${image.value.id}`
               : image.value.url
           }
+          onClick={() => {setLightBoxOpen(true)}}
         />
         {!authorized ? null : (
           <button
@@ -66,6 +70,23 @@ export const ImageSection = (props: { entityID: string }) => {
             remove
           </button>
         )}
+          {lightBoxOpen &&
+          <LightBoxModal open={lightBoxOpen} onClose={() => setLightBoxOpen(false)}>
+            <div className="relative">
+              <button
+                className="absolute top-0 right-0 text-grey-55 hover:text-accent-blue"
+                onClick={() => {
+                  setLightBoxOpen(false)
+                }}
+              >
+                close
+              </button>
+              <img
+                src={image.value.filetype === "image"
+                  ? `${WORKER_URL}/static/${image.value.id}`
+                  : image.value.url}/>
+            </div>
+          </LightBoxModal>}
       </div>
     ) : null
   );

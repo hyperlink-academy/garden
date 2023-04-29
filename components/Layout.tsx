@@ -55,6 +55,32 @@ export const Modal: React.FC<
   );
 };
 
+export const LightBoxModal: React.FC<
+  React.PropsWithChildren<{ open: boolean; onClose: () => void }>
+> = (props) => {
+  return (
+    <Dialog
+      open={props.open}
+      onClose={props.onClose}
+      className="fixed inset-0 z-10 overflow-y-hidden"
+    >
+      <Dialog.Overlay className="overlay" />
+      <FloatingContainer
+        className={`
+              fixed top-1/2 left-1/2 grid max-h-[calc(100%-100px)]
+              w-[calc(100%-50px)] -translate-x-1/2
+              -translate-y-1/2
+              grid-flow-row
+              gap-4
+              overflow-auto
+              `}
+      >
+        {props.children}
+      </FloatingContainer>
+    </Dialog>
+  );
+};
+
 export const MenuContainer: React.FC<
   React.PropsWithChildren<{ className?: string }>
 > = (props) => {
