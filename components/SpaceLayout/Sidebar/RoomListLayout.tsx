@@ -2,6 +2,8 @@ import { ButtonPrimary, ButtonTertiary } from "components/Buttons";
 import { Modal, Divider } from "components/Layout";
 import { Fact } from "data/Facts";
 import {
+  CollectionList as CollectionListIcon,
+  CollectionPreview as CollectionPreviewIcon,
   Delete,
   RoomCalendar,
   RoomCanvas,
@@ -45,6 +47,8 @@ export const EditRoomModal = (props: {
 
   let currentRoomDescription: Fact<"room/description"> | null = null;
   currentRoomDescription = useIndex.eav(props.currentRoom, "room/description");
+
+  let roomType = useIndex.eav(props.currentRoom, "room/type");
 
   let { mutate } = useMutations();
   let [nameState, setNameState] = useState(currentRoomName?.value || "");
@@ -96,6 +100,7 @@ export const EditRoomModal = (props: {
                 }}
               />
             </div>
+            {(roomType?.value === "collection") && <CollectionHeader entityID={entityID} />}
             <ButtonPrimary
               content="Edit Room"
               onClick={async () => {
@@ -193,6 +198,45 @@ const AreYouSureRoomDeletionModal = (props: {
         </div>
       </div>
     </Modal>
+  );
+};
+
+const CollectionHeader = (props: { entityID: string }) => {
+  let collectionType = useIndex.eav(props.entityID, "collection/type");
+  let { mutate, authorized } = useMutations();
+  if (!authorized) return null;
+  let type = collectionType?.value || "list";
+
+  const onClick = (value: Fact<"collection/type">["value"]) => () => {
+    mutate("assertFact", {
+      entity: props.entityID,
+      attribute: "collection/type",
+      value: value,
+      positions: {},
+    });
+  };
+  const className = (typeName: Fact<"collection/type">["value"]) =>
+    `p-0.5 text-grey-55 ${
+      type === typeName
+        ? "rounded-md border border-grey-55"
+        : "border border-transparent"
+    }`;
+
+  return (
+    <div className="collectionTypeSelector flex flex-row gap-0.5 place-self-start">
+      <button
+        className={`${className("list")} shrink-0`}
+        onClick={onClick("list")}
+      >
+        <CollectionListIcon />
+      </button>
+      <button
+        className={`${className("cardpreview")} shrink-0`}
+        onClick={onClick("cardpreview")}
+      >
+        <CollectionPreviewIcon />
+      </button>
+    </div>
   );
 };
 

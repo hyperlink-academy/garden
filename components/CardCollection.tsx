@@ -19,10 +19,6 @@ import { CardAdder } from "./CardStack";
 import { useCardViewer } from "./CardViewerContext";
 import { useCombinedRefs } from "./Desktop";
 import { useDraggableCard, useDroppableZone } from "./DragContext";
-import {
-  CollectionList as CollectionListIcon,
-  CollectionPreview as CollectionPreviewIcon,
-} from "./Icons";
 
 type Filter = { reaction: string; not: boolean };
 export const CardCollection = (props: {
@@ -51,7 +47,6 @@ export const CardCollection = (props: {
         ) : (
           <div /> //empty div annoying hack for CollectionHeader right alignment
         )}
-        <CollectionHeader entityID={props.entityID} />
       </div>
       <CollectionList
         attribute={props.attribute}
@@ -283,45 +278,6 @@ const CollectionList = (props: {
         addToEnd
         openOnAdd
       />
-    </div>
-  );
-};
-
-const CollectionHeader = (props: { entityID: string }) => {
-  let collectionType = useIndex.eav(props.entityID, "collection/type");
-  let { mutate, authorized } = useMutations();
-  if (!authorized) return null;
-  let type = collectionType?.value || "list";
-
-  const onClick = (value: Fact<"collection/type">["value"]) => () => {
-    mutate("assertFact", {
-      entity: props.entityID,
-      attribute: "collection/type",
-      value: value,
-      positions: {},
-    });
-  };
-  const className = (typeName: Fact<"collection/type">["value"]) =>
-    `p-0.5 text-grey-55 ${
-      type === typeName
-        ? "rounded-md border border-grey-55"
-        : "border border-transparent"
-    }`;
-
-  return (
-    <div className="collectionTypeSelector flex flex-row gap-0.5 place-self-start">
-      <button
-        className={`${className("list")} shrink-0`}
-        onClick={onClick("list")}
-      >
-        <CollectionListIcon />
-      </button>
-      <button
-        className={`${className("cardpreview")} shrink-0`}
-        onClick={onClick("cardpreview")}
-      >
-        <CollectionPreviewIcon />
-      </button>
     </div>
   );
 };
