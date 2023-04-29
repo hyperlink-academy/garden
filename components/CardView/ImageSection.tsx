@@ -81,14 +81,11 @@ export const ImageSection = (props: { entityID: string }) => {
               >
                 close
               </button>
-              <div>
-                <meta name="viewport" content="user-scalable=yes"></meta>
-                <img
-                  src={image.value.filetype === "image"
-                    ? `${WORKER_URL}/static/${image.value.id}`
-                    : image.value.url}
-                />
-              </div>
+              <img
+                src={image.value.filetype === "image"
+                  ? `${WORKER_URL}/static/${image.value.id}`
+                  : image.value.url}
+              />
             </div>
           </LightBoxModal>}
       </div>
