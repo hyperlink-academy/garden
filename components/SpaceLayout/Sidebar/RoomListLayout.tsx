@@ -55,7 +55,18 @@ export const EditRoomModal = (props: {
   let [descriptionState, setDescriptionState] = useState(
     currentRoomDescription?.value || ""
   );
-  let [areYouSureRoomDeletionModalOpen, setAreYouSureRoomDeletionModalOpen] = useState(false);
+  let [areYouSureRoomDeletionModalOpen, setAreYouSureRoomDeletionModalOpen] =
+    useState(false);
+  let currentCollectionType = useIndex.eav(
+    props.currentRoom,
+    "collection/type"
+  );
+  let [collectionType, setCollectionType] = useState(
+    currentCollectionType?.value
+  );
+  useEffect(() => {
+    setCollectionType(currentCollectionType?.value);
+  }, [currentCollectionType?.value]);
 
   useEffect(() => {
     setNameState(currentRoomName?.value || "");
@@ -100,7 +111,13 @@ export const EditRoomModal = (props: {
                 }}
               />
             </div>
-            {(roomType?.value === "collection") && <CollectionHeader entityID={entityID} />}
+            {roomType?.value === "collection" && (
+              <CollectionType
+                collectionType={collectionType}
+                setCollectionType={setCollectionType}
+                entityID={entityID}
+              />
+            )}
             <ButtonPrimary
               content="Edit Room"
               onClick={async () => {
@@ -115,6 +132,13 @@ export const EditRoomModal = (props: {
                   data: {
                     value: nameState,
                   },
+                });
+                await mutate("assertFact", {
+                  entity: props.currentRoom,
+                  factID: ulid(),
+                  attribute: "collection/type",
+                  value: collectionType || "list",
+                  positions: {},
                 });
                 await mutate("assertFact", {
                   entity: props.currentRoom,
@@ -141,13 +165,17 @@ export const EditRoomModal = (props: {
           </>
         )}
       </div>
-      { areYouSureRoomDeletionModalOpen && (
-      <AreYouSureRoomDeletionModal
-        open={areYouSureRoomDeletionModalOpen}
-        onClose={() => {setAreYouSureRoomDeletionModalOpen(false); props.onClose()}}
-        entityID={entityID}
-        currentRoomName={currentRoomName}
-      />)}
+      {areYouSureRoomDeletionModalOpen && (
+        <AreYouSureRoomDeletionModal
+          open={areYouSureRoomDeletionModalOpen}
+          onClose={() => {
+            setAreYouSureRoomDeletionModalOpen(false);
+            props.onClose();
+          }}
+          entityID={entityID}
+          currentRoomName={currentRoomName}
+        />
+      )}
     </Modal>
   );
 };
@@ -157,14 +185,10 @@ const AreYouSureRoomDeletionModal = (props: {
   onClose: () => void;
   onDelete?: () => void;
   entityID: string;
-  currentRoomName: Fact<"room/name"> | Fact<"member/name"> | null
+  currentRoomName: Fact<"room/name"> | Fact<"member/name"> | null;
 }) => {
   let { mutate } = useMutations();
-  let [nameState, setNameState] = useState(props.currentRoomName?.value || "");
 
-  useEffect(() => {
-    setNameState(props.currentRoomName?.value || "");
-  }, [props.currentRoomName?.value, props.open]);
   return (
     <Modal open={props.open} onClose={props.onClose}>
       <div className="flex flex-col gap-3 text-grey-35">
@@ -188,7 +212,6 @@ const AreYouSureRoomDeletionModal = (props: {
               destructive={true}
               onClick={async () => {
                 await mutate("deleteEntity", { entity: props.entityID });
-                setNameState("");
                 props.onClose();
               }}
             >
@@ -201,19 +224,17 @@ const AreYouSureRoomDeletionModal = (props: {
   );
 };
 
-const CollectionHeader = (props: { entityID: string }) => {
-  let collectionType = useIndex.eav(props.entityID, "collection/type");
-  let { mutate, authorized } = useMutations();
-  if (!authorized) return null;
-  let type = collectionType?.value || "list";
+const CollectionType = (props: {
+  entityID: string;
+  setCollectionType: (
+    value: Fact<"collection/type">["value"] | undefined
+  ) => void;
+  collectionType: Fact<"collection/type">["value"] | undefined;
+}) => {
+  let type = props.collectionType || "list";
 
   const onClick = (value: Fact<"collection/type">["value"]) => () => {
-    mutate("assertFact", {
-      entity: props.entityID,
-      attribute: "collection/type",
-      value: value,
-      positions: {},
-    });
+    props.setCollectionType(value);
   };
   const className = (typeName: Fact<"collection/type">["value"]) =>
     `p-0.5 text-grey-55 ${
