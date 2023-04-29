@@ -276,7 +276,7 @@ const CardMoreOptionsMenu = (props: {
 }) => {
   let { authorized, mutate, action } = useMutations();
   let memberName = useIndex.eav(props.entityID, "member/name");
-  let [areYouSureModalOpen, setAreYouSureModalOpen] = useState(false);
+  let [areYouSureCardDeletionModalOpen, setAreYouSureCardDeletionModalOpen] = useState(false);
 
   let { query: q } = useRouter();
 
@@ -303,7 +303,7 @@ const CardMoreOptionsMenu = (props: {
         </div>{" "}
         <MenuItem
           onClick={() => {
-            setAreYouSureModalOpen(true);
+            setAreYouSureCardDeletionModalOpen(true);
           }}
         >
           <p className="font-bold text-accent-red">Delete Card</p>
@@ -312,9 +312,9 @@ const CardMoreOptionsMenu = (props: {
           </div>
         </MenuItem>
       </MenuContainer>
-      <AreYouSureModal
-        open={areYouSureModalOpen}
-        onClose={() => setAreYouSureModalOpen(false)}
+      <AreYouSureCardDeletionModal
+        open={areYouSureCardDeletionModalOpen}
+        onClose={() => setAreYouSureCardDeletionModalOpen(false)}
         onDelete={props.onDelete}
         entityID={props.entityID}
       />
@@ -322,7 +322,7 @@ const CardMoreOptionsMenu = (props: {
   );
 };
 
-const AreYouSureModal = (props: {
+const AreYouSureCardDeletionModal = (props: {
   open: boolean;
   onClose: () => void;
   onDelete?: () => void;

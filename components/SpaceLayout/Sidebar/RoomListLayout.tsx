@@ -1,4 +1,4 @@
-import { ButtonPrimary } from "components/Buttons";
+import { ButtonPrimary, ButtonTertiary } from "components/Buttons";
 import { Modal, Divider } from "components/Layout";
 import { Fact } from "data/Facts";
 import {
@@ -51,6 +51,7 @@ export const EditRoomModal = (props: {
   let [descriptionState, setDescriptionState] = useState(
     currentRoomDescription?.value || ""
   );
+  let [areYouSureRoomDeletionModalOpen, setAreYouSureRoomDeletionModalOpen] = useState(false);
 
   useEffect(() => {
     setNameState(currentRoomName?.value || "");
@@ -125,10 +126,8 @@ export const EditRoomModal = (props: {
             {isMember ? null : (
               <ButtonPrimary
                 destructive
-                onClick={async () => {
-                  await mutate("deleteEntity", { entity: entityID });
-                  setNameState("");
-                  props.onClose();
+                onClick={() => {
+                  setAreYouSureRoomDeletionModalOpen(true);
                 }}
                 content="Delete Room"
                 icon={<Delete />}
@@ -136,6 +135,62 @@ export const EditRoomModal = (props: {
             )}
           </>
         )}
+      </div>
+      { areYouSureRoomDeletionModalOpen && (
+      <AreYouSureRoomDeletionModal
+        open={areYouSureRoomDeletionModalOpen}
+        onClose={() => {setAreYouSureRoomDeletionModalOpen(false); props.onClose()}}
+        entityID={entityID}
+        currentRoomName={currentRoomName}
+      />)}
+    </Modal>
+  );
+};
+
+const AreYouSureRoomDeletionModal = (props: {
+  open: boolean;
+  onClose: () => void;
+  onDelete?: () => void;
+  entityID: string;
+  currentRoomName: Fact<"room/name"> | Fact<"member/name"> | null
+}) => {
+  let { mutate } = useMutations();
+  let [nameState, setNameState] = useState(props.currentRoomName?.value || "");
+
+  useEffect(() => {
+    setNameState(props.currentRoomName?.value || "");
+  }, [props.currentRoomName?.value, props.open]);
+  return (
+    <Modal open={props.open} onClose={props.onClose}>
+      <div className="flex flex-col gap-3 text-grey-35">
+        <div className="modal flex flex-col gap-3">
+          <p className="text-lg font-bold">Are you sure?</p>
+          <p className="text-sm">
+            This will permanently delete the room and its contents.
+          </p>
+          <div className="flex justify-end gap-4">
+            <ButtonTertiary
+              content="Cancel"
+              onClick={() => {
+                props.onClose();
+              }}
+            >
+              Cancel
+            </ButtonTertiary>
+            <ButtonPrimary
+              content="Delete Room"
+              icon={<Delete />}
+              destructive={true}
+              onClick={async () => {
+                await mutate("deleteEntity", { entity: props.entityID });
+                setNameState("");
+                props.onClose();
+              }}
+            >
+              Delete
+            </ButtonPrimary>
+          </div>
+        </div>
       </div>
     </Modal>
   );
