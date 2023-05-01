@@ -21,12 +21,12 @@ export const RenderedText = forwardRef<
       let entity = await rep?.rep.query((tx) =>
         scanIndex(tx).ave("card/title", link.slice(2, -2))
       );
-      if (!entity || entity.value !== link) {
+      if (!entity || entity.value !== link.slice(2, -2)) {
         if (!authorized || !memberEntity) return;
         let entityID = ulid();
         await mutate("createCard", {
           entityID,
-          title: link.slice(2,-2),
+          title: link.slice(2, -2),
           memberEntity,
         });
 
