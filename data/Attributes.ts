@@ -90,6 +90,11 @@ export const DefaultAttributes = {
     unique: true,
     cardinality: "one",
   },
+  "card/inline-links-to": {
+    type: "reference",
+    unique: false,
+    cardinality: "many",
+  },
   "card/position-in": {
     type: "position",
     unique: false,

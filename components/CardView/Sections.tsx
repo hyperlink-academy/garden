@@ -1,13 +1,24 @@
 import { Textarea } from "components/Textarea";
 
 import { useIndex, useMutations } from "hooks/useReplicache";
-import { useRef, useState } from "react";
+import {
+  SyntheticEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { FilterAttributes } from "data/Attributes";
 import { useAuth } from "hooks/useAuth";
 import { CardCollection } from "components/CardCollection";
+import { Autocomplete, useSuggestions } from "components/Autocomplete";
+import { getCoordinatesInTextarea } from "src/getCoordinatesInTextarea";
+import { getLinkAtCursor } from "src/utils";
+import { modifyString, useKeyboardHandling } from "hooks/useKeyboardHandling";
 
 export const SingleTextSection = (
   props: {
+    autocompleteCardNames?: boolean;
     entityID: string;
     section: keyof FilterAttributes<{
       unique: any;
@@ -24,31 +35,195 @@ export const SingleTextSection = (
   let timeout = useRef<null | number>(null);
   let { authorized, mutate, action } = useMutations();
 
-  return (
-    <Textarea
-      {...props}
-      focused={props.focused}
-      previewOnly={props.previewOnly || !authorized}
-      placeholder={props.placeholder}
-      className={`w-full bg-inherit ${props.className || ""}`}
-      spellCheck={false}
-      value={(fact?.value as string) || ""}
-      onChange={async (e) => {
-        if (!timeout.current) action.start();
-        else clearTimeout(timeout.current);
-        timeout.current = window.setTimeout(() => {
-          timeout.current = null;
-          action.end();
-        }, 200);
+  let [cursorCoordinates, setCursorCoordinates] = useState<
+    undefined | { top: number; left: number; textIndex: number }
+  >();
+  let {
+    setSuggestionPrefix,
+    suggestionPrefix,
+    suggestions,
+    suggestionIndex,
+    close,
+    setSuggestionIndex,
+  } = useSuggestions({ disabled: !props.autocompleteCardNames });
 
-        await mutate("assertFact", {
-          entity: props.entityID,
-          attribute: props.section,
-          value: e.currentTarget.value,
-          positions: fact?.positions || {},
-        });
-      }}
-    />
+  const onSelect = useCallback(
+    (e: SyntheticEvent<HTMLTextAreaElement>) => {
+      let value = e.currentTarget.value,
+        start = e.currentTarget.selectionStart,
+        end = e.currentTarget.selectionEnd;
+      previousSelection.current = { start, end };
+      if (start !== end) return setCursorCoordinates(undefined);
+
+      let link = getLinkAtCursor(value, start);
+      if (!link) {
+        setSuggestionPrefix(undefined);
+        setCursorCoordinates(undefined);
+        close();
+        return;
+      }
+      let coordinates = getCoordinatesInTextarea(e.currentTarget, link.start);
+      let textareaPosition = e.currentTarget.getBoundingClientRect();
+      setCursorCoordinates({
+        textIndex: link.start,
+        top:
+          coordinates.top +
+          textareaPosition.top +
+          document.documentElement.scrollTop +
+          coordinates.height,
+        left: coordinates.left + textareaPosition.left,
+      });
+    },
+    [setCursorCoordinates]
+  );
+
+  let onKeyDown = useKeyboardHandling({
+    ...props,
+    suggestions,
+    suggestionIndex,
+    suggestionPrefix,
+    setSuggestionIndex,
+    cursorCoordinates,
+    close,
+  });
+
+  let textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  let previousSelection = useRef<null | { start: number; end: number }>();
+
+  return (
+    <>
+      {suggestionPrefix && cursorCoordinates && suggestions.length > 0 ? (
+        <Autocomplete
+          top={cursorCoordinates.top}
+          onClick={async (item) => {
+            if (!textareaRef.current || !suggestionPrefix) return;
+
+            let value = textareaRef.current.value,
+              start = textareaRef.current.selectionStart,
+              end = textareaRef.current.selectionEnd;
+
+            action.start();
+            let [newValue, cursors] = modifyString(
+              value,
+              [start, end],
+              (text) => {
+                if (!cursorCoordinates || !suggestionPrefix) return;
+                text.delete(
+                  cursorCoordinates.textIndex,
+                  suggestionPrefix.length
+                );
+                text.insert(cursorCoordinates.textIndex, item);
+              }
+            );
+
+            action.add({
+              undo: () => {
+                textareaRef.current?.setSelectionRange(start, end);
+              },
+              redo: () => {
+                textareaRef?.current?.setSelectionRange(cursors[0], cursors[1]);
+              },
+            });
+            await mutate("assertFact", {
+              entity: props.entityID,
+              attribute: props.section,
+              value: newValue,
+              positions: {},
+            });
+            textareaRef.current.setSelectionRange(
+              cursors[0] + 2 - suggestionPrefix.length,
+              cursors[1] + 2 - suggestionPrefix.length
+            );
+            action.end();
+          }}
+          left={cursorCoordinates.left}
+          selected={suggestionIndex}
+          suggestions={suggestions.map((s) => s.value)}
+          suggestionPrefix={suggestionPrefix}
+        />
+      ) : null}
+      <Textarea
+        {...props}
+        textareaRef={textareaRef}
+        onKeyDown={(e, ref) => {
+          props?.onKeyDown?.(e);
+          onKeyDown(e, ref);
+        }}
+        renderLinks={props.autocompleteCardNames}
+        focused={props.focused}
+        previewOnly={props.previewOnly || !authorized}
+        placeholder={props.placeholder}
+        className={`w-full bg-inherit ${props.className || ""}`}
+        spellCheck={false}
+        value={(fact?.value as string) || ""}
+        onSelect={onSelect}
+        onChange={async (e) => {
+          if (!timeout.current) action.start();
+          else clearTimeout(timeout.current);
+          timeout.current = window.setTimeout(() => {
+            timeout.current = null;
+            action.end();
+          }, 200);
+
+          let value = e.currentTarget.value,
+            start = e.currentTarget.selectionStart,
+            end = e.currentTarget.selectionEnd;
+          if (start !== end) return setCursorCoordinates(undefined);
+
+          let link = getLinkAtCursor(value, start);
+          setSuggestionPrefix(link?.value);
+          if (!link) {
+            setCursorCoordinates(undefined);
+            close();
+          }
+          if (link) {
+            let coordinates = getCoordinatesInTextarea(
+              e.currentTarget,
+              link.start
+            );
+
+            let textareaPosition = e.currentTarget.getBoundingClientRect();
+            setCursorCoordinates({
+              textIndex: link.start,
+              top:
+                coordinates.top +
+                textareaPosition.top +
+                document.documentElement.scrollTop +
+                coordinates.height,
+              left: coordinates.left + textareaPosition.left,
+            });
+          }
+
+          let previousStart = previousSelection.current?.start;
+          let previousEnd = previousSelection.current?.end;
+          action.add({
+            undo: () => {
+              textareaRef.current?.setSelectionRange(
+                previousStart || null,
+                previousEnd || null
+              );
+            },
+            redo: () => {
+              textareaRef.current?.setSelectionRange(start, end);
+            },
+          });
+          await mutate(
+            props.section === "card/content"
+              ? "updateContentFact"
+              : props.section === "card/title"
+              ? "updateTitleFact"
+              : "assertFact",
+            {
+              entity: props.entityID,
+              attribute: props.section,
+              value: value,
+              positions: fact?.positions || {},
+            }
+          );
+          previousSelection.current = { start, end };
+        }}
+      />
+    </>
   );
 };
 

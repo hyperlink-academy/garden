@@ -468,6 +468,7 @@ const DefaultTextSection = (props: { entityID: string }) => {
   let spaceID = useSpaceID();
   return (
     <SingleTextSection
+      autocompleteCardNames
       id="default-text-section"
       onPaste={async (e) => {
         if (!authToken || !spaceID) return;

@@ -6,7 +6,13 @@ export const Textarea = (
   props: {
     previewOnly?: boolean;
     focused?: boolean;
-  } & JSX.IntrinsicElements["textarea"]
+    renderLinks?: boolean;
+    textareaRef?: React.MutableRefObject<HTMLTextAreaElement | null>;
+    onKeyDown?(
+      e: React.KeyboardEvent<HTMLTextAreaElement>,
+      ref?: React.MutableRefObject<HTMLTextAreaElement | null>
+    ): void;
+  } & Omit<JSX.IntrinsicElements["textarea"], "onKeyDown">
 ) => {
   let textarea = useRef<HTMLTextAreaElement | null>(null);
   let previewElement = useRef<HTMLPreElement | null>(null);
@@ -88,9 +94,10 @@ export const Textarea = (
   return (
     <AutosizeTextarea
       {...newProps}
+      className={`dontundo ${props.className}`}
       onKeyDown={(e) => {
-        if (e.key === "Escape") e.currentTarget.blur();
-        props.onKeyDown?.(e);
+        props.onKeyDown?.(e, textarea);
+        if (e.key === "Escape" && !e.defaultPrevented) e.currentTarget.blur();
       }}
       onChange={async (e) => {
         if (!props.onChange) return;
@@ -104,7 +111,10 @@ export const Textarea = (
         setInitialCursor(null);
         props.onBlur?.(e);
       }}
-      ref={textarea}
+      ref={(node) => {
+        textarea.current = node;
+        if (props.textareaRef) props.textareaRef.current = node;
+      }}
     />
   );
 };

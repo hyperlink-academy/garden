@@ -208,6 +208,72 @@ const updateFact: Mutation<{
   await ctx.updateFact(args.id, args.data, args.undoAction);
 };
 
+const updateContentFact: Mutation<
+  Pick<Fact<"card/content">, "attribute" | "entity" | "value" | "positions">
+> = async (args, ctx) => {
+  let existingLinks = await Promise.all(
+    (
+      await ctx.scanIndex.eav(args.entity, "card/inline-links-to")
+    ).map(async (l) => ({
+      id: l.id,
+      title: await ctx.scanIndex.eav(l.value.value, "card/title"),
+    }))
+  );
+  let newLinks = [...args.value.matchAll(/\[\[([^\[\n\]]*)\]\]/g)];
+
+  let linkstoremove = existingLinks.filter(
+    (l) => !newLinks.find((n) => n[1] === l.title?.value)
+  );
+
+  let linkstoadd = newLinks.filter(
+    (n) => !existingLinks.find((l) => n[1] === l.title?.value)
+  );
+
+  for (let link of linkstoremove) {
+    await ctx.retractFact(link.id);
+  }
+  for (let link of linkstoadd) {
+    let title = link[1];
+    let entity = await ctx.scanIndex.ave("card/title", title);
+    if (!entity || entity.value !== title) continue;
+    await ctx.assertFact({
+      entity: args.entity,
+      attribute: "card/inline-links-to",
+      value: ref(entity.entity),
+      positions: {},
+    });
+  }
+  await ctx.assertFact(args);
+};
+
+const updateTitleFact: Mutation<{
+  attribute: "card/title";
+  entity: string;
+  value: string;
+}> = async (args, ctx) => {
+  let existingLinks = await ctx.scanIndex.vae(
+    args.entity,
+    "card/inline-links-to"
+  );
+  console.log(existingLinks);
+  let oldTitle = await ctx.scanIndex.eav(args.entity, "card/title");
+  if (!oldTitle) return;
+  for (let link of existingLinks) {
+    let content = await ctx.scanIndex.eav(link.entity, "card/content");
+    if (!content) continue;
+    await ctx.assertFact({
+      entity: link.entity,
+      attribute: "card/content",
+      value: content.value.replace(
+        `[[${oldTitle.value}]]`,
+        `[[${args.value}]]`
+      ),
+      positions: {},
+    });
+  }
+  await ctx.assertFact({ ...args, positions: {} });
+};
+
 const replyToDiscussion: Mutation<{
   discussion: string;
   message: Message;
@@ -301,6 +367,8 @@ export const Mutations = {
   deleteEntity,
   createCard,
   updatePositions,
+  updateContentFact,
+  updateTitleFact,
   addCardToSection,
   replyToDiscussion,
   assertFact,
