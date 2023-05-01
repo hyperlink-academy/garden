@@ -98,6 +98,8 @@ const removeCardFromDesktopOrCollection: Mutation<{
     await Promise.all(
       facts.concat(references).map((f) => ctx.retractFact(f.id))
     );
+  } else {
+    if (args.factID) await ctx.retractFact(args.factID);
   }
   if (args.factID) {
     let position = await ctx.scanIndex.eav(args.factID, "card/position-in");
