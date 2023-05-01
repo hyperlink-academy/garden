@@ -2,9 +2,9 @@ import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
 import { useAuth } from "hooks/useAuth";
 import { spaceAPI } from "backend/lib/api";
 import { SectionImageAdd } from "components/Icons";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { DotLoader } from "components/DotLoader";
-import { LightBoxModal, Modal } from "../Layout";
+import { LightBoxModal } from "../Layout";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 
