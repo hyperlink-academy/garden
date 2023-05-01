@@ -184,6 +184,48 @@ export const useKeyboardHandling = (deps: {
 
           break;
         }
+        case "i": {
+          if (!e.ctrlKey) break;
+          if (start !== end) {
+            transact((text) => {
+              text.insert(start, "*");
+              text.insert(end + 1, "*");
+            });
+            //React seems to change the selection state if you set the value to something the current value is not
+          }
+          break;
+        }
+        case "b": {
+          if (!e.ctrlKey) break;
+          if (start !== end) {
+            transact((text) => {
+              text.insert(start, "**");
+              text.insert(end + 2, "**");
+            });
+            //React seems to change the selection state if you set the value to something the current value is not
+          }
+          break;
+        }
+        case "*": {
+          if (e.ctrlKey || e.altKey) break;
+          e.preventDefault();
+          if (start !== end) {
+            transact((text) => {
+              text.insert(start, "*");
+              text.insert(end + 1, "*");
+            });
+            //React seems to change the selection state if you set the value to something the current value is not
+          } else {
+            if (e.currentTarget.value[start] === "*") {
+              e.preventDefault();
+              ref?.current?.setSelectionRange(start + 1, start + 1);
+            } else
+              transact((text) => {
+                text.insert(start, "**");
+              }, 1);
+          }
+          break;
+        }
         case "[": {
           if (e.ctrlKey || e.altKey) break;
           e.preventDefault();
