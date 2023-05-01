@@ -79,6 +79,32 @@ const addCardToDesktop: Mutation<{
     positions: {},
   });
 };
+
+const removeCardFromDesktopOrCollection: Mutation<{
+  factID?: string;
+  entityID: string;
+}> = async (args, ctx) => {
+  let references = await ctx.scanIndex.vae(args.entityID);
+  let facts = await ctx.scanIndex.eav(args.entityID, null);
+  let deleteable = facts.reduce((acc, f) => {
+    return (
+      acc &&
+      (!f.value ||
+        f.attribute === "card/created-by" ||
+        f.attribute === "card/unread-by")
+    );
+  }, true);
+  if (deleteable && references.length === 1) {
+    await Promise.all(
+      facts.concat(references).map((f) => ctx.retractFact(f.id))
+    );
+  }
+  if (args.factID) {
+    let position = await ctx.scanIndex.eav(args.factID, "card/position-in");
+    if (position) await ctx.retractFact(position.id);
+  }
+};
+
 const updatePositionInDesktop: Mutation<{
   parent: string;
   factID: string;
@@ -375,6 +401,7 @@ export const Mutations = {
   retractFact,
   updateFact,
   updatePositionInDesktop,
+  removeCardFromDesktopOrCollection,
   addCardToDesktop,
   addReaction,
 };

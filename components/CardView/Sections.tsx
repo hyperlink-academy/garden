@@ -1,13 +1,7 @@
 import { Textarea } from "components/Textarea";
 
 import { useIndex, useMutations } from "hooks/useReplicache";
-import {
-  SyntheticEvent,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { SyntheticEvent, useCallback, useRef, useState } from "react";
 import { FilterAttributes } from "data/Attributes";
 import { useAuth } from "hooks/useAuth";
 import { CardCollection } from "components/CardCollection";

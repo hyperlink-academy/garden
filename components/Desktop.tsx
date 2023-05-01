@@ -296,7 +296,10 @@ const DraggableCard = (props: {
                 });
               }}
               onDelete={() => {
-                mutate("retractFact", { id: props.relationshipID });
+                mutate("removeCardFromDesktopOrCollection", {
+                  factID: props.relationshipID,
+                  entityID: props.entityID,
+                });
                 close({ entityID: props.entityID });
               }}
               dragHandleProps={{ listeners, attributes }}
