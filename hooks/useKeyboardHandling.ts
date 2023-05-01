@@ -86,7 +86,7 @@ export const useKeyboardHandling = (deps: {
         case "Enter": {
           if (suggestions.length > 0 && !!cursorCoordinates) {
             e.preventDefault();
-            let value = suggestions[suggestionIndex];
+            let value = suggestions[suggestionIndex] || suggestions[0];
             if (!value) break;
             // TODO write the text!
             if (!suggestionPrefix) break;
@@ -103,6 +103,19 @@ export const useKeyboardHandling = (deps: {
               true
             );
             close();
+            break;
+          }
+          break;
+        }
+        case "Tab": {
+          if (suggestions.length > 0 && !!cursorCoordinates) {
+            e.preventDefault();
+            if (e.shiftKey) {
+              if (suggestionIndex > 0) setSuggestionIndex((i) => i - 1);
+            } else {
+              if (suggestionIndex < suggestions.length - 1)
+                setSuggestionIndex((i) => i + 1);
+            }
             break;
           }
           break;
