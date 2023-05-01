@@ -6,7 +6,6 @@ import {
   Member,
   CalendarMedium,
   CardAdd,
-  Send,
   ReactionAdd,
 } from "components/Icons";
 import { Divider, MenuContainer, MenuItem, Modal } from "components/Layout";
@@ -26,15 +25,9 @@ import { MakeImage, ImageSection } from "./ImageSection";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
 import { AddExistingCard } from "components/CardStack";
-import {
-  ButtonPrimary,
-  ButtonSecondary,
-  ButtonTertiary,
-} from "components/Buttons";
+import { ButtonPrimary, ButtonTertiary } from "components/Buttons";
 import { Discussion } from "./Discussion";
 import { ulid } from "src/ulid";
-import { animated, useSpring } from "@react-spring/web";
-import { RenderedText } from "components/Textarea/RenderedText";
 import { AddReaction, Reactions } from "./Reactions";
 import { useDroppableZone } from "components/DragContext";
 import { sortByPosition } from "src/position_helpers";
@@ -44,7 +37,6 @@ import { Fact } from "data/Facts";
 import { getAndUploadFile } from "src/getAndUploadFile";
 import { useReactions } from "hooks/useReactions";
 
-const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 const borderStyles = (args: { member: boolean }) => {
   switch (true) {
     //styles can be found is global.css
@@ -237,7 +229,16 @@ export const CardContent = (props: {
       {/* END CARD CONTENT */}
       {/* <Divider /> */}
       {/* START CARD DISCUSSION + REACTIONS */}
-      <div className="flex flex-1 flex-col justify-end gap-4">
+      <div
+        className="flex flex-1 flex-col justify-end gap-4"
+        onClick={(e) => {
+          console.log(e.currentTarget);
+          console.log(e.target);
+          if (e.target !== e.currentTarget) return;
+          let element = document.getElementById("default-text-section");
+          element?.focus();
+        }}
+      >
         <Reactions entityID={props.entityID} />
         <Discussion entityID={props.entityID} allowReact isRoom={false} />
       </div>
