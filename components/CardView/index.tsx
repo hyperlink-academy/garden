@@ -7,6 +7,7 @@ import {
   CalendarMedium,
   CardAdd,
   Send,
+  ReactionAdd,
 } from "components/Icons";
 import { Divider, MenuContainer, MenuItem, Modal } from "components/Layout";
 import {
@@ -34,13 +35,14 @@ import { Discussion } from "./Discussion";
 import { ulid } from "src/ulid";
 import { animated, useSpring } from "@react-spring/web";
 import { RenderedText } from "components/Textarea/RenderedText";
-import { Reactions } from "./Reactions";
+import { AddReaction, Reactions } from "./Reactions";
 import { useDroppableZone } from "components/DragContext";
 import { sortByPosition } from "src/position_helpers";
 import { generateKeyBetween } from "src/fractional-indexing";
 import { useUndoableState } from "hooks/useUndoableState";
 import { Fact } from "data/Facts";
 import { getAndUploadFile } from "src/getAndUploadFile";
+import { useReactions } from "hooks/useReactions";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 const borderStyles = (args: { member: boolean }) => {
@@ -276,7 +278,8 @@ const CardMoreOptionsMenu = (props: {
 }) => {
   let { authorized, mutate, action } = useMutations();
   let memberName = useIndex.eav(props.entityID, "member/name");
-  let [areYouSureCardDeletionModalOpen, setAreYouSureCardDeletionModalOpen] = useState(false);
+  let [areYouSureCardDeletionModalOpen, setAreYouSureCardDeletionModalOpen] =
+    useState(false);
 
   let { query: q } = useRouter();
 
@@ -493,10 +496,10 @@ const DefaultTextSection = (props: { entityID: string }) => {
 };
 
 export const SectionAdder = (props: { entityID: string }) => {
-  let { mutate, authorized } = useMutations();
-  let date = useIndex.eav(props.entityID, "card/date");
+  let { authorized } = useMutations();
   let [open, setOpen] = useState(false);
   let attachedCards = useIndex.eav(props.entityID, "deck/contains");
+  let reactions = useReactions(props.entityID);
 
   if (!authorized) return null;
   return (
@@ -515,7 +518,19 @@ export const SectionAdder = (props: { entityID: string }) => {
             </div>
           </AddExistingCard>
         )}
+
+        {reactions.length === 0 && (
+          <button
+            className="text-grey-55 hover:text-accent-blue"
+            onClick={() => setOpen(!open)}
+          >
+            <ReactionAdd />
+          </button>
+        )}
       </div>
+      {open && authorized && (
+        <AddReaction entityID={props.entityID} close={() => setOpen(false)} />
+      )}
     </div>
   );
 };
