@@ -9,7 +9,7 @@ import {
   useSpaceID,
 } from "hooks/useReplicache";
 import { useSubscribe } from "hooks/useSubscribe";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { generateKeyBetween } from "src/fractional-indexing";
 import { getAndUploadFile } from "src/getAndUploadFile";
 import { sortByPosition, updatePositions } from "src/position_helpers";
@@ -27,6 +27,21 @@ export const CardCollection = (props: {
   attribute: "desktop/contains" | "deck/contains";
 }) => {
   let [filters, setFilters] = useState<Filter[]>([]);
+  let filterString = window.localStorage.getItem(`cardCollectionFilters-${props.entityID}`);
+  // set filter values based on local storage
+  useEffect(() => {
+    if (filterString) {
+      setFilters(JSON.parse(filterString));
+    }
+  }, []);
+  // save filter values to local storage every time the filters state is updated
+  useEffect(() => {
+    window.localStorage.setItem(
+      `cardCollectionFilters-${props.entityID}`,
+      JSON.stringify(filters)
+    );
+  }, [filters]);
+
   let cards = useCards(props.entityID, props.attribute);
   let reactions = cards.reduce((acc, card) => {
     for (let reaction of card.reactions) {
