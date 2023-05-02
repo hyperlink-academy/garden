@@ -19,20 +19,33 @@ import { CardAdder } from "./CardStack";
 import { useCardViewer } from "./CardViewerContext";
 import { useCombinedRefs } from "./Desktop";
 import { useDraggableCard, useDroppableZone } from "./DragContext";
+import * as z from "zod";
 
-type Filter = { reaction: string; not: boolean };
+let FilterVerifier = z.array(
+  z.object({
+    reaction: z.string(),
+    not: z.boolean(),
+  })
+);
+type Filters = z.TypeOf<typeof FilterVerifier>;
+
 export const CardCollection = (props: {
   filterable?: boolean;
   entityID: string;
   attribute: "desktop/contains" | "deck/contains";
 }) => {
-  let [filters, setFilters] = useState<Filter[]>([]);
-  let filterString = window.localStorage.getItem(`cardCollectionFilters-${props.entityID}`);
+  let [filters, setFilters] = useState<Filters>([]);
   // set filter values based on local storage
   useEffect(() => {
-    if (filterString) {
-      setFilters(JSON.parse(filterString));
-    }
+    try {
+      let filterString = window.localStorage.getItem(
+        `cardCollectionFilters-${props.entityID}`
+      );
+      if (filterString) {
+        let parsed = FilterVerifier.safeParse(JSON.parse(filterString));
+        if (parsed.success) setFilters(parsed.data);
+      }
+    } catch (e) {}
   }, []);
   // save filter values to local storage every time the filters state is updated
   useEffect(() => {
@@ -83,8 +96,8 @@ export const CardCollection = (props: {
 
 function FilterByReactions(props: {
   reactions: string[];
-  filters: Filter[];
-  setFilters: (f: (old: Filter[]) => Filter[]) => void;
+  filters: Filters;
+  setFilters: (f: (old: Filters) => Filters) => void;
 }) {
   return (
     <div className="flex flex-row flex-wrap gap-2">
