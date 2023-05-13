@@ -287,6 +287,7 @@ const CreateSpaceForm = ({
           <textarea
             className="!important box-border min-h-[90px] w-full rounded-md border border-grey-55 bg-white p-2"
             placeholder=""
+            maxLength={256}
             value={formState.description}
             onChange={(e) => {
               let value = e.currentTarget.value;
@@ -296,6 +297,9 @@ const CreateSpaceForm = ({
               }));
             }}
           />
+          <div className="text-xs italic">
+            {formState.description.length}/256
+          </div>
         </div>
 
         {/* date section */}
