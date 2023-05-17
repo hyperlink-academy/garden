@@ -74,7 +74,6 @@ export const MessageInput = (props: {
   let { mutate, memberEntity, authorized } = useMutations();
   let replyMessage = useIndex.messageByID(props.reply);
   let reactions = useReactions(props.entityID);
-  let containerRef = useRef<null | HTMLDivElement>(null);
 
   if (!authorized) return null;
   const send = async () => {
@@ -140,12 +139,7 @@ export const MessageInput = (props: {
           <div className="z-10 flex w-full items-end gap-1 rounded-md border border-grey-80 bg-white p-1 text-base">
             <AutosizeTextarea
               onKeyDown={(e) => {
-                if (
-                  (e.key === "Enter" && e.ctrlKey) ||
-                  (e.key === "Enter" && e.metaKey)
-                ) {
-                  send();
-                }
+                if (!e.shiftKey && e.key === "Enter") send();
               }}
               onFocus={() => setMode("focused")}
               onBlur={() => setMode("normal")}
