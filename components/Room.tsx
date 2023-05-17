@@ -87,8 +87,8 @@ function RoomHeader(props: { entityID: string | null }) {
 
   return (
     <>
-      <div className="sticky top-0 z-10" ref={titleRef}>
-        <div className="flex justify-between bg-background text-lg font-bold text-grey-35">
+      <div className="sticky top-0 z-10 bg-background" ref={titleRef}>
+        <div className="flex justify-between text-lg font-bold text-grey-35">
           <p
             className={
               !isRoomDescriptionVisible ? "mb-2 cursor-pointer" : "mb-2"
@@ -97,37 +97,39 @@ function RoomHeader(props: { entityID: string | null }) {
           >
             {roomName?.value}
           </p>
-          {isRoomDescriptionVisible || !isToggleableRoomDescriptionHidden ? (
-            <RoomOptions entityID={props.entityID} />
-          ) : (
-            <button
-              onClick={() =>
-                descriptionRef?.current?.scrollIntoView({
-                  behavior: "smooth",
-                  block: "end",
-                })
-              }
-            >
-              <GoToTop />
-            </button>
-          )}
+          <div className="roomButtonWrapper mt-[2px]">
+            {isRoomDescriptionVisible || !isToggleableRoomDescriptionHidden ? (
+              <RoomOptions entityID={props.entityID} />
+            ) : (
+              <button
+                onClick={() =>
+                  descriptionRef?.current?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "end",
+                  })
+                }
+              >
+                <GoToTop />
+              </button>
+            )}
+          </div>
         </div>
 
         {!isRoomDescriptionVisible && !isToggleableRoomDescriptionHidden && (
-          <div id="roomDescription2" className="-mt-0 bg-background">
+          <div id="roomDescription2" className="-mt-1 pb-2">
             <RenderedText
               style={{
                 whiteSpace: "pre-wrap",
                 fontFamily: "inherit",
                 width: "100%",
               }}
-              className="mb-2 text-sm text-grey-35"
+              className="pb-1 text-sm text-grey-35"
               text={roomDescription?.value || ""}
             />
           </div>
         )}
       </div>
-      <div id="roomDescription" className="-mt-2" ref={descriptionRef}>
+      <div id="roomDescription" className="-mt-2 pb-2" ref={descriptionRef}>
         <RenderedText
           className="text-sm text-grey-35"
           id="roomDescriptionY"
