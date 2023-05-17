@@ -39,8 +39,8 @@ export const useKeyboardHandling = (deps: {
         end = e.currentTarget.selectionEnd;
       let transact = async (
         transaction: Transaction,
-        offset: number = 0,
-        undo?: boolean
+        offset: [number, number] | number = [0, 0],
+        undo: boolean = true
       ) => {
         if (undo) action.start();
         let [newValue, cursors] = modifyString(
@@ -48,17 +48,24 @@ export const useKeyboardHandling = (deps: {
           [start, end],
           transaction
         );
+        let offsets: [number, number];
+        if (typeof offset === "number") offsets = [offset, offset];
+        else offsets = offset;
 
         if (undo)
           action.add({
             undo: () => {
-              ref?.current?.setSelectionRange(start, end);
+              setTimeout(() => {
+                ref?.current?.setSelectionRange(start, end);
+              }, 10);
             },
             redo: () => {
-              ref?.current?.setSelectionRange(
-                cursors[0] + offset,
-                cursors[1] + offset
-              );
+              setTimeout(() => {
+                ref?.current?.setSelectionRange(
+                  cursors[0] + offsets[0],
+                  cursors[1] + offsets[1]
+                );
+              }, 10);
             },
           });
         await mutate("assertFact", {
@@ -67,10 +74,12 @@ export const useKeyboardHandling = (deps: {
           value: newValue,
           positions: {},
         });
-        ref?.current?.setSelectionRange(
-          cursors[0] + offset,
-          cursors[1] + offset
-        );
+        setTimeout(() => {
+          ref?.current?.setSelectionRange(
+            cursors[0] + offsets[0],
+            cursors[1] + offsets[1]
+          );
+        }, 10);
         if (undo) action.end();
       };
 
@@ -191,38 +200,19 @@ export const useKeyboardHandling = (deps: {
               text.insert(start, "*");
               text.insert(end + 1, "*");
             });
-            //React seems to change the selection state if you set the value to something the current value is not
           }
           break;
         }
         case "b": {
           if (!e.ctrlKey) break;
           if (start !== end) {
-            transact((text) => {
-              text.insert(start, "**");
-              text.insert(end + 2, "**");
-            });
-            //React seems to change the selection state if you set the value to something the current value is not
-          }
-          break;
-        }
-        case "*": {
-          if (e.ctrlKey || e.altKey) break;
-          e.preventDefault();
-          if (start !== end) {
-            transact((text) => {
-              text.insert(start, "*");
-              text.insert(end + 1, "*");
-            });
-            //React seems to change the selection state if you set the value to something the current value is not
-          } else {
-            if (e.currentTarget.value[start] === "*") {
-              e.preventDefault();
-              ref?.current?.setSelectionRange(start + 1, start + 1);
-            } else
-              transact((text) => {
+            transact(
+              (text) => {
                 text.insert(start, "**");
-              }, 1);
+                text.insert(end + 2, "**");
+              },
+              [0, 2]
+            );
           }
           break;
         }
@@ -234,7 +224,6 @@ export const useKeyboardHandling = (deps: {
               text.insert(start, "[");
               text.insert(end + 1, "]");
             });
-            //React seems to change the selection state if you set the value to something the current value is not
           } else {
             transact((text) => {
               text.insert(start, "[]");

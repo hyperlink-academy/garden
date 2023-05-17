@@ -17,6 +17,13 @@ export const Textarea = (
   let textarea = useRef<HTMLTextAreaElement | null>(null);
   let previewElement = useRef<HTMLPreElement | null>(null);
   let ignoreFocus = useRef(false);
+  let [intermediateState, setIntermediateState] = useState(
+    props.value as string
+  );
+
+  useEffect(() => {
+    setIntermediateState(props.value as string);
+  }, [props.value]);
 
   let [initialCursor, setInitialCursor] = useState<[number, number] | null>(
     null
@@ -94,6 +101,7 @@ export const Textarea = (
   return (
     <AutosizeTextarea
       {...newProps}
+      value={intermediateState}
       className={`dontundo ${props.className}`}
       onKeyDown={(e) => {
         props.onKeyDown?.(e, textarea);
@@ -101,10 +109,8 @@ export const Textarea = (
       }}
       onChange={async (e) => {
         if (!props.onChange) return;
-        let start = e.currentTarget.selectionStart,
-          end = e.currentTarget.selectionEnd;
+        setIntermediateState(e.currentTarget.value);
         await Promise.all([props.onChange(e)]);
-        textarea.current?.setSelectionRange(start, end);
       }}
       onBlur={(e) => {
         setFocused(false);
