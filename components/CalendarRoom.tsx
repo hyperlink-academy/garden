@@ -98,7 +98,15 @@ export function CalendarRoom() {
             <p>Schedule cards on the calendar 📅</p>
             <p>To get started, set start & end dates for the space!</p>
           </div>
-        ) : null}
+        ) : (
+          // empty calendar - non-auth view
+          <div className="flex flex-col gap-4 italic text-grey-35">
+            <p>
+              This Space is not yet scheduled — once dates are set, its calendar
+              will show here 📅 ✨
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
