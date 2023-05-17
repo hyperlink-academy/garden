@@ -2,21 +2,23 @@ import Link from "next/link";
 
 import { Divider, Modal } from "components/Layout";
 import { useAuth } from "hooks/useAuth";
-import { useIndex, useMutations } from "hooks/useReplicache";
+import { useIndex } from "hooks/useReplicache";
 import React, { Fragment, useState } from "react";
 import {
   BackToStudio as BackToStudioIcon,
   Information,
   MoreOptionsSmall,
+  RoomCalendar,
+  RoomSearch,
 } from "../../Icons";
 import { EditSpaceModal } from "components/CreateSpace";
 import { getCurrentDate } from "src/utils";
 import { useRouter } from "next/router";
-import { RoomListItem, EditRoomModal } from "./RoomListLayout";
+import { EditRoomModal } from "./RoomListLayout";
 import { SharedRoomList } from "./SharedRoomList";
 import { MemberRoomList } from "./MemberRoomList";
 import { Popover } from "@headlessui/react";
-import { ButtonLink, ButtonPrimary, ButtonSecondary } from "components/Buttons";
+import { ButtonPrimary } from "components/Buttons";
 import { LogInModal } from "components/LoginModal";
 
 export const Sidebar = (props: {
@@ -31,21 +33,28 @@ export const Sidebar = (props: {
       <div className="no-scrollbar flex h-full w-full flex-col gap-4 overflow-y-scroll">
         <SpaceName />
         <Divider />
-        <div className="flex flex-col gap-0.5">
-          <RoomListItem
-            onRoomChange={props.onRoomChange}
-            currentRoom={props.currentRoom}
-            roomEntity={"search"}
+        <div className="flex flex-row content-between gap-2 pl-2">
+          <button
+            className={`flex  w-full justify-center rounded-md border border-grey-80 p-1 ${
+              props.currentRoom === "search"
+                ? "rounded-md bg-accent-blue font-bold text-white"
+                : " text-grey-35 hover:bg-grey-90"
+            }`}
+            onClick={() => props.onRoomChange("search")}
           >
-            Search
-          </RoomListItem>
-          <RoomListItem
-            onRoomChange={props.onRoomChange}
-            currentRoom={props.currentRoom}
-            roomEntity={"calendar"}
+            <RoomSearch />
+          </button>
+
+          <button
+            className={`flex  w-full justify-center rounded-md border border-grey-80 p-1 ${
+              props.currentRoom === "calendar"
+                ? "rounded-md bg-accent-blue font-bold text-white"
+                : " text-grey-35 hover:bg-grey-90"
+            }`}
+            onClick={() => props.onRoomChange("calendar")}
           >
-            Calendar
-          </RoomListItem>
+            <RoomCalendar />
+          </button>
         </div>
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">

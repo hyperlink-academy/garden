@@ -139,7 +139,10 @@ export const MessageInput = (props: {
           <div className="z-10 flex w-full items-end gap-1 rounded-md border border-grey-80 bg-white p-1 text-base">
             <AutosizeTextarea
               onKeyDown={(e) => {
-                if (!e.shiftKey && e.key === "Enter") send();
+                if (!e.shiftKey && e.key === "Enter") {
+                  e.preventDefault();
+                  send();
+                }
               }}
               onFocus={() => setMode("focused")}
               onBlur={() => setMode("normal")}
