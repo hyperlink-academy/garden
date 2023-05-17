@@ -156,7 +156,7 @@ function RoomOptions(props: { entityID: string | null }) {
     <>
       <button
         onClick={() => setIsRoomEditOpen(true)}
-        className={` rounded-md border border-transparent pt-[1px] hover:border-white`}
+        className={` flex rounded-md border border-transparent pt-[4px] align-top hover:border-white`}
       >
         <MoreOptionsTiny />
       </button>
