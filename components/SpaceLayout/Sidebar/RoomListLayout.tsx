@@ -321,30 +321,28 @@ export const RoomListItem = (props: {
             : undefined
         }
       >
-        {authorized && (
-          <div
-            className={` roomListItemIcon mt-[2px] h-5 w-5 shrink-0 pt-[1px] pl-[2px]
+        <div
+          className={` roomListItemIcon mt-[2px] h-5 w-5 shrink-0 pt-[1px] pl-[2px]
              ${
                props.roomEntity === props.currentRoom
                  ? "text-white"
                  : "text-grey-55"
              }`}
-          >
-            {props.roomEntity === memberEntity || isMember ? (
-              <RoomMember />
-            ) : roomType?.value === "collection" ? (
-              <RoomCollection />
-            ) : roomType?.value === "canvas" ? (
-              <RoomCanvas />
-            ) : roomType?.value === "chat" ? (
-              <RoomChat />
-            ) : props.roomEntity === "search" ? (
-              <RoomSearch />
-            ) : props.roomEntity === "calendar" ? (
-              <RoomCalendar />
-            ) : null}
-          </div>
-        )}
+        >
+          {props.roomEntity === memberEntity || isMember ? (
+            <RoomMember />
+          ) : roomType?.value === "collection" ? (
+            <RoomCollection />
+          ) : roomType?.value === "canvas" ? (
+            <RoomCanvas />
+          ) : roomType?.value === "chat" ? (
+            <RoomChat />
+          ) : props.roomEntity === "search" ? (
+            <RoomSearch />
+          ) : props.roomEntity === "calendar" ? (
+            <RoomCalendar />
+          ) : null}
+        </div>
         <div className="roomListItemUnreads grow">{props.children}</div>
         {unreadCount && (
           <div className="unreadCount mt-[6px] ml-1 h-[12px] w-[12px] shrink-0 rounded-full border  border-white bg-accent-gold"></div>
