@@ -297,9 +297,10 @@ export const Messages = (props: {
   let { authorized } = useMutations();
   // no empty state placeholder if it's a chat room
   if (props.isRoom === false && messages.length == 0) return null;
+
   return (
     <div
-      className="flex flex-1 flex-col justify-end gap-6"
+      className="flex flex-1 flex-col justify-end"
       style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
     >
       {messages.length == 0 && authorized ? (
@@ -308,8 +309,13 @@ export const Messages = (props: {
           <p>Still quiet…start the conversation 🌱</p>
         </div>
       ) : null}
-      {messages.map((m) => (
+      {messages.map((m, index) => (
         <Message
+          multipleFromSameAuthor={
+            index > 0 &&
+            m.sender === messages[index - 1].sender &&
+            parseInt(m.ts) - parseInt(messages[index - 1].ts) < 1000 * 60 * 3
+          }
           author={m.sender}
           date={m.ts}
           content={m.content}
@@ -325,6 +331,7 @@ export const Messages = (props: {
 };
 
 const Message = (props: {
+  multipleFromSameAuthor: boolean;
   content: string;
   author: string;
   date: string;
@@ -344,32 +351,38 @@ const Message = (props: {
     "message/attached-card"
   );
   return (
-    <div className="flex flex-col gap-0">
-      <div className="flex justify-between gap-2 text-grey-55">
-        <div className="flex gap-2">
-          <small className="font-bold">{memberName?.value}</small>
-          <span className="self-center text-xs">
-            {time.toLocaleDateString(undefined, {
-              month: "short",
-              day: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
-          </span>
+    <div
+      className={`flex flex-col gap-0 ${
+        !props.multipleFromSameAuthor ? "pt-6" : "pt-1"
+      }`}
+    >
+      {!props.multipleFromSameAuthor && (
+        <div className="flex justify-between gap-2 text-grey-55">
+          <div className="flex gap-2">
+            <small className="font-bold">{memberName?.value}</small>
+            <span className="self-center text-xs">
+              {time.toLocaleDateString(undefined, {
+                month: "short",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </span>
+          </div>
+          {authorized ? (
+            <span className="text-xs">
+              <button
+                onClick={() => {
+                  props.setReply(props.id);
+                  document.getElementById("messageInput")?.focus();
+                }}
+              >
+                reply
+              </button>
+            </span>
+          ) : null}
         </div>
-        {authorized ? (
-          <span className="text-xs">
-            <button
-              onClick={() => {
-                props.setReply(props.id);
-                document.getElementById("messageInput")?.focus();
-              }}
-            >
-              reply
-            </button>
-          </span>
-        ) : null}
-      </div>
+      )}
 
       {replyMessage && (
         <div className="my-1 rounded-md border-l-4 border-accent-blue bg-bg-blue p-2">
