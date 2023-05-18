@@ -199,9 +199,10 @@ export const HoverControls = (
 
       {/* Rotate and Resize Handle */}
 
-      {authorized && !props.outerControls ? null : props.onDelete ||
-        props.onResize ||
-        props.onRotateDrag ? (
+      {authorized && !props.outerControls ? null : (authorized &&
+          props.onDelete) ||
+        (authorized && props.onResize) ||
+        (authorized && props.onRotateDrag) ? (
         <div className="z-50 flex flex-col justify-between gap-1 pb-1 text-grey-80 opacity-0 group-hover:opacity-100">
           {authorized && props.onDelete ? (
             <button
@@ -244,7 +245,9 @@ export const HoverControls = (
             )}
           </div>
         </div>
-      ) : (
+      ) : props.size == "big" ? null : (
+        // spacer for small card only, to maintain consistent size
+        // NOT for big card e.g. in collection, so card spans full width
         <div className="w-[12px]"> </div>
       )}
       {/* End Rotate and Resize Handle */}
