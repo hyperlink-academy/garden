@@ -194,7 +194,7 @@ export const useKeyboardHandling = (deps: {
           break;
         }
         case "i": {
-          if (!e.ctrlKey) break;
+          if (!(e.ctrlKey || e.metaKey)) break;
           if (start !== end) {
             transact((text) => {
               text.insert(start, "*");
@@ -204,7 +204,7 @@ export const useKeyboardHandling = (deps: {
           break;
         }
         case "b": {
-          if (!e.ctrlKey) break;
+          if (!(e.ctrlKey || e.metaKey)) break;
           if (start !== end) {
             transact(
               (text) => {
@@ -217,7 +217,7 @@ export const useKeyboardHandling = (deps: {
           break;
         }
         case "[": {
-          if (e.ctrlKey || e.altKey) break;
+          if (e.ctrlKey || e.altKey || e.metaKey) break;
           e.preventDefault();
           if (start !== end) {
             transact((text) => {
@@ -232,7 +232,7 @@ export const useKeyboardHandling = (deps: {
           break;
         }
         case "]": {
-          if (e.ctrlKey || e.altKey) break;
+          if (e.ctrlKey || e.altKey || e.metaKey) break;
           let start = e.currentTarget.selectionStart,
             end = e.currentTarget.selectionEnd;
           if (start === end) {
