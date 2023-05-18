@@ -46,7 +46,7 @@ export const BigCardBody = (
       }}
     >
       {/* Big Card Preview Content Wrapper */}
-      <div className="cardPreview flex w-full flex-col hover:cursor-pointer">
+      <div className="cardPreview flex w-full flex-col gap-2 hover:cursor-pointer">
         {/* Big Card Preview Title and GoTo Button*/}
         <div
           className={`cardPreviewHeader items-top flex justify-between gap-2`}
@@ -115,30 +115,33 @@ export const BigCardBody = (
         {props.showRelated && <Backlinks entityID={props.entityID} />}
 
         {/* Big Card Preview Default Content */}
-        <div
-          className={` cardPreviewDefaultContent ${
-            props.data.isMember &&
-            !props.hideContent &&
-            props.data.content?.value
-              ? "mt-1 rounded-md bg-white p-2 pt-1 text-accent-red"
-              : ""
-          }`}
-        >
-          {!props.data.imageUrl || props.hideContent ? null : (
-            <img
-              src={`${props.data.imageUrl}`}
-              className="max-h-[600px] max-w-full  py-2 px-1"
-            />
+        {!props.hideContent &&
+          (props.data.content?.value || props.data.imageUrl) && (
+            <div
+              className={` cardPreviewDefaultContent ${
+                props.data.isMember &&
+                !props.hideContent &&
+                props.data.content?.value
+                  ? "mt-1 rounded-md bg-white p-2 pt-1 text-accent-red"
+                  : ""
+              }`}
+            >
+              {!props.data.imageUrl || props.hideContent ? null : (
+                <img
+                  src={`${props.data.imageUrl}`}
+                  className="max-h-[600px] max-w-full  py-2 px-1"
+                />
+              )}
+              {!props.hideContent && props.data.content?.value && (
+                <RenderedText
+                  className={`cardPreviewDefaultTextContent truncate whitespace-pre-wrap pt-1 leading-tight  ${
+                    !props.data.imageUrl ? "" : "rounded-[3px] bg-white/75 px-1"
+                  } `}
+                  text={(props.data.content?.value as string) || ""}
+                />
+              )}
+            </div>
           )}
-          {!props.hideContent && props.data.content?.value && (
-            <RenderedText
-              className={`cardPreviewDefaultTextContent truncate whitespace-pre-wrap pt-1 leading-tight  ${
-                !props.data.imageUrl ? "" : "rounded-[3px] bg-white/75 px-1"
-              } `}
-              text={(props.data.content?.value as string) || ""}
-            />
-          )}
-        </div>
 
         {/* Reactags */}
         {/* show reactions ONLY for non-member cards */}
