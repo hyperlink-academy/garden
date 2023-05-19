@@ -118,7 +118,7 @@ export const BigCardBody = (
         {/* Reactions + Discussions WRAPPER */}
         {/* NB: show ONLY for non-member cards for now */}
         {!props.data.isMember && (
-          <div className="flex w-full justify-end gap-2 pt-2">
+          <div className="flex w-full justify-end gap-2">
             {/* Reactions */}
             {props.data.reactions.length > 0 ? (
               <div className="flex w-full flex-row items-end gap-1">
