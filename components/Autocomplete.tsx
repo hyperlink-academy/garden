@@ -103,7 +103,11 @@ export const useSuggestions = (props: { disabled: boolean }) => {
   let suggestions =
     !suggestionPrefix || props.disabled
       ? []
-      : names.filter((title) => title.value.includes(suggestionPrefix || ""));
+      : names.filter((title) =>
+          title.value
+            .toLocaleLowerCase()
+            .includes(suggestionPrefix?.toLocaleLowerCase() || "")
+        );
   useEffect(() => {
     if (suggestionIndex > suggestions.length - 1)
       setSuggestionIndex(suggestions.length - 1);
