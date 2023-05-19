@@ -78,13 +78,6 @@ export const RenderedText = forwardRef<
                 </p>
               );
             }
-            if (t.startsWith("-"))
-              return (
-                <p key={key}>
-                  <strong>-</strong>
-                  {parseLine(t.slice(1), parseConfig)}
-                </p>
-              );
 
             return <p key={key}>{parseLine(t, parseConfig)}</p>;
           })
