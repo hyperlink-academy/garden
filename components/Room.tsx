@@ -129,21 +129,23 @@ function RoomHeader(props: { entityID: string | null }) {
           </div>
         )}
       </div>
-      <div id="roomDescription" className="-mt-2 pb-2" ref={descriptionRef}>
-        <RenderedText
-          className="text-sm text-grey-35"
-          id="roomDescriptionY"
-          style={{
-            whiteSpace: "pre-wrap",
-            fontFamily: "inherit",
-            width: "100%",
-          }}
-          text={roomDescription?.value || ""}
-        />
-      </div>
+      {roomDescription?.value ? (
+        <div id="roomDescription" className="-mt-2 pb-2" ref={descriptionRef}>
+          <RenderedText
+            className="text-sm text-grey-35"
+            id="roomDescriptionY"
+            style={{
+              whiteSpace: "pre-wrap",
+              fontFamily: "inherit",
+              width: "100%",
+            }}
+            text={roomDescription?.value || ""}
+          />
+        </div>
+      ) : null}
 
       <hr
-        className="sticky z-10 mb-1 text-grey-80"
+        className="sticky z-10 mb-1 -mt-1 text-grey-80"
         style={{ top: `${height}px` }}
       />
     </>
