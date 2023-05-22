@@ -1,3 +1,4 @@
+import { Fact } from "data/Facts";
 import { useIndex } from "hooks/useReplicache";
 import { usePreserveScroll } from "hooks/utils";
 import { useEffect, useRef, useState } from "react";
@@ -82,7 +83,13 @@ function RoomHeader(props: { entityID: string | null }) {
     }
   };
   let roomDescription = useIndex.eav(props.entityID, "room/description");
-  let roomName = useIndex.eav(props.entityID, "room/name");
+  let roomName: Fact<"room/name"> | Fact<"member/name"> | null = null;
+  let sharedRoomName = useIndex.eav(props.entityID, "room/name");
+  let memberRoomName = useIndex.eav(props.entityID, "member/name");
+  if (memberRoomName) {
+    roomName = memberRoomName;
+  } else roomName = sharedRoomName;
+
   let descriptionRef = useRef<null | HTMLDivElement>(null);
 
   return (
