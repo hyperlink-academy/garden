@@ -52,18 +52,22 @@ export const BigCardBody = (
           className={`cardPreviewHeader items-top flex justify-between gap-2`}
         >
           <div className="flex w-full justify-between gap-2">
-            <RenderedText
-              style={{
-                whiteSpace: "pre-wrap",
-                fontFamily: "inherit",
-                width: "100%",
-              }}
-              text={props.data.member?.value || props.data.title?.value || ""}
-              placeholder="Untitled"
-              className={`cardPreviewTitle text-md !w-fit font-bold ${
-                props.data.isMember ? "text-white" : "text-grey-35"
-              } ${!props.data.imageUrl ? "" : "rounded-[3px] !bg-white px-1"}`}
-            />
+            {(props.data.title?.value || props.data.member) && (
+              <RenderedText
+                style={{
+                  whiteSpace: "pre-wrap",
+                  fontFamily: "inherit",
+                  width: "100%",
+                }}
+                text={props.data.member?.value || props.data.title?.value || ""}
+                placeholder="Untitled"
+                className={`cardPreviewTitle text-md !w-fit font-bold ${
+                  props.data.isMember ? "text-white" : "text-grey-35"
+                } ${
+                  !props.data.imageUrl ? "" : "rounded-[3px] !bg-white px-1"
+                }`}
+              />
+            )}
             {props.data.isMember ? (
               <div className="shrink-0 italic text-white">member</div>
             ) : (
