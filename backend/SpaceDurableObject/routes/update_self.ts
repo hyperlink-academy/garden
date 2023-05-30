@@ -34,6 +34,16 @@ export const update_self_route = makeRoute({
       thisEntity.entity,
       "space/community"
     );
+
+    await supabase.from("space_data").upsert({
+      do_id: env.id,
+      owner: session.id,
+      display_name: msg.data.display_name,
+      description: msg.data.description,
+      start_date: msg.data.start_date,
+      end_date: msg.data.end_date,
+    });
+
     if (!msg.data.publish_on_listings_page && community) {
       let spaceID = env.env.SPACES.idFromString(community.value);
       let stub = env.env.SPACES.get(spaceID);

@@ -86,6 +86,15 @@ export const create_space_route = makeRoute({
       ownerName: session.username,
     });
 
+    await supabase.from("space_data").insert({
+      do_id: newSpace.toString(),
+      owner: session.id,
+      display_name: msg.display_name,
+      description: msg.description,
+      start_date: msg.start_date,
+      end_date: msg.end_date,
+    });
+
     let thisStub = env.env.SPACES.get(env.env.SPACES.idFromString(env.id));
     await privateSpaceAPI(thisStub)("http://internal", "add_space_data", {
       ...data,
