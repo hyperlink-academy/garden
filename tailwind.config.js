@@ -4,8 +4,6 @@ module.exports = {
     "./components/**/*.{js,ts,jsx,tsx}",
   ],
 
-  darkMode: false,
-
   theme: {
     screens: {
       sm: "640px",
