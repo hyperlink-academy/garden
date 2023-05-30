@@ -1,5 +1,6 @@
 import { SVGProps } from "react";
 
+type Props = SVGProps<SVGSVGElement>;
 // LARGE ICONS 48x48
 // These are really big mostly for touch nased navigation on mobile
 
@@ -7,7 +8,7 @@ import { SVGProps } from "react";
 // These are large click targets, very important, or somewhat illustrative
 //
 
-export const CalendarMedium = (props: SVGProps<SVGSVGElement>) => (
+export const CalendarMedium = (props: Props) => (
   <svg
     width="25"
     height="24"
@@ -31,7 +32,7 @@ export const CalendarMedium = (props: SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
-export const CardMedium = (props: SVGProps<SVGSVGElement>) => (
+export const CardMedium = (props: Props) => (
   <svg
     width="32"
     height="32"
@@ -48,7 +49,7 @@ export const CardMedium = (props: SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
-export const RemoveFromHighlight = (props: SVGProps<SVGSVGElement>) => {
+export const RemoveFromHighlight = (props: Props) => {
   return (
     <svg
       width="32"
@@ -71,7 +72,7 @@ export const RemoveFromHighlight = (props: SVGProps<SVGSVGElement>) => {
 // SMALL ICONS 24x24
 // Most icons are small icons
 
-export const AddSmall = (props: SVGProps<SVGSVGElement>) => {
+export const AddSmall = (props: Props) => {
   return (
     <svg
       {...props}
@@ -91,7 +92,7 @@ export const AddSmall = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
-export const ArrowUp = (props: SVGProps<SVGSVGElement>) => {
+export const ArrowUp = (props: Props) => {
   return (
     <svg
       width="24"
@@ -111,7 +112,7 @@ export const ArrowUp = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
-export const ArrowDown = (props: SVGProps<SVGSVGElement>) => {
+export const ArrowDown = (props: Props) => {
   return (
     <svg
       width="24"
@@ -131,7 +132,7 @@ export const ArrowDown = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
-export const BackToStudio = (props: SVGProps<SVGSVGElement>) => {
+export const BackToStudio = (props: Props) => {
   return (
     <svg
       width="24"
@@ -150,7 +151,7 @@ export const BackToStudio = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
-export const CardSmall = (props: SVGProps<SVGSVGElement>) => (
+export const CardSmall = (props: Props) => (
   <svg
     {...props}
     width="24"
@@ -168,7 +169,7 @@ export const CardSmall = (props: SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
-export const CardAdd = (props: SVGProps<SVGSVGElement>) => {
+export const CardAdd = (props: Props) => {
   return (
     <svg
       {...props}
@@ -188,7 +189,7 @@ export const CardAdd = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
-export const CardSearch = (props: SVGProps<SVGSVGElement>) => {
+export const CardSearch = (props: Props) => {
   return (
     <svg
       width="24"
@@ -207,7 +208,7 @@ export const CardSearch = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
-export const ChatSmall = (props: SVGProps<SVGSVGElement>) => {
+export const ChatSmall = (props: Props) => {
   return (
     <svg
       width="24"
@@ -226,7 +227,7 @@ export const ChatSmall = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
-export const ChatEmptySmall = (props: SVGProps<SVGSVGElement>) => {
+export const ChatEmptySmall = (props: Props) => {
   return (
     <svg
       width="24"
@@ -257,7 +258,7 @@ export const ChatEmptySmall = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
-export const CollectionGrid = (props: SVGProps<SVGSVGElement>) => {
+export const CollectionGrid = (props: Props) => {
   return (
     <svg
       width="25"
@@ -275,7 +276,7 @@ export const CollectionGrid = (props: SVGProps<SVGSVGElement>) => {
     </svg>
   );
 };
-export const CollectionList = (props: SVGProps<SVGSVGElement>) => {
+export const CollectionList = (props: Props) => {
   return (
     <svg
       width="24"
@@ -294,7 +295,7 @@ export const CollectionList = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
-export const CollectionPreview = (props: SVGProps<SVGSVGElement>) => {
+export const CollectionPreview = (props: Props) => {
   return (
     <svg
       width="24"
@@ -313,7 +314,7 @@ export const CollectionPreview = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
-export const DeckSmall = (props: SVGProps<SVGSVGElement>) => (
+export const DeckSmall = (props: Props) => (
   <svg
     width="24"
     height="24"
@@ -331,7 +332,7 @@ export const DeckSmall = (props: SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
-export const DeckAdd = (props: SVGProps<SVGSVGElement>) => {
+export const DeckAdd = (props: Props) => {
   return (
     <svg
       width="24"
@@ -350,7 +351,7 @@ export const DeckAdd = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
-export const Delete = (props: SVGProps<SVGSVGElement>) => {
+export const Delete = (props: Props) => {
   return (
     <svg
       width="24"
@@ -369,7 +370,7 @@ export const Delete = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
-export const Information = (props: SVGProps<SVGSVGElement>) => {
+export const Information = (props: Props) => {
   return (
     <svg
       width="24"
@@ -388,7 +389,7 @@ export const Information = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
-export const Member = (props: SVGProps<SVGSVGElement>) => (
+export const Member = (props: Props) => (
   <svg
     width="24"
     height="24"
@@ -405,7 +406,7 @@ export const Member = (props: SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
-export const MemberAdd = (props: SVGProps<SVGSVGElement>) => {
+export const MemberAdd = (props: Props) => {
   return (
     <svg
       width="24"
@@ -424,7 +425,7 @@ export const MemberAdd = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
-export const MoreOptionsSmall = (props: SVGProps<SVGSVGElement>) => {
+export const MoreOptionsSmall = (props: Props) => {
   return (
     <svg
       width="12"
@@ -443,7 +444,7 @@ export const MoreOptionsSmall = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
-export const Note = (props: SVGProps<SVGSVGElement>) => {
+export const Note = (props: Props) => {
   return (
     <svg
       width="24"
@@ -462,7 +463,7 @@ export const Note = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
-export const Print = (props: SVGProps<SVGSVGElement>) => {
+export const Print = (props: Props) => {
   return (
     <svg
       width="24"
@@ -481,7 +482,7 @@ export const Print = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
-export const Rooms = (props: SVGProps<SVGSVGElement>) => {
+export const Rooms = (props: Props) => {
   return (
     <svg
       width="24"
@@ -500,7 +501,7 @@ export const Rooms = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
-export const SectionText = (props: SVGProps<SVGSVGElement>) => {
+export const SectionText = (props: Props) => {
   return (
     <svg
       {...props}
@@ -520,7 +521,7 @@ export const SectionText = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
-export const SectionLinkedCard = (props: SVGProps<SVGSVGElement>) => {
+export const SectionLinkedCard = (props: Props) => {
   return (
     <svg
       {...props}
@@ -540,7 +541,7 @@ export const SectionLinkedCard = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
-export const SectionImageAdd = (props: SVGProps<SVGSVGElement>) => {
+export const SectionImageAdd = (props: Props) => {
   return (
     <svg
       {...props}
@@ -560,7 +561,7 @@ export const SectionImageAdd = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
-export const Send = (props: SVGProps<SVGSVGElement>) => {
+export const Send = (props: Props) => {
   return (
     <svg
       width="24"
@@ -579,7 +580,7 @@ export const Send = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
-export const SearchOrCommand = (props: SVGProps<SVGSVGElement>) => {
+export const SearchOrCommand = (props: Props) => {
   return (
     <svg
       width="24"
@@ -598,7 +599,7 @@ export const SearchOrCommand = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
-export const SettingsStudio = (props: SVGProps<SVGSVGElement>) => {
+export const SettingsStudio = (props: Props) => {
   return (
     <svg
       width="24"
@@ -617,7 +618,7 @@ export const SettingsStudio = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
-export const SpaceCreate = (props: SVGProps<SVGSVGElement>) => {
+export const SpaceCreate = (props: Props) => {
   return (
     <svg
       width="24"
@@ -639,7 +640,7 @@ export const SpaceCreate = (props: SVGProps<SVGSVGElement>) => {
 // TINY ICONS 16x16
 // These are mostly used inline with text.
 
-export const AddTiny = (props: SVGProps<SVGSVGElement>) => {
+export const AddTiny = (props: Props) => {
   return (
     <svg
       width="16"
@@ -658,7 +659,7 @@ export const AddTiny = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
-export const Checkmark = (props: SVGProps<SVGSVGElement>) => {
+export const Checkmark = (props: Props) => {
   return (
     <svg
       width="16"
@@ -679,7 +680,7 @@ export const Checkmark = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
-export const CloseFilledTiny = (props: SVGProps<SVGSVGElement>) => (
+export const CloseFilledTiny = (props: Props) => (
   <svg
     width="16"
     height="16"
@@ -696,7 +697,7 @@ export const CloseFilledTiny = (props: SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
-export const CloseLinedTiny = (props: SVGProps<SVGSVGElement>) => {
+export const CloseLinedTiny = (props: Props) => {
   return (
     <svg
       width="16"
@@ -754,7 +755,7 @@ export const DisclosureExpandTiny = () => {
   );
 };
 
-export const ExternalLink = (props: SVGProps<SVGSVGElement>) => {
+export const ExternalLink = (props: Props) => {
   return (
     <svg
       width="16"
@@ -773,7 +774,7 @@ export const ExternalLink = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
-export const GoToPage = (props: SVGProps<SVGSVGElement>) => {
+export const GoToPage = (props: Props) => {
   return (
     <svg
       width="16"
@@ -792,7 +793,7 @@ export const GoToPage = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
-export const GoBackToPage = (props: SVGProps<SVGSVGElement>) => {
+export const GoBackToPage = (props: Props) => {
   return (
     <svg
       width="16"
@@ -811,7 +812,7 @@ export const GoBackToPage = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
-export const GoToTop = (props: SVGProps<SVGSVGElement>) => {
+export const GoToTop = (props: Props) => {
   return (
     <svg
       width="16"
@@ -831,7 +832,7 @@ export const GoToTop = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
-export const MoreOptionsTiny = (props: SVGProps<SVGSVGElement>) => {
+export const MoreOptionsTiny = (props: Props) => {
   return (
     <svg
       width="8"
@@ -850,7 +851,7 @@ export const MoreOptionsTiny = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
-export const RoomCalendar = (props: SVGProps<SVGSVGElement>) => {
+export const RoomCalendar = (props: Props) => {
   return (
     <svg
       width="16"
@@ -858,6 +859,7 @@ export const RoomCalendar = (props: SVGProps<SVGSVGElement>) => {
       viewBox="0 0 16 16"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      {...props}
     >
       <path
         fillRule="evenodd"
@@ -869,7 +871,7 @@ export const RoomCalendar = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
-export const RoomCanvas = (props: SVGProps<SVGSVGElement>) => {
+export const RoomCanvas = (props: Props) => {
   return (
     <svg
       width="16"
@@ -888,7 +890,7 @@ export const RoomCanvas = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
-export const RoomCollection = (props: SVGProps<SVGSVGElement>) => {
+export const RoomCollection = (props: Props) => {
   return (
     <svg
       width="16"
@@ -907,7 +909,7 @@ export const RoomCollection = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
-export const RoomChat = (props: SVGProps<SVGSVGElement>) => {
+export const RoomChat = (props: Props) => {
   return (
     <svg
       {...props}
@@ -927,7 +929,7 @@ export const RoomChat = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
-export const RoomMember = (props: SVGProps<SVGSVGElement>) => {
+export const RoomMember = (props: Props) => {
   return (
     <svg
       width="16"
@@ -946,7 +948,7 @@ export const RoomMember = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
-export const RoomSearch = () => {
+export const RoomSearch = (props: Props) => {
   return (
     <svg
       width="16"
@@ -954,6 +956,7 @@ export const RoomSearch = () => {
       viewBox="0 0 16 16"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      {...props}
     >
       <path
         fillRule="evenodd"
