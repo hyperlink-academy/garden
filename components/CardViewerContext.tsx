@@ -15,10 +15,8 @@ export const useCardViewer = () => {
   };
 };
 
-export function CardViewer(props: {
-  EmptyState: React.ReactNode;
-  room: string | null;
-}) {
+export function CardViewer(props: { room: string | null }) {
+  let roomType = useIndex.eav(props.room, "room/type")?.value;
   let [history, setHistory] = useUndoableState<{ [k: string]: string[] }>({});
   let ref = useRef<HTMLDivElement | null>(null);
   let { mutate, memberEntity } = useMutations();
@@ -108,8 +106,46 @@ export function CardViewer(props: {
           }
         />
       ) : (
-        props.EmptyState
+        <EmptyState roomType={roomType} />
       )}
     </div>
   );
 }
+
+const EmptyState = (props: { roomType: string | undefined }) => {
+  return (
+    <div className="no-scrollbar relative flex h-full w-full max-w-3xl snap-y snap-mandatory snap-start flex-col gap-6 overflow-y-scroll rounded-lg border border-dashed border-grey-80 p-4 text-grey-35">
+      <div className="m-auto flex flex-col gap-4 text-center">
+        {props.roomType === "canvas" ? (
+          <>
+            <p>
+              <em>Double-click canvas to add a card</em>
+            </p>
+            <p>
+              <em>Drag a card to move it</em>
+            </p>
+          </>
+        ) : props.roomType === "collection" ? (
+          <>
+            <p>
+              <em>Click a card to open it here</em>
+            </p>
+            <p>
+              <em>Drag cards to reorder</em>
+            </p>
+          </>
+        ) : (
+          // if not 'canvas' or 'collection', it's chat
+          <>
+            <p>
+              <em>Attach cards to chat messages</em>
+            </p>
+            <p>
+              <em>Click to open them here</em>
+            </p>
+          </>
+        )}
+      </div>
+    </div>
+  );
+};

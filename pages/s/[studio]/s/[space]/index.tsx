@@ -1,38 +1,17 @@
-import { Desktop } from "components/Desktop";
 import { CardViewer } from "components/CardViewerContext";
-import {
-  ReplicacheContext,
-  scanIndex,
-  useIndex,
-  useMutations,
-  useSpaceID,
-} from "hooks/useReplicache";
+import { useIndex, useSpaceID } from "hooks/useReplicache";
 import { SmallCardDragContext } from "components/DragContext";
 import { Sidebar } from "components/SpaceLayout";
-import Head from "next/head";
-import { useContext, useEffect, useState } from "react";
+import { useEffect } from "react";
 import useWindowDimensions from "hooks/useWindowDimensions";
-import { CardCollection } from "components/CardCollection";
-import { useSubscribe } from "replicache-react";
-import { usePreserveScroll } from "hooks/utils";
 import { sortByPosition } from "src/position_helpers";
-import { SearchRoom } from "components/SearchRoom";
-import { CalendarRoom } from "components/CalendarRoom";
 import { useUndoableState } from "hooks/useUndoableState";
-import { useRouter } from "next/router";
-import { slugify } from "src/utils";
-import { Discussion } from "components/CardView/Discussion";
-import { GoToTop, MoreOptionsTiny } from "components/Icons";
-import { RenderedText } from "components/Textarea/RenderedText";
-import { EditRoomModal } from "components/SpaceLayout/Sidebar/RoomListLayout";
 import { Room } from "components/Room";
+import { SpaceMetaTitle } from "components/SpaceMetaTitle";
 
 export default function SpacePage() {
-  let spaceName = useIndex.aev("space/display_name")[0];
-
   // get first room = your room
   // OR if viewing anon, get first room based on room id
-  let { memberEntity } = useMutations();
   let firstRoomByID = useIndex
     .aev("room/name")
     .sort(sortByPosition("roomList"))[0]?.entity;
@@ -52,42 +31,7 @@ export default function SpacePage() {
   }, [r, spaceID]);
 
   let room = r || firstRoom;
-  let roomType = useIndex.eav(room, "room/type")?.value;
   const { width } = useWindowDimensions();
-
-  let rep = useContext(ReplicacheContext);
-  let unreadCount = useSubscribe(
-    rep?.rep,
-    async (tx) => {
-      //This is more complicated than you would think as we only want to notify
-      //for cards in rooms directly, and discussions on those cards
-      if (!memberEntity) return null;
-      let count = 0;
-      let unreadDiscussions = await scanIndex(tx).vae(
-        memberEntity,
-        "discussion/unread-by"
-      );
-      let unreadCards = await scanIndex(tx).vae(memberEntity, "card/unread-by");
-
-      for (let card of unreadCards) {
-        let inRooms = await scanIndex(tx).vae(card.entity, "desktop/contains");
-        if (inRooms.length > 0) count++;
-      }
-      for (let discussion of unreadDiscussions) {
-        let inRooms = await scanIndex(tx).vae(
-          discussion.entity,
-          "desktop/contains"
-        );
-
-        let isRoom = await scanIndex(tx).eav(discussion.entity, "room/name");
-        if (inRooms.length > 0 || isRoom) count++;
-      }
-
-      return count;
-    },
-    null as number | null,
-    [memberEntity]
-  );
 
   useEffect(() => {
     window.requestAnimationFrame(() => {
@@ -95,25 +39,10 @@ export default function SpacePage() {
       roomPane?.scrollIntoView();
     });
   }, []);
-  let router = useRouter();
-  useEffect(() => {
-    if (spaceName)
-      history.replaceState(
-        null,
-        "",
-        `/s/${router.query.studio}/s/${router.query.space}/${slugify(
-          spaceName?.value
-        )}`
-      );
-  }, [spaceName, router]);
 
   return (
     <>
-      <Head>
-        <title key="title">{`${
-          unreadCount && unreadCount > 0 ? `(${unreadCount})` : ""
-        } ${spaceName?.value}`}</title>
-      </Head>
+      <SpaceMetaTitle />
 
       <div className="pageWrapperflex safari-pwa-height h-[100dvh] flex-col items-stretch justify-items-center gap-2 overflow-hidden sm:gap-4">
         <div className="pageContent max-w-screen-xl relative mx-auto flex h-full w-full grow items-stretch md:py-6 md:px-4">
@@ -138,10 +67,7 @@ export default function SpacePage() {
                   </div>
                 </div>
 
-                <CardViewer
-                  EmptyState={<EmptyState roomType={roomType} />}
-                  room={room}
-                />
+                <CardViewer room={room} />
               </div>
             ) : (
               <div className="no-scrollbar flex snap-x snap-mandatory flex-row gap-2 overflow-x-scroll overscroll-x-none scroll-smooth">
@@ -170,10 +96,7 @@ export default function SpacePage() {
                 </div>
 
                 <div className="pwa-padding py-4 pr-2">
-                  <CardViewer
-                    EmptyState={<EmptyState roomType={roomType} />}
-                    room={room}
-                  />
+                  <CardViewer room={room} />
                 </div>
               </div>
             )}
@@ -183,41 +106,3 @@ export default function SpacePage() {
     </>
   );
 }
-
-const EmptyState = (props: { roomType?: string | undefined }) => {
-  return (
-    <div className="no-scrollbar relative flex h-full w-full max-w-3xl snap-y snap-mandatory snap-start flex-col gap-6 overflow-y-scroll rounded-lg border border-dashed border-grey-80 p-4 text-grey-35">
-      <div className="m-auto flex flex-col gap-4 text-center">
-        {props.roomType === "canvas" ? (
-          <>
-            <p>
-              <em>Double-click canvas to add a card</em>
-            </p>
-            <p>
-              <em>Drag a card to move it</em>
-            </p>
-          </>
-        ) : props.roomType === "collection" ? (
-          <>
-            <p>
-              <em>Click a card to open it here</em>
-            </p>
-            <p>
-              <em>Drag cards to reorder</em>
-            </p>
-          </>
-        ) : (
-          // if not 'canvas' or 'collection', it's chat
-          <>
-            <p>
-              <em>Attach cards to chat messages</em>
-            </p>
-            <p>
-              <em>Click to open them here</em>
-            </p>
-          </>
-        )}
-      </div>
-    </div>
-  );
-};
