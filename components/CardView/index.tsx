@@ -1,7 +1,7 @@
 import { Menu } from "@headlessui/react";
-import { Tldraw } from '@tldraw/tldraw'
 import '@tldraw/tldraw/editor.css'
 import '@tldraw/tldraw/ui.css'
+import dynamic from "next/dynamic";
 
 import {
   MoreOptionsTiny,
@@ -228,7 +228,7 @@ export const CardContent = (props: {
             height: '500px',
           }}
         >
-          <Tldraw />
+          <Tldraw persistenceKey={props.entityID}/>
         </div>
 
         <DefaultTextSection entityID={props.entityID} />
@@ -283,6 +283,11 @@ const Title = (props: { entityID: string }) => {
     />
   );
 };
+
+const Tldraw = dynamic(
+  () => import("@tldraw/tldraw").then((module) => module.Tldraw),
+  { ssr: false }
+);
 
 const CardMoreOptionsMenu = (props: {
   entityID: string;
