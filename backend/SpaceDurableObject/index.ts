@@ -19,6 +19,7 @@ import { delete_self_route } from "./routes/delete_self";
 import { claim_as_community_route } from "./routes/claim_as_community";
 import { add_space_data_route } from "./internal_routes/add_space";
 import { sync_notifications_route } from "./internal_routes/sync_notifications";
+import { update_space_data_route } from "./routes/update_space_data";
 
 export type Env = {
   factStore: ReturnType<typeof store>;
@@ -30,6 +31,7 @@ export type Env = {
 };
 
 let routes = [
+  update_space_data_route,
   pullRoute,
   push_route,
   claimRoute,
