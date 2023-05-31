@@ -1,4 +1,7 @@
 import { Menu } from "@headlessui/react";
+import { Tldraw } from '@tldraw/tldraw'
+import '@tldraw/tldraw/editor.css'
+import '@tldraw/tldraw/ui.css'
 
 import {
   MoreOptionsTiny,
@@ -105,7 +108,7 @@ export const CardView = (props: {
       card
       no-scrollbar
       relative
-      mx-auto       
+      mx-auto
       flex
       h-full w-full
       max-w-3xl grow
@@ -146,7 +149,7 @@ export const CardView = (props: {
           ref={ref}
           id="cardContentAndDiscussion"
           className={`
-            no-scrollbar flex h-full          
+            no-scrollbar flex h-full
             grow
             flex-col
             gap-4
@@ -215,6 +218,17 @@ export const CardContent = (props: {
           />
 
           {/* <DateSection entityID={props.entityID} /> */}
+        </div>
+
+        <div
+          style={{
+            position: 'relative',
+            inset: 0,
+            width: '500px',
+            height: '500px',
+          }}
+        >
+          <Tldraw />
         </div>
 
         <DefaultTextSection entityID={props.entityID} />

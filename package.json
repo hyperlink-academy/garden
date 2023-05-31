@@ -36,6 +36,7 @@
     "@supabase/auth-helpers-nextjs": "^0.6.1",
     "@supabase/auth-helpers-react": "^0.3.1",
     "@supabase/supabase-js": "^2.12.0",
+    "@tldraw/tldraw": "^2.0.0-alpha.12",
     "@use-gesture/react": "^10.2.18",
     "@vercel/analytics": "^0.1.5",
     "bcryptjs": "^2.4.3",
@@ -52,6 +53,8 @@
     "react-use-measure": "^2.1.1",
     "replicache": "^12.2.1",
     "replicache-react": "^2.10.1",
+    "signia": "^0.1.4",
+    "signia-react": "^0.1.4",
     "swr": "^2.0.3",
     "typescript": "^4.6.2",
     "zod": "^3.17.10"
