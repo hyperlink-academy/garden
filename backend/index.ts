@@ -31,7 +31,11 @@ export type Bindings = {
   USER_UPLOADS: R2Bucket;
 };
 
-async function handleRequest(request: Request, env: Bindings) {
+async function handleRequest(
+  request: Request,
+  env: Bindings,
+  context: ExecutionContext
+) {
   let url = new URL(request.url);
   let path = url.pathname.split("/");
   if (path[1] !== "v0")
@@ -56,6 +60,16 @@ async function handleRequest(request: Request, env: Bindings) {
   }
   if (path[2] === "static") {
     try {
+      // Construct the cache key from the cache URL
+      const cacheKey = new Request(url.toString(), request);
+      //@ts-ignore
+      const cache: Cache = caches.default;
+
+      // Check whether the value is already available in the cache
+      // if not, you will need to fetch it from R2, and store it in the cache
+      // for future access
+      let response = await cache.match(cacheKey);
+
       const object = await env.USER_UPLOADS.get(path[3]);
 
       if (!object || !object.body) {
@@ -67,9 +81,12 @@ async function handleRequest(request: Request, env: Bindings) {
       headers.set("etag", object.httpEtag);
       headers.set("Cache-control", "public, max-age=15552000");
 
-      return new Response(object.body, {
+      response = new Response(object.body, {
         headers,
       });
+      context.waitUntil(cache.put(cacheKey, response.clone()));
+
+      return response;
     } catch (e) {
       console.log(e);
     }
