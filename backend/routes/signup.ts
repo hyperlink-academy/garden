@@ -70,7 +70,6 @@ export const SignupRoute = makeRoute({
     await newSpace("http://internal", "claim", {
       data: {
         display_name: msg.username,
-        publish_on_listings_page: false,
         start_date: "",
         end_date: "",
         description: "",

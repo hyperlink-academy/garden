@@ -30,11 +30,6 @@ export const update_self_route = makeRoute({
     if (!thisEntity)
       return { data: { success: false, error: "No this entity" } } as const;
 
-    let community = await env.factStore.scanIndex.eav(
-      thisEntity.entity,
-      "space/community"
-    );
-
     await supabase.from("space_data").upsert({
       do_id: env.id,
       owner: session.id,
@@ -48,46 +43,6 @@ export const update_self_route = makeRoute({
       start_date: msg.data.start_date,
       end_date: msg.data.end_date,
     });
-
-    if (!msg.data.publish_on_listings_page && community) {
-      let spaceID = env.env.SPACES.idFromString(community.value);
-      let stub = env.env.SPACES.get(spaceID);
-      await privateSpaceAPI(stub)(
-        "http://internal",
-        "update_local_space_data",
-        {
-          spaceID: env.id,
-          data: {
-            deleted: true,
-          },
-        }
-      );
-    }
-    if (msg.data.publish_on_listings_page && !community) {
-      let { data: communityData } = await supabase
-        .from("communities")
-        .select("*")
-        .eq("name", "hyperlink")
-        .single();
-      if (!communityData)
-        return {
-          data: { success: false, error: "no hyperlink community" },
-        } as const;
-      let communitySpaceID = env.env.SPACES.idFromString(communityData.spaceID);
-      let communitySpace = env.env.SPACES.get(communitySpaceID);
-      await privateSpaceAPI(communitySpace)(
-        "http://internal",
-        "add_space_data",
-        {
-          spaceID: env.id,
-          name: thisEntity.value,
-          data: {
-            studio: session.username,
-            ...msg.data,
-          },
-        }
-      );
-    }
 
     let selfStub = env.env.SPACES.get(env.env.SPACES.idFromString(env.id));
     await privateSpaceAPI(selfStub)(
@@ -103,18 +58,6 @@ export const update_self_route = makeRoute({
     let members = await env.factStore.scanIndex.aev("space/member");
     for (let i = 0; i < members.length; i++) {
       let spaceID = env.env.SPACES.idFromString(members[i].value);
-      let stub = env.env.SPACES.get(spaceID);
-      await privateSpaceAPI(stub)(
-        "http://internal",
-        "update_local_space_data",
-        {
-          spaceID: env.id,
-          data: msg.data,
-        }
-      );
-    }
-    if (msg.data.publish_on_listings_page && community) {
-      let spaceID = env.env.SPACES.idFromString(community.value);
       let stub = env.env.SPACES.get(spaceID);
       await privateSpaceAPI(stub)(
         "http://internal",

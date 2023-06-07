@@ -11,7 +11,6 @@ export const space_input = z.object({
   start_date: z.string(),
   end_date: z.string(),
   description: z.string().max(256),
-  publish_on_listings_page: z.boolean(),
   image: z
     .discriminatedUnion("filetype", [
       z.object({
@@ -51,21 +50,6 @@ export const create_space_route = makeRoute({
       (await env.storage.get<number>("meta-space-created-index")) || 0;
     await env.storage.put("meta-space-created-index", spaceIndex + 1);
 
-    //Eventually we want this to be choosable!
-    let community;
-    if (msg.publish_on_listings_page) {
-      let { data } = await supabase
-        .from("communities")
-        .select("*")
-        .eq("name", "hyperlink")
-        .single();
-      if (!data)
-        return {
-          data: { success: false, error: "no hyperlink community" },
-        } as const;
-      community = data;
-    }
-
     let newSpace = env.env.SPACES.newUniqueId();
     let stub = env.env.SPACES.get(newSpace);
 
@@ -75,7 +59,6 @@ export const create_space_route = makeRoute({
       data: {
         ...msg,
         studio: session.username,
-        community: community?.spaceID,
       },
     };
 
@@ -104,15 +87,6 @@ export const create_space_route = makeRoute({
       isOwner: true,
     });
 
-    if (community) {
-      let communitySpaceID = env.env.SPACES.idFromString(community.spaceID);
-      let communitySpace = env.env.SPACES.get(communitySpaceID);
-      await privateSpaceAPI(communitySpace)(
-        "http://internal",
-        "add_space_data",
-        data
-      );
-    }
     env.poke();
     app_event(env.env, {
       event: "create_space",

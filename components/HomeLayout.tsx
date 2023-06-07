@@ -44,15 +44,6 @@ export const HomeHeader = () => {
           <ButtonLink content="my studio" />
         </Link>
       )}
-
-      <div>
-        <Link
-          href={`/calendar`}
-          className={pathname?.endsWith("calendar") ? decorationClasses : ``}
-        >
-          <ButtonLink content="calendar" />
-        </Link>
-      </div>
     </div>
   );
 };

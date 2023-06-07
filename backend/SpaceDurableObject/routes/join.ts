@@ -70,10 +70,6 @@ export const join_route = makeRoute({
       thisEntity,
       "space/door/uploaded-image"
     );
-    let community = await env.factStore.scanIndex.eav(
-      thisEntity,
-      "space/community"
-    );
 
     let display_name = await env.factStore.scanIndex.eav(
       thisEntity,
@@ -84,7 +80,6 @@ export const join_route = makeRoute({
       spaceID: env.id,
       name: name[0].value,
       data: {
-        publish_on_listings_page: !!community,
         image: image?.value,
         description: description?.value || "",
         start_date: start_date?.value.value || "",

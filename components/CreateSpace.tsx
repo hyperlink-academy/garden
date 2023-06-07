@@ -13,7 +13,6 @@ type FormState = {
   description: string;
   start_date: string;
   end_date: string;
-  publish_on_listings_page: boolean;
   image: Door | undefined;
 };
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
@@ -24,7 +23,6 @@ export const CreateSpace = (props: { studioSpaceID: string }) => {
     description: "",
     start_date: "",
     end_date: "",
-    publish_on_listings_page: false,
     image: undefined as Door | undefined,
   });
   let auth = useAuth();
@@ -71,7 +69,6 @@ export const CreateSpace = (props: { studioSpaceID: string }) => {
                   description: "",
                   start_date: "",
                   end_date: "",
-                  publish_on_listings_page: false,
                   image: undefined,
                 });
                 rep?.rep.pull();
@@ -93,7 +90,6 @@ export const EditSpaceModal = (props: {
 }) => {
   let { authToken } = useAuth();
   let spaceID = useIndex.eav(props.spaceEntity, "space/id");
-  let community = useIndex.eav(props.spaceEntity, "space/community");
 
   let name = useIndex.eav(props.spaceEntity, "space/display_name");
   let description = useIndex.eav(props.spaceEntity, "space/description");
@@ -111,7 +107,6 @@ export const EditSpaceModal = (props: {
     description: "",
     start_date: "",
     end_date: "",
-    publish_on_listings_page: false,
     image: undefined as Door | undefined,
   });
   let modified =
@@ -130,10 +125,9 @@ export const EditSpaceModal = (props: {
         description: description?.value || "",
         display_name: name?.value || "",
         image: uploadedDoor?.value,
-        publish_on_listings_page: !!community,
       };
     });
-  }, [uploadedDoor, description, start_date, end_date, name, community]);
+  }, [uploadedDoor, description, start_date, end_date, name]);
 
   let [mode, setMode] = useState<"normal" | "delete">("normal");
   return (
@@ -340,37 +334,6 @@ const CreateSpaceForm = ({
           selected={formState.image}
           onSelect={(d) => setFormState((form) => ({ ...form, image: d }))}
         />
-
-        <div className="flex flex-col gap-2">
-          <div className="flex gap-2">
-            <input
-              type="checkbox"
-              disabled={
-                !(
-                  formState.start_date &&
-                  formState.end_date &&
-                  formState.display_name &&
-                  formState.description &&
-                  formState.image
-                )
-              }
-              checked={formState.publish_on_listings_page}
-              onChange={(e) => {
-                let value = e.currentTarget.checked;
-                setFormState((form) => ({
-                  ...form,
-                  publish_on_listings_page: value,
-                }));
-              }}
-            />
-            <p className="font-bold">Publish to Community Calendar?</p>
-          </div>
-
-          <p className="text-sm">
-            Once all details are set, you can list your Space for others to see.
-            People will still need an invite to join.
-          </p>
-        </div>
       </>
     );
 };
