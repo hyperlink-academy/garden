@@ -182,28 +182,26 @@ export const CardContent = (props: {
   return (
     <>
       {/* START CARD CONTENT */}
-      <div className="cardContent grid-auto-rows grid gap-3">
-        <div className="cardHeader flex flex-col gap-0">
-          <div className="cardTitle flex flex-col gap-2">
-            {cardCreatorName ? (
-              <div className="flex justify-between gap-2">
-                <div className="lightBorder self-start rounded-md py-1 px-2 text-xs text-grey-35">
-                  {cardCreatorName}
-                </div>
-                <CardMoreOptionsMenu
-                  onDelete={props.onDelete}
-                  entityID={props.entityID}
-                  referenceFactID={props?.referenceFactID}
-                  setDateEditing={() => {
-                    setDateEditing(true);
-                  }}
-                  date={date}
-                />
-              </div>
-            ) : null}
-            <Title entityID={props.entityID} />
-          </div>
-
+      <div className="cardContent grid-auto-rows  grid gap-3 ">
+        <div className="cardSectionAdder absolute top-3 z-10">
+          <SectionAdder entityID={props.entityID} />
+        </div>
+        <div className="cardInfo mr-0 ml-auto flex h-[42px] shrink-0 items-center gap-2 ">
+          {cardCreatorName ? (
+            <div className="text-sm text-grey-55">by {cardCreatorName}</div>
+          ) : null}
+          <CardMoreOptionsMenu
+            onDelete={props.onDelete}
+            entityID={props.entityID}
+            referenceFactID={props?.referenceFactID}
+            setDateEditing={() => {
+              setDateEditing(true);
+            }}
+            date={date}
+          />
+        </div>
+        <div className="flex flex-col gap-0">
+          <Title entityID={props.entityID} />
           <ScheduledDate
             entityID={props.entityID}
             date={date}
@@ -211,10 +209,7 @@ export const CardContent = (props: {
             closeDateEditing={() => setDateEditing(false)}
             openDateEditing={() => setDateEditing(true)}
           />
-
-          {/* <DateSection entityID={props.entityID} /> */}
         </div>
-
         <DefaultTextSection entityID={props.entityID} />
 
         {/* show the image and attached cards if any */}
@@ -222,7 +217,6 @@ export const CardContent = (props: {
         <AttachedCardSection entityID={props.entityID} />
 
         {/* this handles the triggers to add cards, image, and date! */}
-        <SectionAdder entityID={props.entityID} />
       </div>
       {/* END CARD CONTENT */}
       {/* <Divider /> */}
@@ -506,56 +500,42 @@ export const SectionAdder = (props: { entityID: string }) => {
 
   if (!authorized) return null;
   return (
-    <div className="flex flex-col gap-2 text-grey-55">
-      <div className="flex gap-2 pt-2">
-        <button
-          className="inline-block w-max cursor-pointer text-grey-55 hover:text-accent-blue"
-          onClick={async () => {
-            if (memberName) return;
-            if (cardTitle) {
-              await mutate("updateTitleFact", {
-                attribute: "card/title",
-                entity: props.entityID,
-                value: "",
-              });
-              await mutate("retractFact", cardTitle);
-            } else {
-              await mutate("updateTitleFact", {
-                attribute: "card/title",
-                entity: props.entityID,
-                value: "",
-              });
-            }
-          }}
+    <div className="lightBorder flex w-fit gap-2  bg-white p-2 text-grey-55">
+      <button
+        className="inline-block w-max cursor-pointer text-grey-55 hover:text-accent-blue"
+        onClick={async () => {
+          if (memberName) return;
+          if (cardTitle) {
+            await mutate("updateTitleFact", {
+              attribute: "card/title",
+              entity: props.entityID,
+              value: "",
+            });
+            await mutate("retractFact", cardTitle);
+          } else {
+            await mutate("updateTitleFact", {
+              attribute: "card/title",
+              entity: props.entityID,
+              value: "",
+            });
+          }
+        }}
+      >
+        <TitleAdd />
+      </button>
+      <MakeImage entity={props.entityID} />
+      {attachedCards && attachedCards.length !== 0 ? null : (
+        <AddExistingCard
+          parentID={props.entityID}
+          attribute="deck/contains"
+          positionKey="eav"
         >
-          <TitleAdd />
-        </button>
-        <MakeImage entity={props.entityID} />
-
-        {attachedCards && attachedCards.length !== 0 ? null : (
-          <AddExistingCard
-            parentID={props.entityID}
-            attribute="deck/contains"
-            positionKey="eav"
-          >
-            <div className="hover:text-accent-blue">
-              <CardAdd />
-            </div>
-          </AddExistingCard>
-        )}
-
-        {reactions.length === 0 && (
-          <button
-            className="text-grey-55 hover:text-accent-blue"
-            onClick={() => setOpen(!open)}
-          >
-            <ReactionAdd />
-          </button>
-        )}
-      </div>
-      {open && authorized && (
-        <AddReaction entityID={props.entityID} close={() => setOpen(false)} />
+          <div className="hover:text-accent-blue">
+            <CardAdd />
+          </div>
+        </AddExistingCard>
       )}
+      add the date stuff
     </div>
   );
 };
