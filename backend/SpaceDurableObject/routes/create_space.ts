@@ -91,6 +91,9 @@ export const create_space_route = makeRoute({
       owner: session.id,
       display_name: msg.display_name,
       description: msg.description,
+      image: msg.image?.filetype === "image" ? msg.image.id : null,
+      default_space_image:
+        msg.image?.filetype === "external_image" ? msg.image.url : null,
       start_date: msg.start_date,
       end_date: msg.end_date,
     });

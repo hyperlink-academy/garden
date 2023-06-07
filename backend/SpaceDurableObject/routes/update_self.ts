@@ -38,6 +38,11 @@ export const update_self_route = makeRoute({
     await supabase.from("space_data").upsert({
       do_id: env.id,
       owner: session.id,
+      image: msg.data.image?.filetype === "image" ? msg.data.image.id : null,
+      default_space_image:
+        msg.data.image?.filetype === "external_image"
+          ? msg.data.image.url
+          : null,
       display_name: msg.data.display_name,
       description: msg.data.description,
       start_date: msg.data.start_date,
