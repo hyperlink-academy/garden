@@ -51,6 +51,14 @@ export const update_space_data_route = makeRoute({
     await supabase.from("space_data").upsert({
       do_id: env.id,
       owner: owner_id.data.id,
+      image:
+        data["space/door/uploaded-image"]?.filetype === "image"
+          ? data["space/door/uploaded-image"]?.id
+          : null,
+      default_space_image:
+        data["space/door/uploaded-image"]?.filetype === "external_image"
+          ? data["space/door/uploaded-image"]?.url
+          : null,
       display_name: data["space/display_name"],
       description: data["space/description"],
       start_date: data["space/start-date"]?.value,

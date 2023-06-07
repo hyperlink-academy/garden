@@ -50,6 +50,7 @@ export interface Database {
           name?: string
           spaceID?: string
         }
+        Relationships: []
       }
       file_uploads: {
         Row: {
@@ -76,6 +77,14 @@ export interface Database {
           space?: string
           user_id?: string
         }
+        Relationships: [
+          {
+            foreignKeyName: "file_uploads_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       identity_data: {
         Row: {
@@ -93,6 +102,14 @@ export interface Database {
           studio?: string
           username?: string
         }
+        Relationships: [
+          {
+            foreignKeyName: "identity_data_id_fkey"
+            columns: ["id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       old_identities: {
         Row: {
@@ -113,9 +130,11 @@ export interface Database {
           studio?: string
           username?: string
         }
+        Relationships: []
       }
       space_data: {
         Row: {
+          default_space_image: string | null
           description: string | null
           display_name: string | null
           do_id: string
@@ -125,6 +144,7 @@ export interface Database {
           start_date: string | null
         }
         Insert: {
+          default_space_image?: string | null
           description?: string | null
           display_name?: string | null
           do_id: string
@@ -134,6 +154,7 @@ export interface Database {
           start_date?: string | null
         }
         Update: {
+          default_space_image?: string | null
           description?: string | null
           display_name?: string | null
           do_id?: string
@@ -142,6 +163,14 @@ export interface Database {
           owner?: string
           start_date?: string | null
         }
+        Relationships: [
+          {
+            foreignKeyName: "space_data_owner_fkey"
+            columns: ["owner"]
+            referencedRelation: "identity_data"
+            referencedColumns: ["id"]
+          }
+        ]
       }
     }
     Views: {
@@ -193,6 +222,14 @@ export interface Database {
           public?: boolean | null
           updated_at?: string | null
         }
+        Relationships: [
+          {
+            foreignKeyName: "buckets_owner_fkey"
+            columns: ["owner"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       migrations: {
         Row: {
@@ -213,6 +250,7 @@ export interface Database {
           id?: number
           name?: string
         }
+        Relationships: []
       }
       objects: {
         Row: {
@@ -251,6 +289,20 @@ export interface Database {
           updated_at?: string | null
           version?: string | null
         }
+        Relationships: [
+          {
+            foreignKeyName: "objects_bucketId_fkey"
+            columns: ["bucket_id"]
+            referencedRelation: "buckets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "objects_owner_fkey"
+            columns: ["owner"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
       }
     }
     Views: {
@@ -282,7 +334,7 @@ export interface Database {
         Args: {
           name: string
         }
-        Returns: string[]
+        Returns: unknown
       }
       get_size_by_bucket: {
         Args: Record<PropertyKey, never>
