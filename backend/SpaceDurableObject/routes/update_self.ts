@@ -30,19 +30,6 @@ export const update_self_route = makeRoute({
     if (!thisEntity)
       return { data: { success: false, error: "No this entity" } } as const;
 
-    await supabase.from("space_data").upsert({
-      do_id: env.id,
-      owner: session.id,
-      image: msg.data.image?.filetype === "image" ? msg.data.image.id : null,
-      default_space_image:
-        msg.data.image?.filetype === "external_image"
-          ? msg.data.image.url
-          : null,
-      display_name: msg.data.display_name,
-      description: msg.data.description,
-      start_date: msg.data.start_date,
-      end_date: msg.data.end_date,
-    });
 
     let selfStub = env.env.SPACES.get(env.env.SPACES.idFromString(env.id));
     await privateSpaceAPI(selfStub)(
@@ -68,6 +55,20 @@ export const update_self_route = makeRoute({
         }
       );
     }
+    await supabase
+      .from("space_data")
+      .update({
+        image: msg.data.image?.filetype === "image" ? msg.data.image.id : null,
+        default_space_image:
+          msg.data.image?.filetype === "external_image"
+            ? msg.data.image.url
+            : null,
+        display_name: msg.data.display_name,
+        description: msg.data.description,
+        start_date: msg.data.start_date,
+        end_date: msg.data.end_date,
+      })
+      .eq("do_id", env.id);
 
     return { data: { success: true } } as const;
   },

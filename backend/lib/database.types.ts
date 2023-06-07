@@ -140,6 +140,7 @@ export interface Database {
           do_id: string
           end_date: string | null
           image: string | null
+          name: string
           owner: string
           start_date: string | null
         }
@@ -150,6 +151,7 @@ export interface Database {
           do_id: string
           end_date?: string | null
           image?: string | null
+          name: string
           owner: string
           start_date?: string | null
         }
@@ -160,6 +162,7 @@ export interface Database {
           do_id?: string
           end_date?: string | null
           image?: string | null
+          name?: string
           owner?: string
           start_date?: string | null
         }

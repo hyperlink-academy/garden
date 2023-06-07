@@ -18,6 +18,7 @@ export const update_space_data_route = makeRoute({
       "space/start-date",
       "space/end-date",
       "space/door/uploaded-image",
+      "space/name",
     ] as const;
     let data: {
       [k in (typeof attributes)[number]]: Fact<k>["value"] | undefined;
@@ -41,29 +42,25 @@ export const update_space_data_route = makeRoute({
     );
     if (!owner || !data["space/display_name"])
       return { data: { success: false } };
-    let owner_id = await supabase
-      .from("identity_data")
-      .select("id")
-      .eq("studio", owner)
-      .single();
-    if (!owner_id.data) return { data: { success: false } };
 
-    await supabase.from("space_data").upsert({
-      do_id: env.id,
-      owner: owner_id.data.id,
-      image:
-        data["space/door/uploaded-image"]?.filetype === "image"
-          ? data["space/door/uploaded-image"]?.id
-          : null,
-      default_space_image:
-        data["space/door/uploaded-image"]?.filetype === "external_image"
-          ? data["space/door/uploaded-image"]?.url
-          : null,
-      display_name: data["space/display_name"],
-      description: data["space/description"],
-      start_date: data["space/start-date"]?.value,
-      end_date: data["space/end-date"]?.value,
-    });
+    await supabase
+      .from("space_data")
+      .update({
+        name: data["space/name"],
+        image:
+          data["space/door/uploaded-image"]?.filetype === "image"
+            ? data["space/door/uploaded-image"]?.id
+            : null,
+        default_space_image:
+          data["space/door/uploaded-image"]?.filetype === "external_image"
+            ? data["space/door/uploaded-image"]?.url
+            : null,
+        display_name: data["space/display_name"],
+        description: data["space/description"],
+        start_date: data["space/start-date"]?.value,
+        end_date: data["space/end-date"]?.value,
+      })
+      .eq("do_id", env.id);
 
     return {
       data: {

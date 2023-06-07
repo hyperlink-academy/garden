@@ -71,6 +71,7 @@ export const create_space_route = makeRoute({
 
     await supabase.from("space_data").insert({
       do_id: newSpace.toString(),
+      name: (spaceIndex + 1).toString(),
       owner: session.id,
       display_name: msg.display_name,
       description: msg.description,
