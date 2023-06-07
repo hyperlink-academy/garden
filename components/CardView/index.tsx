@@ -7,6 +7,7 @@ import {
   CalendarMedium,
   CardAdd,
   ReactionAdd,
+  TitleAdd,
 } from "components/Icons";
 import { Divider, MenuContainer, MenuItem, Modal } from "components/Layout";
 import {
@@ -176,9 +177,6 @@ export const CardContent = (props: {
   )?.value;
   let [dateEditing, setDateEditing] = useUndoableState(false);
 
-  let { session } = useAuth();
-  let { mutate, authorized } = useMutations();
-
   let date = useIndex.eav(props.entityID, "card/date");
 
   return (
@@ -252,21 +250,23 @@ const Title = (props: { entityID: string }) => {
   let cardTitle = useIndex.eav(props.entityID, "card/title");
   let titleFact = memberName || cardTitle;
   return (
-    <SingleTextSection
-      id="card-title"
-      className="bg-inherit text-xl font-bold"
-      onKeyDown={(e) => {
-        if (e.key === "Enter") {
-          let className = `${props.entityID}-default-text-section}`;
-          let element = document.getElementById(className);
-          element?.focus();
-        }
-      }}
-      entityID={props.entityID}
-      section={titleFact?.attribute || "card/title"}
-      previewOnly={titleFact?.attribute === "member/name"}
-      placeholder={authorized ? "write something..." : "Untitled"}
-    />
+    (memberName || titleFact) && (
+      <SingleTextSection
+        id="card-title"
+        className="bg-inherit text-xl font-bold"
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            let className = `${props.entityID}-default-text-section}`;
+            let element = document.getElementById(className);
+            element?.focus();
+          }
+        }}
+        entityID={props.entityID}
+        section={titleFact?.attribute || "card/title"}
+        previewOnly={titleFact?.attribute === "member/name"}
+        placeholder={authorized ? "write something..." : "Untitled"}
+      />
+    )
   );
 };
 
@@ -497,15 +497,39 @@ const DefaultTextSection = (props: { entityID: string }) => {
 };
 
 export const SectionAdder = (props: { entityID: string }) => {
-  let { authorized } = useMutations();
+  let { authorized, mutate } = useMutations();
   let [open, setOpen] = useState(false);
   let attachedCards = useIndex.eav(props.entityID, "deck/contains");
   let reactions = useReactions(props.entityID);
+  let memberName = useIndex.eav(props.entityID, "member/name");
+  let cardTitle = useIndex.eav(props.entityID, "card/title");
 
   if (!authorized) return null;
   return (
     <div className="flex flex-col gap-2 text-grey-55">
       <div className="flex gap-2 pt-2">
+        <button
+          className="inline-block w-max cursor-pointer text-grey-55 hover:text-accent-blue"
+          onClick={async () => {
+            if (memberName) return;
+            if (cardTitle) {
+              await mutate("updateTitleFact", {
+                attribute: "card/title",
+                entity: props.entityID,
+                value: "",
+              });
+              await mutate("retractFact", cardTitle);
+            } else {
+              await mutate("updateTitleFact", {
+                attribute: "card/title",
+                entity: props.entityID,
+                value: "",
+              });
+            }
+          }}
+        >
+          <TitleAdd />
+        </button>
         <MakeImage entity={props.entityID} />
 
         {attachedCards && attachedCards.length !== 0 ? null : (
