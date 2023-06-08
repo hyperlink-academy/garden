@@ -255,9 +255,13 @@ export const AttachedCardSection = (props: { entityID: string }) => {
   let attachedCards = useIndex.eav(props.entityID, "deck/contains");
   return (
     <>
-      {attachedCards && attachedCards.length === 0 ? null : (
+      {attachedCards && attachedCards.length > 0 && (
         <div className="flex flex-col gap-2">
-          <CardCollection entityID={props.entityID} attribute="deck/contains" />
+          <CardCollection
+            entityID={props.entityID}
+            attribute="deck/contains"
+            cards={attachedCards}
+          />
         </div>
       )}
     </>

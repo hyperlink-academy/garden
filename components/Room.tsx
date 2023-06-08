@@ -1,5 +1,5 @@
 import { Fact } from "data/Facts";
-import { useIndex } from "hooks/useReplicache";
+import { scanIndex, useIndex } from "hooks/useReplicache";
 import { usePreserveScroll } from "hooks/utils";
 import { useEffect, useRef, useState } from "react";
 import useMeasure from "react-use-measure";
@@ -11,10 +11,62 @@ import { GoToTop, MoreOptionsTiny } from "./Icons";
 import { SearchRoom } from "./SearchRoom";
 import { EditRoomModal } from "./SpaceLayout/Sidebar/RoomListLayout";
 import { RenderedText } from "./Textarea/RenderedText";
+import * as z from "zod";
+import { useSubscribe } from "hooks/useSubscribe";
+import { sortByPosition } from "src/position_helpers";
 
-export const Room = (props: { entityID: string | null }) => {
+let FilterVerifier = z.array(
+  z.object({
+    reaction: z.string(),
+    not: z.boolean(),
+  })
+);
+type Filters = z.TypeOf<typeof FilterVerifier>;
+
+export const Room = (props: { entityID: string }) => {
   let roomType = useIndex.eav(props.entityID, "room/type");
   let { ref } = usePreserveScroll<HTMLDivElement>(props.entityID);
+
+  // CARD COLLECTION FILTERS
+  let [filters, setFilters] = useState<Filters>([]);
+
+  // set filter values based on local storage
+  useEffect(() => {
+    try {
+      let filterString = window.localStorage.getItem(
+        `cardCollectionFilters-${props.entityID}`
+      );
+      if (filterString) {
+        let parsed = FilterVerifier.safeParse(JSON.parse(filterString));
+        if (parsed.success) setFilters(parsed.data);
+      }
+    } catch (e) {}
+  }, []);
+  // save filter values to local storage every time the filters state is updated
+  useEffect(() => {
+    window.localStorage.setItem(
+      `cardCollectionFilters-${props.entityID}`,
+      JSON.stringify(filters)
+    );
+  }, [filters]);
+
+  let cards = useCards(props.entityID, "desktop/contains");
+  let reactions = cards.reduce((acc, card) => {
+    for (let reaction of card.reactions) {
+      if (!acc.includes(reaction)) acc.push(reaction);
+    }
+    return acc;
+  }, [] as string[]);
+
+  let cardsFiltered = cards.filter((card) => {
+    let passed = true;
+    for (let filter of filters) {
+      if (filter.not)
+        passed = passed && !card.reactions.includes(filter.reaction);
+      else passed = passed && card.reactions.includes(filter.reaction);
+    }
+    return passed;
+  });
 
   if (props.entityID === "search") return <SearchRoom />;
   if (props.entityID === "calendar") return <CalendarRoom />;
@@ -25,14 +77,19 @@ export const Room = (props: { entityID: string | null }) => {
       ref={ref}
       className="no-scrollbar m-2 flex h-full w-[336px] flex-col gap-1 overflow-x-hidden overflow-y-scroll text-sm sm:m-4"
     >
-      <RoomHeader entityID={props.entityID} />
+      <RoomHeader
+        entityID={props.entityID}
+        reactions={reactions}
+        filters={filters}
+        setFilters={setFilters}
+      />
 
       {/* per-room wrappers + components */}
       {props.entityID ? (
         roomType?.value === "collection" ? (
           <div className="flex min-h-[calc(100vh-132px)] flex-col gap-2">
             <CardCollection
-              filterable
+              cards={cardsFiltered}
               entityID={props.entityID}
               attribute="desktop/contains"
             />
@@ -52,7 +109,12 @@ export const Room = (props: { entityID: string | null }) => {
   );
 };
 
-function RoomHeader(props: { entityID: string | null }) {
+function RoomHeader(props: {
+  entityID: string;
+  reactions: string[];
+  filters: Filters;
+  setFilters: (f: (old: Filters) => Filters) => void;
+}) {
   const [isRoomDescriptionVisible, setIsRoomDescriptionVisible] =
     useState(true);
   const [
@@ -92,6 +154,8 @@ function RoomHeader(props: { entityID: string | null }) {
 
   let descriptionRef = useRef<null | HTMLDivElement>(null);
 
+  let roomType = useIndex.eav(props.entityID, "room/type");
+
   return (
     <>
       <div className="sticky top-0 z-10 bg-background" ref={titleRef}>
@@ -123,31 +187,68 @@ function RoomHeader(props: { entityID: string | null }) {
         </div>
 
         {!isRoomDescriptionVisible && !isToggleableRoomDescriptionHidden && (
-          <div id="roomDescription2" className="-mt-1 pb-2">
+          <>
+            <div
+              id="roomDescription2"
+              className="-mt-0 flex flex-col gap-2 pb-2"
+            >
+              {roomDescription?.value && (
+                <RenderedText
+                  style={{
+                    whiteSpace: "pre-wrap",
+                    fontFamily: "inherit",
+                    width: "100%",
+                  }}
+                  className="pb-1 text-sm text-grey-35"
+                  text={roomDescription?.value || ""}
+                />
+              )}
+
+              {props.reactions.length > 0 ? (
+                <div className="flex justify-between gap-2">
+                  {roomType?.value === "collection" ? (
+                    <FilterByReactions
+                      reactions={props.reactions}
+                      filters={props.filters}
+                      setFilters={props.setFilters}
+                    />
+                  ) : null}
+                </div>
+              ) : null}
+            </div>
+          </>
+        )}
+      </div>
+      {/* allow expanded toggle if description OR reactions for filtering */}
+      {roomDescription?.value || props.reactions.length > 0 ? (
+        <div
+          id="roomDescription"
+          className="-mt-1 flex flex-col gap-2 pb-2"
+          ref={descriptionRef}
+        >
+          {roomDescription?.value && (
             <RenderedText
+              className="text-sm text-grey-35"
+              id="roomDescriptionY"
               style={{
                 whiteSpace: "pre-wrap",
                 fontFamily: "inherit",
                 width: "100%",
               }}
-              className="pb-1 text-sm text-grey-35"
               text={roomDescription?.value || ""}
             />
-          </div>
-        )}
-      </div>
-      {roomDescription?.value ? (
-        <div id="roomDescription" className="-mt-2 pb-2" ref={descriptionRef}>
-          <RenderedText
-            className="text-sm text-grey-35"
-            id="roomDescriptionY"
-            style={{
-              whiteSpace: "pre-wrap",
-              fontFamily: "inherit",
-              width: "100%",
-            }}
-            text={roomDescription?.value || ""}
-          />
+          )}
+          {props.reactions.length > 0 ? (
+            <div className="flex justify-between gap-2">
+              {roomType?.value === "collection" ? (
+                <FilterByReactions
+                  reactions={props.reactions}
+                  filters={props.filters}
+                  setFilters={props.setFilters}
+                />
+              ) : null}
+            </div>
+          ) : null}
         </div>
       ) : null}
 
@@ -175,5 +276,77 @@ function RoomOptions(props: { entityID: string | null }) {
         currentRoom={props.entityID}
       />
     </>
+  );
+}
+
+const useCards = (
+  entityID: string,
+  attribute: "desktop/contains" | "deck/contains"
+) => {
+  let cards = useSubscribe(
+    async (tx) => {
+      let allCards = await scanIndex(tx).eav(entityID, attribute);
+      return Promise.all(
+        allCards.sort(sortByPosition("eav")).map(async (card) => {
+          let reactions = (
+            await scanIndex(tx).eav(card.value.value, "card/reaction")
+          ).map((r) => r.value);
+          return { ...card, reactions };
+        })
+      );
+    },
+    [],
+    [entityID, attribute],
+    `${entityID}-cards`
+  );
+  return cards;
+};
+
+function FilterByReactions(props: {
+  reactions: string[];
+  filters: Filters;
+  setFilters: (f: (old: Filters) => Filters) => void;
+}) {
+  return (
+    <div className="flex flex-row flex-wrap gap-2">
+      {props.reactions.map((reaction) => {
+        let existingFilter = props.filters.find((f) => f.reaction === reaction);
+        return (
+          <button
+            key={reaction}
+            onClick={() => {
+              props.setFilters((oldFilters) => {
+                let existingFilter = oldFilters.find(
+                  (f) => f.reaction === reaction
+                );
+                if (!existingFilter)
+                  return [...oldFilters, { reaction, not: false }];
+                if (existingFilter.not)
+                  return oldFilters.filter((f) => f.reaction !== reaction);
+                return oldFilters.map((f) =>
+                  f.reaction === reaction ? { ...f, not: true } : f
+                );
+              });
+            }}
+            className={`text-md flex items-center gap-2 rounded-md border px-2 py-0.5 ${
+              existingFilter
+                ? existingFilter.not
+                  ? "border-accent-red bg-bg-red"
+                  : "border-accent-green bg-bg-green"
+                : "border-grey-80"
+            }`}
+          >
+            <strong>
+              {existingFilter?.reaction === reaction &&
+                (existingFilter.not ? "−" : "+")}{" "}
+              {reaction}
+            </strong>{" "}
+          </button>
+        );
+      })}
+      {props.filters.length > 0 && (
+        <button onClick={() => props.setFilters(() => [])}>clear</button>
+      )}
+    </div>
   );
 }
