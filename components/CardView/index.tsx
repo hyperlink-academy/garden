@@ -175,18 +175,22 @@ export const CardContent = (props: {
     cardCreator?.value.value as string,
     "member/name"
   )?.value;
-  let [dateEditing, setDateEditing] = useUndoableState(false);
-
   let date = useIndex.eav(props.entityID, "card/date");
+  let [dateEditing, setDateEditing] = useUndoableState(false);
 
   return (
     <>
       {/* START CARD CONTENT */}
       <div className="cardContent grid-auto-rows  grid gap-3 ">
-        <div className="cardSectionAdder absolute top-3 z-10">
-          <SectionAdder entityID={props.entityID} />
+        <div className="cardSectionAdder absolute top-4 z-10">
+          <SectionAdder
+            entityID={props.entityID}
+            setDateEditing={() => {
+              setDateEditing(true);
+            }}
+          />
         </div>
-        <div className="cardInfo mr-0 ml-auto flex h-[42px] shrink-0 items-center gap-2 ">
+        <div className="cardInfo mr-0 ml-auto mb-2 flex h-[42px] shrink-0 items-center gap-3">
           {cardCreatorName ? (
             <div className="text-sm text-grey-55">by {cardCreatorName}</div>
           ) : null}
@@ -194,10 +198,6 @@ export const CardContent = (props: {
             onDelete={props.onDelete}
             entityID={props.entityID}
             referenceFactID={props?.referenceFactID}
-            setDateEditing={() => {
-              setDateEditing(true);
-            }}
-            date={date}
           />
         </div>
         <div className="flex flex-col gap-0">
@@ -268,8 +268,6 @@ const CardMoreOptionsMenu = (props: {
   entityID: string;
   referenceFactID?: string;
   onDelete?: () => void;
-  setDateEditing: () => void;
-  date: Fact<"card/date"> | null;
 }) => {
   let { authorized, mutate, action } = useMutations();
   let memberName = useIndex.eav(props.entityID, "member/name");
@@ -284,18 +282,6 @@ const CardMoreOptionsMenu = (props: {
         <MoreOptionsTiny />
       </Menu.Button>
       <MenuContainer>
-        <MenuItem
-          onClick={() => {
-            if (props.date !== null) {
-              mutate("retractFact", { id: props.date.id });
-            } else {
-              props.setDateEditing();
-            }
-          }}
-        >
-          {props.date ? <p>Remove Schedule</p> : <p>Schedule Card</p>}
-          <CalendarMedium />
-        </MenuItem>
         <div className="py-2">
           <Divider />
         </div>{" "}
@@ -397,11 +383,12 @@ const ScheduledDate = (props: {
   if (!props.dateEditing && !date) return null;
 
   return (
-    <div className="flex place-items-center gap-2  text-sm text-grey-55">
+    <div className="flex place-items-center gap-2  text-sm font-bold text-grey-55">
+      Scheduled for{" "}
       {props.dateEditing ? (
         <>
           <input
-            className="-ml-1 border-grey-80 py-[2px] px-1 text-grey-55 "
+            className="-ml-1 border-grey-80 py-[2px] px-1 font-bold text-grey-55 "
             onBlur={() => {
               props.closeDateEditing();
             }}
@@ -443,7 +430,7 @@ const ScheduledDate = (props: {
       ) : date ? (
         authorized ? (
           <button
-            className="-ml-[5px] border border-transparent py-[3px] px-1 text-sm text-grey-55 hover:underline"
+            className="-ml-[5px] border border-transparent py-[3px] px-1 text-sm font-bold text-grey-55 hover:underline"
             onClick={() => {
               props.openDateEditing();
             }}
@@ -490,13 +477,17 @@ const DefaultTextSection = (props: { entityID: string }) => {
   );
 };
 
-export const SectionAdder = (props: { entityID: string }) => {
+export const SectionAdder = (props: {
+  entityID: string;
+  setDateEditing: () => void;
+}) => {
   let { authorized, mutate } = useMutations();
   let [open, setOpen] = useState(false);
   let attachedCards = useIndex.eav(props.entityID, "deck/contains");
   let reactions = useReactions(props.entityID);
   let memberName = useIndex.eav(props.entityID, "member/name");
   let cardTitle = useIndex.eav(props.entityID, "card/title");
+  let date = useIndex.eav(props.entityID, "card/date");
 
   if (!authorized) return null;
   return (
@@ -535,7 +526,17 @@ export const SectionAdder = (props: { entityID: string }) => {
           </div>
         </AddExistingCard>
       )}
-      add the date stuff
+      <button
+        onClick={() => {
+          if (date !== null) {
+            mutate("retractFact", { id: date.id });
+          } else {
+            props.setDateEditing();
+          }
+        }}
+      >
+        <CalendarMedium />
+      </button>
     </div>
   );
 };
