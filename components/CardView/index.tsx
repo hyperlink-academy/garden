@@ -5,7 +5,6 @@ import {
   Delete,
   Member,
   CalendarMedium,
-  TitleToggle,
   CardSmallLined,
   SectionImageAdd,
 } from "components/Icons";
@@ -247,23 +246,21 @@ const Title = (props: { entityID: string }) => {
   let cardTitle = useIndex.eav(props.entityID, "card/title");
   let titleFact = memberName || cardTitle;
   return (
-    (memberName || titleFact) && (
-      <SingleTextSection
-        id="card-title"
-        className="bg-inherit text-xl font-bold"
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            let className = `${props.entityID}-default-text-section}`;
-            let element = document.getElementById(className);
-            element?.focus();
-          }
-        }}
-        entityID={props.entityID}
-        section={titleFact?.attribute || "card/title"}
-        previewOnly={titleFact?.attribute === "member/name"}
-        placeholder={authorized ? "write something..." : "Untitled"}
-      />
-    )
+    <SingleTextSection
+      id="card-title"
+      className="bg-inherit text-xl font-bold"
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          let className = `${props.entityID}-default-text-section}`;
+          let element = document.getElementById(className);
+          element?.focus();
+        }
+      }}
+      entityID={props.entityID}
+      section={titleFact?.attribute || "card/title"}
+      previewOnly={titleFact?.attribute === "member/name"}
+      placeholder={authorized ? "Untitled" : "Untitled"}
+    />
   );
 };
 
@@ -486,8 +483,8 @@ export const SectionAdder = (props: {
   let { authorized, mutate } = useMutations();
   let image = useIndex.eav(props.entityID, "card/image");
   let attachedCards = useIndex.eav(props.entityID, "deck/contains");
-  let memberName = useIndex.eav(props.entityID, "member/name");
-  let cardTitle = useIndex.eav(props.entityID, "card/title");
+  // let memberName = useIndex.eav(props.entityID, "member/name");
+  // let cardTitle = useIndex.eav(props.entityID, "card/title");
   let date = useIndex.eav(props.entityID, "card/date");
 
   let toggledOffStyle =
@@ -499,7 +496,7 @@ export const SectionAdder = (props: {
   return (
     <div className="flex w-fit gap-2 rounded-md border border-grey-90  bg-white px-3 py-2 text-grey-55">
       {/* TITLE ADDER */}
-      <button
+      {/* <button
         className={`${cardTitle ? toggledOnStyle : toggledOffStyle} `}
         onClick={async () => {
           if (memberName) return;
@@ -527,7 +524,7 @@ export const SectionAdder = (props: {
         }}
       >
         <TitleToggle />
-      </button>
+      </button> */}
       {/* END TITLE ADDER */}
 
       {/* IMAGE ADDER */}
