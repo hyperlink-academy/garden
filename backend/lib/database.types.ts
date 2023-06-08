@@ -111,6 +111,34 @@ export interface Database {
           }
         ]
       }
+      members_in_spaces: {
+        Row: {
+          member: string
+          space_do_id: string
+        }
+        Insert: {
+          member: string
+          space_do_id: string
+        }
+        Update: {
+          member?: string
+          space_do_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "members_in_spaces_member_fkey"
+            columns: ["member"]
+            referencedRelation: "identity_data"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "members_in_spaces_space_do_id_fkey"
+            columns: ["space_do_id"]
+            referencedRelation: "space_data"
+            referencedColumns: ["do_id"]
+          }
+        ]
+      }
       old_identities: {
         Row: {
           email: string
