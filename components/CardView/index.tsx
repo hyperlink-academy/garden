@@ -7,7 +7,9 @@ import {
   CalendarMedium,
   CardAdd,
   ReactionAdd,
-  TitleAdd,
+  TitleToggle,
+  CardSmall,
+  CardSmallLined,
 } from "components/Icons";
 import { Divider, MenuContainer, MenuItem, Modal } from "components/Layout";
 import {
@@ -181,8 +183,11 @@ export const CardContent = (props: {
   return (
     <>
       {/* START CARD CONTENT */}
-      <div className="cardContent grid-auto-rows  grid gap-3 ">
-        <div className="cardSectionAdder absolute top-4 z-10">
+      <div
+        className="cardContentWrapper relative"
+        id="cardContentScrollContainer"
+      >
+        <div className="cardSectionAdder sticky top-0 z-10">
           <SectionAdder
             entityID={props.entityID}
             setDateEditing={() => {
@@ -190,33 +195,35 @@ export const CardContent = (props: {
             }}
           />
         </div>
-        <div className="cardInfo mr-0 ml-auto mb-2 flex h-[42px] shrink-0 items-center gap-3">
-          {cardCreatorName ? (
-            <div className="text-sm text-grey-55">by {cardCreatorName}</div>
-          ) : null}
-          <CardMoreOptionsMenu
-            onDelete={props.onDelete}
-            entityID={props.entityID}
-            referenceFactID={props?.referenceFactID}
-          />
-        </div>
-        <div className="flex flex-col gap-0">
-          <Title entityID={props.entityID} />
-          <ScheduledDate
-            entityID={props.entityID}
-            date={date}
-            dateEditing={dateEditing}
-            closeDateEditing={() => setDateEditing(false)}
-            openDateEditing={() => setDateEditing(true)}
-          />
-        </div>
-        <DefaultTextSection entityID={props.entityID} />
+        <div className="cardContent grid-auto-rows relative grid gap-3">
+          <div className="cardInfo mr-0 ml-auto -mt-[42px] flex h-[42px] shrink-0 items-center justify-end gap-3">
+            {cardCreatorName ? (
+              <div className="text-sm text-grey-55">{cardCreatorName}</div>
+            ) : null}
+            <CardMoreOptionsMenu
+              onDelete={props.onDelete}
+              entityID={props.entityID}
+              referenceFactID={props?.referenceFactID}
+            />
+          </div>
+          <div className="flex flex-col gap-0">
+            <Title entityID={props.entityID} />
+            <ScheduledDate
+              entityID={props.entityID}
+              date={date}
+              dateEditing={dateEditing}
+              closeDateEditing={() => setDateEditing(false)}
+              openDateEditing={() => setDateEditing(true)}
+            />
+          </div>
+          <DefaultTextSection entityID={props.entityID} />
 
-        {/* show the image and attached cards if any */}
-        <ImageSection entityID={props.entityID} />
-        <AttachedCardSection entityID={props.entityID} />
+          {/* show the image and attached cards if any */}
+          <ImageSection entityID={props.entityID} />
+          <AttachedCardSection entityID={props.entityID} />
 
-        {/* this handles the triggers to add cards, image, and date! */}
+          {/* this handles the triggers to add cards, image, and date! */}
+        </div>
       </div>
       {/* END CARD CONTENT */}
       {/* <Divider /> */}
@@ -282,9 +289,6 @@ const CardMoreOptionsMenu = (props: {
         <MoreOptionsTiny />
       </Menu.Button>
       <MenuContainer>
-        <div className="py-2">
-          <Divider />
-        </div>{" "}
         <MenuItem
           onClick={() => {
             setAreYouSureCardDeletionModalOpen(true);
@@ -491,10 +495,12 @@ export const SectionAdder = (props: {
 
   if (!authorized) return null;
   return (
-    <div className="lightBorder flex w-fit gap-2  bg-white p-2 text-grey-55">
+    <div className="flex w-fit gap-2 rounded-md border border-grey-90  bg-white px-3 py-2 text-grey-55">
       <button
         className="inline-block w-max cursor-pointer text-grey-55 hover:text-accent-blue"
         onClick={async () => {
+          let cardTitle = document.getElementById("card-title");
+
           if (memberName) return;
           if (cardTitle) {
             await mutate("updateTitleFact", {
@@ -512,7 +518,7 @@ export const SectionAdder = (props: {
           }
         }}
       >
-        <TitleAdd />
+        <TitleToggle />
       </button>
       <MakeImage entity={props.entityID} />
       {attachedCards && attachedCards.length !== 0 ? null : (
@@ -522,7 +528,7 @@ export const SectionAdder = (props: {
           positionKey="eav"
         >
           <div className="hover:text-accent-blue">
-            <CardAdd />
+            <CardSmallLined />
           </div>
         </AddExistingCard>
       )}
