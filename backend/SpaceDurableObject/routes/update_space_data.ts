@@ -40,6 +40,25 @@ export const update_space_data_route = makeRoute({
       env.env.SUPABASE_URL,
       env.env.SUPABASE_API_TOKEN
     );
+
+    let spaceNames = await env.factStore.scanIndex.aev(
+      "space/local-unique-name"
+    );
+    for (let spaceName of spaceNames) {
+      let spaceID = await env.factStore.scanIndex.eav(
+        spaceName.entity,
+        "space/id"
+      );
+      if (spaceID) {
+        await supabase
+          .from("space_data")
+          .update({
+            name: spaceName.value,
+          })
+          .eq("do_id", spaceID.value);
+      }
+    }
+
     if (!owner || !data["space/display_name"])
       return { data: { success: false } };
 
@@ -60,7 +79,6 @@ export const update_space_data_route = makeRoute({
     await supabase
       .from("space_data")
       .update({
-        name: data["space/name"],
         image:
           data["space/door/uploaded-image"]?.filetype === "image"
             ? data["space/door/uploaded-image"]?.id
