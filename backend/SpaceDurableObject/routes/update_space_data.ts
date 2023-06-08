@@ -43,6 +43,20 @@ export const update_space_data_route = makeRoute({
     if (!owner || !data["space/display_name"])
       return { data: { success: false } };
 
+    let members = await env.factStore.scanIndex.aev("space/member");
+    for (let member of members) {
+      let { data: memberID } = await supabase
+        .from("identity_data")
+        .select("id")
+        .eq("studio", member.value)
+        .single();
+      if (!memberID) continue;
+      await supabase.from("members_in_spaces").insert({
+        space_do_id: env.id,
+        member: memberID.id,
+      });
+    }
+
     await supabase
       .from("space_data")
       .update({

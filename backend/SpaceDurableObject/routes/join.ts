@@ -4,6 +4,8 @@ import { authTokenVerifier, verifyIdentity } from "backend/lib/auth";
 import { ulid } from "src/ulid";
 import { z } from "zod";
 import { Env } from "..";
+import { createClient } from "@supabase/supabase-js";
+import { Database } from "backend/lib/database.types";
 
 export const join_route = makeRoute({
   route: "join",
@@ -13,6 +15,10 @@ export const join_route = makeRoute({
     studio: z.string(),
   }),
   handler: async (msg, env: Env) => {
+    let supabase = createClient<Database>(
+      env.env.SUPABASE_URL,
+      env.env.SUPABASE_API_TOKEN
+    );
     let session = await verifyIdentity(env.env, msg.authToken);
     if (!session)
       return {
@@ -60,6 +66,9 @@ export const join_route = makeRoute({
       thisEntity,
       "space/start-date"
     );
+    await supabase
+      .from("members_in_spaces")
+      .insert({ space_do_id: env.id, member: session.id });
 
     let end_date = await env.factStore.scanIndex.eav(
       thisEntity,
