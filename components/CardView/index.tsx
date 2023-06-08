@@ -196,7 +196,7 @@ export const CardContent = (props: {
           />
         </div>
         <div className="cardContent grid-auto-rows relative grid gap-3">
-          <div className="cardInfo mr-0 ml-auto -mt-[42px] flex h-[42px] shrink-0 items-center justify-end gap-3">
+          <div className="cardInfo z-10 mr-0 ml-auto -mt-[42px] flex h-[42px] shrink-0 items-center justify-end gap-3">
             {cardCreatorName ? (
               <div className="text-sm text-grey-55">{cardCreatorName}</div>
             ) : null}
@@ -499,8 +499,6 @@ export const SectionAdder = (props: {
       <button
         className="inline-block w-max cursor-pointer text-grey-55 hover:text-accent-blue"
         onClick={async () => {
-          let cardTitle = document.getElementById("card-title");
-
           if (memberName) return;
           if (cardTitle) {
             await mutate("updateTitleFact", {
