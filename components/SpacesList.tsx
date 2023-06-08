@@ -1,19 +1,20 @@
 import { useIndex, useMutations } from "hooks/useReplicache";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { ButtonLink } from "./Buttons";
 import { DoorImage } from "./Doors";
 import { Information, SettingsStudio } from "./Icons";
 import { Modal } from "./Layout";
-import { prefetchSpaceId } from "./ReplicacheProvider";
 import { useAuth } from "hooks/useAuth";
 import { spacePath } from "hooks/utils";
-import { Fact } from "data/Facts";
 import { EditSpaceModal } from "./CreateSpace";
+import { useSpaceData } from "hooks/useSpaceData";
+import { Database } from "backend/lib/database.types";
 
-export const SpaceList = (props: {
-  spaces: Fact<"space/start-date" | "space/end-date" | "space/name">[];
-}) => {
+export type SpaceData = Database["public"]["Tables"]["space_data"]["Row"] & {
+  owner: { username: string; id: string; studio: string };
+};
+export const SpaceList = (props: { spaces: Array<SpaceData> }) => {
   return (
     <div>
       <style jsx>{`
@@ -26,70 +27,58 @@ export const SpaceList = (props: {
       `}</style>
       <div className="spacesList grid grid-cols-[repeat(auto-fill,148px)] justify-between gap-4">
         {props.spaces?.map((a) => {
-          return <Space entity={a.entity} key={a.id} />;
+          return <Space {...a} key={a.do_id} />;
         })}
       </div>
     </div>
   );
 };
 
-const Space = (props: { entity: string }) => {
+const Space = (props: SpaceData) => {
   let { session } = useAuth();
   let { authorized } = useMutations();
 
-  let studio = useIndex.eav(props.entity, "space/studio");
-  let display_name = useIndex.eav(props.entity, "space/display_name");
-  let name = useIndex.eav(props.entity, "space/name");
-  let description = useIndex.eav(props.entity, "space/description");
-  let unreads = useIndex.eav(props.entity, "space/unread-notifications");
+  let { data } = useSpaceData(props.do_id, props);
+  let spaceEntity = useIndex.ave("space/id", props.do_id);
+  let unreads = useIndex.eav(
+    spaceEntity?.entity || null,
+    "space/unread-notifications"
+  );
 
-  let start_date = useIndex.eav(props.entity, "space/start-date");
-  let end_date = useIndex.eav(props.entity, "space/end-date");
   let duration_days = null;
   // calculate duration, in days
   // add extra +1 day to account for start and end dates
-  if (start_date && end_date) {
-    let start = new Date(start_date.value.value);
-    let end = new Date(end_date.value.value);
+  if (data?.start_date && data?.end_date) {
+    let start = new Date(data.start_date);
+    let end = new Date(data.end_date);
     let start_timestamp = start.getTime();
     let end_timestamp = end.getTime();
     let delta = Math.abs(end_timestamp - start_timestamp) / 1000;
     duration_days = Math.floor(delta / 86400) + 1;
   }
 
-  let prefetched = useRef(false);
-
   return (
     <div className="flex w-min flex-col gap-4">
-      <div
-        className="-ml-2 grid grid-cols-[max-content,max-content] items-end gap-1 "
-        onPointerDown={() => {
-          if (prefetched.current) return;
-          if (!studio?.value) return;
-          if (name) prefetchSpaceId(studio.value, name?.value);
-          prefetched.current = true;
-        }}
-        onMouseOver={() => {
-          if (prefetched.current) return;
-          if (!studio?.value) return;
-          if (name) prefetchSpaceId(studio.value, name?.value);
-          prefetched.current = true;
-        }}
-      >
-        <Link href={`${spacePath(studio?.value, name?.value)}`}>
+      <div className="-ml-2 grid grid-cols-[max-content,max-content] items-end gap-1 ">
+        <Link href={`${spacePath(data?.owner.username, data?.name)}`}>
           <DoorImage
-            entityID={props.entity}
+            display_name={data?.display_name}
+            image={data?.image}
+            default_space_image={data?.default_space_image}
             glow={!!unreads && !!authorized && unreads.value > 0}
           />
         </Link>
         <div className="flex w-[20px] flex-col gap-4 pb-[92px]">
-          {studio?.value.toLocaleLowerCase() == session.session?.username ? (
-            <EditSpaceButton spaceEntity={props.entity} />
+          {data?.owner.username == session.session?.username ? (
+            <EditSpaceButton
+              spaceID={props.do_id}
+              owner={data?.owner.username}
+            />
           ) : (
             <SpaceInfo
-              studio={studio?.value}
-              name={display_name?.value}
-              description={description?.value}
+              studio={data?.owner.username}
+              name={data?.display_name}
+              description={data?.description}
             />
           )}
         </div>
@@ -104,12 +93,12 @@ const Space = (props: { entity: string }) => {
               }}
               className="text-xl"
             >
-              {display_name?.value}
+              {data?.display_name}
             </h3>
-            {start_date?.value.value ? (
+            {data?.start_date ? (
               <div className="text-sm text-grey-35">
                 <div>
-                  ❇️ <strong>{start_date?.value.value}</strong>
+                  ❇️ <strong>{data?.start_date}</strong>
                 </div>
                 {duration_days ? (
                   <div>
@@ -124,14 +113,14 @@ const Space = (props: { entity: string }) => {
     </div>
   );
 };
-export const EditSpaceButton = (props: { spaceEntity: string }) => {
+export const EditSpaceButton = (props: { spaceID: string; owner?: string }) => {
   let [open, setOpen] = useState(false);
   let { authorized } = useMutations();
   let { session } = useAuth();
-  let studio = useIndex.eav(props.spaceEntity, "space/studio");
   if (
+    !props.owner ||
     authorized === false ||
-    session.session?.username !== studio?.value.toLocaleLowerCase()
+    session.session?.username !== props.owner
   ) {
     return null;
   } else
@@ -146,10 +135,10 @@ export const EditSpaceButton = (props: { spaceEntity: string }) => {
           />
         </a>
         <EditSpaceModal
+          spaceID={props.spaceID}
           open={open}
           onClose={() => setOpen(false)}
           onDelete={() => setOpen(false)}
-          spaceEntity={props.spaceEntity}
         />
       </>
     );
@@ -157,8 +146,8 @@ export const EditSpaceButton = (props: { spaceEntity: string }) => {
 
 const SpaceInfo = (props: {
   studio?: string;
-  name?: string;
-  description?: string;
+  name?: string | null;
+  description?: string | null;
 }) => {
   let [open, setOpen] = useState(false);
 

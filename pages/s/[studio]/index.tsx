@@ -1,44 +1,55 @@
 import { workerAPI } from "backend/lib/api";
 import { SpaceProvider } from "components/ReplicacheProvider";
-import { SpaceList } from "components/SpacesList";
+import { SpaceData, SpaceList } from "components/SpacesList";
 import { CreateSpace } from "components/CreateSpace";
 import { StudioName } from "components/StudioLayout";
-import { useIndex } from "hooks/useReplicache";
 import { GetStaticPropsContext, InferGetStaticPropsType } from "next";
-import { sortByPosition } from "src/position_helpers";
 import { useAuth } from "hooks/useAuth";
 import { useRouter } from "next/router";
 import { getCurrentDate } from "src/utils";
-import { string } from "zod";
+import { useStudioData } from "hooks/useStudioData";
 
-const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 type Props = InferGetStaticPropsType<typeof getStaticProps>;
 export default function StudioPage(props: Props) {
   let { session } = useAuth();
   let { query } = useRouter();
+  let { data } = useStudioData(query.studio as string, props.data);
   if (props.notFound) return <div>404 - studio not found!</div>;
-  if (!props.id) return <div>loading </div>;
+  if (!data) return <div>loading </div>;
 
   let myStudioName = session.session?.username;
   let currentStudioName = query.studio;
+  let spaces = [
+    ...data.members_in_spaces
+      ?.filter((s) => !!s.space_data)
+      .map((s) => s.space_data as SpaceData),
+    ...data.owner,
+  ];
 
   return (
-    <SpaceProvider id={props.id}>
+    <SpaceProvider id={data.studio}>
       <StudioName />
-      {query.history !== undefined ? <HistoryList /> : <List id={props.id} />}
+      {query.history !== undefined ? (
+        <HistoryList spaces={spaces} />
+      ) : (
+        <List spaces={spaces} id={data.studio} name={query.studio as string} />
+      )}
       {/* main CreateSpace button, after all Space lists */}
       {!session?.loggedIn || myStudioName != currentStudioName ? null : (
-        <CreateSpace studioSpaceID={props.id} />
+        <CreateSpace
+          studioSpaceID={data.studio}
+          studioName={query.studio as string}
+        />
       )}
     </SpaceProvider>
   );
 }
 
-const HistoryList = () => {
+const HistoryList = (props: { spaces: Array<SpaceData> }) => {
   let now = getCurrentDate();
-  const spacesHistory = useIndex
-    .aev("space/end-date")
-    .filter((s) => s.value.value && s.value.value < now);
+  let spacesHistory = props.spaces.filter(
+    (s) => s.end_date && s.end_date < now
+  );
 
   // return <SpaceList spaces={spaces} />;
   return (
@@ -66,7 +77,11 @@ three lists:
 NB: calendar.tsx uses same date calculations
 but simplified b/c calendar requires start + end dates
 */
-const List = (props: { id: string }) => {
+const List = (props: {
+  spaces: Array<SpaceData>;
+  id: string;
+  name: string;
+}) => {
   let { session } = useAuth();
   let { query } = useRouter();
 
@@ -74,42 +89,31 @@ const List = (props: { id: string }) => {
   let currentStudioName = query.studio;
 
   let now = getCurrentDate();
-
-  // all spaces
-  const thisEntity = useIndex.aev("this/name");
-  const spacesAll = useIndex
-    .aev("space/name")
-    .sort(sortByPosition("aev"))
-    .filter((f) => f.entity !== thisEntity[0]?.entity);
-  const spacesStartingAll = useIndex.at("space/start-date");
-  const spacesEndingAll = useIndex.at("space/end-date");
-
-  // all space with start / end dates
-  let spacesWithStartAndEnd = spacesAll.map((s) => {
-    const start = spacesStartingAll.find((f) => f.entity === s.entity);
-    const end = spacesEndingAll.find((f) => f.entity === s.entity);
-    return { ...s, start: start?.value.value, end: end?.value.value };
-  });
-
   // upcoming:
   // start-date = in future
-  const spacesUpcoming = spacesWithStartAndEnd.filter(
-    (s) => s.start && s.start > now
+  const spacesUpcoming = props.spaces.filter(
+    (s) => s?.start_date && s.start_date > now
   );
 
   // active:
   // start-date = in past
   // end-date = in future or unset
-  const spacesActive = spacesWithStartAndEnd.filter((s) => {
-    if (!s.start) {
-      return s.end && s.end >= now;
-    } else return s.start && s.start <= now && (!s.end || s.end >= now);
+  const spacesActive = props.spaces.filter((s) => {
+    if (!s) return false;
+    if (!s.start_date) {
+      return s.end_date && s.end_date >= now;
+    } else
+      return (
+        s.start_date &&
+        s.start_date <= now &&
+        (!s.end_date || s.end_date >= now)
+      );
   });
 
   // unscheduled (implicit draft)
   // spaces with NEITHER start nor end date
-  const spacesUnscheduled = spacesWithStartAndEnd.filter(
-    (s) => !s.start && !s.end
+  const spacesUnscheduled = props.spaces.filter(
+    (s) => !s?.start_date && !s?.end_date
   );
 
   return (
@@ -131,7 +135,7 @@ const List = (props: { id: string }) => {
       myStudioName != currentStudioName ||
       spacesActive.length == 0 ||
       !(spacesUpcoming.length > 0 || spacesUnscheduled.length > 0) ? null : (
-        <CreateSpace studioSpaceID={props.id} />
+        <CreateSpace studioSpaceID={props.id} studioName={props.name} />
       )}
       {/* empty state - if studio has NO ACTIVE SPACES */}
       {/* different messages for logged in user vs. viewing someone else's studio */}
@@ -174,15 +178,17 @@ export async function getStaticPaths() {
   return { paths: [], fallback: "blocking" };
 }
 
+const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export async function getStaticProps(ctx: GetStaticPropsContext) {
   if (!ctx.params?.studio)
     return { props: { notFound: true }, revalidate: 10 } as const;
-  let id = await workerAPI(WORKER_URL, "get_studio", {
+  let data = await workerAPI(WORKER_URL, "get_studio", {
     name: ctx.params?.studio as string,
   });
-  if (!id.success)
+
+  if (!data.success)
     return { props: { notFound: true }, revalidate: 10 } as const;
-  return { props: { notFound: false, id: id.id } };
+  return { props: { notFound: false, data: data.data } };
 }
 
 const MyStudioEmpty = () => {

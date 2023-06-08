@@ -1,5 +1,5 @@
 import { Env } from "..";
-import { makeRoute, privateSpaceAPI } from "backend/lib/api";
+import { makeRoute } from "backend/lib/api";
 import { z } from "zod";
 import { space_input } from "./create_space";
 import { authTokenVerifier, verifyIdentity } from "backend/lib/auth";
@@ -30,39 +30,11 @@ export const update_self_route = makeRoute({
     if (!thisEntity)
       return { data: { success: false, error: "No this entity" } } as const;
 
-
-    let selfStub = env.env.SPACES.get(env.env.SPACES.idFromString(env.id));
-    await privateSpaceAPI(selfStub)(
-      "http://internal",
-      "update_local_space_data",
-      {
-        spaceID: env.id,
-        data: msg.data,
-      }
-    );
-
-    //CALL MEMBERS
-    let members = await env.factStore.scanIndex.aev("space/member");
-    for (let i = 0; i < members.length; i++) {
-      let spaceID = env.env.SPACES.idFromString(members[i].value);
-      let stub = env.env.SPACES.get(spaceID);
-      await privateSpaceAPI(stub)(
-        "http://internal",
-        "update_local_space_data",
-        {
-          spaceID: env.id,
-          data: msg.data,
-        }
-      );
-    }
     await supabase
       .from("space_data")
       .update({
-        image: msg.data.image?.filetype === "image" ? msg.data.image.id : null,
-        default_space_image:
-          msg.data.image?.filetype === "external_image"
-            ? msg.data.image.url
-            : null,
+        image: msg.data.image,
+        default_space_image: msg.data.default_space_image,
         display_name: msg.data.display_name,
         description: msg.data.description,
         start_date: msg.data.start_date,

@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { Divider, Modal } from "components/Layout";
 import { useAuth } from "hooks/useAuth";
-import { useIndex } from "hooks/useReplicache";
+import { useSpaceID } from "hooks/useReplicache";
 import React, { Fragment, useState } from "react";
 import {
   BackToStudio as BackToStudioIcon,
@@ -20,6 +20,7 @@ import { MemberRoomList } from "./MemberRoomList";
 import { Popover } from "@headlessui/react";
 import { ButtonPrimary } from "components/Buttons";
 import { LogInModal } from "components/LoginModal";
+import { useSpaceData } from "hooks/useSpaceData";
 
 export const Sidebar = (props: {
   onRoomChange: (room: string) => void;
@@ -84,19 +85,17 @@ export const Sidebar = (props: {
   );
 };
 const SpaceName = () => {
-  let thisEntity = useIndex.aev("this/name")[0]?.entity;
-  let spaceName = useIndex.eav(thisEntity, "space/display_name");
-  let studio = useIndex.eav(thisEntity, "space/studio");
+  let spaceID = useSpaceID();
+  let { data } = useSpaceData(spaceID);
   let router = useRouter();
   let { session } = useAuth();
   let authorized =
-    session.session &&
-    session.session.username === studio?.value.toLocaleLowerCase();
+    session.session && session.session.username === data?.owner.username;
   let [editModal, setEditModal] = useState(false);
   return (
     <div className="SidebarSpaceInfo flex flex-col gap-2">
       <div className="flex items-start justify-between gap-2">
-        <h3 className="">{spaceName?.value}</h3>
+        <h3 className="">{data?.display_name}</h3>
         {authorized && (
           <button
             onClick={() => setEditModal(true)}
@@ -106,10 +105,7 @@ const SpaceName = () => {
           </button>
         )}
       </div>
-      <SpaceStatus
-        entityID={thisEntity}
-        openEditModal={() => setEditModal(true)}
-      />
+      <SpaceStatus openEditModal={() => setEditModal(true)} />
       <EditSpaceModal
         open={editModal}
         onDelete={() => {
@@ -117,7 +113,7 @@ const SpaceName = () => {
           router.push(`/s/${session.session.username}`);
         }}
         onClose={() => setEditModal(false)}
-        spaceEntity={thisEntity}
+        spaceID={spaceID}
       />
     </div>
   );
@@ -186,15 +182,10 @@ const InfoModal = (props: { open: boolean; onClose: () => void }) => {
   );
 };
 
-const SpaceStatus = (props: {
-  entityID: string;
-  openEditModal: () => void;
-}) => {
-  let start_date = useIndex.eav(props.entityID, "space/start-date")?.value
-    .value;
-  let end_date = useIndex.eav(props.entityID, "space/end-date")?.value.value;
+const SpaceStatus = (props: { openEditModal: () => void }) => {
+  let id = useSpaceID();
+  let { data } = useSpaceData(id);
 
-  let studio = useIndex.eav(props.entityID, "space/studio");
   let { session } = useAuth();
   let status: "unscheduled" | "ongoing" | "upcoming" | "completed" =
     "unscheduled";
@@ -206,9 +197,9 @@ const SpaceStatus = (props: {
   let space_progress = undefined;
   let now_timestamp = new Date(getCurrentDate()).getTime();
 
-  if (start_date && end_date) {
-    let start_timestamp = new Date(start_date).getTime();
-    let end_timestamp = new Date(end_date).getTime();
+  if (data?.start_date && data?.end_date) {
+    let start_timestamp = new Date(data.start_date).getTime();
+    let end_timestamp = new Date(data.end_date).getTime();
     let delta_duration = Math.abs(end_timestamp - start_timestamp) / 1000;
     let delta_now = Math.abs(now_timestamp - start_timestamp) / 1000;
     duration_days = Math.floor(delta_duration / 86400) + 1;
@@ -219,17 +210,18 @@ const SpaceStatus = (props: {
   // date logic - this should match studio index.tsx
   if (
     // start in past + end missing or in future
-    (start_date &&
-      start_date <= getCurrentDate() &&
-      (!end_date || end_date >= getCurrentDate())) ||
+    (data?.start_date &&
+      data?.start_date <= getCurrentDate() &&
+      (!data?.end_date || data?.end_date >= getCurrentDate())) ||
     // OR no start + future end date
-    (!start_date && end_date && end_date >= getCurrentDate())
+    (!data?.start_date && data?.end_date && data?.end_date >= getCurrentDate())
   )
     status = "ongoing";
 
-  if (start_date && start_date > getCurrentDate()) status = "upcoming";
+  if (data?.start_date && data?.start_date > getCurrentDate())
+    status = "upcoming";
 
-  if (end_date && end_date < getCurrentDate()) status = "completed";
+  if (data?.end_date && data?.end_date < getCurrentDate()) status = "completed";
 
   let statusStyles = "";
   if (status === "unscheduled")
@@ -242,7 +234,7 @@ const SpaceStatus = (props: {
   if (
     status === "unscheduled" &&
     session.session &&
-    session.session.username === studio?.value.toLocaleLowerCase()
+    session.session.username === data?.owner.username
   )
     return (
       <button
@@ -254,7 +246,7 @@ const SpaceStatus = (props: {
     );
 
   // ongoing - just show progress bar
-  if (status === "ongoing" && start_date && end_date)
+  if (status === "ongoing" && data?.start_date && data?.end_date)
     return (
       <Popover className="w-full cursor-pointer">
         <Popover.Button as={Fragment}>

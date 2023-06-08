@@ -6,18 +6,15 @@ import { claimRoute } from "./routes/claim";
 import { create_space_route } from "./routes/create_space";
 import { delete_file_upload_route } from "./routes/delete_file_upload";
 import { get_share_code_route } from "./routes/get_share_code";
-import { get_space_route } from "./routes/get_space";
 import { join_route } from "./routes/join";
 import { pullRoute } from "./routes/pull";
 import { push_route } from "./routes/push";
 import { connect } from "./socket";
 import { handleFileUpload } from "./upload_file";
 import { migrations } from "./migrations";
-import { update_local_space_data_route } from "./internal_routes/update_local_space_data";
 import { update_self_route } from "./routes/update_self";
 import { delete_self_route } from "./routes/delete_self";
 import { claim_as_community_route } from "./routes/claim_as_community";
-import { add_space_data_route } from "./internal_routes/add_space";
 import { sync_notifications_route } from "./internal_routes/sync_notifications";
 import { update_space_data_route } from "./routes/update_space_data";
 
@@ -37,18 +34,13 @@ let routes = [
   claimRoute,
   claim_as_community_route,
   create_space_route,
-  get_space_route,
   get_share_code_route,
   join_route,
   delete_file_upload_route,
   update_self_route,
   delete_self_route,
 ];
-let private_routes = [
-  update_local_space_data_route,
-  add_space_data_route,
-  sync_notifications_route,
-];
+let private_routes = [sync_notifications_route];
 export type PrivateSpaceRoutes = typeof private_routes;
 export type SpaceRoutes = typeof routes;
 let router = makeRouter(routes);

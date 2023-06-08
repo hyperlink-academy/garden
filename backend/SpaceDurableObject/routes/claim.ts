@@ -1,4 +1,4 @@
-import { makeRoute, privateSpaceAPI } from "backend/lib/api";
+import { makeRoute } from "backend/lib/api";
 import { flag } from "data/Facts";
 import { ulid } from "src/ulid";
 import { z } from "zod";
@@ -88,12 +88,6 @@ export const claimRoute = makeRoute({
       env.storage.put("meta-creator", msg.ownerID),
     ]);
     let selfStub = env.env.SPACES.get(env.env.SPACES.idFromString(env.id));
-    await privateSpaceAPI(selfStub)("http://internal", "add_space_data", {
-      entityID: thisEntity,
-      spaceID: env.id,
-      name: msg.name,
-      data: msg.data,
-    });
     return { data: { success: true } };
   },
 });

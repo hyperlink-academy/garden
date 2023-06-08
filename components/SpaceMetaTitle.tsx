@@ -3,7 +3,9 @@ import {
   scanIndex,
   useIndex,
   useMutations,
+  useSpaceID,
 } from "hooks/useReplicache";
+import { useSpaceData } from "hooks/useSpaceData";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useContext, useEffect } from "react";
@@ -12,19 +14,20 @@ import { slugify } from "src/utils";
 
 export const SpaceMetaTitle = () => {
   let rep = useContext(ReplicacheContext);
-  let spaceName = useIndex.aev("space/display_name")[0];
+  let spaceID = useSpaceID();
+  let { data } = useSpaceData(spaceID);
 
   let router = useRouter();
   useEffect(() => {
-    if (spaceName)
+    if (data?.display_name)
       history.replaceState(
         null,
         "",
         `/s/${router.query.studio}/s/${router.query.space}/${slugify(
-          spaceName?.value
+          data.display_name
         )}`
       );
-  }, [spaceName, router]);
+  }, [data?.display_name, router]);
 
   let { memberEntity } = useMutations();
   let unreadCount = useSubscribe(
@@ -64,7 +67,7 @@ export const SpaceMetaTitle = () => {
     <Head>
       <title key="title">{`${
         unreadCount && unreadCount > 0 ? `(${unreadCount})` : ""
-      } ${spaceName?.value}`}</title>
+      } ${data?.display_name}`}</title>
     </Head>
   );
 };

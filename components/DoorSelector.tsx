@@ -17,10 +17,10 @@ const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export type Door = Fact<"space/door/uploaded-image">["value"];
 export const DoorSelector = (props: {
   onSelect: (s: Door) => void;
-  selected?: Door;
+  selected?: string | null;
 }) => {
   let spaceID = useSpaceID();
-  let { session, authToken } = useAuth();
+  let { authToken } = useAuth();
 
   const cleanup = (id: string) => {
     if (!authToken) return;
@@ -37,15 +37,13 @@ export const DoorSelector = (props: {
           return (
             <button
               key={f}
-              className={`${
-                props.selected?.filetype === "external_image" &&
-                props.selected?.url === f
-                  ? ""
-                  : "opacity-50"
-              }`}
+              className={`${props.selected === f ? "" : "opacity-50"}`}
               onClick={() => {
-                if (props.selected?.filetype === "image")
-                  cleanup(props.selected.id);
+                if (
+                  props.selected &&
+                  !defaultDoorImages.includes(props.selected)
+                )
+                  cleanup(props.selected);
                 props.onSelect({
                   type: "file",
                   filetype: "external_image",
@@ -57,8 +55,8 @@ export const DoorSelector = (props: {
             </button>
           );
         })}
-        {props.selected?.filetype === "image" ? (
-          <DoorClippedImage url={`${WORKER_URL}/static/${props.selected.id}`} />
+        {props.selected && !defaultDoorImages.includes(props.selected) ? (
+          <DoorClippedImage url={`${WORKER_URL}/static/${props.selected}`} />
         ) : null}
       </div>
       <div>
@@ -77,8 +75,8 @@ export const DoorSelector = (props: {
         </p>
         <AddImage
           onUpload={(imageID) => {
-            if (props.selected?.filetype === "image")
-              cleanup(props.selected.id);
+            if (props.selected && !defaultDoorImages.includes(props.selected))
+              cleanup(props.selected);
             props.onSelect({ type: "file", filetype: "image", id: imageID });
           }}
         >

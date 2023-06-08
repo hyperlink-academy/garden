@@ -13,31 +13,19 @@ export const getStudioRoute = makeRoute({
     );
     let { data } = await supabase
       .from("identity_data")
-      .select("*")
-      .eq("username", msg.name.toLowerCase());
-    if (data?.[0]) {
-      return { data: { success: true, id: data[0].studio } } as const;
+      .select(
+        `*,
+        members_in_spaces(
+          space_data(*, owner:identity_data!space_data_owner_fkey(*))
+        ),
+        owner:space_data!space_data_owner_fkey(*, owner:identity_data!space_data_owner_fkey(*))`
+      )
+      .eq("username", msg.name.toLowerCase())
+      .single();
+    if (data) {
+      return { data: { success: true, data } } as const;
     }
 
     return { data: { success: false } } as const;
-  },
-});
-
-export const get_community_route = makeRoute({
-  route: "get_community",
-  input: z.object({ name: z.string() }),
-  handler: async (_msg, env: Bindings) => {
-    const supabase = createClient<Database>(
-      env.SUPABASE_URL,
-      env.SUPABASE_API_TOKEN
-    );
-    let { data: community } = await supabase
-      .from("communities")
-      .select("*")
-      .eq("name", "hyperlink")
-      .single();
-
-    if (!community) return { data: { success: false } } as const;
-    return { data: { success: true, id: community.spaceID } } as const;
   },
 });

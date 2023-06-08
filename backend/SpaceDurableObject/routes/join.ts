@@ -1,5 +1,5 @@
 import { app_event } from "backend/lib/analytics";
-import { makeRoute, privateSpaceAPI } from "backend/lib/api";
+import { makeRoute } from "backend/lib/api";
 import { authTokenVerifier, verifyIdentity } from "backend/lib/auth";
 import { ulid } from "src/ulid";
 import { z } from "zod";
@@ -53,50 +53,10 @@ export const join_route = makeRoute({
         positions: { aev: "a0" },
       }),
     ]);
-    let memberStudio = env.env.SPACES.get(
-      env.env.SPACES.idFromString(session.studio)
-    );
-    let name = await env.factStore.scanIndex.aev("this/name");
-    let thisEntity = name[0].entity;
-    let description = await env.factStore.scanIndex.eav(
-      thisEntity,
-      "space/description"
-    );
-    let start_date = await env.factStore.scanIndex.eav(
-      thisEntity,
-      "space/start-date"
-    );
     await supabase
       .from("members_in_spaces")
       .insert({ space_do_id: env.id, member: session.id });
 
-    let end_date = await env.factStore.scanIndex.eav(
-      thisEntity,
-      "space/end-date"
-    );
-
-    let image = await env.factStore.scanIndex.eav(
-      thisEntity,
-      "space/door/uploaded-image"
-    );
-
-    let display_name = await env.factStore.scanIndex.eav(
-      thisEntity,
-      "space/display_name"
-    );
-
-    await privateSpaceAPI(memberStudio)("http://internal", "add_space_data", {
-      spaceID: env.id,
-      name: name[0].value,
-      data: {
-        image: image?.value,
-        description: description?.value || "",
-        start_date: start_date?.value.value || "",
-        end_date: end_date?.value.value || "",
-        studio: msg.studio,
-        display_name: display_name?.value || "",
-      },
-    });
     env.poke();
     app_event(env.env, {
       event: "joined_space",

@@ -1,29 +1,38 @@
 import { spaceAPI } from "backend/lib/api";
 import { useAuth } from "hooks/useAuth";
-import { ReplicacheContext, useIndex, useMutations } from "hooks/useReplicache";
+import { ReplicacheContext, useMutations } from "hooks/useReplicache";
 import { useContext, useEffect, useState } from "react";
 import { ButtonPrimary, ButtonSecondary, ButtonTertiary } from "./Buttons";
-import { Door, DoorSelector } from "./DoorSelector";
+import { DoorSelector } from "./DoorSelector";
 import { DotLoader } from "./DotLoader";
 import { SpaceCreate } from "./Icons";
 import { Modal } from "./Layout";
+import { useSpaceData } from "hooks/useSpaceData";
+import { useStudioData } from "hooks/useStudioData";
 
 type FormState = {
   display_name: string;
   description: string;
   start_date: string;
   end_date: string;
-  image: Door | undefined;
+  image: string | null;
+  default_space_image: string | null;
 };
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
-export const CreateSpace = (props: { studioSpaceID: string }) => {
+export const CreateSpace = (props: {
+  studioSpaceID: string;
+  studioName: string;
+}) => {
+  let { mutate } = useStudioData(props.studioName);
+  console.log(props.studioSpaceID);
   let [open, setOpen] = useState(false);
   let [formState, setFormState] = useState<FormState>({
     display_name: "",
     description: "",
     start_date: "",
     end_date: "",
-    image: undefined as Door | undefined,
+    image: null,
+    default_space_image: null,
   });
   let auth = useAuth();
   let rep = useContext(ReplicacheContext);
@@ -48,7 +57,10 @@ export const CreateSpace = (props: { studioSpaceID: string }) => {
 
             <ButtonPrimary
               content="Create!"
-              disabled={!formState.display_name || !formState.image}
+              disabled={
+                !formState.display_name ||
+                !(formState.image || formState.default_space_image)
+              }
               onClick={async () => {
                 if (
                   !auth.session.loggedIn ||
@@ -56,7 +68,7 @@ export const CreateSpace = (props: { studioSpaceID: string }) => {
                   !formState.display_name
                 )
                   return;
-                await spaceAPI(
+                let result = await spaceAPI(
                   `${WORKER_URL}/space/${props.studioSpaceID}`,
                   "create_space",
                   {
@@ -64,12 +76,23 @@ export const CreateSpace = (props: { studioSpaceID: string }) => {
                     ...formState,
                   }
                 );
+                if (result.success) {
+                  let d = result.data;
+                  mutate((s) => {
+                    if (!s) return s;
+                    return {
+                      ...s,
+                      owner: [...s.owner, d],
+                    };
+                  });
+                }
                 setFormState({
                   display_name: "",
                   description: "",
                   start_date: "",
                   end_date: "",
-                  image: undefined,
+                  image: null,
+                  default_space_image: null,
                 });
                 rep?.rep.pull();
                 setOpen(false);
@@ -86,20 +109,10 @@ export const EditSpaceModal = (props: {
   open: boolean;
   onDelete: () => void;
   onClose: () => void;
-  spaceEntity: string;
+  spaceID?: string;
 }) => {
   let { authToken } = useAuth();
-  let spaceID = useIndex.eav(props.spaceEntity, "space/id");
-
-  let name = useIndex.eav(props.spaceEntity, "space/display_name");
-  let description = useIndex.eav(props.spaceEntity, "space/description");
-  let start_date = useIndex.eav(props.spaceEntity, "space/start-date");
-  let end_date = useIndex.eav(props.spaceEntity, "space/end-date");
-
-  let uploadedDoor = useIndex.eav(
-    props.spaceEntity,
-    "space/door/uploaded-image"
-  );
+  let { data, mutate } = useSpaceData(props.spaceID);
 
   let [status, setStatus] = useState<"normal" | "loading">("normal");
   let [formState, setFormState] = useState<FormState>({
@@ -107,27 +120,29 @@ export const EditSpaceModal = (props: {
     description: "",
     start_date: "",
     end_date: "",
-    image: undefined as Door | undefined,
+    image: null,
+    default_space_image: null,
   });
   let modified =
-    formState.display_name !== (name?.value || "") ||
-    formState.description !== (description?.value || "") ||
-    formState.start_date !== (start_date?.value.value || "") ||
-    formState.end_date !== (end_date?.value.value || "") ||
-    JSON.stringify(formState.image) !== JSON.stringify(uploadedDoor?.value);
+    formState.display_name !== data?.display_name ||
+    formState.description !== data?.description ||
+    formState.start_date !== data?.start_date ||
+    formState.end_date !== data?.end_date ||
+    JSON.stringify(formState.image) !== JSON.stringify(data.image);
 
   useEffect(() => {
     setFormState((s) => {
       return {
         ...s,
-        start_date: start_date?.value.value || "",
-        end_date: end_date?.value.value || "",
-        description: description?.value || "",
-        display_name: name?.value || "",
-        image: uploadedDoor?.value,
+        display_name: data?.display_name || "",
+        description: data?.description || "",
+        start_date: data?.start_date || "",
+        end_date: data?.end_date || "",
+        image: data?.image || null,
+        default_space_image: data?.default_space_image || null,
       };
     });
-  }, [uploadedDoor, description, start_date, end_date, name]);
+  }, [data]);
 
   let [mode, setMode] = useState<"normal" | "delete">("normal");
   return (
@@ -153,11 +168,11 @@ export const EditSpaceModal = (props: {
               content={status === "normal" ? "Update" : <DotLoader />}
               disabled={!modified}
               onClick={async () => {
-                if (!authToken || !spaceID?.value) return;
+                if (!authToken || !props.spaceID) return;
                 setStatus("loading");
                 console.log(
                   await spaceAPI(
-                    `${WORKER_URL}/space/${spaceID.value}`,
+                    `${WORKER_URL}/space/${props.spaceID}`,
                     "update_self",
                     {
                       authToken,
@@ -165,6 +180,10 @@ export const EditSpaceModal = (props: {
                     }
                   )
                 );
+                mutate((s) => {
+                  if (!s) return;
+                  return { ...s, ...formState };
+                });
                 setStatus("normal");
               }}
             />
@@ -172,9 +191,9 @@ export const EditSpaceModal = (props: {
         </>
       ) : (
         <>
-          {!spaceID ? null : (
+          {!props.spaceID ? null : (
             <DeleteSpaceForm
-              spaceEntity={props.spaceEntity}
+              spaceID={props.spaceID}
               onCancel={() => setMode("normal")}
               onDelete={() => {
                 props.onDelete();
@@ -189,15 +208,14 @@ export const EditSpaceModal = (props: {
 };
 
 const DeleteSpaceForm = (props: {
-  spaceEntity: string;
+  spaceID: string;
   onCancel: () => void;
   onDelete: () => void;
 }) => {
   let [state, setState] = useState({ spaceName: "" });
   let [status, setStatus] = useState<"normal" | "loading">("normal");
-  let { session, authToken } = useAuth();
-  let name = useIndex.eav(props.spaceEntity, "space/display_name");
-  let spaceID = useIndex.eav(props.spaceEntity, "space/id");
+  let { authToken } = useAuth();
+  let { data } = useSpaceData(props.spaceID);
   return (
     <>
       <div className="flex flex-col gap-1">
@@ -217,11 +235,11 @@ const DeleteSpaceForm = (props: {
           />
           <ButtonPrimary
             onClick={async () => {
-              if (name?.value !== state.spaceName) return;
-              if (!spaceID || !authToken) return;
+              if (data?.display_name !== state.spaceName) return;
+              if (!props.spaceID || !authToken) return;
               setStatus("loading");
               await spaceAPI(
-                `${WORKER_URL}/space/${spaceID.value}`,
+                `${WORKER_URL}/space/${props.spaceID}`,
                 "delete_self",
                 { authToken, name: state.spaceName }
               );
@@ -229,7 +247,7 @@ const DeleteSpaceForm = (props: {
               props.onDelete();
             }}
             destructive
-            disabled={name?.value !== state.spaceName}
+            disabled={data?.display_name !== state.spaceName}
             content={status === "normal" ? "Delete" : <DotLoader />}
           />
         </div>
@@ -331,8 +349,19 @@ const CreateSpaceForm = ({
 
         {/* door image selector */}
         <DoorSelector
-          selected={formState.image}
-          onSelect={(d) => setFormState((form) => ({ ...form, image: d }))}
+          selected={formState.image || formState.default_space_image}
+          onSelect={(d) =>
+            setFormState((form) => {
+              if (d.filetype === "image")
+                return { ...form, image: d.id, default_space_image: null };
+              else
+                return {
+                  ...form,
+                  image: null,
+                  default_space_image: d.url,
+                };
+            })
+          }
         />
       </>
     );

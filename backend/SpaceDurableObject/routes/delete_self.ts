@@ -1,5 +1,5 @@
 import { Env } from "..";
-import { makeRoute, privateSpaceAPI } from "backend/lib/api";
+import { makeRoute } from "backend/lib/api";
 import { z } from "zod";
 import { authTokenVerifier, verifyIdentity } from "backend/lib/auth";
 import { createClient } from "@supabase/supabase-js";
@@ -27,21 +27,9 @@ export const delete_self_route = makeRoute({
       .update({ deleted: true })
       .eq("space", env.id);
 
-    let members = await env.factStore.scanIndex.aev("space/member");
-    let communities = await env.factStore.scanIndex.aev("space/community");
-    let thingsToDeleteFrom = [...members, ...communities];
-    for (let i = 0; i < thingsToDeleteFrom.length; i++) {
-      let spaceID = env.env.SPACES.idFromString(thingsToDeleteFrom[i].value);
-      let stub = env.env.SPACES.get(spaceID);
-      await privateSpaceAPI(stub)(
-        "http://internal",
-        "update_local_space_data",
-        {
-          spaceID: env.id,
-          data: { deleted: true },
-        }
-      );
-    }
+    //Delete the space in supabase!
+    await supabase.from("space_data").delete().eq("do_id", env.id);
+
     //DELETING EVERYTHING
     await env.storage.deleteAll();
     return { data: { success: true } };

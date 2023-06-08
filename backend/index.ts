@@ -1,7 +1,8 @@
 import { makeRouter } from "./lib/api";
 import { handleOptions } from "./lib/handleOptions";
 import { get_space_route } from "./routes/get_space";
-import { getStudioRoute, get_community_route } from "./routes/get_studio";
+import { get_space_data_route } from "./routes/get_space_data";
+import { getStudioRoute } from "./routes/get_studio";
 import { LoginRoute } from "./routes/login";
 import { SignupRoute } from "./routes/signup";
 export { SpaceDurableObject } from "./SpaceDurableObject";
@@ -14,9 +15,10 @@ const Routes = [
   SignupRoute,
   LoginRoute,
   getStudioRoute,
-  get_community_route,
   get_space_route,
+  get_space_data_route,
 ];
+
 export type WorkerRoutes = typeof Routes;
 
 let router = makeRouter(Routes);

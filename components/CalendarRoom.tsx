@@ -1,21 +1,21 @@
-import { useIndex, useMutations } from "hooks/useReplicache";
+import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
 import { useState } from "react";
 import { ulid } from "src/ulid";
-import { CardPreview, CardPreviewWithData } from "./CardPreview";
+import { CardPreviewWithData } from "./CardPreview";
 import { FindOrCreate, useAllItems } from "./FindOrCreateEntity";
-import { AddSmall, CardSearch } from "./Icons";
+import { CardSearch } from "./Icons";
 import { Divider } from "./Layout";
+import { useSpaceData } from "hooks/useSpaceData";
 
 export function CalendarRoom() {
   let { authorized } = useMutations();
-
-  let start_date = useIndex.aev("space/start-date")[0];
-  let end_date = useIndex.aev("space/end-date")[0];
+  let spaceID = useSpaceID();
+  let { data } = useSpaceData(spaceID);
 
   let days: string[] = [];
-  if (start_date && end_date) {
-    let date = new Date(start_date.value.value);
-    let endDate = new Date(end_date.value.value);
+  if (data?.start_date && data?.end_date) {
+    let date = new Date(data?.start_date);
+    let endDate = new Date(data?.end_date);
     while (date <= endDate) {
       days.push(date.toISOString().split("T")[0]);
       date.setTime(date.getTime() + 24 * 60 * 60 * 1000);

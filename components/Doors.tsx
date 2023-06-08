@@ -1,19 +1,17 @@
-import { useIndex } from "hooks/useReplicache";
 import { defaultDoorImages } from "./DoorSelector";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export const DoorImage = (props: {
-  entityID: string;
+  image?: string | null;
+  default_space_image?: string | null;
+  display_name?: string | null;
   width?: string;
   glow?: boolean;
 }) => {
-  let uploadedDoor = useIndex.eav(props.entityID, "space/door/uploaded-image");
-  let spaceName = useIndex.eav(props.entityID, "space/display_name");
-
-  let image = uploadedDoor?.value
-    ? uploadedDoor.value.filetype === "image"
-      ? `${WORKER_URL}/static/${uploadedDoor.value.id}`
-      : uploadedDoor.value.url
+  let image = props.image
+    ? `${WORKER_URL}/static/${props.image}`
+    : props.default_space_image
+    ? props.default_space_image
     : "/doors/door-clouds-256.jpg";
   let color1 = "#ffec96";
   let color2 = "#ffd700";
@@ -30,7 +28,7 @@ export const DoorImage = (props: {
       filter={props?.glow ? "url(#softGlow)" : ""}
       overflow="visible"
     >
-      <title id="titleid">Door to {spaceName?.value}</title>
+      <title id="titleid">Door to {props.display_name}</title>
       <defs>
         <style>
           {`.cls-1{fill:`}
