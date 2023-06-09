@@ -182,7 +182,7 @@ export const CardContent = (props: {
     <>
       {/* START CARD CONTENT */}
       <div className="cardContentWrapper relative">
-        <div className="cardSectionAdder  pointer-events-none  sticky top-0  flex w-full justify-center ">
+        <div className="cardSectionAdder  pointer-events-none  sticky top-0 z-10 flex w-full justify-center ">
           <SectionAdder
             entityID={props.entityID}
             setDateEditing={() => {
@@ -196,13 +196,13 @@ export const CardContent = (props: {
         {/* hide for members, who don't have a cardCreatorName */}
         {cardCreatorName && (
           <div
-            className={`cardInfo pointer-events-none relative mb-3 ${
+            className={`cardInfo pointer-events-none relative z-20 mb-3 ${
               authorized ? "-mt-[42px]" : ""
             } flex h-[42px] shrink-0 items-center justify-between gap-3`}
           >
             {cardCreatorName ? (
               <div className="group pointer-events-auto flex place-items-center gap-2">
-                <div className=" h-[32px] w-[32px] rounded-full    border border-grey-80 pt-[5px] text-center text-sm text-grey-55">
+                <div className=" h-[32px] w-[32px] rounded-full border border-grey-80 pt-[5px] text-center text-sm text-grey-55">
                   <div className="w-full text-center">
                     {cardCreatorName.charAt(0).toUpperCase()}
                   </div>
@@ -219,7 +219,7 @@ export const CardContent = (props: {
             />
           </div>
         )}
-        <div className="cardContent grid-auto-rows grid gap-3">
+        <div className="cardContent grid-auto-rows z-0 grid gap-3">
           <div className="flex flex-col gap-0">
             <Title entityID={props.entityID} />
             <ScheduledDate
