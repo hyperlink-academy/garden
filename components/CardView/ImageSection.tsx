@@ -8,7 +8,10 @@ import { LightBoxModal } from "../Layout";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 
-export const MakeImage = (props: { entity: string }) => {
+export const MakeImage = (props: {
+  entity: string;
+  children: React.ReactNode;
+}) => {
   let { mutate, authorized } = useMutations();
   let image = useIndex.eav(props.entity, "card/image");
   let [imageID, setState] = useState<null | string>(null);
@@ -24,14 +27,32 @@ export const MakeImage = (props: { entity: string }) => {
     }
   }, [imageID]);
 
-  return !authorized || image ? null : (
+  return !authorized ? null : !image ? (
     <AddImage
       onUpload={async (imageID) => {
         setState(imageID);
+        setTimeout(
+          () =>
+            document
+              .getElementById("card-image")
+              ?.scrollIntoView({ behavior: "smooth", block: "center" }),
+          500
+        );
       }}
     >
-      <SectionImageAdd />
+      {props.children}
     </AddImage>
+  ) : (
+    <button
+      onClick={() =>
+        document
+          .getElementById("card-image")
+          ?.scrollIntoView({ behavior: "smooth", block: "center" })
+      }
+    >
+      {" "}
+      {props.children}{" "}
+    </button>
   );
 };
 
@@ -44,7 +65,10 @@ export const ImageSection = (props: { entityID: string }) => {
   return (
     // FOCUS ON DIV AND PASTE AN IMAGE
     image ? (
-      <div className="grid auto-rows-max justify-items-center gap-1 pb-2">
+      <div
+        id="card-image"
+        className="grid auto-rows-max justify-items-center gap-1 pb-2"
+      >
         <img
           className="max-w-full rounded-md hover:cursor-pointer"
           src={
@@ -98,7 +122,9 @@ export const ImageSection = (props: { entityID: string }) => {
           </LightBoxModal>
         )}
       </div>
-    ) : null
+    ) : (
+      <div id="card-image" />
+    )
   );
 };
 

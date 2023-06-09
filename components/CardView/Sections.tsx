@@ -256,7 +256,7 @@ export const AttachedCardSection = (props: { entityID: string }) => {
   return (
     <>
       {attachedCards && attachedCards.length === 0 ? null : (
-        <div className="flex flex-col gap-2">
+        <div id="card-attached-cards" className="flex flex-col gap-2">
           <CardCollection entityID={props.entityID} attribute="deck/contains" />
         </div>
       )}

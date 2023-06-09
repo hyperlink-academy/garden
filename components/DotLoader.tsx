@@ -10,5 +10,9 @@ export function DotLoader() {
       clearInterval(id);
     };
   }, []);
-  return <div>{".".repeat(dots) + "\u00a0".repeat(3 - dots)}</div>;
+  return (
+    <div className="w-[26px]  text-center text-sm">
+      {".".repeat(dots) + "\u00a0".repeat(3 - dots)}
+    </div>
+  );
 }

@@ -5,11 +5,10 @@ import {
   Delete,
   Member,
   CalendarMedium,
-  CardAdd,
-  ReactionAdd,
-  TitleAdd,
+  CardSmallLined,
+  SectionImageAdd,
 } from "components/Icons";
-import { Divider, MenuContainer, MenuItem, Modal } from "components/Layout";
+import { MenuContainer, MenuItem, Modal } from "components/Layout";
 import {
   scanIndex,
   useIndex,
@@ -29,7 +28,7 @@ import { AddExistingCard } from "components/CardStack";
 import { ButtonPrimary, ButtonTertiary } from "components/Buttons";
 import { Discussion } from "./Discussion";
 import { ulid } from "src/ulid";
-import { AddReaction, Reactions } from "./Reactions";
+import { Reactions } from "./Reactions";
 import { useDroppableZone } from "components/DragContext";
 import { sortByPosition } from "src/position_helpers";
 import { generateKeyBetween } from "src/fractional-indexing";
@@ -103,18 +102,18 @@ export const CardView = (props: {
       <div
         ref={setNodeRef}
         className={`
-      card
-      no-scrollbar
-      relative
-      mx-auto       
-      flex
-      h-full w-full
-      max-w-3xl grow
-      flex-col items-stretch overflow-y-scroll
-      ${borderStyles({
-        member: !!memberName,
-      })}
-      `}
+          card
+          no-scrollbar
+          relative
+          mx-auto       
+          flex
+          h-full w-full
+          max-w-3xl grow
+          flex-col items-stretch overflow-y-scroll
+          ${borderStyles({
+            member: !!memberName,
+          })}
+          `}
         onDragOver={(e) => e.preventDefault()}
         onDrop={async (e) => {
           if (!authToken || !spaceID) return;
@@ -145,7 +144,7 @@ export const CardView = (props: {
         )}
         <div
           ref={ref}
-          id="cardContentAndDiscussion"
+          id="card-container"
           className={`
             no-scrollbar flex h-full          
             grow
@@ -175,54 +174,61 @@ export const CardContent = (props: {
     cardCreator?.value.value as string,
     "member/name"
   )?.value;
-  let [dateEditing, setDateEditing] = useUndoableState(false);
-
   let date = useIndex.eav(props.entityID, "card/date");
+  let [dateEditing, setDateEditing] = useUndoableState(false);
 
   return (
     <>
       {/* START CARD CONTENT */}
-      <div className="cardContent grid-auto-rows grid gap-3">
-        <div className="cardHeader flex flex-col gap-0">
-          <div className="cardTitle flex flex-col gap-2">
-            {cardCreatorName ? (
-              <div className="flex justify-between gap-2">
-                <div className="lightBorder self-start rounded-md py-1 px-2 text-xs text-grey-35">
-                  {cardCreatorName}
-                </div>
-                <CardMoreOptionsMenu
-                  onDelete={props.onDelete}
-                  entityID={props.entityID}
-                  referenceFactID={props?.referenceFactID}
-                  setDateEditing={() => {
-                    setDateEditing(true);
-                  }}
-                  date={date}
-                />
-              </div>
-            ) : null}
-            <Title entityID={props.entityID} />
-          </div>
-
-          <ScheduledDate
+      <div className="cardContentWrapper relative">
+        <div className="cardSectionAdder  pointer-events-none  sticky top-0  flex w-full justify-center ">
+          <SectionAdder
             entityID={props.entityID}
-            date={date}
+            setDateEditing={() => {
+              setDateEditing(true);
+            }}
             dateEditing={dateEditing}
-            closeDateEditing={() => setDateEditing(false)}
-            openDateEditing={() => setDateEditing(true)}
           />
-
-          {/* <DateSection entityID={props.entityID} /> */}
         </div>
 
-        <DefaultTextSection entityID={props.entityID} />
+        <div className="cardInfo pointer-events-none relative mb-3 -mt-[42px] flex h-[42px] shrink-0 items-center justify-between gap-3">
+          {cardCreatorName ? (
+            <div className="group pointer-events-auto flex place-items-center gap-2">
+              <div className=" h-[32px] w-[32px] rounded-full    border border-grey-80 pt-[5px] text-center text-sm text-grey-55">
+                <div className="w-full text-center">
+                  {cardCreatorName.charAt(0).toUpperCase()}
+                </div>
+              </div>
+              <div className="absolute left-8 hidden max-w-[275px] overflow-hidden whitespace-pre rounded-md bg-white px-2 py-1 text-sm text-grey-55 group-hover:block group-focus:block">
+                by {cardCreatorName}
+              </div>
+            </div>
+          ) : null}
+          <CardMoreOptionsMenu
+            onDelete={props.onDelete}
+            entityID={props.entityID}
+            referenceFactID={props?.referenceFactID}
+          />
+        </div>
+        <div className="cardContent grid-auto-rows grid gap-3">
+          <div className="flex flex-col gap-0">
+            <Title entityID={props.entityID} />
+            <ScheduledDate
+              entityID={props.entityID}
+              date={date}
+              dateEditing={dateEditing}
+              closeDateEditing={() => setDateEditing(false)}
+              openDateEditing={() => setDateEditing(true)}
+            />
+          </div>
+          <DefaultTextSection entityID={props.entityID} />
 
-        {/* show the image and attached cards if any */}
-        <ImageSection entityID={props.entityID} />
-        <AttachedCardSection entityID={props.entityID} />
+          {/* show the image and attached cards if any */}
+          <ImageSection entityID={props.entityID} />
+          <AttachedCardSection entityID={props.entityID} />
 
-        {/* this handles the triggers to add cards, image, and date! */}
-        <SectionAdder entityID={props.entityID} />
+          {/* this handles the triggers to add cards, image, and date! */}
+        </div>
       </div>
       {/* END CARD CONTENT */}
       {/* <Divider /> */}
@@ -250,23 +256,21 @@ const Title = (props: { entityID: string }) => {
   let cardTitle = useIndex.eav(props.entityID, "card/title");
   let titleFact = memberName || cardTitle;
   return (
-    (memberName || titleFact) && (
-      <SingleTextSection
-        id="card-title"
-        className="bg-inherit text-xl font-bold"
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            let className = `${props.entityID}-default-text-section}`;
-            let element = document.getElementById(className);
-            element?.focus();
-          }
-        }}
-        entityID={props.entityID}
-        section={titleFact?.attribute || "card/title"}
-        previewOnly={titleFact?.attribute === "member/name"}
-        placeholder={authorized ? "write something..." : "Untitled"}
-      />
-    )
+    <SingleTextSection
+      id="card-title"
+      className="bg-inherit text-xl font-bold"
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          let className = `${props.entityID}-default-text-section}`;
+          let element = document.getElementById(className);
+          element?.focus();
+        }
+      }}
+      entityID={props.entityID}
+      section={titleFact?.attribute || "card/title"}
+      previewOnly={titleFact?.attribute === "member/name"}
+      placeholder={authorized ? "Untitled" : "Untitled"}
+    />
   );
 };
 
@@ -274,8 +278,6 @@ const CardMoreOptionsMenu = (props: {
   entityID: string;
   referenceFactID?: string;
   onDelete?: () => void;
-  setDateEditing: () => void;
-  date: Fact<"card/date"> | null;
 }) => {
   let { authorized, mutate, action } = useMutations();
   let memberName = useIndex.eav(props.entityID, "member/name");
@@ -285,26 +287,11 @@ const CardMoreOptionsMenu = (props: {
   let { query: q } = useRouter();
 
   return !authorized || !!memberName ? null : (
-    <Menu as="div" className="relative">
-      <Menu.Button className={`pt-[6px]`}>
+    <Menu as="div" className="pointer-events-auto relative">
+      <Menu.Button className={` pt-[6px]`}>
         <MoreOptionsTiny />
       </Menu.Button>
       <MenuContainer>
-        <MenuItem
-          onClick={() => {
-            if (props.date !== null) {
-              mutate("retractFact", { id: props.date.id });
-            } else {
-              props.setDateEditing();
-            }
-          }}
-        >
-          {props.date ? <p>Remove Schedule</p> : <p>Schedule Card</p>}
-          <CalendarMedium />
-        </MenuItem>
-        <div className="py-2">
-          <Divider />
-        </div>{" "}
         <MenuItem
           onClick={() => {
             setAreYouSureCardDeletionModalOpen(true);
@@ -403,14 +390,15 @@ const ScheduledDate = (props: {
   if (!props.dateEditing && !date) return null;
 
   return (
-    <div className="flex place-items-center gap-2  text-sm text-grey-55">
+    <div
+      id="card-date"
+      className="flex place-items-center gap-2  text-sm italic text-grey-55"
+    >
+      Scheduled for{" "}
       {props.dateEditing ? (
         <>
           <input
             className="-ml-1 border-grey-80 py-[2px] px-1 text-grey-55 "
-            onBlur={() => {
-              props.closeDateEditing();
-            }}
             onChange={(e) => {
               setDateInputValue(e.currentTarget.value);
               mutate("assertFact", {
@@ -449,7 +437,7 @@ const ScheduledDate = (props: {
       ) : date ? (
         authorized ? (
           <button
-            className="-ml-[5px] border border-transparent py-[3px] px-1 text-sm text-grey-55 hover:underline"
+            className="-ml-[5px] border border-transparent py-[3px] px-1 text-sm italic text-grey-55 underline hover:text-accent-blue"
             onClick={() => {
               props.openDateEditing();
             }}
@@ -496,66 +484,89 @@ const DefaultTextSection = (props: { entityID: string }) => {
   );
 };
 
-export const SectionAdder = (props: { entityID: string }) => {
+export const SectionAdder = (props: {
+  entityID: string;
+  dateEditing: boolean;
+
+  setDateEditing: () => void;
+}) => {
   let { authorized, mutate } = useMutations();
-  let [open, setOpen] = useState(false);
+  let image = useIndex.eav(props.entityID, "card/image");
   let attachedCards = useIndex.eav(props.entityID, "deck/contains");
-  let reactions = useReactions(props.entityID);
-  let memberName = useIndex.eav(props.entityID, "member/name");
-  let cardTitle = useIndex.eav(props.entityID, "card/title");
+  let date = useIndex.eav(props.entityID, "card/date");
+
+  let toggledOffStyle =
+    "rounded-md border hover:border-accent-blue hover:text-accent-blue border-transparent my-2 mx-1";
+  let toggledOnStyle =
+    "rounded-md border hover:border-accent-blue hover:text-accent-blue border-grey-90 bg-bg-blue text-grey-80 mx-1 my-2";
 
   if (!authorized) return null;
   return (
-    <div className="flex flex-col gap-2 text-grey-55">
-      <div className="flex gap-2 pt-2">
+    <div className="pointer-events-auto flex w-fit  rounded-full border border-grey-90 bg-white  px-4  text-grey-55 shadow">
+      {/* IMAGE ADDER */}
+      <MakeImage entity={props.entityID}>
+        <div className={`${image ? toggledOnStyle : toggledOffStyle} `}>
+          <SectionImageAdd />
+        </div>
+      </MakeImage>
+      {/* END ADDER */}
+
+      {/* LINKED CARD ADDER */}
+      {attachedCards && attachedCards.length !== 0 ? (
         <button
-          className="inline-block w-max cursor-pointer text-grey-55 hover:text-accent-blue"
-          onClick={async () => {
-            if (memberName) return;
-            if (cardTitle) {
-              await mutate("updateTitleFact", {
-                attribute: "card/title",
-                entity: props.entityID,
-                value: "",
-              });
-              await mutate("retractFact", cardTitle);
-            } else {
-              await mutate("updateTitleFact", {
-                attribute: "card/title",
-                entity: props.entityID,
-                value: "",
-              });
-            }
+          className={`${toggledOnStyle}`}
+          onClick={() => {
+            document
+              .getElementById("card-attached-cards")
+              ?.scrollIntoView({ behavior: "smooth" });
           }}
         >
-          <TitleAdd />
+          <CardSmallLined />
         </button>
-        <MakeImage entity={props.entityID} />
-
-        {attachedCards && attachedCards.length !== 0 ? null : (
-          <AddExistingCard
-            parentID={props.entityID}
-            attribute="deck/contains"
-            positionKey="eav"
-          >
-            <div className="hover:text-accent-blue">
-              <CardAdd />
-            </div>
-          </AddExistingCard>
-        )}
-
-        {reactions.length === 0 && (
-          <button
-            className="text-grey-55 hover:text-accent-blue"
-            onClick={() => setOpen(!open)}
-          >
-            <ReactionAdd />
-          </button>
-        )}
-      </div>
-      {open && authorized && (
-        <AddReaction entityID={props.entityID} close={() => setOpen(false)} />
+      ) : (
+        <AddExistingCard
+          parentID={props.entityID}
+          attribute="deck/contains"
+          positionKey="eav"
+          onAdd={() => {
+            setTimeout(
+              () =>
+                document
+                  .getElementById("card-attached-cards")
+                  ?.scrollIntoView({ behavior: "smooth" }),
+              50
+            );
+          }}
+        >
+          <div className={`${toggledOffStyle} `}>
+            <CardSmallLined />
+          </div>
+        </AddExistingCard>
       )}
+
+      {/* END LINKED CARD ADDER */}
+
+      {/* DATE ADDER */}
+      <button
+        className={`${
+          date || props.dateEditing ? toggledOnStyle : toggledOffStyle
+        } `}
+        onClick={() => {
+          if (date !== null) {
+            document
+              .getElementById("card-container")
+              ?.scrollTo({ top: 0, behavior: "smooth" });
+          } else {
+            props.setDateEditing();
+            document
+              .getElementById("card-container")
+              ?.scrollTo({ top: 0, behavior: "smooth" });
+          }
+        }}
+      >
+        <CalendarMedium />
+      </button>
+      {/* END DATE ADDER */}
     </div>
   );
 };

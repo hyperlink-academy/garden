@@ -97,6 +97,7 @@ export const AddExistingCard = (
         | { entity: string; type: "existing" }
         | { name: string; type: "create"; cardType: "card" }
     ) => void;
+    onClick?: () => void;
     children: React.ReactNode;
   } & StackData
 ) => {
@@ -118,7 +119,12 @@ export const AddExistingCard = (
       {/* decide styling of button via children */}
       <button
         {...handlers}
-        onClick={() => !isLongPress.current && setOpen(true)}
+        onClick={() => {
+          !isLongPress.current && setOpen(true);
+          {
+            props.onClick ? props.onClick() : null;
+          }
+        }}
       >
         {/* {props.expanded ? "Attach Card" : ""} */}
         {props.children}
