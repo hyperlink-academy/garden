@@ -1,7 +1,7 @@
 import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
 import { useAuth } from "hooks/useAuth";
 import { spaceAPI } from "backend/lib/api";
-import { SectionImageAdd } from "components/Icons";
+import { CloseLinedTiny, SectionImageAdd } from "components/Icons";
 import { useEffect, useState } from "react";
 import { DotLoader } from "components/DotLoader";
 import { LightBoxModal } from "../Layout";
@@ -46,7 +46,7 @@ export const ImageSection = (props: { entityID: string }) => {
     image ? (
       <div className="grid auto-rows-max justify-items-center gap-1 pb-2">
         <img
-          className="max-w-full"
+          className="max-w-full rounded-md hover:cursor-pointer"
           src={
             image.value.filetype === "image"
               ? `${WORKER_URL}/static/${image.value.id}`
@@ -79,12 +79,12 @@ export const ImageSection = (props: { entityID: string }) => {
           >
             <div className="relative">
               <button
-                className="absolute top-0 right-0 text-grey-55 hover:text-accent-blue"
+                className="bg-white/ absolute top-4 right-4 rounded-full bg-white/90 p-1 text-grey-55 hover:text-accent-blue"
                 onClick={() => {
                   setLightBoxOpen(false);
                 }}
               >
-                close
+                <CloseLinedTiny />
               </button>
               <img
                 className="m-auto"
