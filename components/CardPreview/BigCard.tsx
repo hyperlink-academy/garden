@@ -50,51 +50,52 @@ export const BigCardBody = (
         {/* Big Card Preview Title and GoTo Button*/}
         {/* show ONLY if we have title OR inner "x" to remove button */}
         {(!props.outerControls && props.onDelete && authorized) ||
-          ((props.data.title?.value || props.data.member) && (
-            <div
-              className={`cardPreviewHeader items-top flex justify-between gap-2`}
-            >
-              <div className="flex w-full justify-between gap-2">
-                {(props.data.title?.value || props.data.member) && (
-                  <RenderedText
-                    style={{
-                      whiteSpace: "pre-wrap",
-                      fontFamily: "inherit",
-                      width: "100%",
-                    }}
-                    text={
-                      props.data.member?.value || props.data.title?.value || ""
-                    }
-                    placeholder="Untitled"
-                    className={`cardPreviewTitle text-md !w-fit font-bold ${
-                      props.data.isMember ? "text-white" : "text-grey-35"
-                    } ${
-                      !props.data.imageUrl ? "" : "rounded-[3px] !bg-white px-1"
-                    }`}
-                  />
-                )}
-                {props.data.isMember ? (
-                  <div className="shrink-0 italic text-white">member</div>
-                ) : (
-                  ""
-                )}
-              </div>
-
-              {/* Card "X" to remove button */}
-              {/* NB: this is for inner control in Collection only! */}
-              {!props.outerControls && props.onDelete && authorized ? (
-                <button
-                  className="h-fit pt-1 text-grey-80 hover:text-grey-15"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    props.onDelete?.();
+        props.data.title?.value ||
+        props.data.member ? (
+          <div
+            className={`cardPreviewHeader items-top flex justify-between gap-2`}
+          >
+            <div className="flex w-full justify-between gap-2">
+              {(props.data.title?.value || props.data.member) && (
+                <RenderedText
+                  style={{
+                    whiteSpace: "pre-wrap",
+                    fontFamily: "inherit",
+                    width: "100%",
                   }}
-                >
-                  <CloseLinedTiny width={12} height={12} />
-                </button>
-              ) : null}
+                  text={
+                    props.data.member?.value || props.data.title?.value || ""
+                  }
+                  placeholder="Untitled"
+                  className={`cardPreviewTitle text-md !w-fit font-bold ${
+                    props.data.isMember ? "text-white" : "text-grey-35"
+                  } ${
+                    !props.data.imageUrl ? "" : "rounded-[3px] !bg-white px-1"
+                  }`}
+                />
+              )}
+              {props.data.isMember ? (
+                <div className="shrink-0 italic text-white">member</div>
+              ) : (
+                ""
+              )}
             </div>
-          ))}
+
+            {/* Card "X" to remove button */}
+            {/* NB: this is for inner control in Collection only! */}
+            {!props.outerControls && props.onDelete && authorized ? (
+              <button
+                className="h-fit pt-1 text-grey-80 hover:text-grey-15"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  props.onDelete?.();
+                }}
+              >
+                <CloseLinedTiny width={12} height={12} />
+              </button>
+            ) : null}
+          </div>
+        ) : null}
         {props.showRelated && <Backlinks entityID={props.entityID} />}
 
         {/* Big Card Preview Default Content */}
