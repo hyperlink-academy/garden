@@ -181,7 +181,7 @@ export const CardContent = (props: {
     <>
       {/* START CARD CONTENT */}
       <div className="cardContentWrapper relative">
-        <div className="cardSectionAdder sticky top-0 z-10">
+        <div className="cardSectionAdder  pointer-events-none  sticky top-0  flex w-full justify-center ">
           <SectionAdder
             entityID={props.entityID}
             setDateEditing={() => {
@@ -190,17 +190,27 @@ export const CardContent = (props: {
             dateEditing={dateEditing}
           />
         </div>
-        <div className="cardContent grid-auto-rows relative grid gap-3">
-          <div className="cardInfo z-10 mr-0 ml-auto -mt-[42px] flex h-[42px] shrink-0 items-center justify-end gap-3">
-            {cardCreatorName ? (
-              <div className="text-sm text-grey-55">{cardCreatorName}</div>
-            ) : null}
-            <CardMoreOptionsMenu
-              onDelete={props.onDelete}
-              entityID={props.entityID}
-              referenceFactID={props?.referenceFactID}
-            />
-          </div>
+
+        <div className="cardInfo pointer-events-none relative mb-3 -mt-[42px] flex h-[42px] shrink-0 items-center justify-between gap-3">
+          {cardCreatorName ? (
+            <div className="group pointer-events-auto flex place-items-center gap-2">
+              <div className=" h-[32px] w-[32px] rounded-full    border border-grey-80 pt-[5px] text-center text-sm text-grey-55">
+                <div className="w-full text-center">
+                  {cardCreatorName.charAt(0).toUpperCase()}
+                </div>
+              </div>
+              <div className="absolute left-8 hidden max-w-[275px] overflow-hidden whitespace-pre rounded-md bg-white px-2 py-1 text-sm text-grey-55 group-hover:block group-focus:block">
+                by {cardCreatorName}
+              </div>
+            </div>
+          ) : null}
+          <CardMoreOptionsMenu
+            onDelete={props.onDelete}
+            entityID={props.entityID}
+            referenceFactID={props?.referenceFactID}
+          />
+        </div>
+        <div className="cardContent grid-auto-rows grid gap-3">
           <div className="flex flex-col gap-0">
             <Title entityID={props.entityID} />
             <ScheduledDate
@@ -277,8 +287,8 @@ const CardMoreOptionsMenu = (props: {
   let { query: q } = useRouter();
 
   return !authorized || !!memberName ? null : (
-    <Menu as="div" className="relative">
-      <Menu.Button className={`pt-[6px]`}>
+    <Menu as="div" className="pointer-events-auto relative">
+      <Menu.Button className={` pt-[6px]`}>
         <MoreOptionsTiny />
       </Menu.Button>
       <MenuContainer>
@@ -483,50 +493,16 @@ export const SectionAdder = (props: {
   let { authorized, mutate } = useMutations();
   let image = useIndex.eav(props.entityID, "card/image");
   let attachedCards = useIndex.eav(props.entityID, "deck/contains");
-  // let memberName = useIndex.eav(props.entityID, "member/name");
-  // let cardTitle = useIndex.eav(props.entityID, "card/title");
   let date = useIndex.eav(props.entityID, "card/date");
 
   let toggledOffStyle =
-    "rounded-md border hover:border-accent-blue hover:text-accent-blue border-transparent";
+    "rounded-md border hover:border-accent-blue hover:text-accent-blue border-transparent my-2 mx-1";
   let toggledOnStyle =
-    "rounded-md border hover:border-accent-blue hover:text-accent-blue border-grey-90 bg-bg-blue text-grey-80";
+    "rounded-md border hover:border-accent-blue hover:text-accent-blue border-grey-90 bg-bg-blue text-grey-80 mx-1 my-2";
 
   if (!authorized) return null;
   return (
-    <div className="flex w-fit gap-2 rounded-md border border-grey-90  bg-white px-3 py-2 text-grey-55">
-      {/* TITLE ADDER */}
-      {/* <button
-        className={`${cardTitle ? toggledOnStyle : toggledOffStyle} `}
-        onClick={async () => {
-          if (memberName) return;
-          if (cardTitle) {
-            await mutate("updateTitleFact", {
-              attribute: "card/title",
-              entity: props.entityID,
-              value: "",
-            });
-            await mutate("retractFact", cardTitle);
-
-            document
-              .getElementById("card-container")
-              ?.scrollTo({ top: 0, behavior: "smooth" });
-          } else {
-            await mutate("updateTitleFact", {
-              attribute: "card/title",
-              entity: props.entityID,
-              value: "",
-            });
-            document
-              .getElementById("card-container")
-              ?.scrollTo({ top: 0, behavior: "smooth" });
-          }
-        }}
-      >
-        <TitleToggle />
-      </button> */}
-      {/* END TITLE ADDER */}
-
+    <div className="pointer-events-auto flex w-fit  rounded-full border border-grey-90 bg-white  px-4  text-grey-55 shadow">
       {/* IMAGE ADDER */}
       <MakeImage entity={props.entityID}>
         <div className={`${image ? toggledOnStyle : toggledOffStyle} `}>
