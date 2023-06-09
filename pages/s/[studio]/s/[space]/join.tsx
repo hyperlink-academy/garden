@@ -8,6 +8,7 @@ import { useRouter } from "next/router";
 import { SVGProps, useState } from "react";
 import { LogInModal, SignupModal } from "components/LoginModal";
 import Head from "next/head";
+import { useSpaceData } from "hooks/useSpaceData";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export default function JoinSpacePage() {
@@ -19,8 +20,7 @@ export function JoinSpace() {
   let router = useRouter();
   let code = router.query.code as string | undefined;
   let isMember = useIndex.ave("space/member", session.session?.studio);
-  let thisEntity = useIndex.aev("this/name")[0]?.entity;
-  let spaceName = useIndex.eav(thisEntity, "space/display_name");
+  let { data } = useSpaceData(id);
 
   let [state, setState] = useState<"normal" | "signup" | "login">("normal");
 
@@ -42,12 +42,12 @@ export function JoinSpace() {
     return (
       <>
         <Head>
-          <title key="title">{spaceName?.value}: you&apos;re invited!</title>
+          <title key="title">{data?.display_name}: you&apos;re invited!</title>
         </Head>
 
         <div className="mx-auto flex max-w-3xl flex-col place-items-center gap-6 p-8">
           <div className="flex flex-col gap-2 text-center ">
-            <h2>You&apos;ve been invited to {spaceName?.value}</h2>
+            <h2>You&apos;ve been invited to {data?.display_name}</h2>
             <p>A new membership card is waiting for you!</p>
           </div>
           <div className="relative">
@@ -78,12 +78,12 @@ export function JoinSpace() {
   return (
     <>
       <Head>
-        <title key="title">{spaceName?.value}: you&apos;re invited!</title>
+        <title key="title">{data?.display_name}: you&apos;re invited!</title>
       </Head>
 
       <div className="mx-auto flex max-w-3xl flex-col place-items-center gap-6 p-8">
         <div className="flex flex-col gap-2 text-center ">
-          <h2>You&apos;ve been invited to {spaceName?.value}</h2>
+          <h2>You&apos;ve been invited to {data?.display_name}</h2>
         </div>
         <div className="display flex flex-row gap-2">
           <ButtonPrimary
@@ -102,7 +102,7 @@ export function JoinSpace() {
           onClose={() => setState("normal")}
         />
         <SignupModal
-          redirectTo={`/s/${router.query.studio}/s/${router.query.space}/${spaceName?.value}/join?code=${router.query.code}`}
+          redirectTo={`/s/${router.query.studio}/s/${router.query.space}/${data?.display_name}/join?code=${router.query.code}`}
           isOpen={state === "signup"}
           onClose={() => setState("normal")}
         />
