@@ -30,140 +30,19 @@ let FilterVerifier = z.array(
 type Filters = z.TypeOf<typeof FilterVerifier>;
 
 export const CardCollection = (props: {
-  filterable?: boolean;
   entityID: string;
   attribute: "desktop/contains" | "deck/contains";
+  cards: Fact<"desktop/contains" | "deck/contains">[];
 }) => {
-  let [filters, setFilters] = useState<Filters>([]);
-  // set filter values based on local storage
-  useEffect(() => {
-    try {
-      let filterString = window.localStorage.getItem(
-        `cardCollectionFilters-${props.entityID}`
-      );
-      if (filterString) {
-        let parsed = FilterVerifier.safeParse(JSON.parse(filterString));
-        if (parsed.success) setFilters(parsed.data);
-      }
-    } catch (e) {}
-  }, []);
-  // save filter values to local storage every time the filters state is updated
-  useEffect(() => {
-    window.localStorage.setItem(
-      `cardCollectionFilters-${props.entityID}`,
-      JSON.stringify(filters)
-    );
-  }, [filters]);
-
-  let cards = useCards(props.entityID, props.attribute);
-  let reactions = cards.reduce((acc, card) => {
-    for (let reaction of card.reactions) {
-      if (!acc.includes(reaction)) acc.push(reaction);
-    }
-    return acc;
-  }, [] as string[]);
   let collectionType = useIndex.eav(props.entityID, "collection/type");
   return (
-    <>
-      <div className="flex justify-between gap-2">
-        {props.filterable ? (
-          <FilterByReactions
-            reactions={reactions}
-            filters={filters}
-            setFilters={setFilters}
-          />
-        ) : (
-          <div /> //empty div annoying hack for CollectionHeader right alignment
-        )}
-      </div>
-      <CollectionList
-        attribute={props.attribute}
-        entityID={props.entityID}
-        cards={cards.filter((card) => {
-          let passed = true;
-          for (let filter of filters) {
-            if (filter.not)
-              passed = passed && !card.reactions.includes(filter.reaction);
-            else passed = passed && card.reactions.includes(filter.reaction);
-          }
-          return passed;
-        })}
-        size={collectionType?.value === "cardpreview" ? "big" : "small"}
-      />
-    </>
+    <CollectionList
+      attribute={props.attribute}
+      entityID={props.entityID}
+      cards={props.cards}
+      size={collectionType?.value === "cardpreview" ? "big" : "small"}
+    />
   );
-};
-
-function FilterByReactions(props: {
-  reactions: string[];
-  filters: Filters;
-  setFilters: (f: (old: Filters) => Filters) => void;
-}) {
-  return (
-    <div className="flex flex-row flex-wrap gap-2">
-      {props.reactions.map((reaction) => {
-        let existingFilter = props.filters.find((f) => f.reaction === reaction);
-        return (
-          <button
-            key={reaction}
-            onClick={() => {
-              props.setFilters((oldFilters) => {
-                let existingFilter = oldFilters.find(
-                  (f) => f.reaction === reaction
-                );
-                if (!existingFilter)
-                  return [...oldFilters, { reaction, not: false }];
-                if (existingFilter.not)
-                  return oldFilters.filter((f) => f.reaction !== reaction);
-                return oldFilters.map((f) =>
-                  f.reaction === reaction ? { ...f, not: true } : f
-                );
-              });
-            }}
-            className={`text-md flex items-center gap-2 rounded-md border px-2 py-0.5 ${
-              existingFilter
-                ? existingFilter.not
-                  ? "border-accent-red bg-bg-red"
-                  : "border-accent-green bg-bg-green"
-                : "border-grey-80"
-            }`}
-          >
-            <strong>
-              {existingFilter?.reaction === reaction &&
-                (existingFilter.not ? "−" : "+")}{" "}
-              {reaction}
-            </strong>{" "}
-          </button>
-        );
-      })}
-      {props.filters.length > 0 && (
-        <button onClick={() => props.setFilters(() => [])}>clear</button>
-      )}
-    </div>
-  );
-}
-
-const useCards = (
-  entityID: string,
-  attribute: "desktop/contains" | "deck/contains"
-) => {
-  let cards = useSubscribe(
-    async (tx) => {
-      let allCards = await scanIndex(tx).eav(entityID, attribute);
-      return Promise.all(
-        allCards.sort(sortByPosition("eav")).map(async (card) => {
-          let reactions = (
-            await scanIndex(tx).eav(card.value.value, "card/reaction")
-          ).map((r) => r.value);
-          return { ...card, reactions };
-        })
-      );
-    },
-    [],
-    [entityID, attribute],
-    `${entityID}-cards`
-  );
-  return cards;
 };
 
 const CollectionList = (props: {

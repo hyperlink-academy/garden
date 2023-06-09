@@ -1,10 +1,11 @@
 import { Fact } from "data/Facts";
-import { useIndex } from "hooks/useReplicache";
+import { scanIndex, useIndex } from "hooks/useReplicache";
 import { usePreserveScroll } from "hooks/utils";
 import { useEffect, useRef, useState } from "react";
 import useMeasure from "react-use-measure";
 import { CalendarRoom } from "./CalendarRoom";
 import { CardCollection } from "./CardCollection";
+import { useFilteredCards, Filters, FilterByReactions } from "./CardFilter";
 import { Discussion } from "./CardView/Discussion";
 import { Desktop } from "./Desktop";
 import { GoToTop, MoreOptionsTiny } from "./Icons";
@@ -12,9 +13,14 @@ import { SearchRoom } from "./SearchRoom";
 import { EditRoomModal } from "./SpaceLayout/Sidebar/RoomListLayout";
 import { RenderedText } from "./Textarea/RenderedText";
 
-export const Room = (props: { entityID: string | null }) => {
+export const Room = (props: { entityID: string }) => {
   let roomType = useIndex.eav(props.entityID, "room/type");
   let { ref } = usePreserveScroll<HTMLDivElement>(props.entityID);
+
+  let { reactions, filters, setFilters, cardsFiltered } = useFilteredCards(
+    props.entityID,
+    "desktop/contains"
+  );
 
   if (props.entityID === "search") return <SearchRoom />;
   if (props.entityID === "calendar") return <CalendarRoom />;
@@ -25,14 +31,19 @@ export const Room = (props: { entityID: string | null }) => {
       ref={ref}
       className="no-scrollbar m-2 flex h-full w-[336px] flex-col gap-1 overflow-x-hidden overflow-y-scroll text-sm sm:m-4"
     >
-      <RoomHeader entityID={props.entityID} />
+      <RoomHeader
+        entityID={props.entityID}
+        reactions={reactions}
+        filters={filters}
+        setFilters={setFilters}
+      />
 
       {/* per-room wrappers + components */}
       {props.entityID ? (
         roomType?.value === "collection" ? (
           <div className="flex min-h-[calc(100vh-132px)] flex-col gap-2">
             <CardCollection
-              filterable
+              cards={cardsFiltered}
               entityID={props.entityID}
               attribute="desktop/contains"
             />
@@ -52,7 +63,12 @@ export const Room = (props: { entityID: string | null }) => {
   );
 };
 
-function RoomHeader(props: { entityID: string | null }) {
+function RoomHeader(props: {
+  entityID: string;
+  reactions: string[];
+  filters: Filters;
+  setFilters: (f: (old: Filters) => Filters) => void;
+}) {
   const [isRoomDescriptionVisible, setIsRoomDescriptionVisible] =
     useState(true);
   const [
@@ -92,6 +108,8 @@ function RoomHeader(props: { entityID: string | null }) {
 
   let descriptionRef = useRef<null | HTMLDivElement>(null);
 
+  let roomType = useIndex.eav(props.entityID, "room/type");
+
   return (
     <>
       <div className="sticky top-0 z-10 bg-background" ref={titleRef}>
@@ -123,31 +141,68 @@ function RoomHeader(props: { entityID: string | null }) {
         </div>
 
         {!isRoomDescriptionVisible && !isToggleableRoomDescriptionHidden && (
-          <div id="roomDescription2" className="-mt-1 pb-2">
+          <>
+            <div
+              id="roomDescription2"
+              className="-mt-0 flex flex-col gap-2 pb-2"
+            >
+              {roomDescription?.value && (
+                <RenderedText
+                  style={{
+                    whiteSpace: "pre-wrap",
+                    fontFamily: "inherit",
+                    width: "100%",
+                  }}
+                  className="pb-1 text-sm text-grey-35"
+                  text={roomDescription?.value || ""}
+                />
+              )}
+
+              {props.reactions.length > 0 ? (
+                <div className="flex justify-between gap-2">
+                  {roomType?.value === "collection" ? (
+                    <FilterByReactions
+                      reactions={props.reactions}
+                      filters={props.filters}
+                      setFilters={props.setFilters}
+                    />
+                  ) : null}
+                </div>
+              ) : null}
+            </div>
+          </>
+        )}
+      </div>
+      {/* allow expanded toggle if description OR reactions for filtering */}
+      {roomDescription?.value || props.reactions.length > 0 ? (
+        <div
+          id="roomDescription"
+          className="-mt-1 flex flex-col gap-2 pb-2"
+          ref={descriptionRef}
+        >
+          {roomDescription?.value && (
             <RenderedText
+              className="text-sm text-grey-35"
+              id="roomDescriptionY"
               style={{
                 whiteSpace: "pre-wrap",
                 fontFamily: "inherit",
                 width: "100%",
               }}
-              className="pb-1 text-sm text-grey-35"
               text={roomDescription?.value || ""}
             />
-          </div>
-        )}
-      </div>
-      {roomDescription?.value ? (
-        <div id="roomDescription" className="-mt-2 pb-2" ref={descriptionRef}>
-          <RenderedText
-            className="text-sm text-grey-35"
-            id="roomDescriptionY"
-            style={{
-              whiteSpace: "pre-wrap",
-              fontFamily: "inherit",
-              width: "100%",
-            }}
-            text={roomDescription?.value || ""}
-          />
+          )}
+          {props.reactions.length > 0 ? (
+            <div className="flex justify-between gap-2">
+              {roomType?.value === "collection" ? (
+                <FilterByReactions
+                  reactions={props.reactions}
+                  filters={props.filters}
+                  setFilters={props.setFilters}
+                />
+              ) : null}
+            </div>
+          ) : null}
         </div>
       ) : null}
 
