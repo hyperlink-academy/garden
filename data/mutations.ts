@@ -285,7 +285,10 @@ const updateTitleFact: Mutation<{
   );
   console.log(existingLinks);
   let oldTitle = await ctx.scanIndex.eav(args.entity, "card/title");
-  if (!oldTitle) return;
+  if (!oldTitle) {
+    await ctx.assertFact({ ...args, positions: {} });
+    return;
+  }
   for (let link of existingLinks) {
     let content = await ctx.scanIndex.eav(link.entity, "card/content");
     if (!content) continue;
