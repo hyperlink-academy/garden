@@ -142,30 +142,32 @@ export const store = (storage: BasicStorage, ctx: { id: string }) => {
   let context: Omit<MutationContext, "runOnServer"> = {
     scanIndex,
     updateFact: async (id, data) => {
-      let existingFact = await storage.get<Fact<keyof Attribute>>(
-        indexes.factID(id)
-      );
-      if (!existingFact) return { success: false };
+      return lock.withLock(async () => {
+        let existingFact = await storage.get<Fact<keyof Attribute>>(
+          indexes.factID(id)
+        );
+        if (!existingFact) return { success: false };
 
-      //This is a little worrying, what if you change the schema from unique to
-      //not?
-      let schema = await getSchema(
-        data.attribute ? data.attribute : existingFact.attribute
-      );
-      if (!schema)
-        return {
-          success: false,
-        };
+        //This is a little worrying, what if you change the schema from unique to
+        //not?
+        let schema = await getSchema(
+          data.attribute ? data.attribute : existingFact.attribute
+        );
+        if (!schema)
+          return {
+            success: false,
+          };
 
-      return await writeFactToStore(
-        {
-          ...existingFact,
-          ...data,
-          positions: { ...existingFact.positions, ...data.positions },
-          lastUpdated: Date.now().toString(),
-        },
-        schema
-      );
+        return await writeFactToStore(
+          {
+            ...existingFact,
+            ...data,
+            positions: { ...existingFact.positions, ...data.positions },
+            lastUpdated: Date.now().toString(),
+          },
+          schema
+        );
+      });
     },
     retractFact: async (id) => {
       return lock.withLock(async () => {
@@ -207,15 +209,17 @@ export const store = (storage: BasicStorage, ctx: { id: string }) => {
       });
     },
     postMessage: async (m) => {
-      let latestMessage = await storage.get<number>("meta-latest-message");
-      let index = latestMessage !== undefined ? latestMessage + 1 : 0;
-      storage.put(`messages-${m.ts}-${m.id}`, {
-        ...m,
-        index,
-      });
+      return lock.withLock(async () => {
+        let latestMessage = await storage.get<number>("meta-latest-message");
+        let index = latestMessage !== undefined ? latestMessage + 1 : 0;
+        storage.put(`messages-${m.ts}-${m.id}`, {
+          ...m,
+          index,
+        });
 
-      await storage.put("meta-latest-message", index);
-      return { success: true };
+        await storage.put("meta-latest-message", index);
+        return { success: true };
+      });
     },
   };
   return {
