@@ -33,9 +33,9 @@ export const Autocomplete = (props: {
           align="center"
           sideOffset={4}
           onOpenAutoFocus={(e) => e.preventDefault()}
-          className="rounded-sm z-10 max-h-32 w-64 overflow-y-scroll border bg-white py-1 text-grey-35"
+          className="z-10 max-h-32 w-64 overflow-y-scroll rounded-md border border-grey-80 bg-white py-0 text-grey-35"
         >
-          <ul>
+          <ul className="text-sm">
             {props.suggestions.map((result, index) => {
               return (
                 <ListItem
@@ -71,28 +71,18 @@ const ListItem = (props: {
     }
   }, [el, props.index, props.selectedIndex]);
   return (
-    <>
-      <style jsx>
-        {`
-          .autocomplete-hover:hover {
-            @apply bg-bg-blue;
-            cursor: pointer;
-          }
-        `}
-      </style>
-      <li
-        ref={el}
-        onMouseDown={(e) => {
-          e.preventDefault();
-          props.onClick(props.value);
-        }}
-        className={`autocomplete-hover py-1 px-2 ${
-          props.index === props.selectedIndex ? "bg-bg-blue" : ""
-        }`}
-      >
-        {props.value}
-      </li>
-    </>
+    <li
+      ref={el}
+      onMouseDown={(e) => {
+        e.preventDefault();
+        props.onClick(props.value);
+      }}
+      className={`py-1 px-2 hover:cursor-pointer hover:bg-bg-blue ${
+        props.index === props.selectedIndex ? "bg-bg-blue" : ""
+      }`}
+    >
+      {props.value}
+    </li>
   );
 };
 
