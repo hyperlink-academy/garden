@@ -3,7 +3,6 @@ import { flag } from "data/Facts";
 import { ulid } from "src/ulid";
 import { z } from "zod";
 import { Env } from "..";
-import { space_input } from "./create_space";
 
 let defaultReactions = [
   "😊",
@@ -25,19 +24,14 @@ export const claimRoute = makeRoute({
   route: "claim",
   input: z.object({
     ownerID: z.string(),
-    name: z.string(),
     ownerName: z.string(),
-    data: space_input.merge(
-      z.object({
-        studio: z.string().optional(),
-        community: z.string().optional(),
-      })
-    ),
+    type: z.union([z.literal("space"), z.literal("studio"), z.literal("user")]),
   }),
   handler: async (msg, env: Env) => {
     let creator = await env.storage.get("meta-creator");
+    let space_type = await env.storage.get<string>("meta-space-type");
     let thisEntity = ulid();
-    if (creator) return { data: { success: false } };
+    if (creator || space_type) return { data: { success: false } };
     let memberEntity = ulid();
     let homeEntity = ulid();
     await Promise.all([
@@ -71,12 +65,6 @@ export const claimRoute = makeRoute({
         value: msg.ownerName,
         positions: { aev: "a0" },
       }),
-      env.factStore.assertFact({
-        entity: thisEntity,
-        attribute: "this/name",
-        positions: { aev: "a0" },
-        value: msg.name,
-      }),
       ...defaultReactions.map((r) =>
         env.factStore.assertFact({
           entity: thisEntity,
@@ -86,8 +74,8 @@ export const claimRoute = makeRoute({
         })
       ),
       env.storage.put("meta-creator", msg.ownerID),
+      env.storage.put("meta-space-type", msg.type),
     ]);
-    let selfStub = env.env.SPACES.get(env.env.SPACES.idFromString(env.id));
     return { data: { success: true } };
   },
 });

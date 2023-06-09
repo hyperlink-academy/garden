@@ -59,10 +59,7 @@ export const create_space_route = makeRoute({
     if (!data) return { data: { success: false } } as const;
 
     await internalSpaceAPI(stub)("http://internal", "claim", {
-      data: {
-        ...msg,
-        studio: session.username,
-      },
+      type: "space",
       name: (spaceIndex + 1).toString(),
       ownerID: session.studio,
       ownerName: session.username,
