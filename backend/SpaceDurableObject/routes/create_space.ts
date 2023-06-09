@@ -60,7 +60,6 @@ export const create_space_route = makeRoute({
 
     await internalSpaceAPI(stub)("http://internal", "claim", {
       type: "space",
-      name: (spaceIndex + 1).toString(),
       ownerID: session.studio,
       ownerName: session.username,
     });
