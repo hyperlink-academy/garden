@@ -212,7 +212,7 @@ export const store = (storage: BasicStorage, ctx: { id: string }) => {
       return lock.withLock(async () => {
         let latestMessage = await storage.get<number>("meta-latest-message");
         let index = latestMessage !== undefined ? latestMessage + 1 : 0;
-        storage.put(`messages-${m.ts}-${m.id}`, {
+        storage.put(`messages-${Date.now()}-${m.id}`, {
           ...m,
           index,
         });
