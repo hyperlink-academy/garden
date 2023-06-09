@@ -189,13 +189,12 @@ const createCard: Mutation<{
     value: ref(args.memberEntity),
     positions: {},
   });
-  if (args.title)
-    await ctx.assertFact({
-      entity: args.entityID,
-      attribute: "card/title",
-      value: args.title,
-      positions: {},
-    });
+  await ctx.assertFact({
+    entity: args.entityID,
+    attribute: "card/title",
+    value: args.title,
+    positions: {},
+  });
   await markUnread(
     {
       attribute: "card/unread-by",
@@ -286,10 +285,7 @@ const updateTitleFact: Mutation<{
   );
   console.log(existingLinks);
   let oldTitle = await ctx.scanIndex.eav(args.entity, "card/title");
-  if (!oldTitle) {
-    await ctx.assertFact({ ...args, positions: {} });
-    return;
-  }
+  if (!oldTitle) return;
   for (let link of existingLinks) {
     let content = await ctx.scanIndex.eav(link.entity, "card/content");
     if (!content) continue;

@@ -1,14 +1,17 @@
 import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
 import { useAuth } from "hooks/useAuth";
 import { spaceAPI } from "backend/lib/api";
-import { SectionImageAdd } from "components/Icons";
+import { CloseLinedTiny, SectionImageAdd } from "components/Icons";
 import { useEffect, useState } from "react";
 import { DotLoader } from "components/DotLoader";
 import { LightBoxModal } from "../Layout";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 
-export const MakeImage = (props: { entity: string }) => {
+export const MakeImage = (props: {
+  entity: string;
+  children: React.ReactNode;
+}) => {
   let { mutate, authorized } = useMutations();
   let image = useIndex.eav(props.entity, "card/image");
   let [imageID, setState] = useState<null | string>(null);
@@ -24,14 +27,32 @@ export const MakeImage = (props: { entity: string }) => {
     }
   }, [imageID]);
 
-  return !authorized || image ? null : (
+  return !authorized ? null : !image ? (
     <AddImage
       onUpload={async (imageID) => {
         setState(imageID);
+        setTimeout(
+          () =>
+            document
+              .getElementById("card-image")
+              ?.scrollIntoView({ behavior: "smooth", block: "center" }),
+          500
+        );
       }}
     >
-      <SectionImageAdd />
+      {props.children}
     </AddImage>
+  ) : (
+    <button
+      onClick={() =>
+        document
+          .getElementById("card-image")
+          ?.scrollIntoView({ behavior: "smooth", block: "center" })
+      }
+    >
+      {" "}
+      {props.children}{" "}
+    </button>
   );
 };
 
@@ -44,9 +65,12 @@ export const ImageSection = (props: { entityID: string }) => {
   return (
     // FOCUS ON DIV AND PASTE AN IMAGE
     image ? (
-      <div className="grid auto-rows-max justify-items-center gap-1 pb-2">
+      <div
+        id="card-image"
+        className="grid auto-rows-max justify-items-center gap-1 pb-2"
+      >
         <img
-          className="max-w-full"
+          className="max-w-full rounded-md hover:cursor-pointer"
           src={
             image.value.filetype === "image"
               ? `${WORKER_URL}/static/${image.value.id}`
@@ -79,12 +103,12 @@ export const ImageSection = (props: { entityID: string }) => {
           >
             <div className="relative">
               <button
-                className="absolute top-0 right-0 text-grey-55 hover:text-accent-blue"
+                className="bg-white/ absolute top-4 right-4 rounded-full bg-white/90 p-1 text-grey-55 hover:text-accent-blue"
                 onClick={() => {
                   setLightBoxOpen(false);
                 }}
               >
-                close
+                <CloseLinedTiny />
               </button>
               <img
                 className="m-auto"
@@ -98,7 +122,9 @@ export const ImageSection = (props: { entityID: string }) => {
           </LightBoxModal>
         )}
       </div>
-    ) : null
+    ) : (
+      <div id="card-image" />
+    )
   );
 };
 

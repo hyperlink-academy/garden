@@ -66,13 +66,18 @@ export const LightBoxModal: React.FC<
     >
       <Dialog.Overlay className="overlay" />
       <FloatingContainer
+        // override default FloatingContainer border and padding!
+        // also change to max-w + w-max, better for narrow images
         className={`
               fixed top-1/2 left-1/2 grid max-h-[calc(100%-100px)]
-              w-[calc(100%-50px)] -translate-x-1/2
-              -translate-y-1/2
-              grid-flow-row
+              w-max
+              max-w-[calc(100%-50px)]
+              -translate-x-1/2
+              -translate-y-1/2 grid-flow-row
               gap-4
               overflow-auto
+              border-none
+              px-0 py-0
               `}
       >
         {props.children}

@@ -14,9 +14,7 @@ import { handleFileUpload } from "./upload_file";
 import { migrations } from "./migrations";
 import { update_self_route } from "./routes/update_self";
 import { delete_self_route } from "./routes/delete_self";
-import { claim_as_community_route } from "./routes/claim_as_community";
 import { sync_notifications_route } from "./internal_routes/sync_notifications";
-import { update_space_data_route } from "./routes/update_space_data";
 
 export type Env = {
   factStore: ReturnType<typeof store>;
@@ -28,11 +26,9 @@ export type Env = {
 };
 
 let routes = [
-  update_space_data_route,
   pullRoute,
   push_route,
   claimRoute,
-  claim_as_community_route,
   create_space_route,
   get_share_code_route,
   join_route,

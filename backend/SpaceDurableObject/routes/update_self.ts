@@ -26,9 +26,6 @@ export const update_self_route = makeRoute({
     if (!creator) return { data: { success: false } } as const;
     if (creator !== session.studio)
       return { data: { success: false } } as const;
-    let thisEntity = (await env.factStore.scanIndex.aev("this/name"))[0];
-    if (!thisEntity)
-      return { data: { success: false, error: "No this entity" } } as const;
 
     await supabase
       .from("space_data")

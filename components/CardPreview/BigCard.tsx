@@ -29,13 +29,13 @@ export const BigCardBody = (
   return (
     <div
       {...listenersAndAttributes}
-      className={`CardPreviewContent flex h-full grow  flex-row overflow-hidden !bg-cover !bg-center !bg-no-repeat pl-2 text-sm ${
-        props.data.isMember ? "py-2 pr-2" : "py-2 pr-3"
+      className={`CardPreviewContent flex h-full grow flex-row overflow-hidden !bg-cover !bg-center !bg-no-repeat pl-2 text-sm ${
+        props.data.isMember ? "py-2 pr-2" : "py-2 pr-2"
       }`}
       style={{
         wordBreak: "break-word",
         background:
-          props.hideContent && props.data.imageUrl
+          props.hideContent && props.data.imageUrl && !props.data.isMember
             ? `url(${props.data.imageUrl})`
             : "",
       }} //no tailwind equiv - need for long titles to wrap
@@ -48,71 +48,83 @@ export const BigCardBody = (
       {/* Big Card Preview Content Wrapper */}
       <div className="cardPreview flex w-full flex-col gap-2 hover:cursor-pointer">
         {/* Big Card Preview Title and GoTo Button*/}
-        <div
-          className={`cardPreviewHeader items-top flex justify-between gap-2`}
-        >
-          <div className="flex w-full justify-between gap-2">
-            {(props.data.title?.value || props.data.member) && (
-              <RenderedText
-                style={{
-                  whiteSpace: "pre-wrap",
-                  fontFamily: "inherit",
-                  width: "100%",
-                }}
-                text={props.data.member?.value || props.data.title?.value || ""}
-                placeholder="Untitled"
-                className={`cardPreviewTitle text-md !w-fit font-bold ${
-                  props.data.isMember ? "text-white" : "text-grey-35"
-                } ${
-                  !props.data.imageUrl ? "" : "rounded-[3px] !bg-white px-1"
-                }`}
-              />
-            )}
-            {props.data.isMember ? (
-              <div className="shrink-0 italic text-white">member</div>
-            ) : (
-              ""
-            )}
-          </div>
+        {/* show ONLY if we have title OR inner "x" to remove button */}
+        {(!props.outerControls && props.onDelete && authorized) ||
+        props.data.title?.value ||
+        props.data.member ? (
+          <div
+            className={`cardPreviewHeader items-top flex justify-between gap-2`}
+          >
+            <div className="flex w-full justify-between gap-2">
+              {(props.data.title?.value || props.data.member) && (
+                <RenderedText
+                  style={{
+                    whiteSpace: "pre-wrap",
+                    fontFamily: "inherit",
+                    width: "100%",
+                  }}
+                  text={
+                    props.data.member?.value || props.data.title?.value || ""
+                  }
+                  placeholder="Untitled"
+                  className={`cardPreviewTitle text-md !w-fit font-bold ${
+                    props.data.isMember ? "text-white" : "text-grey-35"
+                  } ${
+                    props.data.imageUrl &&
+                    props.hideContent &&
+                    !props.data.isMember
+                      ? "rounded-[3px] !bg-white px-1"
+                      : ""
+                  }`}
+                />
+              )}
+              {props.data.isMember ? (
+                <div className="shrink-0 italic text-white">member</div>
+              ) : (
+                ""
+              )}
+            </div>
 
-          {/* Card "X" to remove button */}
-          {!props.outerControls && props.onDelete && authorized ? (
-            <button
-              className="h-fit pt-1 text-grey-80 hover:text-grey-15"
-              onClick={(e) => {
-                e.stopPropagation();
-                props.onDelete?.();
-              }}
-            >
-              <CloseLinedTiny width={12} height={12} />
-            </button>
-          ) : null}
-        </div>
+            {/* Card "X" to remove button */}
+            {/* NB: this is for inner control in Collection only! */}
+            {!props.outerControls && props.onDelete && authorized ? (
+              <button
+                className="h-fit pt-1 text-grey-80 hover:text-grey-15"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  props.onDelete?.();
+                }}
+              >
+                <CloseLinedTiny width={12} height={12} />
+              </button>
+            ) : null}
+          </div>
+        ) : null}
         {props.showRelated && <Backlinks entityID={props.entityID} />}
 
         {/* Big Card Preview Default Content */}
         {!props.hideContent &&
           (props.data.content?.value || props.data.imageUrl) && (
             <div
-              className={` cardPreviewDefaultContent ${
+              className={`cardPreviewDefaultContent flex flex-col gap-2 ${
                 props.data.isMember &&
                 !props.hideContent &&
                 props.data.content?.value
-                  ? "mt-1 rounded-md bg-white p-2 pt-1 text-accent-red"
+                  ? "mt-1 rounded-md bg-white text-accent-red"
                   : ""
               }`}
             >
               {!props.data.imageUrl || props.hideContent ? null : (
                 <img
                   src={`${props.data.imageUrl}`}
-                  className="max-h-[600px] max-w-full  py-2 px-1"
+                  className="max-h-[600px] max-w-full rounded-md"
                 />
               )}
               {!props.hideContent && props.data.content?.value && (
                 <RenderedText
-                  className={`cardPreviewDefaultTextContent truncate whitespace-pre-wrap pt-1 leading-tight  ${
-                    !props.data.imageUrl ? "" : "rounded-[3px] bg-white/75 px-1"
-                  } `}
+                  className={`cardPreviewDefaultTextContent truncate whitespace-pre-wrap leading-tight ${
+                    !props.data.imageUrl ? "" : ""
+                  } ${props.data.isMember ? "px-2 pb-2" : ""} `}
                   text={(props.data.content?.value as string) || ""}
                 />
               )}
