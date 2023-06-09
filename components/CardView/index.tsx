@@ -135,7 +135,7 @@ export const CardView = (props: {
       >
         {/* IF MEMBER CARD, INCLUDE LINK TO STUDIO  */}
         {!memberName ? null : (
-          <div className="grid shrink-0 grid-cols-[auto_max-content] items-end px-2 pt-2 pb-1 text-white">
+          <div className="grid shrink-0 grid-cols-[auto_max-content] items-end pl-2 pr-3 pt-2 pb-1 text-white">
             <Member />
             <Link href={`/s/${memberName?.value}`}>
               <small className="justify-self-start">visit studio</small>
@@ -176,6 +176,7 @@ export const CardContent = (props: {
   )?.value;
   let date = useIndex.eav(props.entityID, "card/date");
   let [dateEditing, setDateEditing] = useUndoableState(false);
+  let { authorized } = useMutations();
 
   return (
     <>
@@ -191,25 +192,33 @@ export const CardContent = (props: {
           />
         </div>
 
-        <div className="cardInfo pointer-events-none relative mb-3 -mt-[42px] flex h-[42px] shrink-0 items-center justify-between gap-3">
-          {cardCreatorName ? (
-            <div className="group pointer-events-auto flex place-items-center gap-2">
-              <div className=" h-[32px] w-[32px] rounded-full    border border-grey-80 pt-[5px] text-center text-sm text-grey-55">
-                <div className="w-full text-center">
-                  {cardCreatorName.charAt(0).toUpperCase()}
+        {/* card info (name and more options menu) */}
+        {/* hide for members, who don't have a cardCreatorName */}
+        {cardCreatorName && (
+          <div
+            className={`cardInfo pointer-events-none relative mb-3 ${
+              authorized ? "-mt-[42px]" : ""
+            } flex h-[42px] shrink-0 items-center justify-between gap-3`}
+          >
+            {cardCreatorName ? (
+              <div className="group pointer-events-auto flex place-items-center gap-2">
+                <div className=" h-[32px] w-[32px] rounded-full    border border-grey-80 pt-[5px] text-center text-sm text-grey-55">
+                  <div className="w-full text-center">
+                    {cardCreatorName.charAt(0).toUpperCase()}
+                  </div>
+                </div>
+                <div className="absolute left-8 hidden max-w-[275px] overflow-hidden whitespace-pre rounded-md bg-white px-2 py-1 text-sm text-grey-55 group-hover:block group-focus:block">
+                  by {cardCreatorName}
                 </div>
               </div>
-              <div className="absolute left-8 hidden max-w-[275px] overflow-hidden whitespace-pre rounded-md bg-white px-2 py-1 text-sm text-grey-55 group-hover:block group-focus:block">
-                by {cardCreatorName}
-              </div>
-            </div>
-          ) : null}
-          <CardMoreOptionsMenu
-            onDelete={props.onDelete}
-            entityID={props.entityID}
-            referenceFactID={props?.referenceFactID}
-          />
-        </div>
+            ) : null}
+            <CardMoreOptionsMenu
+              onDelete={props.onDelete}
+              entityID={props.entityID}
+              referenceFactID={props?.referenceFactID}
+            />
+          </div>
+        )}
         <div className="cardContent grid-auto-rows grid gap-3">
           <div className="flex flex-col gap-0">
             <Title entityID={props.entityID} />
