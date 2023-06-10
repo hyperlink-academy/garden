@@ -131,48 +131,30 @@ export const MessageInput = (props: {
         </div>
       )}
       <div className="flex w-full items-end gap-2">
-        {mode === "reacting" ? (
-          <AddReaction
-            entityID={props.entityID}
-            onSelect={() => setMode("normal")}
-          />
-        ) : (
-          <div className="z-10 flex w-full items-end gap-1 rounded-md border border-grey-80 bg-white p-1 text-base">
-            <AutosizeTextarea
-              onKeyDown={(e) => {
-                if (!e.shiftKey && e.key === "Enter") {
-                  e.preventDefault();
-                  send();
-                }
-              }}
-              onFocus={() => setMode("focused")}
-              onBlur={() => setMode("normal")}
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              placeholder=""
-              className="w-full "
-              id="messageInput"
-            />
-            <AttachCard
-              attachedCards={attachedCards}
-              setAttachedCards={setAttachedCards}
-            />
-          </div>
-        )}
-        <div className="flex h-min justify-end text-grey-55">
-          {!value &&
-          mode !== "focused" &&
-          reactions.length === 0 &&
-          props.allowReact ? (
-            <ButtonSecondary
-              icon={<ReactionAdd />}
-              onClick={() =>
-                setMode(mode === "reacting" ? "normal" : "reacting")
+        <div className="z-10 flex w-full items-end gap-1 rounded-md border border-grey-80 bg-white p-1 text-base">
+          <AutosizeTextarea
+            onKeyDown={(e) => {
+              if (!e.shiftKey && e.key === "Enter") {
+                e.preventDefault();
+                send();
               }
-            />
-          ) : (
-            <ButtonPrimary disabled={!value} onClick={send} icon={<Send />} />
-          )}
+            }}
+            onFocus={() => setMode("focused")}
+            onBlur={() => setMode("normal")}
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            placeholder=""
+            className="w-full "
+            id="messageInput"
+          />
+          <AttachCard
+            attachedCards={attachedCards}
+            setAttachedCards={setAttachedCards}
+          />
+        </div>
+
+        <div className="flex h-min justify-end text-grey-55">
+          <ButtonPrimary disabled={!value} onClick={send} icon={<Send />} />
         </div>
       </div>
     </div>
