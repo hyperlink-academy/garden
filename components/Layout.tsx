@@ -1,12 +1,13 @@
 import { Dialog, Menu, Transition } from "@headlessui/react";
 import React, { Fragment } from "react";
 
-export const Divider = (props: { dark?: boolean }) => {
+export const Divider = (props: { dark?: boolean; vertical?: boolean }) => {
   return (
     <div
       className={`w-full border-t border-l ${
         props.dark ? `border-grey-55` : `border-grey-80`
-      }`}
+      } ${props.vertical ? "h-full" : ""}
+      `}
     ></div>
   );
 };
