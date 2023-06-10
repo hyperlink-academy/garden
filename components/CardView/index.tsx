@@ -7,14 +7,16 @@ import {
   CalendarMedium,
   CardSmallLined,
   SectionImageAdd,
+  ReactionAdd,
 } from "components/Icons";
-import { MenuContainer, MenuItem, Modal } from "components/Layout";
+import { Divider, MenuContainer, MenuItem, Modal } from "components/Layout";
 import {
   scanIndex,
   useIndex,
   useMutations,
   useSpaceID,
 } from "hooks/useReplicache";
+import * as Popover from "@radix-ui/react-popover";
 
 import { AttachedCardSection, SingleTextSection } from "./Sections";
 import { Backlinks } from "./Backlinks";
@@ -28,7 +30,7 @@ import { AddExistingCard } from "components/CardStack";
 import { ButtonPrimary, ButtonTertiary } from "components/Buttons";
 import { Discussion } from "./Discussion";
 import { ulid } from "src/ulid";
-import { Reactions } from "./Reactions";
+import { AddReaction, Reactions } from "./Reactions";
 import { useDroppableZone } from "components/DragContext";
 import { sortByPosition } from "src/position_helpers";
 import { generateKeyBetween } from "src/fractional-indexing";
@@ -503,15 +505,18 @@ export const SectionAdder = (props: {
   let image = useIndex.eav(props.entityID, "card/image");
   let attachedCards = useIndex.eav(props.entityID, "deck/contains");
   let date = useIndex.eav(props.entityID, "card/date");
+  let reactions = useReactions(props.entityID);
+
+  let [reactionPickerOpen, setReactionPickerOpen] = useState(false);
 
   let toggledOffStyle =
-    "rounded-md border hover:border-accent-blue hover:text-accent-blue border-transparent my-2 mx-1";
+    "rounded-md border p-0.5 hover:border-accent-blue hover:text-accent-blue border-transparent";
   let toggledOnStyle =
-    "rounded-md border hover:border-accent-blue hover:text-accent-blue border-grey-90 bg-bg-blue text-grey-80 mx-1 my-2";
+    "rounded-md border p-0.5 hover:border-accent-blue hover:text-accent-blue border-grey-90 bg-bg-blue text-grey-80";
 
   if (!authorized) return null;
   return (
-    <div className="pointer-events-auto flex w-fit  rounded-full border border-grey-90 bg-white  px-4  text-grey-55 shadow">
+    <div className="pointer-events-auto flex w-fit items-center gap-1 rounded-full border border-grey-90 bg-white  py-2 px-4 text-grey-55 shadow">
       {/* IMAGE ADDER */}
       <MakeImage entity={props.entityID}>
         <div className={`${image ? toggledOnStyle : toggledOffStyle} `}>
@@ -519,7 +524,6 @@ export const SectionAdder = (props: {
         </div>
       </MakeImage>
       {/* END ADDER */}
-
       {/* LINKED CARD ADDER */}
       {attachedCards && attachedCards.length !== 0 ? (
         <button
@@ -552,9 +556,7 @@ export const SectionAdder = (props: {
           </div>
         </AddExistingCard>
       )}
-
       {/* END LINKED CARD ADDER */}
-
       {/* DATE ADDER */}
       <button
         className={`${
@@ -576,6 +578,40 @@ export const SectionAdder = (props: {
         <CalendarMedium />
       </button>
       {/* END DATE ADDER */}
+      <div className="h-full w-[2px] px-2">
+        <Divider vertical />
+      </div>
+      <Popover.Root>
+        <Popover.Trigger className="flex items-center">
+          <button
+            className={`${toggledOffStyle}${
+              reactionPickerOpen
+                ? ""
+                : "rounded-md border border-accent-blue p-0.5 text-accent-blue"
+            }`}
+            onClick={() => setReactionPickerOpen(!reactionPickerOpen)}
+          >
+            <ReactionAdd />
+          </button>
+        </Popover.Trigger>
+        <Popover.Portal>
+          <Popover.Content
+            sideOffset={16}
+            collisionPadding={{ right: 20 }}
+            className="-mt-[1px] max-w-[320px]"
+          >
+            <AddReaction
+              entityID={props.entityID}
+              close={() => setReactionPickerOpen(false)}
+            />
+            {/* <Popover.Arrow
+              width={16}
+              height={8}
+              className="-z-10 fill-white stroke-grey-80 stroke-2"
+            /> */}
+          </Popover.Content>
+        </Popover.Portal>
+      </Popover.Root>
     </div>
   );
 };
