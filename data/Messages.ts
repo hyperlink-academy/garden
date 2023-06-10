@@ -6,4 +6,5 @@ export type Message = {
   entity?: string;
   replyTo?: string;
   ts: string;
+  server_ts?: string;
 };

@@ -44,7 +44,9 @@ export const pullRoute = makeRoute({
 
     let newLastUpdated = lastUpdated || Date.now().toString();
     let lastKey = updates[updates.length - 1]?.lastUpdated;
-    let lastMessage = messages[messages.length - 1]?.ts;
+    let lastMessage =
+      messages[messages.length - 1]?.server_ts ||
+      messages[messages.length - 1]?.ts;
     if (lastKey && lastKey > newLastUpdated) newLastUpdated = lastKey;
     if (lastMessage && lastMessage > newLastUpdated)
       newLastUpdated = lastMessage;
