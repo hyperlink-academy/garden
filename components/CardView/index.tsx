@@ -242,19 +242,17 @@ export const CardContent = (props: {
         </div>
       </div>
       {/* END CARD CONTENT */}
-      {/* <Divider /> */}
+      <Reactions entityID={props.entityID} />
+
       {/* START CARD DISCUSSION + REACTIONS */}
       <div
         className="flex flex-1 flex-col justify-end gap-4"
         onClick={(e) => {
-          console.log(e.currentTarget);
-          console.log(e.target);
           if (e.target !== e.currentTarget) return;
           let element = document.getElementById("default-text-section");
           element?.focus();
         }}
       >
-        <Reactions entityID={props.entityID} />
         <Discussion entityID={props.entityID} allowReact isRoom={false} />
       </div>
     </>
@@ -581,15 +579,16 @@ export const SectionAdder = (props: {
       <div className="h-full w-[2px] px-2">
         <Divider vertical />
       </div>
-      <Popover.Root>
+      <Popover.Root
+        onOpenChange={() => setReactionPickerOpen(!reactionPickerOpen)}
+      >
         <Popover.Trigger className="flex items-center">
           <button
-            className={`${toggledOffStyle}${
-              reactionPickerOpen
+            className={`${toggledOffStyle} ${
+              !reactionPickerOpen
                 ? ""
                 : "rounded-md border border-accent-blue p-0.5 text-accent-blue"
             }`}
-            onClick={() => setReactionPickerOpen(!reactionPickerOpen)}
           >
             <ReactionAdd />
           </button>
@@ -602,7 +601,11 @@ export const SectionAdder = (props: {
           >
             <AddReaction
               entityID={props.entityID}
-              close={() => setReactionPickerOpen(false)}
+              onSelect={() =>
+                document
+                  .getElementById("card-reactions")
+                  ?.scrollIntoView({ block: "center", behavior: "smooth" })
+              }
             />
             {/* <Popover.Arrow
               width={16}

@@ -12,8 +12,8 @@ export const Reactions = (props: { entityID: string }) => {
   let reactions = useReactions(props.entityID);
   if (reactions.length === 0) return null;
   return (
-    <div className="flex w-full flex-col gap-2">
-      <div className="flex">
+    <div className="flex flex-col gap-2" id="card-reactions">
+      <div className="flex justify-start gap-2">
         <ReactionList entityID={props.entityID} />
         {authorized && (
           <button
@@ -25,7 +25,10 @@ export const Reactions = (props: { entityID: string }) => {
         )}
       </div>
       {open && authorized && (
-        <AddReaction entityID={props.entityID} close={() => setOpen(false)} />
+        <AddReaction
+          entityID={props.entityID}
+          onSelect={() => setOpen(false)}
+        />
       )}
     </div>
   );
@@ -35,7 +38,7 @@ export const ReactionList = (props: { entityID: string }) => {
   let reactions = useReactions(props.entityID);
 
   return (
-    <div className="reactionAddedReactions flex w-full flex-row flex-wrap items-center gap-2">
+    <div className="reactionAddedReactions flex flex-row flex-wrap items-center gap-2">
       {reactions?.map(([reaction, data]) => {
         return (
           <SingleReaction
@@ -50,7 +53,10 @@ export const ReactionList = (props: { entityID: string }) => {
   );
 };
 
-export const AddReaction = (props: { entityID: string; close: () => void }) => {
+export const AddReaction = (props: {
+  entityID: string;
+  onSelect: () => void;
+}) => {
   let { authorized, mutate, memberEntity } = useMutations();
   let reactions = useIndex.aev("space/reaction");
   let [editing, setEditing] = useState(false);
@@ -73,7 +79,7 @@ export const AddReaction = (props: { entityID: string; close: () => void }) => {
                 memberEntity,
                 cardEntity: props.entityID,
               });
-              props.close();
+              props.onSelect();
             }}
           >
             {r.value}
@@ -111,7 +117,7 @@ export const AddReaction = (props: { entityID: string; close: () => void }) => {
               },
             ]);
             setNewReaction("");
-            props.close();
+            props.onSelect();
           }}
           disabled={editing && newReaction == "" ? true : false}
         >

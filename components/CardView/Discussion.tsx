@@ -133,7 +133,7 @@ export const MessageInput = (props: {
         {mode === "reacting" ? (
           <AddReaction
             entityID={props.entityID}
-            close={() => setMode("normal")}
+            onSelect={() => setMode("normal")}
           />
         ) : (
           <div className="z-10 flex w-full items-end gap-1 rounded-md border border-grey-80 bg-white p-1 text-base">
