@@ -214,7 +214,7 @@ export const store = (storage: BasicStorage, ctx: { id: string }) => {
         let index = latestMessage !== undefined ? latestMessage + 1 : 0;
         storage.put(`messages-${Date.now()}-${m.id}`, {
           ...m,
-          server_ts: Date.now(),
+          server_ts: Date.now().toString(),
           index,
         });
 
