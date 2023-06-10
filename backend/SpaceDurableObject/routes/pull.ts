@@ -12,7 +12,7 @@ export const pullRoute = makeRoute({
     clientID: z.string(),
     cookie: z.union([
       z.object({
-        lastUpdated: z.string(),
+        lastUpdated: z.union([z.string(), z.number()]),
       }),
       z.undefined(),
       z.null(),
