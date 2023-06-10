@@ -116,7 +116,7 @@ export const MessageInput = (props: {
   };
   return (
     <div
-      className=" sticky bottom-0 flex w-full flex-col gap-2 "
+      className="sticky bottom-0 flex w-full flex-col gap-2"
       onBlur={(e) => {
         if (e.currentTarget.contains(e.relatedTarget)) return;
         setMode("normal");
@@ -283,7 +283,7 @@ export const Messages = (props: {
 
   return (
     <div
-      className={`flex-1 flex-col justify-end `}
+      className="flex-1 flex-col justify-end pb-2"
       style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
     >
       {messages.length == 0 && authorized ? (
@@ -335,7 +335,7 @@ const Message = (props: {
   );
   return (
     <div
-      className={`message flex flex-col gap-0 text-sm first:pt-0 last:pb-4  ${
+      className={`message flex flex-col gap-1 text-sm first:pt-0 last:pb-2 ${
         !props.multipleFromSameAuthor ? "pt-6" : "pt-1"
       }`}
     >

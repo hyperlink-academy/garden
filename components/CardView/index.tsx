@@ -151,6 +151,7 @@ export const CardView = (props: {
             no-scrollbar flex h-full          
             grow
             flex-col
+            justify-between
             gap-16
             overflow-scroll
             ${contentStyles({
@@ -184,7 +185,7 @@ export const CardContent = (props: {
     <>
       {/* START CARD CONTENT */}
       <div className="cardContentWrapper relative">
-        <div className="cardSectionAdder  pointer-events-none  sticky top-0 z-10 flex w-full justify-center ">
+        <div className="cardSectionAdder pointer-events-none  sticky top-0 z-10 flex w-full justify-center ">
           <SectionAdder
             entityID={props.entityID}
             setDateEditing={() => {
@@ -245,19 +246,15 @@ export const CardContent = (props: {
       {/* END CARD CONTENT */}
 
       {/* START CARD DISCUSSION */}
-      <div>
-        <div className="text-sm  text-grey-55">comments</div>
-
-        <div
-          className=" flex flex-col gap-4 rounded-md border border-grey-90 p-3"
-          onClick={(e) => {
-            if (e.target !== e.currentTarget) return;
-            let element = document.getElementById("default-text-section");
-            element?.focus();
-          }}
-        >
-          <Discussion entityID={props.entityID} allowReact isRoom={false} />
+      <div className="cardDiscussionWrapper">
+        {/* sticky "comments" tab */}
+        <div className="sticky -top-4 z-10 -mx-4 mb-4 border-b border-grey-90 bg-white px-4 pt-4">
+          <div className="z-20 -mb-[1px] w-fit rounded-t-md border border-grey-90 border-b-white bg-white p-2 text-sm text-grey-55">
+            comments
+          </div>
         </div>
+
+        <Discussion entityID={props.entityID} allowReact isRoom={false} />
       </div>
     </>
   );
