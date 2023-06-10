@@ -232,14 +232,14 @@ export const CardContent = (props: {
               openDateEditing={() => setDateEditing(true)}
             />
           </div>
+
+          <Reactions entityID={props.entityID} />
+
           <DefaultTextSection entityID={props.entityID} />
 
-          {/* show the image and attached cards if any */}
           <ImageSection entityID={props.entityID} />
 
           <AttachedCardSection entityID={props.entityID} />
-
-          <Reactions entityID={props.entityID} />
         </div>
       </div>
       {/* END CARD CONTENT */}
