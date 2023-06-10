@@ -151,7 +151,7 @@ export const CardView = (props: {
             no-scrollbar flex h-full          
             grow
             flex-col
-            gap-4
+            gap-16
             overflow-scroll
             ${contentStyles({
               member: !!memberName,
@@ -236,24 +236,28 @@ export const CardContent = (props: {
 
           {/* show the image and attached cards if any */}
           <ImageSection entityID={props.entityID} />
+
           <AttachedCardSection entityID={props.entityID} />
 
-          {/* this handles the triggers to add cards, image, and date! */}
+          <Reactions entityID={props.entityID} />
         </div>
       </div>
       {/* END CARD CONTENT */}
-      <Reactions entityID={props.entityID} />
 
-      {/* START CARD DISCUSSION + REACTIONS */}
-      <div
-        className="flex flex-1 flex-col justify-end gap-4"
-        onClick={(e) => {
-          if (e.target !== e.currentTarget) return;
-          let element = document.getElementById("default-text-section");
-          element?.focus();
-        }}
-      >
-        <Discussion entityID={props.entityID} allowReact isRoom={false} />
+      {/* START CARD DISCUSSION */}
+      <div>
+        <div className="text-sm  text-grey-55">comments</div>
+
+        <div
+          className=" flex flex-col gap-4 rounded-md border border-grey-90 p-3"
+          onClick={(e) => {
+            if (e.target !== e.currentTarget) return;
+            let element = document.getElementById("default-text-section");
+            element?.focus();
+          }}
+        >
+          <Discussion entityID={props.entityID} allowReact isRoom={false} />
+        </div>
       </div>
     </>
   );

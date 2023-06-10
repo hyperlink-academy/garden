@@ -50,6 +50,7 @@ export const Discussion = (props: {
         setReply={setReply}
         isRoom={props.isRoom}
       />
+
       <MessageInput
         entityID={props.entityID}
         allowReact={props.allowReact}
@@ -115,7 +116,7 @@ export const MessageInput = (props: {
   };
   return (
     <div
-      className="sticky bottom-0 flex w-full flex-col gap-2 pt-4"
+      className=" sticky bottom-0 flex w-full flex-col gap-2 "
       onBlur={(e) => {
         if (e.currentTarget.contains(e.relatedTarget)) return;
         setMode("normal");
@@ -300,7 +301,7 @@ export const Messages = (props: {
 
   return (
     <div
-      className="flex flex-1 flex-col justify-end"
+      className={`flex-1 flex-col justify-end `}
       style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
     >
       {messages.length == 0 && authorized ? (
@@ -352,15 +353,18 @@ const Message = (props: {
   );
   return (
     <div
-      className={`flex flex-col gap-0 ${
+      className={`message flex flex-col gap-0 text-sm first:pt-0 last:pb-4  ${
         !props.multipleFromSameAuthor ? "pt-6" : "pt-1"
       }`}
     >
+      {/* MESSAGE HEADER */}
       {!props.multipleFromSameAuthor && (
         <div className="flex justify-between gap-2 text-grey-55">
-          <div className="flex gap-2">
-            <small className="font-bold">{memberName?.value}</small>
-            <span className="self-center text-xs">
+          <div className="messageInfo flex gap-2">
+            <small className="messageAuthor text-sm font-bold italic ">
+              {memberName?.value}
+            </small>
+            <span className="messageTimeStamp self-center text-xs">
               {time.toLocaleDateString(undefined, {
                 month: "short",
                 day: "numeric",
@@ -369,21 +373,10 @@ const Message = (props: {
               })}
             </span>
           </div>
-          {authorized ? (
-            <span className="text-xs">
-              <button
-                onClick={() => {
-                  props.setReply(props.id);
-                  document.getElementById("messageInput")?.focus();
-                }}
-              >
-                reply
-              </button>
-            </span>
-          ) : null}
         </div>
       )}
 
+      {/* IF THE MESSAGE IS IN REPLY TO SOMEONE */}
       {replyMessage && (
         <div className="my-1 rounded-md border-l-4 border-accent-blue bg-bg-blue p-2">
           <div className="text-xs font-bold text-grey-55">
@@ -392,14 +385,29 @@ const Message = (props: {
           <div>{replyMessage?.content}</div>
         </div>
       )}
-      <RenderedText
-        className="text-base"
-        text={props.content}
-        tabIndex={0}
-        style={{
-          whiteSpace: "pre-wrap",
-        }}
-      />
+      <div className=" group flex gap-2 hover:bg-bg-blue">
+        <RenderedText
+          className="messageContent grow text-sm text-grey-35 "
+          text={props.content}
+          tabIndex={0}
+          style={{
+            whiteSpace: "pre-wrap",
+          }}
+        />
+        {authorized ? (
+          <span className="messageReplyButton w-8 shrink-0 text-xs ">
+            <button
+              className="hidden group-hover:block"
+              onClick={() => {
+                props.setReply(props.id);
+                document.getElementById("messageInput")?.focus();
+              }}
+            >
+              reply
+            </button>
+          </span>
+        ) : null}
+      </div>
       {attachedCards && (
         <div className="mt-2 flex flex-col gap-1">
           {attachedCards?.map((c) => (
