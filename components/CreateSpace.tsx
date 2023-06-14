@@ -8,7 +8,7 @@ import { DotLoader } from "./DotLoader";
 import { SpaceCreate } from "./Icons";
 import { Modal } from "./Layout";
 import { useSpaceData } from "hooks/useSpaceData";
-import { useStudioData } from "hooks/useStudioData";
+import { useIdentityData } from "hooks/useIdentityData";
 
 type FormState = {
   display_name: string;
@@ -23,7 +23,7 @@ export const CreateSpace = (props: {
   studioSpaceID: string;
   studioName: string;
 }) => {
-  let { mutate } = useStudioData(props.studioName);
+  let { mutate } = useIdentityData(props.studioName);
   console.log(props.studioSpaceID);
   let [open, setOpen] = useState(false);
   let [formState, setFormState] = useState<FormState>({

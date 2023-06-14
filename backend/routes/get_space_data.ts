@@ -9,7 +9,8 @@ export const get_space_data_route = makeRoute({
   handler: async (msg, env: Bindings) => {
     const supabase = createClient<Database>(
       env.SUPABASE_URL,
-      env.SUPABASE_API_TOKEN
+      env.SUPABASE_API_TOKEN,
+      { auth: { persistSession: false } }
     );
     let { data } = await supabase
       .from("space_data")

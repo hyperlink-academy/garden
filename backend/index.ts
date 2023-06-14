@@ -1,8 +1,10 @@
 import { makeRouter } from "./lib/api";
 import { handleOptions } from "./lib/handleOptions";
+import { create_studio_route } from "./routes/create_studio";
+import { get_identity_data_route } from "./routes/get_identity_data";
 import { get_space_route } from "./routes/get_space";
 import { get_space_data_route } from "./routes/get_space_data";
-import { getStudioRoute } from "./routes/get_studio";
+import { get_studio_data_route } from "./routes/get_studio_data";
 import { LoginRoute } from "./routes/login";
 import { SignupRoute } from "./routes/signup";
 export { SpaceDurableObject } from "./SpaceDurableObject";
@@ -14,9 +16,11 @@ export default {
 const Routes = [
   SignupRoute,
   LoginRoute,
-  getStudioRoute,
+  get_identity_data_route,
   get_space_route,
   get_space_data_route,
+  get_studio_data_route,
+  create_studio_route,
 ];
 
 export type WorkerRoutes = typeof Routes;
@@ -27,6 +31,7 @@ export type Bindings = {
   APP_EVENT_ANALYTICS: AnalyticsEngineDataset;
   SUPABASE_API_TOKEN: string;
   SUPABASE_URL: string;
+  DAILY_API_KEY: string;
   SPACES: DurableObjectNamespace;
   USER_UPLOADS: R2Bucket;
 };

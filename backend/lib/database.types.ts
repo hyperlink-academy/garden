@@ -203,6 +203,34 @@ export interface Database {
           }
         ]
       }
+      studios: {
+        Row: {
+          creator: string
+          do_id: string
+          id: string
+          name: string
+        }
+        Insert: {
+          creator: string
+          do_id: string
+          id?: string
+          name: string
+        }
+        Update: {
+          creator?: string
+          do_id?: string
+          id?: string
+          name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "studios_creator_fkey"
+            columns: ["creator"]
+            referencedRelation: "identity_data"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never

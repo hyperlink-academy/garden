@@ -3,8 +3,8 @@ import { Bindings } from "backend";
 import { makeRoute } from "backend/lib/api";
 import { Database } from "backend/lib/database.types";
 import { z } from "zod";
-export const getStudioRoute = makeRoute({
-  route: "get_studio",
+export const get_identity_data_route = makeRoute({
+  route: "get_identity_data",
   input: z.object({ name: z.string() }),
   handler: async (msg, env: Bindings) => {
     const supabase = createClient<Database>(
@@ -18,6 +18,7 @@ export const getStudioRoute = makeRoute({
         members_in_spaces(
           space_data(*, owner:identity_data!space_data_owner_fkey(*))
         ),
+        studios!studios_creator_fkey(*),
         owner:space_data!space_data_owner_fkey(*, owner:identity_data!space_data_owner_fkey(*))`
       )
       .eq("username", msg.name.toLowerCase())

@@ -7,13 +7,13 @@ import { GetStaticPropsContext, InferGetStaticPropsType } from "next";
 import { useAuth } from "hooks/useAuth";
 import { useRouter } from "next/router";
 import { getCurrentDate } from "src/utils";
-import { useStudioData } from "hooks/useStudioData";
+import { useIdentityData } from "hooks/useIdentityData";
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>;
 export default function StudioPage(props: Props) {
   let { session } = useAuth();
   let { query } = useRouter();
-  let { data } = useStudioData(query.studio as string, props.data);
+  let { data } = useIdentityData(query.studio as string, props.data);
   if (props.notFound) return <div>404 - studio not found!</div>;
   if (!data) return <div>loading </div>;
 
@@ -182,7 +182,7 @@ const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export async function getStaticProps(ctx: GetStaticPropsContext) {
   if (!ctx.params?.studio)
     return { props: { notFound: true }, revalidate: 10 } as const;
-  let data = await workerAPI(WORKER_URL, "get_studio", {
+  let data = await workerAPI(WORKER_URL, "get_identity_data", {
     name: ctx.params?.studio as string,
   });
 
