@@ -21,6 +21,7 @@ import { Popover } from "@headlessui/react";
 import { ButtonPrimary } from "components/Buttons";
 import { LogInModal } from "components/LoginModal";
 import { useSpaceData } from "hooks/useSpaceData";
+import { CallManager } from "components/Calls/CallManager";
 
 export const Sidebar = (props: {
   onRoomChange: (room: string) => void;
@@ -115,6 +116,7 @@ const SpaceName = () => {
         onClose={() => setEditModal(false)}
         spaceID={spaceID}
       />
+      {spaceID && data?.display_name && <CallManager roomID={spaceID} />}
     </div>
   );
 };
