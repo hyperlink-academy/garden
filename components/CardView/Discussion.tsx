@@ -1,6 +1,12 @@
 import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
 import * as Popover from "@radix-ui/react-popover";
-import { CardAdd, CloseLinedTiny, ReactionAdd, Send } from "components/Icons";
+import {
+  CardAdd,
+  CloseLinedTiny,
+  ReactionAdd,
+  Reply,
+  Send,
+} from "components/Icons";
 import { RenderedText } from "components/Textarea/RenderedText";
 import { useIndex, useMutations } from "hooks/useReplicache";
 import { useEffect, useRef, useState } from "react";
@@ -335,8 +341,8 @@ const Message = (props: {
   );
   return (
     <div
-      className={`message flex flex-col gap-1 text-sm first:pt-0 last:pb-2 ${
-        !props.multipleFromSameAuthor ? "pt-6" : "pt-1"
+      className={`message flex flex-col text-sm first:pt-0 last:pb-2 ${
+        !props.multipleFromSameAuthor ? "pt-5" : "pt-1"
       }`}
     >
       {/* MESSAGE HEADER */}
@@ -367,7 +373,7 @@ const Message = (props: {
           <div>{replyMessage?.content}</div>
         </div>
       )}
-      <div className=" group flex gap-2 hover:bg-bg-blue">
+      <div className=" group mx-3 flex gap-1 py-1  px-3 hover:bg-bg-blue sm:-mx-4 sm:px-4">
         <RenderedText
           className="messageContent grow text-sm text-grey-35 "
           text={props.content}
@@ -377,15 +383,15 @@ const Message = (props: {
           }}
         />
         {authorized ? (
-          <span className="messageReplyButton w-8 shrink-0 text-xs ">
+          <span className="messageReplyButton h-4 w-4 shrink-0 pt-[2px] text-xs ">
             <button
-              className="hidden group-hover:block"
+              className="hidden text-grey-55 hover:text-accent-blue group-hover:block"
               onClick={() => {
                 props.setReply(props.id);
                 document.getElementById("messageInput")?.focus();
               }}
             >
-              reply
+              <Reply />
             </button>
           </span>
         ) : null}

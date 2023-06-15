@@ -199,7 +199,7 @@ export const CardContent = (props: {
         {cardCreatorName && (
           <div
             className={`cardInfo pointer-events-none relative z-20 mb-3 ${
-              authorized ? "-mt-[42px]" : ""
+              authorized ? "-mt-[170px]" : ""
             } flex h-[42px] shrink-0 items-center justify-between gap-3`}
           >
             {cardCreatorName ? (
