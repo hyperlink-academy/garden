@@ -266,10 +266,7 @@ export const CardContent = (props: {
       {/* END CARD CONTENT */}
 
       {/* START CARD DISCUSSION */}
-      {/* the negative margin and padding are to ensure that when the comment section is scrolled to vis button, there is sufficent padding at the top to include the comment header */}
-      <div className="cardDiscussionWrapper -mt-20 pt-20" id="card-comments">
-        <Discussion entityID={props.entityID} allowReact isRoom={false} />
-      </div>
+      <Discussion entityID={props.entityID} allowReact isRoom={false} />
     </>
   );
 };
