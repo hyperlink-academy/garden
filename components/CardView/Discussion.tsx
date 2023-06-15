@@ -52,7 +52,9 @@ export const Discussion = (props: {
   let [reply, setReply] = useState<string | null>(null);
 
   return (
-    <>
+    // negative margin and padding required to make sure that
+    // the comment section bottoms out with some spacing under it when scrolled to via button
+    <div className="-mb-4 flex flex-col pb-4 " id="card-comments">
       <Messages
         entityID={props.entityID}
         setReply={setReply}
@@ -66,7 +68,7 @@ export const Discussion = (props: {
         reply={reply}
         setReply={setReply}
       />
-    </>
+    </div>
   );
 };
 
@@ -121,6 +123,13 @@ export const MessageInput = (props: {
     else ScrollContainer = document.getElementById("cardContentAndDiscussion");
     if (ScrollContainer)
       ScrollContainer?.scrollTo(0, ScrollContainer.scrollHeight);
+    setTimeout(
+      () =>
+        document
+          .getElementById("card-comments")
+          ?.scrollIntoView({ behavior: "smooth", block: "end" }),
+      50
+    );
   };
   return (
     <div
@@ -309,14 +318,9 @@ export const Messages = (props: {
   if (props.isRoom === false && messages.length == 0) return null;
 
   return (
-    // the negative margin and padding are to ensure that
-    // when the comment section is scrolled to vis button,
-    // there is sufficent padding at the top to include the comment header */}
-
     <div
-      className="messages -mt-20 flex  flex-1 flex-col justify-end pt-20 pb-2"
+      className="messages flex  flex-1 flex-col justify-end  pb-2"
       style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
-      id="card-comments"
     >
       {messages.length == 0 && authorized ? (
         <div className="messagesEmpty flex flex-col gap-4 text-base italic text-grey-35">

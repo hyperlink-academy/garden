@@ -3,6 +3,8 @@ import { makeRoute } from "backend/lib/api";
 import { Env } from "..";
 import { generateShareCode } from "../lib/generate_share_code";
 import { authTokenVerifier, verifyIdentity } from "backend/lib/auth";
+import { createClient } from "@supabase/supabase-js";
+import { Database } from "backend/lib/database.types";
 
 export const get_share_code_route = makeRoute({
   route: "get_share_code",
@@ -13,10 +15,19 @@ export const get_share_code_route = makeRoute({
       return {
         data: { success: false, error: "Invalid session token" },
       } as const;
-    let isMember = await env.factStore.scanIndex.ave(
-      "space/member",
-      session.studio
+
+    let supabase = createClient<Database>(
+      env.env.SUPABASE_URL,
+      env.env.SUPABASE_API_TOKEN
     );
+
+    let { data: isMember } = await supabase
+      .from("members_in_spaces")
+      .select("member")
+      .eq("member", session.id)
+      .eq("space_do_id", env.id)
+      .single();
+
     if (!isMember)
       return {
         data: { success: false, error: "user is not a member" },
