@@ -124,7 +124,7 @@ export const MessageInput = (props: {
   };
   return (
     <div
-      className="messageInput sticky bottom-0 flex w-full flex-col gap-2  pt-1"
+      className="messageInput  sticky bottom-0 flex w-full flex-col gap-2  pt-1"
       onBlur={(e) => {
         if (e.currentTarget.contains(e.relatedTarget)) return;
         setMode("normal");
@@ -310,11 +310,11 @@ export const Messages = (props: {
 
   return (
     <div
-      className="flex-1 flex-col justify-end pb-2"
+      className="messages flex flex-1  flex-col justify-end pb-2"
       style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
     >
       {messages.length == 0 && authorized ? (
-        <div className="flex flex-col gap-4 text-base italic text-grey-35">
+        <div className="messagesEmpty flex flex-col gap-4 text-base italic text-grey-35">
           <p>Welcome to the chat!</p>
           <p>Still quiet…start the conversation 🌱</p>
         </div>
@@ -397,7 +397,7 @@ const Message = (props: {
           <div className="ml-2 h-2 w-0 border border-grey-80" />
         </>
       )}
-      <div className=" group mx-3 flex items-end gap-1 py-1  px-3 hover:bg-bg-blue sm:-mx-4 sm:px-4">
+      <div className=" group -mx-4 flex items-end gap-1 py-1  px-4 hover:bg-bg-blue ">
         <RenderedText
           className="messageContent grow text-sm text-grey-35 "
           text={props.content}

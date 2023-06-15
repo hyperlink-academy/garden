@@ -54,7 +54,7 @@ const contentStyles = (args: { member: boolean }) => {
     case args.member:
       return `bg-white rounded-md mx-2 mt-1 mb-3 px-4 py-4`;
     default:
-      return `px-2 py-2 sm:px-4 sm:py-4`;
+      return `px-3 py-3 sm:px-4 sm:py-4`;
   }
 };
 
@@ -152,7 +152,8 @@ export const CardView = (props: {
             grow
             flex-col
             justify-between
-            overflow-scroll
+            overflow-x-hidden
+            overflow-y-scroll
             ${contentStyles({
               member: !!memberName,
             })}

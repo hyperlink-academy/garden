@@ -29,7 +29,7 @@ export const Room = (props: { entityID: string }) => {
     <div
       id="roomScrollContainer"
       ref={ref}
-      className="no-scrollbar m-2 flex h-full w-[336px] flex-col gap-1 overflow-x-hidden overflow-y-scroll text-sm sm:m-4"
+      className="no-scrollbar flex h-full w-[336px] flex-col gap-1 overflow-x-hidden overflow-y-scroll p-2 pt-0 text-sm sm:p-4 sm:pt-0 "
     >
       <RoomHeader
         entityID={props.entityID}
@@ -49,9 +49,7 @@ export const Room = (props: { entityID: string }) => {
             />
           </div>
         ) : roomType?.value === "chat" ? (
-          <div className="flex h-full flex-col">
-            <Discussion entityID={props.entityID} isRoom={true} />
-          </div>
+          <Discussion entityID={props.entityID} isRoom={true} />
         ) : (
           <div className="relative flex flex-col">
             <Desktop entityID={props.entityID} />
@@ -112,7 +110,10 @@ function RoomHeader(props: {
 
   return (
     <>
-      <div className="sticky top-0 z-10 bg-background" ref={titleRef}>
+      <div
+        className="sticky top-0 z-10 bg-background pt-2 sm:pt-4"
+        ref={titleRef}
+      >
         <div className="flex justify-between text-lg font-bold text-grey-35">
           <p
             className={
