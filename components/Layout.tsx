@@ -1,13 +1,21 @@
 import { Dialog, Menu, Transition } from "@headlessui/react";
 import React, { Fragment } from "react";
 
-export const Divider = (props: { dark?: boolean; vertical?: boolean }) => {
+export const Divider = (props: {
+  dark?: boolean;
+  vertical?: boolean;
+  px?: number;
+  py?: number;
+}) => {
   return (
     <div
       className={`w-full border-t border-l ${
         props.dark ? `border-grey-55` : `border-grey-80`
-      } ${props.vertical ? "h-full" : ""}
+      } ${props.vertical ? "h-full" : ""} 
       `}
+      style={{
+        padding: `${props.py}px ${props.px}px ${props.py}px ${props.px}px`,
+      }}
     ></div>
   );
 };
@@ -37,7 +45,7 @@ export const Modal: React.FC<
     <Dialog
       open={props.open}
       onClose={props.onClose}
-      className="fixed inset-0 z-10 overflow-y-hidden"
+      className="fixed inset-0 z-50 overflow-y-hidden"
     >
       <Dialog.Overlay className="overlay" />
       <FloatingContainer

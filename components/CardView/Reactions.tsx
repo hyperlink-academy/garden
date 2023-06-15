@@ -1,4 +1,7 @@
-import { AddSmall, ReactionAdd } from "components/Icons";
+import * as Popover from "@radix-ui/react-popover";
+import { AddSmall, CloseLinedTiny, ReactionAdd } from "components/Icons";
+import { Divider, Modal } from "components/Layout";
+import { useSmoker } from "components/Smoke";
 import { ref } from "data/Facts";
 import { useReactions } from "hooks/useReactions";
 import { useIndex, useMutations } from "hooks/useReplicache";
@@ -7,7 +10,7 @@ import { ulid } from "src/ulid";
 
 export const Reactions = (props: { entityID: string }) => {
   let { authorized } = useMutations();
-  let [open, setOpen] = useState(false);
+  let [reactionPickerOpen, setReactionPickerOpen] = useState(false);
 
   let reactions = useReactions(props.entityID);
   if (reactions.length === 0) return null;
@@ -15,21 +18,31 @@ export const Reactions = (props: { entityID: string }) => {
     <div className="flex flex-col gap-2" id="card-reactions">
       <div className="flex justify-start gap-2">
         <ReactionList entityID={props.entityID} />
-        {authorized && (
-          <button
-            className="text-grey-55 hover:text-accent-blue"
-            onClick={() => setOpen(!open)}
-          >
-            <ReactionAdd />
-          </button>
-        )}
+        <Popover.Root
+          onOpenChange={() => setReactionPickerOpen(!reactionPickerOpen)}
+        >
+          <Popover.Trigger className="flex items-center px-1">
+            <button
+              className={` ${
+                reactionPickerOpen
+                  ? "text-accent-blue"
+                  : "text-grey-55 hover:text-accent-blue"
+              }`}
+            >
+              <ReactionAdd />
+            </button>
+          </Popover.Trigger>
+          <Popover.Portal>
+            <Popover.Content
+              sideOffset={8}
+              collisionPadding={{ right: 20 }}
+              className="-mt-[1px] max-w-[320px]"
+            >
+              <AddReaction entityID={props.entityID} />
+            </Popover.Content>
+          </Popover.Portal>
+        </Popover.Root>
       </div>
-      {open && authorized && (
-        <AddReaction
-          entityID={props.entityID}
-          onSelect={() => setOpen(false)}
-        />
-      )}
     </div>
   );
 };
@@ -55,11 +68,13 @@ export const ReactionList = (props: { entityID: string }) => {
 
 export const AddReaction = (props: {
   entityID: string;
-  onSelect: () => void;
+  onSelect?: () => void;
 }) => {
   let { authorized, mutate, memberEntity } = useMutations();
   let reactions = useIndex.aev("space/reaction");
   let [editing, setEditing] = useState(false);
+  let [reactionEditOpen, setReactionEditOpen] = useState(false);
+
   let [newReaction, setNewReaction] = useState("");
   if (!authorized) return null;
   return (
@@ -79,7 +94,7 @@ export const AddReaction = (props: {
                 memberEntity,
                 cardEntity: props.entityID,
               });
-              props.onSelect();
+              props.onSelect ? props.onSelect() : null;
             }}
           >
             {r.value}
@@ -96,35 +111,109 @@ export const AddReaction = (props: {
           />
         )}
         <button
-          className="text-grey-55 hover:text-accent-blue disabled:hover:text-grey-55"
-          onClick={async () => {
-            if (!editing) return setEditing(true);
-            if (!memberEntity) return;
-            await mutate("addReaction", {
-              reaction: newReaction.slice(0, 4),
-              reactionFactID: ulid(),
-              reactionAuthorFactID: ulid(),
-              memberEntity,
-              cardEntity: props.entityID,
-            });
-            await mutate("assertFact", [
-              {
-                entity: memberEntity,
-                value: newReaction.slice(0, 4),
-                factID: ulid(),
-                attribute: "space/reaction",
-                positions: {},
-              },
-            ]);
-            setNewReaction("");
-            props.onSelect();
-          }}
-          disabled={editing && newReaction == "" ? true : false}
+          className="reactionPickerAdd text-grey-55 hover:text-accent-blue disabled:hover:text-grey-55"
+          onClick={() => setReactionEditOpen(true)}
         >
           <AddSmall />
         </button>
+        <EditReactions
+          reactionEditOpen={reactionEditOpen}
+          onClose={() => setReactionEditOpen(false)}
+          entityID={props.entityID}
+        />
       </div>
     </div>
+  );
+};
+
+export const EditReactions = (props: {
+  entityID: string;
+  reactionEditOpen: boolean;
+  onClose: () => void;
+}) => {
+  let reactions = useIndex.aev("space/reaction");
+  let { mutate, memberEntity } = useMutations();
+
+  let [newReaction, setNewReaction] = useState("");
+
+  let smoker = useSmoker();
+
+  return (
+    <Modal open={props.reactionEditOpen} onClose={() => props.onClose()}>
+      <div className="flex flex-col gap-2 p-2">
+        <div className="flex flex-col gap-0">
+          <div className="flex items-center justify-between">
+            <div className="font-bold text-grey-35">Add New</div>
+            <button className="text-grey-55" onClick={props.onClose}>
+              <CloseLinedTiny />
+            </button>
+          </div>
+          <div className="text-sm text-grey-35">
+            You can use up to four characters of emojis, text, or even unicode!
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <input
+            className="w-24"
+            autoFocus
+            maxLength={4}
+            value={newReaction}
+            onChange={(e) => {
+              setNewReaction(e.currentTarget.value);
+            }}
+          />
+          <button
+            className="shrink-0 text-accent-blue"
+            onClick={async (e: React.MouseEvent) => {
+              if (!memberEntity) return;
+              if (reactions.map((r) => r.value).includes(newReaction)) {
+                smoker({
+                  position: { x: e.clientX, y: e.clientY },
+                  text: "that already exists!",
+                  error: true,
+                });
+              } else {
+                await mutate("assertFact", [
+                  {
+                    entity: memberEntity,
+                    value: newReaction.slice(0, 4),
+                    factID: ulid(),
+                    attribute: "space/reaction",
+                    positions: {},
+                  },
+                ]);
+                setNewReaction("");
+              }
+            }}
+          >
+            <AddSmall />
+          </button>
+        </div>
+        <div className="my-2">
+          <Divider />
+        </div>
+        <div className="mx-auto flex flex-wrap place-items-center gap-2 place-self-center">
+          {reactions
+            .filter((f) => !!f.value) // strip empty strings
+            .sort((a, b) => {
+              return a.id > b.id ? 1 : -1;
+            })
+            .map((r) => (
+              <div key={r.value} className="lightBorder w-20 p-1 text-center">
+                <div className="text-lg font-bold">{r.value} </div>
+                <button
+                  className="text-sm italic text-grey-55 hover:text-accent-blue"
+                  onClick={async () => {
+                    await mutate("retractFact", { id: r.id });
+                  }}
+                >
+                  remove
+                </button>
+              </div>
+            ))}
+        </div>
+      </div>
+    </Modal>
   );
 };
 
