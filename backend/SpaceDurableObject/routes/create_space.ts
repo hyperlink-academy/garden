@@ -57,6 +57,10 @@ export const create_space_route = makeRoute({
       .select("*, owner:identity_data!space_data_owner_fkey(*)")
       .single();
     if (!data) return { data: { success: false } } as const;
+    await supabase.from("members_in_spaces").insert({
+      space_do_id: newSpace.toString(),
+      member: session.id,
+    });
 
     await internalSpaceAPI(stub)("http://internal", "claim", {
       type: "space",
