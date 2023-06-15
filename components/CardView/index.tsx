@@ -54,7 +54,7 @@ const contentStyles = (args: { member: boolean }) => {
     case args.member:
       return `bg-white rounded-md mx-2 mt-1 mb-3 px-4 py-4`;
     default:
-      return `px-2 py-2 sm:px-4 sm:py-4`;
+      return `px-3 py-3 sm:px-4 sm:py-4`;
   }
 };
 
@@ -152,8 +152,8 @@ export const CardView = (props: {
             grow
             flex-col
             justify-between
-            gap-16
-            overflow-scroll
+            overflow-x-hidden
+            overflow-y-scroll
             ${contentStyles({
               member: !!memberName,
             })}
@@ -185,7 +185,7 @@ export const CardContent = (props: {
     <>
       {/* START CARD CONTENT */}
       <div className="cardContentWrapper relative">
-        <div className="cardSectionAdder pointer-events-none  sticky top-0 z-10 flex w-full justify-center ">
+        <div className="cardSectionAdder pointer-events-none  sticky top-0 z-10 mb-32 flex w-full justify-center ">
           <SectionAdder
             entityID={props.entityID}
             setDateEditing={() => {
@@ -200,7 +200,7 @@ export const CardContent = (props: {
         {cardCreatorName && (
           <div
             className={`cardInfo pointer-events-none relative z-20 mb-3 ${
-              authorized ? "-mt-[42px]" : ""
+              authorized ? "-mt-[170px]" : ""
             } flex h-[42px] shrink-0 items-center justify-between gap-3`}
           >
             {cardCreatorName ? (
@@ -242,18 +242,32 @@ export const CardContent = (props: {
 
           <AttachedCardSection entityID={props.entityID} />
         </div>
+
+        {/* sticky "comments" tab */}
+        <div className=" sticky -bottom-4 z-10  -mx-3 mt-16 md:-mx-4 ">
+          <div className="flex items-end">
+            <div className="w-4 grow border border-transparent border-b-grey-90" />
+
+            <button
+              className="w-fit shrink-0 rounded-t-md border border-grey-90 border-b-white bg-white p-2 text-sm text-grey-55"
+              onClick={() =>
+                document
+                  .getElementById("card-comments")
+                  ?.scrollIntoView({ behavior: "smooth" })
+              }
+            >
+              comments
+            </button>
+            <div className="w-full grow border border-transparent border-b-grey-90" />
+          </div>
+          <div className="h-6 bg-white" />
+        </div>
       </div>
       {/* END CARD CONTENT */}
 
       {/* START CARD DISCUSSION */}
-      <div className="cardDiscussionWrapper">
-        {/* sticky "comments" tab */}
-        <div className="sticky -top-4 z-10 -mx-4 mb-4 border-b border-grey-90 bg-white px-4 pt-4">
-          <div className="z-20 -mb-[1px] w-fit rounded-t-md border border-grey-90 border-b-white bg-white p-2 text-sm text-grey-55">
-            comments
-          </div>
-        </div>
-
+      {/* the negative margin and padding are to ensure that when the comment section is scrolled to vis button, there is sufficent padding at the top to include the comment header */}
+      <div className="cardDiscussionWrapper -mt-20 pt-20" id="card-comments">
         <Discussion entityID={props.entityID} allowReact isRoom={false} />
       </div>
     </>
@@ -608,11 +622,6 @@ export const SectionAdder = (props: {
                   ?.scrollIntoView({ block: "center", behavior: "smooth" })
               }
             />
-            {/* <Popover.Arrow
-              width={16}
-              height={8}
-              className="-z-10 fill-white stroke-grey-80 stroke-2"
-            /> */}
           </Popover.Content>
         </Popover.Portal>
       </Popover.Root>

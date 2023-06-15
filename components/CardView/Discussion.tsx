@@ -1,6 +1,14 @@
 import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
 import * as Popover from "@radix-ui/react-popover";
-import { CardAdd, CloseLinedTiny, ReactionAdd, Send } from "components/Icons";
+import {
+  CardAdd,
+  CardSmall,
+  CloseLinedTiny,
+  Member,
+  ReactionAdd,
+  Reply,
+  Send,
+} from "components/Icons";
 import { RenderedText } from "components/Textarea/RenderedText";
 import { useIndex, useMutations } from "hooks/useReplicache";
 import { useEffect, useRef, useState } from "react";
@@ -74,7 +82,7 @@ export const MessageInput = (props: {
   let [mode, setMode] = useState("normal" as "normal" | "focused" | "reacting");
   let { mutate, memberEntity, authorized } = useMutations();
   let replyMessage = useIndex.messageByID(props.reply);
-  let reactions = useReactions(props.entityID);
+  let replyToName = useIndex.eav(replyMessage?.sender || null, "member/name");
 
   if (!authorized) return null;
   const send = async () => {
@@ -116,22 +124,30 @@ export const MessageInput = (props: {
   };
   return (
     <div
-      className="sticky bottom-0 flex w-full flex-col gap-2"
+      className="messageInput  sticky bottom-0 flex w-full flex-col gap-2  pt-1"
       onBlur={(e) => {
         if (e.currentTarget.contains(e.relatedTarget)) return;
         setMode("normal");
       }}
     >
+      {/* IF MESSAGE IS IN REPLY */}
       {props.reply && (
-        <div className="flex justify-between gap-2 rounded-md bg-bg-blue p-2">
-          <div>{replyMessage?.content}</div>{" "}
-          <button onClick={() => props.setReply(null)}>
-            <CloseLinedTiny />
-          </button>
+        <div className="messageInputReply -mb-2">
+          <div className="flex items-start justify-between gap-2 rounded-md border border-grey-80 bg-white p-2 text-xs italic text-grey-55">
+            <div className="flex flex-col gap-[1px]">
+              <div className="font-bold"> {replyToName?.value}</div>
+              <div>{replyMessage?.content}</div>
+            </div>
+            <button className="" onClick={() => props.setReply(null)}>
+              <CloseLinedTiny />
+            </button>
+          </div>
+          <div className="ml-2 h-2 w-0 border border-grey-80 " />
         </div>
       )}
-      <div className="flex w-full items-end gap-2">
-        <div className="z-10 flex w-full items-end gap-1 rounded-md border border-grey-80 bg-white p-1 text-base">
+      {/* ACTUAL MESSAGE INPUT */}
+      <div className="flex w-full  gap-2">
+        <div className="z-10 flex w-full items-center  gap-1 rounded-md border border-grey-55 bg-white p-1 text-sm  text-grey-15">
           <AutosizeTextarea
             onKeyDown={(e) => {
               if (!e.shiftKey && e.key === "Enter") {
@@ -147,10 +163,12 @@ export const MessageInput = (props: {
             className="w-full "
             id="messageInput"
           />
-          <AttachCard
-            attachedCards={attachedCards}
-            setAttachedCards={setAttachedCards}
-          />
+          <div className="place-self-end">
+            <AttachCard
+              attachedCards={attachedCards}
+              setAttachedCards={setAttachedCards}
+            />
+          </div>
         </div>
 
         <div className="flex h-min justify-end text-grey-55">
@@ -183,25 +201,29 @@ const AttachCard = ({
       ) : (
         <Popover.Root>
           <Popover.Trigger asChild>
-            <button className="flex items-center text-sm">
+            <button className="flex items-center gap-[1px] text-sm text-grey-55">
               {attachedCards.length} <CardAdd />
             </button>
           </Popover.Trigger>
           <Popover.Portal>
             <Popover.Content
               className="PopoverContent"
-              sideOffset={24}
+              sideOffset={12}
+              collisionPadding={{ left: 24, right: 24 }}
               side="top"
+              align="end"
+              alignOffset={-6}
             >
-              <div className="flex w-48 flex-col items-start gap-2 rounded-md border bg-white p-2 shadow-sm">
+              <div className="flex w-96 flex-col gap-0 rounded-md border border-grey-80 bg-white py-1 shadow-sm">
                 {attachedCards.map((card) => {
                   return (
                     <div
-                      className="flex w-full justify-between gap-2 text-sm"
+                      className="flex w-full items-start justify-between gap-2 py-1 px-2 text-sm hover:bg-bg-blue"
                       key={card}
                     >
                       <AttachedCard entityID={card} />
                       <button
+                        className="pt-1 text-grey-55 hover:text-accent-blue "
                         onClick={() =>
                           setAttachedCards((a) => a.filter((c) => c !== card))
                         }
@@ -213,12 +235,12 @@ const AttachCard = ({
                 })}
                 <button
                   onClick={() => setOpen(true)}
-                  className="flex text-grey-55"
+                  className="flex gap-2 py-1 px-2 text-sm text-grey-55 hover:text-accent-blue"
                 >
                   <CardAdd />
+                  attach another card
                 </button>
               </div>
-              <Popover.Arrow className="PopoverArrow" />
             </Popover.Content>
           </Popover.Portal>
         </Popover.Root>
@@ -263,10 +285,15 @@ const AttachedCard = (props: { entityID: string }) => {
   let name = useIndex.eav(props.entityID, "card/title");
   let memberName = useIndex.eav(props.entityID, "member/name");
   return (
-    <div className="w-full rounded-md border border-grey-80 py-1 px-2">
-      {memberName?.value || name?.value || (
-        <span className="italic text-grey-55">untitled</span>
-      )}
+    <div className="flex w-full items-start gap-2">
+      <div className="shrink-0 text-grey-35">
+        {memberName ? <Member /> : <CardSmall />}
+      </div>
+      <div className="grow pt-[2px]">
+        {memberName?.value || name?.value || (
+          <span className="italic text-grey-55">untitled</span>
+        )}
+      </div>
     </div>
   );
 };
@@ -283,11 +310,11 @@ export const Messages = (props: {
 
   return (
     <div
-      className="flex-1 flex-col justify-end pb-2"
+      className="messages flex flex-1  flex-col justify-end pb-2"
       style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
     >
       {messages.length == 0 && authorized ? (
-        <div className="flex flex-col gap-4 text-base italic text-grey-35">
+        <div className="messagesEmpty flex flex-col gap-4 text-base italic text-grey-35">
           <p>Welcome to the chat!</p>
           <p>Still quiet…start the conversation 🌱</p>
         </div>
@@ -335,8 +362,8 @@ const Message = (props: {
   );
   return (
     <div
-      className={`message flex flex-col gap-1 text-sm first:pt-0 last:pb-2 ${
-        !props.multipleFromSameAuthor ? "pt-6" : "pt-1"
+      className={`message flex flex-col text-sm first:pt-0 last:pb-2 ${
+        !props.multipleFromSameAuthor ? "pt-5" : "pt-1"
       }`}
     >
       {/* MESSAGE HEADER */}
@@ -360,14 +387,17 @@ const Message = (props: {
 
       {/* IF THE MESSAGE IS IN REPLY TO SOMEONE */}
       {replyMessage && (
-        <div className="my-1 rounded-md border-l-4 border-accent-blue bg-bg-blue p-2">
-          <div className="text-xs font-bold text-grey-55">
-            {replyToName?.value}
+        <>
+          <div className="mt-1 flex flex-col gap-[1px] rounded-md border border-grey-80 p-2 text-xs">
+            <div className="font-bold italic text-grey-55">
+              {replyToName?.value}
+            </div>
+            <div className=" italic text-grey-55">{replyMessage?.content}</div>
           </div>
-          <div>{replyMessage?.content}</div>
-        </div>
+          <div className="ml-2 h-2 w-0 border border-grey-80" />
+        </>
       )}
-      <div className=" group flex gap-2 hover:bg-bg-blue">
+      <div className=" group -mx-4 flex items-end gap-1 py-1  px-4 hover:bg-bg-blue ">
         <RenderedText
           className="messageContent grow text-sm text-grey-35 "
           text={props.content}
@@ -377,15 +407,15 @@ const Message = (props: {
           }}
         />
         {authorized ? (
-          <span className="messageReplyButton w-8 shrink-0 text-xs ">
+          <span className="messageReplyButton mb-[1px] h-4 w-4 shrink-0  text-xs ">
             <button
-              className="hidden group-hover:block"
+              className=" hidden text-grey-55 hover:text-accent-blue group-hover:block"
               onClick={() => {
                 props.setReply(props.id);
                 document.getElementById("messageInput")?.focus();
               }}
             >
-              reply
+              <Reply />
             </button>
           </span>
         ) : null}
