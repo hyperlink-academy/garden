@@ -253,7 +253,7 @@ export const CardContent = (props: {
               onClick={() =>
                 document
                   .getElementById("card-comments")
-                  ?.scrollIntoView({ behavior: "smooth" })
+                  ?.scrollIntoView({ behavior: "smooth", block: "end" })
               }
             >
               comments
