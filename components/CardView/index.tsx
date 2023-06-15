@@ -244,7 +244,7 @@ export const CardContent = (props: {
         </div>
 
         {/* sticky "comments" tab */}
-        <div className=" sticky -bottom-4 z-10  -mx-3 mt-16 md:-mx-4 ">
+        <div className=" sticky -bottom-4 z-10 -mx-3 mt-16  md:-mx-4 ">
           <div className="flex items-end">
             <div className="w-4 grow border border-transparent border-b-grey-90" />
 
@@ -260,7 +260,7 @@ export const CardContent = (props: {
             </button>
             <div className="w-full grow border border-transparent border-b-grey-90" />
           </div>
-          <div className="h-6 bg-white" />
+          <div className="h-6 rounded-lg bg-white" />
         </div>
       </div>
       {/* END CARD CONTENT */}

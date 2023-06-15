@@ -52,7 +52,7 @@ export const Discussion = (props: {
   let [reply, setReply] = useState<string | null>(null);
 
   return (
-    <>
+    <div className="flex flex-col">
       <Messages
         entityID={props.entityID}
         setReply={setReply}
@@ -66,7 +66,7 @@ export const Discussion = (props: {
         reply={reply}
         setReply={setReply}
       />
-    </>
+    </div>
   );
 };
 
