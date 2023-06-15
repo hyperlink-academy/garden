@@ -366,12 +366,15 @@ const Message = (props: {
 
       {/* IF THE MESSAGE IS IN REPLY TO SOMEONE */}
       {replyMessage && (
-        <div className="my-1 rounded-md border-l-4 border-accent-blue bg-bg-blue p-2">
-          <div className="text-xs font-bold text-grey-55">
-            {replyToName?.value}
+        <>
+          <div className="mt-1 flex flex-col gap-[1px] rounded-md border border-grey-80 p-2 text-xs">
+            <div className="font-bold italic text-grey-55">
+              {replyToName?.value}
+            </div>
+            <div className=" italic text-grey-55">{replyMessage?.content}</div>
           </div>
-          <div>{replyMessage?.content}</div>
-        </div>
+          <div className="ml-2 h-2 w-0 border border-grey-80" />
+        </>
       )}
       <div className=" group mx-3 flex gap-1 py-1  px-3 hover:bg-bg-blue sm:-mx-4 sm:px-4">
         <RenderedText
