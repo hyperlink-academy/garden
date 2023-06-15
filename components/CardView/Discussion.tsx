@@ -309,9 +309,14 @@ export const Messages = (props: {
   if (props.isRoom === false && messages.length == 0) return null;
 
   return (
+    // the negative margin and padding are to ensure that
+    // when the comment section is scrolled to vis button,
+    // there is sufficent padding at the top to include the comment header */}
+
     <div
-      className="messages flex flex-1  flex-col justify-end pb-2"
+      className="messages -mt-20 flex  flex-1 flex-col justify-end pt-20 pb-2"
       style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
+      id="card-comments"
     >
       {messages.length == 0 && authorized ? (
         <div className="messagesEmpty flex flex-col gap-4 text-base italic text-grey-35">
