@@ -80,7 +80,7 @@ export const MessageInput = (props: {
   let [mode, setMode] = useState("normal" as "normal" | "focused" | "reacting");
   let { mutate, memberEntity, authorized } = useMutations();
   let replyMessage = useIndex.messageByID(props.reply);
-  let reactions = useReactions(props.entityID);
+  let replyToName = useIndex.eav(replyMessage?.sender || null, "member/name");
 
   if (!authorized) return null;
   const send = async () => {
@@ -122,20 +122,28 @@ export const MessageInput = (props: {
   };
   return (
     <div
-      className="sticky bottom-0 flex w-full flex-col gap-2"
+      className="messageInput sticky bottom-0 flex w-full flex-col gap-2 bg-white"
       onBlur={(e) => {
         if (e.currentTarget.contains(e.relatedTarget)) return;
         setMode("normal");
       }}
     >
+      {/* IF MESSAGE IS IN REPLY */}
       {props.reply && (
-        <div className="flex justify-between gap-2 rounded-md bg-bg-blue p-2">
-          <div>{replyMessage?.content}</div>{" "}
-          <button onClick={() => props.setReply(null)}>
-            <CloseLinedTiny />
-          </button>
+        <div className="messageInputReply -mb-2 ">
+          <div className="flex items-start justify-between gap-2 rounded-md border border-grey-80 bg-white p-2 text-xs italic text-grey-55">
+            <div className="flex flex-col gap-[1px]">
+              <div className="font-bold"> {replyToName?.value}</div>
+              <div>{replyMessage?.content}</div>
+            </div>
+            <button className="" onClick={() => props.setReply(null)}>
+              <CloseLinedTiny />
+            </button>
+          </div>
+          <div className="ml-2 h-2 w-0 border border-grey-80 " />
         </div>
       )}
+      {/* ACTUAL MESSAGE INPUT */}
       <div className="flex w-full items-end gap-2">
         <div className="z-10 flex w-full items-end gap-1 rounded-md border border-grey-80 bg-white p-1 text-base">
           <AutosizeTextarea
@@ -376,7 +384,7 @@ const Message = (props: {
           <div className="ml-2 h-2 w-0 border border-grey-80" />
         </>
       )}
-      <div className=" group mx-3 flex gap-1 py-1  px-3 hover:bg-bg-blue sm:-mx-4 sm:px-4">
+      <div className=" group mx-3 flex items-end gap-1 py-1  px-3 hover:bg-bg-blue sm:-mx-4 sm:px-4">
         <RenderedText
           className="messageContent grow text-sm text-grey-35 "
           text={props.content}
@@ -386,9 +394,9 @@ const Message = (props: {
           }}
         />
         {authorized ? (
-          <span className="messageReplyButton h-4 w-4 shrink-0 pt-[2px] text-xs ">
+          <span className="messageReplyButton mb-[1px] h-4 w-4 shrink-0  text-xs ">
             <button
-              className="hidden text-grey-55 hover:text-accent-blue group-hover:block"
+              className=" hidden text-grey-55 hover:text-accent-blue group-hover:block"
               onClick={() => {
                 props.setReply(props.id);
                 document.getElementById("messageInput")?.focus();
