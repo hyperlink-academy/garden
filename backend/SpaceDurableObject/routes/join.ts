@@ -31,11 +31,13 @@ export const join_route = makeRoute({
         data: { success: "false", error: "invalid share code" },
       } as const;
 
-    let existingMember = await env.factStore.scanIndex.ave(
-      "member/name",
-      session.username
-    );
-    if (existingMember)
+    let { data: isMember } = await supabase
+      .from("members_in_spaces")
+      .select("member")
+      .eq("member", session.id)
+      .eq("space_do_id", env.id)
+      .single();
+    if (!!isMember)
       return { data: { success: false, error: "Existing member" } } as const;
 
     let memberEntity = ulid();
