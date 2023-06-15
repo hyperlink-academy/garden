@@ -2,7 +2,9 @@ import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
 import * as Popover from "@radix-ui/react-popover";
 import {
   CardAdd,
+  CardSmall,
   CloseLinedTiny,
+  Member,
   ReactionAdd,
   Reply,
   Send,
@@ -122,7 +124,7 @@ export const MessageInput = (props: {
   };
   return (
     <div
-      className="messageInput sticky bottom-0 flex w-full flex-col gap-2 bg-white"
+      className="messageInput sticky bottom-0 flex w-full flex-col gap-2  pt-1"
       onBlur={(e) => {
         if (e.currentTarget.contains(e.relatedTarget)) return;
         setMode("normal");
@@ -130,7 +132,7 @@ export const MessageInput = (props: {
     >
       {/* IF MESSAGE IS IN REPLY */}
       {props.reply && (
-        <div className="messageInputReply -mb-2 ">
+        <div className="messageInputReply -mb-2">
           <div className="flex items-start justify-between gap-2 rounded-md border border-grey-80 bg-white p-2 text-xs italic text-grey-55">
             <div className="flex flex-col gap-[1px]">
               <div className="font-bold"> {replyToName?.value}</div>
@@ -144,8 +146,8 @@ export const MessageInput = (props: {
         </div>
       )}
       {/* ACTUAL MESSAGE INPUT */}
-      <div className="flex w-full items-end gap-2">
-        <div className="z-10 flex w-full items-end gap-1 rounded-md border border-grey-80 bg-white p-1 text-base">
+      <div className="flex w-full  gap-2">
+        <div className="z-10 flex w-full items-center  gap-1 rounded-md border border-grey-55 bg-white p-1 text-sm  text-grey-15">
           <AutosizeTextarea
             onKeyDown={(e) => {
               if (!e.shiftKey && e.key === "Enter") {
@@ -161,10 +163,12 @@ export const MessageInput = (props: {
             className="w-full "
             id="messageInput"
           />
-          <AttachCard
-            attachedCards={attachedCards}
-            setAttachedCards={setAttachedCards}
-          />
+          <div className="place-self-end">
+            <AttachCard
+              attachedCards={attachedCards}
+              setAttachedCards={setAttachedCards}
+            />
+          </div>
         </div>
 
         <div className="flex h-min justify-end text-grey-55">
@@ -197,25 +201,29 @@ const AttachCard = ({
       ) : (
         <Popover.Root>
           <Popover.Trigger asChild>
-            <button className="flex items-center text-sm">
+            <button className="flex items-center gap-[1px] text-sm text-grey-55">
               {attachedCards.length} <CardAdd />
             </button>
           </Popover.Trigger>
           <Popover.Portal>
             <Popover.Content
               className="PopoverContent"
-              sideOffset={24}
+              sideOffset={12}
+              collisionPadding={{ left: 24, right: 24 }}
               side="top"
+              align="end"
+              alignOffset={-6}
             >
-              <div className="flex w-48 flex-col items-start gap-2 rounded-md border bg-white p-2 shadow-sm">
+              <div className="flex w-96 flex-col gap-0 rounded-md border border-grey-80 bg-white py-1 shadow-sm">
                 {attachedCards.map((card) => {
                   return (
                     <div
-                      className="flex w-full justify-between gap-2 text-sm"
+                      className="flex w-full items-start justify-between gap-2 py-1 px-2 text-sm hover:bg-bg-blue"
                       key={card}
                     >
                       <AttachedCard entityID={card} />
                       <button
+                        className="pt-1 text-grey-55 hover:text-accent-blue "
                         onClick={() =>
                           setAttachedCards((a) => a.filter((c) => c !== card))
                         }
@@ -227,12 +235,12 @@ const AttachCard = ({
                 })}
                 <button
                   onClick={() => setOpen(true)}
-                  className="flex text-grey-55"
+                  className="flex gap-2 py-1 px-2 text-sm text-grey-55 hover:text-accent-blue"
                 >
                   <CardAdd />
+                  attach another card
                 </button>
               </div>
-              <Popover.Arrow className="PopoverArrow" />
             </Popover.Content>
           </Popover.Portal>
         </Popover.Root>
@@ -277,10 +285,15 @@ const AttachedCard = (props: { entityID: string }) => {
   let name = useIndex.eav(props.entityID, "card/title");
   let memberName = useIndex.eav(props.entityID, "member/name");
   return (
-    <div className="w-full rounded-md border border-grey-80 py-1 px-2">
-      {memberName?.value || name?.value || (
-        <span className="italic text-grey-55">untitled</span>
-      )}
+    <div className="flex w-full items-start gap-2">
+      <div className="shrink-0 text-grey-35">
+        {memberName ? <Member /> : <CardSmall />}
+      </div>
+      <div className="grow pt-[2px]">
+        {memberName?.value || name?.value || (
+          <span className="italic text-grey-55">untitled</span>
+        )}
+      </div>
     </div>
   );
 };
