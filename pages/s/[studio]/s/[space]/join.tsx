@@ -29,7 +29,6 @@ export function JoinSpace() {
     let data = await spaceAPI(`${WORKER_URL}/space/${id}`, "join", {
       authToken,
       code,
-      studio: router.query.studio as string,
     });
     if (data.success) {
       router.push(`/s/${router.query.studio}/s/${router.query.space}`);

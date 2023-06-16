@@ -241,7 +241,7 @@ const DeleteSpaceForm = (props: {
               await spaceAPI(
                 `${WORKER_URL}/space/${props.spaceID}`,
                 "delete_self",
-                { authToken, name: state.spaceName }
+                { authToken }
               );
               setStatus("normal");
               props.onDelete();

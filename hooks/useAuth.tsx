@@ -34,6 +34,7 @@ export const useAuth = () => {
           },
       session: {
         loggedIn: !!session,
+        user: session?.user,
         session: session?.user?.user_metadata as {
           username: string;
           studio: string;

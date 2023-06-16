@@ -55,14 +55,14 @@ const StudiosList = (props: { username: string }) => {
 
         <Popover.Portal>
           <Popover.Content
-            className="max-w-md rounded-md border-2 border-grey-80 bg-white p-2 drop-shadow-md"
+            className="flex max-w-md flex-col gap-2 rounded-md border-2 border-grey-80 bg-white p-2 drop-shadow-md"
             sideOffset={-4}
           >
             <Popover.Arrow className="fill-grey-80 stroke-grey-80" />
             {data?.studios.map((s) => (
               <Link href={`/studio/${s.id}`}>{s.name}</Link>
             ))}
-            <CreateStudio />
+            <CreateStudio username={props.username} />
           </Popover.Content>
         </Popover.Portal>
       </Popover.Root>

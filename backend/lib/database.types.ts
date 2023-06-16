@@ -139,6 +139,34 @@ export interface Database {
           }
         ]
       }
+      members_in_studios: {
+        Row: {
+          member: string
+          studio: string
+        }
+        Insert: {
+          member: string
+          studio: string
+        }
+        Update: {
+          member?: string
+          studio?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "members_in_studios_member_fkey"
+            columns: ["member"]
+            referencedRelation: "identity_data"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "members_in_studios_studio_fkey"
+            columns: ["studio"]
+            referencedRelation: "studios"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       old_identities: {
         Row: {
           email: string
@@ -206,18 +234,21 @@ export interface Database {
       studios: {
         Row: {
           creator: string
+          description: string | null
           do_id: string
           id: string
           name: string
         }
         Insert: {
           creator: string
+          description?: string | null
           do_id: string
           id?: string
           name: string
         }
         Update: {
           creator?: string
+          description?: string | null
           do_id?: string
           id?: string
           name?: string

@@ -20,13 +20,25 @@ export const get_share_code_route = makeRoute({
       env.env.SUPABASE_URL,
       env.env.SUPABASE_API_TOKEN
     );
-
-    let { data: isMember } = await supabase
-      .from("members_in_spaces")
-      .select("member")
-      .eq("member", session.id)
-      .eq("space_do_id", env.id)
-      .single();
+    let space_type = await env.storage.get<string>("meta-space-type");
+    let isMember;
+    if (space_type === "studio") {
+      let { data } = await supabase
+        .from("members_in_studios")
+        .select("member, studios!inner(do_id)")
+        .eq("member", session.id)
+        .eq("studios.do_id", env.id)
+        .single();
+      isMember = !!data;
+    } else {
+      let { data } = await supabase
+        .from("members_in_spaces")
+        .select("member")
+        .eq("member", session.id)
+        .eq("space_do_id", env.id)
+        .single();
+      isMember = !!data;
+    }
 
     if (!isMember)
       return {

@@ -41,6 +41,10 @@ export const create_studio_route = makeRoute({
       .select()
       .single();
     if (!data) return { data: { success: false } } as const;
+    await supabase.from("members_in_studios").insert({
+      studio: data.id,
+      member: session.id,
+    });
 
     await internalSpaceAPI(stub)("http://internal", "claim", {
       type: "studio",

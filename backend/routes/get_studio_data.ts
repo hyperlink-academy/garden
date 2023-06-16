@@ -13,7 +13,7 @@ export const get_studio_data_route = makeRoute({
     );
     let { data } = await supabase
       .from("studios")
-      .select("*")
+      .select("*, members_in_studios(*, identity_data(username))")
       .eq("id", msg.id)
       .single();
     if (data) {
