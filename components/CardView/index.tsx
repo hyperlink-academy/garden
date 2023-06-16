@@ -609,7 +609,7 @@ export const SectionAdder = (props: {
           <Popover.Content
             sideOffset={16}
             collisionPadding={{ right: 20 }}
-            className="-mt-[1px] max-w-[320px]"
+            className="-mt-[1px] max-w-[298px]"
           >
             <AddReaction
               entityID={props.entityID}

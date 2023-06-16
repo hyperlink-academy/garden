@@ -16,7 +16,7 @@ export const Reactions = (props: { entityID: string }) => {
   if (reactions.length === 0) return null;
   return (
     <div className="flex flex-col gap-2" id="card-reactions">
-      <div className="flex justify-start gap-2">
+      <div className="flex flex-wrap justify-start gap-2">
         <ReactionList entityID={props.entityID} />
         <Popover.Root
           onOpenChange={() => setReactionPickerOpen(!reactionPickerOpen)}
@@ -36,7 +36,7 @@ export const Reactions = (props: { entityID: string }) => {
             <Popover.Content
               sideOffset={8}
               collisionPadding={{ right: 20 }}
-              className="-mt-[1px] max-w-[320px]"
+              className="-mt-[1px] max-w-[298px]"
             >
               <AddReaction entityID={props.entityID} />
             </Popover.Content>
@@ -51,7 +51,8 @@ export const ReactionList = (props: { entityID: string }) => {
   let reactions = useReactions(props.entityID);
 
   return (
-    <div className="reactionAddedReactions flex flex-row flex-wrap items-center gap-2">
+    // <div className="reactionAddedReactions flex flex-row flex-wrap items-center gap-2">
+    <>
       {reactions?.map(([reaction, data]) => {
         return (
           <SingleReaction
@@ -62,7 +63,8 @@ export const ReactionList = (props: { entityID: string }) => {
           />
         );
       })}
-    </div>
+    </>
+    // </div>
   );
 };
 
@@ -72,56 +74,49 @@ export const AddReaction = (props: {
 }) => {
   let { authorized, mutate, memberEntity } = useMutations();
   let reactions = useIndex.aev("space/reaction");
-  let [editing, setEditing] = useState(false);
   let [reactionEditOpen, setReactionEditOpen] = useState(false);
 
-  let [newReaction, setNewReaction] = useState("");
   if (!authorized) return null;
   return (
-    <div className="reactionPicker flex w-full flex-wrap gap-x-4 gap-y-2 rounded-md border border-grey-80 bg-white py-1 px-2">
-      {reactions
-        .filter((f) => !!f.value) // strip empty strings
-        .map((r) => (
-          <button
-            key={r.id}
-            className="font-bold"
-            onClick={async () => {
-              if (!memberEntity) return;
-              await mutate("addReaction", {
-                reaction: r.value,
-                reactionFactID: ulid(),
-                reactionAuthorFactID: ulid(),
-                memberEntity,
-                cardEntity: props.entityID,
-              });
-              props.onSelect ? props.onSelect() : null;
-            }}
-          >
-            {r.value}
-          </button>
-        ))}
-      <div className="flex gap-1">
-        {editing && (
-          <input
-            className="h-6 w-[6ch] self-center"
-            autoFocus
-            maxLength={4}
-            value={newReaction}
-            onChange={(e) => setNewReaction(e.currentTarget.value)}
-          />
-        )}
-        <button
-          className="reactionPickerAdd text-grey-55 hover:text-accent-blue disabled:hover:text-grey-55"
-          onClick={() => setReactionEditOpen(true)}
-        >
-          <AddSmall />
-        </button>
-        <EditReactions
-          reactionEditOpen={reactionEditOpen}
-          onClose={() => setReactionEditOpen(false)}
-          entityID={props.entityID}
-        />
+    <div className="reactionPicker flex flex-col gap-1 rounded-md border border-grey-80 bg-white px-3 py-2">
+      <div className="reactionOptions flex w-full flex-wrap gap-x-4 gap-y-2 ">
+        {reactions
+          .filter((f) => !!f.value) // strip empty strings
+          .sort((a, b) => {
+            return a.id > b.id ? 1 : -1;
+          })
+          .map((r) => (
+            <button
+              key={r.id}
+              className="font-bold"
+              onClick={async () => {
+                if (!memberEntity) return;
+                await mutate("addReaction", {
+                  reaction: r.value,
+                  reactionFactID: ulid(),
+                  reactionAuthorFactID: ulid(),
+                  memberEntity,
+                  cardEntity: props.entityID,
+                });
+                props.onSelect ? props.onSelect() : null;
+              }}
+            >
+              {r.value}
+            </button>
+          ))}
       </div>
+      <Divider />
+      <button
+        className="reactionPickerSettings place-self-end text-sm italic text-grey-55 hover:text-accent-blue disabled:hover:text-grey-55"
+        onClick={() => setReactionEditOpen(true)}
+      >
+        add / remove
+      </button>
+      <EditReactions
+        reactionEditOpen={reactionEditOpen}
+        onClose={() => setReactionEditOpen(false)}
+        entityID={props.entityID}
+      />
     </div>
   );
 };
