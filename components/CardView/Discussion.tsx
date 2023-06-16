@@ -54,7 +54,10 @@ export const Discussion = (props: {
   return (
     // negative margin and padding required to make sure that
     // the comment section bottoms out with some spacing under it when scrolled to via button
-    <div className="-mb-4 flex flex-col pb-4 " id="card-comments">
+    <div
+      className="-mb-4 flex grow flex-col justify-end pb-4"
+      id="card-comments"
+    >
       <Messages
         entityID={props.entityID}
         setReply={setReply}
@@ -155,8 +158,8 @@ export const MessageInput = (props: {
         </div>
       )}
       {/* ACTUAL MESSAGE INPUT */}
-      <div className="flex w-full  gap-2">
-        <div className="z-10 flex w-full items-center  gap-1 rounded-md border border-grey-55 bg-white p-1 text-sm  text-grey-15">
+      <div className="flex w-full items-end gap-2">
+        <div className="z-10 flex w-full items-center gap-1 rounded-md border border-grey-55 bg-white p-1 text-sm text-grey-15">
           <AutosizeTextarea
             onKeyDown={(e) => {
               if (!e.shiftKey && e.key === "Enter") {
@@ -223,7 +226,7 @@ const AttachCard = ({
               align="end"
               alignOffset={-6}
             >
-              <div className="flex w-96 flex-col gap-0 rounded-md border border-grey-80 bg-white py-1 shadow-sm">
+              <div className="flex w-72 flex-col gap-0 rounded-md border border-grey-80 bg-white py-1 shadow-sm">
                 {attachedCards.map((card) => {
                   return (
                     <div
@@ -406,7 +409,7 @@ const Message = (props: {
           <div className="ml-2 h-2 w-0 border border-grey-80" />
         </>
       )}
-      <div className=" group -mx-4 flex items-end gap-1 py-1  px-4 hover:bg-bg-blue ">
+      <div className=" group -mx-4 flex items-end gap-1 py-1 px-4 hover:bg-bg-blue ">
         <RenderedText
           className="messageContent grow text-sm text-grey-35 "
           text={props.content}
@@ -416,7 +419,7 @@ const Message = (props: {
           }}
         />
         {authorized ? (
-          <span className="messageReplyButton mb-[1px] h-4 w-4 shrink-0  text-xs ">
+          <span className="messageReplyButton mb-[1px] h-4 w-4 shrink-0 text-xs ">
             <button
               className=" hidden text-grey-55 hover:text-accent-blue group-hover:block"
               onClick={() => {
