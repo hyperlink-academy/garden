@@ -187,7 +187,7 @@ export const EditReactions = (props: {
         <div className="my-2">
           <Divider />
         </div>
-        <div className="mx-auto flex flex-wrap place-items-center gap-2 place-self-center">
+        <div className=" mx-auto flex max-h-[440px] flex-wrap place-items-center gap-2 place-self-center overflow-scroll">
           {reactions
             .filter((f) => !!f.value) // strip empty strings
             .sort((a, b) => {

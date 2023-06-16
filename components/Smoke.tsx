@@ -40,7 +40,7 @@ const Smoke: React.FC<
 > = (props) => {
   return (
     <div
-      className={`smoke pointer-events-none absolute z-20 rounded-full py-1 px-2 text-sm  ${
+      className={`smoke pointer-events-none absolute z-50 rounded-full py-1 px-2 text-sm  ${
         props.error
           ? "border border-accent-red bg-white text-accent-red"
           : "bg-accent-blue text-white"
