@@ -319,11 +319,11 @@ export const Messages = (props: {
 
   return (
     <div
-      className="messages flex  flex-1 flex-col justify-end  pb-2"
+      className="messages flex flex-1 flex-col justify-end pb-2"
       style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
     >
       {messages.length == 0 && authorized ? (
-        <div className="messagesEmpty flex flex-col gap-4 text-base italic text-grey-35">
+        <div className="messagesEmpty flex flex-col gap-4 text-sm italic text-grey-35">
           <p>Welcome to the chat!</p>
           <p>Still quiet…start the conversation 🌱</p>
         </div>
