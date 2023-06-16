@@ -185,15 +185,17 @@ export const CardContent = (props: {
     <>
       {/* START CARD CONTENT */}
       <div className="cardContentWrapper relative">
-        <div className="cardSectionAdder pointer-events-none  sticky top-0 z-10 mb-32 flex w-full justify-center ">
-          <SectionAdder
-            entityID={props.entityID}
-            setDateEditing={() => {
-              setDateEditing(true);
-            }}
-            dateEditing={dateEditing}
-          />
-        </div>
+        {authorized && (
+          <div className="cardSectionAdder pointer-events-none  sticky top-0 z-10 mb-32 flex w-full justify-center ">
+            <SectionAdder
+              entityID={props.entityID}
+              setDateEditing={() => {
+                setDateEditing(true);
+              }}
+              dateEditing={dateEditing}
+            />
+          </div>
+        )}
 
         {/* card info (name and more options menu) */}
         {/* hide for members, who don't have a cardCreatorName */}
