@@ -23,7 +23,6 @@ export default function StudioPage(props: Props) {
     ...data.members_in_spaces
       ?.filter((s) => !!s.space_data)
       .map((s) => s.space_data as SpaceData),
-    ...data.owner,
   ];
 
   return (
