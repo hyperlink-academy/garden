@@ -179,6 +179,7 @@ export const CardContent = (props: {
   )?.value;
   let date = useIndex.eav(props.entityID, "card/date");
   let [dateEditing, setDateEditing] = useUndoableState(false);
+  let memberName = useIndex.eav(props.entityID, "member/name");
   let { authorized } = useMutations();
 
   return (
@@ -186,44 +187,55 @@ export const CardContent = (props: {
       {/* START CARD CONTENT */}
       <div className="cardContentWrapper relative">
         {authorized && (
-          <div className="cardSectionAdder pointer-events-none  sticky top-0 z-10 mb-32 flex w-full justify-center ">
-            <SectionAdder
-              entityID={props.entityID}
-              setDateEditing={() => {
-                setDateEditing(true);
-              }}
-              dateEditing={dateEditing}
-            />
-          </div>
+          <>
+            <div className="cardSectionAdder pointer-events-none  sticky top-0 z-10 mb-32 flex w-full justify-center ">
+              <SectionAdder
+                entityID={props.entityID}
+                setDateEditing={() => {
+                  setDateEditing(true);
+                }}
+                dateEditing={dateEditing}
+              />
+            </div>
+            <div className="-mt-[170px]" />
+          </>
         )}
 
         {/* card info (name and more options menu) */}
         {/* hide for members, who don't have a cardCreatorName */}
-        {cardCreatorName && (
+        {/* AND handle for legacy regular cards w/o cardCreatorName */}
+        {!memberName ? (
           <div
-            className={`cardInfo pointer-events-none relative z-20 mb-3 ${
-              authorized ? "-mt-[170px]" : ""
-            } flex h-[42px] shrink-0 items-center justify-between gap-3`}
+            className={`cardInfo pointer-events-none relative z-20 mb-3 flex h-[42px] shrink-0 items-center justify-between gap-3`}
           >
-            {cardCreatorName ? (
-              <div className="group pointer-events-auto flex place-items-center gap-2">
-                <div className=" h-[32px] w-[32px] rounded-full border border-grey-80 pt-[5px] text-center text-sm text-grey-55">
-                  <div className="w-full text-center">
-                    {cardCreatorName.charAt(0).toUpperCase()}
+            {/* NB: keep wrapper for spacing with CardMoreOptionsMenu even if no cardCreatorName */}
+            <div className="group pointer-events-auto flex place-items-center gap-2">
+              {cardCreatorName ? (
+                <>
+                  <div className=" h-[32px] w-[32px] rounded-full border border-grey-80 pt-[5px] text-center text-sm text-grey-55">
+                    <div className="w-full text-center">
+                      {cardCreatorName.charAt(0).toUpperCase()}
+                    </div>
                   </div>
-                </div>
-                <div className="absolute left-8 hidden max-w-[275px] overflow-hidden whitespace-pre rounded-md bg-white px-2 py-1 text-sm text-grey-55 group-hover:block group-focus:block">
-                  by {cardCreatorName}
-                </div>
-              </div>
-            ) : null}
+                  <div className="absolute left-8 hidden max-w-[275px] overflow-hidden whitespace-pre rounded-md bg-white px-2 py-1 text-sm text-grey-55 group-hover:block group-focus:block">
+                    by {cardCreatorName}
+                  </div>
+                </>
+              ) : null}
+            </div>
+
             <CardMoreOptionsMenu
               onDelete={props.onDelete}
               entityID={props.entityID}
               referenceFactID={props?.referenceFactID}
             />
           </div>
+        ) : (
+          // member card offset only if authed
+          authorized && <div className="mb-3 h-[42px]" />
         )}
+
+        {/* card content wrapper */}
         <div className="cardContent grid-auto-rows z-0 grid gap-3">
           <div className="flex flex-col gap-0">
             <Title entityID={props.entityID} />
