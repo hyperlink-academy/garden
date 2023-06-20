@@ -8,11 +8,20 @@ import { CardCollection } from "./CardCollection";
 import { useFilteredCards, Filters, FilterByReactions } from "./CardFilter";
 import { Discussion } from "./CardView/Discussion";
 import { Desktop } from "./Desktop";
-import { GoToTop, MoreOptionsTiny } from "./Icons";
+import {
+  CollectionList as CollectionListIcon,
+  CollectionListTiny,
+  CollectionPreview as CollectionPreviewIcon,
+  CollectionPreviewTiny,
+  GoToTop,
+  MoreOptionsTiny,
+} from "./Icons";
 import { Divider } from "./Layout";
 import { SearchRoom } from "./SearchRoom";
 import { EditRoomModal } from "./SpaceLayout/Sidebar/RoomListLayout";
 import { RenderedText } from "./Textarea/RenderedText";
+import * as Popover from "@radix-ui/react-popover";
+import { ulid } from "src/ulid";
 
 export const Room = (props: { entityID: string }) => {
   let roomType = useIndex.eav(props.entityID, "room/type");
@@ -105,15 +114,19 @@ function RoomHeader(props: {
         className="roomHeader sticky top-0 z-20 bg-background pt-2 sm:pt-4"
         ref={titleRef}
       >
-        <div className="roomTitle flex justify-between text-lg font-bold text-grey-35">
-          <p
-            className={!descriptionOpen ? "mb-2 cursor-pointer" : "mb-2"}
-            onClick={() => setDescriptionOpen(!descriptionOpen)}
+        <div className="roomTitle flex justify-between ">
+          <button
+            className={`mb-1 text-lg font-bold text-grey-35 `}
+            onClick={() => {
+              if (!scrolledTop) {
+                setDescriptionOpen(!descriptionOpen);
+              } else return;
+            }}
           >
             {roomName?.value}
-          </p>
+          </button>
           {authorized && (
-            <div className="roomOptionsWrapper mt-[2px]">
+            <div className="roomOptionsWrapper mt-[4px]">
               {descriptionOpen || scrolledTop ? (
                 <RoomOptions entityID={props.entityID} />
               ) : (
@@ -135,8 +148,8 @@ function RoomHeader(props: {
       </div>
 
       <div
-        className={` z-10 bg-background pb-3 ${
-          descriptionOpen ? "sticky" : ""
+        className={`roomDescriptionAndFilter z-10 bg-background ${
+          descriptionOpen ? "sticky  " : ""
         }`}
         style={{ top: `${titleHeight}px` }}
         ref={descriptionRef}
@@ -149,11 +162,11 @@ function RoomHeader(props: {
         />
       </div>
       <div
-        className="sticky z-10 mb-3 bg-background  "
+        className="roomDivider sticky z-10 mb-3 bg-background "
         style={
           descriptionOpen
             ? { top: `calc(${titleHeight}px + ${descriptionHeight}px)` }
-            : { top: `${titleHeight}px` }
+            : { top: `calc(${titleHeight}px)` }
         }
       >
         <Divider />
@@ -170,33 +183,61 @@ const RoomDescription = (props: {
 }) => {
   let roomDescription = useIndex.eav(props.entityID, "room/description");
   let roomType = useIndex.eav(props.entityID, "room/type");
+  let currentCollectionType = useIndex.eav(props.entityID, "collection/type");
+  let [filtersOpen, setFiltersOpen] = useState(false);
+  // let [collectionType, setCollectionType] = useState(
+  //   currentCollectionType?.value
+  // );
+
+  // useEffect(() => {
+  //   setCollectionType(currentCollectionType?.value);
+  // }, [currentCollectionType?.value]);
 
   return (
-    <div id="roomDescription" className="flex flex-col gap-2 ">
-      {roomDescription?.value && (
-        <RenderedText
-          className="text-sm text-grey-35"
-          id="roomDescriptionY"
-          style={{
-            whiteSpace: "pre-wrap",
-            fontFamily: "inherit",
-            width: "100%",
-          }}
-          text={roomDescription?.value || ""}
-        />
-      )}
-      {props.reactions.length > 0 ? (
-        <div className="flex justify-between gap-2">
-          {roomType?.value === "collection" ? (
-            <FilterByReactions
-              reactions={props.reactions}
-              filters={props.filters}
-              setFilters={props.setFilters}
-            />
-          ) : null}
-        </div>
-      ) : null}
-    </div>
+    <>
+      <div id="roomDescription" className="flex flex-col gap-2 pb-3 ">
+        {roomDescription?.value && (
+          <RenderedText
+            className="text-base text-grey-35"
+            id="roomDescriptionY"
+            style={{
+              whiteSpace: "pre-wrap",
+              fontFamily: "inherit",
+              width: "100%",
+              zIndex: 10,
+            }}
+            text={roomDescription?.value || ""}
+          />
+        )}
+        {roomType?.value === "collection" ? (
+          <div className="flex flex-col gap-1">
+            <div className="roomFilterAndToggle flex justify-between text-sm">
+              <CollectionType
+                collectionType={currentCollectionType?.value}
+                entityID={props.entityID}
+              />
+              <button
+                className={`${
+                  props.filters.length === 0
+                    ? "text-grey-55 underline"
+                    : "font-bold text-accent-blue"
+                }`}
+                onClick={() => setFiltersOpen(!filtersOpen)}
+              >
+                filters({props.filters.length})
+              </button>
+            </div>
+            <div className={`${filtersOpen ? "" : "hidden"}`}>
+              <FilterByReactions
+                reactions={props.reactions}
+                filters={props.filters}
+                setFilters={props.setFilters}
+              />
+            </div>
+          </div>
+        ) : null}
+      </div>
+    </>
   );
 };
 
@@ -218,3 +259,46 @@ function RoomOptions(props: { entityID: string | null }) {
     </>
   );
 }
+
+const CollectionType = (props: {
+  entityID: string;
+
+  collectionType: Fact<"collection/type">["value"] | undefined;
+}) => {
+  let type = props.collectionType || "list";
+  let { mutate } = useMutations();
+
+  const onClick = (value: Fact<"collection/type">["value"]) => async () => {
+    await mutate("assertFact", {
+      entity: props.entityID,
+      factID: ulid(),
+      attribute: "collection/type",
+      value: value,
+      positions: {},
+    });
+  };
+  const className = (typeName: Fact<"collection/type">["value"]) =>
+    `p-0.5 text-grey-55 ${
+      type === typeName
+        ? "rounded-md border border-grey-55"
+        : "border border-transparent"
+    }`;
+
+  return (
+    <div className="collectionTypeSelector flex flex-row items-center gap-1 place-self-start">
+      <p className="text-grey-55">view</p>
+      <button
+        className={`${className("list")} shrink-0`}
+        onClick={onClick("list")}
+      >
+        <CollectionListTiny />
+      </button>
+      <button
+        className={`${className("cardpreview")} shrink-0`}
+        onClick={onClick("cardpreview")}
+      >
+        <CollectionPreviewTiny />
+      </button>
+    </div>
+  );
+};
