@@ -52,7 +52,12 @@ export const Discussion = (props: {
   let [reply, setReply] = useState<string | null>(null);
 
   return (
-    <div className="flex flex-col">
+    // negative margin and padding required to make sure that
+    // the comment section bottoms out with some spacing under it when scrolled to via button
+    <div
+      className="-mb-4 flex grow flex-col justify-end pb-4"
+      id="card-comments"
+    >
       <Messages
         entityID={props.entityID}
         setReply={setReply}
@@ -121,6 +126,13 @@ export const MessageInput = (props: {
     else ScrollContainer = document.getElementById("cardContentAndDiscussion");
     if (ScrollContainer)
       ScrollContainer?.scrollTo(0, ScrollContainer.scrollHeight);
+    setTimeout(
+      () =>
+        document
+          .getElementById("card-comments")
+          ?.scrollIntoView({ behavior: "smooth", block: "end" }),
+      50
+    );
   };
   return (
     <div
@@ -146,8 +158,8 @@ export const MessageInput = (props: {
         </div>
       )}
       {/* ACTUAL MESSAGE INPUT */}
-      <div className="flex w-full  gap-2">
-        <div className="z-10 flex w-full items-center  gap-1 rounded-md border border-grey-55 bg-white p-1 text-sm  text-grey-15">
+      <div className="flex w-full items-end gap-2">
+        <div className="z-10 flex w-full items-center gap-1 rounded-md border border-grey-55 bg-white p-1 text-sm text-grey-15">
           <AutosizeTextarea
             onKeyDown={(e) => {
               if (!e.shiftKey && e.key === "Enter") {
@@ -214,7 +226,7 @@ const AttachCard = ({
               align="end"
               alignOffset={-6}
             >
-              <div className="flex w-96 flex-col gap-0 rounded-md border border-grey-80 bg-white py-1 shadow-sm">
+              <div className="flex w-72 flex-col gap-0 rounded-md border border-grey-80 bg-white py-1 shadow-sm">
                 {attachedCards.map((card) => {
                   return (
                     <div
@@ -309,17 +321,12 @@ export const Messages = (props: {
   if (props.isRoom === false && messages.length == 0) return null;
 
   return (
-    // the negative margin and padding are to ensure that
-    // when the comment section is scrolled to vis button,
-    // there is sufficent padding at the top to include the comment header */}
-
     <div
-      className="messages -mt-20 flex  flex-1 flex-col justify-end pt-20 pb-2"
+      className="messages flex flex-1 flex-col justify-end pb-2"
       style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
-      id="card-comments"
     >
       {messages.length == 0 && authorized ? (
-        <div className="messagesEmpty flex flex-col gap-4 text-base italic text-grey-35">
+        <div className="messagesEmpty flex flex-col gap-4 text-sm italic text-grey-35">
           <p>Welcome to the chat!</p>
           <p>Still quiet…start the conversation 🌱</p>
         </div>
@@ -402,7 +409,7 @@ const Message = (props: {
           <div className="ml-2 h-2 w-0 border border-grey-80" />
         </>
       )}
-      <div className=" group -mx-4 flex items-end gap-1 py-1  px-4 hover:bg-bg-blue ">
+      <div className=" group -mx-4 flex items-end gap-1 py-1 px-4 hover:bg-bg-blue ">
         <RenderedText
           className="messageContent grow text-sm text-grey-35 "
           text={props.content}
@@ -412,7 +419,7 @@ const Message = (props: {
           }}
         />
         {authorized ? (
-          <span className="messageReplyButton mb-[1px] h-4 w-4 shrink-0  text-xs ">
+          <span className="messageReplyButton mb-[1px] h-4 w-4 shrink-0 text-xs ">
             <button
               className=" hidden text-grey-55 hover:text-accent-blue group-hover:block"
               onClick={() => {

@@ -1,6 +1,10 @@
 import { createContext, useContext, useState } from "react";
 
-type Smoke = { position: { x: number; y: number }; text: string };
+type Smoke = {
+  position: { x: number; y: number };
+  text: string;
+  error?: boolean;
+};
 type Smokes = Array<Smoke & { key: string }>;
 let SmokeContext = createContext({
   setState: (_f: (t: Smokes) => Smokes) => {},
@@ -23,7 +27,7 @@ export const SmokeProvider: React.FC<React.PropsWithChildren<unknown>> = (
     <SmokeContext.Provider value={{ setState }}>
       {props.children}
       {state.map((toast) => (
-        <Smoke {...toast.position} key={toast.key}>
+        <Smoke {...toast.position} error={toast.error} key={toast.key}>
           {toast.text}
         </Smoke>
       ))}
@@ -31,12 +35,16 @@ export const SmokeProvider: React.FC<React.PropsWithChildren<unknown>> = (
   );
 };
 
-const Smoke: React.FC<React.PropsWithChildren<{ x: number; y: number }>> = (
-  props
-) => {
+const Smoke: React.FC<
+  React.PropsWithChildren<{ x: number; y: number; error?: boolean }>
+> = (props) => {
   return (
     <div
-      className={`smoke absolute z-20 rounded-full bg-accent-blue text-white py-1 px-2 pointer-events-none `}
+      className={`smoke pointer-events-none absolute z-50 rounded-full py-1 px-2 text-sm  ${
+        props.error
+          ? "border border-accent-red bg-white text-accent-red"
+          : "bg-accent-blue text-white"
+      }`}
     >
       <style jsx>{`
         .smoke {

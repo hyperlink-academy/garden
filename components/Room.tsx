@@ -1,5 +1,5 @@
 import { Fact } from "data/Facts";
-import { scanIndex, useIndex } from "hooks/useReplicache";
+import { scanIndex, useIndex, useMutations } from "hooks/useReplicache";
 import { usePreserveScroll } from "hooks/utils";
 import { useEffect, useRef, useState } from "react";
 import useMeasure from "react-use-measure";
@@ -108,6 +108,8 @@ function RoomHeader(props: {
 
   let roomType = useIndex.eav(props.entityID, "room/type");
 
+  let { authorized } = useMutations();
+
   return (
     <>
       <div
@@ -123,22 +125,25 @@ function RoomHeader(props: {
           >
             {roomName?.value}
           </p>
-          <div className="roomButtonWrapper mt-[2px]">
-            {isRoomDescriptionVisible || !isToggleableRoomDescriptionHidden ? (
-              <RoomOptions entityID={props.entityID} />
-            ) : (
-              <button
-                onClick={() =>
-                  descriptionRef?.current?.scrollIntoView({
-                    behavior: "smooth",
-                    block: "end",
-                  })
-                }
-              >
-                <GoToTop />
-              </button>
-            )}
-          </div>
+          {authorized && (
+            <div className="roomButtonWrapper mt-[2px]">
+              {isRoomDescriptionVisible ||
+              !isToggleableRoomDescriptionHidden ? (
+                <RoomOptions entityID={props.entityID} />
+              ) : (
+                <button
+                  onClick={() =>
+                    descriptionRef?.current?.scrollIntoView({
+                      behavior: "smooth",
+                      block: "end",
+                    })
+                  }
+                >
+                  <GoToTop />
+                </button>
+              )}
+            </div>
+          )}
         </div>
 
         {!isRoomDescriptionVisible && !isToggleableRoomDescriptionHidden && (

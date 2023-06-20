@@ -173,7 +173,10 @@ export const BigCardBody = (
                 props.entityID && open({ entityID: props.entityID });
                 setTimeout(() => {
                   document.getElementById("messageInput")?.focus();
-                }, 50);
+                  document
+                    .getElementById("card-comments")
+                    ?.scrollIntoView({ behavior: "smooth", block: "end" });
+                }, 100);
               }}
             >
               {props.messagesCount && props.messagesCount > 0 ? (
