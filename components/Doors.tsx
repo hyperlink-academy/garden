@@ -28,7 +28,6 @@ export const DoorImage = (props: {
       filter={props?.glow ? "url(#softGlow)" : ""}
       overflow="visible"
     >
-      <title id="titleid">Door to {props.display_name}</title>
       <defs>
         <style>
           {`.cls-1{fill:`}

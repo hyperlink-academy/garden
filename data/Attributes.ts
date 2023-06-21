@@ -17,6 +17,7 @@ export const BaseAttributes = {
       "file",
       "last-read-message",
       "timestamp",
+      "feed_post",
       "string",
       "union",
       "position",
@@ -47,6 +48,11 @@ export const DefaultAttributes = {
   },
   arbitrarySectionStringType: {
     type: "string",
+    unique: false,
+    cardinality: "one",
+  },
+  "feed/post": {
+    type: "feed_post",
     unique: false,
     cardinality: "one",
   },

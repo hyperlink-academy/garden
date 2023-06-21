@@ -15,9 +15,12 @@ import { useSmoker } from "components/Smoke";
 import Router from "next/router";
 
 export function StudioOptionsMenu(props: { id: string }) {
+  let [open, setOpen] = useState(false);
+  let [inviteModalOpen, setInviteModalOpen] = useState(false);
+  let [studioSettingsModalOpen, setStudioSettingsModalOpen] = useState(false);
   return (
     <>
-      <Popover.Root>
+      <Popover.Root open={open} onOpenChange={(o) => setOpen(o)}>
         <Popover.Trigger>
           <MoreOptionsSmall />
         </Popover.Trigger>
@@ -26,17 +29,45 @@ export function StudioOptionsMenu(props: { id: string }) {
             className="w-56 rounded-md border-2 border-grey-80 bg-white p-2 drop-shadow-md"
             sideOffset={8}
           >
-            <InviteModal id={props.id} />
-            <StudioSettings id={props.id} />
+            <button
+              className="w-full py-1 px-2 text-right text-grey-35 hover:bg-bg-blue"
+              onClick={() => {
+                setInviteModalOpen(true);
+                setOpen(false);
+              }}
+            >
+              Invite members
+            </button>
+            <button
+              className="w-full py-1 px-2 text-right text-grey-35 hover:bg-bg-blue"
+              onClick={() => setStudioSettingsModalOpen(true)}
+            >
+              Studio Settings
+            </button>
           </Popover.Content>
         </Popover.Portal>
       </Popover.Root>
+
+      <InviteModal
+        id={props.id}
+        open={inviteModalOpen}
+        onClose={() => setInviteModalOpen(false)}
+      />
+
+      <StudioSettings
+        id={props.id}
+        open={studioSettingsModalOpen}
+        onClose={() => setStudioSettingsModalOpen(false)}
+      />
     </>
   );
 }
 
-function StudioSettings(props: { id: string }) {
-  let [open, setOpen] = useState(false);
+function StudioSettings(props: {
+  id: string;
+  open: boolean;
+  onClose: () => void;
+}) {
   let { session, authToken } = useAuth();
   let { data, mutate } = useStudioData(props.id);
   let [loading, setLoading] = useState(false);
@@ -53,13 +84,7 @@ function StudioSettings(props: { id: string }) {
   }, [data?.description, data?.name]);
   return (
     <>
-      <button
-        className="w-full py-1 px-2 text-right text-grey-35 hover:bg-bg-blue"
-        onClick={() => setOpen(true)}
-      >
-        Studio Settings
-      </button>
-      <Modal open={open} onClose={() => setOpen(false)}>
+      <Modal open={props.open} onClose={props.onClose}>
         <form
           className="flex flex-col gap-8"
           onSubmit={async (e) => {
@@ -87,7 +112,7 @@ function StudioSettings(props: { id: string }) {
             <ButtonLink
               content="nevermind"
               className="font-normal"
-              onClick={() => setOpen(false)}
+              onClick={props.onClose}
             />
             <ButtonPrimary
               disabled={!formState.name}
@@ -132,8 +157,11 @@ function StudioSettings(props: { id: string }) {
 }
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
-function InviteModal(props: { id: string }) {
-  let [open, setOpen] = useState(false);
+function InviteModal(props: {
+  id: string;
+  onClose: () => void;
+  open: boolean;
+}) {
   let { data } = useStudioData(props.id);
   let { authToken } = useAuth();
   let { data: inviteLink } = useSWR(
@@ -162,13 +190,7 @@ function InviteModal(props: { id: string }) {
   };
   return (
     <>
-      <button
-        className="w-full py-1 px-2 text-right text-grey-35 hover:bg-bg-blue"
-        onClick={() => setOpen(true)}
-      >
-        Invite members
-      </button>
-      <Modal open={open} onClose={() => setOpen(false)}>
+      <Modal open={props.open} onClose={props.onClose}>
         <div className="inviteMemberModalLink flex w-full gap-2">
           <input
             className="grow bg-grey-90 text-grey-35"

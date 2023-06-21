@@ -120,10 +120,13 @@ export function FactWithIndexes<A extends keyof Attribute>(f: Fact<A>) {
     at?: string;
     ave?: string;
     vae?: string;
+    feed?: string;
   } = {
     eav: `${f.entity}-${f.attribute}-${f.id}`,
     aev: `${f.attribute}-${f.entity}-${f.id}`,
   };
+  if (f.schema.type === "feed_post")
+    indexes.feed = `${f.attribute}-${f.value}-${f.id}`;
   if (f.schema.unique) indexes.ave = `${f.attribute}-${f.value}`;
   if (f.schema.type === "reference")
     indexes.vae = `${(f.value as ReferenceType).value}-${f.attribute}`;

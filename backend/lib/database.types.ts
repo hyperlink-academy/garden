@@ -196,7 +196,7 @@ export interface Database {
           do_id: string
           end_date: string | null
           image: string | null
-          name: string
+          name: string | null
           owner: string
           start_date: string | null
         }
@@ -207,7 +207,7 @@ export interface Database {
           do_id: string
           end_date?: string | null
           image?: string | null
-          name: string
+          name?: string | null
           owner: string
           start_date?: string | null
         }
@@ -218,7 +218,7 @@ export interface Database {
           do_id?: string
           end_date?: string | null
           image?: string | null
-          name?: string
+          name?: string | null
           owner?: string
           start_date?: string | null
         }
@@ -227,6 +227,34 @@ export interface Database {
             foreignKeyName: "space_data_owner_fkey"
             columns: ["owner"]
             referencedRelation: "identity_data"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      spaces_in_studios: {
+        Row: {
+          space: string | null
+          studio: string | null
+        }
+        Insert: {
+          space?: string | null
+          studio?: string | null
+        }
+        Update: {
+          space?: string | null
+          studio?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "spaces_in_studios_space_fkey"
+            columns: ["space"]
+            referencedRelation: "space_data"
+            referencedColumns: ["do_id"]
+          },
+          {
+            foreignKeyName: "spaces_in_studios_studio_fkey"
+            columns: ["studio"]
+            referencedRelation: "studios"
             referencedColumns: ["id"]
           }
         ]

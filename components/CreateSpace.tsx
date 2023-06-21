@@ -10,7 +10,7 @@ import { Modal } from "./Layout";
 import { useSpaceData } from "hooks/useSpaceData";
 import { useIdentityData } from "hooks/useIdentityData";
 
-type FormState = {
+export type CreateSpaceFormState = {
   display_name: string;
   description: string;
   start_date: string;
@@ -26,7 +26,9 @@ export const CreateSpace = (props: {
   let { mutate } = useIdentityData(props.studioName);
   console.log(props.studioSpaceID);
   let [open, setOpen] = useState(false);
-  let [formState, setFormState] = useState<FormState>({
+
+  let { authorized } = useMutations();
+  let [formState, setFormState] = useState<CreateSpaceFormState>({
     display_name: "",
     description: "",
     start_date: "",
@@ -36,6 +38,7 @@ export const CreateSpace = (props: {
   });
   let auth = useAuth();
   let rep = useContext(ReplicacheContext);
+  if (!authorized) return null;
   return (
     <div className="mt-4 mb-8 grid w-full">
       <a className="place-self-center">
@@ -115,7 +118,7 @@ export const EditSpaceModal = (props: {
   let { data, mutate } = useSpaceData(props.spaceID);
 
   let [status, setStatus] = useState<"normal" | "loading">("normal");
-  let [formState, setFormState] = useState<FormState>({
+  let [formState, setFormState] = useState<CreateSpaceFormState>({
     display_name: "",
     description: "",
     start_date: "",
@@ -256,113 +259,106 @@ const DeleteSpaceForm = (props: {
   );
 };
 
-const CreateSpaceForm = ({
+export const CreateSpaceForm = ({
   disableName,
   formState,
   setFormState,
 }: {
   disableName?: boolean;
-  formState: FormState;
-  setFormState: React.Dispatch<React.SetStateAction<FormState>>;
+  formState: CreateSpaceFormState;
+  setFormState: React.Dispatch<React.SetStateAction<CreateSpaceFormState>>;
 }) => {
-  let { authorized } = useMutations();
-
-  if (authorized === false) {
-    return null;
-  } else
-    return (
-      <>
-        <div className="flex flex-col gap-1">
-          <p className="font-bold">Name this Space</p>
-          {disableName ? (
-            <h3>{formState.display_name}</h3>
-          ) : (
-            <input
-              className="w-full"
-              value={formState.display_name}
-              placeholder=""
-              onChange={(e) => {
-                let value = e.currentTarget.value;
-                setFormState((form) => ({
-                  ...form,
-                  display_name: value,
-                }));
-              }}
-            />
-          )}
-        </div>
-
-        {/* space description */}
-        <div className="flex flex-col gap-1">
-          <p className="font-bold">Add a Description</p>
-          {/* NB: Textarea component = broken w/o placeholder */}
-          <textarea
-            className="!important box-border min-h-[90px] w-full rounded-md border border-grey-55 bg-white p-2"
+  return (
+    <>
+      <div className="flex flex-col gap-1">
+        <p className="font-bold">Name this Space</p>
+        {disableName ? (
+          <h3>{formState.display_name}</h3>
+        ) : (
+          <input
+            className="w-full"
+            value={formState.display_name}
             placeholder=""
-            maxLength={256}
-            value={formState.description}
             onChange={(e) => {
               let value = e.currentTarget.value;
               setFormState((form) => ({
                 ...form,
-                description: value,
+                display_name: value,
               }));
             }}
           />
-          <div className="text-xs italic">
-            {formState.description.length}/256
-          </div>
-        </div>
+        )}
+      </div>
 
-        {/* date section */}
-        <div className="flex flex-wrap justify-between gap-2">
-          <div className="flex flex-col gap-1">
-            <p className="font-bold">Start Date</p>
-            <input
-              type="date"
-              value={formState.start_date}
-              onChange={(e) => {
-                let value = e.currentTarget.value;
-                setFormState((form) => ({
-                  ...form,
-                  start_date: value,
-                }));
-              }}
-            />
-          </div>
-          <div className="flex flex-col gap-1">
-            <p className="font-bold">End Date</p>
-
-            <input
-              type="date"
-              value={formState.end_date}
-              onChange={(e) => {
-                let value = e.currentTarget.value;
-                setFormState((form) => ({
-                  ...form,
-                  end_date: value,
-                }));
-              }}
-            />
-          </div>
-        </div>
-
-        {/* door image selector */}
-        <DoorSelector
-          selected={formState.image || formState.default_space_image}
-          onSelect={(d) =>
-            setFormState((form) => {
-              if (d.filetype === "image")
-                return { ...form, image: d.id, default_space_image: null };
-              else
-                return {
-                  ...form,
-                  image: null,
-                  default_space_image: d.url,
-                };
-            })
-          }
+      {/* space description */}
+      <div className="flex flex-col gap-1">
+        <p className="font-bold">Add a Description</p>
+        {/* NB: Textarea component = broken w/o placeholder */}
+        <textarea
+          className="!important box-border min-h-[90px] w-full rounded-md border border-grey-55 bg-white p-2"
+          placeholder=""
+          maxLength={256}
+          value={formState.description}
+          onChange={(e) => {
+            let value = e.currentTarget.value;
+            setFormState((form) => ({
+              ...form,
+              description: value,
+            }));
+          }}
         />
-      </>
-    );
+        <div className="text-xs italic">{formState.description.length}/256</div>
+      </div>
+
+      {/* date section */}
+      <div className="flex flex-wrap justify-between gap-2">
+        <div className="flex flex-col gap-1">
+          <p className="font-bold">Start Date</p>
+          <input
+            type="date"
+            value={formState.start_date}
+            onChange={(e) => {
+              let value = e.currentTarget.value;
+              setFormState((form) => ({
+                ...form,
+                start_date: value,
+              }));
+            }}
+          />
+        </div>
+        <div className="flex flex-col gap-1">
+          <p className="font-bold">End Date</p>
+
+          <input
+            type="date"
+            value={formState.end_date}
+            onChange={(e) => {
+              let value = e.currentTarget.value;
+              setFormState((form) => ({
+                ...form,
+                end_date: value,
+              }));
+            }}
+          />
+        </div>
+      </div>
+
+      {/* door image selector */}
+      <DoorSelector
+        selected={formState.image || formState.default_space_image}
+        onSelect={(d) =>
+          setFormState((form) => {
+            if (d.filetype === "image")
+              return { ...form, image: d.id, default_space_image: null };
+            else
+              return {
+                ...form,
+                image: null,
+                default_space_image: d.url,
+              };
+          })
+        }
+      />
+    </>
+  );
 };

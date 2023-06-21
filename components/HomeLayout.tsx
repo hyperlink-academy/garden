@@ -59,8 +59,11 @@ const StudiosList = (props: { username: string }) => {
             sideOffset={-4}
           >
             <Popover.Arrow className="fill-grey-80 stroke-grey-80" />
+
             {data?.studios.map((s) => (
-              <Link href={`/studio/${s.id}`}>{s.name}</Link>
+              <Link href={`/studio/${s.id}`} key={s.id}>
+                <Popover.Close>{s.name}</Popover.Close>
+              </Link>
             ))}
             <CreateStudio username={props.username} />
           </Popover.Content>

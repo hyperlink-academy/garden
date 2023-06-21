@@ -1,26 +1,51 @@
 import { workerAPI } from "backend/lib/api";
-import { ButtonTertiary } from "components/Buttons";
-import { MoreOptionsSmall } from "components/Icons";
+import { SpaceData, SpaceList } from "components/SpacesList";
+import { AddSpace } from "components/StudioPage/AddSpace";
 import { StudioOptionsMenu } from "components/StudioPage/StudioOptionsMenu";
+import { StudioPosts } from "components/StudioPosts";
 import { useStudioData } from "hooks/useStudioData";
 import { GetStaticPropsContext, InferGetStaticPropsType } from "next";
 import { useRouter } from "next/router";
+import { useState } from "react";
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>;
 export default function StudioPage(props: Props) {
   let { query } = useRouter();
-  let { data } = useStudioData(query.studio_id as string, props.data);
+
+  let id = query.studio_id as string;
+  let { data } = useStudioData(id, props.data);
+  let [view, setView] = useState<"posts" | "spaces">("posts");
   return (
-    <div>
+    <div className="flex flex-col gap-4">
       <div className="flex flex-row justify-between">
         <h1>{data?.name}</h1>
         <div className="flex flex-row items-center gap-2">
-          <ButtonTertiary content={"Add a space"} />
-          <StudioOptionsMenu id={query.studio_id as string} />
+          <AddSpace id={id} />
+          <StudioOptionsMenu id={id} />
         </div>
       </div>
       {data?.description}
-      <pre>{JSON.stringify(data, undefined, 2)}</pre>
+      <div className="flex flex-col">
+        <button
+          onClick={() => setView("spaces")}
+          className={`w-fit self-end rounded-t-md border-2 border-b-0 border-accent-blue py-1 px-2 font-bold ${view === "posts"
+              ? "bg-bg-blue text-accent-blue"
+              : "bg-accent-blue text-white"
+            }`}
+        >
+          explore the spaces
+        </button>
+        <hr className="border border-accent-blue" />
+      </div>
+      {view === "posts" ? (
+        <StudioPosts id={query.studio_id as string} />
+      ) : (
+        <SpaceList
+          spaces={
+            data?.spaces_in_studios.map((s) => s.space_data as SpaceData) || []
+          }
+        />
+      )}
     </div>
   );
 }

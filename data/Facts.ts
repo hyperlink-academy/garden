@@ -26,6 +26,7 @@ type Value<A extends AttributeName> = Attribute[A] extends {
 }
   ? Attribute[A]["union/value"][number]
   : {
+      feed_post: string;
       union: never;
       timestamp: TimestampeType;
       string: string;

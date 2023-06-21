@@ -10,6 +10,6 @@ const fetcher = async (name: string) => {
 };
 
 export const useIdentityData = (
-  studio: string,
+  studio: string | null | undefined,
   fallbackData?: Awaited<ReturnType<typeof fetcher>>
 ) => useSWR(studio, fetcher, { fallbackData });

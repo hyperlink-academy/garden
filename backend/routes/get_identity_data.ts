@@ -11,7 +11,7 @@ export const get_identity_data_route = makeRoute({
       env.SUPABASE_URL,
       env.SUPABASE_API_TOKEN
     );
-    let { data } = await supabase
+    let { data, error } = await supabase
       .from("identity_data")
       .select(
         `*,
@@ -23,6 +23,7 @@ export const get_identity_data_route = makeRoute({
       )
       .eq("username", msg.name.toLowerCase())
       .single();
+    console.log(error);
     if (data) {
       return { data: { success: true, data } } as const;
     }
