@@ -162,7 +162,7 @@ function RoomHeader(props: {
         />
       </div>
       <div
-        className="roomDivider sticky z-10 mb-3 bg-background "
+        className="roomDivider sticky z-10 mb-3 bg-background  pt-2 "
         style={
           descriptionOpen
             ? { top: `calc(${titleHeight}px + ${descriptionHeight}px)` }
@@ -195,7 +195,7 @@ const RoomDescription = (props: {
 
   return (
     <>
-      <div id="roomDescription" className="flex flex-col gap-2 pb-3 ">
+      <div id="roomDescription" className="flex flex-col gap-2">
         {roomDescription?.value && (
           <RenderedText
             className="text-base text-grey-35"
@@ -210,7 +210,7 @@ const RoomDescription = (props: {
           />
         )}
         {roomType?.value === "collection" ? (
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-1 pt-2">
             <div className="roomFilterAndToggle flex justify-between text-sm">
               <CollectionType
                 collectionType={currentCollectionType?.value}
@@ -260,7 +260,7 @@ function RoomOptions(props: { entityID: string | null }) {
   );
 }
 
-const CollectionType = (props: {
+export const CollectionType = (props: {
   entityID: string;
 
   collectionType: Fact<"collection/type">["value"] | undefined;
@@ -285,8 +285,8 @@ const CollectionType = (props: {
     }`;
 
   return (
-    <div className="collectionTypeSelector flex flex-row items-center gap-1 place-self-start">
-      <p className="text-grey-55">view</p>
+    <div className="collectionTypeSelector flex flex-row items-center gap-1">
+      {/* <p className="pr-1 text-sm text-grey-55">view</p> */}
       <button
         className={`${className("list")} shrink-0`}
         onClick={onClick("list")}

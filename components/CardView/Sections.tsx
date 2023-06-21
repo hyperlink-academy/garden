@@ -9,6 +9,7 @@ import { Autocomplete, useSuggestions } from "components/Autocomplete";
 import { getCoordinatesInTextarea } from "src/getCoordinatesInTextarea";
 import { getLinkAtCursor } from "src/utils";
 import { modifyString, useKeyboardHandling } from "hooks/useKeyboardHandling";
+import { CollectionType } from "components/Room";
 
 export const SingleTextSection = (
   props: {
@@ -253,10 +254,18 @@ export const DateSection = (props: { entityID: string }) => {
 
 export const AttachedCardSection = (props: { entityID: string }) => {
   let attachedCards = useIndex.eav(props.entityID, "deck/contains");
+  let currentCollectionType = useIndex.eav(props.entityID, "collection/type");
+
   return (
     <>
       {attachedCards && attachedCards.length > 0 && (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-3">
+          <div className="float-right">
+            <CollectionType
+              collectionType={currentCollectionType?.value}
+              entityID={props.entityID}
+            />
+          </div>
           <CardCollection
             entityID={props.entityID}
             attribute="deck/contains"
