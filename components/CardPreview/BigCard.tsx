@@ -2,7 +2,12 @@ import { Backlinks } from "components/CardView/Backlinks";
 import { SingleReactionPreview } from "components/CardView/Reactions";
 import { SingleTextSection } from "components/CardView/Sections";
 import { useCardViewer } from "components/CardViewerContext";
-import { ChatEmptySmall, ChatSmall, CloseLinedTiny } from "components/Icons";
+import {
+  ChatEmptySmall,
+  ChatSmall,
+  CloseLinedTiny,
+  Edit,
+} from "components/Icons";
 import { RenderedText } from "components/Textarea/RenderedText";
 import { useReactions } from "hooks/useReactions";
 import { useIndex, useMutations } from "hooks/useReplicache";
@@ -88,15 +93,20 @@ export const BigCardBody = (
             {/* Card "X" to remove button */}
             {/* NB: this is for inner control in Collection only! */}
             {!props.outerControls && props.onDelete && authorized ? (
-              <button
-                className="h-fit pt-1 text-grey-80 hover:text-grey-15"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  props.onDelete?.();
-                }}
-              >
-                <CloseLinedTiny width={12} height={12} />
-              </button>
+              <>
+                <button className="self-start">
+                  <Edit />
+                </button>
+                <button
+                  className="h-fit pt-1 text-grey-80 hover:text-grey-15"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    props.onDelete?.();
+                  }}
+                >
+                  <CloseLinedTiny width={12} height={12} />
+                </button>
+              </>
             ) : null}
           </div>
         ) : null}
