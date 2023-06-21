@@ -113,8 +113,8 @@ export const CardView = (props: {
           max-w-3xl grow
           flex-col items-stretch overflow-y-scroll
           ${borderStyles({
-            member: !!memberName,
-          })}
+          member: !!memberName,
+        })}
           `}
         onDragOver={(e) => e.preventDefault()}
         onDrop={async (e) => {
@@ -155,8 +155,8 @@ export const CardView = (props: {
             overflow-x-hidden
             overflow-y-scroll
             ${contentStyles({
-              member: !!memberName,
-            })}
+            member: !!memberName,
+          })}
             `}
         >
           <CardContent {...props} />
@@ -185,45 +185,39 @@ export const CardContent = (props: {
     <>
       {/* START CARD CONTENT */}
       <div className="cardContentWrapper relative">
-        {authorized && (
-          <div className="cardSectionAdder pointer-events-none  sticky top-0 z-10 mb-32 flex w-full justify-center ">
-            <SectionAdder
-              entityID={props.entityID}
-              setDateEditing={() => {
-                setDateEditing(true);
-              }}
-              dateEditing={dateEditing}
-            />
-          </div>
-        )}
+        <div className="cardSectionAdder pointer-events-none  sticky top-0 z-10 mb-32 flex w-full justify-center ">
+          <SectionAdder
+            entityID={props.entityID}
+            setDateEditing={() => {
+              setDateEditing(true);
+            }}
+            dateEditing={dateEditing}
+          />
+        </div>
 
         {/* card info (name and more options menu) */}
         {/* hide for members, who don't have a cardCreatorName */}
-        {cardCreatorName && (
-          <div
-            className={`cardInfo pointer-events-none relative z-20 mb-3 ${
-              authorized ? "-mt-[170px]" : ""
+        <div
+          className={`cardInfo pointer-events-none relative z-20 mb-3 ${authorized ? "-mt-[170px]" : ""
             } flex h-[42px] shrink-0 items-center justify-between gap-3`}
-          >
-            {cardCreatorName ? (
-              <div className="group pointer-events-auto flex place-items-center gap-2">
-                <div className=" h-[32px] w-[32px] rounded-full border border-grey-80 pt-[5px] text-center text-sm text-grey-55">
-                  <div className="w-full text-center">
-                    {cardCreatorName.charAt(0).toUpperCase()}
-                  </div>
-                </div>
-                <div className="absolute left-8 hidden max-w-[275px] overflow-hidden whitespace-pre rounded-md bg-white px-2 py-1 text-sm text-grey-55 group-hover:block group-focus:block">
-                  by {cardCreatorName}
-                </div>
+        >
+          <div className="group pointer-events-auto flex place-items-center gap-2">
+            <div className=" h-[32px] w-[32px] rounded-full border border-grey-80 pt-[5px] text-center text-sm text-grey-55">
+              <div className="w-full text-center">
+                {cardCreatorName?.charAt(0).toUpperCase()}
               </div>
-            ) : null}
-            <CardMoreOptionsMenu
-              onDelete={props.onDelete}
-              entityID={props.entityID}
-              referenceFactID={props?.referenceFactID}
-            />
+            </div>
+            <div className="absolute left-8 hidden max-w-[275px] overflow-hidden whitespace-pre rounded-md bg-white px-2 py-1 text-sm text-grey-55 group-hover:block group-focus:block">
+              by {cardCreatorName}
+            </div>
           </div>
-        )}
+
+          <CardMoreOptionsMenu
+            onDelete={props.onDelete}
+            entityID={props.entityID}
+            referenceFactID={props?.referenceFactID}
+          />
+        </div>
         <div className="cardContent grid-auto-rows z-0 grid gap-3">
           <div className="flex flex-col gap-0">
             <Title entityID={props.entityID} />
@@ -255,7 +249,7 @@ export const CardContent = (props: {
               onClick={() =>
                 document
                   .getElementById("card-comments")
-                  ?.scrollIntoView({ behavior: "smooth", block: "end" })
+                  ?.scrollIntoView({ behavior: "smooth" })
               }
             >
               comments
@@ -571,9 +565,8 @@ export const SectionAdder = (props: {
       {/* END LINKED CARD ADDER */}
       {/* DATE ADDER */}
       <button
-        className={`${
-          date || props.dateEditing ? toggledOnStyle : toggledOffStyle
-        } `}
+        className={`${date || props.dateEditing ? toggledOnStyle : toggledOffStyle
+          } `}
         onClick={() => {
           if (date !== null) {
             document
@@ -598,11 +591,10 @@ export const SectionAdder = (props: {
       >
         <Popover.Trigger className="flex items-center">
           <button
-            className={`${toggledOffStyle} ${
-              !reactionPickerOpen
+            className={`${toggledOffStyle} ${!reactionPickerOpen
                 ? ""
                 : "rounded-md border border-accent-blue p-0.5 text-accent-blue"
-            }`}
+              }`}
           >
             <ReactionAdd />
           </button>
@@ -611,7 +603,7 @@ export const SectionAdder = (props: {
           <Popover.Content
             sideOffset={16}
             collisionPadding={{ right: 20 }}
-            className="-mt-[1px] max-w-[298px]"
+            className="-mt-[1px] max-w-[320px]"
           >
             <AddReaction
               entityID={props.entityID}
