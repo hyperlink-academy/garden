@@ -8,12 +8,11 @@ import {
   CloseLinedTiny,
   Edit,
 } from "components/Icons";
-import { RenderedText } from "components/Textarea/RenderedText";
-import { useReactions } from "hooks/useReactions";
-import { useIndex, useMutations } from "hooks/useReplicache";
+import { useMutations } from "hooks/useReplicache";
+import { useUIState } from "hooks/useUIState";
+import { useEffect, useState } from "react";
 import { Props } from "./index";
 
-const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export const BigCardBody = (
   props: {
     entityID: string;
@@ -23,13 +22,28 @@ export const BigCardBody = (
 ) => {
   let { authorized } = useMutations();
   let { open } = useCardViewer();
+  let editing = useUIState((s) => s.focusedCard === props.entityID);
+  let setFocusedCard = useUIState((s) => s.setFocusedCard);
+  const setEditting = () =>
+    editing ? setFocusedCard(undefined) : setFocusedCard(props.entityID);
+  useEffect(() => {
+    if (editing)
+      return () => {
+        useUIState.setState((s) => {
+          if (s.focusedCard === props.entityID)
+            return { ...s, focusedCard: undefined };
+          return s;
+        });
+      };
+  }, [editing]);
 
-  let listenersAndAttributes = authorized
-    ? {
-        ...props?.dragHandleProps?.attributes,
-        ...props?.dragHandleProps?.listeners,
-      }
-    : {};
+  let listenersAndAttributes =
+    authorized && !editing
+      ? {
+          ...props?.dragHandleProps?.attributes,
+          ...props?.dragHandleProps?.listeners,
+        }
+      : {};
 
   return (
     <div
@@ -44,36 +58,43 @@ export const BigCardBody = (
             ? `url(${props.data.imageUrl})`
             : "",
       }} //no tailwind equiv - need for long titles to wrap
-      onClick={() => {
+      onClick={(e) => {
+        if (editing) return;
+        if (e.defaultPrevented) return;
         let cardView = document.getElementById("cardViewerWrapper");
         open({ entityID: props.entityID });
         cardView ? cardView.scrollIntoView({ behavior: "smooth" }) : null;
       }}
     >
       {/* Big Card Preview Content Wrapper */}
-      <div className="cardPreview flex w-full flex-col gap-2 hover:cursor-pointer">
+      <div
+        className={`cardPreview flex w-full flex-col gap-2 ${
+          editing ? "" : "hover:cursor-pointer"
+        }`}
+      >
         {/* Big Card Preview Title and GoTo Button*/}
         {/* show ONLY if we have title OR inner "x" to remove button */}
         {(!props.outerControls && props.onDelete && authorized) ||
         props.data.title?.value ||
-        props.data.member ? (
+        props.data.member ||
+        editing ? (
           <div
             className={`cardPreviewHeader items-top flex justify-between gap-2`}
           >
             <div className="flex w-full justify-between gap-2">
-              {(props.data.title?.value || props.data.member) && (
-                <RenderedText
+              {(props.data.title?.value || props.data.member || editing) && (
+                <SingleTextSection
                   style={{
                     whiteSpace: "pre-wrap",
                     fontFamily: "inherit",
                     width: "100%",
                   }}
-                  text={
-                    props.data.member?.value || props.data.title?.value || ""
-                  }
+                  entityID={props.entityID}
+                  section={props.data.member ? "member/name" : "card/title"}
                   placeholder="Untitled"
-                  className={`cardPreviewTitle text-md !w-fit font-bold ${
-                    props.data.isMember ? "text-white" : "text-grey-35"
+                  previewOnly={!editing || !!props.data.member}
+                  className={`cardPreviewTitle text-md bg-accent-blue font-bold ${
+                    props.data.isMember ? "w-fit text-white" : "text-grey-35"
                   } ${
                     props.data.imageUrl &&
                     props.hideContent &&
@@ -94,7 +115,15 @@ export const BigCardBody = (
             {/* NB: this is for inner control in Collection only! */}
             {!props.outerControls && props.onDelete && authorized ? (
               <>
-                <button className="self-start">
+                <button
+                  className={`self-start ${
+                    editing ? "text-grey-15" : "text-white"
+                  }`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setEditting();
+                  }}
+                >
                   <Edit />
                 </button>
                 <button
@@ -113,33 +142,35 @@ export const BigCardBody = (
         {props.showRelated && <Backlinks entityID={props.entityID} />}
 
         {/* Big Card Preview Default Content */}
-        {!props.hideContent &&
-          (props.data.content?.value || props.data.imageUrl) && (
-            <div
-              className={`cardPreviewDefaultContent flex flex-col gap-2 ${
-                props.data.isMember &&
-                !props.hideContent &&
-                props.data.content?.value
-                  ? "mt-1 rounded-md bg-white text-accent-red"
-                  : ""
-              }`}
-            >
-              {!props.data.imageUrl || props.hideContent ? null : (
-                <img
-                  src={`${props.data.imageUrl}`}
-                  className="max-h-[600px] max-w-full rounded-md"
-                />
-              )}
-              {!props.hideContent && props.data.content?.value && (
-                <RenderedText
-                  className={`cardPreviewDefaultTextContent truncate whitespace-pre-wrap leading-tight ${
-                    !props.data.imageUrl ? "" : ""
-                  } ${props.data.isMember ? "px-2 pb-2" : ""} `}
-                  text={(props.data.content?.value as string) || ""}
-                />
-              )}
-            </div>
-          )}
+        {!props.hideContent && (
+          <div
+            className={`cardPreviewDefaultContent flex flex-col gap-2 ${
+              props.data.isMember &&
+              !props.hideContent &&
+              props.data.content?.value
+                ? "mt-1 rounded-md bg-white text-accent-red"
+                : ""
+            }`}
+          >
+            {!props.data.imageUrl || props.hideContent ? null : (
+              <img
+                src={`${props.data.imageUrl}`}
+                className="max-h-[600px] max-w-full rounded-md"
+              />
+            )}
+            {!props.hideContent && (
+              <SingleTextSection
+                placeholder=" "
+                entityID={props.entityID}
+                previewOnly={!editing}
+                className={`cardPreviewDefaultTextContent truncate whitespace-pre-wrap bg-accent-blue leading-tight ${
+                  !props.data.imageUrl ? "" : ""
+                } ${props.data.isMember ? "px-2 pb-2" : ""} `}
+                section={"card/content"}
+              />
+            )}
+          </div>
+        )}
 
         {/* Reactions + Discussions WRAPPER */}
         {/* NB: show ONLY for non-member cards for now */}
