@@ -296,7 +296,8 @@ const Title = (props: { entityID: string }) => {
       className="bg-inherit text-xl font-bold"
       onKeyDown={(e) => {
         if (e.key === "Enter") {
-          let className = `${props.entityID}-default-text-section}`;
+          e.preventDefault();
+          let className = `default-text-section`;
           let element = document.getElementById(className);
           element?.focus();
         }
