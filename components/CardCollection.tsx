@@ -111,8 +111,15 @@ const CollectionList = (props: {
       action.end();
     },
   });
-  const onAdd = (entity) => {
-    if (props.editable) useUIState.getState().setFocusedCard(entity);
+  const onAdd = (entity: string) => {
+    if (props.editable) {
+      useUIState.getState().setFocusedCard(entity);
+      requestAnimationFrame(() => {
+        let element = document.getElementById(`${entity}-preview-title`);
+
+        element?.focus();
+      });
+    }
   };
   return (
     <div

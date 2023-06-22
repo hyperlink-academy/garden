@@ -113,8 +113,8 @@ export const CardView = (props: {
           max-w-3xl grow
           flex-col items-stretch overflow-y-scroll
           ${borderStyles({
-          member: !!memberName,
-        })}
+            member: !!memberName,
+          })}
           `}
         onDragOver={(e) => e.preventDefault()}
         onDrop={async (e) => {
@@ -155,8 +155,8 @@ export const CardView = (props: {
             overflow-x-hidden
             overflow-y-scroll
             ${contentStyles({
-            member: !!memberName,
-          })}
+              member: !!memberName,
+            })}
             `}
         >
           <CardContent {...props} />
@@ -198,8 +198,9 @@ export const CardContent = (props: {
         {/* card info (name and more options menu) */}
         {/* hide for members, who don't have a cardCreatorName */}
         <div
-          className={`cardInfo pointer-events-none relative z-20 mb-3 ${authorized ? "-mt-[170px]" : ""
-            } flex h-[42px] shrink-0 items-center justify-between gap-3`}
+          className={`cardInfo pointer-events-none relative z-20 mb-3 ${
+            authorized ? "-mt-[170px]" : ""
+          } flex h-[42px] shrink-0 items-center justify-between gap-3`}
         >
           <div className="group pointer-events-auto flex place-items-center gap-2">
             <div className=" h-[32px] w-[32px] rounded-full border border-grey-80 pt-[5px] text-center text-sm text-grey-55">
@@ -278,8 +279,8 @@ const Title = (props: { entityID: string }) => {
       className="bg-inherit text-xl font-bold"
       onKeyDown={(e) => {
         if (e.key === "Enter") {
-          let className = `${props.entityID}-default-text-section}`;
-          let element = document.getElementById(className);
+          e.preventDefault();
+          let element = document.getElementById("default-text-section");
           element?.focus();
         }
       }}
@@ -565,8 +566,9 @@ export const SectionAdder = (props: {
       {/* END LINKED CARD ADDER */}
       {/* DATE ADDER */}
       <button
-        className={`${date || props.dateEditing ? toggledOnStyle : toggledOffStyle
-          } `}
+        className={`${
+          date || props.dateEditing ? toggledOnStyle : toggledOffStyle
+        } `}
         onClick={() => {
           if (date !== null) {
             document
@@ -591,10 +593,11 @@ export const SectionAdder = (props: {
       >
         <Popover.Trigger className="flex items-center">
           <button
-            className={`${toggledOffStyle} ${!reactionPickerOpen
+            className={`${toggledOffStyle} ${
+              !reactionPickerOpen
                 ? ""
                 : "rounded-md border border-accent-blue p-0.5 text-accent-blue"
-              }`}
+            }`}
           >
             <ReactionAdd />
           </button>

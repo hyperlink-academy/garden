@@ -95,6 +95,16 @@ export const BigCardBody = (
                       ? "rounded-[3px] !bg-white px-1"
                       : ""
                   }`}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      let element = document.getElementById(
+                        "preview-default-text-section"
+                      );
+                      element?.focus();
+                    }
+                  }}
+                  id={`${props.entityID}-preview-title`}
                 />
               )}
               {props.data.isMember ? (
@@ -144,6 +154,7 @@ export const BigCardBody = (
                     !props.data.imageUrl ? "" : ""
                   } ${props.data.isMember ? "px-2 pb-2" : ""} `}
                   section={"card/content"}
+                  id="preview-default-text-section"
                 />
               )}
 
