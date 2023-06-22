@@ -24,7 +24,11 @@ export type StackData = {
 };
 
 export const CardAdder = (
-  props: { openOnAdd?: boolean | undefined; addToEnd?: boolean } & StackData
+  props: {
+    openOnAdd?: boolean | undefined;
+    addToEnd?: boolean;
+    onAdd?: (entityID: string) => void;
+  } & StackData
 ) => {
   let { authorized, mutate, memberEntity, action } = useMutations();
   let rep = useContext(ReplicacheContext);
@@ -54,6 +58,7 @@ export const CardAdder = (
             } else {
               create(entity, props, rep.rep, mutate);
             }
+            props.onAdd?.(entity);
 
             action.end();
           }}
@@ -74,6 +79,7 @@ export const CardAdder = (
                     : undefined,
               });
             } else null;
+            props.onAdd?.(entity);
           }}
           addToEnd={props.addToEnd}
           parentID={props.parentID}

@@ -20,6 +20,7 @@ import { useCardViewer } from "./CardViewerContext";
 import { useCombinedRefs } from "./Desktop";
 import { useDraggableCard, useDroppableZone } from "./DragContext";
 import * as z from "zod";
+import { useUIState } from "hooks/useUIState";
 
 let FilterVerifier = z.array(
   z.object({
@@ -34,11 +35,13 @@ export const CardCollection = (props: {
   editable?: boolean;
   attribute: "desktop/contains" | "deck/contains";
   cards: Fact<"desktop/contains" | "deck/contains">[];
+  openOnAdd?: boolean;
 }) => {
   let collectionType = useIndex.eav(props.entityID, "collection/type");
   return (
     <CollectionList
       editable={props.editable}
+      openOnAdd={props.openOnAdd}
       attribute={props.attribute}
       entityID={props.entityID}
       cards={props.cards}
@@ -49,6 +52,7 @@ export const CardCollection = (props: {
 
 const CollectionList = (props: {
   editable?: boolean;
+  openOnAdd?: boolean;
   collectionType?: Fact<"collection/type">["value"];
   entityID: string;
   attribute: "desktop/contains" | "deck/contains";
@@ -58,6 +62,8 @@ const CollectionList = (props: {
   let spaceID = useSpaceID();
   let { authToken } = useAuth();
   let { mutate, action } = useMutations();
+  let focusedCard = useUIState((s) => s.focusedCard);
+  // Handles reordering cards in list via drag and drop
   let { setNodeRef, over } = useDroppableZone({
     type: "dropzone",
     entityID: "",
@@ -105,6 +111,9 @@ const CollectionList = (props: {
       action.end();
     },
   });
+  const onAdd = (entity) => {
+    if (props.editable) useUIState.getState().setFocusedCard(entity);
+  };
   return (
     <div
       ref={setNodeRef}
@@ -156,7 +165,8 @@ const CollectionList = (props: {
             parentID={props.entityID}
             attribute={props.attribute}
             positionKey="eav"
-            openOnAdd
+            openOnAdd={props.openOnAdd}
+            onAdd={onAdd}
           />
         </div>
       )}
@@ -171,7 +181,6 @@ const CollectionList = (props: {
           id={card.id}
         />
       ))}
-
       {over && over.type === "card" && (
         <div className="opacity-60">
           <CardPreview
@@ -188,7 +197,8 @@ const CollectionList = (props: {
         attribute={props.attribute}
         positionKey="eav"
         addToEnd
-        openOnAdd
+        openOnAdd={props.openOnAdd}
+        onAdd={onAdd}
       />
     </div>
   );

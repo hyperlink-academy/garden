@@ -10,6 +10,7 @@ import { getCoordinatesInTextarea } from "src/getCoordinatesInTextarea";
 import { getLinkAtCursor } from "src/utils";
 import { modifyString, useKeyboardHandling } from "hooks/useKeyboardHandling";
 import { CollectionType } from "components/Room";
+import { sortByPosition } from "src/position_helpers";
 
 export const SingleTextSection = (
   props: {
@@ -270,7 +271,7 @@ export const AttachedCardSection = (props: { entityID: string }) => {
             editable
             entityID={props.entityID}
             attribute="deck/contains"
-            cards={attachedCards}
+            cards={attachedCards.sort(sortByPosition("eav"))}
           />
         </div>
       )}

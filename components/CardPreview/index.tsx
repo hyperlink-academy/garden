@@ -23,6 +23,7 @@ import { useAuth } from "hooks/useAuth";
 import { ulid } from "src/ulid";
 import { getAndUploadFile } from "src/getAndUploadFile";
 import { CardPreviewData, useCardPreviewData } from "hooks/CardPreviewData";
+import { useUIState } from "hooks/useUIState";
 
 const borderStyles = (args: { isMember: boolean }) => {
   switch (true) {
@@ -84,6 +85,8 @@ export const CardPreview = (
     false,
     [memberEntity, props.entityID]
   );
+  let editing = useUIState((s) => s.focusedCard === props.entityID);
+
   let messagesCount = useIndex.messages(props.entityID).length;
 
   let { handlers, isLongPress } = useLongPress(
@@ -121,7 +124,7 @@ export const CardPreview = (
         className={`cardPreviewBorder select-none ${
           isUnread ? "unreadCardGlow" : ""
         } relative grow overflow-hidden ${borderStyles({ isMember })} ${
-          props.isSelected ? "selectedCardGlow" : ""
+          props.isSelected || editing ? "selectedCardGlow" : ""
         } ${props.isOver ? "rounded-[24px] shadow-[0_0_16px_0_#cccccc]" : ""}`}
         style={{ WebkitTapHighlightColor: "transparent" }}
       >

@@ -29,16 +29,6 @@ export const BigCardBody = (
   let setFocusedCard = useUIState((s) => s.setFocusedCard);
   const setEditting = () =>
     editing ? setFocusedCard(undefined) : setFocusedCard(props.entityID);
-  useEffect(() => {
-    if (editing)
-      return () => {
-        useUIState.setState((s) => {
-          if (s.focusedCard === props.entityID)
-            return { ...s, focusedCard: undefined };
-          return s;
-        });
-      };
-  }, [editing, props.entityID]);
 
   let listenersAndAttributes =
     authorized && !editing
@@ -51,9 +41,9 @@ export const BigCardBody = (
   return (
     <div
       {...listenersAndAttributes}
-      className={`CardPreviewContent flex h-full grow flex-row overflow-hidden !bg-cover !bg-center !bg-no-repeat pl-2 text-sm ${
+      className={`CardPreviewContent flex h-full grow flex-row !bg-cover !bg-center !bg-no-repeat pl-2 text-sm ${
         props.data.isMember ? "py-2 pr-2" : "py-2 pr-2"
-      }`}
+      } `}
       style={{
         wordBreak: "break-word",
         background:
@@ -71,7 +61,7 @@ export const BigCardBody = (
     >
       {/* Big Card Preview Content Wrapper */}
       <div
-        className={`cardPreview flex w-full flex-col gap-2 ${
+        className={`cardPreview flex w-full flex-col  ${
           editing ? "" : "hover:cursor-pointer"
         }`}
       >
@@ -82,7 +72,7 @@ export const BigCardBody = (
         props.data.member ||
         editing ? (
           <div
-            className={`cardPreviewHeader items-top flex justify-between gap-2`}
+            className={`cardPreviewHeader items-top flex justify-between gap-2 pb-1`}
           >
             <div className="flex w-full justify-between gap-2">
               {(props.data.title?.value || props.data.member || editing) && (
@@ -134,41 +124,42 @@ export const BigCardBody = (
         {props.showRelated && <Backlinks entityID={props.entityID} />}
 
         {/* Big Card Preview Default Content */}
-        {!props.hideContent && (
-          <div
-            className={`cardPreviewDefaultContent flex flex-col gap-2 ${
-              props.data.isMember &&
-              !props.hideContent &&
-              props.data.content?.value
-                ? "mt-1 rounded-md bg-white text-accent-red"
-                : ""
-            }`}
-          >
-            {!props.hideContent && (
-              <SingleTextSection
-                placeholder="..."
-                entityID={props.entityID}
-                previewOnly={!editing}
-                className={`cardPreviewDefaultTextContent truncate whitespace-pre-wrap bg-accent-blue leading-tight ${
-                  !props.data.imageUrl ? "" : ""
-                } ${props.data.isMember ? "px-2 pb-2" : ""} `}
-                section={"card/content"}
-              />
-            )}
+        {!props.hideContent &&
+          (editing || !!props.data.content?.value || !!props.data.imageUrl) && (
+            <div
+              className={`cardPreviewDefaultContent flex flex-col gap-2 pb-2 ${
+                props.data.isMember &&
+                !props.hideContent &&
+                props.data.content?.value
+                  ? "mt-1 rounded-md bg-white text-accent-red"
+                  : ""
+              }`}
+            >
+              {!props.hideContent && (
+                <SingleTextSection
+                  placeholder={editing ? "write something..." : ""}
+                  entityID={props.entityID}
+                  previewOnly={!editing}
+                  className={`cardPreviewDefaultTextContent truncate whitespace-pre-wrap bg-accent-blue leading-tight ${
+                    !props.data.imageUrl ? "" : ""
+                  } ${props.data.isMember ? "px-2 pb-2" : ""} `}
+                  section={"card/content"}
+                />
+              )}
 
-            {!props.data.imageUrl || props.hideContent ? null : (
-              <img
-                src={`${props.data.imageUrl}`}
-                className="max-h-[600px] max-w-full rounded-md"
-              />
-            )}
-          </div>
-        )}
+              {!props.data.imageUrl || props.hideContent ? null : (
+                <img
+                  src={`${props.data.imageUrl}`}
+                  className="max-h-[600px] max-w-full rounded-md"
+                />
+              )}
+            </div>
+          )}
 
         {/* Reactions + Discussions WRAPPER */}
         {/* NB: show ONLY for non-member cards for now */}
         {!props.data.isMember && (
-          <div className="cardPreviewActions flex w-full justify-between gap-2">
+          <div className="cardPreviewActions flex w-full justify-between gap-2 pt-1">
             <div className="cardPreviewReactionAndDiscussion flex gap-2">
               {/* Discussions */}
               {/* three states: unread, existing, none */}

@@ -56,6 +56,7 @@ export const Room = (props: { entityID: string }) => {
               cards={cardsFiltered}
               entityID={props.entityID}
               attribute="desktop/contains"
+              openOnAdd
             />
           </div>
         ) : roomType?.value === "chat" ? (
