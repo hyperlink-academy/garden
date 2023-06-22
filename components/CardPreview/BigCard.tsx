@@ -4,10 +4,13 @@ import { SingleTextSection } from "components/CardView/Sections";
 import { useCardViewer } from "components/CardViewerContext";
 import {
   ChatEmptySmall,
+  ChatEmptyTiny,
   ChatSmall,
   CloseLinedTiny,
   Edit,
+  RoomChat,
 } from "components/Icons";
+import { Divider } from "components/Layout";
 import { useMutations } from "hooks/useReplicache";
 import { useUIState } from "hooks/useUIState";
 import { useEffect, useState } from "react";
@@ -35,7 +38,7 @@ export const BigCardBody = (
           return s;
         });
       };
-  }, [editing]);
+  }, [editing, props.entityID]);
 
   let listenersAndAttributes =
     authorized && !editing
@@ -116,17 +119,6 @@ export const BigCardBody = (
             {!props.outerControls && props.onDelete && authorized ? (
               <>
                 <button
-                  className={`self-start ${
-                    editing ? "text-grey-15" : "text-white"
-                  }`}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setEditting();
-                  }}
-                >
-                  <Edit />
-                </button>
-                <button
                   className="h-fit pt-1 text-grey-80 hover:text-grey-15"
                   onClick={(e) => {
                     e.stopPropagation();
@@ -160,7 +152,7 @@ export const BigCardBody = (
             )}
             {!props.hideContent && (
               <SingleTextSection
-                placeholder=" "
+                placeholder="..."
                 entityID={props.entityID}
                 previewOnly={!editing}
                 className={`cardPreviewDefaultTextContent truncate whitespace-pre-wrap bg-accent-blue leading-tight ${
@@ -175,57 +167,90 @@ export const BigCardBody = (
         {/* Reactions + Discussions WRAPPER */}
         {/* NB: show ONLY for non-member cards for now */}
         {!props.data.isMember && (
-          <div className="flex w-full justify-end gap-2">
-            {/* Reactions */}
-            {props.data.reactions.length > 0 ? (
-              <div className="flex w-full flex-row items-end gap-1">
-                {props.data.reactions.slice(0, 3).map(([reaction, data]) => {
-                  return (
-                    <SingleReactionPreview
-                      key={reaction}
-                      {...data}
-                      reaction={reaction}
-                      entityID={props.entityID}
-                    />
-                  );
-                })}
-                {props.data.reactions.length > 3 ? (
-                  <span className="rounded-md border border-grey-90 bg-white py-0.5 px-1 text-xs text-grey-55">
-                    {`+${props.data.reactions.length - 3}`}
-                  </span>
-                ) : (
-                  ""
-                )}
-              </div>
-            ) : null}
+          <div className="cardPreviewActions flex w-full justify-between gap-2">
+            <div className="cardPreviewReactionAndDiscussion flex gap-2">
+              {/* Discussions */}
+              {/* three states: unread, existing, none */}
+              {/* clicking = shortcut to focus input for a new message */}
+              <button
+                className={`cardPreivewComments relative rounded-md border ${
+                  props.unreadDiscussions
+                    ? "unreadCardGlow bg-background text-accent-blue hover:bg-accent-blue hover:text-background"
+                    : "border-transparent bg-white text-grey-55 hover:border-accent-blue hover:bg-bg-blue hover:text-accent-blue"
+                } `}
+                onClick={() => {
+                  props.entityID && open({ entityID: props.entityID });
+                  setTimeout(() => {
+                    document.getElementById("messageInput")?.focus();
+                    document
+                      .getElementById("card-comments")
+                      ?.scrollIntoView({ behavior: "smooth", block: "end" });
+                  }, 100);
+                }}
+              >
+                <div className="flex shrink-0 items-center gap-1 py-0.5 pl-0.5 pr-1 text-xs">
+                  {props.messagesCount && props.messagesCount > 0 ? (
+                    <>
+                      <RoomChat /> {props.messagesCount}
+                    </>
+                  ) : (
+                    <>
+                      <ChatEmptyTiny /> 0
+                    </>
+                  )}
+                </div>
+              </button>
 
-            {/* Discussions */}
-            {/* three states: unread, existing, none */}
-            {/* clicking = shortcut to focus input for a new message */}
-            <button
-              className={`unreadCount relative -right-[7px] -bottom-[0px] w-fit self-end rounded-md border ${
-                props.unreadDiscussions
-                  ? "unreadCardGlow bg-background text-accent-blue hover:bg-accent-blue hover:text-background"
-                  : props.messagesCount && props.messagesCount > 0
-                  ? "border-grey-80 bg-background text-grey-55 hover:border-accent-blue hover:bg-bg-blue hover:text-accent-blue"
-                  : "border-grey-80 bg-white text-grey-55 hover:border-accent-blue hover:bg-bg-blue hover:text-accent-blue"
-              } `}
-              onClick={() => {
-                props.entityID && open({ entityID: props.entityID });
-                setTimeout(() => {
-                  document.getElementById("messageInput")?.focus();
-                  document
-                    .getElementById("card-comments")
-                    ?.scrollIntoView({ behavior: "smooth", block: "end" });
-                }, 100);
-              }}
-            >
-              {props.messagesCount && props.messagesCount > 0 ? (
-                <ChatSmall />
-              ) : (
-                <ChatEmptySmall />
-              )}
-            </button>
+              {/* Reactions */}
+              {props.data.reactions.length > 0 ? (
+                <>
+                  <div className="h-full w-0">
+                    <Divider vertical />
+                  </div>
+                  <div className="cardPreviewReactions flex flex-row items-end gap-1">
+                    {props.data.reactions
+                      .slice(0, 3)
+                      .map(([reaction, data]) => {
+                        return (
+                          <SingleReactionPreview
+                            key={reaction}
+                            {...data}
+                            reaction={reaction}
+                            entityID={props.entityID}
+                          />
+                        );
+                      })}
+                    {props.data.reactions.length > 3 ? (
+                      <span className="rounded-md border border-grey-90 bg-white py-0.5 px-1 text-xs text-grey-55">
+                        {`+${props.data.reactions.length - 3}`}
+                      </span>
+                    ) : (
+                      ""
+                    )}
+                  </div>
+                </>
+              ) : null}
+            </div>
+
+            {/* edit toggle on cardPreview  */}
+            {props.editable && (
+              <button
+                className={`shink-0 jusitfy-self-end flex items-center gap-2 text-xs italic   ${
+                  editing ? "text-accent-blue" : "text-grey-55"
+                }`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setEditting();
+                }}
+              >
+                {!editing ? (
+                  <div className="hidden group-hover:block">read mode</div>
+                ) : (
+                  <div>edit mode</div>
+                )}
+                <Edit editing={editing} width={20} height={20} />
+              </button>
+            )}
           </div>
         )}
       </div>

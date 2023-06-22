@@ -260,13 +260,14 @@ export const AttachedCardSection = (props: { entityID: string }) => {
     <>
       {attachedCards && attachedCards.length > 0 && (
         <div className="flex flex-col gap-3">
-          <div className="float-right">
+          <div className="">
             <CollectionType
               collectionType={currentCollectionType?.value}
               entityID={props.entityID}
             />
           </div>
           <CardCollection
+            editable
             entityID={props.entityID}
             attribute="deck/contains"
             cards={attachedCards}

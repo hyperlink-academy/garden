@@ -31,22 +31,25 @@ type Filters = z.TypeOf<typeof FilterVerifier>;
 
 export const CardCollection = (props: {
   entityID: string;
+  editable?: boolean;
   attribute: "desktop/contains" | "deck/contains";
   cards: Fact<"desktop/contains" | "deck/contains">[];
 }) => {
   let collectionType = useIndex.eav(props.entityID, "collection/type");
   return (
     <CollectionList
+      editable={props.editable}
       attribute={props.attribute}
       entityID={props.entityID}
       cards={props.cards}
-      size={collectionType?.value === "cardpreview" ? "big" : "small"}
+      collectionType={collectionType?.value}
     />
   );
 };
 
 const CollectionList = (props: {
-  size: "small" | "big";
+  editable?: boolean;
+  collectionType?: Fact<"collection/type">["value"];
   entityID: string;
   attribute: "desktop/contains" | "deck/contains";
   cards: Fact<"desktop/contains" | "deck/contains">[];
@@ -160,8 +163,9 @@ const CollectionList = (props: {
       {props.cards?.map((card) => (
         <DraggableCard
           attribute={props.attribute}
-          hideContent={props.size === "small"}
+          hideContent={props.collectionType !== "cardpreview"}
           parent={props.entityID}
+          editable={props.collectionType === "cardpreview" && props.editable}
           entityID={card.value.value}
           key={card.id}
           id={card.id}
@@ -174,7 +178,8 @@ const CollectionList = (props: {
             data={over.data}
             entityID={over.entityID}
             size={"big"}
-            hideContent={props.size === "small"}
+            hideContent={props.collectionType !== "cardpreview"}
+            editable={props.collectionType === "cardpreview" && props.editable}
           />
         </div>
       )}
@@ -194,6 +199,7 @@ const CollectionList = (props: {
 // specific types
 
 const DraggableCard = (props: {
+  editable?: boolean;
   entityID: string;
   attribute: "desktop/contains" | "deck/contains";
   hideContent?: boolean;
@@ -291,6 +297,7 @@ const DraggableCard = (props: {
             data={data}
             entityID={props.entityID}
             size="big"
+            editable={props.editable}
             dragHandleProps={{ listeners, attributes }}
             hideContent={props.hideContent}
             onDelete={() => {

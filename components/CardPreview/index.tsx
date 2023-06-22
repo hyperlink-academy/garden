@@ -40,6 +40,7 @@ export type Props = {
   onDelete?: () => void;
   outerControls?: boolean;
   hideContent?: boolean;
+  editable?: boolean;
   factID?: string;
   dragHandleProps?: {
     attributes?: DraggableAttributes;
