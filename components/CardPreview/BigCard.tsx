@@ -144,12 +144,6 @@ export const BigCardBody = (
                 : ""
             }`}
           >
-            {!props.data.imageUrl || props.hideContent ? null : (
-              <img
-                src={`${props.data.imageUrl}`}
-                className="max-h-[600px] max-w-full rounded-md"
-              />
-            )}
             {!props.hideContent && (
               <SingleTextSection
                 placeholder="..."
@@ -159,6 +153,13 @@ export const BigCardBody = (
                   !props.data.imageUrl ? "" : ""
                 } ${props.data.isMember ? "px-2 pb-2" : ""} `}
                 section={"card/content"}
+              />
+            )}
+
+            {!props.data.imageUrl || props.hideContent ? null : (
+              <img
+                src={`${props.data.imageUrl}`}
+                className="max-h-[600px] max-w-full rounded-md"
               />
             )}
           </div>
