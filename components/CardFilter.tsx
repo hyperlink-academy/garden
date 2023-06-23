@@ -81,7 +81,7 @@ export function FilterByReactions(props: {
   setFilters: (f: (old: Filters) => Filters) => void;
 }) {
   return (
-    <div className="flex flex-row flex-wrap gap-2">
+    <div className="lightBorder flex w-full flex-row flex-wrap gap-2 p-2">
       {props.reactions.map((reaction) => {
         let existingFilter = props.filters.find((f) => f.reaction === reaction);
         return (

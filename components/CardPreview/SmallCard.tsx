@@ -2,9 +2,11 @@ import { SingleReactionPreview } from "components/CardView/Reactions";
 import { useCardViewer } from "components/CardViewerContext";
 import {
   ChatEmptySmall,
+  ChatEmptyTiny,
   ChatSmall,
   ExternalLink,
   Member,
+  RoomChat,
 } from "components/Icons";
 import { useReactions } from "hooks/useReactions";
 import { useMutations } from "hooks/useReplicache";
@@ -66,7 +68,7 @@ export const BaseSmallCard = (
         props.entityID && open({ entityID: props.entityID });
       }}
       className={`h-full w-full !bg-cover !bg-center !bg-no-repeat hover:cursor-pointer ${
-        props.isMember ? "pr-1 pl-2 pt-2 pb-1" : "py-2 pr-3 pl-2"
+        props.isMember ? "pr-1 pl-2 pt-2 pb-1" : "py-2 px-2"
       }`}
       style={{
         background: props.imageUrl ? `url(${props.imageUrl})` : "",
@@ -76,28 +78,26 @@ export const BaseSmallCard = (
       {!props.isMember ? (
         /* Default Content (Member Content Further Down) */
         <div
-          className="flex h-full w-full flex-col items-stretch gap-1 overflow-hidden"
+          className="flex h-full w-full flex-col items-stretch gap-1 "
           style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
         >
           {/* Small Card Preview Title Or Content */}
-          <a className="h-full overflow-hidden">
-            {/* if we have an image, do NOT show title / content / 'Untitled' placeholder */}
-            {!props.imageUrl ? (
-              props.title ? (
-                <div className="w-fit text-ellipsis font-bold leading-tight text-grey-35">
-                  {props.title}
-                </div>
-              ) : props.content ? (
-                <small>
-                  <pre className="w-fit truncate whitespace-pre-wrap leading-tight">
-                    {props?.content}
-                  </pre>
-                </small>
-              ) : (
-                <div className="block w-full font-bold italic !text-grey-80">
-                  Untitled
-                </div>
-              )
+          <a className="h-full ">
+            {/* if we have an image, do NOT show 'Untitled' placeholder */}
+            {props.title ? (
+              <div className="-m-1 max-h-full w-fit overflow-hidden text-ellipsis rounded-[4px] bg-white bg-opacity-70 p-1 font-bold leading-tight  text-grey-35">
+                {props.title}
+              </div>
+            ) : props.content ? (
+              <small>
+                <pre className="-m-1 max-h-full w-fit overflow-hidden truncate whitespace-pre-wrap rounded-[4px] bg-white bg-opacity-60 p-1 leading-tight">
+                  {props?.content}
+                </pre>
+              </small>
+            ) : !props.imageUrl ? (
+              <div className="block w-full font-bold italic !text-grey-80">
+                Untitled
+              </div>
             ) : null}
           </a>
 
@@ -153,7 +153,7 @@ export const BaseSmallCard = (
           {/* three states: unread, existing, none */}
           {/* clicking = shortcut to focus input for a new message */}
           <button
-            className={`unreadCount fixed -bottom-[12px] right-[24px] z-50 rounded-md border ${
+            className={`unreadCount fixed -bottom-[10px] right-[24px] z-50 rounded-md border p-[2px] ${
               props.unreadDiscussions
                 ? "unreadCardGlow bg-background text-accent-blue hover:bg-accent-blue hover:text-background"
                 : props.messagesCount && props.messagesCount > 0
@@ -168,9 +168,9 @@ export const BaseSmallCard = (
             }}
           >
             {props.messagesCount && props.messagesCount > 0 ? (
-              <ChatSmall />
+              <RoomChat />
             ) : (
-              <ChatEmptySmall />
+              <ChatEmptyTiny />
             )}
           </button>
         </div>

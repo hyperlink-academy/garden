@@ -115,6 +115,8 @@ export const CardView = (props: {
           ${borderStyles({
             member: !!memberName,
           })}
+            member: !!memberName,
+          })}
           `}
         onDragOver={(e) => e.preventDefault()}
         onDrop={async (e) => {
@@ -297,8 +299,7 @@ const Title = (props: { entityID: string }) => {
       onKeyDown={(e) => {
         if (e.key === "Enter") {
           e.preventDefault();
-          let className = `default-text-section`;
-          let element = document.getElementById(className);
+          let element = document.getElementById("default-text-section");
           element?.focus();
         }
       }}
