@@ -27,8 +27,6 @@ export const BigCardBody = (
   let { open } = useCardViewer();
   let editing = useUIState((s) => s.focusedCard === props.entityID);
   let setFocusedCard = useUIState((s) => s.setFocusedCard);
-  const setEditting = () =>
-    editing ? setFocusedCard(undefined) : setFocusedCard(props.entityID);
 
   let listenersAndAttributes =
     authorized && !editing
@@ -74,7 +72,7 @@ export const BigCardBody = (
           <div
             className={`cardPreviewHeader items-top flex justify-between gap-2 pb-1`}
           >
-            <div className="flex w-full justify-between gap-2">
+            <div className="cardPreviewTitle flex w-full justify-between gap-2">
               {(props.data.title?.value || props.data.member || editing) && (
                 <SingleTextSection
                   style={{
@@ -99,12 +97,12 @@ export const BigCardBody = (
                     if (e.key === "Enter") {
                       e.preventDefault();
                       let element = document.getElementById(
-                        "preview-default-text-section"
+                        `${props.entityID}-preview-default-text-section`
                       );
                       element?.focus();
                     }
                   }}
-                  id={`${props.entityID}-preview-title`}
+                  id={props.editable ? `${props.entityID}-preview-title` : ""}
                 />
               )}
               {props.data.isMember ? (
@@ -141,7 +139,7 @@ export const BigCardBody = (
                 props.data.isMember &&
                 !props.hideContent &&
                 props.data.content?.value
-                  ? "mt-1 rounded-md bg-white text-accent-red"
+                  ? "rounded-md bg-white pt-2 text-accent-red"
                   : ""
               }`}
             >
@@ -152,9 +150,13 @@ export const BigCardBody = (
                   previewOnly={!editing}
                   className={`cardPreviewDefaultTextContent truncate whitespace-pre-wrap bg-accent-blue leading-tight ${
                     !props.data.imageUrl ? "" : ""
-                  } ${props.data.isMember ? "px-2 pb-2" : ""} `}
+                  } ${props.data.isMember ? "px-2 " : ""} `}
                   section={"card/content"}
-                  id="preview-default-text-section"
+                  id={
+                    props.editable
+                      ? `${props.entityID}-preview-default-text-section`
+                      : ""
+                  }
                 />
               )}
 
@@ -243,7 +245,28 @@ export const BigCardBody = (
                 }`}
                 onClick={(e) => {
                   e.preventDefault();
-                  setEditting();
+                  if (editing) setFocusedCard(undefined);
+                  else {
+                    setFocusedCard(props.entityID);
+                    requestAnimationFrame(() => {
+                      let element = document.getElementById(
+                        `${props.entityID}-preview-default-text-section`
+                      );
+                      console.log(element);
+
+                      element?.focus();
+                      requestAnimationFrame(() => {
+                        let element = document.getElementById(
+                          `${props.entityID}-preview-default-text-section`
+                        ) as HTMLTextAreaElement;
+                        console.log(element);
+                        element?.setSelectionRange(
+                          element?.value?.length || 0,
+                          element?.value?.length || 0
+                        );
+                      });
+                    });
+                  }
                 }}
               >
                 {!editing ? (
