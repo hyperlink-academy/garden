@@ -219,7 +219,7 @@ export const BigCardBody = (
                         return (
                           <SingleReactionPreview
                             key={reaction}
-                            {...data}
+                            memberReaction={data.memberReaction}
                             reaction={reaction}
                             entityID={props.entityID}
                           />
