@@ -1,4 +1,5 @@
 import { workerAPI } from "backend/lib/api";
+import { SpaceProvider } from "components/ReplicacheProvider";
 import { SpaceData, SpaceList } from "components/SpacesList";
 import { AddSpace } from "components/StudioPage/AddSpace";
 import { StudioOptionsMenu } from "components/StudioPage/StudioOptionsMenu";
@@ -15,38 +16,40 @@ export default function StudioPage(props: Props) {
   let id = query.studio_id as string;
   let { data } = useStudioData(id, props.data);
   let [view, setView] = useState<"posts" | "spaces">("posts");
+  if (!data) return null;
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-row justify-between">
-        <h1>{data?.name}</h1>
-        <div className="flex flex-row items-center gap-2">
-          <AddSpace id={id} />
-          <StudioOptionsMenu id={id} />
+    <SpaceProvider id={data?.do_id}>
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-row justify-between">
+          <h1>{data?.name}</h1>
+          <div className="flex flex-row items-center gap-2">
+            <AddSpace id={id} />
+            <StudioOptionsMenu id={id} />
+          </div>
         </div>
+        {data?.description}
+        <div className="flex flex-col">
+          <button
+            onClick={() => setView(view === "spaces" ? "posts" : "spaces")}
+            className={`w-fit self-end rounded-t-md border-2 border-b-0 border-accent-blue bg-bg-blue py-1 px-2 font-bold text-accent-blue
+            `}
+          >
+            {view === "spaces" ? "Posts" : "Spaces"}
+          </button>
+          <hr className="border border-accent-blue" />
+        </div>
+        {view === "posts" ? (
+          <StudioPosts id={query.studio_id as string} />
+        ) : (
+          <SpaceList
+            spaces={
+              data?.spaces_in_studios.map((s) => s.space_data as SpaceData) ||
+              []
+            }
+          />
+        )}
       </div>
-      {data?.description}
-      <div className="flex flex-col">
-        <button
-          onClick={() => setView("spaces")}
-          className={`w-fit self-end rounded-t-md border-2 border-b-0 border-accent-blue py-1 px-2 font-bold ${view === "posts"
-              ? "bg-bg-blue text-accent-blue"
-              : "bg-accent-blue text-white"
-            }`}
-        >
-          explore the spaces
-        </button>
-        <hr className="border border-accent-blue" />
-      </div>
-      {view === "posts" ? (
-        <StudioPosts id={query.studio_id as string} />
-      ) : (
-        <SpaceList
-          spaces={
-            data?.spaces_in_studios.map((s) => s.space_data as SpaceData) || []
-          }
-        />
-      )}
-    </div>
+    </SpaceProvider>
   );
 }
 

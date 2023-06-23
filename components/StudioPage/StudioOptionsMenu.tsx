@@ -10,7 +10,7 @@ import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { Database } from "backend/lib/database.types";
 import { useAuth } from "hooks/useAuth";
 import useSWR from "swr";
-import { spaceAPI } from "backend/lib/api";
+import { spaceAPI, workerAPI } from "backend/lib/api";
 import { useSmoker } from "components/Smoke";
 import Router from "next/router";
 
@@ -89,19 +89,19 @@ function StudioSettings(props: {
           className="flex flex-col gap-8"
           onSubmit={async (e) => {
             e.preventDefault();
+            if (!authToken) return;
             setLoading(true);
             mutate((s) => {
               if (!s) return;
               return { ...s, ...formState };
             }, false);
 
-            await supabase
-              .from("studios")
-              .update({
-                description: formState.description,
-                name: formState.name,
-              })
-              .eq("id", props.id);
+            await workerAPI(WORKER_URL, "update_studio_data", {
+              authToken,
+              studio_id: props.id,
+              name: formState.name,
+              description: formState.description,
+            });
             setLoading(false);
             mutate();
           }}

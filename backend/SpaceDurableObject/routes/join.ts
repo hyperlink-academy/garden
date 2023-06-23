@@ -51,20 +51,23 @@ export const join_route = makeRoute({
     }
 
     let memberEntity = ulid();
-    await Promise.all([
-      env.factStore.assertFact({
-        entity: memberEntity,
-        attribute: "space/member",
-        value: session.studio,
-        positions: { aev: "a0" },
-      }),
-      env.factStore.assertFact({
-        entity: memberEntity,
-        attribute: "member/name",
-        value: session.username,
-        positions: { aev: "a0" },
-      }),
-    ]);
+    console.log("creating members");
+    console.log(
+      await Promise.all([
+        env.factStore.assertFact({
+          entity: memberEntity,
+          attribute: "space/member",
+          value: session.studio,
+          positions: {},
+        }),
+        env.factStore.assertFact({
+          entity: memberEntity,
+          attribute: "member/name",
+          value: session.username,
+          positions: {},
+        }),
+      ])
+    );
     if (space_type === "studio") {
       let { data: studio_ID } = await supabase
         .from("studios")

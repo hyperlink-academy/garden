@@ -148,7 +148,7 @@ function makeMutators(
     ) => {
       let q = scanIndex(tx);
       let context: MutationContext = {
-        runOnServer: async () => {},
+        runOnServer: async () => { },
         scanIndex: q,
         postMessage: async (m) => {
           await tx.put(m.id, MessageWithIndexes(m));
@@ -299,7 +299,7 @@ export const makeReplicache = (args: {
   name: string;
   undoManager: UndoManager;
 }) => {
-  let grabData = function (): {
+  let grabData = function(): {
     rep: Replicache<ReplicacheMutators>;
     undoManager: UndoManager;
   } {

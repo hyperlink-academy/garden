@@ -1,14 +1,25 @@
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import { spaceAPI, workerAPI } from "backend/lib/api";
 import { Database } from "backend/lib/database.types";
-import { ButtonLink, ButtonPrimary, ButtonTertiary } from "components/Buttons";
+import {
+  ButtonLink,
+  ButtonPrimary,
+  ButtonSecondary,
+  ButtonTertiary,
+} from "components/Buttons";
 import { CreateSpaceForm, CreateSpaceFormState } from "components/CreateSpace";
+import { DotLoader } from "components/DotLoader";
 import { SpaceCreate } from "components/Icons";
 import { Modal } from "components/Layout";
 import { useAuth } from "hooks/useAuth";
 import { useIdentityData } from "hooks/useIdentityData";
+import { scanIndex, useMutations } from "hooks/useReplicache";
 import { useStudioData } from "hooks/useStudioData";
 import { useEffect, useState } from "react";
+import { generateKeyBetween } from "src/fractional-indexing";
+import { ulid } from "src/ulid";
 
+const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export function AddSpace(props: { id: string }) {
   let [open, setOpen] = useState(false);
   let { data } = useStudioData(props.id);
@@ -68,14 +79,14 @@ export function AddSpace(props: { id: string }) {
             studioID={props.id}
           />
         ) : (
-          <AddNewSpace />
+          <AddNewSpace onClose={() => setOpen(false)} studioID={props.id} />
         )}
       </Modal>
     </>
   );
 }
 
-const AddNewSpace = () => {
+const AddNewSpace = (props: { onClose: () => void; studioID: string }) => {
   let [formState, setFormState] = useState<CreateSpaceFormState>({
     display_name: "",
     description: "",
@@ -84,18 +95,106 @@ const AddNewSpace = () => {
     image: null,
     default_space_image: null,
   });
+
+  let { mutate: mutateStudioData } = useStudioData(props.studioID);
+
+  let auth = useAuth();
+  let { mutate, rep } = useMutations();
+  let [status, setStatus] = useState<"normal" | "loading">("normal");
   return (
     <>
       <CreateSpaceForm formState={formState} setFormState={setFormState} />
+      <div className="flex gap-4 place-self-end">
+        <ButtonLink
+          content={"Nevermind"}
+          onClick={async () => {
+            props.onClose();
+          }}
+        />
+        <ButtonPrimary
+          content={status === "normal" ? "Create" : <DotLoader />}
+          disabled={
+            !formState.display_name ||
+            !(formState.image || formState.default_space_image)
+          }
+          onClick={async () => {
+            if (
+              !auth.session.loggedIn ||
+              !auth.authToken ||
+              !rep ||
+              !formState.display_name
+            )
+              return;
+            let result = await spaceAPI(
+              `${WORKER_URL}/space/${auth.session.session?.studio}`,
+              "create_space",
+              {
+                authToken: auth.authToken,
+                ...formState,
+              }
+            );
+            if (!result.success) return;
+
+            await workerAPI(WORKER_URL, "add_space_to_studio", {
+              authToken: auth.authToken,
+              studio_id: props.studioID,
+              space_do_id: result.data.do_id,
+            });
+
+            let latestPost = await rep.query(async (tx) => {
+              let posts = await scanIndex(tx).aev("feed/post");
+              return posts.sort((a, b) => {
+                let aPosition = a.value,
+                  bPosition = b.value;
+                if (aPosition === bPosition) return a.id > b.id ? 1 : -1;
+                return aPosition > bPosition ? 1 : -1;
+              })[0]?.value;
+            });
+            let entity = ulid();
+            mutate("assertFact", [
+              {
+                entity,
+                attribute: "feed/post",
+                value: generateKeyBetween(null, latestPost || null),
+                positions: {},
+              },
+              {
+                entity,
+                attribute: "post/type",
+                value: "space_added",
+                positions: {},
+              },
+              {
+                entity,
+                attribute: "post/attached-space",
+                value: result.data.do_id,
+                positions: {},
+              },
+            ]);
+            mutateStudioData();
+            setStatus("normal");
+            props.onClose();
+          }}
+        />
+      </div>
     </>
   );
 };
 
 const AddExistingSpace = (props: { onClose: () => void; studioID: string }) => {
-  let { session } = useAuth();
+  let { session, authToken } = useAuth();
+  let { data: studioData, mutate: mutateStudioData } = useStudioData(
+    props.studioID
+  );
+  let { mutate, rep } = useMutations();
   let { data } = useIdentityData(session?.session?.username);
-  let supabase = useSupabaseClient<Database>();
   let [addedSpaces, setAddedSpaces] = useState<string[]>([]);
+  let spaces = data?.members_in_spaces.filter((s) => {
+    return !studioData?.spaces_in_studios.find(
+      (f) => f.space === s.space_data?.do_id
+    );
+  });
+
   return (
     <div className="flex flex-col gap-4">
       <div>
@@ -105,7 +204,7 @@ const AddExistingSpace = (props: { onClose: () => void; studioID: string }) => {
         </p>
       </div>
       <div>
-        {data?.members_in_spaces.map(({ space_data }) =>
+        {spaces?.map(({ space_data }) =>
           !!space_data ? (
             <button
               key={space_data.do_id}
@@ -135,12 +234,46 @@ const AddExistingSpace = (props: { onClose: () => void; studioID: string }) => {
         <ButtonPrimary
           onClick={async () => {
             if (addedSpaces.length === 0) return;
-            let result = await supabase?.from("spaces_in_studios").insert(
-              addedSpaces.map((space) => {
-                return { space, studio: props.studioID };
-              })
-            );
-            console.log(result);
+            if (!authToken || !rep) return;
+
+            for (let space of addedSpaces) {
+              await workerAPI(WORKER_URL, "add_space_to_studio", {
+                authToken,
+                studio_id: props.studioID,
+                space_do_id: space,
+              });
+              let latestPost = await rep.query(async (tx) => {
+                let posts = await scanIndex(tx).aev("feed/post");
+                return posts.sort((a, b) => {
+                  let aPosition = a.value,
+                    bPosition = b.value;
+                  if (aPosition === bPosition) return a.id > b.id ? 1 : -1;
+                  return aPosition > bPosition ? 1 : -1;
+                })[0]?.value;
+              });
+              let entity = ulid();
+              mutate("assertFact", [
+                {
+                  entity,
+                  attribute: "feed/post",
+                  value: generateKeyBetween(null, latestPost || null),
+                  positions: {},
+                },
+                {
+                  entity,
+                  attribute: "post/type",
+                  value: "space_added",
+                  positions: {},
+                },
+                {
+                  entity,
+                  attribute: "post/attached-space",
+                  value: space,
+                  positions: {},
+                },
+              ]);
+            }
+            mutateStudioData();
           }}
           disabled={addedSpaces.length === 0}
           content={
