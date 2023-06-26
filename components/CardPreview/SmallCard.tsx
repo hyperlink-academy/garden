@@ -133,7 +133,7 @@ export const BaseSmallCard = (
                   return (
                     <SingleReactionPreview
                       key={reaction}
-                      {...data}
+                      memberReaction={data.memberReaction}
                       reaction={reaction}
                       entityID={props.entityID}
                     />
