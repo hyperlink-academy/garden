@@ -19,6 +19,7 @@ export const get_identity_data_route = makeRoute({
           space_data(*, owner:identity_data!space_data_owner_fkey(*))
         ),
         studios!studios_creator_fkey(*),
+        members_in_studios(studios(*)),
         owner:space_data!space_data_owner_fkey(*, owner:identity_data!space_data_owner_fkey(*))`
       )
       .eq("username", msg.name.toLowerCase())

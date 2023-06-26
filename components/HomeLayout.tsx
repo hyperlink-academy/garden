@@ -45,7 +45,9 @@ export const HomeHeader = () => {
 
 const StudiosList = (props: { username: string }) => {
   let { data } = useIdentityData(props.username);
-  console.log(data);
+  let studios = data?.members_in_studios.map(
+    (s) => s.studios as Exclude<typeof s.studios, null>
+  );
   return (
     <>
       <Popover.Root>
@@ -60,7 +62,7 @@ const StudiosList = (props: { username: string }) => {
           >
             <Popover.Arrow className="fill-grey-80 stroke-grey-80" />
 
-            {data?.studios.map((s) => (
+            {studios.map((s) => (
               <Link href={`/studio/${s.id}`} key={s.id}>
                 <Popover.Close>{s.name}</Popover.Close>
               </Link>
