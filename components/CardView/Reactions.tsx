@@ -258,7 +258,7 @@ export const SingleReaction = (props: {
 export const SingleReactionPreview = (props: {
   entityID: string;
   reaction: string;
-  count: number;
+  count?: number;
   memberReaction: string | null;
 }) => {
   return (
@@ -270,7 +270,9 @@ export const SingleReactionPreview = (props: {
       }`}
     >
       <strong>{props.reaction}</strong>
-      <span className="text-xs text-grey-55">{props.count}</span>
+      {props.count && (
+        <span className="text-xs text-grey-55">{props.count}</span>
+      )}
     </div>
   );
 };

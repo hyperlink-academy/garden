@@ -20,6 +20,7 @@ import { useCardViewer } from "./CardViewerContext";
 import { useCombinedRefs } from "./Desktop";
 import { useDraggableCard, useDroppableZone } from "./DragContext";
 import * as z from "zod";
+import { useUIState } from "hooks/useUIState";
 
 let FilterVerifier = z.array(
   z.object({
@@ -31,22 +32,28 @@ type Filters = z.TypeOf<typeof FilterVerifier>;
 
 export const CardCollection = (props: {
   entityID: string;
+  editable?: boolean;
   attribute: "desktop/contains" | "deck/contains";
   cards: Fact<"desktop/contains" | "deck/contains">[];
+  openOnAdd?: boolean;
 }) => {
   let collectionType = useIndex.eav(props.entityID, "collection/type");
   return (
     <CollectionList
+      editable={props.editable}
+      openOnAdd={props.openOnAdd}
       attribute={props.attribute}
       entityID={props.entityID}
       cards={props.cards}
-      size={collectionType?.value === "cardpreview" ? "big" : "small"}
+      collectionType={collectionType?.value}
     />
   );
 };
 
 const CollectionList = (props: {
-  size: "small" | "big";
+  editable?: boolean;
+  openOnAdd?: boolean;
+  collectionType?: Fact<"collection/type">["value"];
   entityID: string;
   attribute: "desktop/contains" | "deck/contains";
   cards: Fact<"desktop/contains" | "deck/contains">[];
@@ -55,6 +62,8 @@ const CollectionList = (props: {
   let spaceID = useSpaceID();
   let { authToken } = useAuth();
   let { mutate, action } = useMutations();
+  let focusedCard = useUIState((s) => s.focusedCard);
+  // Handles reordering cards in list via drag and drop
   let { setNodeRef, over } = useDroppableZone({
     type: "dropzone",
     entityID: "",
@@ -102,6 +111,16 @@ const CollectionList = (props: {
       action.end();
     },
   });
+  const onAdd = (entity: string) => {
+    if (props.editable) {
+      useUIState.getState().setFocusedCard(entity);
+      requestAnimationFrame(() => {
+        let element = document.getElementById(`${entity}-preview-title`);
+
+        element?.focus();
+      });
+    }
+  };
   return (
     <div
       ref={setNodeRef}
@@ -153,28 +172,30 @@ const CollectionList = (props: {
             parentID={props.entityID}
             attribute={props.attribute}
             positionKey="eav"
-            openOnAdd
+            openOnAdd={props.openOnAdd}
+            onAdd={onAdd}
           />
         </div>
       )}
       {props.cards?.map((card) => (
         <DraggableCard
           attribute={props.attribute}
-          hideContent={props.size === "small"}
+          hideContent={props.collectionType !== "cardpreview"}
           parent={props.entityID}
+          editable={props.collectionType === "cardpreview" && props.editable}
           entityID={card.value.value}
           key={card.id}
           id={card.id}
         />
       ))}
-
       {over && over.type === "card" && (
         <div className="opacity-60">
           <CardPreview
             data={over.data}
             entityID={over.entityID}
             size={"big"}
-            hideContent={props.size === "small"}
+            hideContent={props.collectionType !== "cardpreview"}
+            editable={props.collectionType === "cardpreview" && props.editable}
           />
         </div>
       )}
@@ -183,7 +204,8 @@ const CollectionList = (props: {
         attribute={props.attribute}
         positionKey="eav"
         addToEnd
-        openOnAdd
+        openOnAdd={props.openOnAdd}
+        onAdd={onAdd}
       />
     </div>
   );
@@ -194,6 +216,7 @@ const CollectionList = (props: {
 // specific types
 
 const DraggableCard = (props: {
+  editable?: boolean;
   entityID: string;
   attribute: "desktop/contains" | "deck/contains";
   hideContent?: boolean;
@@ -291,6 +314,7 @@ const DraggableCard = (props: {
             data={data}
             entityID={props.entityID}
             size="big"
+            editable={props.editable}
             dragHandleProps={{ listeners, attributes }}
             hideContent={props.hideContent}
             onDelete={() => {
