@@ -203,7 +203,7 @@ const AddExistingSpace = (props: { onClose: () => void; studioID: string }) => {
           You can only add Spaces that are upcoming, active, or unscheduled
         </p>
       </div>
-      <div>
+      <div className="flex flex-col gap-2">
         {spaces?.map(({ space_data }) =>
           !!space_data ? (
             <button
@@ -215,10 +215,11 @@ const AddExistingSpace = (props: { onClose: () => void; studioID: string }) => {
                   );
                 else setAddedSpaces((spaces) => [...spaces, space_data.do_id]);
               }}
-              className={`w-full rounded-lg border ${addedSpaces.includes(space_data.do_id)
+              className={`w-full rounded-lg border ${
+                addedSpaces.includes(space_data.do_id)
                   ? "border-accent-blue bg-accent-blue text-white"
                   : "border-grey-80 hover:border-accent-blue hover:bg-bg-blue"
-                } py-2 px-3 text-left `}
+              } py-2 px-3 text-left `}
             >
               <h3>{space_data.display_name}</h3>
             </button>

@@ -29,7 +29,7 @@ export default function StudioPage(props: Props) {
       </Head>
       <SpaceProvider id={data?.do_id}>
         <div className="flex flex-col gap-4">
-          <div className="flex flex-row justify-between">
+          <div className="flex flex-row items-start justify-between gap-4">
             <h1>{data?.name}</h1>
             {/* TODO - replace this with updated 'authorized' in useMutations() */}
             {data?.members_in_studios.find(

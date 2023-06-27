@@ -7,6 +7,7 @@ import { useState } from "react";
 import { generateKeyBetween } from "src/fractional-indexing";
 import { ulid } from "src/ulid";
 import { ButtonPrimary } from "./Buttons";
+import { Send } from "./Icons";
 import { Textarea } from "./Textarea";
 
 export function StudioPosts(props: { id: string }) {
@@ -22,41 +23,52 @@ export function StudioPosts(props: { id: string }) {
   let [selectedSpaces, setSelectedSpace] = useState<string[]>([]);
   let [value, setValue] = useState("");
   return (
-    <div>
+    <div className="flex flex-col gap-4">
       {/* TODO - replace this with updated 'authorized' in useMutations() */}
       {data?.members_in_studios.find((m) => m.member === session?.user?.id) && (
-        <div>
-          {data?.spaces_in_studios.map((s) => {
-            if (!s.space) return;
-            let spaceID = s.space;
-            return (
-              <button
-                className={`${
-                  selectedSpaces.includes(spaceID) ? "underline" : ""
-                }`}
-                key={spaceID}
-                onClick={() =>
-                  selectedSpaces.includes(spaceID)
-                    ? setSelectedSpace(
-                        selectedSpaces.filter((space) => space !== s.space)
-                      )
-                    : setSelectedSpace([...selectedSpaces, spaceID])
-                }
-              >
-                {s.space_data?.display_name}
-              </button>
-            );
-          })}
+        <div className="PostCreateWrapper flex flex-col gap-2 rounded-md border bg-white p-2">
+          {/* <p className="text-center font-bold italic">new post</p> */}
+          <div className="flex flex-col gap-2">
+            {data?.spaces_in_studios && data?.spaces_in_studios.length > 0 && (
+              <span className="text-sm italic">select space(s) to attach</span>
+            )}
+            <div className="flex flex-wrap gap-2">
+              {data?.spaces_in_studios.map((s) => {
+                if (!s.space) return;
+                let spaceID = s.space;
+                return (
+                  <button
+                    className={`rounded-md border py-1 px-2 ${
+                      selectedSpaces.includes(spaceID)
+                        ? "border-accent-blue bg-accent-blue text-white"
+                        : "border-grey-80 hover:border-accent-blue hover:bg-bg-blue"
+                    }`}
+                    key={spaceID}
+                    onClick={() =>
+                      selectedSpaces.includes(spaceID)
+                        ? setSelectedSpace(
+                            selectedSpaces.filter((space) => space !== s.space)
+                          )
+                        : setSelectedSpace([...selectedSpaces, spaceID])
+                    }
+                  >
+                    {s.space_data?.display_name}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
           <Textarea
             className="w-full rounded-md border bg-white p-2"
             value={value}
-            placeholder=" "
+            placeholder="share something with the group…"
             onChange={(e) => setValue(e.currentTarget.value)}
           />
 
           <ButtonPrimary
             content="Send"
+            icon={<Send />}
             onClick={async () => {
               let entity = ulid();
               if (!memberEntity) return;
@@ -88,11 +100,13 @@ export function StudioPosts(props: { id: string }) {
                   positions: {},
                 },
               ]);
+              setValue("");
+              setSelectedSpace([]);
             }}
           />
         </div>
       )}
-      <div className="flex flex-col gap-2">
+      <div className="PostListWrapper flex flex-col gap-4">
         {posts.map((post) => (
           <Post entityID={post.entity} key={post.entity} studioID={props.id} />
         ))}
@@ -109,7 +123,7 @@ const Post = (props: { entityID: string; studioID: string }) => {
   let creatorName = useIndex.eav(createdBy?.value.value || null, "member/name");
   let type = useIndex.eav(props.entityID, "post/type");
   return (
-    <div className="flex flex-col gap-2 rounded-md border p-4">
+    <div className="flex flex-col gap-2 rounded-md border bg-white p-4">
       {creatorName && <div className="w-fit border">{creatorName?.value}</div>}
       {type?.value}
       {content?.value}
