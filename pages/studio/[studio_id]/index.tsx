@@ -6,6 +6,7 @@ import { StudioOptionsMenu } from "components/StudioPage/StudioOptionsMenu";
 import { StudioPosts } from "components/StudioPosts";
 import { useStudioData } from "hooks/useStudioData";
 import { GetStaticPropsContext, InferGetStaticPropsType } from "next";
+import Head from "next/head";
 import { useRouter } from "next/router";
 import { useState } from "react";
 
@@ -18,53 +19,58 @@ export default function StudioPage(props: Props) {
   let [view, setView] = useState<"posts" | "spaces">("posts");
   if (!data) return null;
   return (
-    <SpaceProvider id={data?.do_id}>
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-row justify-between">
-          <h1>{data?.name}</h1>
-          <div className="flex flex-row items-center gap-2">
-            <AddSpace id={id} />
-            <StudioOptionsMenu id={id} />
+    <>
+      <Head>
+        <title key="title">{data?.name}</title>
+      </Head>
+      <SpaceProvider id={data?.do_id}>
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-row justify-between">
+            <h1>{data?.name}</h1>
+            <div className="flex flex-row items-center gap-2">
+              <AddSpace id={id} />
+              <StudioOptionsMenu id={id} />
+            </div>
           </div>
-        </div>
-        <p>{data?.description}</p>
-        <div className="flex flex-col">
-          <div className="flex self-end">
-            <button
-              onClick={() => setView(view === "spaces" ? "posts" : "spaces")}
-              className={`-mr-[2px] rounded-t-md border-2 border-b-0  py-1 px-2  ${
-                view === "posts"
-                  ? "z-10 border-accent-blue bg-bg-blue font-bold text-accent-blue"
-                  : "bg-white text-grey-35"
-              }`}
-            >
-              Posts
-            </button>
-            <button
-              onClick={() => setView(view === "spaces" ? "posts" : "spaces")}
-              className={`rounded-t-md border-2 border-b-0  py-1 px-2 ${
-                view === "spaces"
-                  ? "z-10 border-accent-blue bg-bg-blue font-bold text-accent-blue"
-                  : "bg-white text-grey-35"
-              }`}
-            >
-              Spaces
-            </button>
+          <p>{data?.description}</p>
+          <div className="flex flex-col">
+            <div className="flex self-end">
+              <button
+                onClick={() => setView(view === "spaces" ? "posts" : "spaces")}
+                className={`-mr-[2px] rounded-t-md border-2 border-b-0  py-1 px-2  ${
+                  view === "posts"
+                    ? "z-10 border-accent-blue bg-bg-blue font-bold text-accent-blue"
+                    : "bg-white text-grey-35"
+                }`}
+              >
+                Posts
+              </button>
+              <button
+                onClick={() => setView(view === "spaces" ? "posts" : "spaces")}
+                className={`rounded-t-md border-2 border-b-0  py-1 px-2 ${
+                  view === "spaces"
+                    ? "z-10 border-accent-blue bg-bg-blue font-bold text-accent-blue"
+                    : "bg-white text-grey-35"
+                }`}
+              >
+                Spaces
+              </button>
+            </div>
+            <hr className="border border-accent-blue" />
           </div>
-          <hr className="border border-accent-blue" />
+          {view === "posts" ? (
+            <StudioPosts id={query.studio_id as string} />
+          ) : (
+            <SpaceList
+              spaces={
+                data?.spaces_in_studios.map((s) => s.space_data as SpaceData) ||
+                []
+              }
+            />
+          )}
         </div>
-        {view === "posts" ? (
-          <StudioPosts id={query.studio_id as string} />
-        ) : (
-          <SpaceList
-            spaces={
-              data?.spaces_in_studios.map((s) => s.space_data as SpaceData) ||
-              []
-            }
-          />
-        )}
-      </div>
-    </SpaceProvider>
+      </SpaceProvider>
+    </>
   );
 }
 

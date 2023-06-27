@@ -85,7 +85,7 @@ export function CreateStudio(props: { username: string }) {
       />
       <Modal open={open} onClose={() => setOpen(false)}>
         <form
-          className="z-20 flex flex-col gap-8"
+          className="flex flex-col gap-8"
           onSubmit={async (e) => {
             if (!authToken) return;
             e.preventDefault();
