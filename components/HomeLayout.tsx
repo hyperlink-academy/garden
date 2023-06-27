@@ -66,7 +66,7 @@ const StudiosList = (props: { username: string }) => {
 
             {studios?.map((s) => (
               <Link href={`/studio/${s.id}`} key={s.id}>
-                <Popover.Close className="text-left hover:text-accent-blue">
+                <Popover.Close className="w-full py-1 px-2 text-left text-grey-35 hover:bg-bg-blue">
                   {s.name}
                 </Popover.Close>
               </Link>

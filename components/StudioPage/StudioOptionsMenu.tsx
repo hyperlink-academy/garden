@@ -26,20 +26,20 @@ export function StudioOptionsMenu(props: { id: string }) {
         </Popover.Trigger>
         <Popover.Portal>
           <Popover.Content
-            className="w-56 rounded-md border-2 border-grey-80 bg-white p-2 drop-shadow-md"
+            className="z-20 flex w-fit flex-col rounded-md border-2 border-grey-80 bg-white p-2 drop-shadow-md"
             sideOffset={8}
           >
             <button
-              className="w-full py-1 px-2 text-right text-grey-35 hover:bg-bg-blue"
+              className="py-1 px-2 text-right text-grey-35 hover:bg-bg-blue"
               onClick={() => {
                 setInviteModalOpen(true);
                 setOpen(false);
               }}
             >
-              Invite members
+              Invite Members
             </button>
             <button
-              className="w-full py-1 px-2 text-right text-grey-35 hover:bg-bg-blue"
+              className="py-1 px-2 text-right text-grey-35 hover:bg-bg-blue"
               onClick={() => setStudioSettingsModalOpen(true)}
             >
               Studio Settings

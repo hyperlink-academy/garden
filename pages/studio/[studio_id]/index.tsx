@@ -4,6 +4,8 @@ import { SpaceData, SpaceList } from "components/SpacesList";
 import { AddSpace } from "components/StudioPage/AddSpace";
 import { StudioOptionsMenu } from "components/StudioPage/StudioOptionsMenu";
 import { StudioPosts } from "components/StudioPosts";
+import { useAuth } from "hooks/useAuth";
+import { useMutations } from "hooks/useReplicache";
 import { useStudioData } from "hooks/useStudioData";
 import { GetStaticPropsContext, InferGetStaticPropsType } from "next";
 import Head from "next/head";
@@ -13,6 +15,8 @@ import { useState } from "react";
 type Props = InferGetStaticPropsType<typeof getStaticProps>;
 export default function StudioPage(props: Props) {
   let { query } = useRouter();
+  let { authorized } = useMutations();
+  let { session } = useAuth();
 
   let id = query.studio_id as string;
   let { data } = useStudioData(id, props.data);
@@ -27,10 +31,15 @@ export default function StudioPage(props: Props) {
         <div className="flex flex-col gap-4">
           <div className="flex flex-row justify-between">
             <h1>{data?.name}</h1>
-            <div className="flex flex-row items-center gap-2">
-              <AddSpace id={id} />
-              <StudioOptionsMenu id={id} />
-            </div>
+            {/* TODO - replace this with updated 'authorized' in useMutations() */}
+            {data?.members_in_studios.find(
+              (m) => m.member === session?.user?.id
+            ) && (
+              <div className="flex flex-row items-center gap-2">
+                <AddSpace id={id} />
+                <StudioOptionsMenu id={id} />
+              </div>
+            )}
           </div>
           <p>{data?.description}</p>
           <div className="flex flex-col">
