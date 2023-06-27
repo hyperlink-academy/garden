@@ -62,7 +62,7 @@ const StudiosList = (props: { username: string }) => {
           >
             <Popover.Arrow className="fill-grey-80 stroke-grey-80" />
 
-            {studios.map((s) => (
+            {studios?.map((s) => (
               <Link href={`/studio/${s.id}`} key={s.id}>
                 <Popover.Close>{s.name}</Popover.Close>
               </Link>

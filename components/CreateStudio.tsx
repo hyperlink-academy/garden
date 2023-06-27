@@ -13,7 +13,7 @@ let wierd_studios = [
   "Black Mountain College",
   "Roke",
   "Starfleet Academy",
-  "Xavier's School for Gifted Youngsters}",
+  "Xavier's School for Gifted Youngsters",
 ];
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;

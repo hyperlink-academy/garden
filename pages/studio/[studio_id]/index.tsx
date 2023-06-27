@@ -27,15 +27,30 @@ export default function StudioPage(props: Props) {
             <StudioOptionsMenu id={id} />
           </div>
         </div>
-        {data?.description}
+        <p>{data?.description}</p>
         <div className="flex flex-col">
-          <button
-            onClick={() => setView(view === "spaces" ? "posts" : "spaces")}
-            className={`w-fit self-end rounded-t-md border-2 border-b-0 border-accent-blue bg-bg-blue py-1 px-2 font-bold text-accent-blue
-            `}
-          >
-            {view === "spaces" ? "Posts" : "Spaces"}
-          </button>
+          <div className="flex self-end">
+            <button
+              onClick={() => setView(view === "spaces" ? "posts" : "spaces")}
+              className={`-mr-[2px] rounded-t-md border-2 border-b-0  py-1 px-2  ${
+                view === "posts"
+                  ? "z-10 border-accent-blue bg-bg-blue font-bold text-accent-blue"
+                  : "bg-white text-grey-35"
+              }`}
+            >
+              Posts
+            </button>
+            <button
+              onClick={() => setView(view === "spaces" ? "posts" : "spaces")}
+              className={`rounded-t-md border-2 border-b-0  py-1 px-2 ${
+                view === "spaces"
+                  ? "z-10 border-accent-blue bg-bg-blue font-bold text-accent-blue"
+                  : "bg-white text-grey-35"
+              }`}
+            >
+              Spaces
+            </button>
+          </div>
           <hr className="border border-accent-blue" />
         </div>
         {view === "posts" ? (
