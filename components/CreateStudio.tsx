@@ -33,6 +33,7 @@ export const StudioForm = ({
         <input
           placeholder={example_studio + "..."}
           className="w-full"
+          maxLength={64}
           value={formState.name}
           onChange={(e) => {
             let value = e.currentTarget.value;
@@ -42,6 +43,7 @@ export const StudioForm = ({
             }));
           }}
         />
+        <div className="text-xs italic">{formState.name.length}/64</div>
       </div>
 
       <div className="flex flex-col gap-2">
@@ -59,7 +61,6 @@ export const StudioForm = ({
             }));
           }}
         />
-
         <div className="text-xs italic">{formState.description.length}/256</div>
       </div>
     </>
@@ -84,7 +85,7 @@ export function CreateStudio(props: { username: string }) {
       />
       <Modal open={open} onClose={() => setOpen(false)}>
         <form
-          className="flex flex-col gap-8"
+          className="z-20 flex flex-col gap-8"
           onSubmit={async (e) => {
             if (!authToken) return;
             e.preventDefault();

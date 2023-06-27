@@ -33,7 +33,7 @@ export const HomeHeader = () => {
   return (
     <div className="HomeHeader pwa-padding sticky top-0 z-10 m-auto  flex w-full max-w-4xl flex-row justify-between bg-white py-2 px-2">
       <Link href={myStudioName ? `/s/${myStudioName}` : "/"}>
-        <span className="flex flex-row items-center font-bold text-grey-35">
+        <span className="flex flex-row items-center font-bold text-grey-35 hover:text-accent-blue">
           <img src="/android-chrome-192x192.png" width={32} className="-mr-1" />
           ome
         </span>
@@ -52,19 +52,23 @@ const StudiosList = (props: { username: string }) => {
     <>
       <Popover.Root>
         <Popover.Trigger>
-          <button className="font-bold text-grey-35">Studios</button>
+          <button className="font-bold text-grey-35 hover:text-accent-blue">
+            Studios
+          </button>
         </Popover.Trigger>
 
         <Popover.Portal>
           <Popover.Content
-            className="flex max-w-md flex-col gap-2 rounded-md border-2 border-grey-80 bg-white p-2 drop-shadow-md"
+            className="z-20 flex max-w-xs flex-col gap-2 rounded-md border-2 border-grey-80 bg-white p-2 drop-shadow-md"
             sideOffset={-4}
           >
             <Popover.Arrow className="fill-grey-80 stroke-grey-80" />
 
             {studios?.map((s) => (
               <Link href={`/studio/${s.id}`} key={s.id}>
-                <Popover.Close>{s.name}</Popover.Close>
+                <Popover.Close className="text-left hover:text-accent-blue">
+                  {s.name}
+                </Popover.Close>
               </Link>
             ))}
             <CreateStudio username={props.username} />
