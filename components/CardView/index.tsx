@@ -38,7 +38,10 @@ import { useUndoableState } from "hooks/useUndoableState";
 import { Fact } from "data/Facts";
 import { getAndUploadFile } from "src/getAndUploadFile";
 import { useReactions } from "hooks/useReactions";
+import { useSpaceData } from "hooks/useSpaceData";
+import { spaceAPI } from "backend/lib/api";
 
+const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 const borderStyles = (args: { member: boolean }) => {
   switch (true) {
     //styles can be found is global.css
@@ -316,29 +319,69 @@ const CardMoreOptionsMenu = (props: {
   referenceFactID?: string;
   onDelete?: () => void;
 }) => {
-  let { authorized, mutate, action } = useMutations();
+  let spaceID = useSpaceID();
+  let { data } = useSpaceData(spaceID);
+  let { identityData } = useAuth();
+  let isStudioMate = data?.spaces_in_studios.find((studio) =>
+    identityData?.members_in_studios.find(
+      (memberStudio) => memberStudio.studios?.id === studio.studio
+    )
+  );
+
+  let { authToken } = useAuth();
+  let { authorized } = useMutations();
   let memberName = useIndex.eav(props.entityID, "member/name");
   let [areYouSureCardDeletionModalOpen, setAreYouSureCardDeletionModalOpen] =
     useState(false);
+  if (!!memberName) return null;
+  if (!authorized && !isStudioMate) return null;
 
-  let { query: q } = useRouter();
-
-  return !authorized || !!memberName ? null : (
+  return (
     <Menu as="div" className="pointer-events-auto relative">
       <Menu.Button className={` pt-[6px]`}>
         <MoreOptionsTiny />
       </Menu.Button>
       <MenuContainer>
-        <MenuItem
-          onClick={() => {
-            setAreYouSureCardDeletionModalOpen(true);
-          }}
-        >
-          <p className="font-bold text-accent-red">Delete Card</p>
-          <div className="text-accent-red">
-            <Delete />
-          </div>
-        </MenuItem>
+        {authorized && (
+          <MenuItem
+            onClick={() => {
+              setAreYouSureCardDeletionModalOpen(true);
+            }}
+          >
+            <p className="font-bold text-accent-red">Delete Card</p>
+            <div className="text-accent-red">
+              <Delete />
+            </div>
+          </MenuItem>
+        )}
+        {isStudioMate && (
+          <MenuItem
+            onClick={async () => {
+              if (
+                !isStudioMate ||
+                !authToken ||
+                !isStudioMate.studios ||
+                !isStudioMate.space
+              ) {
+                console.log("wat");
+                return;
+              }
+              let data = await spaceAPI(
+                `${WORKER_URL}/space/${isStudioMate.studios.do_id}`,
+                "post_feed_route",
+                {
+                  authToken: authToken,
+                  content: "Hello World",
+                  spaceID: isStudioMate.space,
+                  cardEntity: props.entityID,
+                }
+              );
+              console.log(data);
+            }}
+          >
+            Highlight this card bb
+          </MenuItem>
+        )}
       </MenuContainer>
       <AreYouSureCardDeletionModal
         open={areYouSureCardDeletionModalOpen}

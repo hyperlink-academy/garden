@@ -6,6 +6,7 @@ import {
   useSupabaseClient,
 } from "@supabase/auth-helpers-react";
 import { createBrowserSupabaseClient } from "@supabase/auth-helpers-nextjs";
+import { useIdentityData } from "./useIdentityData";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 
@@ -23,9 +24,13 @@ export const AuthProvider: React.FC<React.PropsWithChildren<unknown>> = (
 export const useAuth = () => {
   const supabaseClient = useSupabaseClient();
   let session = useSession();
+  let { data: identityData } = useIdentityData(
+    session?.user?.user_metadata.username
+  );
 
   return useMemo(
     () => ({
+      identityData,
       authToken: !session
         ? null
         : {
@@ -69,6 +74,6 @@ export const useAuth = () => {
         });
       },
     }),
-    [session, supabaseClient.auth]
+    [session, supabaseClient.auth, identityData]
   );
 };

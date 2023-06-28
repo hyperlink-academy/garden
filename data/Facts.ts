@@ -27,6 +27,7 @@ type Value<A extends AttributeName> = Attribute[A] extends {
   ? Attribute[A]["union/value"][number]
   : {
       feed_post: string;
+      "post/attached-card": { space_do_id: string; cardEntity: string };
       union: never;
       timestamp: TimestampeType;
       string: string;

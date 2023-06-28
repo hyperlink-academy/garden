@@ -84,7 +84,7 @@ export const BigCardBody = (
                   section={props.data.member ? "member/name" : "card/title"}
                   placeholder="Untitled"
                   previewOnly={!editing || !!props.data.member}
-                  className={`cardPreviewTitle text-md bg-accent-blue font-bold ${
+                  className={`cardPreviewTitle text-md font-bold ${
                     props.data.isMember ? "w-fit text-white" : "text-grey-35"
                   } ${
                     props.data.imageUrl &&
@@ -148,7 +148,7 @@ export const BigCardBody = (
                   placeholder={editing ? "write something..." : ""}
                   entityID={props.entityID}
                   previewOnly={!editing}
-                  className={`cardPreviewDefaultTextContent truncate whitespace-pre-wrap bg-accent-blue leading-tight ${
+                  className={`cardPreviewDefaultTextContent truncate whitespace-pre-wrap leading-tight ${
                     !props.data.imageUrl ? "" : ""
                   } ${props.data.isMember ? "px-2 " : ""} `}
                   section={"card/content"}

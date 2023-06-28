@@ -15,7 +15,7 @@ export const get_space_data_route = makeRoute({
     let { data } = await supabase
       .from("space_data")
       .select(
-        `*, owner:identity_data!space_data_owner_fkey(*), spaces_in_studios(*)`
+        `*, owner:identity_data!space_data_owner_fkey(*), spaces_in_studios(*, studios(do_id))`
       )
       .eq("do_id", msg.spaceID)
       .single();
