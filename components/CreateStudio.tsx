@@ -8,12 +8,13 @@ import { Modal } from "./Layout";
 import Router from "next/router";
 import { useIdentityData } from "hooks/useIdentityData";
 
-let wierd_studios = [
+let weird_studios = [
   "Bauhaus",
   "Black Mountain College",
-  "Roke",
+  "Roke School of Wizardry",
   "Starfleet Academy",
   "Xavier's School for Gifted Youngsters",
+  "Summerhill School",
 ];
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
@@ -25,7 +26,7 @@ export const StudioForm = ({
   formState: FormState;
   setFormState: React.Dispatch<React.SetStateAction<FormState>>;
 }) => {
-  let example_studio = useRandomValue(wierd_studios);
+  let example_studio = useRandomValue(weird_studios);
   return (
     <>
       <div className="flex flex-col gap-2">

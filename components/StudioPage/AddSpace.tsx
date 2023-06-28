@@ -32,18 +32,22 @@ export function AddSpace(props: { id: string }) {
   return (
     <>
       <ButtonTertiary
-        content={"Add a space"}
+        content={"Add a Space"}
         onClick={() => setOpen(true)}
         icon={<SpaceCreate />}
       />
       <Modal open={open} onClose={() => setOpen(false)}>
         {state === "normal" ? (
           <>
+            <h2 className="text-center">
+              Add a Space to <span>{data?.name}</span>
+            </h2>
             <p className="text-center">
-              When you link a space to a studio, your studiomates will be able
-              to cheer you on by <b>commenting</b>, <b>reacting</b>, and{" "}
-              <b>highlighting cards</b> in the space that they think are
-              amazing!
+              Studio members will be able to <b>post</b> about the Space and{" "}
+              <b>highlight cards</b> they appreciate!
+            </p>
+            <p className="text-center">
+              They&apos;ll still need an invite to join a Space.
             </p>
             <button
               className="rounded-md border-2 border-grey-80 py-3 px-4 hover:border-accent-blue hover:bg-bg-blue"
@@ -51,10 +55,9 @@ export function AddSpace(props: { id: string }) {
                 setState("add-new");
               }}
             >
-              <h3> Link a New Space</h3>
-              <p className="text-grey-35">
-                Create a brand new space and link it to {data?.name}. It will
-                also appear in your Homepage.
+              <h3>New Space</h3>
+              <p className="italic text-grey-35">
+                Create a brand new Space; it will also appear in your Homepage
               </p>
             </button>
 
@@ -64,12 +67,9 @@ export function AddSpace(props: { id: string }) {
                 setState("add-existing");
               }}
             >
-              <h3> Link an Existing Space</h3>
-              <p className="text-grey-35">
-                Link a space you’ve already made to Learning Anti-Book Club.
-              </p>
-              <p className="text-grey-35">
-                Spaces can be linked to multiple Studios!
+              <h3>Existing Space</h3>
+              <p className="italic text-grey-35">
+                Spaces can be linked to multiple Studios
               </p>
             </button>
           </>
