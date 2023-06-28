@@ -19,7 +19,7 @@ export const HomeLayout = (props: {
         <HomeHeader />
         <div className="outline-b-0  -mx-0.5 h-3 rounded-t-[8px] border-2 border-b-0 border-grey-80 bg-background" />
       </div>
-      <div className="bg-background px-2 pt-2 ">
+      <div className="bg-background p-4">
         <div className="m-auto max-w-3xl">{props.children}</div>
       </div>
     </div>

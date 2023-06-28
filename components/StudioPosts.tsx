@@ -130,12 +130,13 @@ const Post = (props: { entityID: string; studioID: string }) => {
     return <NewSpacePost {...props} spaceID={attachedSpaces[0]?.value} />;
   return (
     <div className="flex flex-col gap-2 rounded-md border bg-white p-4">
-      {creatorName && <div className="w-fit border">{creatorName?.value}</div>}
-      {type?.value}
+      {creatorName && (
+        <div className="w-fit italic text-grey-35">{creatorName?.value}</div>
+      )}
+      {/* {type?.value} */}
       {content?.value}
       {attachedSpaces && attachedSpaces?.length > 0 && (
-        <div className="flex flex-row gap-1 border p-2">
-          <span>attached spaces:</span>
+        <div className="flex gap-4">
           {attachedSpaces?.map((space) => {
             let spaceData = data?.spaces_in_studios.find(
               (s) => s.space === space.value
@@ -144,8 +145,20 @@ const Post = (props: { entityID: string; studioID: string }) => {
               <Link
                 href={`/s/${spaceData?.space_data?.owner.username}/s/${spaceData?.space_data?.name}`}
                 key={spaceData?.space}
+                className="w-fit rounded-md"
               >
-                {spaceData?.space_data?.display_name}
+                <div className="flex items-center gap-2">
+                  <DoorImage
+                    width="32"
+                    image={spaceData?.space_data?.image}
+                    default_space_image={
+                      spaceData?.space_data?.default_space_image
+                    }
+                  />
+                  <span className="text-lg font-bold text-accent-blue">
+                    {spaceData?.space_data?.display_name}
+                  </span>
+                </div>
               </Link>
             );
           })}
