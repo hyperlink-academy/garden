@@ -12,7 +12,8 @@ import { decodeTime, ulid } from "src/ulid";
 import { ButtonPrimary } from "./Buttons";
 import { AddReaction, ReactionList, Reactions } from "./CardView/Reactions";
 import { DoorImage } from "./Doors";
-import { ReactionAdd, Send } from "./Icons";
+import { Note, ReactionAdd, Send } from "./Icons";
+import { StudioPostFullScreen } from "./StudioPostFullScreen";
 import { Textarea } from "./Textarea";
 
 export function StudioPosts(props: { id: string }) {
@@ -119,7 +120,7 @@ export function StudioPosts(props: { id: string }) {
   );
 }
 
-const Post = (props: { entityID: string; studioID: string }) => {
+export function Post(props: { entityID: string; studioID: string }) {
   let { data } = useStudioData(props.studioID);
   let attachedSpaces =
     useIndex.eav(props.entityID, "post/attached-space") || [];
@@ -170,24 +171,47 @@ const Post = (props: { entityID: string; studioID: string }) => {
 
         {attachedCard && <RemoteCardData {...attachedCard.value} />}
       </div>
-      <div className="flex flex-row gap-2">
+      <div className="-mt-3 ml-4 flex flex-row justify-between ">
         <PostReactions entityID={props.entityID} />
+        <PostComments entityID={props.entityID} />
       </div>
     </div>
   );
-};
+}
 
 const RemoteCardData = (props: { space_do_id: string; cardEntity: string }) => {
   let { data } = useRemoteCardData(props.space_do_id, props.cardEntity);
   return <RemoteCard {...data} />;
 };
 
+function PostComments(props: { entityID: string }) {
+  let messagesCount = useIndex.eav(props.entityID, "discussion/message-count");
+  let [open, setOpen] = useState(false);
+  return (
+    <>
+      <button
+        className="flex flex-row gap-1 rounded-md border border-accent-blue bg-accent-blue p-1 text-white hover:bg-bg-blue hover:text-accent-blue"
+        onClick={() => setOpen(true)}
+      >
+        {messagesCount?.value || 0}
+        <Note />
+      </button>
+      {open && (
+        <StudioPostFullScreen
+          entityID={props.entityID}
+          onClose={() => setOpen(false)}
+        />
+      )}
+    </>
+  );
+}
+
 const PostReactions = (props: { entityID: string }) => {
   let { authorized } = useMutations();
   let [reactionPickerOpen, setReactionPickerOpen] = useState(false);
   if (!authorized) return null;
   return (
-    <div className="-mt-2 ml-4 flex flex-wrap justify-start gap-2">
+    <div className="flex flex-wrap justify-start gap-2">
       <ReactionList entityID={props.entityID} />
       <Popover.Root
         onOpenChange={() => setReactionPickerOpen(!reactionPickerOpen)}

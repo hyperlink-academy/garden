@@ -129,6 +129,13 @@ textarea {
   @apply opacity-70;
 }
 
+.dark-overlay {
+  @apply fixed;
+  @apply inset-0;
+  @apply bg-grey-15;
+  @apply opacity-90;
+}
+
 .lightBorder {
   @apply border;
   @apply border-grey-80;
