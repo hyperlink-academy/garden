@@ -9,11 +9,9 @@ import { useAuth } from "hooks/useAuth";
 import { spacePath } from "hooks/utils";
 import { EditSpaceModal } from "./CreateSpace";
 import { useSpaceData } from "hooks/useSpaceData";
-import { Database } from "backend/lib/database.types";
+export type { SpaceData } from "backend/routes/get_space_data";
+import type { SpaceData } from "backend/routes/get_space_data";
 
-export type SpaceData = Database["public"]["Tables"]["space_data"]["Row"] & {
-  owner: { username: string; id: string; studio: string };
-};
 export const SpaceList = (props: { spaces: Array<SpaceData> }) => {
   return (
     <div>
@@ -60,7 +58,7 @@ const Space = (props: SpaceData) => {
   return (
     <div className="flex w-min flex-col gap-4">
       <div className="-ml-2 grid grid-cols-[max-content,max-content] items-end gap-1 ">
-        <Link href={`${spacePath(data?.owner.username, data?.name)}`}>
+        <Link href={`${spacePath(data?.owner.username, data?.name || "")}`}>
           <DoorImage
             display_name={data?.display_name}
             image={data?.image}
