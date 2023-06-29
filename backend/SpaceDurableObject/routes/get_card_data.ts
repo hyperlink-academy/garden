@@ -13,8 +13,23 @@ export const get_card_data_route = makeRoute({
       msg.cardEntity,
       "card/content"
     );
+    let creator = await env.factStore.scanIndex.eav(
+      msg.cardEntity,
+      "card/created-by"
+    );
+    let creatorName;
+    if (creator)
+      creatorName = await env.factStore.scanIndex.eav(
+        creator.value.value,
+        "member/name"
+      );
+
     return {
-      data: { title: title?.value, content: content?.value },
+      data: {
+        title: title?.value,
+        content: content?.value,
+        creator: creatorName?.value,
+      },
     };
   },
 });

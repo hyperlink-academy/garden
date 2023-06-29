@@ -1,6 +1,5 @@
 import { spaceAPI } from "backend/lib/api";
 import { ButtonLink, ButtonPrimary } from "components/Buttons";
-import { AddExistingCard } from "components/CardStack";
 import { DotLoader } from "components/DotLoader";
 import { Checkmark, Note } from "components/Icons";
 import { Modal } from "components/Layout";
@@ -9,7 +8,7 @@ import { Textarea } from "components/Textarea";
 import { useAuth } from "hooks/useAuth";
 import { useIndex, useSpaceID } from "hooks/useReplicache";
 import { useSpaceData } from "hooks/useSpaceData";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export function HighlightCard(props: { entityID: string }) {
@@ -121,5 +120,14 @@ export function HighlightCard(props: { entityID: string }) {
 const LocalRemoteCard = (props: { entityID: string }) => {
   let title = useIndex.eav(props.entityID, "card/title");
   let content = useIndex.eav(props.entityID, "card/content");
-  return <RemoteCard title={title?.value} content={content?.value} />;
+  let creator = useIndex.eav(props.entityID, "card/created-by");
+  let creatorName = useIndex.eav(creator?.value.value || null, "member/name");
+
+  return (
+    <RemoteCard
+      title={title?.value}
+      content={content?.value}
+      creator={creatorName?.value}
+    />
+  );
 };

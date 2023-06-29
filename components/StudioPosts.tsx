@@ -1,6 +1,4 @@
 import * as Popover from "@radix-ui/react-popover";
-import { ref } from "data/Facts";
-import { useAuth } from "hooks/useAuth";
 import { useRemoteCardData } from "hooks/useRemoteCardData";
 import { useIndex, useMutations } from "hooks/useReplicache";
 import { useSpaceData } from "hooks/useSpaceData";
@@ -8,7 +6,7 @@ import { useStudioData } from "hooks/useStudioData";
 import Link from "next/link";
 import { useState } from "react";
 import { decodeTime } from "src/ulid";
-import { AddReaction, ReactionList, Reactions } from "./CardView/Reactions";
+import { AddReaction, ReactionList } from "./CardView/Reactions";
 import { CreateStudioPost } from "./CreateStudioPost";
 import { DoorImage } from "./Doors";
 import { Note, ReactionAdd } from "./Icons";
@@ -95,6 +93,7 @@ export function Post(props: { entityID: string; studioID: string }) {
 
 const RemoteCardData = (props: { space_do_id: string; cardEntity: string }) => {
   let { data } = useRemoteCardData(props.space_do_id, props.cardEntity);
+  if (!data) return null;
   return <RemoteCard {...data} />;
 };
 
@@ -157,13 +156,14 @@ const PostReactions = (props: { entityID: string }) => {
 };
 
 export const RemoteCard = (props: {
-  title?: string;
-  content?: string;
-  creator?: string;
+  title: string | undefined;
+  content: string | undefined;
+  creator: string | undefined;
 }) => (
   <div className="w-36 rounded-md border border-grey-80 bg-white p-3">
     <h4>{props?.title}</h4>
     <p>{props?.content}</p>
+    <p className="text-xs italic text-grey-55">by {props.creator}</p>
   </div>
 );
 
