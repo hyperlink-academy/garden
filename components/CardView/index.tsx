@@ -38,10 +38,8 @@ import { useUndoableState } from "hooks/useUndoableState";
 import { Fact } from "data/Facts";
 import { getAndUploadFile } from "src/getAndUploadFile";
 import { useReactions } from "hooks/useReactions";
-import { useSpaceData } from "hooks/useSpaceData";
-import { spaceAPI } from "backend/lib/api";
+import { HighlightCard } from "./HighlightCard";
 
-const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 const borderStyles = (args: { member: boolean }) => {
   switch (true) {
     //styles can be found is global.css
@@ -116,8 +114,8 @@ export const CardView = (props: {
           max-w-3xl grow
           flex-col items-stretch overflow-y-scroll
           ${borderStyles({
-            member: !!memberName,
-          })}
+          member: !!memberName,
+        })}
             member: !!memberName,
           })}
           `}
@@ -160,8 +158,8 @@ export const CardView = (props: {
             overflow-x-hidden
             overflow-y-scroll
             ${contentStyles({
-              member: !!memberName,
-            })}
+            member: !!memberName,
+          })}
             `}
         >
           <CardContent {...props} />
@@ -229,11 +227,14 @@ export const CardContent = (props: {
               ) : null}
             </div>
 
-            <CardMoreOptionsMenu
-              onDelete={props.onDelete}
-              entityID={props.entityID}
-              referenceFactID={props?.referenceFactID}
-            />
+            <div className="flex flex-row gap-2">
+              <HighlightCard entityID={props.entityID} />
+              <CardMoreOptionsMenu
+                onDelete={props.onDelete}
+                entityID={props.entityID}
+                referenceFactID={props?.referenceFactID}
+              />
+            </div>
           </div>
         ) : (
           // member card offset only if authed
@@ -319,22 +320,12 @@ const CardMoreOptionsMenu = (props: {
   referenceFactID?: string;
   onDelete?: () => void;
 }) => {
-  let spaceID = useSpaceID();
-  let { data } = useSpaceData(spaceID);
-  let { identityData } = useAuth();
-  let isStudioMate = data?.spaces_in_studios.find((studio) =>
-    identityData?.members_in_studios.find(
-      (memberStudio) => memberStudio.studios?.id === studio.studio
-    )
-  );
-
-  let { authToken } = useAuth();
   let { authorized } = useMutations();
   let memberName = useIndex.eav(props.entityID, "member/name");
   let [areYouSureCardDeletionModalOpen, setAreYouSureCardDeletionModalOpen] =
     useState(false);
   if (!!memberName) return null;
-  if (!authorized && !isStudioMate) return null;
+  if (!authorized) return null;
 
   return (
     <Menu as="div" className="pointer-events-auto relative">
@@ -352,34 +343,6 @@ const CardMoreOptionsMenu = (props: {
             <div className="text-accent-red">
               <Delete />
             </div>
-          </MenuItem>
-        )}
-        {isStudioMate && (
-          <MenuItem
-            onClick={async () => {
-              if (
-                !isStudioMate ||
-                !authToken ||
-                !isStudioMate.studios ||
-                !isStudioMate.space
-              ) {
-                console.log("wat");
-                return;
-              }
-              let data = await spaceAPI(
-                `${WORKER_URL}/space/${isStudioMate.studios.do_id}`,
-                "post_feed_route",
-                {
-                  authToken: authToken,
-                  content: "Hello World",
-                  spaceID: isStudioMate.space,
-                  cardEntity: props.entityID,
-                }
-              );
-              console.log(data);
-            }}
-          >
-            Highlight this card bb
           </MenuItem>
         )}
       </MenuContainer>
@@ -628,9 +591,8 @@ export const SectionAdder = (props: {
       {/* END LINKED CARD ADDER */}
       {/* DATE ADDER */}
       <button
-        className={`${
-          date || props.dateEditing ? toggledOnStyle : toggledOffStyle
-        } `}
+        className={`${date || props.dateEditing ? toggledOnStyle : toggledOffStyle
+          } `}
         onClick={() => {
           if (date !== null) {
             document
@@ -655,11 +617,10 @@ export const SectionAdder = (props: {
       >
         <Popover.Trigger className="flex items-center">
           <button
-            className={`${toggledOffStyle} ${
-              !reactionPickerOpen
+            className={`${toggledOffStyle} ${!reactionPickerOpen
                 ? ""
                 : "rounded-md border border-accent-blue p-0.5 text-accent-blue"
-            }`}
+              }`}
           >
             <ReactionAdd />
           </button>

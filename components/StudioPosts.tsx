@@ -40,17 +40,16 @@ export function StudioPosts(props: { id: string }) {
                 let spaceID = s.space;
                 return (
                   <button
-                    className={`rounded-md border py-1 px-2 ${
-                      selectedSpaces.includes(spaceID)
+                    className={`rounded-md border py-1 px-2 ${selectedSpaces.includes(spaceID)
                         ? "border-accent-blue bg-accent-blue text-white"
                         : "border-grey-80 hover:border-accent-blue hover:bg-bg-blue"
-                    }`}
+                      }`}
                     key={spaceID}
                     onClick={() =>
                       selectedSpaces.includes(spaceID)
                         ? setSelectedSpace(
-                            selectedSpaces.filter((space) => space !== s.space)
-                          )
+                          selectedSpaces.filter((space) => space !== s.space)
+                        )
                         : setSelectedSpace([...selectedSpaces, spaceID])
                     }
                   >
@@ -130,54 +129,50 @@ const Post = (props: { entityID: string; studioID: string }) => {
     return <NewSpacePost {...props} spaceID={attachedSpaces[0]?.value} />;
   return (
     <div className="flex flex-col gap-2 rounded-md border bg-white p-4">
-      {creatorName && (
-        <div className="w-fit italic text-grey-35">{creatorName?.value}</div>
-      )}
-      {/* {type?.value} */}
+      <div className="flex flex-row gap-2 font-bold text-grey-55">
+        {creatorName && <span className="italic ">{creatorName?.value}</span>}
+        {attachedSpaces && attachedSpaces?.length > 0 && (
+          <span className="flex flex-row gap-2">
+            highlighted
+            {attachedSpaces?.map((space) => {
+              let spaceData = data?.spaces_in_studios.find(
+                (s) => s.space === space.value
+              );
+              return (
+                <Link
+                  href={`/s/${spaceData?.space_data?.owner.username}/s/${spaceData?.space_data?.name}`}
+                  key={spaceData?.space}
+                  className="font-bold text-accent-blue"
+                >
+                  {spaceData?.space_data?.display_name}
+                </Link>
+              );
+            })}
+          </span>
+        )}
+      </div>
       {content?.value}
-      {attachedSpaces && attachedSpaces?.length > 0 && (
-        <div className="flex gap-4">
-          {attachedSpaces?.map((space) => {
-            let spaceData = data?.spaces_in_studios.find(
-              (s) => s.space === space.value
-            );
-            return (
-              <Link
-                href={`/s/${spaceData?.space_data?.owner.username}/s/${spaceData?.space_data?.name}`}
-                key={spaceData?.space}
-                className="w-fit rounded-md"
-              >
-                <div className="flex items-center gap-2">
-                  <DoorImage
-                    width="32"
-                    image={spaceData?.space_data?.image}
-                    default_space_image={
-                      spaceData?.space_data?.default_space_image
-                    }
-                  />
-                  <span className="text-lg font-bold text-accent-blue">
-                    {spaceData?.space_data?.display_name}
-                  </span>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-      )}
-      {attachedCard && <RemoteCard {...attachedCard.value} />}
+
+      {attachedCard && <RemoteCardData {...attachedCard.value} />}
     </div>
   );
 };
 
-const RemoteCard = (props: { space_do_id: string; cardEntity: string }) => {
+const RemoteCardData = (props: { space_do_id: string; cardEntity: string }) => {
   let { data } = useRemoteCardData(props.space_do_id, props.cardEntity);
-  return (
-    <div className="rounded-md border-2 p-3">
-      <h4>{data?.title}</h4>
-      <p>{data?.content}</p>
-    </div>
-  );
+  return <RemoteCard {...data} />;
 };
+
+export const RemoteCard = (props: {
+  title?: string;
+  content?: string;
+  creator?: string;
+}) => (
+  <div className="w-36 rounded-md border-2 border border-grey-80 bg-white p-3">
+    <h4>{props?.title}</h4>
+    <p>{props?.content}</p>
+  </div>
+);
 
 function NewSpacePost(props: {
   entityID: string;
