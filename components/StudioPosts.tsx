@@ -173,7 +173,7 @@ export function Post(props: { entityID: string; studioID: string }) {
       </div>
       <div className="-mt-3 ml-4 flex flex-row justify-between ">
         <PostReactions entityID={props.entityID} />
-        <PostComments entityID={props.entityID} />
+        <PostComments entityID={props.entityID} studioID={props.studioID} />
       </div>
     </div>
   );
@@ -184,7 +184,7 @@ const RemoteCardData = (props: { space_do_id: string; cardEntity: string }) => {
   return <RemoteCard {...data} />;
 };
 
-function PostComments(props: { entityID: string }) {
+function PostComments(props: { entityID: string; studioID: string }) {
   let messagesCount = useIndex.eav(props.entityID, "discussion/message-count");
   let [open, setOpen] = useState(false);
   return (
@@ -198,6 +198,7 @@ function PostComments(props: { entityID: string }) {
       </button>
       {open && (
         <StudioPostFullScreen
+          studioID={props.studioID}
           entityID={props.entityID}
           onClose={() => setOpen(false)}
         />
