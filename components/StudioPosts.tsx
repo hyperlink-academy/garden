@@ -1,3 +1,4 @@
+import * as Popover from "@radix-ui/react-popover";
 import { ref } from "data/Facts";
 import { useAuth } from "hooks/useAuth";
 import { useRemoteCardData } from "hooks/useRemoteCardData";
@@ -9,8 +10,9 @@ import { useState } from "react";
 import { generateKeyBetween } from "src/fractional-indexing";
 import { decodeTime, ulid } from "src/ulid";
 import { ButtonPrimary } from "./Buttons";
+import { AddReaction, ReactionList, Reactions } from "./CardView/Reactions";
 import { DoorImage } from "./Doors";
-import { Send } from "./Icons";
+import { ReactionAdd, Send } from "./Icons";
 import { Textarea } from "./Textarea";
 
 export function StudioPosts(props: { id: string }) {
@@ -40,16 +42,17 @@ export function StudioPosts(props: { id: string }) {
                 let spaceID = s.space;
                 return (
                   <button
-                    className={`rounded-md border py-1 px-2 ${selectedSpaces.includes(spaceID)
+                    className={`rounded-md border py-1 px-2 ${
+                      selectedSpaces.includes(spaceID)
                         ? "border-accent-blue bg-accent-blue text-white"
                         : "border-grey-80 hover:border-accent-blue hover:bg-bg-blue"
-                      }`}
+                    }`}
                     key={spaceID}
                     onClick={() =>
                       selectedSpaces.includes(spaceID)
                         ? setSelectedSpace(
-                          selectedSpaces.filter((space) => space !== s.space)
-                        )
+                            selectedSpaces.filter((space) => space !== s.space)
+                          )
                         : setSelectedSpace([...selectedSpaces, spaceID])
                     }
                   >
@@ -123,37 +126,53 @@ const Post = (props: { entityID: string; studioID: string }) => {
   let content = useIndex.eav(props.entityID, "card/content");
   let createdBy = useIndex.eav(props.entityID, "card/created-by");
   let creatorName = useIndex.eav(createdBy?.value.value || null, "member/name");
+
+  let date = new Date(decodeTime(props.entityID)).toLocaleDateString([], {
+    dateStyle: "short",
+  });
   let type = useIndex.eav(props.entityID, "post/type");
   let attachedCard = useIndex.eav(props.entityID, "post/attached-card");
   if (type?.value === "space_added")
-    return <NewSpacePost {...props} spaceID={attachedSpaces[0]?.value} />;
+    return (
+      <NewSpacePost
+        {...props}
+        spaceID={attachedSpaces[0]?.value}
+        createdAt={type.lastUpdated}
+      />
+    );
   return (
-    <div className="flex flex-col gap-2 rounded-md border bg-white p-4">
-      <div className="flex flex-row gap-2 font-bold text-grey-55">
-        {creatorName && <span className="italic ">{creatorName?.value}</span>}
-        {attachedSpaces && attachedSpaces?.length > 0 && (
-          <span className="flex flex-row gap-2">
-            highlighted
-            {attachedSpaces?.map((space) => {
-              let spaceData = data?.spaces_in_studios.find(
-                (s) => s.space === space.value
-              );
-              return (
-                <Link
-                  href={`/s/${spaceData?.space_data?.owner.username}/s/${spaceData?.space_data?.name}`}
-                  key={spaceData?.space}
-                  className="font-bold text-accent-blue"
-                >
-                  {spaceData?.space_data?.display_name}
-                </Link>
-              );
-            })}
-          </span>
-        )}
-      </div>
-      {content?.value}
+    <div className="flex flex-col">
+      <div className="text-right text-sm italic text-grey-55">{date}</div>
+      <div className="flex flex-col gap-2 rounded-md border border-grey-80 bg-white p-4">
+        <div className="flex flex-row gap-2 font-bold text-grey-55">
+          {creatorName && <span className="italic ">{creatorName?.value}</span>}
+          {attachedSpaces && attachedSpaces?.length > 0 && (
+            <span className="flex flex-row gap-2">
+              highlighted
+              {attachedSpaces?.map((space) => {
+                let spaceData = data?.spaces_in_studios.find(
+                  (s) => s.space === space.value
+                );
+                return (
+                  <Link
+                    href={`/s/${spaceData?.space_data?.owner.username}/s/${spaceData?.space_data?.name}`}
+                    key={spaceData?.space}
+                    className="font-bold text-accent-blue"
+                  >
+                    {spaceData?.space_data?.display_name}
+                  </Link>
+                );
+              })}
+            </span>
+          )}
+        </div>
+        {content?.value}
 
-      {attachedCard && <RemoteCardData {...attachedCard.value} />}
+        {attachedCard && <RemoteCardData {...attachedCard.value} />}
+      </div>
+      <div className="flex flex-row gap-2">
+        <PostReactions entityID={props.entityID} />
+      </div>
     </div>
   );
 };
@@ -163,12 +182,47 @@ const RemoteCardData = (props: { space_do_id: string; cardEntity: string }) => {
   return <RemoteCard {...data} />;
 };
 
+const PostReactions = (props: { entityID: string }) => {
+  let { authorized } = useMutations();
+  let [reactionPickerOpen, setReactionPickerOpen] = useState(false);
+  if (!authorized) return null;
+  return (
+    <div className="-mt-2 ml-4 flex flex-wrap justify-start gap-2">
+      <ReactionList entityID={props.entityID} />
+      <Popover.Root
+        onOpenChange={() => setReactionPickerOpen(!reactionPickerOpen)}
+      >
+        <Popover.Trigger className="flex items-center px-1">
+          <button
+            className={`rounded-md border border-grey-80 bg-white p-1 ${
+              reactionPickerOpen
+                ? "text-accent-blue"
+                : "text-grey-55 hover:text-accent-blue"
+            }`}
+          >
+            <ReactionAdd />
+          </button>
+        </Popover.Trigger>
+        <Popover.Portal>
+          <Popover.Content
+            sideOffset={8}
+            collisionPadding={{ right: 20 }}
+            className="-mt-[1px] max-w-[298px]"
+          >
+            <AddReaction entityID={props.entityID} />
+          </Popover.Content>
+        </Popover.Portal>
+      </Popover.Root>
+    </div>
+  );
+};
+
 export const RemoteCard = (props: {
   title?: string;
   content?: string;
   creator?: string;
 }) => (
-  <div className="w-36 rounded-md border-2 border border-grey-80 bg-white p-3">
+  <div className="w-36 rounded-md border border-grey-80 bg-white p-3">
     <h4>{props?.title}</h4>
     <p>{props?.content}</p>
   </div>
@@ -178,9 +232,12 @@ function NewSpacePost(props: {
   entityID: string;
   studioID: string;
   spaceID: string;
+  createdAt: string;
 }) {
-  let date = decodeTime(props.entityID);
   let { data: spaceData } = useSpaceData(props.spaceID);
+  let date = new Date(parseInt(props.createdAt)).toLocaleDateString([], {
+    dateStyle: "short",
+  });
   return (
     <Link href={`/s/${spaceData?.owner.username}/s/${spaceData?.name}`}>
       <div className="flex flex-row">
@@ -192,11 +249,14 @@ function NewSpacePost(props: {
           />
         </div>
 
-        <div className="-ml-6 w-96 self-end rounded-lg border border-grey-80 bg-white p-4 pl-8">
-          <h4>New Space!</h4>
-          <hr className="border-grey-80" />
-          <h3 className="text-accent-blue">{spaceData?.display_name}</h3>
-          <p>{spaceData?.description}</p>
+        <div className="mt-8 flex flex-col">
+          <div className="text-right text-sm italic text-grey-55">{date}</div>
+          <div className="-ml-6 w-96 self-end rounded-lg border border-grey-80 bg-white p-4 pl-8">
+            <h4>New Space!</h4>
+            <hr className="border-grey-80" />
+            <h3 className="text-accent-blue">{spaceData?.display_name}</h3>
+            <p>{spaceData?.description}</p>
+          </div>
         </div>
       </div>
     </Link>
