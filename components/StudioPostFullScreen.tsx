@@ -1,11 +1,11 @@
 import { Dialog } from "@headlessui/react";
-import { useMutations } from "hooks/useReplicache";
+import { useIndex, useMutations } from "hooks/useReplicache";
 import { useState } from "react";
 import { ulid } from "src/ulid";
 import { ButtonPrimary } from "./Buttons";
 import { Messages } from "./CardView/Discussion";
 import { Message } from "data/Messages";
-import { Send } from "./Icons";
+import { CloseLinedTiny, Send } from "./Icons";
 import { Post } from "./StudioPosts";
 import { Textarea } from "./Textarea";
 
@@ -42,6 +42,10 @@ function Comments(props: { entityID: string }) {
   let [newComment, setNewComment] = useState("");
 
   let { mutate, memberEntity, authorized } = useMutations();
+  let [reply, setReply] = useState<string | null>(null);
+
+  let replyMessage = useIndex.messageByID(reply);
+  let replyToName = useIndex.eav(replyMessage?.sender || null, "member/name");
 
   const send = async () => {
     if (!memberEntity || !newComment) return;
@@ -60,7 +64,23 @@ function Comments(props: { entityID: string }) {
   };
 
   return (
-    <div className="rounded-md border border-grey-80 bg-white p-3">
+    <div className="flex flex-col gap-2 rounded-md border border-grey-80 bg-white p-3">
+      <Messages entityID={props.entityID} isRoom={false} setReply={setReply} />
+
+      {reply && (
+        <div className="messageInputReply -mb-2">
+          <div className="flex items-start justify-between gap-2 rounded-md border border-grey-80 bg-white p-2 text-xs italic text-grey-55">
+            <div className="flex flex-col gap-[1px]">
+              <div className="font-bold"> {replyToName?.value}</div>
+              <div>{replyMessage?.content}</div>
+            </div>
+            <button className="" onClick={() => setReply(null)}>
+              <CloseLinedTiny />
+            </button>
+          </div>
+          <div className="ml-2 h-2 w-0 border border-grey-80 " />
+        </div>
+      )}
       {authorized && (
         <div className="flex flex-col gap-2">
           <Textarea
@@ -80,11 +100,6 @@ function Comments(props: { entityID: string }) {
           </div>
         </div>
       )}
-      <Messages
-        entityID={props.entityID}
-        isRoom={false}
-        setReply={(_reply) => {}}
-      />
     </div>
   );
 }
