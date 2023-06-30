@@ -8,33 +8,46 @@ import { Message } from "data/Messages";
 import { CloseLinedTiny, Send } from "./Icons";
 import { Post } from "./StudioPosts";
 import { Textarea } from "./Textarea";
+import { useRemoteCardData } from "hooks/useRemoteCardData";
+import { RenderedText } from "./Textarea/RenderedText";
+import { createPortal } from "react-dom";
 
 export function StudioPostFullScreen(props: {
   entityID: string;
   studioID: string;
   onClose: () => void;
 }) {
-  return (
+  let attachedCard = useIndex.eav(props.entityID, "post/attached-card");
+  return createPortal(
     <Dialog
       open={true}
       onClose={props.onClose}
-      className="fixed inset-0 z-30 overflow-y-hidden"
+      className="fixed inset-0 overflow-y-hidden"
     >
       <Dialog.Overlay className={"dark-overlay"} />
       <div
-        className={`
-        fixed
-              top-1/2 left-1/2 flex max-h-[calc(100%-32px)] w-[calc(100%-32px)]
-              max-w-md -translate-x-1/2 -translate-y-1/2
-              grid-flow-row
-              flex-col
-              gap-6 
-              `}
+        className={`fixed top-1/2 max-h-[calc(100%-32px)] w-full -translate-y-1/2 `}
       >
-        <Post entityID={props.entityID} studioID={props.studioID} />
-        <Comments entityID={props.entityID} />
+        <div className="no-scrollbar relative mx-auto flex w-fit max-w-full snap-x snap-mandatory items-stretch gap-8 overflow-x-scroll px-8">
+          <div className="flex w-[calc(100vw-32px)] max-w-screen-md flex-shrink-0 snap-center flex-col gap-8">
+            <Post entityID={props.entityID} studioID={props.studioID} />
+            <Comments entityID={props.entityID} />
+          </div>
+          {attachedCard && <PostBigView {...attachedCard.value} />}
+        </div>
       </div>
-    </Dialog>
+    </Dialog>,
+    document.body
+  );
+}
+
+function PostBigView(props: { space_do_id: string; cardEntity: string }) {
+  let { data } = useRemoteCardData(props.space_do_id, props.cardEntity);
+  return (
+    <div className="mt-5 flex w-[calc(100vw-32px)] max-w-screen-md flex-shrink-0 snap-center flex-col gap-6 bg-white p-4">
+      <h2>{data?.title}</h2>
+      <RenderedText text={data?.content || ""} />
+    </div>
   );
 }
 

@@ -48,7 +48,7 @@ export default function StudioPage(props: Props) {
                 onClick={() => setView(view === "spaces" ? "posts" : "spaces")}
                 className={`-mr-[2px] rounded-t-md border-2 border-b-0  py-1 px-2  ${
                   view === "posts"
-                    ? "z-10 border-accent-blue bg-bg-blue font-bold text-accent-blue"
+                    ? "border-accent-blue bg-bg-blue font-bold text-accent-blue"
                     : "bg-white text-grey-35"
                 }`}
               >
@@ -58,7 +58,7 @@ export default function StudioPage(props: Props) {
                 onClick={() => setView(view === "spaces" ? "posts" : "spaces")}
                 className={`rounded-t-md border-2 border-b-0  py-1 px-2 ${
                   view === "spaces"
-                    ? "z-10 border-accent-blue bg-bg-blue font-bold text-accent-blue"
+                    ? "border-accent-blue bg-bg-blue font-bold text-accent-blue"
                     : "bg-white text-grey-35"
                 }`}
               >

@@ -53,19 +53,25 @@ export function Post(props: { entityID: string; studioID: string }) {
         createdAt={type.lastUpdated}
       />
     );
+  let spaces = attachedSpaces.map((space) => {
+    return data?.spaces_in_studios.find((s) => s.space === space.value);
+  });
+  if (attachedCard)
+    spaces.push(
+      data?.spaces_in_studios.find(
+        (s) => s.space === attachedCard?.value.space_do_id
+      )
+    );
   return (
     <div className="flex flex-col">
       <div className="text-right text-sm italic text-grey-55">{date}</div>
       <div className="flex flex-col gap-2 rounded-md border border-grey-80 bg-white p-4">
         <div className="flex flex-row gap-2 font-bold text-grey-55">
           {creatorName && <span className="italic ">{creatorName?.value}</span>}
-          {attachedSpaces && attachedSpaces?.length > 0 && (
+          {spaces && spaces?.length > 0 && (
             <span className="flex flex-row gap-2">
               highlighted
-              {attachedSpaces?.map((space) => {
-                let spaceData = data?.spaces_in_studios.find(
-                  (s) => s.space === space.value
-                );
+              {spaces?.map((spaceData) => {
                 return (
                   <Link
                     href={`/s/${spaceData?.space_data?.owner.username}/s/${spaceData?.space_data?.name}`}
@@ -162,7 +168,6 @@ export const RemoteCard = (props: {
 }) => (
   <div className="w-36 rounded-md border border-grey-80 bg-white p-3">
     <h4>{props?.title}</h4>
-    <p>{props?.content}</p>
     <p className="text-xs italic text-grey-55">by {props.creator}</p>
   </div>
 );
