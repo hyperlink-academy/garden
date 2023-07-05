@@ -124,9 +124,7 @@ export const CardPreview = (
         className={`cardPreviewBorder select-none ${
           isUnread ? "unreadCardGlow" : ""
         } relative grow overflow-hidden ${borderStyles({ isMember })} ${
-          props.isSelected || (editing && props.editable && !isMember)
-            ? "selectedCardGlow"
-            : ""
+          props.isSelected || (editing && !isMember) ? "selectedCardGlow" : ""
         } ${props.isOver ? "rounded-[24px] shadow-[0_0_16px_0_#cccccc]" : ""}`}
         style={{ WebkitTapHighlightColor: "transparent" }}
       >

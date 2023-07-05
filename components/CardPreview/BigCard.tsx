@@ -39,7 +39,7 @@ export const BigCardBody = (
   return (
     <div
       {...listenersAndAttributes}
-      className={`CardPreviewContent flex h-full grow flex-row !bg-cover !bg-center !bg-no-repeat pl-2 text-sm ${
+      className={`CardPreview flex h-full grow flex-row !bg-cover !bg-center !bg-no-repeat pl-2 text-sm ${
         props.data.isMember ? "py-2 pr-2" : "py-2 pr-2"
       } `}
       style={{
@@ -50,6 +50,7 @@ export const BigCardBody = (
             : "",
       }} //no tailwind equiv - need for long titles to wrap
       onClick={(e) => {
+        // if card is clicked (and its not in edit mode), open that card in cardView.
         if (editing) return;
         if (e.defaultPrevented) return;
         let cardView = document.getElementById("cardViewerWrapper");
@@ -59,12 +60,16 @@ export const BigCardBody = (
     >
       {/* Big Card Preview Content Wrapper */}
       <div
-        className={`cardPreview flex w-full flex-col  ${
+        className={`cardPreviewContent flex w-full flex-col  ${
           editing ? "" : "hover:cursor-pointer"
         }`}
       >
-        {/* Big Card Preview Title and GoTo Button*/}
-        {/* show ONLY if we have title OR inner "x" to remove button */}
+        {/* Big Card Preview Title*/}
+        {/* show title and remove button
+           if (you're in list view) 
+        or if (theres a title) 
+        or if (its a member card) 
+        or if (you're in edit mode) */}
         {(!props.outerControls && props.onDelete && authorized) ||
         props.data.title?.value ||
         props.data.member ||
@@ -117,7 +122,7 @@ export const BigCardBody = (
             {!props.outerControls && props.onDelete && authorized ? (
               <>
                 <button
-                  className="h-fit pt-1 text-grey-80 hover:text-grey-15"
+                  className="cardPreviewRemove h-fit pt-1 text-grey-80 hover:text-grey-15"
                   onClick={(e) => {
                     e.stopPropagation();
                     props.onDelete?.();
@@ -131,7 +136,7 @@ export const BigCardBody = (
         ) : null}
         {props.showRelated && <Backlinks entityID={props.entityID} />}
 
-        {/* Big Card Preview Default Content */}
+        {/* Big Card Preview Default Content (show if not you're in preview mode AND there is content/image or you're in edit mode)*/}
         {!props.hideContent &&
           (editing || !!props.data.content?.value || !!props.data.imageUrl) && (
             <div
@@ -172,8 +177,8 @@ export const BigCardBody = (
         {/* Reactions + Discussions WRAPPER */}
         {/* NB: show ONLY for non-member cards for now */}
         {!props.data.isMember && (
-          <div className="cardPreviewActions flex w-full justify-between gap-2 pt-1">
-            <div className="cardPreviewReactionAndDiscussion flex gap-2">
+          <div className="cardPreviewActionsWrapper flex w-full justify-between gap-2 pt-1">
+            <div className="cardPreviewActions flex gap-2">
               {/* Discussions */}
               {/* three states: unread, existing, none */}
               {/* clicking = shortcut to focus input for a new message */}
@@ -193,7 +198,7 @@ export const BigCardBody = (
                   }, 100);
                 }}
               >
-                <div className="flex shrink-0 items-center gap-1 py-0.5 pl-0.5 pr-1 text-xs">
+                <div className="cardPreviewCommentIcon flex shrink-0 items-center gap-1 py-0.5 pl-0.5 pr-1 text-xs">
                   {props.messagesCount && props.messagesCount > 0 ? (
                     <>
                       <RoomChat /> {props.messagesCount}

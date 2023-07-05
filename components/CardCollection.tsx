@@ -182,7 +182,7 @@ const CollectionList = (props: {
           attribute={props.attribute}
           hideContent={props.collectionType !== "cardpreview"}
           parent={props.entityID}
-          editable={props.collectionType === "cardpreview" && props.editable}
+          editable={props.editable}
           entityID={card.value.value}
           key={card.id}
           id={card.id}
@@ -195,7 +195,7 @@ const CollectionList = (props: {
             entityID={over.entityID}
             size={"big"}
             hideContent={props.collectionType !== "cardpreview"}
-            editable={props.collectionType === "cardpreview" && props.editable}
+            editable={props.editable}
           />
         </div>
       )}
