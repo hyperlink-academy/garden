@@ -10,6 +10,7 @@ import { AddReaction, ReactionList } from "./CardView/Reactions";
 import { CreateStudioPost } from "./CreateStudioPost";
 import { DoorImage } from "./Doors";
 import { Note, ReactionAdd } from "./Icons";
+import { Divider } from "./Layout";
 import { StudioPostFullScreen } from "./StudioPostFullScreen";
 
 export function StudioPosts(props: { id: string }) {
@@ -63,37 +64,41 @@ export function Post(props: { entityID: string; studioID: string }) {
       )
     );
   return (
-    <div className="flex flex-col">
-      <div className="text-right text-sm italic text-grey-55">{date}</div>
-      <div className="flex flex-col gap-2 rounded-md border border-grey-80 bg-white p-4">
-        <div className="flex flex-row gap-2 font-bold text-grey-55">
-          {creatorName && <span className="italic ">{creatorName?.value}</span>}
-          {spaces && spaces?.length > 0 && (
-            <span className="flex flex-row gap-2">
-              highlighted
-              {spaces?.map((spaceData) => {
-                return (
-                  <Link
-                    href={`/s/${spaceData?.space_data?.owner.username}/s/${spaceData?.space_data?.name}`}
-                    key={spaceData?.space}
-                    className="font-bold text-accent-blue"
-                  >
-                    {spaceData?.space_data?.display_name}
-                  </Link>
-                );
-              })}
-            </span>
-          )}
+    <>
+      <div className="studioPost group flex max-w-lg flex-col gap-1">
+        <div className="studioPostTimeStamp text-right text-xs italic text-grey-55  opacity-0 group-hover:opacity-100">
+          {date}
         </div>
-        {content?.value}
-
-        {attachedCard && <RemoteCardData {...attachedCard.value} />}
+        <div className="StudioPostContent flex flex-col gap-1 rounded-md border border-grey-80 bg-white px-4 pt-3 pb-4">
+          {creatorName && (
+            <div className="w-full text-sm font-bold text-grey-55">
+              {creatorName?.value}
+            </div>
+          )}
+          {content?.value}
+        </div>
+        <div className="studioPostReactionsAndComments mx-3 -mt-3 flex flex-row justify-between ">
+          <PostReactions entityID={props.entityID} />
+          <PostComments entityID={props.entityID} studioID={props.studioID} />
+        </div>
       </div>
-      <div className="-mt-3 ml-4 flex flex-row justify-between ">
-        <PostReactions entityID={props.entityID} />
-        <PostComments entityID={props.entityID} studioID={props.studioID} />
-      </div>
-    </div>
+      {attachedCard && <RemoteCardData {...attachedCard.value} />}
+      {spaces && spaces?.length > 0 && (
+        <span className="studioPostAttachedCarcflex flex-row gap-2">
+          {spaces?.map((spaceData) => {
+            return (
+              <Link
+                href={`/s/${spaceData?.space_data?.owner.username}/s/${spaceData?.space_data?.name}`}
+                key={spaceData?.space}
+                className="font-bold text-accent-blue"
+              >
+                {spaceData?.space_data?.display_name}
+              </Link>
+            );
+          })}
+        </span>
+      )}
+    </>
   );
 }
 

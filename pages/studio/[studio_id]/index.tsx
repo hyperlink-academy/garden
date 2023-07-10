@@ -28,8 +28,8 @@ export default function StudioPage(props: Props) {
         <title key="title">{data?.name}</title>
       </Head>
       <SpaceProvider id={data?.do_id}>
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-row items-start justify-between gap-4">
+        <div className="studioHeader flex flex-col gap-4">
+          <div className="studioTitle flex flex-row items-start justify-between gap-4">
             <h1>{data?.name}</h1>
             {/* TODO - replace this with updated 'authorized' in useMutations() */}
             {data?.members_in_studios.find(
@@ -41,15 +41,15 @@ export default function StudioPage(props: Props) {
               </div>
             )}
           </div>
-          <p>{data?.description}</p>
-          <div className="flex flex-col">
-            <div className="flex self-end">
+          <p className="studioDescription text-lg">{data?.description}</p>
+          <div className="studioNav flex flex-col">
+            <div className="flex gap-2">
               <button
                 onClick={() => setView(view === "spaces" ? "posts" : "spaces")}
                 className={`-mr-[2px] rounded-t-md border-2 border-b-0  py-1 px-2  ${
                   view === "posts"
                     ? "border-accent-blue bg-bg-blue font-bold text-accent-blue"
-                    : "bg-white text-grey-35"
+                    : "border-grey-55 bg-white text-grey-35"
                 }`}
               >
                 Posts
@@ -59,7 +59,7 @@ export default function StudioPage(props: Props) {
                 className={`rounded-t-md border-2 border-b-0  py-1 px-2 ${
                   view === "spaces"
                     ? "border-accent-blue bg-bg-blue font-bold text-accent-blue"
-                    : "bg-white text-grey-35"
+                    : "border-grey-55 bg-white text-grey-35"
                 }`}
               >
                 Spaces
