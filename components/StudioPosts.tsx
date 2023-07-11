@@ -17,23 +17,36 @@ export function StudioPosts(props: { id: string }) {
   let posts = useIndex.aev("feed/post").sort((a, b) => {
     let aPosition = a.value,
       bPosition = b.value;
-    if (aPosition === bPosition) return a.id > b.id ? 1 : -1;
-    return aPosition > bPosition ? 1 : -1;
+    if (aPosition === bPosition) return a.id > b.id ? -1 : 1;
+    return aPosition > bPosition ? -1 : 1;
   });
   return (
-    <div className="flex flex-col gap-4">
-      <CreateStudioPost id={props.id} latestPost={posts[0]?.value} />
-
-      <div className="PostListWrapper flex flex-col gap-4">
-        {posts.map((post) => (
-          <Post entityID={post.entity} key={post.entity} studioID={props.id} />
+    <div className="flex flex-col-reverse gap-4">
+      <div className="PostListWrapper flex flex-col-reverse gap-4">
+        {posts.map((post, index) => (
+          <Post
+            entityID={post.entity}
+            key={post.entity}
+            studioID={props.id}
+            index={index}
+          />
         ))}
       </div>
+
+      <CreateStudioPost
+        id={props.id}
+        latestPost={posts[posts.length - 1]?.value}
+        latestPostEntity={posts[posts.length - 1]?.entity}
+      />
     </div>
   );
 }
 
-export function Post(props: { entityID: string; studioID: string }) {
+export function Post(props: {
+  entityID: string;
+  studioID: string;
+  index: number;
+}) {
   let { data } = useStudioData(props.studioID);
   let attachedSpace = useIndex.eav(props.entityID, "post/attached-space");
   let content = useIndex.eav(props.entityID, "card/content");
@@ -81,7 +94,10 @@ export function Post(props: { entityID: string; studioID: string }) {
       )}
       <div
         className="studioPost group relative flex w-96 max-w-lg flex-col gap-1 "
-        style={{ top: position?.value.y || 0, left: position?.value.x || 0 }}
+        style={{
+          marginBottom: 0 - (position?.value.y || 0),
+          left: position?.value.x || 0,
+        }}
       >
         <div className="studioPostTimeStamp text-right text-xs italic text-grey-55  opacity-0 group-hover:opacity-100">
           {date}
