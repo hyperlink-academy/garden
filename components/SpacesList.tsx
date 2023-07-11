@@ -60,6 +60,8 @@ const Space = (props: SpaceData) => {
       <div className="-ml-2 grid grid-cols-[max-content,max-content] items-end gap-1 ">
         <Link href={`${spacePath(data?.owner.username, data?.name || "")}`}>
           <DoorImage
+            small
+            width="64"
             display_name={data?.display_name}
             image={data?.image}
             default_space_image={data?.default_space_image}
@@ -82,30 +84,28 @@ const Space = (props: SpaceData) => {
         </div>
       </div>
 
-      <div className="">
-        <div className="ml-2 w-full origin-top-left skew-y-[-30deg] scale-x-90 scale-y-110">
-          <div className="flex flex-col gap-2">
-            <h3
-              style={{
-                overflowWrap: "anywhere",
-              }}
-              className="text-xl"
-            >
-              {data?.display_name}
-            </h3>
-            {data?.start_date ? (
-              <div className="text-sm text-grey-35">
-                <div>
-                  ❇️ <strong>{data?.start_date}</strong>
-                </div>
-                {duration_days ? (
-                  <div>
-                    🗓 <strong>{duration_days} days</strong>
-                  </div>
-                ) : null}
+      <div className="ml-2 w-full origin-top-left skew-y-[-30deg] scale-x-90 scale-y-110">
+        <div className="flex flex-col gap-2">
+          <h3
+            style={{
+              overflowWrap: "anywhere",
+            }}
+            className="text-xl"
+          >
+            {data?.display_name}
+          </h3>
+          {data?.start_date ? (
+            <div className="text-sm text-grey-35">
+              <div>
+                ❇️ <strong>{data?.start_date}</strong>
               </div>
-            ) : null}
-          </div>
+              {duration_days ? (
+                <div>
+                  🗓 <strong>{duration_days} days</strong>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
         </div>
       </div>
     </div>
