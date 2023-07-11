@@ -64,12 +64,22 @@ export const DefaultAttributes = {
   },
   "post/attached-space": {
     type: "string",
-    cardinality: "many",
+    cardinality: "one",
     unique: false,
   },
   "post/type": {
     type: "union",
     "union/value": ["user", "space_added"],
+    cardinality: "one",
+    unique: false,
+  },
+  "post/content/position": {
+    type: "position",
+    cardinality: "one",
+    unique: false,
+  },
+  "post/space/position": {
+    type: "position",
     cardinality: "one",
     unique: false,
   },

@@ -35,47 +35,65 @@ export function StudioPosts(props: { id: string }) {
 
 export function Post(props: { entityID: string; studioID: string }) {
   let { data } = useStudioData(props.studioID);
-  let attachedSpaces =
-    useIndex.eav(props.entityID, "post/attached-space") || [];
+  let attachedSpace = useIndex.eav(props.entityID, "post/attached-space");
   let content = useIndex.eav(props.entityID, "card/content");
   let createdBy = useIndex.eav(props.entityID, "card/created-by");
   let creatorName = useIndex.eav(createdBy?.value.value || null, "member/name");
+  let position = useIndex.eav(props.entityID, "post/content/position");
+  let spacePosition = useIndex.eav(props.entityID, "post/space/position");
 
   let date = new Date(decodeTime(props.entityID)).toLocaleDateString([], {
     dateStyle: "short",
   });
   let type = useIndex.eav(props.entityID, "post/type");
   let attachedCard = useIndex.eav(props.entityID, "post/attached-card");
-  if (type?.value === "space_added")
+  if (type?.value === "space_added" && attachedSpace)
     return (
       <NewSpacePost
         {...props}
-        spaceID={attachedSpaces[0]?.value}
+        spaceID={attachedSpace?.value}
         createdAt={type.lastUpdated}
       />
     );
-  let spaces = attachedSpaces.map((space) => {
-    return data?.spaces_in_studios.find((s) => s.space === space.value);
-  });
-  if (attachedCard)
-    spaces.push(
-      data?.spaces_in_studios.find(
-        (s) => s.space === attachedCard?.value.space_do_id
-      )
-    );
+  let space = data?.spaces_in_studios.find(
+    (s) => s.space === attachedSpace?.value
+  );
   return (
-    <>
-      <div className="studioPost group flex max-w-lg flex-col gap-1">
+    <div>
+      {space && (
+        <span
+          className="studioPostAttachedCarcflex relative flex-row gap-2"
+          style={{
+            top: spacePosition?.value.y || 0,
+            left: spacePosition?.value.x || 0,
+          }}
+        >
+          {
+            <Link
+              href={`/s/${space?.space_data?.owner.username}/s/${space?.space_data?.name}`}
+              key={space?.space}
+              className="font-bold text-accent-blue"
+            >
+              {space?.space_data?.display_name}
+            </Link>
+          }
+        </span>
+      )}
+      <div
+        className="studioPost group relative flex w-96 max-w-lg flex-col gap-1 "
+        style={{ top: position?.value.y || 0, left: position?.value.x || 0 }}
+      >
         <div className="studioPostTimeStamp text-right text-xs italic text-grey-55  opacity-0 group-hover:opacity-100">
           {date}
         </div>
         <div className="StudioPostContent flex flex-col gap-1 rounded-md border border-grey-80 bg-white px-4 pt-3 pb-4">
+          {content?.value}
+          <hr className="border-grey-80" />
           {creatorName && (
-            <div className="w-full text-sm font-bold text-grey-55">
+            <div className="w-full text-right text-sm font-bold text-grey-55">
               {creatorName?.value}
             </div>
           )}
-          {content?.value}
         </div>
         <div className="studioPostReactionsAndComments mx-3 -mt-3 flex flex-row justify-between ">
           <PostReactions entityID={props.entityID} />
@@ -83,22 +101,7 @@ export function Post(props: { entityID: string; studioID: string }) {
         </div>
       </div>
       {attachedCard && <RemoteCardData {...attachedCard.value} />}
-      {spaces && spaces?.length > 0 && (
-        <span className="studioPostAttachedCarcflex flex-row gap-2">
-          {spaces?.map((spaceData) => {
-            return (
-              <Link
-                href={`/s/${spaceData?.space_data?.owner.username}/s/${spaceData?.space_data?.name}`}
-                key={spaceData?.space}
-                className="font-bold text-accent-blue"
-              >
-                {spaceData?.space_data?.display_name}
-              </Link>
-            );
-          })}
-        </span>
-      )}
-    </>
+    </div>
   );
 }
 
