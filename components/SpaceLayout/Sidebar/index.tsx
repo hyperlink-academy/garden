@@ -182,7 +182,7 @@ const InfoModal = (props: { open: boolean; onClose: () => void }) => {
   );
 };
 
-const SpaceStatus = (props: { openEditModal: () => void }) => {
+export const SpaceStatus = (props: { openEditModal: () => void }) => {
   let id = useSpaceID();
   let { data } = useSpaceData(id);
 

@@ -11,6 +11,7 @@ import { EditSpaceModal } from "./CreateSpace";
 import { useSpaceData } from "hooks/useSpaceData";
 export type { SpaceData } from "backend/routes/get_space_data";
 import type { SpaceData } from "backend/routes/get_space_data";
+import { SpaceStatus } from "./SpaceLayout/Sidebar";
 
 export const SpaceList = (props: { spaces: Array<SpaceData> }) => {
   return (
@@ -23,7 +24,7 @@ export const SpaceList = (props: { spaces: Array<SpaceData> }) => {
           }
         }
       `}</style>
-      <div className="spacesList grid grid-cols-[repeat(auto-fill,148px)] justify-between gap-4">
+      <div className="spacesList flex flex-wrap gap-4">
         {props.spaces?.map((a) => {
           return <Space {...a} key={a.do_id} />;
         })}
@@ -56,8 +57,8 @@ const Space = (props: SpaceData) => {
   }
 
   return (
-    <div className="flex w-min flex-col gap-4">
-      <div className="-ml-2 grid grid-cols-[max-content,max-content] items-end gap-1 ">
+    <div className="smallSpaceCard relative">
+      <div className="smallSpaceCardIcon absolute left-0 top-0 z-10">
         <Link href={`${spacePath(data?.owner.username, data?.name || "")}`}>
           <DoorImage
             small
@@ -68,7 +69,7 @@ const Space = (props: SpaceData) => {
             glow={!!unreads && !!authorized && unreads.value > 0}
           />
         </Link>
-        <div className="flex w-[20px] flex-col gap-4 pb-[92px]">
+        {/* <div className="flex w-[20px] flex-col gap-4 pb-[92px]">
           {data?.owner.username == session.session?.username ? (
             <EditSpaceButton
               spaceID={props.do_id}
@@ -81,29 +82,17 @@ const Space = (props: SpaceData) => {
               description={data?.description}
             />
           )}
-        </div>
+        </div> */}
       </div>
+      <div className="ml-8 mt-6">
+        <div className="smallSpaceCardContent lightBorder flex w-64 shrink-0 flex-col gap-2 bg-white py-2 pl-10 pr-3 ">
+          <h3>{data?.display_name}</h3>
 
-      <div className="ml-2 w-full origin-top-left skew-y-[-30deg] scale-x-90 scale-y-110">
-        <div className="flex flex-col gap-2">
-          <h3
-            style={{
-              overflowWrap: "anywhere",
-            }}
-            className="text-xl"
-          >
-            {data?.display_name}
-          </h3>
           {data?.start_date ? (
             <div className="text-sm text-grey-35">
               <div>
                 ❇️ <strong>{data?.start_date}</strong>
               </div>
-              {duration_days ? (
-                <div>
-                  🗓 <strong>{duration_days} days</strong>
-                </div>
-              ) : null}
             </div>
           ) : null}
         </div>
