@@ -1,3 +1,4 @@
+import { Divider } from "components/Layout";
 import { SpaceData, SpaceList } from "components/SpacesList";
 import { useStudioData } from "hooks/useStudioData";
 import { getCurrentDate } from "src/utils";
@@ -32,29 +33,31 @@ export function StudioSpaces(props: { id: string }) {
     (s) => !s?.space_data?.start_date && !s?.space_data?.end_date
   );
   return (
-    <div>
+    <div className="flex flex-col gap-8">
       {spacesActive && spacesActive.length > 0 ? (
-        <div>
-          {" "}
+        <>
           <SpaceList
             spaces={spacesActive?.map((s) => s.space_data as SpaceData) || []}
           />
-        </div>
+          <Divider />
+        </>
       ) : null}
 
       {spacesUpcoming && spacesUpcoming?.length > 0 ? (
-        <div>
-          <p>Coming Up</p>
+        <div className="flex flex-col gap-1">
+          <h3>Coming Up</h3>
           <SpaceList
+            small
             spaces={spacesUpcoming?.map((s) => s.space_data as SpaceData) || []}
           />
         </div>
       ) : null}
 
       {spacesUnscheduled && spacesUnscheduled.length > 0 ? (
-        <div>
-          <p>Unscheduled</p>
+        <div className="flex flex-col gap-1">
+          <h3>Unscheduled</h3>
           <SpaceList
+            small
             spaces={
               spacesUnscheduled?.map((s) => s.space_data as SpaceData) || []
             }

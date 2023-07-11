@@ -4,13 +4,17 @@ const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 
 const OuterFrameClipPath = (props: { small?: boolean }) => {
   return (
-    <clipPath id="outer-frame">
+    <>
       {props.small ? (
-        <path d="M177.36,67.83c-41-5.68-81.6,42.82-90.68,108.33-6.57,47.41,5.18,90.73,27.71,113.21.53.09,1.07.18,1.61.25,41,5.69,81.61-42.82,90.68-108.33,6.57-47.41-5.17-90.73-27.7-113.21C178.44,68,177.91,67.9,177.36,67.83Z" />
+        <clipPath id="small-outer-frame">
+          <path d="M177.36,67.83c-41-5.68-81.6,42.82-90.68,108.33-6.57,47.41,5.18,90.73,27.71,113.21.53.09,1.07.18,1.61.25,41,5.69,81.61-42.82,90.68-108.33,6.57-47.41-5.17-90.73-27.7-113.21C178.44,68,177.91,67.9,177.36,67.83Z" />
+        </clipPath>
       ) : (
-        <path d="M58.67,521.92,227,427.57V119.84c0-27.47-13.1-70.32-57.88-65.3-50.79,5.7-111,78.77-110.91,165.32C58.32,295,58.67,521.92,58.67,521.92Z" />
+        <clipPath id="large-outer-frame">
+          <path d="M58.67,521.92,227,427.57V119.84c0-27.47-13.1-70.32-57.88-65.3-50.79,5.7-111,78.77-110.91,165.32C58.32,295,58.67,521.92,58.67,521.92Z" />
+        </clipPath>
       )}
-    </clipPath>
+    </>
   );
 };
 
@@ -59,16 +63,14 @@ export const DoorImage = (props: {
         </>
       </defs>
 
-      {/* rotating images */}
-      {/* NB: this is hacky! */}
-      {/* we're flipping the whole svg, but first want to unflip the image */}
-      {/* but ONLY if uploaded - defaults need to be flipped to match frames! */}
       {/* TODO: fix issue where we see all default images while loading? */}
 
       <g
         width="100%"
         height="100%"
-        clipPath="url(#outer-frame)"
+        clipPath={`${
+          props.small ? "url(#small-outer-frame)" : "url(#large-outer-frame)"
+        } `}
         fill="transparent"
       >
         <image
@@ -172,7 +174,7 @@ export const DoorClippedImage = (props: { url: string; width?: string }) => {
       overflow="visible"
     >
       <defs>
-        <OuterFrameClipPath />
+        <OuterFrameClipPath small={false} />
       </defs>
 
       <image
@@ -180,7 +182,7 @@ export const DoorClippedImage = (props: { url: string; width?: string }) => {
         height="100%"
         preserveAspectRatio="xMinYMin slice"
         xlinkHref={props.url}
-        clipPath="url(#outer-frame)"
+        clipPath="url(#large-outer-frame)"
       />
     </svg>
   );
