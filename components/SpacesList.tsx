@@ -161,11 +161,12 @@ const SpaceCard = (props: { small?: boolean } & SpaceData) => {
               <div className="text-sm italic text-grey-35">
                 <div>
                   ends{" "}
-                  {new Date(data.end_date).toLocaleDateString(undefined, {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                  })}
+                  {data?.end_date &&
+                    new Date(data?.end_date).toLocaleDateString(undefined, {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })}
                 </div>
               </div>
             </div>
