@@ -30,7 +30,12 @@ export function StudioPostFullScreen(props: {
       >
         <div className="no-scrollbar relative mx-auto flex w-fit max-w-full snap-x snap-mandatory items-stretch gap-8 overflow-x-scroll px-8">
           <div className="flex w-[calc(100vw-32px)] max-w-screen-md flex-shrink-0 snap-center flex-col gap-8">
-            <Post entityID={props.entityID} studioID={props.studioID} />
+            <Post
+              entityID={props.entityID}
+              studioID={props.studioID}
+              renderPosition
+              index={0}
+            />
             <Comments entityID={props.entityID} />
           </div>
           {attachedCard && <PostBigView {...attachedCard.value} />}

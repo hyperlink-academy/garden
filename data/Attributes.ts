@@ -78,6 +78,11 @@ export const DefaultAttributes = {
     cardinality: "one",
     unique: false,
   },
+  "post/attached-card/position": {
+    type: "position",
+    cardinality: "one",
+    unique: false,
+  },
   "post/space/position": {
     type: "position",
     cardinality: "one",

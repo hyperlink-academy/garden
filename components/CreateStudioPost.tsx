@@ -6,26 +6,31 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { ref } from "data/Facts";
 import { useAuth } from "hooks/useAuth";
-import { useMutations } from "hooks/useReplicache";
 import { useStudioData } from "hooks/useStudioData";
-import { atom } from "jotai";
 import { useState } from "react";
-import { generateKeyBetween } from "src/fractional-indexing";
-import { ulid } from "src/ulid";
 import { ButtonTertiary } from "./Buttons";
 import { Textarea } from "./Textarea";
 import { create } from "zustand";
 import { restrictToParentElement } from "@dnd-kit/modifiers";
 import { DoorImage } from "./Doors";
 import { SpaceCard, SpaceData } from "./SpacesList";
+import { RemoteCardData } from "./StudioPosts";
 
+let useOffsetsState = create(() => ({
+  offsets: {} as { [key: string]: { y: number; x: number } },
+}));
 export function CreateStudioPost(props: {
+  onPost: (args: {
+    value: string;
+    cardPosition?: { x: number; y: number };
+    contentPosition?: { x: number; y: number };
+    spacePosition?: { x: number; y: number };
+    selectedSpace?: string | null;
+  }) => void;
   id: string;
-  latestPost?: string;
   selectSpace?: boolean;
-  cardEntity: string;
+  remoteCard?: { cardEntity: string; space_do_id: string };
 }) {
   let { data } = useStudioData(props.id);
   let { session } = useAuth();
@@ -49,15 +54,18 @@ export function CreateStudioPost(props: {
         )`,
         }}
       >
-        <SpaceSelector
-          id={props.id}
-          selectedSpaces={selectedSpaces}
-          setSelectedSpace={setSelectedSpace}
-        />
+        {props.selectSpace && (
+          <SpaceSelector
+            id={props.id}
+            selectedSpaces={selectedSpaces}
+            setSelectedSpace={setSelectedSpace}
+          />
+        )}
+        {props.remoteCard && <DraggableRemoteCard {...props.remoteCard} />}
         <Draggable id="post-editor">
           <PostEditor
+            onPost={props.onPost}
             id={props.id}
-            latestPost={props.latestPost}
             selectedSpace={selectedSpaces}
           />
         </Draggable>
@@ -66,75 +74,40 @@ export function CreateStudioPost(props: {
   );
 }
 
+function DraggableRemoteCard(props: {
+  cardEntity: string;
+  space_do_id: string;
+}) {
+  return (
+    <Draggable id="remote-card">
+      <RemoteCardData {...props} />
+    </Draggable>
+  );
+}
+
 function PostEditor(props: {
+  onPost: (args: {
+    value: string;
+    cardPosition?: { x: number; y: number };
+    contentPosition?: { x: number; y: number };
+    spacePosition?: { x: number; y: number };
+    selectedSpace?: string | null;
+  }) => void;
+  remoteCard?: { cardEntity: string; space_do_id: string };
   id: string;
-  latestPost?: string;
   selectedSpace: string | null;
 }) {
-  let { mutate, memberEntity } = useMutations();
   let { identityData } = useAuth();
   let [value, setValue] = useState("");
 
   const onClick = async () => {
-    let entity = ulid();
-    if (!memberEntity || !value) return;
-    if (props.selectedSpace) {
-      let spacePosition = useOffsetsState.getState().offsets["space-selector"];
-      await mutate("assertFact", [
-        {
-          entity,
-          attribute: "post/attached-space",
-          value: props.selectedSpace,
-          positions: {},
-        },
-        {
-          entity,
-          attribute: "post/space/position",
-          positions: {},
-          value: {
-            type: "position",
-            x: spacePosition?.x || 0,
-            y: spacePosition?.y || 0,
-            rotation: 0,
-            size: "small",
-          },
-        },
-      ]);
-    }
-    let contentPosition = useOffsetsState.getState().offsets["post-editor"];
-
-    await mutate("assertFact", [
-      {
-        entity,
-        attribute: "post/content/position",
-        positions: {},
-        value: {
-          type: "position",
-          x: contentPosition?.x || 0,
-          y: contentPosition?.y || 0,
-          rotation: 0,
-          size: "small",
-        },
-      },
-      {
-        entity,
-        attribute: "card/content",
-        value,
-        positions: {},
-      },
-      {
-        entity,
-        attribute: "card/created-by",
-        value: ref(memberEntity),
-        positions: {},
-      },
-      {
-        entity,
-        attribute: "feed/post",
-        value: generateKeyBetween(null, props.latestPost || null),
-        positions: {},
-      },
-    ]);
+    props.onPost({
+      value,
+      cardPosition: useOffsetsState.getState().offsets["remote-card"],
+      contentPosition: useOffsetsState.getState().offsets["post-editor"],
+      spacePosition: useOffsetsState.getState().offsets["space-selector"],
+      selectedSpace: props.selectedSpace,
+    });
     setValue("");
   };
   return (
@@ -222,7 +195,6 @@ function SpaceSelector(props: {
                   }}
                 >
                   <DoorImage
-                    white
                     width="64"
                     small
                     image={s.space_data?.image}
@@ -267,10 +239,6 @@ function PostEditorDragContext(props: { children: React.ReactNode }) {
     </DndContext>
   );
 }
-
-let useOffsetsState = create(() => ({
-  offsets: {} as { [key: string]: { y: number; x: number } },
-}));
 
 function Draggable(props: {
   id: string;

@@ -9,10 +9,13 @@ import { ulid } from "src/ulid";
 import { ref } from "data/Facts";
 import { generateKeyBetween } from "src/fractional-indexing";
 
+const position = z.object({ x: z.number(), y: z.number() });
 export const post_feed_route = makeRoute({
   route: "post_feed_route",
   input: z.object({
     authToken: authTokenVerifier,
+    cardPosition: position.optional(),
+    contentPosition: position.optional(),
     content: z.string(),
     spaceID: z.string(),
     cardEntity: z.string(),
@@ -61,6 +64,33 @@ export const post_feed_route = makeRoute({
       value: msg.content,
       positions: {},
     });
+    if (msg.contentPosition)
+      await env.factStore.assertFact({
+        entity,
+        attribute: "post/content/position",
+        positions: {},
+        value: {
+          type: "position",
+          x: msg.contentPosition?.x || 0,
+          y: msg.contentPosition?.y || 0,
+          rotation: 0,
+          size: "small",
+        },
+      });
+
+    if (msg.contentPosition)
+      await env.factStore.assertFact({
+        entity,
+        attribute: "post/attached-card/position",
+        positions: {},
+        value: {
+          type: "position",
+          x: msg.cardPosition?.x || 0,
+          y: msg.cardPosition?.y || 0,
+          rotation: 0,
+          size: "small",
+        },
+      });
 
     await env.factStore.assertFact({
       entity,

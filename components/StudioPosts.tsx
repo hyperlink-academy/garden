@@ -1,4 +1,5 @@
 import * as Popover from "@radix-ui/react-popover";
+import { ref } from "data/Facts";
 import { useRemoteCardData } from "hooks/useRemoteCardData";
 import { useIndex, useMutations } from "hooks/useReplicache";
 import { useSpaceData } from "hooks/useSpaceData";
@@ -6,17 +7,18 @@ import { useStudioData } from "hooks/useStudioData";
 import useWindowDimensions from "hooks/useWindowDimensions";
 import Link from "next/link";
 import { useState } from "react";
-import { decodeTime } from "src/ulid";
+import { generateKeyBetween } from "src/fractional-indexing";
+import { decodeTime, ulid } from "src/ulid";
 import { AddReaction, ReactionList } from "./CardView/Reactions";
 import { CreateStudioPost } from "./CreateStudioPost";
 import { DoorImage } from "./Doors";
 import { Note, ReactionAdd } from "./Icons";
-import { Divider } from "./Layout";
 import { SpaceCard, SpaceData } from "./SpacesList";
 import { StudioPostFullScreen } from "./StudioPostFullScreen";
 
 export function StudioPosts(props: { id: string }) {
   let { width } = useWindowDimensions();
+  let { mutate, memberEntity } = useMutations();
   let posts = useIndex.aev("feed/post").sort((a, b) => {
     let aPosition = a.value,
       bPosition = b.value;
@@ -38,9 +40,75 @@ export function StudioPosts(props: { id: string }) {
       </div>
 
       <CreateStudioPost
+        selectSpace
         id={props.id}
-        latestPost={posts[posts.length - 1]?.value}
-        latestPostEntity={posts[posts.length - 1]?.entity}
+        onPost={async ({
+          value,
+          contentPosition,
+          spacePosition,
+          selectedSpace,
+        }) => {
+          let entity = ulid();
+          if (!memberEntity || !value) return;
+          if (selectedSpace) {
+            await mutate("assertFact", [
+              {
+                entity,
+                attribute: "post/attached-space",
+                value: selectedSpace,
+                positions: {},
+              },
+              {
+                entity,
+                attribute: "post/space/position",
+                positions: {},
+                value: {
+                  type: "position",
+                  x: spacePosition?.x || 0,
+                  y: spacePosition?.y || 0,
+                  rotation: 0,
+                  size: "small",
+                },
+              },
+            ]);
+          }
+
+          await mutate("assertFact", [
+            {
+              entity,
+              attribute: "post/content/position",
+              positions: {},
+              value: {
+                type: "position",
+                x: contentPosition?.x || 0,
+                y: contentPosition?.y || 0,
+                rotation: 0,
+                size: "small",
+              },
+            },
+            {
+              entity,
+              attribute: "card/content",
+              value,
+              positions: {},
+            },
+            {
+              entity,
+              attribute: "card/created-by",
+              value: ref(memberEntity),
+              positions: {},
+            },
+            {
+              entity,
+              attribute: "feed/post",
+              value: generateKeyBetween(
+                null,
+                posts[posts.length - 1]?.value || null
+              ),
+              positions: {},
+            },
+          ]);
+        }}
       />
     </div>
   );
@@ -59,6 +127,10 @@ export function Post(props: {
   let creatorName = useIndex.eav(createdBy?.value.value || null, "member/name");
   let position = useIndex.eav(props.entityID, "post/content/position");
   let spacePosition = useIndex.eav(props.entityID, "post/space/position");
+  let cardPosition = useIndex.eav(
+    props.entityID,
+    "post/attached-card/position"
+  );
 
   let date = new Date(decodeTime(props.entityID)).toLocaleDateString([], {
     dateStyle: "short",
@@ -101,12 +173,28 @@ export function Post(props: {
           }
         </span>
       )}
+      {attachedCard && (
+        <div
+          className="relative"
+          style={
+            props.renderPosition
+              ? {
+                  top: cardPosition?.value.y || 0,
+                  left: cardPosition?.value.x || 0,
+                }
+              : {}
+          }
+        >
+          <RemoteCardData {...attachedCard.value} />
+        </div>
+      )}
       <div
         className="studioPost group relative flex w-96 max-w-lg flex-col gap-1 "
         style={
           props.renderPosition
             ? {
                 marginBottom: 0 - (position?.value.y || 0),
+                top: position?.value.y || 0,
                 left: position?.value.x || 0,
               }
             : {}
@@ -129,12 +217,14 @@ export function Post(props: {
           <PostComments entityID={props.entityID} studioID={props.studioID} />
         </div>
       </div>
-      {attachedCard && <RemoteCardData {...attachedCard.value} />}
     </div>
   );
 }
 
-const RemoteCardData = (props: { space_do_id: string; cardEntity: string }) => {
+export const RemoteCardData = (props: {
+  space_do_id: string;
+  cardEntity: string;
+}) => {
   let { data } = useRemoteCardData(props.space_do_id, props.cardEntity);
   if (!data) return null;
   return <RemoteCard {...data} />;
