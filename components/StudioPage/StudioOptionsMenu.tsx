@@ -4,7 +4,7 @@ import { useStudioData } from "hooks/useStudioData";
 import { useEffect, useState } from "react";
 import { Modal } from "components/Layout";
 import { StudioForm } from "components/CreateStudio";
-import { ButtonLink, ButtonPrimary } from "components/Buttons";
+import { ButtonLink, ButtonPrimary, ButtonSecondary } from "components/Buttons";
 import { DotLoader } from "components/DotLoader";
 import { useAuth } from "hooks/useAuth";
 import { spaceAPI, workerAPI } from "backend/lib/api";
@@ -56,6 +56,9 @@ function StudioSettings(props: {
     name: "",
     description: "",
   });
+
+  let [mode, setMode] = useState<"normal" | "delete">("normal");
+
   useEffect(() => {
     setFormState({
       description: data?.description || "",
@@ -63,8 +66,8 @@ function StudioSettings(props: {
     });
   }, [data?.description, data?.name]);
   return (
-    <>
-      <Modal open={props.open} onClose={props.onClose}>
+    <Modal open={props.open} onClose={props.onClose}>
+      {mode === "normal" ? (
         <form
           className="flex flex-col gap-8"
           onSubmit={async (e) => {
@@ -105,33 +108,83 @@ function StudioSettings(props: {
               <div className="flex flex-col gap-2">
                 <div className="flex flex-row items-center justify-between gap-4">
                   <h3>Delete Studio</h3>
+                </div>
+                <p className="text-grey-55">
+                  Spaces linked here will NOT be deleted; they will be available
+                  from their members&apos; homepages.
+                </p>
+                <p className="text-grey-55">
+                  You WILL lose all Studio posts / highlights.
+                </p>
+                <div className="flex flex-row justify-end">
                   <ButtonPrimary
-                    destructive
                     content="Delete Studio"
-                    onClick={async () => {
-                      if (!data || !authToken) return;
-                      console.log(
-                        await spaceAPI(
-                          `${WORKER_URL}/space/${data.do_id}`,
-                          "delete_self",
-                          { authToken }
-                        )
-                      );
-                      Router.push(`/`);
-                    }}
+                    destructive
+                    onClick={() => setMode("delete")}
                   />
                 </div>
-                <p className=" text-grey-55">
-                  This studio will disappear. Spaces linked here WILL NOT be
-                  deleted (they can be found in the Homes of their members).
-                  However you will lose any conversations or highlights you have
-                  made on the studio level.
-                </p>
               </div>
             </>
           ) : null}
         </form>
-      </Modal>
-    </>
+      ) : (
+        <>
+          {!props.id ? null : (
+            <DeleteStudioForm
+              studioID={props.id}
+              onCancel={() => setMode("normal")}
+            />
+          )}
+        </>
+      )}
+    </Modal>
   );
 }
+
+const DeleteStudioForm = (props: {
+  studioID: string;
+  onCancel: () => void;
+}) => {
+  let [state, setState] = useState({ studioName: "" });
+  let [status, setStatus] = useState<"normal" | "loading">("normal");
+  let { authToken } = useAuth();
+  let { data } = useStudioData(props.studioID);
+  return (
+    <>
+      <div className="flex flex-col gap-2">
+        <p className="font-bold">Type the name of this Studio</p>
+        <input
+          className="w-full"
+          value={state.studioName}
+          placeholder=""
+          onChange={(e) => setState({ studioName: e.currentTarget.value })}
+        />
+        <div className="flex flex-row gap-2">
+          <ButtonSecondary
+            onClick={async () => {
+              props.onCancel();
+            }}
+            content="Cancel"
+          />
+          <ButtonPrimary
+            onClick={async () => {
+              if (data?.name !== state.studioName) return;
+              if (!props.studioID || !authToken) return;
+              setStatus("loading");
+              await spaceAPI(
+                `${WORKER_URL}/space/${data.do_id}`,
+                "delete_self",
+                { authToken }
+              );
+              setStatus("normal");
+              Router.push(`/`);
+            }}
+            destructive
+            disabled={data?.name !== state.studioName}
+            content={status === "normal" ? "Delete" : <DotLoader />}
+          />
+        </div>
+      </div>
+    </>
+  );
+};

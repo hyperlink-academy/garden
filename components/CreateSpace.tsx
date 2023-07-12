@@ -205,7 +205,6 @@ export const EditSpaceModal = (props: {
           )}
         </>
       )}
-      {/* <ButtonTertiary content="Nevermind" onClick={() => setOpen(false)} /> */}
     </Modal>
   );
 };
@@ -221,8 +220,8 @@ const DeleteSpaceForm = (props: {
   let { data } = useSpaceData(props.spaceID);
   return (
     <>
-      <div className="flex flex-col gap-1">
-        <p className="font-bold">Type the name of this space</p>
+      <div className="flex flex-col gap-2">
+        <p className="font-bold">Type the name of this Space</p>
         <input
           className="w-full"
           value={state.spaceName}
