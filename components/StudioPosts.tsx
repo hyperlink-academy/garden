@@ -3,6 +3,7 @@ import { useRemoteCardData } from "hooks/useRemoteCardData";
 import { useIndex, useMutations } from "hooks/useReplicache";
 import { useSpaceData } from "hooks/useSpaceData";
 import { useStudioData } from "hooks/useStudioData";
+import useWindowDimensions from "hooks/useWindowDimensions";
 import Link from "next/link";
 import { useState } from "react";
 import { decodeTime } from "src/ulid";
@@ -15,6 +16,7 @@ import { SpaceCard, SpaceData } from "./SpacesList";
 import { StudioPostFullScreen } from "./StudioPostFullScreen";
 
 export function StudioPosts(props: { id: string }) {
+  let { width } = useWindowDimensions();
   let posts = useIndex.aev("feed/post").sort((a, b) => {
     let aPosition = a.value,
       bPosition = b.value;
@@ -26,6 +28,7 @@ export function StudioPosts(props: { id: string }) {
       <div className="PostListWrapper flex flex-col-reverse gap-4">
         {posts.map((post, index) => (
           <Post
+            renderPosition={width > 768}
             entityID={post.entity}
             key={post.entity}
             studioID={props.id}
@@ -44,6 +47,7 @@ export function StudioPosts(props: { id: string }) {
 }
 
 export function Post(props: {
+  renderPosition: boolean;
   entityID: string;
   studioID: string;
   index: number;
@@ -77,10 +81,14 @@ export function Post(props: {
       {space && (
         <span
           className="studioPostAttachedCarcflex relative flex-row gap-2"
-          style={{
-            top: spacePosition?.value.y || 0,
-            left: spacePosition?.value.x || 0,
-          }}
+          style={
+            props.renderPosition
+              ? {
+                  top: spacePosition?.value.y || 0,
+                  left: spacePosition?.value.x || 0,
+                }
+              : {}
+          }
         >
           {
             <Link
@@ -95,10 +103,14 @@ export function Post(props: {
       )}
       <div
         className="studioPost group relative flex w-96 max-w-lg flex-col gap-1 "
-        style={{
-          marginBottom: 0 - (position?.value.y || 0),
-          left: position?.value.x || 0,
-        }}
+        style={
+          props.renderPosition
+            ? {
+                marginBottom: 0 - (position?.value.y || 0),
+                left: position?.value.x || 0,
+              }
+            : {}
+        }
       >
         <div className="studioPostTimeStamp text-right text-xs italic text-grey-55  opacity-0 group-hover:opacity-100">
           {date}
