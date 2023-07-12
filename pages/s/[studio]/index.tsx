@@ -2,7 +2,6 @@ import { workerAPI } from "backend/lib/api";
 import { SpaceProvider } from "components/ReplicacheProvider";
 import { SpaceData, SpaceList } from "components/SpacesList";
 import { CreateSpace } from "components/CreateSpace";
-import { StudioName } from "components/StudioLayout";
 import { GetStaticPropsContext, InferGetStaticPropsType } from "next";
 import { useAuth } from "hooks/useAuth";
 import { useRouter } from "next/router";
@@ -31,7 +30,7 @@ export default function StudioPage(props: Props) {
   return (
     <SpaceProvider id={data.studio}>
       <div className="mb-12 flex flex-col gap-2">
-        <div className="flex justify-between ">
+        <div className="flex flex-col gap-2 sm:flex-row sm:justify-between">
           <h1 className="grow">{currentStudioName + "'s studio"}</h1>
           {!session?.loggedIn ||
             (session.session?.username === currentStudioName && (
