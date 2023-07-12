@@ -299,26 +299,12 @@ function NewSpacePost(props: {
     dateStyle: "short",
   });
   return (
-    <Link href={`/s/${spaceData?.owner.username}/s/${spaceData?.name}`}>
-      <div className="flex flex-row">
-        <div>
-          <DoorImage
-            width="64"
-            image={spaceData?.image}
-            default_space_image={spaceData?.default_space_image}
-          />
-        </div>
-
-        <div className="mt-8 flex flex-col">
-          <div className="text-right text-sm italic text-grey-55">{date}</div>
-          <div className="-ml-6 w-96 self-end rounded-lg border border-grey-80 bg-white p-4 pl-8">
-            <h4>New Space!</h4>
-            <hr className="border-grey-80" />
-            <h3 className="text-accent-blue">{spaceData?.display_name}</h3>
-            <p>{spaceData?.description}</p>
-          </div>
-        </div>
-      </div>
+    <Link
+      className="flex w-[420px] flex-col"
+      href={`/s/${spaceData?.owner.username}/s/${spaceData?.name}`}
+    >
+      <h3 className="-mb-9 ml-28 text-grey-55">New Space!</h3>
+      <SpaceCard {...(spaceData as SpaceData)} />
     </Link>
   );
 }
