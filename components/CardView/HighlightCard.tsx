@@ -37,7 +37,7 @@ export function HighlightCard(props: { entityID: string }) {
       >
         <Note />
       </button>
-      <Modal open={open} onClose={() => setOpen(false)}>
+      <Modal width="max-w-fit" open={open} onClose={() => setOpen(false)}>
         <div className="flex  flex-col gap-4">
           <h3>Highlight to a studio!</h3>
 
@@ -64,37 +64,39 @@ export function HighlightCard(props: { entityID: string }) {
             })}
           </div>
           <div className="flex flex-col gap-3 rounded-md bg-bg-blue p-2 pb-28">
-            <CreateStudioPost
-              id={studio}
-              remoteCard={{
-                space_do_id: spaceID,
-                cardEntity: props.entityID,
-              }}
-              onPost={async ({ cardPosition, contentPosition, value }) => {
-                let studio = sharedStudios?.[selectedStudio];
-                if (!authToken || !studio?.studios || !studio?.space) {
-                  return;
-                }
-                setState("loading");
-                let data = await spaceAPI(
-                  `${WORKER_URL}/space/${studio.studios.do_id}`,
-                  "post_feed_route",
-                  {
-                    cardPosition,
-                    contentPosition,
-                    authToken: authToken,
-                    content: value,
-                    spaceID: studio.space,
-                    cardEntity: props.entityID,
+            <div className="w-[768px]">
+              <CreateStudioPost
+                id={studio}
+                remoteCard={{
+                  space_do_id: spaceID,
+                  cardEntity: props.entityID,
+                }}
+                onPost={async ({ cardPosition, contentPosition, value }) => {
+                  let studio = sharedStudios?.[selectedStudio];
+                  if (!authToken || !studio?.studios || !studio?.space) {
+                    return;
                   }
-                );
-                if (data.success) setState("success");
-                setTimeout(() => {
-                  setOpen(false);
-                  setState("normal");
-                }, 300);
-              }}
-            />
+                  setState("loading");
+                  let data = await spaceAPI(
+                    `${WORKER_URL}/space/${studio.studios.do_id}`,
+                    "post_feed_route",
+                    {
+                      cardPosition,
+                      contentPosition,
+                      authToken: authToken,
+                      content: value,
+                      spaceID: studio.space,
+                      cardEntity: props.entityID,
+                    }
+                  );
+                  if (data.success) setState("success");
+                  setTimeout(() => {
+                    setOpen(false);
+                    setState("normal");
+                  }, 300);
+                }}
+              />
+            </div>
           </div>
           <div className="flex flex-row justify-end gap-2">
             <ButtonLink content={"nevermind"} onClick={() => setOpen(false)} />

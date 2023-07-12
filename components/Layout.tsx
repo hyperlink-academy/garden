@@ -43,6 +43,7 @@ export const Modal: React.FC<
     open: boolean;
     onClose: () => void;
     dark?: boolean;
+    width?: string;
   }>
 > = (props) => {
   return (
@@ -55,7 +56,9 @@ export const Modal: React.FC<
       <FloatingContainer
         className={`
               fixed top-1/2 left-1/2 grid max-h-[calc(100%-32px)]
-              w-[calc(100%-32px)] max-w-md -translate-x-1/2
+              w-[calc(100%-32px)] ${
+                props.width ? props.width : "max-w-md"
+              } -translate-x-1/2
               -translate-y-1/2
               grid-flow-row
               gap-4

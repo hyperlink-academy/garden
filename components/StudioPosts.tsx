@@ -5,6 +5,7 @@ import { useIndex, useMutations } from "hooks/useReplicache";
 import { useSpaceData } from "hooks/useSpaceData";
 import { useStudioData } from "hooks/useStudioData";
 import useWindowDimensions from "hooks/useWindowDimensions";
+import { spacePath } from "hooks/utils";
 import Link from "next/link";
 import { useState } from "react";
 import { generateKeyBetween } from "src/fractional-indexing";
@@ -148,6 +149,10 @@ export function Post(props: {
   let space = data?.spaces_in_studios.find(
     (s) => s.space === attachedSpace?.value
   );
+  let cardSpaceData = data?.spaces_in_studios.find(
+    (s) => s.space === attachedCard?.value.space_do_id
+  );
+
   return (
     <div>
       {space && (
@@ -173,7 +178,7 @@ export function Post(props: {
           }
         </span>
       )}
-      {attachedCard && (
+      {attachedCard && cardSpaceData && (
         <div
           className="relative"
           style={
@@ -185,7 +190,10 @@ export function Post(props: {
               : {}
           }
         >
-          <RemoteCardData {...attachedCard.value} />
+          <RemoteCardData
+            space_data={cardSpaceData.space_data}
+            {...attachedCard.value}
+          />
         </div>
       )}
       <div
@@ -207,7 +215,7 @@ export function Post(props: {
           {content?.value}
           <hr className="border-grey-80" />
           {creatorName && (
-            <div className="w-full text-right text-sm font-bold text-grey-55">
+            <div className="flex w-full items-center gap-2 text-right text-sm font-bold text-grey-55">
               {creatorName?.value}
             </div>
           )}
@@ -222,37 +230,98 @@ export function Post(props: {
 }
 
 export const RemoteCardData = (props: {
+  space_data: {
+    display_name: string;
+    name: string;
+    owner: { username: string };
+    default_space_image: string;
+    image: string;
+  };
   space_do_id: string;
   cardEntity: string;
 }) => {
   let { data } = useRemoteCardData(props.space_do_id, props.cardEntity);
   if (!data) return null;
-  return <RemoteCard {...data} />;
+
+  return <RemoteCard space_data={props.space_data} {...data} />;
 };
 
-function PostComments(props: { entityID: string; studioID: string }) {
-  let messagesCount = useIndex.eav(props.entityID, "discussion/message-count");
-  let [open, setOpen] = useState(false);
+export const RemoteCard = (props: {
+  title: string | undefined;
+  content: string | undefined;
+  creator: string | undefined;
+  space_data: {
+    display_name: string;
+    name: string;
+    owner: { username: string };
+    default_space_image: string;
+    image: string;
+  };
+}) => {
   return (
-    <>
-      <button
-        className="flex flex-row gap-1 rounded-md border border-accent-blue bg-accent-blue p-1 text-white hover:bg-bg-blue hover:text-accent-blue"
-        onClick={() => setOpen(true)}
-      >
-        {messagesCount?.value || 0}
-        <Note />
-      </button>
-      {open && (
-        <StudioPostFullScreen
-          studioID={props.studioID}
-          entityID={props.entityID}
-          onClose={() => setOpen(false)}
-        />
-      )}
-    </>
+    <div className="flex flex-col gap-2 text-grey-35">
+      <div className="flex max-h-60 w-[420px] flex-col gap-1 rounded-md border border-grey-90 bg-[#FDFCFA] p-3 shadow-inner">
+        <h4 className="shrink-0">{props?.title}</h4>
+        <p className="shink mb-2 grow overflow-hidden">{props?.content}</p>
+        <p className="flex shrink-0 items-center gap-2 text-xs italic text-grey-55">
+          by {props.creator} in{" "}
+          <Link
+            className=" flex items-center gap-2 font-bold text-accent-blue"
+            href={`${spacePath(
+              props?.space_data.owner?.username,
+              props?.space_data?.name || ""
+            )}`}
+          >
+            <div className="-mt-1">
+              <DoorImage
+                small
+                width="20"
+                image={props?.space_data?.image}
+                default_space_image={props.space_data?.default_space_image}
+              />
+            </div>
+            <p> {props.space_data?.display_name}</p>
+          </Link>
+        </p>
+      </div>
+    </div>
+  );
+};
+
+function NewSpacePost(props: {
+  entityID: string;
+  studioID: string;
+  spaceID: string;
+  createdAt: string;
+}) {
+  let { data: spaceData } = useSpaceData(props.spaceID);
+  let date = new Date(parseInt(props.createdAt)).toLocaleDateString([], {
+    dateStyle: "short",
+  });
+  return (
+    <Link href={`/s/${spaceData?.owner.username}/s/${spaceData?.name}`}>
+      <div className="flex flex-row">
+        <div>
+          <DoorImage
+            width="64"
+            image={spaceData?.image}
+            default_space_image={spaceData?.default_space_image}
+          />
+        </div>
+
+        <div className="mt-8 flex flex-col">
+          <div className="text-right text-sm italic text-grey-55">{date}</div>
+          <div className="-ml-6 w-96 self-end rounded-lg border border-grey-80 bg-white p-4 pl-8">
+            <h4>New Space!</h4>
+            <hr className="border-grey-80" />
+            <h3 className="text-accent-blue">{spaceData?.display_name}</h3>
+            <p>{spaceData?.description}</p>
+          </div>
+        </div>
+      </div>
+    </Link>
   );
 }
-
 const PostReactions = (props: { entityID: string }) => {
   let { authorized } = useMutations();
   let [reactionPickerOpen, setReactionPickerOpen] = useState(false);
@@ -288,48 +357,25 @@ const PostReactions = (props: { entityID: string }) => {
   );
 };
 
-export const RemoteCard = (props: {
-  title: string | undefined;
-  content: string | undefined;
-  creator: string | undefined;
-}) => (
-  <div className="w-36 rounded-md border border-grey-80 bg-white p-3">
-    <h4>{props?.title}</h4>
-    <p className="text-xs italic text-grey-55">by {props.creator}</p>
-  </div>
-);
-
-function NewSpacePost(props: {
-  entityID: string;
-  studioID: string;
-  spaceID: string;
-  createdAt: string;
-}) {
-  let { data: spaceData } = useSpaceData(props.spaceID);
-  let date = new Date(parseInt(props.createdAt)).toLocaleDateString([], {
-    dateStyle: "short",
-  });
+function PostComments(props: { entityID: string; studioID: string }) {
+  let messagesCount = useIndex.eav(props.entityID, "discussion/message-count");
+  let [open, setOpen] = useState(false);
   return (
-    <Link href={`/s/${spaceData?.owner.username}/s/${spaceData?.name}`}>
-      <div className="flex flex-row">
-        <div>
-          <DoorImage
-            width="64"
-            image={spaceData?.image}
-            default_space_image={spaceData?.default_space_image}
-          />
-        </div>
-
-        <div className="mt-8 flex flex-col">
-          <div className="text-right text-sm italic text-grey-55">{date}</div>
-          <div className="-ml-6 w-96 self-end rounded-lg border border-grey-80 bg-white p-4 pl-8">
-            <h4>New Space!</h4>
-            <hr className="border-grey-80" />
-            <h3 className="text-accent-blue">{spaceData?.display_name}</h3>
-            <p>{spaceData?.description}</p>
-          </div>
-        </div>
-      </div>
-    </Link>
+    <>
+      <button
+        className="flex flex-row gap-1 rounded-md border border-accent-blue bg-accent-blue p-1 text-white hover:bg-bg-blue hover:text-accent-blue"
+        onClick={() => setOpen(true)}
+      >
+        {messagesCount?.value || 0}
+        <Note />
+      </button>
+      {open && (
+        <StudioPostFullScreen
+          studioID={props.studioID}
+          entityID={props.entityID}
+          onClose={() => setOpen(false)}
+        />
+      )}
+    </>
   );
 }

@@ -16,6 +16,8 @@ import { restrictToParentElement } from "@dnd-kit/modifiers";
 import { DoorImage } from "./Doors";
 import { SpaceCard, SpaceData } from "./SpacesList";
 import { RemoteCardData } from "./StudioPosts";
+import { useSpaceID } from "hooks/useReplicache";
+import { useSpaceData } from "hooks/useSpaceData";
 
 let useOffsetsState = create(() => ({
   offsets: {} as { [key: string]: { y: number; x: number } },
@@ -32,12 +34,16 @@ export function CreateStudioPost(props: {
   selectSpace?: boolean;
   remoteCard?: { cardEntity: string; space_do_id: string };
 }) {
+  let id = useSpaceID();
+
   let { data } = useStudioData(props.id);
   let { session } = useAuth();
   let [selectedSpaces, setSelectedSpace] = useState<string | null>(null);
 
   if (!data?.members_in_studios.find((m) => m.member === session?.user?.id))
     return null;
+
+  let cardSpaceData = data?.spaces_in_studios.find((s) => s.space === id);
 
   return (
     <PostEditorDragContext>
@@ -61,7 +67,12 @@ export function CreateStudioPost(props: {
             setSelectedSpace={setSelectedSpace}
           />
         )}
-        {props.remoteCard && <DraggableRemoteCard {...props.remoteCard} />}
+        {props.remoteCard && (
+          <DraggableRemoteCard
+            space_data={cardSpaceData?.space_data}
+            {...props.remoteCard}
+          />
+        )}
         <Draggable id="post-editor">
           <PostEditor
             onPost={props.onPost}
@@ -74,10 +85,7 @@ export function CreateStudioPost(props: {
   );
 }
 
-function DraggableRemoteCard(props: {
-  cardEntity: string;
-  space_do_id: string;
-}) {
+function DraggableRemoteCard(props: Parameters<typeof RemoteCardData>[0]) {
   return (
     <Draggable id="remote-card">
       <RemoteCardData {...props} />
@@ -121,6 +129,7 @@ function PostEditor(props: {
         <hr className="border-grey-80" />
         <div className="text-right font-bold text-grey-55">
           {identityData?.username}
+          {props.remoteCard ? <span>hello</span> : null}
         </div>
       </div>
       <div className="absolute -bottom-10 right-0 flex justify-end">

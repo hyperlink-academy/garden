@@ -75,7 +75,6 @@ h4 {
   @apply text-[.95rem];
   @apply font-bold;
   @apply text-grey-35;
-  @apply uppercase;
 }
 
 p {
