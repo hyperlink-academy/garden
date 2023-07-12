@@ -11,7 +11,6 @@ import { EditSpaceModal } from "./CreateSpace";
 import { useSpaceData } from "hooks/useSpaceData";
 export type { SpaceData } from "backend/routes/get_space_data";
 import type { SpaceData } from "backend/routes/get_space_data";
-import { SpaceStatus } from "./SpaceLayout/Sidebar";
 import { getCurrentDate } from "src/utils";
 
 export const SpaceList = (props: {
@@ -29,9 +28,8 @@ export const SpaceList = (props: {
         }
       `}</style>
       <div
-        className={`spacesList flex flex-wrap  ${
-          props?.small ? "gap-4" : "gap-6 py-2"
-        }`}
+        className={`spacesList flex flex-wrap  ${props?.small ? "gap-4" : "gap-6 py-2"
+          }`}
       >
         {props.spaces?.map((a) => {
           return <SpaceCard small={props.small} {...a} key={a.do_id} />;
@@ -41,7 +39,18 @@ export const SpaceList = (props: {
   );
 };
 
-export const SpaceCard = (props: { small?: boolean } & SpaceData) => {
+export const SpaceCard = (
+  props: { small?: boolean; editable?: boolean } & SpaceData
+) => {
+  let { data } = useSpaceData(props.do_id, props);
+  return (
+    <Link href={`${spacePath(data?.owner?.username, data?.name || "")}`}>
+      <BaseSpaceCard {...props} />
+    </Link>
+  );
+};
+
+export const BaseSpaceCard = (props: Parameters<typeof SpaceCard>[0]) => {
   let { session } = useAuth();
   let { authorized } = useMutations();
   let now = getCurrentDate();
@@ -65,122 +74,119 @@ export const SpaceCard = (props: { small?: boolean } & SpaceData) => {
     duration_days = Math.floor(delta / 86400) + 1;
   }
 
-  return (
-    <>
-      {props.small ? (
-        <div className="smallSpaceCard group relative min-h-[82px]">
-          <Link href={`${spacePath(data?.owner?.username, data?.name || "")}`}>
-            <div className="smallSpaceCardIcon absolute left-0 top-0 z-10">
-              <DoorImage
-                small
-                width="64"
-                display_name={data?.display_name}
-                image={data?.image}
-                default_space_image={data?.default_space_image}
-                glow={!!unreads && !!authorized && unreads.value > 0}
-              />
-            </div>
-            <div className="ml-8 mt-6">
-              <div className="smallSpaceCardContent lightBorder flex w-64 shrink-0 flex-col gap-0 bg-white py-2 pl-10 pr-3 ">
-                <div className="flex justify-between gap-2">
-                  <h3>{data?.display_name}</h3>
-                  <div className="">
-                    {data?.owner?.username == session.session?.username ? (
-                      <EditSpaceButton
-                        spaceID={props.do_id}
-                        owner={data?.owner?.username}
-                      />
-                    ) : (
-                      <SpaceInfo
-                        studio={data?.owner?.username}
-                        name={data?.display_name}
-                        description={data?.description}
-                      />
-                    )}
-                  </div>
-                </div>
-                {data?.start_date &&
-                data?.end_date &&
-                data?.start_date <= now &&
-                data?.end_date >= now ? (
-                  <div className="text-sm italic text-grey-35">
-                    <div>
-                      ends{" "}
-                      {new Date(data.end_date).toLocaleDateString(undefined, {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      })}
-                    </div>
-                  </div>
-                ) : data?.start_date && data?.start_date > now ? (
-                  <div className="text-sm italic text-grey-35">
-                    <div>
-                      starts{" "}
-                      {new Date(data.start_date).toLocaleDateString(undefined, {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      })}
-                    </div>
-                  </div>
-                ) : null}
+  if (props.small)
+    return (
+      <div className="smallSpaceCard group relative flex min-h-[82px]">
+        <div className="ml-8 mt-6">
+          <div className="smallSpaceCardContent lightBorder flex w-64 shrink-0 flex-col gap-0 bg-white py-2 pl-10 pr-3 ">
+            <div className="flex justify-between gap-2">
+              <h3>{data?.display_name}</h3>
+              <div className="">
+                {props.editable &&
+                  (data?.owner?.username == session.session?.username ? (
+                    <EditSpaceButton
+                      spaceID={props.do_id}
+                      owner={data?.owner?.username}
+                    />
+                  ) : (
+                    <SpaceInfo
+                      studio={data?.owner?.username}
+                      name={data?.display_name}
+                      description={data?.description}
+                    />
+                  ))}
               </div>
             </div>
-          </Link>
-        </div>
-      ) : (
-        <div className="largeSpaceCard group relative w-full">
-          <Link href={`${spacePath(data?.owner?.username, data?.name || "")}`}>
-            <div className="largeSpaceCardIcon absolute left-0 top-0 z-10">
-              <DoorImage
-                width="96"
-                display_name={data?.display_name}
-                image={data?.image}
-                default_space_image={data?.default_space_image}
-                glow={!!unreads && !!authorized && unreads.value > 0}
-              />
-            </div>
-            <div className="ml-16 mt-10">
-              <div className="largeSpaceCardContent lightBorder flex min-h-[160px] w-full shrink-0 flex-col gap-0 bg-white py-4 pl-12 pr-3 ">
-                <div className="largeSpaceCardDetails flex grow flex-col gap-1">
-                  <div className="flex justify-between gap-2">
-                    <h3>{data?.display_name}</h3>
-                    <div className="">
-                      {data?.owner?.username == session.session?.username ? (
-                        <EditSpaceButton
-                          spaceID={props.do_id}
-                          owner={data?.owner?.username}
-                        />
-                      ) : (
-                        <SpaceInfo
-                          studio={data?.owner?.username}
-                          name={data?.display_name}
-                          description={data?.description}
-                        />
-                      )}
-                    </div>
-                  </div>{" "}
-                  <p>{data?.description}</p>
-                </div>
-
-                <div className="mt-2 text-sm italic text-grey-35">
+            {data?.start_date &&
+              data?.end_date &&
+              data?.start_date <= now &&
+              data?.end_date >= now ? (
+              <div className="text-sm italic text-grey-35">
+                <div>
                   ends{" "}
-                  {data?.end_date &&
-                    new Date(data?.end_date).toLocaleDateString(undefined, {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    })}
+                  {new Date(data.end_date).toLocaleDateString(undefined, {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
                 </div>
               </div>
-            </div>
-          </Link>
+            ) : data?.start_date && data?.start_date > now ? (
+              <div className="text-sm italic text-grey-35">
+                <div>
+                  starts{" "}
+                  {new Date(data.start_date).toLocaleDateString(undefined, {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
+                </div>
+              </div>
+            ) : null}
+          </div>
         </div>
-      )}
-    </>
+        <div className="smallSpaceCardIcon absolute left-0 top-0">
+          <DoorImage
+            small
+            width="64"
+            display_name={data?.display_name}
+            image={data?.image}
+            default_space_image={data?.default_space_image}
+            glow={!!unreads && !!authorized && unreads.value > 0}
+          />
+        </div>
+      </div>
+    );
+
+  return (
+    <div className="largeSpaceCard group relative w-full">
+      <div className="largeSpaceCardIcon absolute left-0 top-0 z-10">
+        <DoorImage
+          width="96"
+          display_name={data?.display_name}
+          image={data?.image}
+          default_space_image={data?.default_space_image}
+          glow={!!unreads && !!authorized && unreads.value > 0}
+        />
+      </div>
+      <div className="ml-16 mt-10">
+        <div className="largeSpaceCardContent lightBorder flex min-h-[160px] w-full shrink-0 flex-col gap-0 bg-white py-4 pl-12 pr-3 ">
+          <div className="largeSpaceCardDetails flex grow flex-col gap-1">
+            <div className="flex justify-between gap-2">
+              <h3>{data?.display_name}</h3>
+              <div className="">
+                {data?.owner?.username == session.session?.username ? (
+                  <EditSpaceButton
+                    spaceID={props.do_id}
+                    owner={data?.owner?.username}
+                  />
+                ) : (
+                  <SpaceInfo
+                    studio={data?.owner?.username}
+                    name={data?.display_name}
+                    description={data?.description}
+                  />
+                )}
+              </div>
+            </div>{" "}
+            <p>{data?.description}</p>
+          </div>
+
+          <div className="mt-2 text-sm italic text-grey-35">
+            ends{" "}
+            {data?.end_date &&
+              new Date(data?.end_date).toLocaleDateString(undefined, {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              })}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
+
 export const EditSpaceButton = (props: { spaceID: string; owner?: string }) => {
   let [open, setOpen] = useState(false);
   let { authorized } = useMutations();
