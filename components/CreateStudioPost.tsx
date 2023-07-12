@@ -8,7 +8,7 @@ import {
 } from "@dnd-kit/core";
 import { ref } from "data/Facts";
 import { useAuth } from "hooks/useAuth";
-import { useIndex, useMutations } from "hooks/useReplicache";
+import { useMutations } from "hooks/useReplicache";
 import { useStudioData } from "hooks/useStudioData";
 import { atom } from "jotai";
 import { useState } from "react";
@@ -18,20 +18,18 @@ import { ButtonTertiary } from "./Buttons";
 import { Textarea } from "./Textarea";
 import { create } from "zustand";
 import { restrictToParentElement } from "@dnd-kit/modifiers";
+import { DoorImage } from "./Doors";
+import { SpaceCard, SpaceData } from "./SpacesList";
 
 export function CreateStudioPost(props: {
   id: string;
   latestPost?: string;
-  latestPostEntity?: string;
+  selectSpace?: boolean;
+  cardEntity: string;
 }) {
   let { data } = useStudioData(props.id);
   let { session } = useAuth();
   let [selectedSpaces, setSelectedSpace] = useState<string | null>(null);
-
-  let latestPostPosition = useIndex.eav(
-    props.latestPostEntity || null,
-    "post/content/position"
-  );
 
   if (!data?.members_in_studios.find((m) => m.member === session?.user?.id))
     return null;
@@ -60,7 +58,6 @@ export function CreateStudioPost(props: {
           <PostEditor
             id={props.id}
             latestPost={props.latestPost}
-            latestPostEntity={props.latestPostEntity}
             selectedSpace={selectedSpaces}
           />
         </Draggable>
@@ -72,7 +69,6 @@ export function CreateStudioPost(props: {
 function PostEditor(props: {
   id: string;
   latestPost?: string;
-  latestPostEntity?: string;
   selectedSpace: string | null;
 }) {
   let { mutate, memberEntity } = useMutations();
@@ -175,48 +171,67 @@ function SpaceSelector(props: {
   return (
     <Draggable id="space-selector" className={open ? "z-10" : ""}>
       {!open ? (
-        <button className="w-fit border " onClick={() => setOpen(true)}>
-          {props.selectedSpaces
-            ? data?.spaces_in_studios.find(
+        <button className="w-fit" onClick={() => setOpen(true)}>
+          {props.selectedSpaces ? (
+            <SpaceCard
+              small
+              {...(data?.spaces_in_studios.find(
                 (s) => s.space === props.selectedSpaces
-              )?.space_data?.display_name
-            : "select a space"}
+              )?.space_data as SpaceData)}
+            />
+          ) : (
+            "select a space"
+          )}
         </button>
       ) : (
-        <div className="flex flex-wrap gap-2" onBlur={() => setOpen(false)}>
-          <button
-            className={`rounded-md border py-1 px-2 ${
-              !props.selectedSpaces
-                ? "border-accent-blue bg-accent-blue text-white"
-                : "border-grey-80 hover:border-accent-blue hover:bg-bg-blue"
-            }`}
-            onClick={() => {
-              props.setSelectedSpace(null);
-              setOpen(false);
-            }}
-          >
-            no space
-          </button>
-          {data?.spaces_in_studios.map((s) => {
-            if (!s.space) return;
-            let spaceID = s.space;
-            return (
-              <button
-                className={`rounded-md border py-1 px-2 ${
-                  props.selectedSpaces === spaceID
-                    ? "border-accent-blue bg-accent-blue text-white"
-                    : "border-grey-80 hover:border-accent-blue hover:bg-bg-blue"
-                }`}
-                key={spaceID}
-                onClick={() => {
-                  props.setSelectedSpace(spaceID);
-                  setOpen(false);
-                }}
-              >
-                {s.space_data?.display_name}
-              </button>
-            );
-          })}
+        <div
+          className="flex flex-col gap-2 rounded-md border border-grey-80 bg-bg-blue px-4 py-2"
+          onBlur={() => setOpen(false)}
+        >
+          <h3>Highlight A Space</h3>
+          <div className="flex flex-wrap gap-2 ">
+            <button
+              className={`rounded-md border py-1 px-2 ${
+                !props.selectedSpaces
+                  ? "border-accent-blue bg-accent-blue text-white"
+                  : "border-grey-80 hover:border-accent-blue hover:bg-bg-blue"
+              }`}
+              onClick={() => {
+                props.setSelectedSpace(null);
+                setOpen(false);
+              }}
+            >
+              no space
+            </button>
+            {data?.spaces_in_studios.map((s) => {
+              if (!s.space) return;
+              let spaceID = s.space;
+              if (s.space === props.selectedSpaces)
+                return <SpaceCard small {...(s.space_data as SpaceData)} />;
+              return (
+                <button
+                  className={`rounded-md border py-1 px-2 ${
+                    props.selectedSpaces === spaceID
+                      ? "border-accent-blue bg-accent-blue text-white"
+                      : "border-grey-80 hover:border-accent-blue hover:bg-bg-blue"
+                  }`}
+                  key={spaceID}
+                  onClick={() => {
+                    props.setSelectedSpace(spaceID);
+                    setOpen(false);
+                  }}
+                >
+                  <DoorImage
+                    white
+                    width="64"
+                    small
+                    image={s.space_data?.image}
+                    default_space_image={s.space_data?.default_space_image}
+                  />
+                </button>
+              );
+            })}
+          </div>
         </div>
       )}
     </Draggable>

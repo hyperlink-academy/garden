@@ -37,7 +37,7 @@ export const SpaceList = (props: {
   );
 };
 
-const SpaceCard = (props: { small?: boolean } & SpaceData) => {
+export const SpaceCard = (props: { small?: boolean } & SpaceData) => {
   let { session } = useAuth();
   let { authorized } = useMutations();
   let now = getCurrentDate();

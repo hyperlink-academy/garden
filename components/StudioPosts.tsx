@@ -11,6 +11,7 @@ import { CreateStudioPost } from "./CreateStudioPost";
 import { DoorImage } from "./Doors";
 import { Note, ReactionAdd } from "./Icons";
 import { Divider } from "./Layout";
+import { SpaceCard, SpaceData } from "./SpacesList";
 import { StudioPostFullScreen } from "./StudioPostFullScreen";
 
 export function StudioPosts(props: { id: string }) {
@@ -87,7 +88,7 @@ export function Post(props: {
               key={space?.space}
               className="font-bold text-accent-blue"
             >
-              {space?.space_data?.display_name}
+              <SpaceCard small {...(space?.space_data as SpaceData)} />
             </Link>
           }
         </span>
