@@ -39,13 +39,12 @@ export function HighlightCard(props: { entityID: string }) {
       </button>
       <Modal width="max-w-fit" open={open} onClose={() => setOpen(false)}>
         <div className="flex  flex-col gap-4">
-          <h3>Highlight to a studio!</h3>
+          <h3>Highlight to a Studio!</h3>
 
           <div className="flex flex-col gap-3">
             <div>
               <p className="text-sm text-grey-55">
-                You can only highlight to a studio that you share with this
-                space
+                Share this card to a Studio where this Space has been linked.
               </p>
             </div>
             {sharedStudios?.map((studio, index) => {
