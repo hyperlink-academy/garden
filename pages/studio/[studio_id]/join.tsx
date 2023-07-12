@@ -50,107 +50,6 @@ export default function StudioPage(props: Props) {
     }
   }, [data, session.user, query.studio_id]);
 
-  if (session.loggedIn) {
-    return (
-      <>
-        <Head>
-          <title key="title">{data?.name}: you&apos;re invited!</title>
-        </Head>
-
-        {/* TODO: replace below w/ matching styles */}
-
-        {/* <div>
-          <div className="flex flex-row justify-between">
-            <h1>{data?.name}</h1>
-          </div>
-          {data?.description}
-          <div className="m-auto max-w-xl rounded-md border">
-            <h2>Welcome!</h2>
-            <ButtonPrimary
-              content="Join"
-              onClick={async () => {
-                if (!props.data || !authToken || !code) return;
-                let data = await spaceAPI(
-                  `${WORKER_URL}/space/${props.data?.do_id}`,
-                  "join",
-                  {
-                    authToken,
-                    code,
-                  }
-                );
-                if (data.success) {
-                  push(`/studio/${query.studio_id}`);
-                }
-              }}
-            />
-          </div>
-        </div> */}
-
-        {/* NB: spacing adjusted b/c we have HomeLayout with header wrapper here */}
-        <div className="mx-auto flex max-w-3xl flex-col place-items-center gap-6 px-0 py-4">
-          <div className="flex flex-col gap-6 text-center ">
-            <p className="text-lg">
-              You&apos;ve been invited to join a{" "}
-              <strong>
-                Studio<sup className="text-grey-55">†</sup>
-              </strong>
-              :{" "}
-            </p>
-            {/* <div>
-              <h2>
-                <Link
-                  href={`/studio/${query.studio_id}`}
-                  className="text-accent-blue"
-                >
-                  {data?.name}
-                </Link>
-              </h2>
-              <p>{data?.description}</p>
-            </div> */}
-
-            <Link
-              href={`/studio/${query.studio_id}`}
-              className="lightBorder flex shrink-0 flex-col gap-0 bg-white p-4"
-            >
-              <h2>{data?.name}</h2>
-              <p>{data?.description}</p>
-            </Link>
-
-            <p>A membership card is waiting for you!</p>
-          </div>
-          <div className="relative">
-            <div className="mb-2 p-4">
-              <div
-                className={`memberCardBorder relative h-[94px] w-[160px] grow`}
-              >
-                <BaseSmallCard
-                  isMember
-                  memberName={session.session?.username}
-                  content=""
-                />
-              </div>
-            </div>
-            <div className="absolute top-0 -left-2">
-              <WelcomeSparkle />
-            </div>
-          </div>
-          <ButtonPrimary
-            content="Join the Studio!"
-            icon={<Member />}
-            onClick={onClick}
-          />
-          <div className="flex max-w-sm flex-col gap-4 pt-4 text-center italic">
-            <Divider />
-            <p>
-              <sup className="text-grey-55">†</sup>
-              <strong>Studios</strong>, on Hyperlink, are places for groups to
-              share and talk about their work.
-            </p>
-          </div>
-        </div>
-      </>
-    );
-  }
   return (
     <>
       <Head>
@@ -159,47 +58,90 @@ export default function StudioPage(props: Props) {
 
       {/* NB: spacing adjusted b/c we have HomeLayout with header wrapper here */}
       <div className="mx-auto flex max-w-3xl flex-col place-items-center gap-6 px-0 py-4">
-        <div className="flex flex-col gap-2 text-center ">
-          <h2>
-            You&apos;ve been invited to join{" "}
-            <Link
-              href={`/studio/${query.studio_id}`}
+        <h2>Welcome!</h2>
+        <p className="text-center text-lg">
+          You&apos;ve been invited to join a{" "}
+          <strong>
+            Studio<sup className="text-grey-55">†</sup>
+          </strong>
+          :{" "}
+        </p>
+        <Link
+          href={`/studio/${query.studio_id}`}
+          className="lightBorder flex shrink-0 flex-col gap-0 bg-white p-4"
+        >
+          <h2>{data?.name}</h2>
+          <p>{data?.description}</p>
+        </Link>
+
+        {session.loggedIn ? (
+          <>
+            <p className="text-center">A membership card is waiting for you!</p>
+            <div className="relative">
+              <div className="mb-2 p-4">
+                <div
+                  className={`memberCardBorder relative h-[94px] w-[160px] grow`}
+                >
+                  <BaseSmallCard
+                    isMember
+                    memberName={session.session?.username}
+                    content=""
+                  />
+                </div>
+              </div>
+              <div className="absolute top-0 -left-2">
+                <WelcomeSparkle />
+              </div>
+            </div>
+            <ButtonPrimary
+              content="Join the Studio"
+              icon={<Member />}
+              onClick={onClick}
+            />
+          </>
+        ) : (
+          <>
+            <div className="display flex flex-row gap-2">
+              <ButtonPrimary
+                content="Log In"
+                onClick={() => setState("login")}
+                className="justify-self-center"
+              />
+              <p className="self-center text-sm italic">or</p>
+              <ButtonSecondary
+                content="Sign Up"
+                onClick={() => setState("signup")}
+                className="justify-self-center"
+              />
+            </div>
+            <LogInModal
+              isOpen={state === "login"}
+              onClose={() => setState("normal")}
+            />
+            <SignupModal
+              redirectTo={`/studio/${query.studio_id}/join?code=${code}`}
+              isOpen={state === "signup"}
+              onClose={() => setState("normal")}
+            />
+          </>
+        )}
+        <div className="flex max-w-sm flex-col gap-4 pt-4 text-center italic">
+          <Divider />
+          <p>
+            <sup className="text-grey-55">†</sup>
+            <strong>Studios</strong>, on Hyperlink, are places for groups to
+            share and talk about their work.
+          </p>
+          <p className="text-center">
+            We&apos;re still in beta! Email if you have any questions:{" "}
+            <a
+              href="mailto:contact@hyperlink.academy"
               className="text-accent-blue"
             >
-              {data?.name}
-            </Link>
-          </h2>
+              contact@hyperlink.academy
+            </a>{" "}
+          </p>
         </div>
-        <div className="display flex flex-row gap-2">
-          <ButtonPrimary
-            content="Log In"
-            onClick={() => setState("login")}
-            className="justify-self-center"
-          />
-          <ButtonSecondary
-            content="Sign up"
-            onClick={() => setState("signup")}
-            className="justify-self-center"
-          />
-        </div>
-        <LogInModal
-          isOpen={state === "login"}
-          onClose={() => setState("normal")}
-        />
-        <SignupModal
-          redirectTo={`/studio/${query.studio_id}/join?code=${code}`}
-          isOpen={state === "signup"}
-          onClose={() => setState("normal")}
-        />
-        <p className="text-center">
-          We&apos;re still in beta! If you have any questions, email us at{" "}
-          <a
-            href="mailto:contact@hyperlink.academy"
-            className="text-accent-blue"
-          >
-            contact@hyperlink.academy
-          </a>{" "}
-        </p>
       </div>
     </>
   );
