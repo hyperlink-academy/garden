@@ -40,7 +40,7 @@ export const CreateSpace = (props: {
   let rep = useContext(ReplicacheContext);
   if (!authorized) return null;
   return (
-    <div className="mt-4 mb-8 grid w-full">
+    <div className="flex gap-2">
       <a className="place-self-center">
         <ButtonSecondary
           icon={<SpaceCreate />}

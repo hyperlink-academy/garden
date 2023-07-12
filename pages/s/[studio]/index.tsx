@@ -8,6 +8,9 @@ import { useAuth } from "hooks/useAuth";
 import { useRouter } from "next/router";
 import { getCurrentDate } from "src/utils";
 import { useIdentityData } from "hooks/useIdentityData";
+import { Divider } from "components/Layout";
+import { useState } from "react";
+import { DisclosureCollapseTiny, DisclosureExpandTiny } from "components/Icons";
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>;
 export default function StudioPage(props: Props) {
@@ -27,19 +30,19 @@ export default function StudioPage(props: Props) {
 
   return (
     <SpaceProvider id={data.studio}>
-      <StudioName />
-      {query.history !== undefined ? (
-        <HistoryList spaces={spaces} />
-      ) : (
+      <div className="mb-12 flex flex-col gap-2">
+        <div className="flex justify-between ">
+          <h1 className="grow">{currentStudioName + "'s studio"}</h1>
+          {!session?.loggedIn ||
+            (session.session?.username === currentStudioName && (
+              <CreateSpace
+                studioSpaceID={data.studio}
+                studioName={currentStudioName as string}
+              />
+            ))}
+        </div>
         <List spaces={spaces} id={data.studio} name={query.studio as string} />
-      )}
-      {/* main CreateSpace button, after all Space lists */}
-      {!session?.loggedIn || myStudioName != currentStudioName ? null : (
-        <CreateSpace
-          studioSpaceID={data.studio}
-          studioName={query.studio as string}
-        />
-      )}
+      </div>
     </SpaceProvider>
   );
 }
@@ -49,17 +52,29 @@ const HistoryList = (props: { spaces: Array<SpaceData> }) => {
   let spacesHistory = props.spaces.filter(
     (s) => s.end_date && s.end_date < now
   );
-
+  let [showHistory, setShowHistory] = useState(false);
   // return <SpaceList spaces={spaces} />;
   return (
     <>
       {spacesHistory.length > 0 ? (
-        <div className="my-4 rounded-lg border border-grey-55">
-          <h2 className=" rounded-t-md bg-[rebeccapurple] py-2 px-4 text-white">
-            History
-          </h2>
-          <div className="p-2 pb-6 sm:p-4 sm:pb-8">
-            <SpaceList spaces={spacesHistory} />
+        <div className="myStudioCompleted">
+          <button
+            className={`flex items-center gap-2 hover:text-accent-blue ${
+              showHistory ? "text-grey-15" : "text-grey-55"
+            }`}
+            onClick={() => {
+              setShowHistory(!showHistory);
+            }}
+          >
+            <h3>Completed ({spacesHistory.length})</h3>
+            {!showHistory ? (
+              <DisclosureCollapseTiny />
+            ) : (
+              <DisclosureExpandTiny />
+            )}
+          </button>
+          <div className={`${showHistory ? "" : "hidden"}`}>
+            <SpaceList small spaces={spacesHistory} />
           </div>
         </div>
       ) : null}
@@ -116,26 +131,10 @@ const List = (props: {
   );
 
   return (
-    <>
-      {spacesActive.length > 0 ? (
-        <div className="my-4 rounded-lg border border-grey-55">
-          <h2 className=" rounded-t-md bg-[steelblue] py-2 px-4 text-white">
-            Active
-          </h2>
-          <div className="p-2 pb-6 sm:p-4 sm:pb-8">
-            <SpaceList spaces={spacesActive} />
-          </div>
-        </div>
-      ) : null}
-      {/* extra CreateSpace just below 'Active' */}
-      {/* NOT if not logged in or not on your studio */}
-      {/* NOT if no active spaces OR no others, to avoid duplicate CreateSpace */}
-      {!session?.loggedIn ||
-      myStudioName != currentStudioName ||
-      spacesActive.length == 0 ||
-      !(spacesUpcoming.length > 0 || spacesUnscheduled.length > 0) ? null : (
-        <CreateSpace studioSpaceID={props.id} studioName={props.name} />
-      )}
+    <div className="flex flex-col gap-8">
+      {spacesActive.length > 0 ? <SpaceList spaces={spacesActive} /> : null}
+
+      <Divider />
       {/* empty state - if studio has NO ACTIVE SPACES */}
       {/* different messages for logged in user vs. viewing someone else's studio */}
       {spacesActive.length == 0 &&
@@ -150,26 +149,19 @@ const List = (props: {
         )
       ) : null}
       {spacesUpcoming.length > 0 ? (
-        <div className="my-4 rounded-lg border border-grey-55">
-          <h2 className=" rounded-t-md bg-[darkgoldenrod] py-2 px-4 text-white">
-            Upcoming
-          </h2>
-          <div className="p-2 pb-6 sm:p-4 sm:pb-8">
-            <SpaceList spaces={spacesUpcoming} />
-          </div>
+        <div className="myStudioUpcoming">
+          <h3 className=" ">Upcoming</h3>
+          <SpaceList small spaces={spacesUpcoming} />
         </div>
       ) : null}
       {spacesUnscheduled.length > 0 ? (
-        <div className="my-4 rounded-lg border border-grey-55">
-          <h2 className=" rounded-t-md bg-[grey] py-2 px-4 text-white">
-            Unscheduled
-          </h2>
-          <div className="p-2 pb-6 sm:p-4 sm:pb-8">
-            <SpaceList spaces={spacesUnscheduled} />
-          </div>
+        <div className="myStudioUnscheduled">
+          <h3 className=" ">Unscheduled</h3>
+          <SpaceList small spaces={spacesUnscheduled} />
         </div>
       ) : null}
-    </>
+      <HistoryList spaces={props.spaces} />
+    </div>
   );
 };
 

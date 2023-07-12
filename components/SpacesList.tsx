@@ -28,7 +28,11 @@ export const SpaceList = (props: {
           }
         }
       `}</style>
-      <div className="spacesList flex flex-wrap gap-4">
+      <div
+        className={`spacesList flex flex-wrap  ${
+          props?.small ? "gap-4" : "gap-6 py-2"
+        }`}
+      >
         {props.spaces?.map((a) => {
           return <SpaceCard small={props.small} {...a} key={a.do_id} />;
         })}
@@ -64,7 +68,7 @@ export const SpaceCard = (props: { small?: boolean } & SpaceData) => {
   return (
     <>
       {props.small ? (
-        <div className="smallSpaceCard relative">
+        <div className="smallSpaceCard relative min-h-[82px]">
           <div className="smallSpaceCardIcon absolute left-0 top-0 z-10">
             <Link href={`${spacePath(data?.owner.username, data?.name || "")}`}>
               <DoorImage
@@ -152,22 +156,20 @@ export const SpaceCard = (props: { small?: boolean } & SpaceData) => {
       </div> */}
           </div>
           <div className="ml-16 mt-10">
-            <div className="largeSpaceCardContent lightBorder flex min-h-[160px] w-full shrink-0 flex-col gap-0 bg-white py-3 pl-11 pr-3 ">
+            <div className="largeSpaceCardContent lightBorder flex min-h-[160px] w-full shrink-0 flex-col gap-0 bg-white py-4 pl-12 pr-3 ">
               <div className="largeSpaceCardDetails flex grow flex-col gap-1">
                 <h2>{data?.display_name}</h2>
                 <p>{data?.description}</p>
               </div>
 
-              <div className="text-sm italic text-grey-35">
-                <div>
-                  ends{" "}
-                  {data?.end_date &&
-                    new Date(data?.end_date).toLocaleDateString(undefined, {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    })}
-                </div>
+              <div className="mt-2 text-sm italic text-grey-35">
+                ends{" "}
+                {data?.end_date &&
+                  new Date(data?.end_date).toLocaleDateString(undefined, {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
               </div>
             </div>
           </div>
