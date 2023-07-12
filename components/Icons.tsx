@@ -132,7 +132,7 @@ export const ArrowDown = (props: Props) => {
   );
 };
 
-export const BackToStudio = (props: Props) => {
+export const BackToHome = (props: Props) => {
   return (
     <svg
       width="24"

@@ -1,11 +1,10 @@
 import Link from "next/link";
-
 import { Divider, Modal } from "components/Layout";
 import { useAuth } from "hooks/useAuth";
 import { useSpaceID } from "hooks/useReplicache";
 import React, { Fragment, useState } from "react";
 import {
-  BackToStudio as BackToStudioIcon,
+  BackToHome,
   Information,
   MoreOptionsSmall,
   RoomCalendar,
@@ -18,9 +17,11 @@ import { EditRoomModal } from "./RoomListLayout";
 import { SharedRoomList } from "./SharedRoomList";
 import { MemberRoomList } from "./MemberRoomList";
 import { Popover } from "@headlessui/react";
+import * as PopoverRadix from "@radix-ui/react-popover";
 import { ButtonPrimary } from "components/Buttons";
 import { LogInModal } from "components/LoginModal";
 import { useSpaceData } from "hooks/useSpaceData";
+import { useIdentityData } from "hooks/useIdentityData";
 
 export const Sidebar = (props: {
   onRoomChange: (room: string) => void;
@@ -120,11 +121,18 @@ const SpaceName = () => {
 };
 
 const SidebarFooter = (props: { studio?: string }) => {
+  let spaceID = useSpaceID();
+  let { data } = useSpaceData(spaceID);
+  let { session } = useAuth();
+  let authorized =
+    session.session && session.session.username === data?.owner.username;
+
   let [infoOpen, setInfoOpen] = useState(false);
   let [logInOpen, setLogInOpen] = useState(false);
 
   return (
-    <div className="sidebarBackToStudio z-10 flex items-center gap-2 ">
+    <div className="sidebarBackToHome z-10 flex items-center justify-between gap-2 ">
+      {/* login OR home button */}
       {!props.studio ? (
         <div className="grow">
           <ButtonPrimary
@@ -134,21 +142,21 @@ const SidebarFooter = (props: { studio?: string }) => {
           <LogInModal isOpen={logInOpen} onClose={() => setLogInOpen(false)} />
         </div>
       ) : (
-        <Link
-          className="flex grow place-items-center gap-2 rounded-md border border-transparent px-2 py-1 hover:border-accent-blue  hover:text-accent-blue"
-          href={`/s/${props.studio}`}
-        >
-          <BackToStudioIcon /> To Studio
+        <Link className="hover:text-accent-blue" href={`/s/${props.studio}`}>
+          <BackToHome />
         </Link>
       )}
 
+      {/* studio list! */}
+      {authorized && <SpaceStudiosList username={session.session.username} />}
+
+      {/* info / help button */}
       <button
         className="hover:text-accent-blue"
         onClick={() => setInfoOpen(true)}
       >
         <Information />
       </button>
-
       <InfoModal open={infoOpen} onClose={() => setInfoOpen(false)} />
     </div>
   );
@@ -179,6 +187,45 @@ const InfoModal = (props: { open: boolean; onClose: () => void }) => {
         <p>—The Hyperlink Team</p>
       </div>
     </Modal>
+  );
+};
+
+const SpaceStudiosList = (props: { username: string }) => {
+  let { data } = useIdentityData(props.username);
+  let studios = data?.members_in_studios.map(
+    (s) => s.studios as Exclude<typeof s.studios, null>
+  );
+  return (
+    <>
+      <PopoverRadix.Root>
+        <PopoverRadix.Trigger>
+          <button className="font-bold text-grey-35 hover:text-accent-blue">
+            Studios
+          </button>
+        </PopoverRadix.Trigger>
+
+        <PopoverRadix.Portal>
+          <PopoverRadix.Content
+            className="relative left-2 z-20 flex max-w-xs flex-col gap-2 rounded-md border-2 border-grey-80 bg-white p-2 drop-shadow-md"
+            sideOffset={4}
+          >
+            <PopoverRadix.Arrow
+              className="fill-grey-80 stroke-grey-80"
+              offset={20}
+              startOffset={20}
+            />
+
+            {studios?.map((s) => (
+              <Link href={`/studio/${s.id}`} key={s.id}>
+                <PopoverRadix.Close className="w-full py-1 px-2 text-left text-grey-35 hover:bg-bg-blue">
+                  {s.name}
+                </PopoverRadix.Close>
+              </Link>
+            ))}
+          </PopoverRadix.Content>
+        </PopoverRadix.Portal>
+      </PopoverRadix.Root>
+    </>
   );
 };
 

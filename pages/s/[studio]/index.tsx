@@ -10,16 +10,16 @@ import { useIdentityData } from "hooks/useIdentityData";
 import { Divider } from "components/Layout";
 import { useState } from "react";
 import { DisclosureCollapseTiny, DisclosureExpandTiny } from "components/Icons";
+import Head from "next/head";
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>;
-export default function StudioPage(props: Props) {
+export default function UserHomePage(props: Props) {
   let { session } = useAuth();
   let { query } = useRouter();
   let { data } = useIdentityData(query.studio as string, props.data);
-  if (props.notFound) return <div>404 - studio not found!</div>;
+  if (props.notFound) return <div>404 - page not found!</div>;
   if (!data) return <div>loading </div>;
 
-  let myStudioName = session.session?.username;
   let currentStudioName = query.studio;
   let spaces = [
     ...data.members_in_spaces
@@ -28,21 +28,30 @@ export default function StudioPage(props: Props) {
   ];
 
   return (
-    <SpaceProvider id={data.studio}>
-      <div className="mb-12 flex flex-col gap-2">
-        <div className="flex flex-col gap-2 sm:flex-row sm:justify-between">
-          <h1 className="grow">{currentStudioName + "'s studio"}</h1>
-          {!session?.loggedIn ||
-            (session.session?.username === currentStudioName && (
-              <CreateSpace
-                studioSpaceID={data.studio}
-                studioName={currentStudioName as string}
-              />
-            ))}
+    <>
+      <Head>
+        <title key="title">{currentStudioName}</title>
+      </Head>
+      <SpaceProvider id={data.studio}>
+        <div className="mb-12 flex flex-col gap-2">
+          <div className="flex flex-col gap-2 sm:flex-row sm:justify-between">
+            <h1 className="grow">{currentStudioName}</h1>
+            {!session?.loggedIn ||
+              (session.session?.username === currentStudioName && (
+                <CreateSpace
+                  studioSpaceID={data.studio}
+                  studioName={currentStudioName as string}
+                />
+              ))}
+          </div>
+          <List
+            spaces={spaces}
+            id={data.studio}
+            name={query.studio as string}
+          />
         </div>
-        <List spaces={spaces} id={data.studio} name={query.studio as string} />
-      </div>
-    </SpaceProvider>
+      </SpaceProvider>
+    </>
   );
 }
 
@@ -52,7 +61,6 @@ const HistoryList = (props: { spaces: Array<SpaceData> }) => {
     (s) => s.end_date && s.end_date < now
   );
   let [showHistory, setShowHistory] = useState(false);
-  // return <SpaceList spaces={spaces} />;
   return (
     <>
       {spacesHistory.length > 0 ? (
@@ -134,17 +142,17 @@ const List = (props: {
       {spacesActive.length > 0 ? <SpaceList spaces={spacesActive} /> : null}
 
       <Divider />
-      {/* empty state - if studio has NO ACTIVE SPACES */}
-      {/* different messages for logged in user vs. viewing someone else's studio */}
+      {/* empty state - if user homepage has NO ACTIVE SPACES */}
+      {/* different messages for logged in user vs. viewing someone else's home */}
       {spacesActive.length == 0 &&
       spacesUpcoming.length == 0 &&
       spacesUnscheduled.length == 0 ? (
         session?.loggedIn && myStudioName == currentStudioName ? (
-          <MyStudioEmpty /> /* me as in the logged in user who can make spaces here */
+          <MyHomeEmpty /> /* me as in the logged in user who can make spaces here */
         ) : (
-          <YourStudioEmpty
+          <YourHomeEmpty
             username={currentStudioName as string}
-          /> /* you as in a studio that's not mine-the-authed-user's */
+          /> /* you as in I'm viewing a homepage that's not mine-the-authed-user's */
         )
       ) : null}
       {spacesUpcoming.length > 0 ? (
@@ -181,7 +189,7 @@ export async function getStaticProps(ctx: GetStaticPropsContext) {
   return { props: { notFound: false, data: data.data } };
 }
 
-const MyStudioEmpty = () => {
+const MyHomeEmpty = () => {
   return (
     <div className="my-4 flex flex-col gap-4 rounded-md border p-4">
       <p>
@@ -194,10 +202,10 @@ const MyStudioEmpty = () => {
   );
 };
 
-const YourStudioEmpty = (props: { username: string }) => {
+const YourHomeEmpty = (props: { username: string }) => {
   return (
     <div className="my-4 flex flex-col gap-4 rounded-md border p-4">
-      <p>This Studio has no active Spaces.</p>
+      <p>This person has no active Spaces.</p>
       <p>Check back later, or invite {props.username} to collaborate!</p>
     </div>
   );
