@@ -69,7 +69,7 @@ export const SpaceCard = (props: { small?: boolean } & SpaceData) => {
     <>
       {props.small ? (
         <div className="smallSpaceCard group relative min-h-[82px]">
-          <Link href={`${spacePath(data?.owner.username, data?.name || "")}`}>
+          <Link href={`${spacePath(data?.owner?.username, data?.name || "")}`}>
             <div className="smallSpaceCardIcon absolute left-0 top-0 z-10">
               <DoorImage
                 small
@@ -85,14 +85,14 @@ export const SpaceCard = (props: { small?: boolean } & SpaceData) => {
                 <div className="flex justify-between gap-2">
                   <h3>{data?.display_name}</h3>
                   <div className="">
-                    {data?.owner.username == session.session?.username ? (
+                    {data?.owner?.username == session.session?.username ? (
                       <EditSpaceButton
                         spaceID={props.do_id}
-                        owner={data?.owner.username}
+                        owner={data?.owner?.username}
                       />
                     ) : (
                       <SpaceInfo
-                        studio={data?.owner.username}
+                        studio={data?.owner?.username}
                         name={data?.display_name}
                         description={data?.description}
                       />
@@ -131,7 +131,7 @@ export const SpaceCard = (props: { small?: boolean } & SpaceData) => {
         </div>
       ) : (
         <div className="largeSpaceCard group relative w-full">
-          <Link href={`${spacePath(data?.owner.username, data?.name || "")}`}>
+          <Link href={`${spacePath(data?.owner?.username, data?.name || "")}`}>
             <div className="largeSpaceCardIcon absolute left-0 top-0 z-10">
               <DoorImage
                 width="96"
@@ -147,14 +147,14 @@ export const SpaceCard = (props: { small?: boolean } & SpaceData) => {
                   <div className="flex justify-between gap-2">
                     <h3>{data?.display_name}</h3>
                     <div className="">
-                      {data?.owner.username == session.session?.username ? (
+                      {data?.owner?.username == session.session?.username ? (
                         <EditSpaceButton
                           spaceID={props.do_id}
-                          owner={data?.owner.username}
+                          owner={data?.owner?.username}
                         />
                       ) : (
                         <SpaceInfo
-                          studio={data?.owner.username}
+                          studio={data?.owner?.username}
                           name={data?.display_name}
                           description={data?.description}
                         />

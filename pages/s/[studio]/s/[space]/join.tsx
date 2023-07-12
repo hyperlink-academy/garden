@@ -9,6 +9,9 @@ import { SVGProps, useState } from "react";
 import { LogInModal, SignupModal } from "components/LoginModal";
 import Head from "next/head";
 import { useSpaceData } from "hooks/useSpaceData";
+import Link from "next/link";
+import { SpaceCard, SpaceData } from "components/SpacesList";
+import { Divider } from "components/Layout";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export default function JoinSpacePage() {
@@ -34,6 +37,7 @@ export function JoinSpace() {
       router.push(`/s/${router.query.studio}/s/${router.query.space}`);
     }
   };
+
   if (isMember)
     router.push(`/s/${router.query.studio}/s/${router.query.space}`);
 
@@ -44,10 +48,19 @@ export function JoinSpace() {
           <title key="title">{data?.display_name}: you&apos;re invited!</title>
         </Head>
 
-        <div className="mx-auto flex max-w-3xl flex-col place-items-center gap-6 p-8">
+        <div className="mx-auto flex max-w-3xl flex-col place-items-center gap-6 py-8 px-4">
           <div className="flex flex-col gap-2 text-center ">
-            <h2>You&apos;ve been invited to {data?.display_name}</h2>
-            <p>A new membership card is waiting for you!</p>
+            <p className="text-lg">
+              You&apos;ve been invited to join a{" "}
+              <strong>
+                Space<sup className="text-grey-55">†</sup>
+              </strong>
+              :{" "}
+            </p>
+            <div className="self-center pb-4">
+              <SpaceCard small {...(data as SpaceData)} />
+            </div>
+            <p>A membership card is waiting for you!</p>
           </div>
           <div className="relative">
             <div className="mb-2 p-4">
@@ -66,10 +79,18 @@ export function JoinSpace() {
             </div>
           </div>
           <ButtonPrimary
-            content="Become a Member!"
+            content="Join the Space!"
             icon={<Member />}
             onClick={onClick}
           />
+          <div className="flex max-w-sm flex-col gap-4 pt-4 text-center italic">
+            <Divider />
+            <p>
+              <sup className="text-grey-55">†</sup>
+              <strong>Spaces</strong>, on Hyperlink, are collaborative
+              workspaces for doing projects together.
+            </p>
+          </div>
         </div>
       </>
     );
@@ -80,9 +101,17 @@ export function JoinSpace() {
         <title key="title">{data?.display_name}: you&apos;re invited!</title>
       </Head>
 
-      <div className="mx-auto flex max-w-3xl flex-col place-items-center gap-6 p-8">
+      <div className="mx-auto flex max-w-3xl flex-col place-items-center gap-6 py-8 px-4">
         <div className="flex flex-col gap-2 text-center ">
-          <h2>You&apos;ve been invited to {data?.display_name}</h2>
+          <h2>
+            You&apos;ve been invited to join{" "}
+            <Link
+              href={`/s/${router.query.studio}/s/${router.query.space}`}
+              className="text-accent-blue"
+            >
+              {data?.display_name}
+            </Link>
+          </h2>
         </div>
         <div className="display flex flex-row gap-2">
           <ButtonPrimary
@@ -106,8 +135,7 @@ export function JoinSpace() {
           onClose={() => setState("normal")}
         />
         <p className="text-center">
-          We&apos;re still in early alpha! If you&apos;d have any questions,
-          email us at{" "}
+          We&apos;re still in beta! If you have any questions, email us at{" "}
           <a
             href="mailto:contact@hyperlink.academy"
             className="text-accent-blue"
