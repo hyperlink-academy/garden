@@ -4,19 +4,15 @@ import { useStudioData } from "hooks/useStudioData";
 import { useEffect, useState } from "react";
 import { Modal } from "components/Layout";
 import { StudioForm } from "components/CreateStudio";
-import { ButtonLink, ButtonPrimary, ButtonSecondary } from "components/Buttons";
+import { ButtonLink, ButtonPrimary } from "components/Buttons";
 import { DotLoader } from "components/DotLoader";
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
-import { Database } from "backend/lib/database.types";
 import { useAuth } from "hooks/useAuth";
-import useSWR from "swr";
 import { spaceAPI, workerAPI } from "backend/lib/api";
-import { useSmoker } from "components/Smoke";
 import Router from "next/router";
 
+const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export function StudioOptionsMenu(props: { id: string }) {
   let [open, setOpen] = useState(false);
-  let [inviteModalOpen, setInviteModalOpen] = useState(false);
   let [studioSettingsModalOpen, setStudioSettingsModalOpen] = useState(false);
   return (
     <>
@@ -31,15 +27,6 @@ export function StudioOptionsMenu(props: { id: string }) {
           >
             <button
               className="py-1 px-2 text-right text-grey-35 hover:bg-bg-blue"
-              onClick={() => {
-                setInviteModalOpen(true);
-                setOpen(false);
-              }}
-            >
-              Invite Members
-            </button>
-            <button
-              className="py-1 px-2 text-right text-grey-35 hover:bg-bg-blue"
               onClick={() => setStudioSettingsModalOpen(true)}
             >
               Studio Settings
@@ -47,12 +34,6 @@ export function StudioOptionsMenu(props: { id: string }) {
           </Popover.Content>
         </Popover.Portal>
       </Popover.Root>
-
-      <InviteModal
-        id={props.id}
-        open={inviteModalOpen}
-        onClose={() => setInviteModalOpen(false)}
-      />
 
       <StudioSettings
         id={props.id}
@@ -75,7 +56,6 @@ function StudioSettings(props: {
     name: "",
     description: "",
   });
-  let supabase = useSupabaseClient<Database>();
   useEffect(() => {
     setFormState({
       description: data?.description || "",
@@ -151,59 +131,6 @@ function StudioSettings(props: {
             </>
           ) : null}
         </form>
-      </Modal>
-    </>
-  );
-}
-
-const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
-function InviteModal(props: {
-  id: string;
-  onClose: () => void;
-  open: boolean;
-}) {
-  let { data } = useStudioData(props.id);
-  let { authToken } = useAuth();
-  let { data: inviteLink } = useSWR(
-    !data || !authToken
-      ? null
-      : `${WORKER_URL}/space/${data.do_id}/get_share_code`,
-    async () => {
-      if (!data || !authToken) return;
-      let code = await spaceAPI(
-        `${WORKER_URL}/space/${data.do_id}`,
-        "get_share_code",
-        { authToken }
-      );
-      if (code.success) {
-        return `${document.location.href}/join?code=${code.code}`;
-      }
-    }
-  );
-
-  let smoker = useSmoker();
-
-  const getShareLink = async (e: React.MouseEvent) => {
-    if (!inviteLink) return;
-    await navigator.clipboard.writeText(inviteLink);
-    smoker({ position: { x: e.clientX, y: e.clientY }, text: "copied!" });
-  };
-  return (
-    <>
-      <Modal open={props.open} onClose={props.onClose}>
-        <div className="inviteMemberModalLink flex w-full gap-2">
-          <input
-            className="grow bg-grey-90 text-grey-35"
-            readOnly
-            value={inviteLink}
-            onClick={getShareLink}
-          />
-          <ButtonPrimary
-            onClick={(e) => getShareLink(e)}
-            content={"Copy Invite Link"}
-          />
-        </div>
-        {data?.members_in_studios.map((m) => m.identity_data?.username)}
       </Modal>
     </>
   );
