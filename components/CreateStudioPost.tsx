@@ -46,42 +46,57 @@ export function CreateStudioPost(props: {
 
   return (
     <PostEditorDragContext>
-      <div
-        className="PostCreateWrapper relative flex w-full flex-col gap-2 rounded-md pb-48"
-        style={{
-          background: `repeating-linear-gradient(
+      <div className="flex flex-col-reverse gap-1">
+        <div
+          className="PostCreateWrapper relative flex w-full flex-col gap-2 rounded-md pb-48"
+          style={{
+            background: `repeating-linear-gradient(
             -58deg,
             #E6E6E6,
             #E6E6E6 1px,
             transparent 1px,
             transparent 8px
         )`,
-        }}
-      >
-        {props.selectSpace && (
-          <SpaceSelector
-            id={props.id}
-            selectedSpaces={selectedSpaces}
-            setSelectedSpace={setSelectedSpace}
-          />
-        )}
-        {props.remoteCard && cardSpaceData && (
-          <DraggableRemoteCard
-            space_data={cardSpaceData.space_data}
-            {...props.remoteCard}
-          />
-        )}
-        <Draggable
-          id="post-editor"
-          default_position={{ y: 32, x: 32 }}
-          relative
+          }}
         >
-          <PostEditor
-            onPost={props.onPost}
-            id={props.id}
-            selectedSpace={selectedSpaces}
-          />
-        </Draggable>
+          {props.remoteCard && cardSpaceData && (
+            <DraggableRemoteCard
+              space_data={cardSpaceData.space_data}
+              {...props.remoteCard}
+            />
+          )}
+          {selectedSpaces && (
+            <Draggable id="space-selector" default_position={{ x: 16, y: 16 }}>
+              <BaseSpaceCard
+                small
+                {...(data?.spaces_in_studios.find(
+                  (s) => s.space === selectedSpaces
+                )?.space_data as SpaceData)}
+              />
+            </Draggable>
+          )}
+          <Draggable
+            id="post-editor"
+            default_position={{ y: 32, x: 32 }}
+            relative
+          >
+            <PostEditor
+              onPost={props.onPost}
+              id={props.id}
+              selectedSpace={selectedSpaces}
+            />
+          </Draggable>
+        </div>
+        {props.selectSpace && (
+          <div className="relative flex h-6 w-full flex-row gap-2">
+            <div className="italic text-grey-35">drag to position.</div>
+            <SpaceSelector
+              id={props.id}
+              selectedSpaces={selectedSpaces}
+              setSelectedSpace={setSelectedSpace}
+            />
+          </div>
+        )}
       </div>
     </PostEditorDragContext>
   );
@@ -152,76 +167,51 @@ function SpaceSelector(props: {
 }) {
   let [open, setOpen] = useState(false);
   let { data } = useStudioData(props.id);
-  if (!props.selectedSpaces && !open) {
+  if (!open) {
     return (
       <button
         className="w-fit italic text-accent-blue hover:underline"
         onClick={() => setOpen(true)}
       >
-        highlight a space
+        {props.selectedSpaces ? "change space" : "highlight a space"}
       </button>
     );
   }
+
   return (
-    <Draggable
-      id="space-selector"
-      className={open ? "z-10" : ""}
-      default_position={{ x: 16, y: 16 }}
+    <div
+      className="absolute flex w-full flex-col gap-2 rounded-md border border-grey-80 bg-bg-blue px-4 py-2"
+      onBlur={() => setOpen(false)}
     >
-      {!open ? (
-        <button className="w-fit" onClick={() => setOpen(true)}>
-          {props.selectedSpaces ? (
-            <BaseSpaceCard
-              small
-              {...(data?.spaces_in_studios.find(
-                (s) => s.space === props.selectedSpaces
-              )?.space_data as SpaceData)}
-            />
-          ) : (
-            <NoSpace />
-          )}
-        </button>
-      ) : (
-        <div
-          className="flex flex-col gap-2 rounded-md border border-grey-80 bg-bg-blue px-4 py-2"
-          onBlur={() => setOpen(false)}
+      <h3>Highlight A Space</h3>
+      <div className="flex flex-wrap gap-2 ">
+        <button
+          onClick={() => {
+            props.setSelectedSpace(null);
+            setOpen(false);
+          }}
         >
-          <h3>Highlight A Space</h3>
-          <div className="flex flex-wrap gap-2 ">
+          <NoSpace />
+        </button>
+        {data?.spaces_in_studios.map((s) => {
+          if (!s.space) return;
+          let spaceID = s.space;
+          if (s.space === props.selectedSpaces)
+            return <BaseSpaceCard small {...(s.space_data as SpaceData)} />;
+          return (
             <button
+              key={spaceID}
               onClick={() => {
-                props.setSelectedSpace(null);
+                props.setSelectedSpace(spaceID);
                 setOpen(false);
               }}
             >
-              <NoSpace />
+              <BaseSpaceCard small {...(s.space_data as SpaceData)} />
             </button>
-            {data?.spaces_in_studios.map((s) => {
-              if (!s.space) return;
-              let spaceID = s.space;
-              if (s.space === props.selectedSpaces)
-                return <BaseSpaceCard small {...(s.space_data as SpaceData)} />;
-              return (
-                <button
-                  key={spaceID}
-                  onClick={() => {
-                    props.setSelectedSpace(spaceID);
-                    setOpen(false);
-                  }}
-                >
-                  <DoorImage
-                    width="64"
-                    small
-                    image={s.space_data?.image}
-                    default_space_image={s.space_data?.default_space_image}
-                  />
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      )}
-    </Draggable>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
