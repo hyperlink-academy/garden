@@ -1,5 +1,6 @@
 import * as Popover from "@radix-ui/react-popover";
 import { ref } from "data/Facts";
+import { useReactions } from "hooks/useReactions";
 import { useRemoteCardData } from "hooks/useRemoteCardData";
 import { useIndex, useMutations } from "hooks/useReplicache";
 import { useSpaceData } from "hooks/useSpaceData";
@@ -10,12 +11,15 @@ import Link from "next/link";
 import { useState } from "react";
 import { generateKeyBetween } from "src/fractional-indexing";
 import { decodeTime, ulid } from "src/ulid";
-import { AddReaction, ReactionList } from "./CardView/Reactions";
+import {
+  AddReaction,
+  ReactionList,
+  SingleReaction,
+} from "./CardView/Reactions";
 import { CreateStudioPost } from "./CreateStudioPost";
 import { DoorImage } from "./Doors";
-import { Note, ReactionAdd } from "./Icons";
+import { ReactionAdd } from "./Icons";
 import { SpaceCard, SpaceData } from "./SpacesList";
-import { StudioPostFullScreen } from "./StudioPostFullScreen";
 import { RenderedText } from "./Textarea/RenderedText";
 
 export function StudioPosts(props: { id: string }) {
@@ -226,7 +230,6 @@ export function Post(props: {
         </div>
         <div className="studioPostReactionsAndComments mx-3 -mt-3 flex flex-row justify-between ">
           <PostReactions entityID={props.entityID} />
-          <PostComments entityID={props.entityID} studioID={props.studioID} />
         </div>
       </div>
     </div>
@@ -315,8 +318,9 @@ function NewSpacePost(props: {
 const PostReactions = (props: { entityID: string }) => {
   let { authorized } = useMutations();
   let [reactionPickerOpen, setReactionPickerOpen] = useState(false);
-  if (!authorized) return null;
-  return (
+  let reactions = useReactions(props.entityID);
+
+  return authorized ? (
     <div className="flex flex-wrap justify-start gap-2">
       <ReactionList entityID={props.entityID} />
       <Popover.Root
@@ -344,28 +348,19 @@ const PostReactions = (props: { entityID: string }) => {
         </Popover.Portal>
       </Popover.Root>
     </div>
-  );
+  ) : reactions.length > 0 ? (
+    <div className="flex flex-wrap justify-start gap-2">
+      {reactions.map(([reaction, data]) => {
+        return (
+          <SingleReaction
+            key={reaction}
+            memberReaction={data.memberReaction}
+            reaction={reaction}
+            entityID={props.entityID}
+            count={data.count}
+          />
+        );
+      })}
+    </div>
+  ) : null;
 };
-
-function PostComments(props: { entityID: string; studioID: string }) {
-  let messagesCount = useIndex.eav(props.entityID, "discussion/message-count");
-  let [open, setOpen] = useState(false);
-  return (
-    <>
-      <button
-        className="flex flex-row gap-1 rounded-md border border-accent-blue bg-accent-blue p-1 text-white hover:bg-bg-blue hover:text-accent-blue"
-        onClick={() => setOpen(true)}
-      >
-        {messagesCount?.value || 0}
-        <Note />
-      </button>
-      {open && (
-        <StudioPostFullScreen
-          studioID={props.studioID}
-          entityID={props.entityID}
-          onClose={() => setOpen(false)}
-        />
-      )}
-    </>
-  );
-}
