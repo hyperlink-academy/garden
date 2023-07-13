@@ -16,6 +16,7 @@ import {
   AddReaction,
   ReactionList,
   SingleReaction,
+  SingleReactionPreview,
 } from "./CardView/Reactions";
 import { CreateStudioPost } from "./CreateStudioPost";
 import { DoorImage } from "./Doors";
@@ -237,14 +238,14 @@ export function Post(props: {
             style={{ whiteSpace: "pre-wrap" }}
           />
           <hr className="border-grey-80" />
-          {creatorName && (
-            <div className="flex w-full items-center gap-2 text-right text-sm font-bold text-grey-55">
-              {creatorName?.value}
-            </div>
-          )}
-        </div>
-        <div className="studioPostReactionsAndComments mx-3 -mt-3 flex flex-row justify-between ">
-          <PostReactions entityID={props.entityID} />
+          <div className="flex items-center justify-between gap-4">
+            {creatorName && (
+              <div className="flex w-full grow items-center gap-2 overflow-x-hidden text-right text-sm font-bold text-grey-55">
+                {creatorName?.value}
+              </div>
+            )}
+            <PostReactions entityID={props.entityID} />
+          </div>
         </div>
       </div>
     </div>
@@ -367,47 +368,53 @@ const PostReactions = (props: { entityID: string }) => {
   let [reactionPickerOpen, setReactionPickerOpen] = useState(false);
   let reactions = useReactions(props.entityID);
 
-  return authorized ? (
-    <div className="flex flex-wrap justify-start gap-2">
-      <ReactionList entityID={props.entityID} />
-      <Popover.Root
-        onOpenChange={() => setReactionPickerOpen(!reactionPickerOpen)}
-      >
-        <Popover.Trigger className="flex items-center px-1">
-          <button
-            className={`rounded-md border border-grey-80 bg-white p-1 ${
-              reactionPickerOpen
-                ? "text-accent-blue"
-                : "text-grey-55 hover:text-accent-blue"
-            }`}
-          >
-            <ReactionAdd />
-          </button>
-        </Popover.Trigger>
-        <Popover.Portal>
-          <Popover.Content
-            sideOffset={8}
-            collisionPadding={{ right: 20 }}
-            className="-mt-[1px] max-w-[298px]"
-          >
-            <AddReaction entityID={props.entityID} />
-          </Popover.Content>
-        </Popover.Portal>
-      </Popover.Root>
+  return (
+    <div className="flex shrink-0 items-center gap-2">
+      <div className="cardPreviewReactions flex flex-row items-center gap-1">
+        {reactions.slice(0, 3).map(([reaction, data]) => {
+          return (
+            <SingleReactionPreview
+              key={reaction}
+              memberReaction={data.memberReaction}
+              reaction={reaction}
+              entityID={props.entityID}
+            />
+          );
+        })}
+        {reactions.length > 3 ? (
+          <span className="text-xs italic text-grey-55">
+            {`+${reactions.length - 3}`}
+          </span>
+        ) : (
+          ""
+        )}
+      </div>{" "}
+      {authorized ? (
+        <Popover.Root
+          onOpenChange={() => setReactionPickerOpen(!reactionPickerOpen)}
+        >
+          <Popover.Trigger className="flex items-center px-1">
+            <button
+              className={`${
+                reactionPickerOpen
+                  ? "text-accent-blue"
+                  : "text-grey-55 hover:text-accent-blue"
+              }`}
+            >
+              <ReactionAdd />
+            </button>
+          </Popover.Trigger>
+          <Popover.Portal>
+            <Popover.Content
+              sideOffset={8}
+              collisionPadding={{ right: 20 }}
+              className="-mt-[1px] max-w-[298px]"
+            >
+              <AddReaction entityID={props.entityID} />
+            </Popover.Content>
+          </Popover.Portal>
+        </Popover.Root>
+      ) : null}
     </div>
-  ) : reactions.length > 0 ? (
-    <div className="flex flex-wrap justify-start gap-2">
-      {reactions.map(([reaction, data]) => {
-        return (
-          <SingleReaction
-            key={reaction}
-            memberReaction={data.memberReaction}
-            reaction={reaction}
-            entityID={props.entityID}
-            count={data.count}
-          />
-        );
-      })}
-    </div>
-  ) : null;
+  );
 };

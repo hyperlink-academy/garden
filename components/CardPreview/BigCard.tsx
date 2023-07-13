@@ -212,7 +212,7 @@ export const BigCardBody = (
                   <div className="h-full w-0">
                     <Divider vertical />
                   </div>
-                  <div className="cardPreviewReactions flex flex-row items-end gap-1">
+                  <div className="cardPreviewReactions flex flex-row items-center gap-1">
                     {props.data.reactions
                       .slice(0, 3)
                       .map(([reaction, data]) => {
@@ -226,7 +226,7 @@ export const BigCardBody = (
                         );
                       })}
                     {props.data.reactions.length > 3 ? (
-                      <span className="rounded-md border border-grey-90 bg-white py-0.5 px-1 text-xs text-grey-55">
+                      <span className="py-0.5 px-1 text-xs text-grey-55">
                         {`+${props.data.reactions.length - 3}`}
                       </span>
                     ) : (
