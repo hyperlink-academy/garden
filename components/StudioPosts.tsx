@@ -1,5 +1,6 @@
 import * as Popover from "@radix-ui/react-popover";
 import { ref } from "data/Facts";
+import { PossibleFragmentSpreadsRule } from "graphql";
 import { useReactions } from "hooks/useReactions";
 import { useRemoteCardData } from "hooks/useRemoteCardData";
 import { useIndex, useMutations } from "hooks/useReplicache";
@@ -20,6 +21,7 @@ import { CreateStudioPost } from "./CreateStudioPost";
 import { DoorImage } from "./Doors";
 import { ReactionAdd } from "./Icons";
 import { SpaceCard, SpaceData } from "./SpacesList";
+import { CardBigView, StudioPostFullScreen } from "./StudioPostFullScreen";
 import { RenderedText } from "./Textarea/RenderedText";
 
 export function StudioPosts(props: { id: string }) {
@@ -263,7 +265,14 @@ export const RemoteCardData = (props: {
   let { data } = useRemoteCardData(props.space_do_id, props.cardEntity);
   if (!data) return null;
 
-  return <RemoteCard space_data={props.space_data} {...data} />;
+  return (
+    <RemoteCard
+      space_do_id={props.space_do_id}
+      cardEntity={props.cardEntity}
+      space_data={props.space_data}
+      {...data}
+    />
+  );
 };
 
 export const RemoteCard = (props: {
@@ -277,10 +286,19 @@ export const RemoteCard = (props: {
     default_space_image: string;
     image: string;
   };
+  space_do_id: string;
+  cardEntity: string;
 }) => {
+  let [open, setOpen] = useState(false);
+
   return (
-    <div className="flex flex-col gap-2 text-grey-35">
-      <div className="flex max-h-60 w-[420px] flex-col gap-1 rounded-md border border-grey-90 bg-[#FDFCFA] p-3 shadow-inner">
+    <div className="flex max-h-60 w-[420px] flex-col gap-2 rounded-md border border-grey-90 bg-[#FDFCFA] p-3 text-grey-35 shadow-inner">
+      {/* card title and content preview */}
+      {/* click for popup view of full card content */}
+      <button
+        className="overflow-hidden text-left"
+        onClick={() => setOpen(true)}
+      >
         <h4 className="shrink-0">{props?.title}</h4>
         <div className="mb-2 shrink grow overflow-hidden">
           <RenderedText
@@ -288,27 +306,37 @@ export const RemoteCard = (props: {
             style={{ whiteSpace: "pre-wrap" }}
           />
         </div>
-        <p className="flex shrink-0 items-center gap-2 text-xs italic text-grey-55">
-          by {props.creator} in{" "}
-          <Link
-            className=" flex items-center gap-2 font-bold text-accent-blue"
-            href={`${spacePath(
-              props?.space_data.owner?.username,
-              props?.space_data?.name || ""
-            )}`}
-          >
-            <div className="-mt-1">
-              <DoorImage
-                small
-                width="20"
-                image={props?.space_data?.image}
-                default_space_image={props.space_data?.default_space_image}
-              />
-            </div>
-            <p> {props.space_data?.display_name}</p>
-          </Link>
-        </p>
-      </div>
+      </button>
+      {open && (
+        <CardBigView
+          space_do_id={props.space_do_id}
+          cardEntity={props.cardEntity}
+          onClose={() => setOpen(false)}
+        />
+      )}
+      {/* link to external Space where the card lives */}
+      <Link
+        className="flex items-center gap-2"
+        href={`${spacePath(
+          props?.space_data.owner?.username,
+          props?.space_data?.name || ""
+        )}`}
+      >
+        <div className="flex shrink-0 items-center gap-2 text-xs italic text-grey-55">
+          <span>by {props.creator} in </span>
+          <div className="-mt-1">
+            <DoorImage
+              small
+              width="20"
+              image={props?.space_data?.image}
+              default_space_image={props.space_data?.default_space_image}
+            />
+          </div>
+          <span className="font-bold text-accent-blue">
+            {props.space_data?.display_name}
+          </span>
+        </div>
+      </Link>
     </div>
   );
 };

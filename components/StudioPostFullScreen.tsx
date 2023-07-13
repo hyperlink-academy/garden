@@ -26,7 +26,7 @@ export function StudioPostFullScreen(props: {
     >
       <Dialog.Overlay className={"dark-overlay"} />
       <div
-        className={`fixed top-1/2 max-h-[calc(100%-32px)] w-full -translate-y-1/2 `}
+        className={`fixed top-1/2 max-h-[calc(100%-32px)] w-full -translate-y-1/2`}
       >
         <div className="no-scrollbar relative mx-auto flex w-fit max-w-full snap-x snap-mandatory items-stretch gap-8 overflow-x-scroll px-8">
           <div className="flex w-[calc(100vw-32px)] max-w-screen-md flex-shrink-0 snap-center flex-col gap-8">
@@ -53,6 +53,37 @@ function PostBigView(props: { space_do_id: string; cardEntity: string }) {
       <h2>{data?.title}</h2>
       <RenderedText text={data?.content || ""} />
     </div>
+  );
+}
+
+// JUST A SIMPLER CARD PREVIEW TO USE FOR NOW!!!
+export function CardBigView(props: {
+  space_do_id: string;
+  cardEntity: string;
+  onClose: () => void;
+}) {
+  let { data } = useRemoteCardData(props.space_do_id, props.cardEntity);
+  return createPortal(
+    <Dialog
+      open={true}
+      onClose={props.onClose}
+      className="fixed inset-0 overflow-y-hidden"
+    >
+      <Dialog.Overlay className={"dark-overlay"} />
+      <div className="fixed top-1/2 max-h-[calc(100%-32px)] w-full -translate-y-1/2">
+        <div className="mx-auto mt-4 flex w-[calc(100vw-32px)] max-w-screen-md flex-col gap-6 rounded-md bg-white p-4">
+          <div className="flex flex-col gap-2">
+            <h2>{data?.title}</h2>
+            <p className="text-sm italic">by {data?.creator}</p>
+          </div>
+          <RenderedText
+            text={data?.content || ""}
+            style={{ whiteSpace: "pre-wrap" }}
+          />
+        </div>
+      </div>
+    </Dialog>,
+    document.body
   );
 }
 
