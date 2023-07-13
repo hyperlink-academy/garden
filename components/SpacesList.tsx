@@ -28,8 +28,9 @@ export const SpaceList = (props: {
         }
       `}</style>
       <div
-        className={`spacesList flex flex-wrap  ${props?.small ? "gap-4" : "gap-6 py-2"
-          }`}
+        className={`spacesList flex flex-wrap  ${
+          props?.small ? "gap-4" : "gap-6 py-2"
+        }`}
       >
         {props.spaces?.map((a) => {
           return <SpaceCard small={props.small} {...a} key={a.do_id} />;
@@ -98,9 +99,9 @@ export const BaseSpaceCard = (props: Parameters<typeof SpaceCard>[0]) => {
               </div>
             </div>
             {data?.start_date &&
-              data?.end_date &&
-              data?.start_date <= now &&
-              data?.end_date >= now ? (
+            data?.end_date &&
+            data?.start_date <= now &&
+            data?.end_date >= now ? (
               <div className="text-sm italic text-grey-35">
                 <div>
                   ends{" "}
@@ -168,7 +169,7 @@ export const BaseSpaceCard = (props: Parameters<typeof SpaceCard>[0]) => {
                   />
                 )}
               </div>
-            </div>{" "}
+            </div>
             <p>{data?.description}</p>
           </div>
 
@@ -200,18 +201,15 @@ export const EditSpaceButton = (props: { spaceID: string; owner?: string }) => {
   } else
     return (
       <>
-        <a>
-          <button
-            onClick={(e) => {
-              setOpen(true);
-              e.preventDefault();
-            }}
-            className="text-grey-55 opacity-0 hover:text-accent-blue group-hover:opacity-100"
-          >
-            <Settings />
-          </button>
-          {/* <ButtonLink content="edit" onClick={() => setOpen(true)} /> */}
-        </a>
+        <button
+          onClick={(e) => {
+            setOpen(true);
+            e.preventDefault();
+          }}
+          className="text-grey-55 opacity-0 hover:text-accent-blue group-hover:opacity-100"
+        >
+          <Settings />
+        </button>
 
         <div className="text-grey-55 opacity-0 hover:text-accent-blue group-hover:opacity-100">
           <EditSpaceModal
@@ -240,17 +238,16 @@ const SpaceInfo = (props: {
 
   return (
     <>
-      <a>
-        <button
-          onClick={(e) => {
-            setOpen(true);
-            e.preventDefault();
-          }}
-          className="text-grey-55 opacity-0 hover:text-accent-blue group-hover:opacity-100"
-        >
-          <Information />
-        </button>
-      </a>
+      <button
+        onClick={(e) => {
+          setOpen(true);
+          e.preventDefault();
+        }}
+        className="text-grey-55 opacity-0 hover:text-accent-blue group-hover:opacity-100"
+      >
+        <Information />
+      </button>
+
       <Modal open={open} onClose={() => setOpen(false)}>
         <div className="flex flex-col gap-4 ">
           <div className="flex flex-col gap-1 ">
