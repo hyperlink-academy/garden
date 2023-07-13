@@ -16,6 +16,7 @@ import { DoorImage } from "./Doors";
 import { Note, ReactionAdd } from "./Icons";
 import { SpaceCard, SpaceData } from "./SpacesList";
 import { StudioPostFullScreen } from "./StudioPostFullScreen";
+import { RenderedText } from "./Textarea/RenderedText";
 
 export function StudioPosts(props: { id: string }) {
   let { width } = useWindowDimensions();
@@ -212,7 +213,10 @@ export function Post(props: {
           {date}
         </div>
         <div className="StudioPostContent flex flex-col gap-1 rounded-md border border-grey-80 bg-white px-4 pt-3 pb-4">
-          {content?.value}
+          <RenderedText
+            text={content?.value || ""}
+            style={{ whiteSpace: "pre-wrap" }}
+          />
           <hr className="border-grey-80" />
           {creatorName && (
             <div className="flex w-full items-center gap-2 text-right text-sm font-bold text-grey-55">
