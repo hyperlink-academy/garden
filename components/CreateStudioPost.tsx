@@ -47,9 +47,8 @@ export function CreateStudioPost(props: {
   return (
     <PostEditorDragContext>
       <div
-        className="PostCreateWrapper flex w-full flex-col gap-2 rounded-md pb-[136px]"
+        className="PostCreateWrapper relative flex w-full flex-col gap-2 rounded-md pb-48"
         style={{
-          marginBottom: -112 + "px",
           background: `repeating-linear-gradient(
             -58deg,
             #E6E6E6,
@@ -72,7 +71,11 @@ export function CreateStudioPost(props: {
             {...props.remoteCard}
           />
         )}
-        <Draggable id="post-editor">
+        <Draggable
+          id="post-editor"
+          default_position={{ y: 32, x: 32 }}
+          relative
+        >
           <PostEditor
             onPost={props.onPost}
             id={props.id}
@@ -86,7 +89,7 @@ export function CreateStudioPost(props: {
 
 function DraggableRemoteCard(props: Parameters<typeof RemoteCardData>[0]) {
   return (
-    <Draggable id="remote-card">
+    <Draggable id="remote-card" default_position={{ x: 16, y: 64 }}>
       <RemoteCardData {...props} />
     </Draggable>
   );
@@ -160,7 +163,11 @@ function SpaceSelector(props: {
     );
   }
   return (
-    <Draggable id="space-selector" className={open ? "z-10" : ""}>
+    <Draggable
+      id="space-selector"
+      className={open ? "z-10" : ""}
+      default_position={{ x: 16, y: 16 }}
+    >
       {!open ? (
         <button className="w-fit" onClick={() => setOpen(true)}>
           {props.selectedSpaces ? (
@@ -241,7 +248,6 @@ function PostEditorDragContext(props: { children: React.ReactNode }) {
           },
         }));
       }}
-      onDragMove={async ({ active: activeData }) => { }}
     >
       {props.children}
     </DndContext>
@@ -249,11 +255,14 @@ function PostEditorDragContext(props: { children: React.ReactNode }) {
 }
 
 function Draggable(props: {
+  relative?: boolean;
   id: string;
+  default_position: { x: number; y: number };
   children: React.ReactNode;
   className?: string;
 }) {
-  let offset = useOffsetsState((s) => s.offsets[props.id]);
+  let offset =
+    useOffsetsState((s) => s.offsets[props.id]) || props.default_position;
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: props.id,
   });
@@ -267,7 +276,9 @@ function Draggable(props: {
     <div
       ref={setNodeRef}
       style={style}
-      className={`relative w-fit ${props.className || ""}`}
+      className={`${props.relative ? "relative" : "absolute"} w-fit ${
+        props.className || ""
+      }`}
       {...attributes}
       {...listeners}
     >

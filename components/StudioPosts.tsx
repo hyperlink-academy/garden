@@ -33,7 +33,7 @@ export function StudioPosts(props: { id: string }) {
   });
   return (
     <div className="flex flex-col-reverse gap-4">
-      <div className="PostListWrapper flex flex-col-reverse gap-4">
+      <div className="PostListWrapper flex flex-col-reverse ">
         {posts.map((post, index) => (
           <Post
             renderPosition={width > 768}
@@ -131,7 +131,7 @@ export function Post(props: {
   let content = useIndex.eav(props.entityID, "card/content");
   let createdBy = useIndex.eav(props.entityID, "card/created-by");
   let creatorName = useIndex.eav(createdBy?.value.value || null, "member/name");
-  let position = useIndex.eav(props.entityID, "post/content/position");
+  let postPosition = useIndex.eav(props.entityID, "post/content/position");
   let spacePosition = useIndex.eav(props.entityID, "post/space/position");
   let cardPosition = useIndex.eav(
     props.entityID,
@@ -143,6 +143,14 @@ export function Post(props: {
   });
   let type = useIndex.eav(props.entityID, "post/type");
   let attachedCard = useIndex.eav(props.entityID, "post/attached-card");
+  const lowestYValue = Math.min(
+    ...([
+      postPosition?.value.y,
+      spacePosition?.value.y,
+      cardPosition?.value.y,
+    ].filter((v) => v !== undefined) as number[])
+  );
+
   if (type?.value === "space_added" && attachedSpace)
     return (
       <NewSpacePost
@@ -159,10 +167,16 @@ export function Post(props: {
   );
 
   return (
-    <div>
+    <div
+      className="relative pb-48"
+      style={{
+        marginTop: -lowestYValue,
+        minHeight: postPosition?.value.y,
+      }}
+    >
       {space && (
         <span
-          className="studioPostAttachedCarcflex relative flex-row gap-2"
+          className="studioPostAttachedCarcflex absolute flex-row gap-2"
           style={
             props.renderPosition
               ? {
@@ -185,7 +199,7 @@ export function Post(props: {
       )}
       {attachedCard && cardSpaceData && (
         <div
-          className="relative"
+          className="absolute"
           style={
             props.renderPosition
               ? {
@@ -202,13 +216,12 @@ export function Post(props: {
         </div>
       )}
       <div
-        className="studioPost group relative flex w-96 max-w-lg flex-col gap-1 "
+        className="studioPost group relative -mt-5 flex w-96 max-w-lg flex-col gap-1"
         style={
           props.renderPosition
             ? {
-                marginBottom: 0 - (position?.value.y || 0),
-                top: position?.value.y || 0,
-                left: position?.value.x || 0,
+                left: postPosition?.value.x || 0,
+                top: postPosition?.value.y || 0,
               }
             : {}
         }
