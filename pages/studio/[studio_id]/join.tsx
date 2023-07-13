@@ -1,14 +1,9 @@
 import { spaceAPI, workerAPI } from "backend/lib/api";
-import {
-  ButtonPrimary,
-  ButtonSecondary,
-  ButtonTertiary,
-} from "components/Buttons";
+import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
 import { BaseSmallCard } from "components/CardPreview/SmallCard";
-import { Member, MoreOptionsSmall } from "components/Icons";
+import { Member } from "components/Icons";
 import { Divider } from "components/Layout";
 import { LogInModal, SignupModal } from "components/LoginModal";
-import { StudioOptionsMenu } from "components/StudioPage/StudioOptionsMenu";
 import { useAuth } from "hooks/useAuth";
 import { useStudioData } from "hooks/useStudioData";
 import { GetStaticPropsContext, InferGetStaticPropsType } from "next";

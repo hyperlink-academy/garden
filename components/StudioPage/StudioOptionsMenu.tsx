@@ -16,24 +16,12 @@ export function StudioOptionsMenu(props: { id: string }) {
   let [studioSettingsModalOpen, setStudioSettingsModalOpen] = useState(false);
   return (
     <>
-      <Popover.Root open={open} onOpenChange={(o) => setOpen(o)}>
-        <Popover.Trigger>
-          <MoreOptionsSmall />
-        </Popover.Trigger>
-        <Popover.Portal>
-          <Popover.Content
-            className="z-20 flex w-fit flex-col rounded-md border-2 border-grey-80 bg-white p-2 drop-shadow-md"
-            sideOffset={8}
-          >
-            <button
-              className="py-1 px-2 text-right text-grey-35 hover:bg-bg-blue"
-              onClick={() => setStudioSettingsModalOpen(true)}
-            >
-              Studio Settings
-            </button>
-          </Popover.Content>
-        </Popover.Portal>
-      </Popover.Root>
+      <button
+        onClick={() => setStudioSettingsModalOpen(true)}
+        className="shrink-0 rounded-md border border-transparent pt-[1px] hover:border-accent-blue hover:text-accent-blue"
+      >
+        <MoreOptionsSmall />
+      </button>
 
       <StudioSettings
         id={props.id}
