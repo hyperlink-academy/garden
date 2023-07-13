@@ -188,6 +188,7 @@ export const EditSpaceModal = (props: {
                   return { ...s, ...formState };
                 });
                 setStatus("normal");
+                props.onClose();
               }}
             />
           </div>
