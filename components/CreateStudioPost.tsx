@@ -66,9 +66,9 @@ export function CreateStudioPost(props: {
             setSelectedSpace={setSelectedSpace}
           />
         )}
-        {props.remoteCard && (
+        {props.remoteCard && cardSpaceData && (
           <DraggableRemoteCard
-            space_data={cardSpaceData?.space_data}
+            space_data={cardSpaceData.space_data}
             {...props.remoteCard}
           />
         )}

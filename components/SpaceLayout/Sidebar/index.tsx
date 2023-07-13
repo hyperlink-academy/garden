@@ -148,7 +148,9 @@ const SidebarFooter = (props: { studio?: string }) => {
       )}
 
       {/* studio list! */}
-      {authorized && <SpaceStudiosList username={session.session.username} />}
+      {authorized && session.session && (
+        <SpaceStudiosList username={session.session.username} />
+      )}
 
       {/* info / help button */}
       <button
