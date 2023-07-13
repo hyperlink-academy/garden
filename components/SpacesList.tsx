@@ -142,7 +142,7 @@ export const BaseSpaceCard = (props: Parameters<typeof SpaceCard>[0]) => {
     );
 
   return (
-    <div className="largeSpaceCard group relative w-full">
+    <div className="largeSpaceCard group relative flex w-full">
       <div className="largeSpaceCardIcon absolute left-0 top-0 z-10">
         <DoorImage
           width="96"
@@ -152,7 +152,7 @@ export const BaseSpaceCard = (props: Parameters<typeof SpaceCard>[0]) => {
           glow={!!unreads && !!authorized && unreads.value > 0}
         />
       </div>
-      <div className="ml-16 mt-10">
+      <div className="ml-16 mt-10 w-full">
         <div className="largeSpaceCardContent lightBorder flex min-h-[160px] w-full shrink-0 flex-col gap-0 bg-white py-4 pl-12 pr-3 ">
           <div className="largeSpaceCardDetails flex grow flex-col gap-1">
             <div className="flex justify-between gap-2">
