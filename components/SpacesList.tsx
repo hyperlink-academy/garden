@@ -109,6 +109,7 @@ export const BaseSpaceCard = (props: Parameters<typeof SpaceCard>[0]) => {
                     month: "short",
                     day: "numeric",
                     year: "numeric",
+                    timeZone: "UTC",
                   })}
                 </div>
               </div>
@@ -120,6 +121,7 @@ export const BaseSpaceCard = (props: Parameters<typeof SpaceCard>[0]) => {
                     month: "short",
                     day: "numeric",
                     year: "numeric",
+                    timeZone: "UTC",
                   })}
                 </div>
               </div>
@@ -180,6 +182,7 @@ export const BaseSpaceCard = (props: Parameters<typeof SpaceCard>[0]) => {
                 month: "short",
                 day: "numeric",
                 year: "numeric",
+                timeZone: "UTC",
               })}
           </div>
         </div>
