@@ -1,8 +1,10 @@
 import { spaceAPI } from "backend/lib/api";
 import { ButtonPrimary } from "components/Buttons";
+import { BaseSmallCard } from "components/CardPreview/SmallCard";
 import { useSmoker } from "components/Smoke";
 import { useAuth } from "hooks/useAuth";
 import { useStudioData } from "hooks/useStudioData";
+import Link from "next/link";
 import useSWR from "swr";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
@@ -47,7 +49,23 @@ export function StudioMembers(props: { id: string }) {
           content={"Copy Invite Link"}
         />
       </div>
-      {data?.members_in_studios.map((m) => m.identity_data?.username)}
+
+      <div className="flex flex-wrap gap-4">
+        {data?.members_in_studios.map((m) => (
+          <Link
+            key={m.member}
+            href={`/s/${m.identity_data?.username}`}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            <div
+              className={`memberCardBorder relative h-[94px] w-[160px] grow transition-all hover:scale-105`}
+            >
+              <BaseSmallCard isMember memberName={m.identity_data?.username} />
+            </div>
+          </Link>
+        ))}
+      </div>
     </>
   );
 }
