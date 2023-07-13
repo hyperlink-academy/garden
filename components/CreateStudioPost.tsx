@@ -137,14 +137,14 @@ function PostEditor(props: {
   };
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex w-96 flex-col gap-2 rounded-lg border border-dashed border-grey-80 bg-white p-2">
+      <div className="flex w-96 flex-col gap-1 rounded-md border border-dashed border-grey-80 bg-white px-4 pt-3 pb-4">
         <Textarea
           value={value}
           placeholder="post a note to the studio..."
           onChange={(e) => setValue(e.currentTarget.value)}
         />
         <hr className="border-grey-80" />
-        <div className="text-right font-bold text-grey-55">
+        <div className="text-sm font-bold text-grey-55">
           {identityData?.username}
           {props.remoteCard ? <span>hello</span> : null}
         </div>
