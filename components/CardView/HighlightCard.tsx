@@ -24,7 +24,7 @@ export function HighlightCard(props: { entityID: string }) {
       (memberStudio) => memberStudio.studios?.id === studio.studio
     )
   );
-  let [selectedStudio] = useState(0);
+  let [selectedStudio, setSelectedStudio] = useState(0);
   let studio = sharedStudios?.[selectedStudio]?.studio;
   if (sharedStudios?.length === 0 || !spaceID || !studio) return null;
   return (
@@ -49,16 +49,19 @@ export function HighlightCard(props: { entityID: string }) {
             </div>
             {sharedStudios?.map((studio, index) => {
               return (
-                <div
+                <button
                   key={studio.studio}
-                  className={`rounded-lg p-2 font-bold ${
+                  onClick={() => {
+                    setSelectedStudio(index);
+                  }}
+                  className={`rounded-lg p-2 text-left font-bold hover:border hover:border-accent-blue ${
                     selectedStudio === index
                       ? "bg-accent-blue text-white"
                       : "bg-bg-blue"
                   }`}
                 >
                   {studio.studios?.name}
-                </div>
+                </button>
               );
             })}
           </div>
