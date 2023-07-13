@@ -269,7 +269,12 @@ export const RemoteCard = (props: {
     <div className="flex flex-col gap-2 text-grey-35">
       <div className="flex max-h-60 w-[420px] flex-col gap-1 rounded-md border border-grey-90 bg-[#FDFCFA] p-3 shadow-inner">
         <h4 className="shrink-0">{props?.title}</h4>
-        <p className="shink mb-2 grow overflow-hidden">{props?.content}</p>
+        <div className="mb-2 shrink grow overflow-hidden">
+          <RenderedText
+            text={props?.content || ""}
+            style={{ whiteSpace: "pre-wrap" }}
+          />
+        </div>
         <p className="flex shrink-0 items-center gap-2 text-xs italic text-grey-55">
           by {props.creator} in{" "}
           <Link
@@ -315,6 +320,7 @@ function NewSpacePost(props: {
     </Link>
   );
 }
+
 const PostReactions = (props: { entityID: string }) => {
   let { authorized } = useMutations();
   let [reactionPickerOpen, setReactionPickerOpen] = useState(false);
