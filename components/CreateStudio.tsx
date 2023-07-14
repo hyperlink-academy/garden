@@ -7,6 +7,7 @@ import { DotLoader } from "./DotLoader";
 import { Modal } from "./Layout";
 import Router from "next/router";
 import { useIdentityData } from "hooks/useIdentityData";
+import { uuidToBase62 } from "src/uuidHelpers";
 
 let weird_studios = [
   "Bauhaus",
@@ -100,7 +101,7 @@ export function CreateStudio(props: { username: string }) {
             if (!studio.success) return;
             setOpen(false);
             setFormState({ name: "", description: "" });
-            Router.push(`/studio/${studio.data.id}`);
+            Router.push(`/studio/${uuidToBase62(studio.data.id)}`);
           }}
         >
           <StudioForm formState={formState} setFormState={setFormState} />

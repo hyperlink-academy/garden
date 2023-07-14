@@ -22,6 +22,7 @@ import { ButtonPrimary } from "components/Buttons";
 import { LogInModal } from "components/LoginModal";
 import { useSpaceData } from "hooks/useSpaceData";
 import { useIdentityData } from "hooks/useIdentityData";
+import { uuidToBase62 } from "src/uuidHelpers";
 
 export const Sidebar = (props: {
   onRoomChange: (room: string) => void;
@@ -218,7 +219,7 @@ const SpaceStudiosList = (props: { username: string }) => {
             />
 
             {studios?.map((s) => (
-              <Link href={`/studio/${s.id}`} key={s.id}>
+              <Link href={`/studio/${uuidToBase62(s.id)}`} key={s.id}>
                 <PopoverRadix.Close className="w-full py-1 px-2 text-left text-grey-35 hover:bg-bg-blue">
                   {s.name}
                 </PopoverRadix.Close>

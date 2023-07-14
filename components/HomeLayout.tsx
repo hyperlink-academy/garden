@@ -8,6 +8,7 @@ import { Modal } from "./Layout";
 import * as Popover from "@radix-ui/react-popover";
 import { CreateStudio } from "./CreateStudio";
 import { useIdentityData } from "hooks/useIdentityData";
+import { uuidToBase62 } from "src/uuidHelpers";
 
 export const HomeLayout = (props: {
   id: string;
@@ -65,7 +66,7 @@ const StudiosList = (props: { username: string }) => {
             <Popover.Arrow className="fill-grey-80 stroke-grey-80" />
 
             {studios?.map((s) => (
-              <Link href={`/studio/${s.id}`} key={s.id}>
+              <Link href={`/studio/${uuidToBase62(s.id)}`} key={s.id}>
                 <Popover.Close className="w-full py-1 px-2 text-left text-grey-35 hover:bg-bg-blue">
                   {s.name}
                 </Popover.Close>

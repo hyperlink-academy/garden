@@ -11,14 +11,19 @@ import Head from "next/head";
 import Link from "next/link";
 import Router, { useRouter } from "next/router";
 import { SVGProps, useEffect, useState } from "react";
+import { base62ToUuid, uuidToBase62 } from "src/uuidHelpers";
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>;
 export default function StudioPage(props: Props) {
   let { query, push } = useRouter();
   let code = query.code as string | undefined;
-  let { data } = useStudioData(query.studio_id as string, props.data);
+  let { data } = useStudioData(props.id, props.data);
   let { session, authToken } = useAuth();
   let [state, setState] = useState<"normal" | "signup" | "login">("normal");
+
+  useEffect(() => {
+    if (props.id) Router.replace(`/studio/${uuidToBase62(props.id)}/join`);
+  }, [props.id]);
   const onClick = async () => {
     if (!props.data || !authToken || !code) return;
     let data = await spaceAPI(
@@ -30,7 +35,7 @@ export default function StudioPage(props: Props) {
       }
     );
     if (data.success) {
-      push(`/studio/${query.studio_id}`);
+      push(`/studio/${uuidToBase62(props.id)}`);
     }
   };
 
@@ -41,9 +46,9 @@ export default function StudioPage(props: Props) {
         ({ member }) => session.user && session.user.id === member
       )
     ) {
-      Router.push(`/studio/${query.studio_id}`);
+      if (props.id) Router.push(`/studio/${uuidToBase62(props.id)}`);
     }
-  }, [data, session.user, query.studio_id]);
+  }, [data, session.user, props.id]);
 
   return (
     <>
@@ -62,7 +67,7 @@ export default function StudioPage(props: Props) {
           :{" "}
         </p>
         <Link
-          href={`/studio/${query.studio_id}`}
+          href={`/studio/${uuidToBase62(props.id || "")}`}
           className="lightBorder flex shrink-0 flex-col gap-0 bg-white p-4"
         >
           <h2>{data?.name}</h2>
@@ -114,7 +119,9 @@ export default function StudioPage(props: Props) {
               onClose={() => setState("normal")}
             />
             <SignupModal
-              redirectTo={`/studio/${query.studio_id}/join?code=${code}`}
+              redirectTo={`/studio/${uuidToBase62(
+                props.id || ""
+              )}/join?code=${code}`}
               isOpen={state === "signup"}
               onClose={() => setState("normal")}
             />
@@ -165,13 +172,15 @@ const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export async function getStaticProps(ctx: GetStaticPropsContext) {
   if (!ctx.params?.studio_id)
     return { props: { notFound: true }, revalidate: 10 } as const;
+  let id = ctx.params.studio_id as string;
+  if (id.length !== 36) id = base62ToUuid(id);
   let data = await workerAPI(WORKER_URL, "get_studio_data", {
-    id: ctx.params?.studio_id as string,
+    id,
   });
 
   if (!data.success)
     return { props: { notFound: true }, revalidate: 10 } as const;
-  return { props: { notFound: false, data: data.data } };
+  return { props: { notFound: false, data: data.data, id } };
 }
 
 export async function getStaticPaths() {

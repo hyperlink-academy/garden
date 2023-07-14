@@ -7,18 +7,20 @@ import { StudioPosts } from "components/StudioPosts";
 import { useStudioData } from "hooks/useStudioData";
 import { GetStaticPropsContext, InferGetStaticPropsType } from "next";
 import Head from "next/head";
-import { useRouter } from "next/router";
-import { useState } from "react";
+import Router from "next/router";
+import { useEffect, useState } from "react";
+import { base62ToUuid, uuidToBase62 } from "src/uuidHelpers";
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>;
 export type View = "posts" | "spaces" | "members";
 export default function StudioPage(props: Props) {
-  let { query } = useRouter();
-
-  let id = query.studio_id as string;
+  let id = props.id;
   let { data } = useStudioData(id, props.data);
   let [view, setView] = useState<View>("posts");
-  if (!data) return null;
+  useEffect(() => {
+    if (id) Router.replace(`/studio/${uuidToBase62(id)}`);
+  }, [id]);
+  if (!data || !id) return null;
   return (
     <>
       <Head>
@@ -49,13 +51,16 @@ const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export async function getStaticProps(ctx: GetStaticPropsContext) {
   if (!ctx.params?.studio_id)
     return { props: { notFound: true }, revalidate: 10 } as const;
+
+  let id = ctx.params.studio_id as string;
+  if (id.length !== 36) id = base62ToUuid(id);
   let data = await workerAPI(WORKER_URL, "get_studio_data", {
-    id: ctx.params?.studio_id as string,
+    id,
   });
 
   if (!data.success)
     return { props: { notFound: true }, revalidate: 10 } as const;
-  return { props: { notFound: false, data: data.data } };
+  return { props: { notFound: false, data: data.data, id } };
 }
 
 export async function getStaticPaths() {
