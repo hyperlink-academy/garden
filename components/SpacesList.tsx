@@ -81,7 +81,10 @@ export const BaseSpaceCard = (props: Parameters<typeof SpaceCard>[0]) => {
         <div className="ml-8 mt-6">
           <div className="smallSpaceCardContent lightBorder flex w-64 shrink-0 flex-col gap-0 bg-white py-2 pl-10 pr-3 ">
             <div className="flex justify-between gap-2">
-              <h3>{data?.display_name}</h3>
+              {/* this may never show 'space deleted' but here same as big space card in case */}
+              <h3 className={!data?.display_name ? "italic text-grey-55" : ""}>
+                {data?.display_name || "space deleted"}
+              </h3>
               <div className="">
                 {props.editable &&
                   (data?.owner?.username == session.session?.username ? (
@@ -156,7 +159,9 @@ export const BaseSpaceCard = (props: Parameters<typeof SpaceCard>[0]) => {
         <div className="largeSpaceCardContent lightBorder flex min-h-[160px] w-full shrink-0 flex-col gap-0 bg-white py-4 pl-12 pr-3 ">
           <div className="largeSpaceCardDetails flex grow flex-col gap-1">
             <div className="flex justify-between gap-2">
-              <h3>{data?.display_name}</h3>
+              <h3 className={!data?.display_name ? "italic text-grey-55" : ""}>
+                {data?.display_name || "space deleted"}
+              </h3>
               <div className="">
                 {data?.owner?.username == session.session?.username ? (
                   <EditSpaceButton

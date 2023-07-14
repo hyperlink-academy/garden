@@ -348,7 +348,9 @@ function NewSpacePost(props: {
   });
   return (
     <Link
-      className="flex w-[420px] flex-col py-4"
+      className={`flex w-[420px] flex-col py-4 ${
+        !spaceData?.name && "pointer-events-none"
+      }`}
       href={`/s/${spaceData?.owner.username}/s/${spaceData?.name}`}
     >
       <h3 className="-mb-9 ml-28 text-grey-55">New Space!</h3>
