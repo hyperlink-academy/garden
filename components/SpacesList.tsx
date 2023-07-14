@@ -180,16 +180,21 @@ export const BaseSpaceCard = (props: Parameters<typeof SpaceCard>[0]) => {
             <p>{data?.description}</p>
           </div>
 
-          <div className="mt-2 text-sm italic text-grey-35">
-            ends{" "}
-            {data?.end_date &&
-              new Date(data?.end_date).toLocaleDateString(undefined, {
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-                timeZone: "UTC",
-              })}
-          </div>
+          {data?.start_date &&
+          data?.end_date &&
+          data?.start_date <= now &&
+          data?.end_date >= now ? (
+            <div className="mt-2 text-sm italic text-grey-35">
+              ends{" "}
+              {data?.end_date &&
+                new Date(data?.end_date).toLocaleDateString(undefined, {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                  timeZone: "UTC",
+                })}
+            </div>
+          ) : null}
         </div>
       </div>
     </div>
