@@ -37,18 +37,20 @@ export function StudioMembers(props: { id: string }) {
   };
   return (
     <>
-      <div className="inviteMemberModalLink flex w-full gap-2">
-        <input
-          className="grow bg-grey-90 text-grey-35"
-          readOnly
-          value={inviteLink}
-          onClick={getShareLink}
-        />
-        <ButtonPrimary
-          onClick={(e) => getShareLink(e)}
-          content={"Copy Invite Link"}
-        />
-      </div>
+      {authToken && (
+        <div className="inviteMemberModalLink flex w-full gap-2">
+          <input
+            className="grow bg-grey-90 text-grey-35"
+            readOnly
+            value={inviteLink}
+            onClick={getShareLink}
+          />
+          <ButtonPrimary
+            onClick={(e) => getShareLink(e)}
+            content={"Copy Invite Link"}
+          />
+        </div>
+      )}
 
       <div className="flex flex-wrap gap-4">
         {data?.members_in_studios.map((m) => (
