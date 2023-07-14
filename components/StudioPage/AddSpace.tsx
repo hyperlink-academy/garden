@@ -238,6 +238,8 @@ const AddExistingSpace = (props: { onClose: () => void; studioID: string }) => {
             if (!authToken || !rep) return;
 
             for (let space of addedSpaces) {
+              if (studioData?.spaces_in_studios.find((s) => s.space === space))
+                continue;
               await workerAPI(WORKER_URL, "add_space_to_studio", {
                 authToken,
                 studio_id: props.studioID,
@@ -273,6 +275,7 @@ const AddExistingSpace = (props: { onClose: () => void; studioID: string }) => {
                   positions: {},
                 },
               ]);
+              setAddedSpaces([]);
             }
             mutateStudioData();
           }}
