@@ -6,14 +6,13 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { useAuth } from "hooks/useAuth";
+import { useAuth, useAuthIdentityData } from "hooks/useAuth";
 import { useStudioData } from "hooks/useStudioData";
 import { useState } from "react";
 import { ButtonTertiary } from "./Buttons";
 import { Textarea } from "./Textarea";
 import { create } from "zustand";
 import { restrictToParentElement } from "@dnd-kit/modifiers";
-import { DoorImage } from "./Doors";
 import { BaseSpaceCard, SpaceData } from "./SpacesList";
 import { RemoteCardData } from "./StudioPosts";
 import { useSpaceID } from "hooks/useReplicache";
@@ -123,7 +122,7 @@ function PostEditor(props: {
   id: string;
   selectedSpace: string | null;
 }) {
-  let { identityData } = useAuth();
+  let { identityData } = useAuthIdentityData();
   let [value, setValue] = useState("");
 
   const onClick = async () => {

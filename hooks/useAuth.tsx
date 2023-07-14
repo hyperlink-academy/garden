@@ -5,7 +5,7 @@ import {
   useSession,
   useSupabaseClient,
 } from "@supabase/auth-helpers-react";
-import { createBrowserSupabaseClient } from "@supabase/auth-helpers-nextjs";
+import { createPagesBrowserClient } from "@supabase/auth-helpers-nextjs";
 import { useIdentityData } from "./useIdentityData";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
@@ -13,12 +13,19 @@ const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export const AuthProvider: React.FC<React.PropsWithChildren<unknown>> = (
   props
 ) => {
-  const [supabaseClient] = useState(() => createBrowserSupabaseClient());
+  const [supabaseClient] = useState(() => createPagesBrowserClient());
   return (
     <SessionContextProvider supabaseClient={supabaseClient}>
       {props.children}
     </SessionContextProvider>
   );
+};
+export const useAuthIdentityData = () => {
+  let session = useSession();
+  let { data: identityData } = useIdentityData(
+    session?.user?.user_metadata.username
+  );
+  return { identityData };
 };
 
 export const useAuth = () => {
@@ -30,13 +37,12 @@ export const useAuth = () => {
 
   return useMemo(
     () => ({
-      identityData,
       authToken: !session
         ? null
         : {
-            access_token: session.access_token,
-            refresh_token: session.refresh_token,
-          },
+          access_token: session.access_token,
+          refresh_token: session.refresh_token,
+        },
       session: {
         loggedIn: !!session,
         user: session?.user,
@@ -67,9 +73,8 @@ export const useAuth = () => {
           email: input.email,
           password: input.password,
           options: {
-            emailRedirectTo: `${window.location.origin}/setup${
-              input.redirectTo ? `?redirectTo=${input.redirectTo}` : ""
-            }`,
+            emailRedirectTo: `${window.location.origin}/setup${input.redirectTo ? `?redirectTo=${input.redirectTo}` : ""
+              }`,
           },
         });
       },

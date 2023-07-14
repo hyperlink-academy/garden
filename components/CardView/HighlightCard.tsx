@@ -1,13 +1,10 @@
 import { spaceAPI } from "backend/lib/api";
 import { ButtonLink, ButtonPrimary } from "components/Buttons";
 import { CreateStudioPost } from "components/CreateStudioPost";
-import { DotLoader } from "components/DotLoader";
-import { Checkmark, Note } from "components/Icons";
+import { Note } from "components/Icons";
 import { Modal } from "components/Layout";
-import { RemoteCard } from "components/StudioPosts";
-import { Textarea } from "components/Textarea";
-import { useAuth } from "hooks/useAuth";
-import { useIndex, useSpaceID } from "hooks/useReplicache";
+import { useAuth, useAuthIdentityData } from "hooks/useAuth";
+import { useSpaceID } from "hooks/useReplicache";
 import { useSpaceData } from "hooks/useSpaceData";
 import { useState } from "react";
 
@@ -15,7 +12,8 @@ const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export function HighlightCard(props: { entityID: string }) {
   let spaceID = useSpaceID();
   let { data } = useSpaceData(spaceID);
-  let { identityData, authToken } = useAuth();
+  let { identityData } = useAuthIdentityData();
+  let { authToken } = useAuth();
   let [open, setOpen] = useState(false);
 
   let [state, setState] = useState<"normal" | "loading" | "success">("normal");
