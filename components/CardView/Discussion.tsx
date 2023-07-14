@@ -10,7 +10,7 @@ import {
   Send,
 } from "components/Icons";
 import { RenderedText } from "components/Textarea/RenderedText";
-import { useIndex, useMutations } from "hooks/useReplicache";
+import { db, useMutations } from "hooks/useReplicache";
 import { useEffect, useRef, useState } from "react";
 import { ulid } from "src/ulid";
 import { Message } from "data/Messages";
@@ -26,7 +26,7 @@ export const Discussion = (props: {
   allowReact?: boolean;
   isRoom: boolean;
 }) => {
-  let unreadBy = useIndex.eav(props.entityID, "discussion/unread-by");
+  let unreadBy = db.useEntity(props.entityID, "discussion/unread-by");
   let [focus, setFocus] = useState(true);
   let { mutate, memberEntity } = useMutations();
   useEffect(() => {
@@ -86,8 +86,8 @@ export const MessageInput = (props: {
   let [attachedCards, setAttachedCards] = useState<string[]>([]);
   let [mode, setMode] = useState("normal" as "normal" | "focused" | "reacting");
   let { mutate, memberEntity, authorized } = useMutations();
-  let replyMessage = useIndex.messageByID(props.reply);
-  let replyToName = useIndex.eav(replyMessage?.sender || null, "member/name");
+  let replyMessage = db.useMessageByID(props.reply);
+  let replyToName = db.useEntity(replyMessage?.sender || null, "member/name");
 
   if (!authorized) return null;
   const send = async () => {
@@ -294,8 +294,8 @@ const AttachCard = ({
 };
 
 const AttachedCard = (props: { entityID: string }) => {
-  let name = useIndex.eav(props.entityID, "card/title");
-  let memberName = useIndex.eav(props.entityID, "member/name");
+  let name = db.useEntity(props.entityID, "card/title");
+  let memberName = db.useEntity(props.entityID, "member/name");
   return (
     <div className="flex w-full items-start gap-2">
       <div className="shrink-0 text-grey-35">
@@ -315,7 +315,7 @@ export const Messages = (props: {
   setReply: (reply: string) => void;
   isRoom: boolean;
 }) => {
-  let messages = useIndex.messages(props.entityID);
+  let messages = db.useMessages(props.entityID);
   let { authorized } = useMutations();
   // no empty state placeholder if it's a chat room
   if (props.isRoom === false && messages.length == 0) return null;
@@ -364,11 +364,11 @@ const Message = (props: {
 }) => {
   let { authorized } = useMutations();
 
-  let memberName = useIndex.eav(props.author, "member/name");
+  let memberName = db.useEntity(props.author, "member/name");
   let time = new Date(parseInt(props.date));
-  let replyMessage = useIndex.messageByID(props.reply || null);
-  let replyToName = useIndex.eav(replyMessage?.sender || null, "member/name");
-  let attachedCards = useIndex.eav(
+  let replyMessage = db.useMessageByID(props.reply || null);
+  let replyToName = db.useEntity(replyMessage?.sender || null, "member/name");
+  let attachedCards = db.useEntity(
     props.entity || null,
     "message/attached-card"
   );

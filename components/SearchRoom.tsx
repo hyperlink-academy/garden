@@ -1,4 +1,4 @@
-import { useIndex } from "hooks/useReplicache";
+import { db } from "hooks/useReplicache";
 import { useState } from "react";
 import { CardPreview, CardPreviewWithData } from "./CardPreview";
 import { CardSmall, RoomSearch } from "./Icons";
@@ -45,7 +45,7 @@ export const SearchRoom = () => {
 };
 
 export const useAllItems = (open: boolean) => {
-  let titles = useIndex.aev(open ? "card/title" : null);
+  let titles = db.useAttribute(open ? "card/title" : null);
   return titles
     .map((t) => {
       return {

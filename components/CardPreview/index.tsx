@@ -3,7 +3,7 @@ import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
 import {
   ReplicacheContext,
   scanIndex,
-  useIndex,
+  db,
   useMutations,
   useSpaceID,
 } from "hooks/useReplicache";
@@ -64,9 +64,9 @@ export const CardPreview = (
     entityID: string;
   } & Props
 ) => {
-  let isMember = !!useIndex.eav(props.entityID, "member/name");
+  let isMember = !!db.useEntity(props.entityID, "member/name");
   let { memberEntity, mutate } = useMutations();
-  let unreadBy = useIndex.eav(props.entityID, "card/unread-by") || [];
+  let unreadBy = db.useEntity(props.entityID, "card/unread-by") || [];
   let isUnread = unreadBy.find((f) => f.value.value === memberEntity);
   let rep = useContext(ReplicacheContext);
   let { authToken } = useAuth();
@@ -87,7 +87,7 @@ export const CardPreview = (
   );
   let editing = useUIState((s) => s.focusedCard === props.entityID);
 
-  let messagesCount = useIndex.messages(props.entityID).length;
+  let messagesCount = db.useMessages(props.entityID).length;
 
   let { handlers, isLongPress } = useLongPress(
     () => props.onLongPress?.(),

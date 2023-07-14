@@ -1,4 +1,4 @@
-import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
+import { db, useMutations, useSpaceID } from "hooks/useReplicache";
 import { useState } from "react";
 import { ulid } from "src/ulid";
 import { CardPreviewWithData } from "./CardPreview";
@@ -22,7 +22,7 @@ export function CalendarRoom() {
     }
   }
 
-  let cardsWithDate = useIndex.at("card/date").reduce((acc, card) => {
+  let cardsWithDate = db.useTimeAttribute("card/date").reduce((acc, card) => {
     let key = card.value.value;
     if (!acc[key]) {
       acc[key] = [{ entity: card.entity, value: card.value.value }];

@@ -1,7 +1,7 @@
 import {
   ReplicacheContext,
   scanIndex,
-  useIndex,
+  db,
   useMutations,
   useSpaceID,
 } from "hooks/useReplicache";
@@ -22,7 +22,7 @@ const GRID_SIZE = 8;
 const snap = (x: number) => Math.round(x / GRID_SIZE) * GRID_SIZE;
 
 export const Desktop = (props: { entityID: string }) => {
-  let cards = useIndex.eav(props.entityID, "desktop/contains");
+  let cards = db.useEntity(props.entityID, "desktop/contains");
   let height = useHeight(props.entityID) + 500;
   let { authToken } = useAuth();
   let { mutate, action, authorized } = useMutations();
@@ -195,7 +195,7 @@ const DraggableCard = (props: {
   parent: string;
   relationshipID: string;
 }) => {
-  let position = useIndex.eav(props.relationshipID, "card/position-in");
+  let position = db.useEntity(props.relationshipID, "card/position-in");
   let { mutate, rep } = useMutations();
   let data = useCardPreviewData(props.entityID);
   const { attributes, listeners, setNodeRef, isDragging } = useDraggableCard({
@@ -329,7 +329,7 @@ const AddCard = (props: {
   position: null | { x: number; y: number };
 }) => {
   let items = useAllItems(!!props.position);
-  let name = useIndex.eav(props.desktopEntity, "member/name");
+  let name = db.useEntity(props.desktopEntity, "member/name");
   let { open } = useCardViewer();
   let { mutate, memberEntity, action } = useMutations();
   return (

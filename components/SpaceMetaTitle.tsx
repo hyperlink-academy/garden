@@ -1,7 +1,7 @@
 import {
   ReplicacheContext,
   scanIndex,
-  useIndex,
+  db,
   useMutations,
   useSpaceID,
 } from "hooks/useReplicache";

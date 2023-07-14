@@ -1,5 +1,5 @@
 import { Fact } from "data/Facts";
-import { scanIndex, useIndex, useMutations } from "hooks/useReplicache";
+import { scanIndex, db, useMutations } from "hooks/useReplicache";
 import { usePreserveScroll } from "hooks/utils";
 import { useEffect, useRef, useState } from "react";
 import useMeasure from "react-use-measure";
@@ -24,7 +24,7 @@ import * as Popover from "@radix-ui/react-popover";
 import { ulid } from "src/ulid";
 
 export const Room = (props: { entityID: string }) => {
-  let roomType = useIndex.eav(props.entityID, "room/type");
+  let roomType = db.useEntity(props.entityID, "room/type");
   let { ref } = usePreserveScroll<HTMLDivElement>(props.entityID);
 
   let { reactions, filters, setFilters, cardsFiltered } = useFilteredCards(
@@ -101,8 +101,8 @@ function RoomHeader(props: {
   }, []);
 
   let roomName: Fact<"room/name"> | Fact<"member/name"> | null = null;
-  let sharedRoomName = useIndex.eav(props.entityID, "room/name");
-  let memberRoomName = useIndex.eav(props.entityID, "member/name");
+  let sharedRoomName = db.useEntity(props.entityID, "room/name");
+  let memberRoomName = db.useEntity(props.entityID, "member/name");
   if (memberRoomName) {
     roomName = memberRoomName;
   } else roomName = sharedRoomName;
@@ -182,9 +182,9 @@ const RoomDescription = (props: {
   setFilters: (f: (old: Filters) => Filters) => void;
   entityID: string;
 }) => {
-  let roomDescription = useIndex.eav(props.entityID, "room/description");
-  let roomType = useIndex.eav(props.entityID, "room/type");
-  let currentCollectionType = useIndex.eav(props.entityID, "collection/type");
+  let roomDescription = db.useEntity(props.entityID, "room/description");
+  let roomType = db.useEntity(props.entityID, "room/type");
+  let currentCollectionType = db.useEntity(props.entityID, "collection/type");
   let [filtersOpen, setFiltersOpen] = useState(false);
   // let [collectionType, setCollectionType] = useState(
   //   currentCollectionType?.value

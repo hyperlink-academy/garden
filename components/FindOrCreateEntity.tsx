@@ -1,5 +1,5 @@
 import { Combobox, Dialog, Transition } from "@headlessui/react";
-import { useIndex } from "hooks/useReplicache";
+import { db } from "hooks/useReplicache";
 import { useRef, useState } from "react";
 import { boolean } from "zod";
 import { ButtonPrimary } from "./Buttons";
@@ -446,10 +446,10 @@ const SearchItem: React.FC<
 };
 
 export const useAllItems = (open: boolean) => {
-  let titles = useIndex
-    .aev(open ? "card/title" : null)
+  let titles = db
+    .useAttribute(open ? "card/title" : null)
     .filter((f) => !!f.value);
-  let members = useIndex.aev("member/name");
+  let members = db.useAttribute("member/name");
   return titles
     .map((t) => {
       return {

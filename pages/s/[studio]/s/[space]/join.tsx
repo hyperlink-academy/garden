@@ -3,7 +3,7 @@ import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
 import { Member } from "components/Icons";
 import { BaseSmallCard } from "components/CardPreview/SmallCard";
 import { useAuth } from "hooks/useAuth";
-import { useIndex, useSpaceID } from "hooks/useReplicache";
+import { db, useSpaceID } from "hooks/useReplicache";
 import { useRouter } from "next/router";
 import { SVGProps, useState } from "react";
 import { LogInModal, SignupModal } from "components/LoginModal";
@@ -22,7 +22,7 @@ export function JoinSpace() {
   let { session, authToken } = useAuth();
   let router = useRouter();
   let code = router.query.code as string | undefined;
-  let isMember = useIndex.ave("space/member", session.session?.studio);
+  let isMember = db.useUniqueAttribute("space/member", session.session?.studio);
   let { data } = useSpaceData(id);
 
   let [state, setState] = useState<"normal" | "signup" | "login">("normal");

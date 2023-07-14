@@ -12,7 +12,7 @@ import {
 import { Divider, MenuContainer, MenuItem, Modal } from "components/Layout";
 import {
   scanIndex,
-  useIndex,
+  db,
   useMutations,
   useSpaceID,
 } from "hooks/useReplicache";
@@ -66,7 +66,7 @@ export const CardView = (props: {
 }) => {
   let { authToken } = useAuth();
   let spaceID = useSpaceID();
-  let memberName = useIndex.eav(props.entityID, "member/name");
+  let memberName = db.useEntity(props.entityID, "member/name");
   let { ref } = usePreserveScroll<HTMLDivElement>(props.entityID);
 
   let { mutate, rep } = useMutations();
@@ -174,15 +174,15 @@ export const CardContent = (props: {
   onDelete?: () => void;
   referenceFactID?: string;
 }) => {
-  let cardCreator = useIndex.eav(props.entityID, "card/created-by");
+  let cardCreator = db.useEntity(props.entityID, "card/created-by");
   // returns reference…
-  let cardCreatorName = useIndex.eav(
+  let cardCreatorName = db.useEntity(
     cardCreator?.value.value as string,
     "member/name"
   )?.value;
-  let date = useIndex.eav(props.entityID, "card/date");
+  let date = db.useEntity(props.entityID, "card/date");
   let [dateEditing, setDateEditing] = useUndoableState(false);
-  let memberName = useIndex.eav(props.entityID, "member/name");
+  let memberName = db.useEntity(props.entityID, "member/name");
   let { authorized } = useMutations();
 
   return (
@@ -293,8 +293,8 @@ export const CardContent = (props: {
 
 const Title = (props: { entityID: string }) => {
   let { authorized } = useMutations();
-  let memberName = useIndex.eav(props.entityID, "member/name");
-  let cardTitle = useIndex.eav(props.entityID, "card/title");
+  let memberName = db.useEntity(props.entityID, "member/name");
+  let cardTitle = db.useEntity(props.entityID, "card/title");
   let titleFact = memberName || cardTitle;
   return (
     <SingleTextSection
@@ -321,7 +321,7 @@ const CardMoreOptionsMenu = (props: {
   onDelete?: () => void;
 }) => {
   let { authorized } = useMutations();
-  let memberName = useIndex.eav(props.entityID, "member/name");
+  let memberName = db.useEntity(props.entityID, "member/name");
   let [areYouSureCardDeletionModalOpen, setAreYouSureCardDeletionModalOpen] =
     useState(false);
   if (!!memberName) return null;
@@ -534,9 +534,9 @@ export const SectionAdder = (props: {
   setDateEditing: () => void;
 }) => {
   let { authorized, mutate } = useMutations();
-  let image = useIndex.eav(props.entityID, "card/image");
-  let attachedCards = useIndex.eav(props.entityID, "deck/contains");
-  let date = useIndex.eav(props.entityID, "card/date");
+  let image = db.useEntity(props.entityID, "card/image");
+  let attachedCards = db.useEntity(props.entityID, "deck/contains");
+  let date = db.useEntity(props.entityID, "card/date");
   let reactions = useReactions(props.entityID);
 
   let [reactionPickerOpen, setReactionPickerOpen] = useState(false);

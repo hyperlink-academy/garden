@@ -13,7 +13,7 @@ import {
 import {
   ReplicacheContext,
   scanIndex,
-  useIndex,
+  db,
   useMutations,
 } from "hooks/useReplicache";
 import { useState, useEffect, useContext } from "react";
@@ -35,8 +35,8 @@ export const EditRoomModal = (props: {
 }) => {
   let currentRoomName: Fact<"room/name"> | Fact<"member/name"> | null = null;
   let isMember = false;
-  let sharedRoomName = useIndex.eav(props.currentRoom, "room/name");
-  let memberRoomName = useIndex.eav(props.currentRoom, "member/name");
+  let sharedRoomName = db.useEntity(props.currentRoom, "room/name");
+  let memberRoomName = db.useEntity(props.currentRoom, "member/name");
 
   if (memberRoomName) {
     currentRoomName = memberRoomName;
@@ -44,7 +44,7 @@ export const EditRoomModal = (props: {
   } else currentRoomName = sharedRoomName;
 
   let currentRoomDescription: Fact<"room/description"> | null = null;
-  currentRoomDescription = useIndex.eav(props.currentRoom, "room/description");
+  currentRoomDescription = db.useEntity(props.currentRoom, "room/description");
 
   let { mutate } = useMutations();
   let [nameState, setNameState] = useState(currentRoomName?.value || "");
@@ -205,8 +205,8 @@ export const RoomListItem = (props: {
   setRoomEditOpen?: () => void;
 }) => {
   let { memberEntity, authorized } = useMutations();
-  let isMember = !!useIndex.eav(props.roomEntity, "member/name");
-  let roomType = useIndex.eav(props.roomEntity, "room/type");
+  let isMember = !!db.useEntity(props.roomEntity, "member/name");
+  let roomType = db.useEntity(props.roomEntity, "room/type");
 
   let rep = useContext(ReplicacheContext);
   let unreadCount = useSubscribe(
@@ -363,7 +363,7 @@ export const DraggableRoomListItem = (props: {
 };
 
 export const RoomListPreview = (props: { entityID: string }) => {
-  let name = useIndex.eav(props.entityID, "room/name");
+  let name = db.useEntity(props.entityID, "room/name");
   return (
     <RoomListItem
       roomEntity={props.entityID}

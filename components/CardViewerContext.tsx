@@ -1,5 +1,5 @@
 import { useAppEventListener, publishAppEvent } from "hooks/useEvents";
-import { useIndex, useMutations } from "hooks/useReplicache";
+import { db, useMutations } from "hooks/useReplicache";
 import { useUndoableState } from "hooks/useUndoableState";
 import { useEffect, useRef } from "react";
 import { CardView } from "./CardView";
@@ -16,11 +16,11 @@ export const useCardViewer = () => {
 };
 
 export function CardViewer(props: { room: string | null }) {
-  let roomType = useIndex.eav(props.room, "room/type")?.value;
+  let roomType = db.useEntity(props.room, "room/type")?.value;
   let [history, setHistory] = useUndoableState<{ [k: string]: string[] }>({});
   let ref = useRef<HTMLDivElement | null>(null);
   let { mutate, memberEntity } = useMutations();
-  let unreadBy = useIndex.eav(
+  let unreadBy = db.useEntity(
     props.room ? history[props.room]?.[0] || null : null,
     "card/unread-by"
   );

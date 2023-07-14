@@ -148,7 +148,7 @@ function makeMutators(
     ) => {
       let q = scanIndex(tx);
       let context: MutationContext = {
-        runOnServer: async () => { },
+        runOnServer: async () => {},
         scanIndex: q,
         postMessage: async (m) => {
           await tx.put(m.id, MessageWithIndexes(m));
@@ -299,7 +299,7 @@ export const makeReplicache = (args: {
   name: string;
   undoManager: UndoManager;
 }) => {
-  let grabData = function(): {
+  let grabData = function (): {
     rep: Replicache<ReplicacheMutators>;
     undoManager: UndoManager;
   } {
@@ -332,8 +332,8 @@ export const makeReplicache = (args: {
   return rep;
 };
 
-export const useIndex = {
-  at<
+export const db = {
+  useTimeAttribute<
     A extends keyof FilterAttributes<{
       type: "timestamp";
       unique: any;
@@ -357,7 +357,7 @@ export const useIndex = {
       "at" + attribute + start
     );
   },
-  eav<A extends keyof Attribute>(
+  useEntity<A extends keyof Attribute>(
     entity: string | null,
     attribute: A
   ): CardinalityResult<A> | null {
@@ -372,7 +372,7 @@ export const useIndex = {
       "eav" + entity + attribute
     );
   },
-  ave<A extends keyof UniqueAttributes>(
+  useUniqueAttribute<A extends keyof UniqueAttributes>(
     attribute: A,
     value: string | undefined
   ) {
@@ -386,7 +386,10 @@ export const useIndex = {
       "ave" + attribute + value
     );
   },
-  aev<A extends keyof Attribute>(attribute: A | null, entity?: string) {
+  useAttribute<A extends keyof Attribute>(
+    attribute: A | null,
+    entity?: string
+  ) {
     return useSubscribe(
       async (tx) => {
         if (!attribute) return [];
@@ -404,7 +407,10 @@ export const useIndex = {
       "aev" + attribute + entity
     );
   },
-  vae<A extends keyof ReferenceAttributes>(entity: string, attribute?: A) {
+  useReference<A extends keyof ReferenceAttributes>(
+    entity: string,
+    attribute?: A
+  ) {
     return useSubscribe(
       async (tx) => {
         let results = await tx
@@ -421,7 +427,7 @@ export const useIndex = {
       "vae" + entity + attribute
     );
   },
-  messages(topic: string) {
+  useMessages(topic: string) {
     return useSubscribe(
       async (tx) => {
         let messages = await tx
@@ -435,7 +441,7 @@ export const useIndex = {
       topic
     );
   },
-  messageByID(id: string | null) {
+  useMessageByID(id: string | null) {
     return useSubscribe(
       async (tx) => {
         if (!id) return null;

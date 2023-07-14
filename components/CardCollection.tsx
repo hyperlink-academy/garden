@@ -4,7 +4,7 @@ import { useAuth } from "hooks/useAuth";
 import {
   ReplicacheContext,
   scanIndex,
-  useIndex,
+  db,
   useMutations,
   useSpaceID,
 } from "hooks/useReplicache";
@@ -37,7 +37,7 @@ export const CardCollection = (props: {
   cards: Fact<"desktop/contains" | "deck/contains">[];
   openOnAdd?: boolean;
 }) => {
-  let collectionType = useIndex.eav(props.entityID, "collection/type");
+  let collectionType = db.useEntity(props.entityID, "collection/type");
   return (
     <CollectionList
       editable={props.editable}

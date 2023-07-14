@@ -4,7 +4,7 @@ import {
   ReplicacheContext,
   ReplicacheMutators,
   scanIndex,
-  useIndex,
+  db,
   useMutations,
 } from "hooks/useReplicache";
 import { FindOrCreate, useAllItems } from "./FindOrCreateEntity";
@@ -115,7 +115,7 @@ export const AddExistingCard = (
   });
   let items = useAllItems(open);
 
-  const alreadyInEAV = useIndex.eav(props.parentID, props.attribute);
+  const alreadyInEAV = db.useEntity(props.parentID, props.attribute);
 
   let rep = useContext(ReplicacheContext);
   let { authorized, mutate, memberEntity, action } = useMutations();

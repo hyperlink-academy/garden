@@ -1,5 +1,5 @@
 import { CardViewer } from "components/CardViewerContext";
-import { useIndex, useSpaceID } from "hooks/useReplicache";
+import { db, useSpaceID } from "hooks/useReplicache";
 import { SmallCardDragContext } from "components/DragContext";
 import { Sidebar } from "components/SpaceLayout";
 import { useEffect } from "react";
@@ -12,8 +12,8 @@ import { SpaceMetaTitle } from "components/SpaceMetaTitle";
 export default function SpacePage() {
   // get first room = your room
   // OR if viewing anon, get first room based on room id
-  let firstRoomByID = useIndex
-    .aev("room/name")
+  let firstRoomByID = db
+    .useAttribute("room/name")
     .sort(sortByPosition("roomList"))[0]?.entity;
   let firstRoom = firstRoomByID;
 

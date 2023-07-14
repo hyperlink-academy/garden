@@ -1,4 +1,4 @@
-import { useIndex, useMutations } from "hooks/useReplicache";
+import { db, useMutations } from "hooks/useReplicache";
 import Link from "next/link";
 import { useState } from "react";
 import { ButtonLink } from "./Buttons";
@@ -57,8 +57,8 @@ export const BaseSpaceCard = (props: Parameters<typeof SpaceCard>[0]) => {
   let now = getCurrentDate();
 
   let { data } = useSpaceData(props.do_id, props);
-  let spaceEntity = useIndex.ave("space/id", props.do_id);
-  let unreads = useIndex.eav(
+  let spaceEntity = db.useUniqueAttribute("space/id", props.do_id);
+  let unreads = db.useEntity(
     spaceEntity?.entity || null,
     "space/unread-notifications"
   );

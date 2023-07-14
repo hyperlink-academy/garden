@@ -2,7 +2,7 @@ import * as Popover from "@radix-ui/react-popover";
 import { ref } from "data/Facts";
 import { useReactions } from "hooks/useReactions";
 import { useRemoteCardData } from "hooks/useRemoteCardData";
-import { useIndex, useMutations } from "hooks/useReplicache";
+import { db, useMutations } from "hooks/useReplicache";
 import { useSpaceData } from "hooks/useSpaceData";
 import { useStudioData } from "hooks/useStudioData";
 import useWindowDimensions from "hooks/useWindowDimensions";
@@ -22,7 +22,7 @@ import { RenderedText } from "./Textarea/RenderedText";
 export function StudioPosts(props: { id: string }) {
   let { width } = useWindowDimensions();
   let { mutate, memberEntity } = useMutations();
-  let posts = useIndex.aev("feed/post").sort((a, b) => {
+  let posts = db.useAttribute("feed/post").sort((a, b) => {
     let aPosition = a.value,
       bPosition = b.value;
     if (aPosition === bPosition) return a.id > b.id ? -1 : 1;
@@ -128,13 +128,13 @@ export function Post(props: {
   index: number;
 }) {
   let { data } = useStudioData(props.studioID);
-  let attachedSpace = useIndex.eav(props.entityID, "post/attached-space");
-  let content = useIndex.eav(props.entityID, "card/content");
-  let createdBy = useIndex.eav(props.entityID, "card/created-by");
-  let creatorName = useIndex.eav(createdBy?.value.value || null, "member/name");
-  let postPosition = useIndex.eav(props.entityID, "post/content/position");
-  let spacePosition = useIndex.eav(props.entityID, "post/space/position");
-  let cardPosition = useIndex.eav(
+  let attachedSpace = db.useEntity(props.entityID, "post/attached-space");
+  let content = db.useEntity(props.entityID, "card/content");
+  let createdBy = db.useEntity(props.entityID, "card/created-by");
+  let creatorName = db.useEntity(createdBy?.value.value || null, "member/name");
+  let postPosition = db.useEntity(props.entityID, "post/content/position");
+  let spacePosition = db.useEntity(props.entityID, "post/space/position");
+  let cardPosition = db.useEntity(
     props.entityID,
     "post/attached-card/position"
   );
@@ -142,8 +142,8 @@ export function Post(props: {
   let date = new Date(decodeTime(props.entityID)).toLocaleDateString([], {
     dateStyle: "short",
   });
-  let type = useIndex.eav(props.entityID, "post/type");
-  let attachedCard = useIndex.eav(props.entityID, "post/attached-card");
+  let type = db.useEntity(props.entityID, "post/type");
+  let attachedCard = db.useEntity(props.entityID, "post/attached-card");
   const lowestYValue = Math.min(
     ...([
       postPosition?.value.y,

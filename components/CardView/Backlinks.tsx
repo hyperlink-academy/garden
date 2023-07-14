@@ -2,13 +2,13 @@ import { Disclosure } from "@headlessui/react";
 import { useSpring, animated } from "@react-spring/web";
 import { CardPreview, CardPreviewWithData } from "components/CardPreview";
 import { DisclosureExpandTiny } from "components/Icons";
-import { useIndex, useMutations } from "hooks/useReplicache";
+import { db, useMutations } from "hooks/useReplicache";
 import useMeasure from "react-use-measure";
 
 import { sortByPosition } from "src/position_helpers";
 
 export const Backlinks = (props: { entityID: string }) => {
-  let backlinks = useIndex.vae(props.entityID, "deck/contains");
+  let backlinks = db.useReference(props.entityID, "deck/contains");
   let cards = backlinks.sort(sortByPosition("vae"));
   let { mutate } = useMutations();
   if (cards.length === 0) return null;

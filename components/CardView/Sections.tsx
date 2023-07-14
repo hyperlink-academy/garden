@@ -1,6 +1,6 @@
 import { Textarea } from "components/Textarea";
 
-import { useIndex, useMutations } from "hooks/useReplicache";
+import { db, useMutations } from "hooks/useReplicache";
 import { SyntheticEvent, useCallback, useRef, useState } from "react";
 import { FilterAttributes } from "data/Attributes";
 import { useAuth } from "hooks/useAuth";
@@ -27,7 +27,7 @@ export const SingleTextSection = (
     new?: boolean;
   } & JSX.IntrinsicElements["textarea"]
 ) => {
-  let fact = useIndex.eav(props.entityID, props.section);
+  let fact = db.useEntity(props.entityID, props.section);
   let timeout = useRef<null | number>(null);
   let { authorized, mutate, action } = useMutations();
 
@@ -229,7 +229,7 @@ export const DateSection = (props: { entityID: string }) => {
   let { session } = useAuth();
   let { mutate, authorized } = useMutations();
 
-  let date = useIndex.eav(props.entityID, "card/date");
+  let date = db.useEntity(props.entityID, "card/date");
   if (!date) return null;
   return (
     <div className="flex gap-2">
@@ -254,8 +254,8 @@ export const DateSection = (props: { entityID: string }) => {
 };
 
 export const AttachedCardSection = (props: { entityID: string }) => {
-  let attachedCards = useIndex.eav(props.entityID, "deck/contains");
-  let currentCollectionType = useIndex.eav(props.entityID, "collection/type");
+  let attachedCards = db.useEntity(props.entityID, "deck/contains");
+  let currentCollectionType = db.useEntity(props.entityID, "collection/type");
 
   return (
     <>

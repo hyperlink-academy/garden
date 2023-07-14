@@ -3,7 +3,7 @@ import { Modal } from "components/Layout";
 import { RadioGroup } from "@headlessui/react";
 import {
   useMutations,
-  useIndex,
+  db,
   ReplicacheContext,
   scanIndex,
 } from "hooks/useReplicache";
@@ -28,7 +28,7 @@ export const SharedRoomList = (props: {
   currentRoom: string | null;
   setRoomEditOpen: () => void;
 }) => {
-  let rooms = useIndex.aev("room/name").sort(sortByPosition("roomList"));
+  let rooms = db.useAttribute("room/name").sort(sortByPosition("roomList"));
   let { onRoomChange, currentRoom } = props;
 
   useEffect(() => {

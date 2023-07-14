@@ -1,4 +1,4 @@
-import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
+import { db, useMutations, useSpaceID } from "hooks/useReplicache";
 import { useAuth } from "hooks/useAuth";
 import { spaceAPI } from "backend/lib/api";
 import { CloseLinedTiny, SectionImageAdd } from "components/Icons";
@@ -13,7 +13,7 @@ export const MakeImage = (props: {
   children: React.ReactNode;
 }) => {
   let { mutate, authorized } = useMutations();
-  let image = useIndex.eav(props.entity, "card/image");
+  let image = db.useEntity(props.entity, "card/image");
   let [imageID, setState] = useState<null | string>(null);
   useEffect(() => {
     if (imageID) {
@@ -60,7 +60,7 @@ export const ImageSection = (props: { entityID: string }) => {
   let { session, authToken } = useAuth();
   let { mutate, authorized } = useMutations();
   let spaceID = useSpaceID();
-  let image = useIndex.eav(props.entityID, "card/image");
+  let image = db.useEntity(props.entityID, "card/image");
   let [lightBoxOpen, setLightBoxOpen] = useState(false);
   return (
     // FOCUS ON DIV AND PASTE AN IMAGE

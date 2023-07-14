@@ -4,7 +4,7 @@ import { Divider, Modal } from "components/Layout";
 import { useSmoker } from "components/Smoke";
 import { ref } from "data/Facts";
 import { useReactions } from "hooks/useReactions";
-import { useIndex, useMutations } from "hooks/useReplicache";
+import { db, useMutations } from "hooks/useReplicache";
 import { useState } from "react";
 import { ulid } from "src/ulid";
 
@@ -73,7 +73,7 @@ export const AddReaction = (props: {
   onSelect?: () => void;
 }) => {
   let { authorized, mutate, memberEntity } = useMutations();
-  let reactions = useIndex.aev("space/reaction");
+  let reactions = db.useAttribute("space/reaction");
   let [reactionEditOpen, setReactionEditOpen] = useState(false);
 
   if (!authorized) return null;
@@ -126,7 +126,7 @@ export const EditReactions = (props: {
   reactionEditOpen: boolean;
   onClose: () => void;
 }) => {
-  let reactions = useIndex.aev("space/reaction");
+  let reactions = db.useAttribute("space/reaction");
   let { mutate, memberEntity } = useMutations();
 
   let [newReaction, setNewReaction] = useState("");

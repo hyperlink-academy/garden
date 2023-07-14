@@ -1,5 +1,5 @@
 import { Dialog } from "@headlessui/react";
-import { useIndex, useMutations } from "hooks/useReplicache";
+import { db, useMutations } from "hooks/useReplicache";
 import { useState } from "react";
 import { ulid } from "src/ulid";
 import { ButtonPrimary } from "./Buttons";
@@ -17,7 +17,7 @@ export function StudioPostFullScreen(props: {
   studioID: string;
   onClose: () => void;
 }) {
-  let attachedCard = useIndex.eav(props.entityID, "post/attached-card");
+  let attachedCard = db.useEntity(props.entityID, "post/attached-card");
   return createPortal(
     <Dialog
       open={true}
@@ -93,8 +93,8 @@ function Comments(props: { entityID: string }) {
   let { mutate, memberEntity, authorized } = useMutations();
   let [reply, setReply] = useState<string | null>(null);
 
-  let replyMessage = useIndex.messageByID(reply);
-  let replyToName = useIndex.eav(replyMessage?.sender || null, "member/name");
+  let replyMessage = db.useMessageByID(reply);
+  let replyToName = db.useEntity(replyMessage?.sender || null, "member/name");
 
   const send = async () => {
     if (!memberEntity || !newComment) return;
