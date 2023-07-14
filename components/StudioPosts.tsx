@@ -256,6 +256,7 @@ export const RemoteCardData = (props: {
   };
   space_do_id: string;
   cardEntity: string;
+  linkDisabled?: boolean;
 }) => {
   let { data } = useRemoteCardData(props.space_do_id, props.cardEntity);
   if (!data) return null;
@@ -265,6 +266,7 @@ export const RemoteCardData = (props: {
       space_do_id={props.space_do_id}
       cardEntity={props.cardEntity}
       space_data={props.space_data}
+      linkDisabled={props.linkDisabled}
       {...data}
     />
   );
@@ -283,6 +285,7 @@ export const RemoteCard = (props: {
   };
   space_do_id: string;
   cardEntity: string;
+  linkDisabled?: boolean;
 }) => {
   let [open, setOpen] = useState(false);
 
@@ -291,6 +294,7 @@ export const RemoteCard = (props: {
       {/* card title and content preview */}
       {/* click for popup view of full card content */}
       <button
+        disabled={props.linkDisabled}
         className="overflow-hidden text-left"
         onClick={() => setOpen(true)}
       >
