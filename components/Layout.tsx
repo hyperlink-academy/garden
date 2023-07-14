@@ -25,6 +25,7 @@ export const FloatingContainer: React.FC<
 > = (props) => {
   return (
     <div
+      onClick={(e) => e.stopPropagation()}
       className={`
         rounded-md border
         border-grey-80 bg-white px-4 
