@@ -54,10 +54,10 @@ export function HighlightCard(props: { entityID: string }) {
                   onClick={() => {
                     setSelectedStudio(index);
                   }}
-                  className={`rounded-lg p-2 text-left font-bold hover:border hover:border-accent-blue ${
+                  className={`rounded-lg border p-2 text-left font-bold hover:border-accent-blue ${
                     selectedStudio === index
-                      ? "bg-accent-blue text-white"
-                      : "bg-bg-blue"
+                      ? "border-accent-blue bg-accent-blue text-white"
+                      : "border-grey-80 bg-bg-blue"
                   }`}
                 >
                   {studio.studios?.name}
