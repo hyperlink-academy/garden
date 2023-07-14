@@ -287,7 +287,7 @@ export const RemoteCard = (props: {
   let [open, setOpen] = useState(false);
 
   return (
-    <div className="flex max-h-60 w-[420px] flex-col gap-2 rounded-md border border-grey-90 bg-[#FDFCFA] p-3 text-grey-35 shadow-inner">
+    <div className="flex max-h-60 max-w-[420px] flex-col gap-2 rounded-md border border-grey-90 bg-[#FDFCFA] p-3 text-grey-35 shadow-inner">
       {/* card title and content preview */}
       {/* click for popup view of full card content */}
       <button
@@ -348,7 +348,7 @@ function NewSpacePost(props: {
   });
   return (
     <Link
-      className={`flex w-[420px] flex-col py-4 ${
+      className={`flex max-w-[420px] flex-col py-4 ${
         !spaceData?.name && "pointer-events-none"
       }`}
       href={`/s/${spaceData?.owner.username}/s/${spaceData?.name}`}
