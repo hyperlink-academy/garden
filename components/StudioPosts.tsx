@@ -30,7 +30,11 @@ export function StudioPosts(props: { id: string }) {
   });
   return (
     <div className="flex flex-col-reverse gap-4">
-      <div className="PostListWrapper flex flex-col-reverse ">
+      <div
+        className={`PostListWrapper flex flex-col-reverse ${
+          width < 768 ? "gap-8" : ""
+        }`}
+      >
         {posts.map((post, index) => (
           <Post
             renderPosition={width > 768}
@@ -165,15 +169,16 @@ export function Post(props: {
 
   return (
     <div
-      className="relative pb-64"
+      className={`relative ${props.renderPosition ? "pb-64" : ""}`}
       style={{
-        marginTop: -lowestYValue,
-        minHeight: postPosition?.value.y,
+        marginTop: props.renderPosition ? -lowestYValue : "",
       }}
     >
       {space && (
         <span
-          className="studioPostAttachedCarcflex absolute flex-row gap-2"
+          className={`studioPostAttachedCard flex ${
+            props.renderPosition ? "absolute" : ""
+          } flex-row gap-2`}
           style={
             props.renderPosition
               ? {
@@ -196,7 +201,7 @@ export function Post(props: {
       )}
       {attachedCard && cardSpaceData && (
         <div
-          className="absolute"
+          className={props.renderPosition ? "absolute" : ""}
           style={
             props.renderPosition
               ? {
