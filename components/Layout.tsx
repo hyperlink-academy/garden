@@ -39,7 +39,12 @@ export const FloatingContainer: React.FC<
 };
 
 export const Modal: React.FC<
-  React.PropsWithChildren<{ open: boolean; onClose: () => void }>
+  React.PropsWithChildren<{
+    open: boolean;
+    onClose: () => void;
+    dark?: boolean;
+    width?: string;
+  }>
 > = (props) => {
   return (
     <Dialog
@@ -47,11 +52,13 @@ export const Modal: React.FC<
       onClose={props.onClose}
       className="fixed inset-0 z-30 overflow-y-hidden"
     >
-      <Dialog.Overlay className="overlay" />
+      <Dialog.Overlay className={props.dark ? "dark-overlay" : "overlay"} />
       <FloatingContainer
         className={`
               fixed top-1/2 left-1/2 grid max-h-[calc(100%-32px)]
-              w-[calc(100%-32px)] max-w-md -translate-x-1/2
+              w-[calc(100%-32px)] ${
+                props.width ? props.width : "max-w-md"
+              } -translate-x-1/2
               -translate-y-1/2
               grid-flow-row
               gap-4

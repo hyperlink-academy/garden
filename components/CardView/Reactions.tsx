@@ -18,30 +18,32 @@ export const Reactions = (props: { entityID: string }) => {
     <div className="flex flex-col gap-2" id="card-reactions">
       <div className="flex flex-wrap justify-start gap-2">
         <ReactionList entityID={props.entityID} />
-        <Popover.Root
-          onOpenChange={() => setReactionPickerOpen(!reactionPickerOpen)}
-        >
-          <Popover.Trigger className="flex items-center px-1">
-            <button
-              className={` ${
-                reactionPickerOpen
-                  ? "text-accent-blue"
-                  : "text-grey-55 hover:text-accent-blue"
-              }`}
-            >
-              <ReactionAdd />
-            </button>
-          </Popover.Trigger>
-          <Popover.Portal>
-            <Popover.Content
-              sideOffset={8}
-              collisionPadding={{ right: 20 }}
-              className="-mt-[1px] max-w-[298px]"
-            >
-              <AddReaction entityID={props.entityID} />
-            </Popover.Content>
-          </Popover.Portal>
-        </Popover.Root>
+        {authorized ? (
+          <Popover.Root
+            onOpenChange={() => setReactionPickerOpen(!reactionPickerOpen)}
+          >
+            <Popover.Trigger className="flex items-center px-1">
+              <button
+                className={` ${
+                  reactionPickerOpen
+                    ? "text-accent-blue"
+                    : "text-grey-55 hover:text-accent-blue"
+                }`}
+              >
+                <ReactionAdd />
+              </button>
+            </Popover.Trigger>
+            <Popover.Portal>
+              <Popover.Content
+                sideOffset={8}
+                collisionPadding={{ right: 20 }}
+                className="-mt-[1px] max-w-[298px]"
+              >
+                <AddReaction entityID={props.entityID} />
+              </Popover.Content>
+            </Popover.Portal>
+          </Popover.Root>
+        ) : null}
       </div>
     </div>
   );
@@ -51,7 +53,6 @@ export const ReactionList = (props: { entityID: string }) => {
   let reactions = useReactions(props.entityID);
 
   return (
-    // <div className="reactionAddedReactions flex flex-row flex-wrap items-center gap-2">
     <>
       {reactions?.map(([reaction, data]) => {
         return (
@@ -64,7 +65,6 @@ export const ReactionList = (props: { entityID: string }) => {
         );
       })}
     </>
-    // </div>
   );
 };
 
@@ -224,8 +224,8 @@ export const SingleReaction = (props: {
       className={`text-md flex items-center gap-2 rounded-md border px-2 py-0.5 ${
         props.memberReaction
           ? "border-accent-blue bg-bg-blue"
-          : "border-grey-80"
-      }`}
+          : "border-grey-80 bg-white"
+      } ${!authorized ? "cursor-default" : ""}`}
       onClick={() => {
         if (!memberEntity || !authorized) return;
         if (props.memberReaction)

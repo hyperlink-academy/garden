@@ -89,7 +89,7 @@ export const BigCardBody = (
                   section={props.data.member ? "member/name" : "card/title"}
                   placeholder="Untitled"
                   previewOnly={!editing || !!props.data.member}
-                  className={`cardPreviewTitle text-md bg-accent-blue font-bold ${
+                  className={`cardPreviewTitle text-md font-bold ${
                     props.data.isMember ? "w-fit text-white" : "text-grey-35"
                   } ${
                     props.data.imageUrl &&
@@ -153,7 +153,7 @@ export const BigCardBody = (
                   placeholder={editing ? "write something..." : ""}
                   entityID={props.entityID}
                   previewOnly={!editing}
-                  className={`cardPreviewDefaultTextContent truncate whitespace-pre-wrap bg-accent-blue leading-tight ${
+                  className={`cardPreviewDefaultTextContent truncate whitespace-pre-wrap leading-tight ${
                     !props.data.imageUrl ? "" : ""
                   } ${props.data.isMember ? "px-2 " : ""} `}
                   section={"card/content"}
@@ -217,7 +217,7 @@ export const BigCardBody = (
                   <div className="h-full w-0">
                     <Divider vertical />
                   </div>
-                  <div className="cardPreviewReactions flex flex-row items-end gap-1">
+                  <div className="cardPreviewReactions flex flex-row items-center gap-1">
                     {props.data.reactions
                       .slice(0, 3)
                       .map(([reaction, data]) => {
@@ -231,7 +231,7 @@ export const BigCardBody = (
                         );
                       })}
                     {props.data.reactions.length > 3 ? (
-                      <span className="rounded-md border border-grey-90 bg-white py-0.5 px-1 text-xs text-grey-55">
+                      <span className="py-0.5 px-1 text-xs text-grey-55">
                         {`+${props.data.reactions.length - 3}`}
                       </span>
                     ) : (

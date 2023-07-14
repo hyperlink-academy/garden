@@ -139,6 +139,34 @@ export interface Database {
           }
         ]
       }
+      members_in_studios: {
+        Row: {
+          member: string
+          studio: string
+        }
+        Insert: {
+          member: string
+          studio: string
+        }
+        Update: {
+          member?: string
+          studio?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "members_in_studios_member_fkey"
+            columns: ["member"]
+            referencedRelation: "identity_data"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "members_in_studios_studio_fkey"
+            columns: ["studio"]
+            referencedRelation: "studios"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       old_identities: {
         Row: {
           email: string
@@ -168,7 +196,7 @@ export interface Database {
           do_id: string
           end_date: string | null
           image: string | null
-          name: string
+          name: string | null
           owner: string
           start_date: string | null
         }
@@ -179,7 +207,7 @@ export interface Database {
           do_id: string
           end_date?: string | null
           image?: string | null
-          name: string
+          name?: string | null
           owner: string
           start_date?: string | null
         }
@@ -190,7 +218,7 @@ export interface Database {
           do_id?: string
           end_date?: string | null
           image?: string | null
-          name?: string
+          name?: string | null
           owner?: string
           start_date?: string | null
         }
@@ -198,6 +226,65 @@ export interface Database {
           {
             foreignKeyName: "space_data_owner_fkey"
             columns: ["owner"]
+            referencedRelation: "identity_data"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      spaces_in_studios: {
+        Row: {
+          space: string | null
+          studio: string | null
+        }
+        Insert: {
+          space?: string | null
+          studio?: string | null
+        }
+        Update: {
+          space?: string | null
+          studio?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "spaces_in_studios_space_fkey"
+            columns: ["space"]
+            referencedRelation: "space_data"
+            referencedColumns: ["do_id"]
+          },
+          {
+            foreignKeyName: "spaces_in_studios_studio_fkey"
+            columns: ["studio"]
+            referencedRelation: "studios"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      studios: {
+        Row: {
+          creator: string
+          description: string | null
+          do_id: string
+          id: string
+          name: string
+        }
+        Insert: {
+          creator: string
+          description?: string | null
+          do_id: string
+          id?: string
+          name: string
+        }
+        Update: {
+          creator?: string
+          description?: string | null
+          do_id?: string
+          id?: string
+          name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "studios_creator_fkey"
+            columns: ["creator"]
             referencedRelation: "identity_data"
             referencedColumns: ["id"]
           }

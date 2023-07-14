@@ -86,7 +86,7 @@ export default function SignupPage() {
   if (!tokens)
     return (
       <div className="grid-rows-max mx-auto grid max-w-md gap-4">
-        <h1>Set up your Studio!</h1>
+        <h1>Set up your Homepage!</h1>
         <p>
           To continue,{" "}
           <Link className="text-accent-blue" href="/signup">
@@ -103,7 +103,7 @@ export default function SignupPage() {
   return (
     <div className="grid-rows-max mx-auto grid max-w-md gap-4">
       <div className="grid-auto-rows grid gap-2">
-        <h1>Set up your Studio</h1>
+        <h1>Set up your Homepage!</h1>
       </div>
 
       <form onSubmit={onSubmit} className="grid w-full gap-4">
@@ -113,8 +113,8 @@ export default function SignupPage() {
           </div>
         ) : null}
         <p>
-          Pick a name for your Studio — your Hyperlink homepage, where all your
-          Spaces will live.
+          Pick a name for your account — also the name of your Hyperlink
+          homepage, where all your Spaces will live.
         </p>
         <label className="grid-flow-rows grid gap-2 font-bold">
           <span>
@@ -141,7 +141,11 @@ export default function SignupPage() {
           }
           type="submit"
           content={
-            status === "loading" ? <DotLoader /> : "Construct your Studio!"
+            status === "loading" ? (
+              <DotLoader />
+            ) : (
+              "Create your Hyperlink homepage!"
+            )
           }
         />
       </form>

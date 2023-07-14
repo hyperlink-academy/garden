@@ -75,7 +75,6 @@ h4 {
   @apply text-[.95rem];
   @apply font-bold;
   @apply text-grey-35;
-  @apply uppercase;
 }
 
 p {
@@ -127,6 +126,13 @@ textarea {
   @apply inset-0;
   @apply bg-white;
   @apply opacity-70;
+}
+
+.dark-overlay {
+  @apply fixed;
+  @apply inset-0;
+  @apply bg-grey-15;
+  @apply opacity-90;
 }
 
 .lightBorder {

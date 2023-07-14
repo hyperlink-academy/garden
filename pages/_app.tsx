@@ -38,7 +38,7 @@ export default function App({ Component, pageProps }: AppProps) {
   // shared logged in homepage: studio + calendar
   if (
     router.pathname.startsWith("/s/[studio]") ||
-    router.pathname.startsWith("/calendar")
+    router.pathname.startsWith("/studio")
   ) {
     return (
       <SharedProviders>

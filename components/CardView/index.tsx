@@ -38,6 +38,7 @@ import { useUndoableState } from "hooks/useUndoableState";
 import { Fact } from "data/Facts";
 import { getAndUploadFile } from "src/getAndUploadFile";
 import { useReactions } from "hooks/useReactions";
+import { HighlightCard } from "./HighlightCard";
 
 const borderStyles = (args: { member: boolean }) => {
   switch (true) {
@@ -113,8 +114,8 @@ export const CardView = (props: {
           max-w-3xl grow
           flex-col items-stretch overflow-y-scroll
           ${borderStyles({
-            member: !!memberName,
-          })}
+          member: !!memberName,
+        })}
             member: !!memberName,
           })}
           `}
@@ -157,8 +158,8 @@ export const CardView = (props: {
             overflow-x-hidden
             overflow-y-scroll
             ${contentStyles({
-              member: !!memberName,
-            })}
+            member: !!memberName,
+          })}
             `}
         >
           <CardContent {...props} />
@@ -226,11 +227,14 @@ export const CardContent = (props: {
               ) : null}
             </div>
 
-            <CardMoreOptionsMenu
-              onDelete={props.onDelete}
-              entityID={props.entityID}
-              referenceFactID={props?.referenceFactID}
-            />
+            <div className="flex flex-row gap-2">
+              <HighlightCard entityID={props.entityID} />
+              <CardMoreOptionsMenu
+                onDelete={props.onDelete}
+                entityID={props.entityID}
+                referenceFactID={props?.referenceFactID}
+              />
+            </div>
           </div>
         ) : (
           // member card offset only if authed
@@ -316,29 +320,31 @@ const CardMoreOptionsMenu = (props: {
   referenceFactID?: string;
   onDelete?: () => void;
 }) => {
-  let { authorized, mutate, action } = useMutations();
+  let { authorized } = useMutations();
   let memberName = useIndex.eav(props.entityID, "member/name");
   let [areYouSureCardDeletionModalOpen, setAreYouSureCardDeletionModalOpen] =
     useState(false);
+  if (!!memberName) return null;
+  if (!authorized) return null;
 
-  let { query: q } = useRouter();
-
-  return !authorized || !!memberName ? null : (
+  return (
     <Menu as="div" className="pointer-events-auto relative">
       <Menu.Button className={` pt-[6px]`}>
         <MoreOptionsTiny />
       </Menu.Button>
       <MenuContainer>
-        <MenuItem
-          onClick={() => {
-            setAreYouSureCardDeletionModalOpen(true);
-          }}
-        >
-          <p className="font-bold text-accent-red">Delete Card</p>
-          <div className="text-accent-red">
-            <Delete />
-          </div>
-        </MenuItem>
+        {authorized && (
+          <MenuItem
+            onClick={() => {
+              setAreYouSureCardDeletionModalOpen(true);
+            }}
+          >
+            <p className="font-bold text-accent-red">Delete Card</p>
+            <div className="text-accent-red">
+              <Delete />
+            </div>
+          </MenuItem>
+        )}
       </MenuContainer>
       <AreYouSureCardDeletionModal
         open={areYouSureCardDeletionModalOpen}
@@ -585,9 +591,8 @@ export const SectionAdder = (props: {
       {/* END LINKED CARD ADDER */}
       {/* DATE ADDER */}
       <button
-        className={`${
-          date || props.dateEditing ? toggledOnStyle : toggledOffStyle
-        } `}
+        className={`${date || props.dateEditing ? toggledOnStyle : toggledOffStyle
+          } `}
         onClick={() => {
           if (date !== null) {
             document
@@ -612,11 +617,10 @@ export const SectionAdder = (props: {
       >
         <Popover.Trigger className="flex items-center">
           <button
-            className={`${toggledOffStyle} ${
-              !reactionPickerOpen
+            className={`${toggledOffStyle} ${!reactionPickerOpen
                 ? ""
                 : "rounded-md border border-accent-blue p-0.5 text-accent-blue"
-            }`}
+              }`}
           >
             <ReactionAdd />
           </button>

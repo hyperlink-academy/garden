@@ -1,64 +1,74 @@
-import { spaceAPI } from "backend/lib/api";
+import { spaceAPI, workerAPI } from "backend/lib/api";
 import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
-import { Member } from "components/Icons";
 import { BaseSmallCard } from "components/CardPreview/SmallCard";
-import { useAuth } from "hooks/useAuth";
-import { useIndex, useSpaceID } from "hooks/useReplicache";
-import { useRouter } from "next/router";
-import { SVGProps, useState } from "react";
-import { LogInModal, SignupModal } from "components/LoginModal";
-import Head from "next/head";
-import { useSpaceData } from "hooks/useSpaceData";
-import Link from "next/link";
-import { SpaceCard, SpaceData } from "components/SpacesList";
+import { Member } from "components/Icons";
 import { Divider } from "components/Layout";
+import { LogInModal, SignupModal } from "components/LoginModal";
+import { useAuth } from "hooks/useAuth";
+import { useStudioData } from "hooks/useStudioData";
+import { GetStaticPropsContext, InferGetStaticPropsType } from "next";
+import Head from "next/head";
+import Link from "next/link";
+import Router, { useRouter } from "next/router";
+import { SVGProps, useEffect, useState } from "react";
 
-const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
-export default function JoinSpacePage() {
-  return <JoinSpace />;
-}
-export function JoinSpace() {
-  let id = useSpaceID();
+type Props = InferGetStaticPropsType<typeof getStaticProps>;
+export default function StudioPage(props: Props) {
+  let { query, push } = useRouter();
+  let code = query.code as string | undefined;
+  let { data } = useStudioData(query.studio_id as string, props.data);
   let { session, authToken } = useAuth();
-  let router = useRouter();
-  let code = router.query.code as string | undefined;
-  let isMember = useIndex.ave("space/member", session.session?.studio);
-  let { data } = useSpaceData(id);
-
   let [state, setState] = useState<"normal" | "signup" | "login">("normal");
-
   const onClick = async () => {
-    if (!authToken || !code || isMember || !id) return;
-    let data = await spaceAPI(`${WORKER_URL}/space/${id}`, "join", {
-      authToken,
-      code,
-    });
+    if (!props.data || !authToken || !code) return;
+    let data = await spaceAPI(
+      `${WORKER_URL}/space/${props.data?.do_id}`,
+      "join",
+      {
+        authToken,
+        code,
+      }
+    );
     if (data.success) {
-      router.push(`/s/${router.query.studio}/s/${router.query.space}`);
+      push(`/studio/${query.studio_id}`);
     }
   };
 
-  if (isMember)
-    router.push(`/s/${router.query.studio}/s/${router.query.space}`);
+  useEffect(() => {
+    if (
+      session.user &&
+      data?.members_in_studios?.find(
+        ({ member }) => session.user && session.user.id === member
+      )
+    ) {
+      Router.push(`/studio/${query.studio_id}`);
+    }
+  }, [data, session.user, query.studio_id]);
 
   return (
     <>
       <Head>
-        <title key="title">{data?.display_name}: you&apos;re invited!</title>
+        <title key="title">{data?.name}: you&apos;re invited!</title>
       </Head>
 
-      <div className="mx-auto flex max-w-3xl flex-col place-items-center gap-6 py-8 px-4">
+      {/* NB: spacing adjusted b/c we have HomeLayout with header wrapper here */}
+      <div className="mx-auto flex max-w-3xl flex-col place-items-center gap-6 px-0 py-4">
         <h2>Welcome!</h2>
         <p className="text-center text-lg">
           You&apos;ve been invited to join a{" "}
           <strong>
-            Space<sup className="text-grey-55">†</sup>
+            Studio<sup className="text-grey-55">†</sup>
           </strong>
           :{" "}
         </p>
-        <div className="-mt-4">
-          <SpaceCard small {...(data as SpaceData)} />
-        </div>
+        <Link
+          href={`/studio/${query.studio_id}`}
+          className="lightBorder flex shrink-0 flex-col gap-0 bg-white p-4"
+        >
+          <h2>{data?.name}</h2>
+          <p>{data?.description}</p>
+        </Link>
+
         {session.loggedIn ? (
           <>
             <p className="text-center">A membership card is waiting for you!</p>
@@ -79,7 +89,7 @@ export function JoinSpace() {
               </div>
             </div>
             <ButtonPrimary
-              content="Join the Space"
+              content="Join the Studio"
               icon={<Member />}
               onClick={onClick}
             />
@@ -104,7 +114,7 @@ export function JoinSpace() {
               onClose={() => setState("normal")}
             />
             <SignupModal
-              redirectTo={`/s/${router.query.studio}/s/${router.query.space}/${data?.display_name}/join?code=${router.query.code}`}
+              redirectTo={`/studio/${query.studio_id}/join?code=${code}`}
               isOpen={state === "signup"}
               onClose={() => setState("normal")}
             />
@@ -114,8 +124,8 @@ export function JoinSpace() {
           <Divider />
           <p>
             <sup className="text-grey-55">†</sup>
-            <strong>Spaces</strong>, on Hyperlink, are collaborative workspaces
-            for doing projects together.
+            <strong>Studios</strong>, on Hyperlink, are places for groups to
+            share and talk about their work.
           </p>
           <p className="text-center">
             We&apos;re still in beta! Email if you have any questions:{" "}
@@ -150,3 +160,20 @@ export const WelcomeSparkle = (props: SVGProps<SVGSVGElement>) => {
     </svg>
   );
 };
+
+const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
+export async function getStaticProps(ctx: GetStaticPropsContext) {
+  if (!ctx.params?.studio_id)
+    return { props: { notFound: true }, revalidate: 10 } as const;
+  let data = await workerAPI(WORKER_URL, "get_studio_data", {
+    id: ctx.params?.studio_id as string,
+  });
+
+  if (!data.success)
+    return { props: { notFound: true }, revalidate: 10 } as const;
+  return { props: { notFound: false, data: data.data } };
+}
+
+export async function getStaticPaths() {
+  return { paths: [], fallback: "blocking" };
+}

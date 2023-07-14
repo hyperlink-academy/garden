@@ -15,6 +15,8 @@ import { migrations } from "./migrations";
 import { update_self_route } from "./routes/update_self";
 import { delete_self_route } from "./routes/delete_self";
 import { sync_notifications_route } from "./internal_routes/sync_notifications";
+import { post_feed_route } from "./routes/post_feed";
+import { get_card_data_route } from "./routes/get_card_data";
 
 export type Env = {
   factStore: ReturnType<typeof store>;
@@ -26,6 +28,7 @@ export type Env = {
 };
 
 let routes = [
+  get_card_data_route,
   pullRoute,
   push_route,
   claimRoute,
@@ -35,6 +38,7 @@ let routes = [
   delete_file_upload_route,
   update_self_route,
   delete_self_route,
+  post_feed_route,
 ];
 let private_routes = [sync_notifications_route];
 export type PrivateSpaceRoutes = typeof private_routes;

@@ -17,6 +17,8 @@ export const BaseAttributes = {
       "file",
       "last-read-message",
       "timestamp",
+      "feed_post",
+      "post/attached-card",
       "string",
       "union",
       "position",
@@ -49,6 +51,42 @@ export const DefaultAttributes = {
     type: "string",
     unique: false,
     cardinality: "one",
+  },
+  "feed/post": {
+    type: "feed_post",
+    unique: false,
+    cardinality: "one",
+  },
+  "post/attached-card": {
+    type: "post/attached-card",
+    unique: false,
+    cardinality: "one",
+  },
+  "post/attached-space": {
+    type: "string",
+    cardinality: "one",
+    unique: false,
+  },
+  "post/type": {
+    type: "union",
+    "union/value": ["user", "space_added"],
+    cardinality: "one",
+    unique: false,
+  },
+  "post/content/position": {
+    type: "position",
+    cardinality: "one",
+    unique: false,
+  },
+  "post/attached-card/position": {
+    type: "position",
+    cardinality: "one",
+    unique: false,
+  },
+  "post/space/position": {
+    type: "position",
+    cardinality: "one",
+    unique: false,
   },
   "deck/contains": {
     type: "reference",

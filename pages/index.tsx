@@ -1,6 +1,6 @@
 import Head from "next/head";
 import { ButtonLink, ButtonPrimary } from "components/Buttons";
-import { BackToStudio, Send } from "components/Icons";
+import { BackToHome, Send } from "components/Icons";
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -71,9 +71,9 @@ export default function IndexPage() {
                       href={`/s/${session.session.username}`}
                       className="mx-auto flex items-center justify-center gap-2 hover:text-accent-blue"
                     >
-                      <BackToStudio />
+                      <BackToHome />
                       <span>
-                        <strong>visit my studio</strong>
+                        <strong>visit my homepage</strong>
                       </span>
                     </Link>
                   ) : (
@@ -81,7 +81,7 @@ export default function IndexPage() {
                       href={`/setup`}
                       className="mx-auto flex items-center justify-center gap-2 hover:text-accent-blue"
                     >
-                      <BackToStudio />
+                      <BackToHome />
                       <span>
                         <strong>finish account setup!</strong>
                       </span>
