@@ -171,7 +171,7 @@ export function Post(props: {
 
   return (
     <div
-      className="relative pb-48"
+      className="relative pb-64"
       style={{
         marginTop: -lowestYValue,
         minHeight: postPosition?.value.y,

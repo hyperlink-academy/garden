@@ -48,7 +48,7 @@ export function CreateStudioPost(props: {
     <PostEditorDragContext>
       <div className="flex flex-col-reverse gap-1">
         <div
-          className="PostCreateWrapper relative flex w-full flex-col gap-2 rounded-md pb-48"
+          className="PostCreateWrapper relative flex w-full flex-col gap-2 rounded-md pb-64"
           style={{
             background: `repeating-linear-gradient(
             -58deg,
