@@ -143,7 +143,7 @@ export const BaseSpaceCard = (props: Parameters<typeof SpaceCard>[0]) => {
 
   return (
     <div className="largeSpaceCard group relative flex w-full">
-      <div className="largeSpaceCardIcon absolute left-0 top-0 z-10">
+      <div className="largeSpaceCardIcon absolute left-0 top-0">
         <DoorImage
           width="96"
           display_name={data?.display_name}
