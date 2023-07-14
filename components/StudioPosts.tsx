@@ -1,6 +1,5 @@
 import * as Popover from "@radix-ui/react-popover";
 import { ref } from "data/Facts";
-import { PossibleFragmentSpreadsRule } from "graphql";
 import { useReactions } from "hooks/useReactions";
 import { useRemoteCardData } from "hooks/useRemoteCardData";
 import { useIndex, useMutations } from "hooks/useReplicache";
@@ -12,17 +11,12 @@ import Link from "next/link";
 import { useState } from "react";
 import { generateKeyBetween } from "src/fractional-indexing";
 import { decodeTime, ulid } from "src/ulid";
-import {
-  AddReaction,
-  ReactionList,
-  SingleReaction,
-  SingleReactionPreview,
-} from "./CardView/Reactions";
+import { AddReaction, SingleReactionPreview } from "./CardView/Reactions";
 import { CreateStudioPost } from "./CreateStudioPost";
 import { DoorImage } from "./Doors";
 import { ReactionAdd } from "./Icons";
 import { SpaceCard, SpaceData } from "./SpacesList";
-import { CardBigView, StudioPostFullScreen } from "./StudioPostFullScreen";
+import { CardBigView } from "./StudioPostFullScreen";
 import { RenderedText } from "./Textarea/RenderedText";
 
 export function StudioPosts(props: { id: string }) {
@@ -354,7 +348,7 @@ function NewSpacePost(props: {
   });
   return (
     <Link
-      className="flex w-[420px] flex-col"
+      className="flex w-[420px] flex-col py-4"
       href={`/s/${spaceData?.owner.username}/s/${spaceData?.name}`}
     >
       <h3 className="-mb-9 ml-28 text-grey-55">New Space!</h3>
