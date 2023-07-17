@@ -42,7 +42,7 @@ export const RenderedText = forwardRef<
     openLink,
   };
   return (
-    <Linkify options={{ className: "text-accent-blue underline" }}>
+    <Linkify options={{ className: "text-accent-blue underline", target:"_blank" }}>
       <pre
         role="link"
         ref={ref}
