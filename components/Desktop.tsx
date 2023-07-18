@@ -25,7 +25,7 @@ export const Desktop = (props: { entityID: string }) => {
   let cards = db.useEntity(props.entityID, "desktop/contains");
   let height = useHeight(props.entityID) + 500;
   let { authToken } = useAuth();
-  let { mutate, action, authorized } = useMutations();
+  let { mutate, action, authorized, memberEntity } = useMutations();
   let rep = useContext(ReplicacheContext);
   let spaceID = useSpaceID();
   let [draggingHeight, setDraggingHeight] = useState(0);
@@ -93,14 +93,20 @@ export const Desktop = (props: { entityID: string }) => {
       {/* Handles Double CLick to Create */}
       <div
         ref={setNodeRef}
-        onClick={(e) => {
-          if (!authorized) return;
+        onClick={async (e) => {
+          if (!authorized || !memberEntity) return;
           if (e.currentTarget !== e.target) return;
           let parentRect = e.currentTarget.getBoundingClientRect();
           if (e.ctrlKey || e.metaKey) {
             action.start();
+            let entity = ulid();
+            await mutate("createCard", {
+              title: "",
+              entityID: entity,
+              memberEntity,
+            });
             mutate("addCardToDesktop", {
-              entity: ulid(),
+              entity,
               factID: ulid(),
               desktop: props.entityID,
               position: {
