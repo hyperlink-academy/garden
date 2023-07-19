@@ -86,9 +86,9 @@ function StudioSettings(props: {
               onClick={props.onClose}
             />
             <ButtonPrimary
+              type="submit"
               disabled={!formState.name}
               content={loading ? <DotLoader /> : "Update Studio"}
-              onClick={props.onClose}
             />
           </div>
           {data?.creator === session?.user?.id ? (
