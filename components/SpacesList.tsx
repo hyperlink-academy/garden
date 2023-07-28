@@ -80,7 +80,7 @@ export const BaseSpaceCard = (props: Parameters<typeof SpaceCard>[0]) => {
       <div className="smallSpaceCard group relative flex min-h-[82px]">
         <div className="ml-8 mt-6">
           <div
-            className="smallSpaceCardContent lightBorder flex w-64 shrink-0 flex-col gap-0 bg-white py-2 pl-10 pr-3"
+            className="smallSpaceCardContent lightBorder flex w-80 shrink-0 flex-col gap-0 bg-white py-2 pl-10 pr-3"
             style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
           >
             <div className="flex justify-between gap-2">
@@ -161,7 +161,10 @@ export const BaseSpaceCard = (props: Parameters<typeof SpaceCard>[0]) => {
       <div className="ml-16 mt-10 w-full">
         <div className="largeSpaceCardContent lightBorder flex min-h-[160px] w-full shrink-0 flex-col gap-0 bg-white py-4 pl-12 pr-3 ">
           <div className="largeSpaceCardDetails flex grow flex-col gap-1">
-            <div className="flex justify-between gap-2">
+            <div
+              className="flex justify-between gap-2"
+              style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
+            >
               <h3 className={!data?.display_name ? "italic text-grey-55" : ""}>
                 {data?.display_name || "space deleted"}
               </h3>
