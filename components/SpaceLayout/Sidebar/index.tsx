@@ -127,18 +127,15 @@ const SpaceName = () => {
 };
 
 const SidebarFooter = (props: { studio?: string }) => {
-  let spaceID = useSpaceID();
-  let { data } = useSpaceData(spaceID);
   let { session } = useAuth();
-  let authorized =
-    session.session && session.session.username === data?.owner.username;
+  let authorized = session.loggedIn;
 
   let [infoOpen, setInfoOpen] = useState(false);
   let [logInOpen, setLogInOpen] = useState(false);
 
   return (
     <div className="sidebarBackToHome z-10 flex items-center justify-between gap-2 ">
-      {/* login OR home button */}
+      {/* login OR home button + studios */}
       {!props.studio ? (
         <div className="grow">
           <ButtonPrimary
@@ -203,7 +200,7 @@ const SpaceStudiosList = (props: { username: string }) => {
   let studios = data?.members_in_studios.map(
     (s) => s.studios as Exclude<typeof s.studios, null>
   );
-  return (
+  return studios && studios.length > 0 ? (
     <>
       <PopoverRadix.Root>
         <PopoverRadix.Trigger>
@@ -234,7 +231,7 @@ const SpaceStudiosList = (props: { username: string }) => {
         </PopoverRadix.Portal>
       </PopoverRadix.Root>
     </>
-  );
+  ) : null;
 };
 
 export const SpaceStatus = (props: { openEditModal: () => void }) => {
