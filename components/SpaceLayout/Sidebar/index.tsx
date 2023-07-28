@@ -97,7 +97,12 @@ const SpaceName = () => {
   return (
     <div className="SidebarSpaceInfo flex flex-col gap-2">
       <div className="flex items-start justify-between gap-2">
-        <h3 className="">{data?.display_name}</h3>
+        <h3
+          className="SpaceName"
+          style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
+        >
+          {data?.display_name}
+        </h3>
         {authorized && (
           <button
             onClick={() => setEditModal(true)}
