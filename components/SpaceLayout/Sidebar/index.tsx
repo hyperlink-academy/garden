@@ -23,6 +23,7 @@ import { LogInModal } from "components/LoginModal";
 import { useSpaceData } from "hooks/useSpaceData";
 import { useIdentityData } from "hooks/useIdentityData";
 import { uuidToBase62 } from "src/uuidHelpers";
+import { HelpModal } from "components/HelpCenter";
 
 export const Sidebar = (props: {
   onRoomChange: (room: string) => void;
@@ -162,36 +163,9 @@ const SidebarFooter = (props: { studio?: string }) => {
       >
         <Information />
       </button>
-      <InfoModal open={infoOpen} onClose={() => setInfoOpen(false)} />
+      {/* <InfoModal open={infoOpen} onClose={() => setInfoOpen(false)} /> */}
+      <HelpModal open={infoOpen} onClose={() => setInfoOpen(false)} />
     </div>
-  );
-};
-
-const InfoModal = (props: { open: boolean; onClose: () => void }) => {
-  return (
-    <Modal open={props.open} onClose={props.onClose}>
-      <div className="editRoomModal flex flex-col gap-3 text-grey-35">
-        <h3>Hyperlink Help Center 🌱</h3>
-        <p>
-          You&apos;re viewing a Space on{" "}
-          <a className="text-accent-blue" href="https://hyperlink.academy/">
-            Hyperlink
-          </a>
-          .
-        </p>
-        <p>
-          Question? Bug report? We&apos;d love to hear from you —{" "}
-          <a
-            className="text-accent-blue"
-            href="mailto:contact@hyperlink.academy"
-          >
-            drop us an email
-          </a>
-          !
-        </p>
-        <p>—The Hyperlink Team</p>
-      </div>
-    </Modal>
   );
 };
 

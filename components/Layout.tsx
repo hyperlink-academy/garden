@@ -72,6 +72,34 @@ export const Modal: React.FC<
   );
 };
 
+export const ModalFixedHeight: React.FC<
+  React.PropsWithChildren<{
+    open: boolean;
+    onClose: () => void;
+    dark?: boolean;
+    width?: string;
+  }>
+> = (props) => {
+  return (
+    <Dialog
+      open={props.open}
+      onClose={props.onClose}
+      className="fixed inset-0 z-30 overflow-y-hidden"
+    >
+      <Dialog.Overlay className={props.dark ? "dark-overlay" : "overlay"} />
+      <FloatingContainer
+        className={`
+              fixed top-1/2 left-1/2 grid h-[calc(100%-32px)] w-[calc(100%-32px)] ${
+                props.width ? props.width : "max-w-md"
+              } -translate-x-1/2 -translate-y-1/2 grid-flow-row content-start gap-4 overflow-auto
+              `}
+      >
+        {props.children}
+      </FloatingContainer>
+    </Dialog>
+  );
+};
+
 export const LightBoxModal: React.FC<
   React.PropsWithChildren<{ open: boolean; onClose: () => void }>
 > = (props) => {
