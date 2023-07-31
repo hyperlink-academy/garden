@@ -22,8 +22,12 @@ export default function StudioPage(props: Props) {
   let [state, setState] = useState<"normal" | "signup" | "login">("normal");
 
   useEffect(() => {
-    if (props.id) Router.replace(`/studio/${uuidToBase62(props.id)}/join`);
+    if (props.id && props.id !== uuidToBase62(props.id))
+      Router.replace(
+        `/studio/${uuidToBase62(props.id)}/join?code=${query.code}`
+      );
   }, [props.id]);
+
   const onClick = async () => {
     if (!props.data || !authToken || !code) return;
     let data = await spaceAPI(
