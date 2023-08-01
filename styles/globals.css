@@ -97,13 +97,6 @@ pre {
   font-family: "Quattro" !important;
 }
 
-code {
-  font-family: "Quattro" !important;
-  @apply px-[2px] py-[1px];
-  @apply bg-grey-90;
-  @apply rounded-md;
-}
-
 .plexSerifBoldItalic {
   font-family: "PlexSerif" !important;
   @apply font-bold;

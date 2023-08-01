@@ -163,7 +163,6 @@ const SidebarFooter = (props: { studio?: string }) => {
       >
         <Information />
       </button>
-      {/* <InfoModal open={infoOpen} onClose={() => setInfoOpen(false)} /> */}
       <HelpModal open={infoOpen} onClose={() => setInfoOpen(false)} />
     </div>
   );

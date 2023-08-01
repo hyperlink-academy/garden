@@ -79,9 +79,9 @@ const HelpHandbook = () => {
       </p>
 
       <p>
-        Activity on Hyperlink happens in <strong>Spaces</strong> —
-        self-contained worlds, each with their own content and members, where
-        people do projects together over time.
+        Activity on Hyperlink happens in <strong>Spaces</strong> — little
+        worlds, with their own content and members, where people do projects
+        together.
       </p>
 
       <p>In a Space, you can:</p>
@@ -89,53 +89,46 @@ const HelpHandbook = () => {
       <ul className="list-disc pl-8">
         <li className="marker:text-accent-blue">
           Create <strong>cards</strong> for meaningful things: ideas, tasks,
-          references, etc.
+          questions, inspo…
         </li>
         <li className="marker:text-accent-red">
-          Organize and work with them in <strong>rooms</strong>
+          Organize and work with cards in <strong>rooms</strong>
         </li>
         <li className="marker:text-accent-gold">
-          Talk about things in chat rooms or card comments
+          Talk together in chats & card comments
         </li>
         <li className="marker:text-accent-blue">
-          Invite others to join a Space and create together
+          Invite others to join & explore with you
         </li>
         <li className="marker:text-accent-red">
-          Tag people (@-mention) to notify them about particular things
+          Tag people in to look at particular things
         </li>
       </ul>
 
       <p>
-        When you first open the app, you&apos;ll land in your{" "}
-        <strong>homeroom</strong>. This is your home base for all the Spaces you
-        create or join.
+        When you open the app, you&apos;ll land in your{" "}
+        <strong>homeroom</strong> — your home base for all Spaces you create or
+        join.
       </p>
 
       <p>
-        You can also make <strong>Studios</strong> — places for a group to share
-        and talk about work across Spaces. You can invite people to Studios, and
-        see a collection of Spaces + an activity feed.
+        You can also make <strong>Studios</strong> — places where a group can
+        share work across many projects, with a collection of Spaces + an
+        activity feed.
       </p>
 
       <p>To get started:</p>
 
       <ul className="list-disc pl-8">
-        <li className="marker:text-accent-blue">
-          Make a Space to explore something
-        </li>
-        <li className="marker:text-accent-red">Invite a friend to join</li>
-        <li className="marker:text-accent-gold">
-          Check back daily: add ideas, riff, edit, play
-        </li>
-        <li className="marker:text-accent-blue">
-          Once you finish a project…repeat!
-        </li>
+        <li className="marker:text-accent-blue">Make a Space</li>
+        <li className="marker:text-accent-red">Invite a friend</li>
+        <li className="marker:text-accent-gold">Add ideas, riff, play…</li>
       </ul>
 
       <p>
-        Over time your Spaces on Hyperlink form an ecosystem of things you care
-        about: seeds of ideas, active projects, archives of past work,
-        communities of collaborators.
+        And repeat! Over time your Spaces on Hyperlink form an ecosystem: seeds
+        of ideas, active projects, archives of past work, communities of
+        collaborators.
       </p>
 
       <p>
@@ -164,16 +157,17 @@ const HelpShortcuts = () => {
       <h3>text editing</h3>
       <ul className="list-disc pl-8">
         <li>
-          <code>[[</code> and search for inline link to a card
+          <TextString>[[</TextString> and search for inline link to a card
         </li>
         <li>
-          start a line with <code>#</code> or <code>##</code> to add headers
+          start a line with <TextString>#</TextString> or{" "}
+          <TextString>##</TextString> to add headers
         </li>
         <li>
-          wrap text in <code>*</code> or ctrl/cmd + i for italic
+          wrap text in <TextString>*</TextString> or ctrl/cmd + i for italic
         </li>
         <li>
-          wrap text in <code>**</code> or ctrl/cmd + b for bold
+          wrap text in <TextString>**</TextString> or ctrl/cmd + b for bold
         </li>
       </ul>
 
@@ -226,9 +220,17 @@ const HelpChangelog = () => {
   );
 };
 
+const TextString = (props: { children: React.ReactNode }) => {
+  return (
+    <code className="rounded-md border border-grey-55 bg-grey-90 px-[2px] py-[2px] text-xs">
+      {props.children}
+    </code>
+  );
+};
+
 const KeyboardKey = (props: { children: React.ReactNode }) => {
   return (
-    <code className="bg-grey-35 px-1 text-xs text-white shadow shadow-accent-gold">
+    <code className="rounded-md bg-grey-35 px-[4px] py-[2px] text-xs text-white shadow shadow-accent-gold">
       {props.children}
     </code>
   );
