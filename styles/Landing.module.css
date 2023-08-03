@@ -23,9 +23,6 @@ iteration-count | direction | fill-mode | play-state | name */
 .cardAnimation1 {
   animation: 2s ease-in-out infinite alternate card1;
 }
-.cardAnimation1b {
-  animation: 1.6s ease-in-out 0.8s infinite alternate card1;
-}
 @keyframes card1 {
   0% {
     transform: rotate(1deg);

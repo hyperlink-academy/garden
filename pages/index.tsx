@@ -1,4 +1,4 @@
-import "styles/landing.css";
+import styles from "styles/Landing.module.css";
 import Head from "next/head";
 import { ButtonLink, ButtonPrimary } from "components/Buttons";
 import { BackToHome, Send } from "components/Icons";
@@ -400,7 +400,7 @@ const Features = () => {
           setActiveVideo(activeVideo === "spaces" ? "" : "spaces");
         }}
         description="containers for structured social activity"
-        buttonClass="cardAnimation0 hover:bg-[#fffaff]"
+        buttonClass={`${styles.cardAnimation0} hover:bg-[#fffaff]`}
         positionClass="absolute right-[0] left-[0] top-[-185px] z-50"
       />
       <Feature
@@ -409,7 +409,7 @@ const Features = () => {
           setActiveVideo(activeVideo === "cards" ? "" : "cards");
         }}
         description="represent meaningful things—questions, tasks, ideas…"
-        buttonClass="cardAnimation1 hover:bg-[#fffdf8]"
+        buttonClass={`${styles.cardAnimation1} hover:bg-[#fffdf8]`}
         positionClass="absolute right-[0px] top-[-100px] z-50"
       />
       <Feature
@@ -418,7 +418,7 @@ const Features = () => {
           setActiveVideo(activeVideo === "rooms" ? "" : "rooms");
         }}
         description="organize & work with things"
-        buttonClass="cardAnimation2 hover:bg-[#fff9f9]"
+        buttonClass={`${styles.cardAnimation2} hover:bg-[#fff9f9]`}
         positionClass="absolute left-[8px] sm:left-[-20px] top-[-20px] z-50"
       />
       <Feature
@@ -427,7 +427,7 @@ const Features = () => {
           setActiveVideo(activeVideo === "discussions" ? "" : "discussions");
         }}
         description="talk about things in focused contexts"
-        buttonClass="cardAnimation3 hover:bg-[#f9f9fd]"
+        buttonClass={`${styles.cardAnimation3} hover:bg-[#f9f9fd]`}
         positionClass="absolute right-[20px] bottom-[-28px] z-50"
       />
       <Feature
@@ -436,7 +436,7 @@ const Features = () => {
           setActiveVideo(activeVideo === "members" ? "" : "members");
         }}
         description="invite friends to join"
-        buttonClass="cardAnimation4 hover:bg-[#fafffa]"
+        buttonClass={`${styles.cardAnimation4} hover:bg-[#fafffa]`}
         positionClass="absolute left-2 sm:left-0 bottom-[-88px] z-50"
       />
       {activeVideo && (
