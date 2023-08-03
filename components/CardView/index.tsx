@@ -10,12 +10,7 @@ import {
   ReactionAdd,
 } from "components/Icons";
 import { Divider, MenuContainer, MenuItem, Modal } from "components/Layout";
-import {
-  scanIndex,
-  db,
-  useMutations,
-  useSpaceID,
-} from "hooks/useReplicache";
+import { scanIndex, db, useMutations, useSpaceID } from "hooks/useReplicache";
 import * as Popover from "@radix-ui/react-popover";
 
 import { AttachedCardSection, SingleTextSection } from "./Sections";
@@ -114,8 +109,8 @@ export const CardView = (props: {
           max-w-3xl grow
           flex-col items-stretch overflow-y-scroll
           ${borderStyles({
-          member: !!memberName,
-        })}
+            member: !!memberName,
+          })}
             member: !!memberName,
           })}
           `}
@@ -158,8 +153,8 @@ export const CardView = (props: {
             overflow-x-hidden
             overflow-y-scroll
             ${contentStyles({
-            member: !!memberName,
-          })}
+              member: !!memberName,
+            })}
             `}
         >
           <CardContent {...props} />
@@ -418,16 +413,20 @@ const ScheduledDate = (props: {
 
   let date = useMemo(() => {
     if (!props.date) return null;
-    let dateParts = Intl.DateTimeFormat("en", {
-      timeZone: "UTC",
-      month: "short",
-      year: "numeric",
-      day: "numeric",
-    }).formatToParts(new Date(props.date.value.value));
-    let month = dateParts.find((f) => f.type === "month")?.value;
-    let day = dateParts.find((f) => f.type === "day")?.value;
-    let year = dateParts.find((f) => f.type === "year")?.value;
-    return { month, day, year };
+    try {
+      let dateParts = Intl.DateTimeFormat("en", {
+        timeZone: "UTC",
+        month: "short",
+        year: "numeric",
+        day: "numeric",
+      }).formatToParts(new Date(props.date.value.value));
+      let month = dateParts.find((f) => f.type === "month")?.value;
+      let day = dateParts.find((f) => f.type === "day")?.value;
+      let year = dateParts.find((f) => f.type === "year")?.value;
+      return { month, day, year };
+    } catch (e) {
+      return null;
+    }
   }, [props.date]);
 
   if (!props.dateEditing && !date) return null;
@@ -442,6 +441,7 @@ const ScheduledDate = (props: {
         <>
           <input
             className="-ml-1 border-grey-80 py-[2px] px-1 text-grey-55 "
+            onBlur={() => props.closeDateEditing()}
             onChange={(e) => {
               setDateInputValue(e.currentTarget.value);
               mutate("assertFact", {
@@ -454,7 +454,6 @@ const ScheduledDate = (props: {
                 },
                 positions: {},
               });
-              props.closeDateEditing();
             }}
             value={dateInputValue}
             type="date"
@@ -591,8 +590,9 @@ export const SectionAdder = (props: {
       {/* END LINKED CARD ADDER */}
       {/* DATE ADDER */}
       <button
-        className={`${date || props.dateEditing ? toggledOnStyle : toggledOffStyle
-          } `}
+        className={`${
+          date || props.dateEditing ? toggledOnStyle : toggledOffStyle
+        } `}
         onClick={() => {
           if (date !== null) {
             document
@@ -617,10 +617,11 @@ export const SectionAdder = (props: {
       >
         <Popover.Trigger className="flex items-center">
           <button
-            className={`${toggledOffStyle} ${!reactionPickerOpen
+            className={`${toggledOffStyle} ${
+              !reactionPickerOpen
                 ? ""
                 : "rounded-md border border-accent-blue p-0.5 text-accent-blue"
-              }`}
+            }`}
           >
             <ReactionAdd />
           </button>
