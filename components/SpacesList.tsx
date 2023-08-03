@@ -33,7 +33,14 @@ export const SpaceList = (props: {
         }`}
       >
         {props.spaces?.map((a) => {
-          return <SpaceCard small={props.small} {...a} key={a.do_id} />;
+          return (
+            <SpaceCard
+              small={props.small}
+              {...a}
+              key={a.do_id}
+              editable={true}
+            />
+          );
         })}
       </div>
     </div>
@@ -96,7 +103,7 @@ export const BaseSpaceCard = (props: Parameters<typeof SpaceCard>[0]) => {
                       owner={data?.owner?.username}
                     />
                   ) : (
-                    <SpaceInfo
+                    <SpaceInfoButton
                       studio={data?.owner?.username}
                       name={data?.display_name}
                       description={data?.description}
@@ -159,10 +166,10 @@ export const BaseSpaceCard = (props: Parameters<typeof SpaceCard>[0]) => {
         />
       </div>
       <div className="ml-16 mt-10 w-full">
-        <div className="largeSpaceCardContent lightBorder flex min-h-[160px] w-full shrink-0 flex-col gap-0 bg-white py-4 pl-12 pr-3 ">
+        <div className="largeSpaceCardContent lightBorder flex min-h-[160px] w-full shrink-0 flex-col gap-0 bg-white py-4 pl-12 pr-4">
           <div className="largeSpaceCardDetails flex grow flex-col gap-1">
             <div
-              className="flex justify-between gap-2"
+              className="flex justify-between gap-4"
               style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
             >
               <h3 className={!data?.display_name ? "italic text-grey-55" : ""}>
@@ -175,7 +182,7 @@ export const BaseSpaceCard = (props: Parameters<typeof SpaceCard>[0]) => {
                     owner={data?.owner?.username}
                   />
                 ) : (
-                  <SpaceInfo
+                  <SpaceInfoButton
                     studio={data?.owner?.username}
                     name={data?.display_name}
                     description={data?.description}
@@ -225,12 +232,12 @@ export const EditSpaceButton = (props: { spaceID: string; owner?: string }) => {
             setOpen(true);
             e.preventDefault();
           }}
-          className="text-grey-55 opacity-0 hover:text-accent-blue group-hover:opacity-100"
+          className="text-grey-55 hover:text-accent-blue"
         >
           <Settings />
         </button>
 
-        <div className="text-grey-55 opacity-0 hover:text-accent-blue group-hover:opacity-100">
+        <div className="text-grey-55 hover:text-accent-blue">
           <EditSpaceModal
             spaceID={props.spaceID}
             open={open}
@@ -242,7 +249,7 @@ export const EditSpaceButton = (props: { spaceID: string; owner?: string }) => {
     );
 };
 
-const SpaceInfo = (props: {
+const SpaceInfoButton = (props: {
   studio?: string;
   name?: string | null;
   description?: string | null;
@@ -262,7 +269,7 @@ const SpaceInfo = (props: {
           setOpen(true);
           e.preventDefault();
         }}
-        className="text-grey-55 opacity-0 hover:text-accent-blue group-hover:opacity-100"
+        className="text-grey-55 hover:text-accent-blue"
       >
         <Information />
       </button>
