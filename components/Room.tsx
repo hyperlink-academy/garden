@@ -27,10 +27,8 @@ export const Room = (props: { entityID: string }) => {
   let roomType = db.useEntity(props.entityID, "room/type");
   let { ref } = usePreserveScroll<HTMLDivElement>(props.entityID);
 
-  let { reactions, filters, setFilters, cardsFiltered } = useFilteredCards(
-    props.entityID,
-    "desktop/contains"
-  );
+  let { reactions, filters, setFilters, cardsFiltered, total } =
+    useFilteredCards(props.entityID, "desktop/contains");
 
   if (props.entityID === "search") return <SearchRoom />;
   if (props.entityID === "calendar") return <CalendarRoom />;
@@ -42,6 +40,8 @@ export const Room = (props: { entityID: string }) => {
       className="no-scrollbar flex h-full w-[336px] flex-col items-stretch overflow-x-hidden overflow-y-scroll p-2 pt-0 text-sm sm:p-4 sm:pt-0 "
     >
       <RoomHeader
+        totalCount={total}
+        filteredCount={cardsFiltered.length}
         entityID={props.entityID}
         reactions={reactions}
         filters={filters}
@@ -73,11 +73,14 @@ export const Room = (props: { entityID: string }) => {
 };
 
 function RoomHeader(props: {
+  filteredCount: number;
+  totalCount: number;
   entityID: string;
   reactions: string[];
   filters: Filters;
   setFilters: (f: (old: Filters) => Filters) => void;
 }) {
+  let roomType = db.useEntity(props.entityID, "room/type");
   let [descriptionOpen, setDescriptionOpen] = useState(false);
   let [scrolledTop, setScrolledTop] = useState(true);
 
@@ -124,7 +127,16 @@ function RoomHeader(props: {
               } else return;
             }}
           >
-            {roomName?.value}
+            {roomName?.value}{" "}
+            {roomType?.value === "collection" ? (
+              <span className="text-sm text-grey-35">
+                (
+                {props.totalCount === props.filteredCount
+                  ? props.totalCount
+                  : `${props.filteredCount}/${props.totalCount}`}
+                )
+              </span>
+            ) : null}
           </button>
           {authorized && (
             <div className="roomOptionsWrapper mt-[4px]">

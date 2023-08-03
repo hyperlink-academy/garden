@@ -72,7 +72,7 @@ export const useFilteredCards = (
     return passed;
   });
 
-  return { reactions, filters, setFilters, cardsFiltered };
+  return { reactions, filters, setFilters, cardsFiltered, total: cards.length };
 };
 
 export function FilterByReactions(props: {
