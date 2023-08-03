@@ -29,7 +29,7 @@ export default function IndexPage() {
           {/* title */}
           <div className="landingTitle flex flex-col justify-center gap-8 text-center ">
             {/* hyperlink */}
-            <div className=" flex flex-col">
+            <div className="flex flex-col">
               <div className="z-10 -mb-[12px] flex w-3/4 rounded-md border-[12px] border-accent-red p-2 text-sm sm:-mb-[24px] sm:w-1/2 sm:border-[24px] sm:p-4 sm:text-base md:w-1/3">
                 <div className="m-auto flex gap-2 self-center">
                   <span>
@@ -164,7 +164,7 @@ export default function IndexPage() {
                   <div className="h-4 w-[75%] rounded-md bg-grey-90"></div>
                   <hr className="my-2 border-grey-80" />
                   <div className="h-4 rounded-md bg-grey-90"></div>
-                  <div className=" h-4 rounded-md bg-accent-blue"></div>
+                  <div className="h-4 rounded-md bg-accent-blue"></div>
                   <div className="h-4 rounded-md bg-grey-90"></div>
                   <div className="h-4 rounded-md bg-grey-90"></div>
                   <hr className="my-2 border-grey-80" />

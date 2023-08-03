@@ -65,7 +65,7 @@ export const MemberRoomList = (props: {
           <>
             <button
               onClick={() => setInviteOpen(true)}
-              className="sidebarAddMember group flex w-full items-center gap-2 rounded-md border border-transparent py-0.5 px-1 text-grey-55 hover:border-accent-blue  hover:text-accent-blue"
+              className="sidebarAddMember group flex w-full items-center gap-2 rounded-md border border-transparent py-0.5 px-1 text-grey-55 hover:border-accent-blue hover:text-accent-blue"
             >
               <div className="text-grey-80 group-hover:text-accent-blue">
                 <AddTiny />

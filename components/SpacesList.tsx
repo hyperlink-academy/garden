@@ -275,8 +275,8 @@ const SpaceInfoButton = (props: {
       </button>
 
       <Modal open={open} onClose={() => setOpen(false)}>
-        <div className="flex flex-col gap-4 ">
-          <div className="flex flex-col gap-1 ">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1">
             <h3>{name}</h3>
             {description ? (
               <div>{description}</div>

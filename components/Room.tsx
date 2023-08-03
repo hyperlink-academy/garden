@@ -37,7 +37,7 @@ export const Room = (props: { entityID: string }) => {
     <div
       id="room-wrapper"
       ref={ref}
-      className="no-scrollbar flex h-full w-[336px] flex-col items-stretch overflow-x-hidden overflow-y-scroll p-2 pt-0 text-sm sm:p-4 sm:pt-0 "
+      className="no-scrollbar flex h-full w-[336px] flex-col items-stretch overflow-x-hidden overflow-y-scroll p-2 pt-0 text-sm sm:p-4 sm:pt-0"
     >
       <RoomHeader
         totalCount={total}
@@ -51,7 +51,7 @@ export const Room = (props: { entityID: string }) => {
       {/* per-room wrappers + components */}
       {props.entityID ? (
         roomType?.value === "collection" ? (
-          <div className="flex  grow flex-col  gap-2 pb-3">
+          <div className="flex grow flex-col gap-2 pb-3">
             <CardCollection
               cards={cardsFiltered}
               entityID={props.entityID}
@@ -64,7 +64,7 @@ export const Room = (props: { entityID: string }) => {
         ) : (
           <div className="relative flex flex-col">
             <Desktop entityID={props.entityID} />
-            <div className="desktopBackground absolute h-full  w-full grow" />
+            <div className="desktopBackground absolute h-full w-full grow" />
           </div>
         )
       ) : null}
@@ -118,7 +118,7 @@ function RoomHeader(props: {
         className="roomHeader sticky top-0 z-20 bg-background pt-2 sm:pt-4"
         ref={titleRef}
       >
-        <div className="roomTitle flex justify-between ">
+        <div className="roomTitle flex justify-between">
           <button
             className={`mb-1 text-lg font-bold text-grey-35 `}
             onClick={() => {
@@ -162,7 +162,7 @@ function RoomHeader(props: {
 
       <div
         className={`roomDescriptionAndFilter z-10 bg-background ${
-          descriptionOpen ? "sticky  " : ""
+          descriptionOpen ? "sticky" : ""
         }`}
         style={{ top: `${titleHeight}px` }}
         ref={descriptionRef}
@@ -175,7 +175,7 @@ function RoomHeader(props: {
         />
       </div>
       <div
-        className="roomDivider sticky z-10 mb-3 bg-background  pt-2 "
+        className="roomDivider sticky z-10 mb-3 bg-background pt-2"
         style={
           descriptionOpen
             ? { top: `calc(${titleHeight}px + ${descriptionHeight}px)` }

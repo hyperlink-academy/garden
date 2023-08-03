@@ -228,7 +228,7 @@ export function Post(props: {
             : {}
         }
       >
-        <div className="studioPostTimeStamp text-right text-xs italic text-grey-55  opacity-0 group-hover:opacity-100">
+        <div className="studioPostTimeStamp text-right text-xs italic text-grey-55 opacity-0 group-hover:opacity-100">
           {date}
         </div>
         <div className="StudioPostContent flex flex-col gap-1 rounded-md border border-grey-80 bg-white px-4 pt-3 pb-4">

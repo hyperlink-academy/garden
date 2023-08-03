@@ -79,7 +79,7 @@ export const AddReaction = (props: {
   if (!authorized) return null;
   return (
     <div className="reactionPicker flex flex-col gap-1 rounded-md border border-grey-80 bg-white px-3 py-2">
-      <div className="reactionOptions flex w-full flex-wrap gap-x-4 gap-y-2 ">
+      <div className="reactionOptions flex w-full flex-wrap gap-x-4 gap-y-2">
         {reactions
           .filter((f) => !!f.value) // strip empty strings
           .sort((a, b) => {
@@ -187,7 +187,7 @@ export const EditReactions = (props: {
         <div className="my-2">
           <Divider />
         </div>
-        <div className=" mx-auto flex max-h-[440px] flex-wrap place-items-center gap-2 place-self-center overflow-scroll">
+        <div className="mx-auto flex max-h-[440px] flex-wrap place-items-center gap-2 place-self-center overflow-scroll">
           {reactions
             .filter((f) => !!f.value) // strip empty strings
             .sort((a, b) => {

@@ -28,7 +28,7 @@ export function ButtonPrimary(
           active:bg-bg-red active:text-accent-red `
           : `
           border-accent-blue
-          bg-accent-blue  hover:bg-bg-blue hover:text-accent-blue
+          bg-accent-blue hover:bg-bg-blue hover:text-accent-blue
           active:bg-bg-blue active:text-accent-blue 
 
           `

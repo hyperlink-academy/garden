@@ -157,13 +157,13 @@ const List = (props: {
       ) : null}
       {spacesUpcoming.length > 0 ? (
         <div className="myStudioUpcoming">
-          <h3 className=" ">Upcoming</h3>
+          <h3>Upcoming</h3>
           <SpaceList small spaces={spacesUpcoming} />
         </div>
       ) : null}
       {spacesUnscheduled.length > 0 ? (
         <div className="myStudioUnscheduled">
-          <h3 className=" ">Unscheduled</h3>
+          <h3>Unscheduled</h3>
           <SpaceList small spaces={spacesUnscheduled} />
         </div>
       ) : null}

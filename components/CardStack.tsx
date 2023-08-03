@@ -38,7 +38,7 @@ export const CardAdder = (
     return null;
   } else
     return (
-      <div className="justify-left flex w-full shrink-0 items-center gap-2 rounded-lg border  border-dashed border-grey-80 px-2 py-1 text-sm text-grey-55 group-hover:border-accent-blue">
+      <div className="justify-left flex w-full shrink-0 items-center gap-2 rounded-lg border border-dashed border-grey-80 px-2 py-1 text-sm text-grey-55 group-hover:border-accent-blue">
         <button
           className="group grow text-left font-bold hover:text-accent-blue"
           onClick={async () => {
@@ -65,7 +65,7 @@ export const CardAdder = (
         >
           <p>create new</p>
         </button>
-        <div className=" h-4 w-[1px] border-l border-dashed text-grey-80" />
+        <div className="h-4 w-[1px] border-l border-dashed text-grey-80" />
         <AddExistingCard
           onAdd={(entity, d) => {
             if (props.openOnAdd) {

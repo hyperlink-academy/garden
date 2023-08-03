@@ -60,7 +60,7 @@ export const Backlinks = (props: { entityID: string }) => {
           )
         }
       </Disclosure>
-      <div className=" border-t-1 border-r-1 mr-3 h-8 w-3 self-end rounded-tr-md border-t border-r border-dashed border-r-grey-55 " />
+      <div className="border-t-1 border-r-1 mr-3 h-8 w-3 self-end rounded-tr-md border-t border-r border-dashed border-r-grey-55" />
     </div>
   );
 };

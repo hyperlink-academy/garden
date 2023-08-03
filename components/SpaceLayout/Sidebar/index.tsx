@@ -39,7 +39,7 @@ export const Sidebar = (props: {
         <Divider />
         <div className="flex flex-row content-between gap-2 pl-2">
           <button
-            className={`flex  w-full justify-center rounded-md border  p-1 ${
+            className={`flex w-full justify-center rounded-md border p-1 ${
               props.currentRoom === "search"
                 ? "rounded-md border-accent-blue bg-accent-blue font-bold text-white"
                 : " border-grey-80 text-grey-35 hover:bg-bg-blue"
@@ -50,7 +50,7 @@ export const Sidebar = (props: {
           </button>
 
           <button
-            className={`flex  w-full justify-center rounded-md border  p-1 ${
+            className={`flex w-full justify-center rounded-md border p-1 ${
               props.currentRoom === "calendar"
                 ? "rounded-md border-accent-blue bg-accent-blue font-bold text-white"
                 : " border-grey-80 text-grey-35 hover:bg-bg-blue"

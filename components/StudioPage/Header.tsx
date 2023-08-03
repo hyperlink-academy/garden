@@ -13,7 +13,7 @@ export function StudioHeader(props: {
   let { session } = useAuth();
   return (
     <div className="studioHeader flex flex-col gap-8">
-      <div className=" flex flex-col gap-2">
+      <div className="flex flex-col gap-2">
         <div className="studioTitle flex flex-row items-start justify-between gap-4">
           <h1>{data?.name}</h1>
           {/* TODO - replace this with updated 'authorized' in useMutations() */}
@@ -72,7 +72,7 @@ function Tab(props: {
   return (
     <button
       onClick={() => props.setView(props.value)}
-      className={`rounded-t-md border-2 border-b-0  py-1 px-2 ${
+      className={`rounded-t-md border-2 border-b-0 py-1 px-2 ${
         props.view === props.value
           ? "border-accent-blue bg-bg-blue font-bold text-accent-blue"
           : "border-grey-55 bg-white text-grey-35"

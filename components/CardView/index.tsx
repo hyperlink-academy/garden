@@ -186,7 +186,7 @@ export const CardContent = (props: {
       <div className="cardContentWrapper relative">
         {authorized && (
           <>
-            <div className="cardSectionAdder pointer-events-none  sticky top-0 z-10 mb-32 flex w-full justify-center ">
+            <div className="cardSectionAdder pointer-events-none sticky top-0 z-10 mb-32 flex w-full justify-center">
               <SectionAdder
                 entityID={props.entityID}
                 setDateEditing={() => {
@@ -210,7 +210,7 @@ export const CardContent = (props: {
             <div className="group pointer-events-auto flex place-items-center gap-2">
               {cardCreatorName ? (
                 <>
-                  <div className=" h-[32px] w-[32px] rounded-full border border-grey-80 pt-[5px] text-center text-sm text-grey-55">
+                  <div className="h-[32px] w-[32px] rounded-full border border-grey-80 pt-[5px] text-center text-sm text-grey-55">
                     <div className="w-full text-center">
                       {cardCreatorName.charAt(0).toUpperCase()}
                     </div>
@@ -259,7 +259,7 @@ export const CardContent = (props: {
         </div>
 
         {/* sticky "comments" tab */}
-        <div className=" sticky -bottom-4 z-10 -mx-3 mt-16  md:-mx-4 ">
+        <div className="sticky -bottom-4 z-10 -mx-3 mt-16 md:-mx-4">
           <div className="flex items-end">
             <div className="w-4 grow border border-transparent border-b-grey-90" />
 
@@ -434,13 +434,13 @@ const ScheduledDate = (props: {
   return (
     <div
       id="card-date"
-      className="flex place-items-center gap-2  text-sm italic text-grey-55"
+      className="flex place-items-center gap-2 text-sm italic text-grey-55"
     >
       Scheduled for{" "}
       {props.dateEditing ? (
         <>
           <input
-            className="-ml-1 border-grey-80 py-[2px] px-1 text-grey-55 "
+            className="-ml-1 border-grey-80 py-[2px] px-1 text-grey-55"
             onBlur={() => props.closeDateEditing()}
             onChange={(e) => {
               setDateInputValue(e.currentTarget.value);
@@ -462,7 +462,7 @@ const ScheduledDate = (props: {
           <div className="h-6 w-[2px] border-l border-grey-55" />
 
           <button
-            className=" justify-self-center text-sm text-grey-55 hover:text-accent-blue"
+            className="justify-self-center text-sm text-grey-55 hover:text-accent-blue"
             onClick={() => {
               if (props.date) {
                 mutate("retractFact", { id: props.date.id });
@@ -547,7 +547,7 @@ export const SectionAdder = (props: {
 
   if (!authorized) return null;
   return (
-    <div className="pointer-events-auto flex w-fit items-center gap-1 rounded-full border border-grey-90 bg-white  py-2 px-4 text-grey-55 shadow">
+    <div className="pointer-events-auto flex w-fit items-center gap-1 rounded-full border border-grey-90 bg-white py-2 px-4 text-grey-55 shadow">
       {/* IMAGE ADDER */}
       <MakeImage entity={props.entityID}>
         <div className={`${image ? toggledOnStyle : toggledOffStyle} `}>

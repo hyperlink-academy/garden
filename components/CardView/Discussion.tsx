@@ -136,7 +136,7 @@ export const MessageInput = (props: {
   };
   return (
     <div
-      className="messageInput  sticky bottom-0 flex w-full flex-col gap-2  pt-1"
+      className="messageInput sticky bottom-0 flex w-full flex-col gap-2 pt-1"
       onBlur={(e) => {
         if (e.currentTarget.contains(e.relatedTarget)) return;
         setMode("normal");
@@ -154,7 +154,7 @@ export const MessageInput = (props: {
               <CloseLinedTiny />
             </button>
           </div>
-          <div className="ml-2 h-2 w-0 border border-grey-80 " />
+          <div className="ml-2 h-2 w-0 border border-grey-80" />
         </div>
       )}
       {/* ACTUAL MESSAGE INPUT */}
@@ -172,7 +172,7 @@ export const MessageInput = (props: {
             value={value}
             onChange={(e) => setValue(e.target.value)}
             placeholder=""
-            className="w-full "
+            className="w-full"
             id="messageInput"
           />
           <div className="place-self-end">
@@ -235,7 +235,7 @@ const AttachCard = ({
                     >
                       <AttachedCard entityID={card} />
                       <button
-                        className="pt-1 text-grey-55 hover:text-accent-blue "
+                        className="pt-1 text-grey-55 hover:text-accent-blue"
                         onClick={() =>
                           setAttachedCards((a) => a.filter((c) => c !== card))
                         }
@@ -404,14 +404,14 @@ const Message = (props: {
             <div className="font-bold italic text-grey-55">
               {replyToName?.value}
             </div>
-            <div className=" italic text-grey-55">{replyMessage?.content}</div>
+            <div className="italic text-grey-55">{replyMessage?.content}</div>
           </div>
           <div className="ml-2 h-2 w-0 border border-grey-80" />
         </>
       )}
-      <div className=" group -mx-4 flex items-end gap-1 py-1 px-4 hover:bg-bg-blue ">
+      <div className="group -mx-4 flex items-end gap-1 py-1 px-4 hover:bg-bg-blue">
         <RenderedText
-          className="messageContent grow text-sm text-grey-35 "
+          className="messageContent grow text-sm text-grey-35"
           text={props.content}
           tabIndex={0}
           style={{
@@ -419,9 +419,9 @@ const Message = (props: {
           }}
         />
         {authorized ? (
-          <span className="messageReplyButton mb-[1px] h-4 w-4 shrink-0 text-xs ">
+          <span className="messageReplyButton mb-[1px] h-4 w-4 shrink-0 text-xs">
             <button
-              className=" hidden text-grey-55 hover:text-accent-blue group-hover:block"
+              className="hidden text-grey-55 hover:text-accent-blue group-hover:block"
               onClick={() => {
                 props.setReply(props.id);
                 document.getElementById("messageInput")?.focus();

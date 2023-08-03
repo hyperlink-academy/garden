@@ -156,14 +156,14 @@ export const FindOrCreate = (props: {
                   {addedItemsList === false ? null : (
                     <ul className="lightBorder no-scrollbar flex flex-col gap-2 bg-bg-blue p-3">
                       {added.length === 0 ? (
-                        <div className="italic text-grey-55 ">
+                        <div className="italic text-grey-55">
                           no cards selected yet!
                         </div>
                       ) : (
                         added.map((addedItem, index) => (
                           <li
                             key={index}
-                            className="addedListItem grid grid-cols-[max-content_auto_max-content] gap-2 "
+                            className="addedListItem grid grid-cols-[max-content_auto_max-content] gap-2"
                           >
                             <div className="pt-[1px]">
                               {addedItem.type === "create" ? (
@@ -310,7 +310,7 @@ const CreateButton = (props: {
   };
 
   return (
-    <div className="flex flex-row ">
+    <div className="flex flex-row">
       <Combobox.Option
         key={"create"}
         value={value}
@@ -388,7 +388,7 @@ const SearchResult = (
             <div
               className={`searchResult grid select-none grid-cols-[min-content_auto_min-content] gap-2 ${
                 props.disabled
-                  ? " cursor-default text-grey-80"
+                  ? "cursor-default text-grey-80"
                   : "cursor-pointer"
               }`}
             >

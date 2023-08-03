@@ -175,7 +175,7 @@ export const BaseSmallCard = (
       ) : (
         // END OF DEFAULT CARD CONTENT, START OF MEMBER CARD CONTENT
         <div className="flex h-full w-full flex-col items-stretch gap-2 overflow-hidden">
-          <div className="grid grid-cols-[auto_max-content] items-end text-white ">
+          <div className="grid grid-cols-[auto_max-content] items-end text-white">
             <Member />
             <span className="mr-0.5 text-sm italic">member</span>
           </div>

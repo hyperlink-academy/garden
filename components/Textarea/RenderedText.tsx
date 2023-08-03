@@ -67,7 +67,7 @@ export const RenderedText = forwardRef<
               );
             if (t.startsWith("#"))
               return (
-                <span className="font-bold underline decoration-2 " key={key}>
+                <span className="font-bold underline decoration-2" key={key}>
                   {parseLine(t, parseConfig)}
                 </span>
               );

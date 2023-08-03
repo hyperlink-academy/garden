@@ -36,7 +36,7 @@ export function HighlightCard(props: { entityID: string }) {
         <Note />
       </button>
       <Modal width="max-w-fit" open={open} onClose={() => setOpen(false)}>
-        <div className="flex  flex-col gap-4">
+        <div className="flex flex-col gap-4">
           <h3>Highlight to a Studio!</h3>
 
           <div className="flex flex-col gap-3">

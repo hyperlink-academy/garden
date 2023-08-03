@@ -281,7 +281,7 @@ export const RoomListItem = (props: {
         </div>
         <div className="roomListItemUnreads grow">{props.children}</div>
         {unreadCount && (
-          <div className="unreadCount mt-[6px] ml-1 h-[12px] w-[12px] shrink-0 rounded-full border  border-white bg-accent-gold"></div>
+          <div className="unreadCount mt-[6px] ml-1 h-[12px] w-[12px] shrink-0 rounded-full border border-white bg-accent-gold"></div>
         )}
       </button>
     </div>

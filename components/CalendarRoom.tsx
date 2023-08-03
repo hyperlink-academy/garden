@@ -35,7 +35,7 @@ export function CalendarRoom() {
   }, {} as { [key: string]: { entity: string; value: string }[] });
 
   return (
-    <div className="no-scrollbar flex h-full w-[336px] flex-col items-stretch overflow-x-hidden overflow-y-scroll p-2 text-sm sm:p-4 ">
+    <div className="no-scrollbar flex h-full w-[336px] flex-col items-stretch overflow-x-hidden overflow-y-scroll p-2 text-sm sm:p-4">
       <div className="calendarCardList flex h-full flex-col gap-4">
         {days.length > 0 ? (
           days.map((d, index, days) => {
@@ -54,7 +54,7 @@ export function CalendarRoom() {
                 <div key={index}>
                   <div className="calendarItem flex flex-row gap-3" key={d}>
                     <div className="flex h-fit flex-col gap-0.5 rounded-md bg-grey-35 pb-0.5 text-center text-sm text-grey-55">
-                      <div className="calendarDateBox -gap-1 flex h-fit w-fit flex-col rounded-md border border-grey-55 bg-white py-1 px-2 ">
+                      <div className="calendarDateBox -gap-1 flex h-fit w-fit flex-col rounded-md border border-grey-55 bg-white py-1 px-2">
                         <span>{month?.value}</span>
                         <span className="text-lg font-bold text-grey-35">
                           {day?.value}
@@ -168,7 +168,7 @@ const AddCardToCalendar = (props: { day: string }) => {
   let { authorized, mutate, memberEntity, action } = useMutations();
   if (!authorized) return null;
   return (
-    <div className="flex shrink-0 place-items-center gap-2  place-self-end text-sm text-grey-55">
+    <div className="flex shrink-0 place-items-center gap-2 place-self-end text-sm text-grey-55">
       <button
         onClick={async () => {
           if (!memberEntity) return;
