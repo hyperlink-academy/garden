@@ -1,3 +1,4 @@
+import "styles/landing.css";
 import Head from "next/head";
 import { ButtonLink, ButtonPrimary } from "components/Buttons";
 import { BackToHome, Send } from "components/Icons";

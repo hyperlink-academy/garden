@@ -138,7 +138,7 @@ export const CardView = (props: {
           <div className="grid shrink-0 grid-cols-[auto_max-content] items-end pl-2 pr-3 pt-2 pb-1 text-white">
             <Member />
             <Link href={`/s/${memberName?.value}`}>
-              <small className="justify-self-start">visit studio</small>
+              <span className="justify-self-start text-sm">visit studio</span>
             </Link>
           </div>
         )}

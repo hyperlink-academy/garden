@@ -144,12 +144,12 @@ export const FindOrCreate = (props: {
               {/* if isMultiselect = true, take all the stuff in the added[] and display it at the top, with a submit button. If not, show nothing! */}
               {isMultiSelect.current === false ? (
                 <div className="mx-3 mt-2 mb-2">
-                  <small className="hidden italic text-grey-55 sm:block">
+                  <span className="hidden text-sm italic text-grey-55 sm:block">
                     SHIFT + click to select multiple cards!
-                  </small>
-                  <small className="italic text-grey-55  sm:hidden ">
+                  </span>
+                  <span className="text-sm italic text-grey-55 sm:hidden">
                     longpress to select multiple cards!
-                  </small>
+                  </span>
                 </div>
               ) : (
                 <div className="addedList mx-3 mt-2 mb-3 flex flex-col gap-2">

@@ -382,9 +382,9 @@ const Message = (props: {
       {!props.multipleFromSameAuthor && (
         <div className="flex justify-between gap-2 text-grey-55">
           <div className="messageInfo flex gap-2">
-            <small className="messageAuthor text-sm font-bold italic ">
+            <span className="messageAuthor text-sm font-bold italic">
               {memberName?.value}
-            </small>
+            </span>
             <span className="messageTimeStamp self-center text-xs">
               {time.toLocaleDateString(undefined, {
                 month: "short",

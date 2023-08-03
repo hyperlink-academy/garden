@@ -85,15 +85,13 @@ export const BaseSmallCard = (
           <a className="h-full ">
             {/* if we have an image, do NOT show 'Untitled' placeholder */}
             {props.title ? (
-              <div className="-m-1 max-h-full w-fit overflow-hidden text-ellipsis rounded-[4px] bg-white bg-opacity-70 p-1 font-bold leading-tight  text-grey-35">
+              <div className="-m-1 max-h-full w-fit overflow-hidden text-ellipsis rounded-[4px] bg-white bg-opacity-70 p-1 font-bold leading-tight text-grey-35">
                 {props.title}
               </div>
             ) : props.content ? (
-              <small>
-                <pre className="-m-1 max-h-full w-fit overflow-hidden truncate whitespace-pre-wrap rounded-[4px] bg-white bg-opacity-60 p-1 leading-tight">
-                  {props?.content}
-                </pre>
-              </small>
+              <pre className="-m-1 max-h-full w-fit overflow-hidden truncate whitespace-pre-wrap rounded-[4px] bg-white bg-opacity-60 p-1 leading-tight">
+                {props?.content}
+              </pre>
             ) : !props.imageUrl ? (
               <div className="block w-full font-bold italic !text-grey-80">
                 Untitled
@@ -179,7 +177,7 @@ export const BaseSmallCard = (
         <div className="flex h-full w-full flex-col items-stretch gap-2 overflow-hidden">
           <div className="grid grid-cols-[auto_max-content] items-end text-white ">
             <Member />
-            <small className="mr-0.5 italic">member</small>
+            <span className="mr-0.5 text-sm italic">member</span>
           </div>
           <div
             className={`

@@ -77,17 +77,6 @@ h4 {
   @apply text-grey-35;
 }
 
-p {
-}
-
-small {
-  @apply text-sm;
-}
-
-.tiny {
-  @apply text-xs;
-}
-
 a {
   color: inherit;
   text-decoration: none;
@@ -207,30 +196,12 @@ textarea {
 }
 
 .unreadCardGlow {
-  /* testing smaller unread glow - ALSO using for messages as well as cards */
-  /* border: dashed 2px goldenrod; */
   border: dashed 1px goldenrod;
-  /* box-shadow: 0px 0px 8px 2px gold; */
   box-shadow: 0px 0px 4px 2px gold;
 }
 
 .selectedCardGlow {
-  /* testing box-shadow instead of drop-shadow for better iOS support */
   box-shadow: 0px 0px 0px 2px blue, 0px 0px 6px 0px blue;
-  /* filter: drop-shadow(2px 0px 0px rgba(0, 125, 255, 1))
-    drop-shadow(0px 2px 0px rgba(0, 125, 255, 1))
-    drop-shadow(-2px 0px 0px rgba(0, 125, 255, 1))
-    drop-shadow(0px -2px 0px rgba(0, 125, 255, 1)); */
-  /* animation: squishy 1s linear infinite; */
-}
-
-@keyframes squishy {
-  25% {
-    transform: scale(1, 0.925);
-  }
-  75% {
-    transform: scale(1, 1.075);
-  }
 }
 
 .desktopBackground {
@@ -239,11 +210,6 @@ textarea {
 
 .desktopBackground:before {
   content: "";
-
-  /* border-image: url(/img/desktopBackground.svg);
-   border-image-repeat: repeat;
-  border-image-slice: 37.5% fill;
-  border-width: 48px; */
   background-image: url(/img/desktopBackgroundCropped.svg);
   background-repeat: repeat;
   background-size: 120px;
@@ -280,94 +246,5 @@ textarea {
 
   .safari-pwa-height {
     height: 100lvh !important;
-  }
-}
-
-/* landing page card animations */
-
-/* @keyframes duration | easing-function | delay |
-iteration-count | direction | fill-mode | play-state | name */
-/* animation: 3s ease-in 1s 2 reverse both paused slidein; */
-
-.cardAnimation0 {
-  animation: 1.3s ease-in-out 1.2s infinite alternate card0;
-}
-@keyframes card0 {
-  0% {
-    transform: rotate(1deg);
-    box-shadow: 0px 0px 0px 2px purple, 0px 0px 6px 0px purple,
-      0px 0px 12px 0px lightgrey;
-  }
-  100% {
-    transform: rotate(-1deg);
-    box-shadow: 0px 0px 0px 2px rgb(205, 0, 205),
-      0px 0px 6px 0px rgb(205, 0, 205), 0px 0px 12px 0px lightgrey;
-  }
-}
-
-.cardAnimation1 {
-  animation: 2s ease-in-out infinite alternate card1;
-}
-.cardAnimation1b {
-  animation: 1.6s ease-in-out 0.8s infinite alternate card1;
-}
-@keyframes card1 {
-  0% {
-    transform: rotate(1deg);
-    box-shadow: 0px 0px 0px 2px gold, 0px 0px 6px 0px gold,
-      0px 0px 12px 0px lightgrey;
-  }
-  100% {
-    transform: rotate(-1deg);
-    box-shadow: 0px 0px 0px 2px rgb(220, 158, 0),
-      0px 0px 6px 0px rgb(220, 158, 0), 0px 0px 12px 0px lightgrey;
-  }
-}
-
-.cardAnimation2 {
-  animation: 2.3s ease-in-out 0.3s infinite alternate card2;
-}
-@keyframes card2 {
-  0% {
-    transform: rotate(1deg);
-    box-shadow: 0px 0px 0px 2px crimson, 0px 0px 6px 0px crimson,
-      0px 0px 12px 0px lightgrey;
-  }
-  100% {
-    transform: rotate(-1deg);
-    box-shadow: 0px 0px 0px 2px rgb(182, 10, 0), 0px 0px 6px 0px rgb(182, 10, 0),
-      0px 0px 12px 0px lightgrey;
-  }
-}
-
-.cardAnimation3 {
-  animation: 1.7s ease-in-out 0.9s infinite alternate card3;
-}
-@keyframes card3 {
-  0% {
-    transform: rotate(1deg);
-    box-shadow: 0px 0px 0px 2px rgb(20, 100, 250),
-      0px 0px 6px 0px rgb(20, 100, 250), 0px 0px 12px 0px lightgrey;
-  }
-  100% {
-    transform: rotate(-1deg);
-    box-shadow: 0px 0px 0px 2px blue, 0px 0px 6px 0px blue,
-      0px 0px 12px 0px lightgrey;
-  }
-}
-
-.cardAnimation4 {
-  animation: 2.5s ease-in-out 0.7s infinite alternate card4;
-}
-@keyframes card4 {
-  0% {
-    transform: rotate(1deg);
-    box-shadow: 0px 0px 0px 2px rgb(25, 160, 0), 0px 0px 6px 0px rgb(25, 160, 0),
-      0px 0px 12px 0px lightgrey;
-  }
-  100% {
-    transform: rotate(-1deg);
-    box-shadow: 0px 0px 0px 2px green, 0px 0px 6px 0px green,
-      0px 0px 12px 0px lightgrey;
   }
 }
