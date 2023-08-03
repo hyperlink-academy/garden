@@ -256,16 +256,19 @@ export const DateSection = (props: { entityID: string }) => {
 export const AttachedCardSection = (props: { entityID: string }) => {
   let attachedCards = db.useEntity(props.entityID, "deck/contains");
   let currentCollectionType = db.useEntity(props.entityID, "collection/type");
+  let { authorized } = useMutations();
 
   return (
     <>
       {attachedCards && attachedCards.length > 0 && (
         <div className="flex flex-col gap-3">
           <div className="">
-            <CollectionType
-              collectionType={currentCollectionType?.value}
-              entityID={props.entityID}
-            />
+            {authorized && (
+              <CollectionType
+                collectionType={currentCollectionType?.value}
+                entityID={props.entityID}
+              />
+            )}
           </div>
           <CardCollection
             editable
