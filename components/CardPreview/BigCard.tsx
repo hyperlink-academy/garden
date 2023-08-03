@@ -183,7 +183,7 @@ export const BigCardBody = (
               {/* three states: unread, existing, none */}
               {/* clicking = shortcut to focus input for a new message */}
               <button
-                className={`cardPreivewComments relative rounded-md border ${
+                className={`cardPreviewComments relative rounded-md border ${
                   props.unreadDiscussions
                     ? "unreadCardGlow bg-background text-accent-blue hover:bg-accent-blue hover:text-background"
                     : "border-transparent bg-white text-grey-55 hover:border-accent-blue hover:bg-bg-blue hover:text-accent-blue"
@@ -243,9 +243,9 @@ export const BigCardBody = (
             </div>
 
             {/* edit toggle on cardPreview  */}
-            {props.editable && (
+            {props.editable && authorized && (
               <button
-                className={`shink-0 jusitfy-self-end flex items-center gap-2 text-xs italic   ${
+                className={`jusitfy-self-end flex shrink-0 items-center gap-2 text-xs italic   ${
                   editing ? "text-accent-blue" : "text-grey-55"
                 }`}
                 onClick={(e) => {
