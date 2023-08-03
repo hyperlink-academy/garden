@@ -35,7 +35,7 @@ export function CalendarRoom() {
   }, {} as { [key: string]: { entity: string; value: string }[] });
 
   return (
-    <div className="no-scrollbar calendarRoom relative m-2 flex h-full w-[336px] flex-col overflow-y-scroll sm:m-4">
+    <div className="no-scrollbar flex h-full w-[336px] flex-col items-stretch overflow-x-hidden overflow-y-scroll p-2 text-sm sm:p-4 ">
       <div className="calendarCardList flex h-full flex-col gap-4">
         {days.length > 0 ? (
           days.map((d, index, days) => {

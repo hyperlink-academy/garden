@@ -8,7 +8,7 @@ export const SearchRoom = () => {
   let items = useAllItems(true);
   let [searchInput, setSearchInput] = useState("");
   return (
-    <div className="no-scrollbar relative m-2 flex h-full w-[336px] flex-col items-stretch gap-3 overflow-y-scroll text-sm sm:m-4">
+    <div className="no-scrollbar flex h-full w-[336px] flex-col items-stretch overflow-x-hidden overflow-y-scroll p-2 text-sm sm:p-4 ">
       <div className="flex gap-2 rounded-md border border-grey-35 bg-white">
         <input
           value={searchInput}
