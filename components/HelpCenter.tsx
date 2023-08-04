@@ -75,33 +75,29 @@ const HelpHandbook = () => {
       </p>
 
       <p>
-        Here&apos;s a <em>very short handbook</em> for the app.
+        Here&apos;s a <em>very short handbook</em>:
       </p>
 
       <p>
-        Activity on Hyperlink happens in <strong>Spaces</strong> — little
-        worlds, with their own content and members, where people do projects
-        together.
+        Activity on Hyperlink happens in <strong>Spaces</strong> — small worlds
+        for shared projects.
       </p>
 
       <p>In a Space, you can:</p>
 
-      <ul className="list-disc pl-8">
+      <ul className="flex list-disc flex-col gap-1 pl-4 sm:pl-8">
         <li className="marker:text-accent-blue">
           Create <strong>cards</strong> for meaningful things: ideas, tasks,
           questions, inspo…
         </li>
         <li className="marker:text-accent-red">
-          Organize and work with cards in <strong>rooms</strong>
+          Organize & work with cards in <strong>rooms</strong>
         </li>
         <li className="marker:text-accent-gold">
-          Talk together in chats & card comments
+          Talk together in <strong>chats</strong> & <strong>comments</strong>
         </li>
         <li className="marker:text-accent-blue">
-          Invite others to join & explore with you
-        </li>
-        <li className="marker:text-accent-red">
-          Tag people in to look at particular things
+          <strong>Invite others</strong> to join & explore with you
         </li>
       </ul>
 
@@ -112,14 +108,13 @@ const HelpHandbook = () => {
       </p>
 
       <p>
-        You can also make <strong>Studios</strong> — places where a group can
-        share work across many projects, with a collection of Spaces + an
-        activity feed.
+        You can also make <strong>Studios</strong> — where a group can collect
+        Spaces to share work across many projects.
       </p>
 
       <p>To get started:</p>
 
-      <ul className="list-disc pl-8">
+      <ul className="flex list-disc flex-col gap-1 pl-4 sm:pl-8">
         <li className="marker:text-accent-blue">Make a Space</li>
         <li className="marker:text-accent-red">Invite a friend</li>
         <li className="marker:text-accent-gold">Add ideas, riff, play…</li>
@@ -136,7 +131,7 @@ const HelpHandbook = () => {
         <a href="mailto:contact@hyperlink.academy" className="text-accent-blue">
           Email us
         </a>{" "}
-        any time. We&apos;re evolving by the week, ears open for suggestions :)
+        any time. Always evolving, ears open for suggestions :)
       </p>
 
       <p>—The Hyperlink Team</p>
@@ -150,29 +145,32 @@ const HelpShortcuts = () => {
       <h2>Shortcuts</h2>
 
       <p>
-        Here are some shortcuts you may find helpful in using Hyperlink. This
-        list is evolving!
+        An evolving list of shortcuts you may find helpful in using Hyperlink!
       </p>
 
       <h3>text editing</h3>
-      <ul className="list-disc pl-8">
+      <ul className="flex list-disc flex-col gap-1 pl-4 sm:pl-8">
         <li>
-          <TextString>[[</TextString> and search for inline link to a card
+          <TextString>[[</TextString> and search to inline link to a card
         </li>
         <li>
           start a line with <TextString>#</TextString> or{" "}
-          <TextString>##</TextString> to add headers
+          <TextString>##</TextString> for headers
         </li>
         <li>
-          wrap text in <TextString>*</TextString> or ctrl/cmd + i for italic
+          wrap in <TextString>*</TextString> or{" "}
+          <KeyboardKey>ctrl/cmd</KeyboardKey> + <KeyboardKey>i</KeyboardKey> for
+          italic
         </li>
         <li>
-          wrap text in <TextString>**</TextString> or ctrl/cmd + b for bold
+          wrap in <TextString>**</TextString> or{" "}
+          <KeyboardKey>ctrl/cmd</KeyboardKey> + <KeyboardKey>b</KeyboardKey> for
+          bold
         </li>
       </ul>
 
       <h3>chat & comments</h3>
-      <ul className="list-disc pl-8">
+      <ul className="flex list-disc flex-col gap-1 pl-4 sm:pl-8">
         <li>
           <KeyboardKey>enter</KeyboardKey> to send a message
         </li>
@@ -183,20 +181,20 @@ const HelpShortcuts = () => {
       </ul>
 
       <h3>rooms & cards</h3>
-      <ul className="list-disc pl-8">
+      <ul className="flex list-disc flex-col gap-1 pl-4 sm:pl-8">
         <li>
-          canvas: <KeyboardKey>ctrl/cmd</KeyboardKey> + click for a new card
+          canvas: <KeyboardKey>ctrl/cmd</KeyboardKey> + click for new card
         </li>
         <li>collection: drag to reorder cards</li>
         <li>drag to reorder rooms in sidebar</li>
-        <li>drag one card onto another to link them</li>
+        <li>drag a card onto another to link them</li>
       </ul>
 
       <h3>general</h3>
-      <ul className="list-disc pl-8">
+      <ul className="flex list-disc flex-col gap-1 pl-4 sm:pl-8">
         <li>
           <KeyboardKey>ctrl/cmd</KeyboardKey> + <KeyboardKey>z</KeyboardKey> to
-          undo (text & card actions)
+          undo
         </li>
         <li>
           <KeyboardKey>ctrl/cmd</KeyboardKey> + <KeyboardKey>shift</KeyboardKey>{" "}
