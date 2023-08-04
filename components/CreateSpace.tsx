@@ -4,11 +4,11 @@ import { ReplicacheContext, useMutations } from "hooks/useReplicache";
 import { useContext, useEffect, useState } from "react";
 import { ButtonPrimary, ButtonSecondary, ButtonTertiary } from "./Buttons";
 import { DoorSelector } from "./DoorSelector";
-import { DotLoader } from "./DotLoader";
 import { SpaceCreate } from "./Icons";
 import { Modal } from "./Layout";
 import { useSpaceData } from "hooks/useSpaceData";
 import { useIdentityData } from "hooks/useIdentityData";
+import { Form, SubmitButton } from "./Form";
 
 export type CreateSpaceFormState = {
   display_name: string;
@@ -24,7 +24,6 @@ export const CreateSpace = (props: {
   studioName: string;
 }) => {
   let { mutate } = useIdentityData(props.studioName);
-  console.log(props.studioSpaceID);
   let [open, setOpen] = useState(false);
 
   let { authorized } = useMutations();
@@ -49,7 +48,49 @@ export const CreateSpace = (props: {
         />
       </a>
       <Modal open={open} onClose={() => setOpen(false)}>
-        <div className="flex flex-col gap-6 overflow-y-auto">
+        <Form
+          validate={() => {
+            if (
+              !auth.session.loggedIn ||
+              !auth.authToken ||
+              !formState.display_name ||
+              !(formState.image || formState.default_space_image)
+            )
+              return;
+            return { authToken: auth.authToken };
+          }}
+          className="flex flex-col gap-6 overflow-y-auto"
+          onSubmit={async ({ authToken }) => {
+            let result = await spaceAPI(
+              `${WORKER_URL}/space/${props.studioSpaceID}`,
+              "create_space",
+              {
+                authToken: authToken,
+                ...formState,
+              }
+            );
+            if (result.success) {
+              let d = result.data;
+              mutate((s) => {
+                if (!s) return s;
+                return {
+                  ...s,
+                  owner: [...s.owner, d],
+                };
+              });
+            }
+            setFormState({
+              display_name: "",
+              description: "",
+              start_date: "",
+              end_date: "",
+              image: null,
+              default_space_image: null,
+            });
+            rep?.rep.pull();
+            setOpen(false);
+          }}
+        >
           <CreateSpaceForm formState={formState} setFormState={setFormState} />
           {/* action buttons */}
           <div className="flex gap-4 place-self-end">
@@ -58,51 +99,9 @@ export const CreateSpace = (props: {
               onClick={() => setOpen(false)}
             />
 
-            <ButtonPrimary
-              content="Create!"
-              disabled={
-                !formState.display_name ||
-                !(formState.image || formState.default_space_image)
-              }
-              onClick={async () => {
-                if (
-                  !auth.session.loggedIn ||
-                  !auth.authToken ||
-                  !formState.display_name
-                )
-                  return;
-                let result = await spaceAPI(
-                  `${WORKER_URL}/space/${props.studioSpaceID}`,
-                  "create_space",
-                  {
-                    authToken: auth.authToken,
-                    ...formState,
-                  }
-                );
-                if (result.success) {
-                  let d = result.data;
-                  mutate((s) => {
-                    if (!s) return s;
-                    return {
-                      ...s,
-                      owner: [...s.owner, d],
-                    };
-                  });
-                }
-                setFormState({
-                  display_name: "",
-                  description: "",
-                  start_date: "",
-                  end_date: "",
-                  image: null,
-                  default_space_image: null,
-                });
-                rep?.rep.pull();
-                setOpen(false);
-              }}
-            />
+            <SubmitButton content="Create!" />
           </div>
-        </div>
+        </Form>
       </Modal>
     </div>
   );
@@ -117,7 +116,6 @@ export const EditSpaceModal = (props: {
   let { authToken } = useAuth();
   let { data, mutate } = useSpaceData(props.spaceID);
 
-  let [status, setStatus] = useState<"normal" | "loading">("normal");
   let [formState, setFormState] = useState<CreateSpaceFormState>({
     display_name: "",
     description: "",
@@ -151,7 +149,23 @@ export const EditSpaceModal = (props: {
   return (
     <Modal open={props.open} onClose={props.onClose}>
       {mode === "normal" ? (
-        <>
+        <Form
+          validate={() => {
+            if (!authToken || !props.spaceID) return;
+            return { authToken, spaceID: props.spaceID };
+          }}
+          onSubmit={async ({ authToken, spaceID }) => {
+            await spaceAPI(`${WORKER_URL}/space/${spaceID}`, "update_self", {
+              authToken,
+              data: formState,
+            });
+            mutate((s) => {
+              if (!s) return;
+              return { ...s, ...formState };
+            });
+            props.onClose();
+          }}
+        >
           <CreateSpaceForm formState={formState} setFormState={setFormState} />
 
           <div className="flex gap-4 place-self-end">
@@ -167,32 +181,9 @@ export const EditSpaceModal = (props: {
                 props.onClose();
               }}
             />
-            <ButtonPrimary
-              content={status === "normal" ? "Update" : <DotLoader />}
-              disabled={!modified}
-              onClick={async () => {
-                if (!authToken || !props.spaceID) return;
-                setStatus("loading");
-                console.log(
-                  await spaceAPI(
-                    `${WORKER_URL}/space/${props.spaceID}`,
-                    "update_self",
-                    {
-                      authToken,
-                      data: formState,
-                    }
-                  )
-                );
-                mutate((s) => {
-                  if (!s) return;
-                  return { ...s, ...formState };
-                });
-                setStatus("normal");
-                props.onClose();
-              }}
-            />
+            <SubmitButton content={"Update"} disabled={!modified} />
           </div>
-        </>
+        </Form>
       ) : (
         <>
           {!props.spaceID ? null : (
@@ -216,12 +207,24 @@ const DeleteSpaceForm = (props: {
   onDelete: () => void;
 }) => {
   let [state, setState] = useState({ spaceName: "" });
-  let [status, setStatus] = useState<"normal" | "loading">("normal");
   let { authToken } = useAuth();
   let { data } = useSpaceData(props.spaceID);
   return (
     <>
-      <div className="flex flex-col gap-2">
+      <Form
+        className="flex flex-col gap-2"
+        validate={() => {
+          if (data?.display_name !== state.spaceName) return;
+          if (!props.spaceID || !authToken) return;
+          return { spaceID: props.spaceID, authToken };
+        }}
+        onSubmit={async ({ authToken, spaceID }) => {
+          await spaceAPI(`${WORKER_URL}/space/${spaceID}`, "delete_self", {
+            authToken,
+          });
+          props.onDelete();
+        }}
+      >
         <p className="font-bold">Type the name of this Space</p>
         <input
           className="w-full"
@@ -236,25 +239,9 @@ const DeleteSpaceForm = (props: {
             }}
             content="Cancel"
           />
-          <ButtonPrimary
-            onClick={async () => {
-              if (data?.display_name !== state.spaceName) return;
-              if (!props.spaceID || !authToken) return;
-              setStatus("loading");
-              await spaceAPI(
-                `${WORKER_URL}/space/${props.spaceID}`,
-                "delete_self",
-                { authToken }
-              );
-              setStatus("normal");
-              props.onDelete();
-            }}
-            destructive
-            disabled={data?.display_name !== state.spaceName}
-            content={status === "normal" ? "Delete" : <DotLoader />}
-          />
+          <SubmitButton destructive content={"Delete"} />
         </div>
-      </div>
+      </Form>
     </>
   );
 };

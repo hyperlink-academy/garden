@@ -1,7 +1,7 @@
 type ButtonProps = JSX.IntrinsicElements["button"];
 export function ButtonPrimary(
   props: {
-    content?: string | React.ReactElement;
+    content?: string | React.ReactNode;
     icon?: React.ReactElement;
     destructive?: boolean;
   } & ButtonProps
