@@ -1,11 +1,10 @@
 import { app_event } from "backend/lib/analytics";
 import { makeRoute } from "backend/lib/api";
 import { authTokenVerifier, verifyIdentity } from "backend/lib/auth";
+import { createClient } from "backend/lib/supabase";
 import { ulid } from "src/ulid";
 import { z } from "zod";
 import { Env } from "..";
-import { createClient } from "@supabase/supabase-js";
-import { Database } from "backend/lib/database.types";
 
 export const join_route = makeRoute({
   route: "join",
@@ -14,10 +13,7 @@ export const join_route = makeRoute({
     authToken: authTokenVerifier,
   }),
   handler: async (msg, env: Env) => {
-    let supabase = createClient<Database>(
-      env.env.SUPABASE_URL,
-      env.env.SUPABASE_API_TOKEN
-    );
+    let supabase = createClient(env.env);
     let session = await verifyIdentity(env.env, msg.authToken);
     if (!session)
       return {

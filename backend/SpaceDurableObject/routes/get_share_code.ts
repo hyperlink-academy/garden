@@ -3,8 +3,7 @@ import { makeRoute } from "backend/lib/api";
 import { Env } from "..";
 import { generateShareCode } from "../lib/generate_share_code";
 import { authTokenVerifier, verifyIdentity } from "backend/lib/auth";
-import { createClient } from "@supabase/supabase-js";
-import { Database } from "backend/lib/database.types";
+import { createClient } from "backend/lib/supabase";
 
 export const get_share_code_route = makeRoute({
   route: "get_share_code",
@@ -16,10 +15,7 @@ export const get_share_code_route = makeRoute({
         data: { success: false, error: "Invalid session token" },
       } as const;
 
-    let supabase = createClient<Database>(
-      env.env.SUPABASE_URL,
-      env.env.SUPABASE_API_TOKEN
-    );
+    let supabase = createClient(env.env);
     let space_type = await env.storage.get<string>("meta-space-type");
     let isMember;
     if (space_type === "studio") {

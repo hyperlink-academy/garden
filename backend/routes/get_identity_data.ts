@@ -1,16 +1,12 @@
-import { createClient } from "@supabase/supabase-js";
 import { Bindings } from "backend";
 import { makeRoute } from "backend/lib/api";
-import { Database } from "backend/lib/database.types";
+import { createClient } from "backend/lib/supabase";
 import { z } from "zod";
 export const get_identity_data_route = makeRoute({
   route: "get_identity_data",
   input: z.object({ name: z.string() }),
   handler: async (msg, env: Bindings) => {
-    const supabase = createClient<Database>(
-      env.SUPABASE_URL,
-      env.SUPABASE_API_TOKEN
-    );
+    const supabase = createClient(env);
     let { data, error } = await supabase
       .from("identity_data")
       .select(

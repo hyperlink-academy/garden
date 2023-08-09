@@ -1,8 +1,7 @@
-import { createClient } from "@supabase/supabase-js";
 import { app_event } from "backend/lib/analytics";
 import { internalSpaceAPI, makeRoute } from "backend/lib/api";
 import { verifyIdentity, authTokenVerifier } from "backend/lib/auth";
-import { Database } from "backend/lib/database.types";
+import { createClient } from "backend/lib/supabase";
 import { z } from "zod";
 import { Env } from "..";
 
@@ -22,10 +21,7 @@ export const create_space_route = makeRoute({
     })
     .merge(space_input),
   handler: async (msg, env: Env) => {
-    const supabase = createClient<Database>(
-      env.env.SUPABASE_URL,
-      env.env.SUPABASE_API_TOKEN
-    );
+    const supabase = createClient(env.env);
     let creator = await env.storage.get("meta-creator");
     let session = await verifyIdentity(env.env, msg.authToken);
 

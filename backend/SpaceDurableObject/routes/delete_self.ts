@@ -2,17 +2,13 @@ import { Env } from "..";
 import { makeRoute } from "backend/lib/api";
 import { z } from "zod";
 import { authTokenVerifier, verifyIdentity } from "backend/lib/auth";
-import { createClient } from "@supabase/supabase-js";
-import { Database } from "backend/lib/database.types";
+import { createClient } from "backend/lib/supabase";
 export const delete_self_route = makeRoute({
   route: "delete_self",
   input: z.object({ authToken: authTokenVerifier }),
   handler: async (msg, env: Env) => {
     let session = await verifyIdentity(env.env, msg.authToken);
-    const supabase = createClient<Database>(
-      env.env.SUPABASE_URL,
-      env.env.SUPABASE_API_TOKEN
-    );
+    const supabase = createClient(env.env);
     if (!session)
       return {
         data: { success: false, error: "Invalid session token" },

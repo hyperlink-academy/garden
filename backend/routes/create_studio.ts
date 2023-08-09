@@ -1,8 +1,7 @@
-import { createClient } from "@supabase/supabase-js";
 import { Bindings } from "backend";
 import { internalSpaceAPI, makeRoute } from "backend/lib/api";
 import { verifyIdentity, authTokenVerifier } from "backend/lib/auth";
-import { Database } from "backend/lib/database.types";
+import { createClient } from "backend/lib/supabase";
 import { z } from "zod";
 
 export const studio_input = z.object({
@@ -17,10 +16,7 @@ export const create_studio_route = makeRoute({
     })
     .merge(studio_input),
   handler: async (msg, env: Bindings) => {
-    const supabase = createClient<Database>(
-      env.SUPABASE_URL,
-      env.SUPABASE_API_TOKEN
-    );
+    const supabase = createClient(env);
     let session = await verifyIdentity(env, msg.authToken);
 
     if (!session)

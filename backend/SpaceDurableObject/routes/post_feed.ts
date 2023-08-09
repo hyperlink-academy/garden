@@ -1,13 +1,11 @@
 import { Env } from "..";
 import { makeRoute } from "backend/lib/api";
 import { z } from "zod";
-import { space_input } from "./create_space";
 import { authTokenVerifier, verifyIdentity } from "backend/lib/auth";
-import { createClient } from "@supabase/supabase-js";
-import { Database } from "backend/lib/database.types";
 import { ulid } from "src/ulid";
 import { ref } from "data/Facts";
 import { generateKeyBetween } from "src/fractional-indexing";
+import { createClient } from "backend/lib/supabase";
 
 const position = z.object({ x: z.number(), y: z.number() });
 export const post_feed_route = makeRoute({
@@ -21,10 +19,7 @@ export const post_feed_route = makeRoute({
     cardEntity: z.string(),
   }),
   handler: async (msg, env: Env) => {
-    const supabase = createClient<Database>(
-      env.env.SUPABASE_URL,
-      env.env.SUPABASE_API_TOKEN
-    );
+    const supabase = createClient(env.env);
     let session = await verifyIdentity(env.env, msg.authToken);
     let space_type = await env.storage.get<string>("meta-space-type");
     if (space_type !== "studio")

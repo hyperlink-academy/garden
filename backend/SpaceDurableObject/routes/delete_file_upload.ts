@@ -2,8 +2,7 @@ import { z } from "zod";
 import { makeRoute } from "backend/lib/api";
 import { Env } from "..";
 import { authTokenVerifier, verifyIdentity } from "backend/lib/auth";
-import { createClient } from "@supabase/supabase-js";
-import { Database } from "backend/lib/database.types";
+import { createClient } from "backend/lib/supabase";
 
 export const delete_file_upload_route = makeRoute({
   route: "delete_file_upload",
@@ -13,10 +12,7 @@ export const delete_file_upload_route = makeRoute({
   }),
   handler: async (msg, env: Env) => {
     let session = await verifyIdentity(env.env, msg.authToken);
-    const supabase = createClient<Database>(
-      env.env.SUPABASE_URL,
-      env.env.SUPABASE_API_TOKEN
-    );
+    const supabase = createClient(env.env);
     if (!session)
       return {
         data: { success: false },
