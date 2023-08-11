@@ -337,10 +337,13 @@ const replyToDiscussion: Mutation<{
     args.message.sender,
     "space/member"
   );
-  let title = await ctx.scanIndex.eav(args.discussion, "card/title");
-
   await ctx.runOnServer(async (env) => {
     if (!senderStudio) return;
+
+    let title: Fact<"room/name" | "card/title"> | null =
+      await ctx.scanIndex.eav(args.discussion, "card/title");
+    if (!title) title = await ctx.scanIndex.eav(args.discussion, "room/name");
+
     console.log(`${env.env.NEXT_API_URL}/api/web_push`);
     try {
       let payload: z.TypeOf<typeof webPushPayloadParser> = {

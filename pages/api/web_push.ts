@@ -61,7 +61,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
     let { data: spaceMembers, error } = await supabase
       .from("space_data")
-      .select("members_in_spaces(identity_data(*, push_subscriptions(*)))")
+      .select(
+        "display_name, members_in_spaces(identity_data(*, push_subscriptions(*)))"
+      )
       .eq("do_id", payloadBody.data.spaceID)
       .single();
 
@@ -69,6 +71,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       let notification: HyperlinkNotification = {
         type: "new-message",
         data: {
+          spaceName: spaceMembers.display_name || "Untitled Space",
           senderUsername:
             spaceMembers.members_in_spaces.find(
               (f) => f.identity_data?.studio === data.senderStudio

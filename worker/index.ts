@@ -8,6 +8,7 @@ export type HyperlinkNotification = {
   type: "new-message";
   data: {
     spaceID: string;
+    spaceName: string;
     title: string;
     senderUsername: string;
     message: {
@@ -29,7 +30,7 @@ self.addEventListener("push", async (event) => {
 
   event?.waitUntil(
     self.registration.showNotification(
-      `New message on: ${data.data.title || "Untitled Card"}`,
+      `${data.data.title || "Untitled Card"} in ${data.data.spaceName}}`,
       {
         tag: "hyperlink-messages",
         body: `${data.data.senderUsername}: ${data.data.message.content}`,
