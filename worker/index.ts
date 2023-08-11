@@ -33,6 +33,7 @@ self.addEventListener("push", async (event) => {
       {
         body: `${data.data.senderUsername}: ${data.data.message.content}`,
         icon: "/android-chrome-192x192.png",
+        badge: "/android-chrome-192x192.png",
       }
     )
   );
