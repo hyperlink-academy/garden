@@ -7,11 +7,16 @@ import { MoreOptionsTiny } from "./Icons";
 export const NotificationManager = () => {
   let supabase = useSupabaseClient<Database>();
   let [open, setOpen] = useState(false);
+  let [result, setResult] = useState({});
   let [notificationPermissionState, setNotificationPermissionState] =
     useState("default");
   useEffect(() => {
-    let notificationPermissionState = Notification.permission;
-    setNotificationPermissionState(notificationPermissionState);
+    if (!("Notification" in window)) {
+      setNotificationPermissionState("unavailable");
+    } else {
+      let notificationPermissionState = Notification.permission;
+      setNotificationPermissionState(notificationPermissionState);
+    }
   }, []);
   return (
     <>
@@ -31,6 +36,7 @@ export const NotificationManager = () => {
                         process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
                       userVisibleOnly: true,
                     });
+                    setResult(result);
                     let { data: session } = await supabase.auth.getSession();
                     if (!session.session) return;
                     await supabase.from("push_subscriptions").insert({
@@ -47,6 +53,8 @@ export const NotificationManager = () => {
           </button>
         ) : notificationPermissionState === "granted" ? (
           "You've subscribed!"
+        ) : notificationPermissionState === "unavailable" ? (
+          "Notifications unavailable in this browser"
         ) : (
           "You've denied notifications."
         )}
