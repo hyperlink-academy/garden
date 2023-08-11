@@ -36,6 +36,8 @@ export type Bindings = {
   SUPABASE_API_TOKEN: string;
   SUPABASE_URL: string;
   DAILY_API_KEY: string;
+  NEXT_API_URL: string;
+  RPC_SECRET: string;
   SPACES: DurableObjectNamespace;
   USER_UPLOADS: R2Bucket;
 };

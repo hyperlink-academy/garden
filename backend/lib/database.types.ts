@@ -188,6 +188,34 @@ export interface Database {
         }
         Relationships: []
       }
+      push_subscriptions: {
+        Row: {
+          endpoint: string
+          id: number
+          push_subscription: Json
+          user_id: string
+        }
+        Insert: {
+          endpoint: string
+          id?: number
+          push_subscription: Json
+          user_id: string
+        }
+        Update: {
+          endpoint?: string
+          id?: number
+          push_subscription?: Json
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "push_subscriptions_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "identity_data"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       space_data: {
         Row: {
           default_space_image: string | null
@@ -233,16 +261,16 @@ export interface Database {
       }
       spaces_in_studios: {
         Row: {
-          space: string | null
-          studio: string | null
+          space: string
+          studio: string
         }
         Insert: {
-          space?: string | null
-          studio?: string | null
+          space: string
+          studio: string
         }
         Update: {
-          space?: string | null
-          studio?: string | null
+          space?: string
+          studio?: string
         }
         Relationships: [
           {

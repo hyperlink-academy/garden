@@ -2,7 +2,7 @@
   "compilerOptions": {
     "downlevelIteration": true,
     "target": "es5",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": ["dom", "dom.iterable", "esnext", "webworker"],
     "types": ["@cloudflare/workers-types"],
     "allowJs": true,
     "baseUrl": ".",

@@ -11,6 +11,7 @@ import { Divider } from "components/Layout";
 import { useState } from "react";
 import { DisclosureCollapseTiny, DisclosureExpandTiny } from "components/Icons";
 import Head from "next/head";
+import { NotificationManager } from "components/NotificationManager";
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>;
 export default function UserHomePage(props: Props) {
@@ -38,10 +39,13 @@ export default function UserHomePage(props: Props) {
             <h1 className="grow">{currentStudioName}</h1>
             {!session?.loggedIn ||
               (session.session?.username === currentStudioName && (
-                <CreateSpace
-                  studioSpaceID={data.studio}
-                  studioName={currentStudioName as string}
-                />
+                <>
+                  <CreateSpace
+                    studioSpaceID={data.studio}
+                    studioName={currentStudioName as string}
+                  />
+                  <NotificationManager />
+                </>
               ))}
           </div>
           <List
