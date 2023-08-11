@@ -28,7 +28,10 @@ webpush.setVapidDetails(
   process.env.VAPID_PRIVATE_KEY as string
 );
 
-let supabase = createClient(process.env as any);
+let supabase = createClient({
+  SUPABASE_API_TOKEN: process.env.SUPABASE_API_TOKEN as string,
+  SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL as string,
+});
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   try {
