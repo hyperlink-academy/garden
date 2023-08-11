@@ -39,13 +39,13 @@ export default function UserHomePage(props: Props) {
             <h1 className="grow">{currentStudioName}</h1>
             {!session?.loggedIn ||
               (session.session?.username === currentStudioName && (
-                <>
+                <div className="flex flex-row justify-between gap-2">
                   <CreateSpace
                     studioSpaceID={data.studio}
                     studioName={currentStudioName as string}
                   />
                   <NotificationManager />
-                </>
+                </div>
               ))}
           </div>
           <List
