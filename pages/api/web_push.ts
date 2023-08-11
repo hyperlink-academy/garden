@@ -62,7 +62,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     let { data: spaceMembers, error } = await supabase
       .from("space_data")
       .select(
-        "display_name, members_in_spaces(identity_data(*, push_subscriptions(*)))"
+        "display_name, name, owner:identity_data!space_data_owner_fkey(username), members_in_spaces(identity_data(*, push_subscriptions(*)))"
       )
       .eq("do_id", payloadBody.data.spaceID)
       .single();
@@ -72,6 +72,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         type: "new-message",
         data: {
           spaceName: spaceMembers.display_name || "Untitled Space",
+          spaceURL: `/s/${spaceMembers.owner?.username}/s/${spaceMembers.name}`,
           senderUsername:
             spaceMembers.members_in_spaces.find(
               (f) => f.identity_data?.studio === data.senderStudio
