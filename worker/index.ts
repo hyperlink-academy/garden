@@ -25,6 +25,15 @@ self.addEventListener("notificationclick", async (event) => {
   let data: HyperlinkNotification = event.notification.data;
   event.waitUntil(
     (async () => {
+      let clientList = await self.clients.matchAll({
+        type: "window",
+      });
+      for (const client of clientList) {
+        if (client.url === data.data.spaceURL && "focus" in client) {
+          client.focus();
+          break;
+        }
+      }
       return self.clients.openWindow(data.data.spaceURL);
     })()
   );
