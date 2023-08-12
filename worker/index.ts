@@ -27,6 +27,7 @@ self.addEventListener("notificationclick", async (event) => {
     (async () => {
       let clientList = await self.clients.matchAll({
         type: "window",
+        includeUncontrolled: true,
       });
       for (const client of clientList) {
         if (client.url === data.data.spaceURL && "focus" in client) {
