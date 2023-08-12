@@ -29,13 +29,14 @@ self.addEventListener("notificationclick", async (event) => {
         type: "window",
         includeUncontrolled: true,
       });
+      const urlToOpen = new URL(data.data.spaceURL, self.location.origin).href;
       for (const client of clientList) {
-        if (client.url === data.data.spaceURL && "focus" in client) {
+        if (client.url === urlToOpen && "focus" in client) {
           client.focus();
           return;
         }
       }
-      return self.clients.openWindow(data.data.spaceURL);
+      return self.clients.openWindow(urlToOpen);
     })()
   );
 });
