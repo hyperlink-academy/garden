@@ -31,7 +31,7 @@ self.addEventListener("notificationclick", async (event) => {
       for (const client of clientList) {
         if (client.url === data.data.spaceURL && "focus" in client) {
           client.focus();
-          break;
+          return;
         }
       }
       return self.clients.openWindow(data.data.spaceURL);
