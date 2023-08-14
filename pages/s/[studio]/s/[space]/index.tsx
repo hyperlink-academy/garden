@@ -8,6 +8,8 @@ import { sortByPosition } from "src/position_helpers";
 import { useUndoableState } from "hooks/useUndoableState";
 import { Room } from "components/Room";
 import { SpaceMetaTitle } from "components/SpaceMetaTitle";
+import type { ServiceWorkerMessages } from "worker";
+import { publishAppEvent } from "hooks/useEvents";
 
 export default function SpacePage() {
   // get first room = your room
@@ -21,6 +23,18 @@ export default function SpacePage() {
   let [r, setRoom, setRoomWithoutHistory] = useUndoableState<string | null>(
     null
   );
+  useEffect(() => {
+    let listener = (ev: MessageEvent<ServiceWorkerMessages>) => {
+      if (ev.data.type === "navigate-to-card") {
+        publishAppEvent("cardviewer.open-card", {
+          entityID: ev.data.data.cardEntity,
+        });
+      }
+    };
+    navigator.serviceWorker.addEventListener("message", listener);
+    return () =>
+      navigator.serviceWorker.removeEventListener("message", listener);
+  }, []);
   useEffect(() => {
     if (!spaceID) return;
     let room = window.localStorage.getItem(`space/${spaceID}/room`);

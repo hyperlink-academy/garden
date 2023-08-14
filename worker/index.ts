@@ -20,6 +20,13 @@ export type HyperlinkNotification = {
   };
 };
 
+export type ServiceWorkerMessages = {
+  type: "navigate-to-card";
+  data: {
+    cardEntity: string;
+  };
+};
+
 self.addEventListener("notificationclick", async (event) => {
   console.log(event);
   let data: HyperlinkNotification = event.notification.data;
@@ -30,12 +37,22 @@ self.addEventListener("notificationclick", async (event) => {
         includeUncontrolled: true,
       });
       const urlToOpen = new URL(data.data.spaceURL, self.location.origin).href;
-      for (const client of clientList) {
-        if (client.url.includes(urlToOpen) && "focus" in client) {
-          return client.focus();
+      let client: null | WindowClient = null;
+      for (const c of clientList) {
+        if (c.url.includes(urlToOpen) && "focus" in c) {
+          client = c;
         }
       }
-      return self.clients.openWindow(urlToOpen);
+      if (!client) client = await self.clients.openWindow(urlToOpen);
+      if (!client) return;
+
+      await client.focus();
+      setTimeout(() => {
+        client?.postMessage({
+          type: "navigate-to-card",
+          data: { cardEntity: data.data.message.topic },
+        } as ServiceWorkerMessages);
+      }, 500);
     })()
   );
 });
