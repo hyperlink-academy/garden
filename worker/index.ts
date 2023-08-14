@@ -31,9 +31,8 @@ self.addEventListener("notificationclick", async (event) => {
       });
       const urlToOpen = new URL(data.data.spaceURL, self.location.origin).href;
       for (const client of clientList) {
-        if (client.url === urlToOpen && "focus" in client) {
-          client.focus();
-          return;
+        if (client.url.includes(urlToOpen) && "focus" in client) {
+          return client.focus();
         }
       }
       return self.clients.openWindow(urlToOpen);
