@@ -1,5 +1,6 @@
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { workerAPI } from "backend/lib/api";
+import { AddAppInfo } from "components/AddAppInfo";
 import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
 import { DotLoader } from "components/DotLoader";
 import { AddSmall, AddTiny, Settings } from "components/Icons";
@@ -164,10 +165,11 @@ export default function SignupPage() {
             Add on mobile for easy access — and notifications from collaborators
             📬
           </p>
-          <ButtonSecondary
+          {/* <ButtonSecondary
             content="Get the Hyperlink App"
             icon={<AddTiny />}
-          ></ButtonSecondary>
+          ></ButtonSecondary> */}
+          <AddAppInfo />
           <p className="flex gap-2">
             Open the app, log in,{" "}
             <span className="inline-block justify-center">

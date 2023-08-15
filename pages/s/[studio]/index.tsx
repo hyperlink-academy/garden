@@ -36,16 +36,20 @@ export default function UserHomePage(props: Props) {
       <SpaceProvider id={data.studio}>
         <div className="mb-12 flex flex-col gap-2">
           <div className="flex flex-col gap-2 sm:flex-row sm:justify-between">
-            <h1 className="grow">{currentStudioName}</h1>
+            <div className="flex flex-row justify-between gap-2">
+              <h1 className="grow">{currentStudioName}</h1>
+              {!session?.loggedIn ||
+                (session.session?.username === currentStudioName && (
+                  <NotificationManager />
+                ))}
+            </div>
+
             {!session?.loggedIn ||
               (session.session?.username === currentStudioName && (
-                <div className="flex flex-row justify-between gap-2">
-                  <CreateSpace
-                    studioSpaceID={data.studio}
-                    studioName={currentStudioName as string}
-                  />
-                  <NotificationManager />
-                </div>
+                <CreateSpace
+                  studioSpaceID={data.studio}
+                  studioName={currentStudioName as string}
+                />
               ))}
           </div>
           <List

@@ -2,7 +2,7 @@ import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { Database } from "backend/lib/database.types";
 import { Modal } from "./Layout";
 import { useEffect, useState } from "react";
-import { MoreOptionsTiny } from "./Icons";
+import { MoreOptionsTiny, Settings } from "./Icons";
 
 export const NotificationManager = () => {
   let supabase = useSupabaseClient<Database>();
@@ -20,8 +20,8 @@ export const NotificationManager = () => {
   }, []);
   return (
     <>
-      <button onClick={() => setOpen(true)}>
-        <MoreOptionsTiny />
+      <button className="hover:text-accent-blue" onClick={() => setOpen(true)}>
+        <Settings />
       </button>
       <Modal open={open} onClose={() => setOpen(false)}>
         {notificationPermissionState === "default" ? (
