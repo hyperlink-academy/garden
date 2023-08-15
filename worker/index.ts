@@ -40,8 +40,10 @@ self.addEventListener("notificationclick", async (event) => {
       if (clientList[0]) {
         await clientList[0].focus();
         await clientList[0].navigate(urlToOpen);
-        return;
-      } else await self.clients.openWindow(urlToOpen);
+      } else {
+        await self.clients.openWindow(urlToOpen);
+      }
+      event.notification.close();
     })()
   );
 });
