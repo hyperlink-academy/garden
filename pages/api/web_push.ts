@@ -72,7 +72,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         type: "new-message",
         data: {
           spaceName: spaceMembers.display_name || "Untitled Space",
-          spaceURL: `/s/${spaceMembers.owner?.username}/s/${spaceMembers.name}`,
+          spaceURL: `/s/${spaceMembers.owner?.username}/s/${spaceMembers.name}?openCard=${data.message.topic}`,
           senderUsername:
             spaceMembers.members_in_spaces.find(
               (f) => f.identity_data?.studio === data.senderStudio
