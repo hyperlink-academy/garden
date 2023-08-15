@@ -37,14 +37,11 @@ self.addEventListener("notificationclick", async (event) => {
         includeUncontrolled: true,
       });
       const urlToOpen = new URL(data.data.spaceURL, self.location.origin);
-      for (const c of clientList) {
-        if (c.url.includes(urlToOpen.pathname) && "focus" in c) {
-          await c.focus();
-          await c.navigate(urlToOpen);
-          return;
-        }
-      }
-      await self.clients.openWindow(urlToOpen);
+      if (clientList[0]) {
+        await clientList[0].focus();
+        await clientList[0].navigate(urlToOpen);
+        return;
+      } else await self.clients.openWindow(urlToOpen);
     })()
   );
 });
