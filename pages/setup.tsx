@@ -170,16 +170,7 @@ export default function SignupPage() {
             icon={<AddTiny />}
           ></ButtonSecondary> */}
           <AddAppInfo />
-          <p className="flex gap-2">
-            Open the app, log in,{" "}
-            <span className="inline-block justify-center">
-              <Settings />
-            </span>{" "}
-            →{" "}
-            <span className="self-center text-sm italic">
-              enable notifications
-            </span>
-          </p>
+
           <p className="italic">
             You can do this now & continue setup on mobile!
           </p>
