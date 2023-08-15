@@ -1,7 +1,8 @@
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { workerAPI } from "backend/lib/api";
-import { ButtonPrimary } from "components/Buttons";
+import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
 import { DotLoader } from "components/DotLoader";
+import { AddSmall, AddTiny, Settings } from "components/Icons";
 import { useAuth } from "hooks/useAuth";
 import { useDebouncedEffect } from "hooks/utils";
 import Link from "next/link";
@@ -101,53 +102,110 @@ export default function SignupPage() {
     );
 
   return (
-    <div className="grid-rows-max mx-auto grid max-w-md gap-4">
+    <div className="grid-rows-max mx-auto grid max-w-md gap-8">
       <div className="grid-auto-rows grid gap-2">
         <h1>Set up your Homepage!</h1>
       </div>
 
-      <form onSubmit={onSubmit} className="grid w-full gap-4">
-        {status === "invalidUsername" ? (
-          <div className="text-accent-red">
-            <span>Sorry, that username is not available</span>
+      <form onSubmit={onSubmit} className="grid w-full gap-8">
+        {/* pick a name */}
+        <div className="flex flex-col gap-4">
+          <div className="flex gap-4">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-blue p-2 text-white">
+              1
+            </div>
+            <h2>pick a name</h2>
           </div>
-        ) : null}
-        <p>
-          Pick a name for your account — also the name of your Hyperlink
-          homepage, where all your Spaces will live.
-        </p>
-        <label className="grid-flow-rows grid gap-2 font-bold">
-          <span>
-            Username{" "}
-            <span className="text-sm font-normal">
-              (numbers, letters, and underscores only)
+          <p>
+            How others see you — and the name of your Hyperlink Homepage, where
+            all your Spaces live 🏡
+          </p>
+          <label className="grid-flow-rows grid gap-2 font-bold">
+            <span>
+              Username{" "}
+              <span className="text-sm font-normal">
+                (numbers, letters, and underscores only)
+              </span>
             </span>
-          </span>
-          <input
-            type="text"
-            minLength={3}
-            required
-            pattern="[A-Za-z_0-9]+"
-            value={data.username}
-            onChange={(e) =>
-              setData({ ...data, username: e.currentTarget.value })
+            {status === "invalidUsername" ? (
+              <p className="pb-1 font-bold text-accent-red">
+                Sorry, that username is not available!
+              </p>
+            ) : null}
+            <input
+              type="text"
+              minLength={3}
+              required
+              pattern="[A-Za-z_0-9]+"
+              value={data.username}
+              onChange={(e) =>
+                setData({ ...data, username: e.currentTarget.value })
+              }
+            />
+          </label>
+        </div>
+
+        {/* add the app */}
+
+        {/* TODO: device logic!
+        if on computer…would just prompt to get phone out
+        if on phone…still on setup + skip if already in app? 
+        maybe trigger notif permissions RIGHT HERE??
+        */}
+
+        <div className="flex flex-col gap-4">
+          <div className="flex gap-4">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-blue p-2 text-white">
+              2
+            </div>
+            <h2>add the app</h2>
+          </div>
+          <p>
+            Add on mobile for easy access — and notifications from collaborators
+            📬
+          </p>
+          <ButtonSecondary
+            content="Get the Hyperlink App"
+            icon={<AddTiny />}
+          ></ButtonSecondary>
+          <p className="flex gap-2">
+            Open the app, log in,{" "}
+            <span className="inline-block justify-center">
+              <Settings />
+            </span>{" "}
+            →{" "}
+            <span className="self-center text-sm italic">
+              enable notifications
+            </span>
+          </p>
+          <p className="italic">
+            You can do this now & continue setup on mobile!
+          </p>
+        </div>
+
+        {/* get started */}
+        <div className="flex flex-col gap-4">
+          <div className="flex gap-4">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-blue p-2 text-white">
+              3
+            </div>
+            <h2>get started</h2>
+          </div>
+          <p>
+            Make your first Space — you&apos;ll find some inspiration on your
+            Homepage ✨
+          </p>
+          <ButtonPrimary
+            disabled={
+              status === "invalidUsername" ||
+              data.username.match(/^[A-Za-z_0-9]+$/) === null
+            }
+            type="submit"
+            content={
+              status === "loading" ? <DotLoader /> : "Create your Homepage!"
             }
           />
-        </label>
-        <ButtonPrimary
-          disabled={
-            status === "invalidUsername" ||
-            data.username.match(/^[A-Za-z_0-9]+$/) === null
-          }
-          type="submit"
-          content={
-            status === "loading" ? (
-              <DotLoader />
-            ) : (
-              "Create your Hyperlink homepage!"
-            )
-          }
-        />
+        </div>
       </form>
     </div>
   );
