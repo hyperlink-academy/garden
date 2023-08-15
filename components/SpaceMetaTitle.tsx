@@ -19,14 +19,15 @@ export const SpaceMetaTitle = () => {
 
   let router = useRouter();
   useEffect(() => {
-    if (data?.display_name)
-      history.replaceState(
-        null,
-        "",
-        `/s/${router.query.studio}/s/${router.query.space}/${slugify(
-          data.display_name
-        )}`
-      );
+    if (
+      data?.display_name &&
+      !window.location.href.includes(slugify(data.display_name))
+    ) {
+      let url = new URL(window.location.href);
+      url.pathname = `/s/${router.query.studio}/s/${router.query.space
+        }/${slugify(data.display_name)}`;
+      history.replaceState(null, "", url);
+    }
   }, [data?.display_name, router]);
 
   let { memberEntity } = useMutations();
@@ -65,9 +66,8 @@ export const SpaceMetaTitle = () => {
 
   return (
     <Head>
-      <title key="title">{`${
-        unreadCount && unreadCount > 0 ? `(${unreadCount})` : ""
-      } ${data?.display_name}`}</title>
+      <title key="title">{`${unreadCount && unreadCount > 0 ? `(${unreadCount})` : ""
+        } ${data?.display_name}`}</title>
     </Head>
   );
 };

@@ -1,6 +1,7 @@
 import { useAppEventListener, publishAppEvent } from "hooks/useEvents";
 import { db, useMutations } from "hooks/useReplicache";
 import { useUndoableState } from "hooks/useUndoableState";
+import { useRouter } from "next/router";
 import { useEffect, useRef } from "react";
 import { CardView } from "./CardView";
 
@@ -63,6 +64,30 @@ export function CardViewer(props: { room: string | null }) {
     },
     [props.room]
   );
+
+  let { query, replace } = useRouter();
+  useEffect(() => {
+    if (query.openCard) {
+      console.log("yo this should work");
+      let entityID = query.openCard as string;
+      if (!props.room) return;
+      let url = new URL(window.location.href);
+      url.searchParams.delete("openCard");
+      replace(url, undefined, { shallow: true });
+      setHistory((h) => {
+        if (!props.room) return h;
+        let room = h[props.room] || [];
+        if (room[0] === entityID) return h;
+        return {
+          ...h,
+          [props.room]: [entityID, ...room],
+        };
+      });
+      setTimeout(() => {
+        ref.current?.scrollIntoView({ inline: "center", behavior: "smooth" });
+      }, 200);
+    }
+  }, [query.openCard, props.room]);
 
   useAppEventListener(
     "cardviewer.close-card",

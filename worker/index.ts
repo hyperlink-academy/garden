@@ -1,4 +1,4 @@
-export {};
+export { };
 declare let self: ServiceWorkerGlobalScope;
 
 //@ts-ignore
@@ -36,23 +36,15 @@ self.addEventListener("notificationclick", async (event) => {
         type: "window",
         includeUncontrolled: true,
       });
-      const urlToOpen = new URL(data.data.spaceURL, self.location.origin).href;
-      let client: null | WindowClient = null;
+      const urlToOpen = new URL(data.data.spaceURL, self.location.origin);
       for (const c of clientList) {
-        if (c.url.includes(urlToOpen) && "focus" in c) {
-          client = c;
+        if (c.url.includes(urlToOpen.pathname) && "focus" in c) {
+          await c.focus();
+          await c.navigate(urlToOpen);
+          return;
         }
       }
-      if (!client) client = await self.clients.openWindow(urlToOpen);
-      if (!client) return;
-
-      await client.focus();
-      setTimeout(() => {
-        client?.postMessage({
-          type: "navigate-to-card",
-          data: { cardEntity: data.data.message.topic },
-        } as ServiceWorkerMessages);
-      }, 500);
+      await self.clients.openWindow(urlToOpen);
     })()
   );
 });
