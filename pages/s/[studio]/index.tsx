@@ -7,7 +7,6 @@ import { useAuth } from "hooks/useAuth";
 import { useRouter } from "next/router";
 import { getCurrentDate } from "src/utils";
 import { useIdentityData } from "hooks/useIdentityData";
-import { Divider } from "components/Layout";
 import { useState } from "react";
 import { DisclosureCollapseTiny, DisclosureExpandTiny } from "components/Icons";
 import Head from "next/head";
@@ -149,7 +148,6 @@ const List = (props: {
     <div className="flex flex-col gap-8">
       {spacesActive.length > 0 ? <SpaceList spaces={spacesActive} /> : null}
 
-      <Divider />
       {/* empty state - if user homepage has NO ACTIVE SPACES */}
       {/* different messages for logged in user vs. viewing someone else's home */}
       {spacesActive.length == 0 &&
@@ -197,24 +195,62 @@ export async function getStaticProps(ctx: GetStaticPropsContext) {
   return { props: { notFound: false, data: data.data } };
 }
 
-const MyHomeEmpty = () => {
+const YourHomeEmpty = (props: { username: string }) => {
   return (
-    <div className="my-4 flex flex-col gap-4 rounded-md border p-4">
-      <p>
-        Spaces are containers for doing things together: projects, experiments,
-        and other collaborative activity.
-      </p>
-      <p>Each Space has its own timeline, content, and set of members.</p>
-      <p>To get started, make a new Space & invite a friend to join!</p>
+    <div className="lightBorder my-4 flex flex-col gap-4 border p-4">
+      <p>This person has no active Spaces.</p>
+      <p>Check back later, or invite {props.username} to collaborate!</p>
     </div>
   );
 };
 
-const YourHomeEmpty = (props: { username: string }) => {
+const MyHomeEmpty = () => {
   return (
-    <div className="my-4 flex flex-col gap-4 rounded-md border p-4">
-      <p>This person has no active Spaces.</p>
-      <p>Check back later, or invite {props.username} to collaborate!</p>
+    <div className="lightBorder my-4 flex flex-col gap-4 border p-4 text-center">
+      <p>
+        Spaces are containers for doing things together: projects, experiments,
+        collaboration. Each Space has its own cards, calendar, and members.
+      </p>
+      <p>To get started, make a new Space & invite a friend to join!</p>
+
+      <ExampleSpaces />
+    </div>
+  );
+};
+
+const ExampleSpaces = () => {
+  return (
+    <div className="flex flex-col gap-4">
+      <p className="m-auto self-center text-lg font-bold">
+        Here are a few Spaces for inspiration ✨🌱
+      </p>
+
+      <div className="my-4 flex flex-col gap-4 sm:flex-row">
+        <a
+          className="flex w-full flex-col gap-2 self-center rounded-md border bg-white p-2 hover:bg-bg-blue sm:w-1/3 sm:gap-4 sm:p-4"
+          href="https://hyperlink.academy/s/brendan/s/Website%20Jam:%20pattern.kitchen/website-jam-patternkitchen"
+          target="_blank"
+        >
+          <h2>side project</h2>
+          <p className="italic">example: website on pattern languages 🌐</p>
+        </a>
+        <a
+          className="flex w-full flex-col gap-2 self-center rounded-md border bg-white p-2 hover:bg-bg-blue sm:w-1/3 sm:gap-4 sm:p-4"
+          href="https://hyperlink.academy/s/celine/s/Stuffy%20Stuff/stuffy-stuff"
+          target="_blank"
+        >
+          <h2>creative project with a friend</h2>
+          <p className="italic">example: stuffed animal crafting 🐰</p>
+        </a>
+        <a
+          className="flex w-full flex-col gap-2 self-center rounded-md border bg-white p-2 hover:bg-bg-blue sm:w-1/3 sm:gap-4 sm:p-4"
+          href="https://hyperlink.academy/s/brendan/s/23/hyperlink-writing-room-2023"
+          target="_blank"
+        >
+          <h2>small group collab</h2>
+          <p className="italic">example: Hyperlink team writing room ✍️</p>
+        </a>
+      </div>
     </div>
   );
 };
