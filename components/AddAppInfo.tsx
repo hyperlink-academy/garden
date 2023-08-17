@@ -28,14 +28,16 @@ export const AddAppInfo = () => {
         <p>To install on iOS:</p>
         <ol className="flex list-decimal flex-col gap-1 pl-4 sm:pl-8">
           <li>Open Hyperlink in Safari</li>
-          <li>Tap the share icon</li>
+          <li>Tap the Share menu icon</li>
           <li>Select &quot;Add to Home Screen&quot;</li>
         </ol>
 
         {/* Android */}
         <p>To install on Android:</p>
         <ol className="flex list-decimal flex-col gap-1 pl-4 sm:pl-8">
-          <li>Click here [TBD]</li>
+          <li>Open in Chrome</li>
+          <li>Tap the &quot;three dot&quot; menu icon</li>
+          <li>Select &quot;Add to Home Screen&quot;</li>
         </ol>
 
         {/* desktop */}
