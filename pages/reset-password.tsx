@@ -102,7 +102,9 @@ function NewPasswordForm() {
     e.preventDefault();
     setStatus("loading");
     await supabase.auth.updateUser({ password: newPassword });
-    router.push("/");
+    let { data: user } = await supabase.auth.getUser();
+    if (!user) router.push("/");
+    else router.push(`/s/${user.user?.user_metadata?.username}`);
     setStatus("normal");
   };
 
