@@ -5,18 +5,27 @@ import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useRouter } from "next/router";
 
 export default function LoginPage() {
-  let [state, setState] = useState<"normal" | "new-password">("normal");
+  let [state, setState] = useState<"normal" | "new-password" | "signed-in">(
+    "normal"
+  );
   let supabase = useSupabaseClient();
   useEffect(() => {
     supabase.auth.onAuthStateChange(async (event) => {
       if (event == "PASSWORD_RECOVERY") {
         setState("new-password");
       }
+      if (event === "SIGNED_IN") {
+        setState("signed-in");
+      }
     });
   }, [supabase]);
   return (
     <div className="grid-auto-rows mx-auto grid max-w-md gap-8">
-      {state === "new-password" ? <NewPasswordForm /> : <ResetPasswordForm />}
+      {state === "new-password" || state === "signed-in" ? (
+        <NewPasswordForm />
+      ) : (
+        <ResetPasswordForm />
+      )}
     </div>
   );
 }
