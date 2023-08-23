@@ -9,14 +9,11 @@ compatibility_date = "2022-01-31"
 
 kv_namespaces = []
 
-main = "out/index.mjs"
+main = "backend/index.ts"
 
 analytics_engine_datasets = [
     { binding = "APP_EVENT_ANALYTICS" }
 ]
-
-[triggers]
-crons = ["0 */1 * * *"]
 
 [[r2_buckets]]
 binding = 'USER_UPLOADS' # <~ valid JavaScript variable name
@@ -32,9 +29,6 @@ bindings = [
 tag = "v1"
 new_classes = ["SpaceDurableObject"]
 
-
-[build]
-command = "npm run build-backend"
 
 [[rules]]
 type = "ESModule"

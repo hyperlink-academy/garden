@@ -34,15 +34,17 @@ export const useAuth = () => {
   let { data: identityData } = useIdentityData(
     session?.user?.user_metadata.username
   );
+  let authToken = useMemo(() => {
+    if (!session) return null;
+    return {
+      access_token: session.access_token,
+      refresh_token: session.refresh_token,
+    };
+  }, [session?.access_token, session?.refresh_token]);
 
   return useMemo(
     () => ({
-      authToken: !session
-        ? null
-        : {
-          access_token: session.access_token,
-          refresh_token: session.refresh_token,
-        },
+      authToken,
       session: {
         loggedIn: !!session,
         user: session?.user,
@@ -73,8 +75,9 @@ export const useAuth = () => {
           email: input.email,
           password: input.password,
           options: {
-            emailRedirectTo: `${window.location.origin}/setup${input.redirectTo ? `?redirectTo=${input.redirectTo}` : ""
-              }`,
+            emailRedirectTo: `${window.location.origin}/setup${
+              input.redirectTo ? `?redirectTo=${input.redirectTo}` : ""
+            }`,
           },
         });
       },

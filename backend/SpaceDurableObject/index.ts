@@ -48,10 +48,9 @@ let internalRouter = makeRouter(private_routes);
 
 export class SpaceDurableObject implements DurableObject {
   throttled = false;
-  sockets: Array<{ socket: WebSocket; id: string }> = [];
   pushLock = new Lock();
   constructor(
-    private readonly state: DurableObjectState,
+    readonly state: DurableObjectState,
     private readonly env: Bindings
   ) {
     this.state.blockConcurrencyWhile(async () => {
@@ -93,8 +92,8 @@ export class SpaceDurableObject implements DurableObject {
 
         this.throttled = true;
         setTimeout(() => {
-          this.sockets.forEach((socket) => {
-            socket.socket.send(JSON.stringify({ type: "poke" }));
+          this.state.getWebSockets().forEach((socket) => {
+            socket.send(JSON.stringify({ type: "poke" }));
           });
           this.throttled = false;
         }, 100);
