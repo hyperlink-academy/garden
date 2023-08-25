@@ -47,10 +47,28 @@ export const SpaceProvider: React.FC<
   }, [undoManager]);
   let socket = useRef<WebSocket>();
   useEffect(() => {
+    let listener = () => {
+      if (socket.current) socket.current.close();
+    };
+    window.addEventListener("beforeunload", listener);
+    return () => window.removeEventListener("beforeunload", listener);
+  }, []);
+
+  useEffect(() => {
     if (!props.id || !rep) return;
     socket.current = new WebSocket(`${SOCKET_URL}/space/${props.id}/socket`);
     socket.current.addEventListener("message", () => {
       rep?.pull();
+    });
+    socket.current.addEventListener("open", () => {
+      rep?.clientID.then((clientID) => {
+        socket.current?.send(
+          JSON.stringify({
+            type: "init",
+            data: { clientID },
+          })
+        );
+      });
     });
     return () => {
       socket.current?.close();
@@ -76,6 +94,30 @@ export const SpaceProvider: React.FC<
       newRep.close();
     };
   }, [props.id, authToken, session.session?.studio, undoManager]);
+  useEffect(() => {
+    if (rep) {
+      rep.clientID.then((clientID) => {
+        if (socket.current) {
+          if (socket.current.readyState === WebSocket.OPEN)
+            socket.current.send(
+              JSON.stringify({
+                type: "init",
+                data: { clientID },
+              })
+            );
+          else
+            socket.current.addEventListener("open", () => {
+              socket.current?.send(
+                JSON.stringify({
+                  type: "init",
+                  data: { clientID },
+                })
+              );
+            });
+        }
+      });
+    }
+  }, [rep]);
 
   return (
     <ReplicacheContext.Provider
@@ -169,12 +211,27 @@ export const makeSpaceReplicache = ({
           value: MessageWithIndexes(m),
         } as const;
       });
+      let ephemeralFacts = result.ephemeralFacts.map((fact) => {
+        return {
+          op: "put",
+          key: fact.id,
+          value: FactWithIndexes(fact),
+        } as const;
+      });
+      let deletedEphemeralFacts = result.deletedEphemeralFacts.map((fact) => {
+        return { op: "del", key: fact } as const;
+      });
       return {
         httpRequestInfo: { httpStatusCode: 200, errorMessage: "" },
         response: {
           lastMutationID: result.lastMutationID,
           cookie: result.cookie,
-          patch: [...ops, ...messageOps],
+          patch: [
+            ...ops,
+            ...messageOps,
+            ...ephemeralFacts,
+            ...deletedEphemeralFacts,
+          ],
         },
       };
     },

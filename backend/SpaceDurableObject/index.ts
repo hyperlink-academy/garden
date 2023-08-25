@@ -17,10 +17,13 @@ import { delete_self_route } from "./routes/delete_self";
 import { sync_notifications_route } from "./internal_routes/sync_notifications";
 import { post_feed_route } from "./routes/post_feed";
 import { get_card_data_route } from "./routes/get_card_data";
+import type { WebSocket as DOWebSocket } from "@cloudflare/workers-types";
+import { Fact } from "data/Facts";
 
 export type Env = {
   factStore: ReturnType<typeof store>;
   storage: DurableObjectStorage;
+  state: DurableObjectState;
   poke: () => void;
   pushLock: Lock;
   id: string;
@@ -77,6 +80,19 @@ export class SpaceDurableObject implements DurableObject {
       );
     });
   }
+  async poke() {
+    if (this.throttled) {
+      return;
+    }
+
+    this.throttled = true;
+    setTimeout(() => {
+      this.state.getWebSockets().forEach((socket) => {
+        socket.send(JSON.stringify({ type: "poke" }));
+      });
+      this.throttled = false;
+    }, 100);
+  }
   async fetch(request: Request) {
     let url = new URL(request.url);
     let path = url.pathname.split("/");
@@ -84,19 +100,10 @@ export class SpaceDurableObject implements DurableObject {
       storage: this.state.storage,
       env: this.env,
       pushLock: this.pushLock,
+      state: this.state,
       id: this.state.id.toString(),
       poke: () => {
-        if (this.throttled) {
-          return;
-        }
-
-        this.throttled = true;
-        setTimeout(() => {
-          this.state.getWebSockets().forEach((socket) => {
-            socket.send(JSON.stringify({ type: "poke" }));
-          });
-          this.throttled = false;
-        }, 100);
+        this.poke();
       },
       factStore: store(this.state.storage, { id: this.state.id.toString() }),
     };
@@ -117,4 +124,32 @@ export class SpaceDurableObject implements DurableObject {
         return new Response("", { status: 404 });
     }
   }
+  async webSocketMessage(_ws: WebSocket, message: string) {
+    let ws = _ws as unknown as DOWebSocket;
+    try {
+      let msg = JSON.parse(message) as WebSocketMessage;
+      if (msg.type === "init") {
+        let clientID = msg.data.clientID;
+        ws.serializeAttachment({ clientID });
+      }
+      console.log(message);
+      this.poke();
+    } catch (e) {
+      console.log("ERROR", e);
+    }
+  }
+  async webSocketClose(_ws: WebSocket) {
+    let ws = _ws as unknown as DOWebSocket;
+    let data = await ws.deserializeAttachment();
+    console.log("disconnectin");
+    this.poke();
+    if (data) {
+      console.log(data);
+    }
+  }
 }
+
+export type WebSocketMessage = {
+  type: "init";
+  data: { clientID: string };
+};

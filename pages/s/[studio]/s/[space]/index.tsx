@@ -11,6 +11,7 @@ import { SpaceMetaTitle } from "components/SpaceMetaTitle";
 import type { ServiceWorkerMessages } from "worker";
 import { publishAppEvent } from "hooks/useEvents";
 import { useRouter } from "next/router";
+import { PresenceHandler } from "components/PresenceHandler";
 
 export default function SpacePage() {
   // get first room = your room
@@ -47,6 +48,7 @@ export default function SpacePage() {
   return (
     <>
       <SpaceMetaTitle />
+      <PresenceHandler />
 
       <div className="pageWrapperflex safari-pwa-height h-[100dvh] flex-col items-stretch justify-items-center gap-2 overflow-hidden sm:gap-4">
         <div className="pageContent max-w-screen-xl relative mx-auto flex h-full w-full grow items-stretch md:py-6 md:px-4">

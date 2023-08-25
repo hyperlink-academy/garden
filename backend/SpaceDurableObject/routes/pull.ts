@@ -4,7 +4,10 @@ import { Attribute } from "data/Attributes";
 import { Fact } from "data/Facts";
 import { Message } from "data/Messages";
 import { z } from "zod";
+import type { WebSocket as DOWebSocket } from "@cloudflare/workers-types";
 import { Env } from "..";
+import { decodeTime } from "src/ulid";
+import { store } from "../fact_store";
 
 export const pullRoute = makeRoute({
   route: "pull",
@@ -12,6 +15,7 @@ export const pullRoute = makeRoute({
     clientID: z.string(),
     cookie: z.union([
       z.object({
+        ephemeralFacts: z.array(z.string()).optional(),
         lastUpdated: z.union([z.string(), z.number()]),
       }),
       z.undefined(),
@@ -38,6 +42,8 @@ export const pullRoute = makeRoute({
         })
       ).values(),
     ];
+    let ephemeralFacts = await getEphemeralFacts(env.state);
+
     let updates = [...facts.values()].filter(
       (f) => !lastUpdated || f.lastUpdated > lastUpdated
     );
@@ -52,6 +58,7 @@ export const pullRoute = makeRoute({
       newLastUpdated = lastMessage;
     let newCookie: typeof msg.cookie = {
       lastUpdated: newLastUpdated,
+      ephemeralFacts: ephemeralFacts.map((f) => f.id),
     };
     app_event(env.env, {
       event: "pulled_from_space",
@@ -61,6 +68,11 @@ export const pullRoute = makeRoute({
 
     return {
       data: {
+        ephemeralFacts,
+        deletedEphemeralFacts:
+          msg.cookie?.ephemeralFacts?.filter(
+            (k) => !ephemeralFacts.find((f) => f.id === k)
+          ) || [],
         cookie: newCookie,
         lastMutationID,
         data: updates,
@@ -69,3 +81,26 @@ export const pullRoute = makeRoute({
     };
   },
 });
+
+async function getEphemeralFacts(state: DurableObjectState) {
+  let facts = await state.storage.list<Fact<keyof Attribute>>({
+    prefix: "ephemeral-",
+  });
+  let clients = state.getWebSockets().map(
+    (ws) =>
+      (ws as unknown as DOWebSocket).deserializeAttachment() as {
+        clientID: string;
+      }
+  );
+  let existingFacts = [] as Fact<keyof Attribute>[];
+  let fact_store = store(state.storage, { id: "" });
+  for (let [key, fact] of facts.entries()) {
+    if (Date.now() - decodeTime(fact.id) < 1000 * 5) existingFacts.push(fact);
+    if (!!clients.find((c) => key.includes(c?.clientID)))
+      existingFacts.push(fact);
+    else {
+      fact_store.retractEphemeralFact(key.slice(-36), fact.id);
+    }
+  }
+  return existingFacts;
+}

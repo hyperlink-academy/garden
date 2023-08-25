@@ -132,3 +132,31 @@ test("You can't create multiple facts with the same value of a unique attribute"
     (await fact_store.scanIndex.ave("card/title", uniqueValue))?.entity
   ).toBe(originalEntity);
 });
+
+test("retracting an ephemeral fact fully deletes it", async () => {
+  const storage = await getMiniflareDurableObjectStorage(id);
+  let fact_store = store(storage, { id: "" });
+
+  let entity = ulid();
+  let clientID = "01234";
+  await fact_store.assertEmphemeralFact(clientID, {
+    entity,
+    attribute: "presence/client-id",
+    value: "client-id",
+    positions: {},
+  });
+  let fact = await fact_store.scanIndex.eav(entity, "presence/client-id");
+  expect(fact.length).toBe(1);
+  let facts = await storage.list<Fact<any>>({
+    prefix: "ephemeral-",
+  });
+  expect([...facts.entries()].length).toBe(1);
+  await fact_store.retractEphemeralFact(clientID, fact[0].id);
+
+  fact = await fact_store.scanIndex.eav(entity, "presence/client-id");
+  expect(fact.length).toBe(0);
+  facts = await storage.list<Fact<any>>({
+    prefix: "ephemeral-",
+  });
+  expect([...facts.entries()].length).toBe(0);
+});

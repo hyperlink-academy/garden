@@ -13,6 +13,7 @@ export type Schema = {
   type: Fact<"type">["value"];
   unique: Fact<"unique">["value"];
   cardinality: Fact<"cardinality">["value"];
+  ephemeral?: boolean;
 };
 
 export type Fact<A extends AttributeName> = FactMetadata & {

@@ -17,6 +17,8 @@ export const indexes = {
   ) => `va-${v.value}-${attribute}-${factID}`,
   factID: (factID: string) => `factID-${factID}`,
   ti: (time: string, factID: string) => `ti-${time}-${factID}`,
+  ephemeral: (factID: string, clientID: string) =>
+    `ephemeral-${factID}-${clientID}`,
 };
 
 let lock = new Lock();
@@ -46,7 +48,16 @@ export const store = (storage: BasicStorage, ctx: { id: string }) => {
     return schema;
   }
 
-  const writeFactToStore = async (f: Fact<keyof Attribute>, schema: Schema) => {
+  const writeFactToStore = async (
+    f: Fact<keyof Attribute>,
+    schema: Schema,
+    clientID?: string
+  ) => {
+    if (schema.ephemeral && !clientID)
+      return {
+        success: false,
+        error: "no clientID and writing an ephemeral fact",
+      };
     if (schema.unique) {
       let existingUniqueValue = await scanIndex.ave(
         f.attribute as keyof UniqueAttributes,
@@ -80,12 +91,20 @@ export const store = (storage: BasicStorage, ctx: { id: string }) => {
             existingFact.id
           )
         );
+      if (schema.ephemeral) {
+        storage.delete(indexes.ephemeral(existingFact.id, clientID as string));
+      }
     }
-
+    if (schema.ephemeral && f.retracted) {
+      return { success: true };
+    }
     storage.put(indexes.factID(f.id), f);
     storage.put(indexes.ea(f.entity, f.attribute, f.id), f);
     storage.put(indexes.ae(f.attribute, f.entity, f.id), f);
-    storage.put(indexes.ti(f.lastUpdated, f.id), f);
+    if (schema.ephemeral)
+      storage.put(indexes.ephemeral(f.id, clientID as string), f);
+    else storage.put(indexes.ti(f.lastUpdated, f.id), f);
+
     if (schema.unique && f.value) {
       storage.put(indexes.av(f.attribute, f.value as string), f);
     }
@@ -178,6 +197,48 @@ export const store = (storage: BasicStorage, ctx: { id: string }) => {
           fact.schema
         );
       });
+    },
+    retractEphemeralFact: async (clientID, id) => {
+      return lock.withLock(async () => {
+        let fact = await storage.get<Fact<keyof Attribute>>(indexes.factID(id));
+        if (!fact) return;
+        await writeFactToStore(
+          { ...fact, retracted: true, lastUpdated: Date.now().toString() },
+          fact.schema,
+          clientID
+        );
+      });
+    },
+    assertEmphemeralFact: async (clientID, f) => {
+      let schema = await getSchema(f.attribute);
+      if (!schema)
+        return { success: false, error: "Invalid attribute" } as const;
+      let lastUpdated = Date.now().toString();
+      if (!schema.ephemeral)
+        return { success: false, error: "Attribute is not ephemeral" };
+      let factID = f.factID || ulid();
+      let existingFact: Fact<keyof Attribute> | undefined;
+      if (schema.cardinality === "one") {
+        let existingFact = (await scanIndex.eav(f.entity, f.attribute)) as
+          | Fact<keyof Attribute>
+          | undefined;
+        // We might want to preserve positions of the existing fact as well
+        if (existingFact) factID = existingFact.id;
+      }
+      let result = await writeFactToStore(
+        {
+          ...f,
+          positions: { ...existingFact?.positions, ...f.positions },
+          id: factID,
+          lastUpdated,
+          schema,
+        },
+        schema,
+        clientID
+      );
+
+      if (result.success) return { success: true, factID };
+      return { success: false };
     },
     assertFact: async (f) => {
       return lock.withLock(async () => {

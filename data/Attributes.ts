@@ -280,6 +280,12 @@ export const DefaultAttributes = {
     cardinality: "many",
     unique: false,
   },
+  "presence/client-id": {
+    type: "string",
+    cardinality: "many",
+    unique: true,
+    ephemeral: true,
+  },
 } as const;
 
 export const ShortCodes: { [k in keyof Attribute]?: string | undefined } = {
@@ -306,10 +312,6 @@ export type ReferenceAttributes = {
     : never]: Attribute[A];
 };
 
-export type FilterAttributes<F extends Attribute[keyof Attribute]> = {
-  [A in keyof Attribute as Attribute[A]["type"] extends F["type"]
-    ? Attribute[A]["cardinality"] extends F["cardinality"]
-      ? A
-      : never
-    : never]: Attribute[A];
+export type FilterAttributes<F extends Partial<Attribute[keyof Attribute]>> = {
+  [A in keyof Attribute as Attribute[A] extends F ? A : never]: Attribute[A];
 };

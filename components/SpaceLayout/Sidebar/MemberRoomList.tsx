@@ -37,7 +37,7 @@ export const MemberRoomList = (props: {
             setRoomEditOpen={() => props.setRoomEditOpen}
           >
             <div className="flex justify-between gap-2">
-              <span className="">{yourUsername}</span>
+              <Member entityID={memberEntity} />
               <span className="flex-shrink-0 self-center rounded-md bg-grey-90 px-1 py-0.5 text-xs text-grey-35">
                 you
               </span>
@@ -57,7 +57,7 @@ export const MemberRoomList = (props: {
                 entityID={member.entity}
                 setRoomEditOpen={props.setRoomEditOpen}
               >
-                {member?.value}
+                <Member entityID={member.entity} />
               </DraggableRoomListItem>
             );
           })}
@@ -84,6 +84,16 @@ export const MemberRoomList = (props: {
 };
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
+
+const Member = (props: { entityID: string }) => {
+  let activeSessions = db.useEntity(props.entityID, "presence/client-id") || [];
+  let memberName = db.useEntity(props.entityID, "member/name");
+  return (
+    <span className={`${activeSessions?.length > 0 ? "text-accent-blue" : ""}`}>
+      {memberName?.value}
+    </span>
+  );
+};
 
 const InviteMember = (props: { open: boolean; onClose: () => void }) => {
   let { authToken, session } = useAuth();

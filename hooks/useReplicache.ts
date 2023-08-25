@@ -148,7 +148,7 @@ function makeMutators(
     ) => {
       let q = scanIndex(tx);
       let context: MutationContext = {
-        runOnServer: async () => {},
+        runOnServer: async () => { },
         scanIndex: q,
         postMessage: async (m) => {
           await tx.put(m.id, MessageWithIndexes(m));
@@ -211,6 +211,34 @@ function makeMutators(
             });
           }
 
+          return { success: true };
+        },
+        retractEphemeralFact: async (_clientID, factID) => {
+          await tx.del(factID);
+        },
+        assertEmphemeralFact: async (_clientID, fact) => {
+          let schema = await getSchema(tx, fact.attribute);
+          if (!schema) return { success: false, error: "no schema" };
+          let lastUpdated = Date.now().toString();
+          let newID: string = "";
+          let existingFact: Fact<keyof Attribute> | undefined;
+          if (schema.cardinality === "one") {
+            existingFact = (await q.eav(fact.entity, fact.attribute)) as
+              | Fact<keyof Attribute>
+              | undefined;
+            if (existingFact) {
+              newID = existingFact.id;
+            }
+          }
+          if (!newID) newID = fact.factID || ulid();
+          let data = FactWithIndexes({
+            id: newID,
+            ...fact,
+            positions: { ...existingFact?.positions, ...fact.positions },
+            lastUpdated,
+            schema,
+          });
+          await tx.put(newID, data);
           return { success: true };
         },
         assertFact: async (fact, undoAction) => {
@@ -299,7 +327,7 @@ export const makeReplicache = (args: {
   name: string;
   undoManager: UndoManager;
 }) => {
-  let grabData = function (): {
+  let grabData = function(): {
     rep: Replicache<ReplicacheMutators>;
     undoManager: UndoManager;
   } {

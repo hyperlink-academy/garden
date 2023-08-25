@@ -1,7 +1,7 @@
 import { privateSpaceAPI } from "backend/lib/api";
 import { Env } from "backend/SpaceDurableObject";
 import { calculateUnreads, markUnread } from "src/markUnread";
-import { Attribute, ReferenceAttributes } from "./Attributes";
+import { Attribute, FilterAttributes, ReferenceAttributes } from "./Attributes";
 import { Fact, ref } from "./Facts";
 import { Message } from "./Messages";
 import { z } from "zod";
@@ -9,6 +9,12 @@ import { webPushPayloadParser } from "pages/api/web_push";
 import { sign } from "src/sign";
 
 export type MutationContext = {
+  assertEmphemeralFact: <A extends keyof FilterAttributes<{ ephemeral: true }>>(
+    clientID: string,
+    d: Pick<Fact<A>, "entity" | "attribute" | "value" | "positions"> & {
+      factID?: string;
+    }
+  ) => Promise<{ success: boolean }>;
   postMessage: (message: Message) => Promise<{ success: boolean }>;
   assertFact: <A extends keyof Attribute>(
     d: Pick<Fact<A>, "entity" | "attribute" | "value" | "positions"> & {
@@ -23,6 +29,7 @@ export type MutationContext = {
   ) => Promise<{ success: boolean }>;
   runOnServer: (fn: (env: Env) => Promise<void>) => Promise<void>;
   retractFact: (id: string, undoAction?: boolean) => Promise<void>;
+  retractEphemeralFact: (clientID: string, id: string) => Promise<void>;
   scanIndex: {
     vae: <A extends keyof ReferenceAttributes>(
       entity: string,
@@ -222,6 +229,15 @@ const assertFact: Mutation<
       return ctx.assertFact({ ...f }, args.undoAction);
     })
   );
+};
+
+const assertEmphemeralFact: Mutation<
+  Pick<
+    Fact<keyof FilterAttributes<{ ephemeral: true }>>,
+    "entity" | "attribute" | "value" | "positions"
+  > & { clientID: string }
+> = async (args, ctx) => {
+  await ctx.assertEmphemeralFact(args.clientID, { ...args });
 };
 
 const retractFact: Mutation<{ id: string; undoAction?: boolean }> = async (
@@ -440,6 +456,7 @@ export const Mutations = {
   addCardToSection,
   replyToDiscussion,
   assertFact,
+  assertEmphemeralFact,
   retractFact,
   updateFact,
   updatePositionInDesktop,
