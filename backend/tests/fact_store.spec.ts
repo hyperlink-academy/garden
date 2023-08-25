@@ -146,15 +146,15 @@ test("retracting an ephemeral fact fully deletes it", async () => {
     positions: {},
   });
   let fact = await fact_store.scanIndex.eav(entity, "presence/client-id");
-  expect(fact.length).toBe(1);
+  expect(fact).toBeTruthy();
   let facts = await storage.list<Fact<any>>({
     prefix: "ephemeral-",
   });
   expect([...facts.entries()].length).toBe(1);
-  await fact_store.retractEphemeralFact(clientID, fact[0].id);
+  await fact_store.retractEphemeralFact(clientID, fact?.id as string);
 
   fact = await fact_store.scanIndex.eav(entity, "presence/client-id");
-  expect(fact.length).toBe(0);
+  expect(fact).toBeFalsy();
   facts = await storage.list<Fact<any>>({
     prefix: "ephemeral-",
   });

@@ -52,8 +52,8 @@ export type MutationContext = {
 
 type UniqueFacts = {
   [A in keyof Attribute as Attribute[A]["unique"] extends true
-    ? A
-    : never]: Attribute[A];
+  ? A
+  : never]: Attribute[A];
 };
 
 type OptionalAttribute<A extends keyof Attribute | null> =
@@ -61,8 +61,8 @@ type OptionalAttribute<A extends keyof Attribute | null> =
 export type CardinalityResult<A extends keyof Attribute | null> = null extends A
   ? Fact<keyof Attribute>[]
   : Attribute[OptionalAttribute<A>] extends {
-      cardinality: "one";
-    }
+    cardinality: "one";
+  }
   ? Fact<OptionalAttribute<A>> | null
   : Fact<OptionalAttribute<A>>[];
 
@@ -446,6 +446,27 @@ const markRead: Mutation<{
   });
 };
 
+const initializeClient: Mutation<{
+  clientID: string;
+  memberEntity: string;
+  clientEntity: string;
+}> = async (args, ctx) => {
+  let client = await ctx.scanIndex.ave("presence/client-id", args.clientID);
+  if (client) return;
+  await ctx.assertEmphemeralFact(args.clientID, {
+    entity: args.clientEntity,
+    attribute: "presence/client-id",
+    value: args.clientID,
+    positions: {},
+  });
+  await ctx.assertEmphemeralFact(args.clientID, {
+    entity: args.clientEntity,
+    attribute: "presence/client-member",
+    value: ref(args.memberEntity),
+    positions: {},
+  });
+};
+
 export const Mutations = {
   markRead,
   deleteEntity,
@@ -463,4 +484,5 @@ export const Mutations = {
   removeCardFromDesktopOrCollection,
   addCardToDesktop,
   addReaction,
+  initializeClient,
 };

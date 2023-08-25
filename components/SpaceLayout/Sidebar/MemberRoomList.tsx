@@ -86,7 +86,8 @@ export const MemberRoomList = (props: {
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 
 const Member = (props: { entityID: string }) => {
-  let activeSessions = db.useEntity(props.entityID, "presence/client-id") || [];
+  let activeSessions =
+    db.useReference(props.entityID, "presence/client-member") || [];
   let memberName = db.useEntity(props.entityID, "member/name");
   return (
     <span className={`${activeSessions?.length > 0 ? "text-accent-blue" : ""}`}>

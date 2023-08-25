@@ -282,8 +282,14 @@ export const DefaultAttributes = {
   },
   "presence/client-id": {
     type: "string",
-    cardinality: "many",
+    cardinality: "one",
     unique: true,
+    ephemeral: true,
+  },
+  "presence/client-member": {
+    type: "reference",
+    cardinality: "one",
+    unique: false,
     ephemeral: true,
   },
 } as const;
