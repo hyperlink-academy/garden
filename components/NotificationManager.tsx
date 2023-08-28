@@ -8,9 +8,9 @@ import { ButtonLink } from "./Buttons";
 export const NotificationManager = () => {
   let supabase = useSupabaseClient<Database>();
   let [open, setOpen] = useState(false);
-  let [result, setResult] = useState({});
   let [notificationPermissionState, setNotificationPermissionState] =
     useState("default");
+  let [pushPermissionState, setPushPermissionState] = useState("prompt");
   useEffect(() => {
     if (!("Notification" in window)) {
       setNotificationPermissionState("unavailable");
@@ -18,6 +18,19 @@ export const NotificationManager = () => {
       let notificationPermissionState = Notification.permission;
       setNotificationPermissionState(notificationPermissionState);
     }
+
+    navigator.serviceWorker
+      .getRegistrations()
+      .then(async function (registrations) {
+        for (let registration of registrations) {
+          let current_pushPermissionState =
+            await registration.pushManager.permissionState({
+              applicationServerKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
+              userVisibleOnly: true,
+            });
+          setPushPermissionState(current_pushPermissionState);
+        }
+      });
   }, []);
   return (
     <>
@@ -52,8 +65,8 @@ export const NotificationManager = () => {
 
         if denied…???
         */}
-
-        {notificationPermissionState === "default" ? (
+        {pushPermissionState === "default" ||
+        pushPermissionState === "prompt" ? (
           <>
             <p>
               Turn on notifications for new chat messages and card comments in
@@ -70,7 +83,6 @@ export const NotificationManager = () => {
                           process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
                         userVisibleOnly: true,
                       });
-                      setResult(result);
                       let { data: session } = await supabase.auth.getSession();
                       if (!session.session) return;
                       await supabase.from("push_subscriptions").insert({
@@ -86,7 +98,7 @@ export const NotificationManager = () => {
               content="enable notifications"
             ></ButtonLink>
           </>
-        ) : notificationPermissionState === "granted" ? (
+        ) : pushPermissionState === "granted" ? (
           "You've enabled notifications on this device!"
         ) : notificationPermissionState === "unavailable" ? (
           "Notifications unavailable in this browser."
