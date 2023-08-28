@@ -131,6 +131,7 @@ export const CallProvider = (props: { children: React.ReactNode }) => {
         audio: { processor: { type: "noise-cancellation" } },
       });
       await call.join({
+        token: token.token.token as string,
         url: `https://hyperlink.daily.co/${token.name}`,
         userName: session.session?.username,
       });

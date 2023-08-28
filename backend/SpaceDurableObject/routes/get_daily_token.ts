@@ -65,7 +65,7 @@ export const get_daily_token_route = makeRoute({
     } else {
       room = await roomDataRequest.json();
     }
-    let token = await fetch(`https://api.daily.co/v1/rooms`, {
+    let token = await fetch(`https://api.daily.co/v1/meeting-tokens`, {
       method: "POST",
       headers,
       body: JSON.stringify({
