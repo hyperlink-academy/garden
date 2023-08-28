@@ -72,7 +72,7 @@ export const useFilteredCards = (
     return passed;
   });
 
-  return { reactions, filters, setFilters, cardsFiltered };
+  return { reactions, filters, setFilters, cardsFiltered, total: cards.length };
 };
 
 export function FilterByReactions(props: {
@@ -80,8 +80,8 @@ export function FilterByReactions(props: {
   filters: Filters;
   setFilters: (f: (old: Filters) => Filters) => void;
 }) {
-  return (
-    <div className="flex flex-row flex-wrap gap-2">
+  return props.reactions.length > 0 ? (
+    <div className="flex w-full flex-row flex-wrap gap-2 pt-1">
       {props.reactions.map((reaction) => {
         let existingFilter = props.filters.find((f) => f.reaction === reaction);
         return (
@@ -120,6 +120,10 @@ export function FilterByReactions(props: {
       {props.filters.length > 0 && (
         <button onClick={() => props.setFilters(() => [])}>clear</button>
       )}
+    </div>
+  ) : (
+    <div className="mt-1 italic text-grey-55">
+      filter cards by adding reactags!
     </div>
   );
 }

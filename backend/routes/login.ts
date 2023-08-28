@@ -2,8 +2,8 @@ import { z } from "zod";
 import { Bindings } from "backend";
 import bcrypt from "bcryptjs";
 import { ExtractResponse, makeRoute } from "backend/lib/api";
-import { AuthResponse, createClient } from "@supabase/supabase-js";
-import { Database } from "backend/lib/database.types";
+import { AuthResponse } from "@supabase/supabase-js";
+import { createClient } from "backend/lib/supabase";
 
 const Errors = {
   noUser: "noUser",
@@ -19,10 +19,7 @@ export const LoginRoute = makeRoute({
     password: z.string(),
   }),
   handler: async (msg, env: Bindings, _request: Request) => {
-    const supabase = createClient<Database>(
-      env.SUPABASE_URL,
-      env.SUPABASE_API_TOKEN
-    );
+    const supabase = createClient(env);
 
     let supabaseLogin = await supabase.auth.signInWithPassword({
       email: msg.email,

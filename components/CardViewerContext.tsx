@@ -1,6 +1,7 @@
 import { useAppEventListener, publishAppEvent } from "hooks/useEvents";
-import { useIndex, useMutations } from "hooks/useReplicache";
+import { db, useMutations } from "hooks/useReplicache";
 import { useUndoableState } from "hooks/useUndoableState";
+import { useRouter } from "next/router";
 import { useEffect, useRef } from "react";
 import { CardView } from "./CardView";
 
@@ -16,11 +17,11 @@ export const useCardViewer = () => {
 };
 
 export function CardViewer(props: { room: string | null }) {
-  let roomType = useIndex.eav(props.room, "room/type")?.value;
+  let roomType = db.useEntity(props.room, "room/type")?.value;
   let [history, setHistory] = useUndoableState<{ [k: string]: string[] }>({});
   let ref = useRef<HTMLDivElement | null>(null);
   let { mutate, memberEntity } = useMutations();
-  let unreadBy = useIndex.eav(
+  let unreadBy = db.useEntity(
     props.room ? history[props.room]?.[0] || null : null,
     "card/unread-by"
   );
@@ -63,6 +64,30 @@ export function CardViewer(props: { room: string | null }) {
     },
     [props.room]
   );
+
+  let { query, replace } = useRouter();
+  useEffect(() => {
+    if (query.openCard) {
+      console.log("yo this should work");
+      let entityID = query.openCard as string;
+      if (!props.room) return;
+      let url = new URL(window.location.href);
+      url.searchParams.delete("openCard");
+      replace(url, undefined, { shallow: true });
+      setHistory((h) => {
+        if (!props.room) return h;
+        let room = h[props.room] || [];
+        if (room[0] === entityID) return h;
+        return {
+          ...h,
+          [props.room]: [entityID, ...room],
+        };
+      });
+      setTimeout(() => {
+        ref.current?.scrollIntoView({ inline: "center", behavior: "smooth" });
+      }, 200);
+    }
+  }, [query.openCard, props.room]);
 
   useAppEventListener(
     "cardviewer.close-card",

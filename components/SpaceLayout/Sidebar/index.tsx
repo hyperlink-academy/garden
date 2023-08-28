@@ -1,11 +1,10 @@
 import Link from "next/link";
-
 import { Divider, Modal } from "components/Layout";
 import { useAuth } from "hooks/useAuth";
 import { useSpaceID } from "hooks/useReplicache";
 import React, { Fragment, useState } from "react";
 import {
-  BackToStudio as BackToStudioIcon,
+  BackToHome,
   Information,
   MoreOptionsSmall,
   RoomCalendar,
@@ -18,10 +17,14 @@ import { EditRoomModal } from "./RoomListLayout";
 import { SharedRoomList } from "./SharedRoomList";
 import { MemberRoomList } from "./MemberRoomList";
 import { Popover } from "@headlessui/react";
+import * as PopoverRadix from "@radix-ui/react-popover";
 import { ButtonPrimary } from "components/Buttons";
 import { LogInModal } from "components/LoginModal";
 import { useSpaceData } from "hooks/useSpaceData";
 import { CallManager } from "components/Calls/CallManager";
+import { useIdentityData } from "hooks/useIdentityData";
+import { uuidToBase62 } from "src/uuidHelpers";
+import { HelpModal } from "components/HelpCenter";
 
 export const Sidebar = (props: {
   onRoomChange: (room: string) => void;
@@ -37,7 +40,7 @@ export const Sidebar = (props: {
         <Divider />
         <div className="flex flex-row content-between gap-2 pl-2">
           <button
-            className={`flex  w-full justify-center rounded-md border  p-1 ${
+            className={`flex w-full justify-center rounded-md border p-1 ${
               props.currentRoom === "search"
                 ? "rounded-md border-accent-blue bg-accent-blue font-bold text-white"
                 : " border-grey-80 text-grey-35 hover:bg-bg-blue"
@@ -48,7 +51,7 @@ export const Sidebar = (props: {
           </button>
 
           <button
-            className={`flex  w-full justify-center rounded-md border  p-1 ${
+            className={`flex w-full justify-center rounded-md border p-1 ${
               props.currentRoom === "calendar"
                 ? "rounded-md border-accent-blue bg-accent-blue font-bold text-white"
                 : " border-grey-80 text-grey-35 hover:bg-bg-blue"
@@ -96,7 +99,12 @@ const SpaceName = () => {
   return (
     <div className="SidebarSpaceInfo flex flex-col gap-2">
       <div className="flex items-start justify-between gap-2">
-        <h3 className="">{data?.display_name}</h3>
+        <h3
+          className="SpaceName"
+          style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
+        >
+          {data?.display_name}
+        </h3>
         {authorized && (
           <button
             onClick={() => setEditModal(true)}
@@ -122,11 +130,15 @@ const SpaceName = () => {
 };
 
 const SidebarFooter = (props: { studio?: string }) => {
+  let { session } = useAuth();
+  let authorized = session.loggedIn;
+
   let [infoOpen, setInfoOpen] = useState(false);
   let [logInOpen, setLogInOpen] = useState(false);
 
   return (
-    <div className="sidebarBackToStudio z-10 flex items-center gap-2 ">
+    <div className="sidebarBackToHome z-10 flex items-center justify-between gap-2 ">
+      {/* login OR home button + studios */}
       {!props.studio ? (
         <div className="grow">
           <ButtonPrimary
@@ -136,55 +148,68 @@ const SidebarFooter = (props: { studio?: string }) => {
           <LogInModal isOpen={logInOpen} onClose={() => setLogInOpen(false)} />
         </div>
       ) : (
-        <Link
-          className="flex grow place-items-center gap-2 rounded-md border border-transparent px-2 py-1 hover:border-accent-blue  hover:text-accent-blue"
-          href={`/s/${props.studio}`}
-        >
-          <BackToStudioIcon /> To Studio
+        <Link className="hover:text-accent-blue" href={`/s/${props.studio}`}>
+          <BackToHome />
         </Link>
       )}
 
+      {/* studio list! */}
+      {authorized && session.session && (
+        <SpaceStudiosList username={session.session.username} />
+      )}
+
+      {/* info / help button */}
       <button
         className="hover:text-accent-blue"
         onClick={() => setInfoOpen(true)}
       >
         <Information />
       </button>
-
-      <InfoModal open={infoOpen} onClose={() => setInfoOpen(false)} />
+      <HelpModal open={infoOpen} onClose={() => setInfoOpen(false)} />
     </div>
   );
 };
 
-const InfoModal = (props: { open: boolean; onClose: () => void }) => {
-  return (
-    <Modal open={props.open} onClose={props.onClose}>
-      <div className="editRoomModal flex flex-col gap-3 text-grey-35">
-        <h3>Hyperlink Help Center 🌱</h3>
-        <p>
-          You&apos;re viewing a Space on{" "}
-          <a className="text-accent-blue" href="https://hyperlink.academy/">
-            Hyperlink
-          </a>
-          .
-        </p>
-        <p>
-          Question? Bug report? We&apos;d love to hear from you —{" "}
-          <a
-            className="text-accent-blue"
-            href="mailto:contact@hyperlink.academy"
-          >
-            drop us an email
-          </a>
-          !
-        </p>
-        <p>—The Hyperlink Team</p>
-      </div>
-    </Modal>
+const SpaceStudiosList = (props: { username: string }) => {
+  let { data } = useIdentityData(props.username);
+  let studios = data?.members_in_studios.map(
+    (s) => s.studios as Exclude<typeof s.studios, null>
   );
+  return studios && studios.length > 0 ? (
+    <>
+      <PopoverRadix.Root>
+        <PopoverRadix.Trigger>
+          <button className="font-bold text-grey-35 hover:text-accent-blue">
+            Studios
+          </button>
+        </PopoverRadix.Trigger>
+
+        <PopoverRadix.Portal>
+          <PopoverRadix.Content
+            className="relative left-2 z-20 flex max-w-xs flex-col gap-2 rounded-md border-2 border-grey-80 bg-white p-2 drop-shadow-md"
+            sideOffset={4}
+          >
+            <PopoverRadix.Arrow
+              className="fill-grey-80 stroke-grey-80"
+              offset={20}
+              startOffset={20}
+            />
+
+            {studios?.map((s) => (
+              <Link href={`/studio/${uuidToBase62(s.id)}`} key={s.id}>
+                <PopoverRadix.Close className="w-full py-1 px-2 text-left text-grey-35 hover:bg-bg-blue">
+                  {s.name}
+                </PopoverRadix.Close>
+              </Link>
+            ))}
+          </PopoverRadix.Content>
+        </PopoverRadix.Portal>
+      </PopoverRadix.Root>
+    </>
+  ) : null;
 };
 
-const SpaceStatus = (props: { openEditModal: () => void }) => {
+export const SpaceStatus = (props: { openEditModal: () => void }) => {
   let id = useSpaceID();
   let { data } = useSpaceData(id);
 

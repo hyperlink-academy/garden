@@ -1,13 +1,21 @@
 import { Dialog, Menu, Transition } from "@headlessui/react";
 import React, { Fragment } from "react";
 
-export const Divider = (props: { dark?: boolean; vertical?: boolean }) => {
+export const Divider = (props: {
+  dark?: boolean;
+  vertical?: boolean;
+  px?: number;
+  py?: number;
+}) => {
   return (
     <div
       className={`w-full border-t border-l ${
         props.dark ? `border-grey-55` : `border-grey-80`
-      } ${props.vertical ? "h-full" : ""}
+      } ${props.vertical ? "h-full" : ""} 
       `}
+      style={{
+        padding: `${props.py}px ${props.px}px ${props.py}px ${props.px}px`,
+      }}
     ></div>
   );
 };
@@ -17,6 +25,7 @@ export const FloatingContainer: React.FC<
 > = (props) => {
   return (
     <div
+      onClick={(e) => e.stopPropagation()}
       className={`
         rounded-md border
         border-grey-80 bg-white px-4 
@@ -31,23 +40,58 @@ export const FloatingContainer: React.FC<
 };
 
 export const Modal: React.FC<
-  React.PropsWithChildren<{ open: boolean; onClose: () => void }>
+  React.PropsWithChildren<{
+    open: boolean;
+    onClose: () => void;
+    dark?: boolean;
+    width?: string;
+  }>
 > = (props) => {
   return (
     <Dialog
       open={props.open}
       onClose={props.onClose}
-      className="fixed inset-0 z-10 overflow-y-hidden"
+      className="fixed inset-0 z-30 overflow-y-hidden"
     >
-      <Dialog.Overlay className="overlay" />
+      <Dialog.Overlay className={props.dark ? "dark-overlay" : "overlay"} />
       <FloatingContainer
         className={`
               fixed top-1/2 left-1/2 grid max-h-[calc(100%-32px)]
-              w-[calc(100%-32px)] max-w-md -translate-x-1/2
+              w-[calc(100%-32px)] ${
+                props.width ? props.width : "max-w-md"
+              } -translate-x-1/2
               -translate-y-1/2
               grid-flow-row
               gap-4
               overflow-auto
+              `}
+      >
+        {props.children}
+      </FloatingContainer>
+    </Dialog>
+  );
+};
+
+export const ModalFixedHeight: React.FC<
+  React.PropsWithChildren<{
+    open: boolean;
+    onClose: () => void;
+    dark?: boolean;
+    width?: string;
+  }>
+> = (props) => {
+  return (
+    <Dialog
+      open={props.open}
+      onClose={props.onClose}
+      className="fixed inset-0 z-30 overflow-y-hidden"
+    >
+      <Dialog.Overlay className={props.dark ? "dark-overlay" : "overlay"} />
+      <FloatingContainer
+        className={`
+              fixed top-1/2 left-1/2 grid h-[calc(100%-32px)] w-[calc(100%-32px)] ${
+                props.width ? props.width : "max-w-md"
+              } -translate-x-1/2 -translate-y-1/2 grid-flow-row content-start gap-4 overflow-auto
               `}
       >
         {props.children}

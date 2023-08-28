@@ -5,7 +5,7 @@ import { ButtonPrimary } from "components/Buttons";
 import { Modal } from "components/Layout";
 import { useSmoker } from "components/Smoke";
 import { useAuth } from "hooks/useAuth";
-import { useIndex, useMutations, useSpaceID } from "hooks/useReplicache";
+import { db, useMutations, useSpaceID } from "hooks/useReplicache";
 import { useState } from "react";
 import { DraggableRoomListItem, RoomListLabel } from "./RoomListLayout";
 import { AddTiny } from "components/Icons";
@@ -15,7 +15,7 @@ export const MemberRoomList = (props: {
   currentRoom: string | null;
   setRoomEditOpen: () => void;
 }) => {
-  let members = useIndex.aev("member/name");
+  let members = db.useAttribute("member/name");
   let { memberEntity, authorized } = useMutations();
   let auth = useAuth();
   let yourUsername = auth.session.session?.username;
@@ -65,7 +65,7 @@ export const MemberRoomList = (props: {
           <>
             <button
               onClick={() => setInviteOpen(true)}
-              className="sidebarAddMember group flex w-full items-center gap-2 rounded-md border border-transparent py-0.5 px-1 text-grey-55 hover:border-accent-blue  hover:text-accent-blue"
+              className="sidebarAddMember group flex w-full items-center gap-2 rounded-md border border-transparent py-0.5 px-1 text-grey-55 hover:border-accent-blue hover:text-accent-blue"
             >
               <div className="text-grey-80 group-hover:text-accent-blue">
                 <AddTiny />
@@ -87,7 +87,7 @@ const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 
 const InviteMember = (props: { open: boolean; onClose: () => void }) => {
   let { authToken, session } = useAuth();
-  let isMember = useIndex.ave("space/member", session.session?.studio);
+  let isMember = db.useUniqueAttribute("space/member", session.session?.studio);
   let smoker = useSmoker();
   const spaceID = useSpaceID();
   let { data: inviteLink } = useSWR(

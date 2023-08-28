@@ -4,6 +4,9 @@ import { calculateUnreads, markUnread } from "src/markUnread";
 import { Attribute, ReferenceAttributes } from "./Attributes";
 import { Fact, ref } from "./Facts";
 import { Message } from "./Messages";
+import { z } from "zod";
+import { webPushPayloadParser } from "pages/api/web_push";
+import { sign } from "src/sign";
 
 export type MutationContext = {
   postMessage: (message: Message) => Promise<{ success: boolean }>;
@@ -330,6 +333,40 @@ const replyToDiscussion: Mutation<{
   );
 
   await ctx.postMessage(args.message);
+  let senderStudio = await ctx.scanIndex.eav(
+    args.message.sender,
+    "space/member"
+  );
+  await ctx.runOnServer(async (env) => {
+    if (!senderStudio) return;
+
+    let title: Fact<"room/name" | "card/title"> | null =
+      await ctx.scanIndex.eav(args.discussion, "card/title");
+    if (!title) title = await ctx.scanIndex.eav(args.discussion, "room/name");
+
+    console.log(`${env.env.NEXT_API_URL}/api/web_push`);
+    try {
+      let payload: z.TypeOf<typeof webPushPayloadParser> = {
+        title: title?.value || "Untitled",
+        senderStudio: senderStudio.value,
+        message: args.message,
+        spaceID: env.id,
+      };
+      let payloadString = JSON.stringify(payload);
+      fetch(`${env.env.NEXT_API_URL}/api/web_push`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          payload: payloadString,
+          sig: await sign(payloadString, env.env.RPC_SECRET),
+        }),
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  });
 };
 
 const deleteEntity: Mutation<{ entity: string }> = async (args, ctx) => {

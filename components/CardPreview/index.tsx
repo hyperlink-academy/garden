@@ -3,7 +3,7 @@ import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
 import {
   ReplicacheContext,
   scanIndex,
-  useIndex,
+  db,
   useMutations,
   useSpaceID,
 } from "hooks/useReplicache";
@@ -23,6 +23,7 @@ import { useAuth } from "hooks/useAuth";
 import { ulid } from "src/ulid";
 import { getAndUploadFile } from "src/getAndUploadFile";
 import { CardPreviewData, useCardPreviewData } from "hooks/CardPreviewData";
+import { useUIState } from "hooks/useUIState";
 
 const borderStyles = (args: { isMember: boolean }) => {
   switch (true) {
@@ -40,6 +41,7 @@ export type Props = {
   onDelete?: () => void;
   outerControls?: boolean;
   hideContent?: boolean;
+  editable?: boolean;
   factID?: string;
   dragHandleProps?: {
     attributes?: DraggableAttributes;
@@ -62,9 +64,9 @@ export const CardPreview = (
     entityID: string;
   } & Props
 ) => {
-  let isMember = !!useIndex.eav(props.entityID, "member/name");
+  let isMember = !!db.useEntity(props.entityID, "member/name");
   let { memberEntity, mutate } = useMutations();
-  let unreadBy = useIndex.eav(props.entityID, "card/unread-by") || [];
+  let unreadBy = db.useEntity(props.entityID, "card/unread-by") || [];
   let isUnread = unreadBy.find((f) => f.value.value === memberEntity);
   let rep = useContext(ReplicacheContext);
   let { authToken } = useAuth();
@@ -83,7 +85,9 @@ export const CardPreview = (
     false,
     [memberEntity, props.entityID]
   );
-  let messagesCount = useIndex.messages(props.entityID).length;
+  let editing = useUIState((s) => s.focusedCard === props.entityID);
+
+  let messagesCount = db.useMessages(props.entityID).length;
 
   let { handlers, isLongPress } = useLongPress(
     () => props.onLongPress?.(),
@@ -120,7 +124,7 @@ export const CardPreview = (
         className={`cardPreviewBorder select-none ${
           isUnread ? "unreadCardGlow" : ""
         } relative grow overflow-hidden ${borderStyles({ isMember })} ${
-          props.isSelected ? "selectedCardGlow" : ""
+          props.isSelected || (editing && !isMember) ? "selectedCardGlow" : ""
         } ${props.isOver ? "rounded-[24px] shadow-[0_0_16px_0_#cccccc]" : ""}`}
         style={{ WebkitTapHighlightColor: "transparent" }}
       >

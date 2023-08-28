@@ -10,12 +10,7 @@ import {
   ReactionAdd,
 } from "components/Icons";
 import { Divider, MenuContainer, MenuItem, Modal } from "components/Layout";
-import {
-  scanIndex,
-  useIndex,
-  useMutations,
-  useSpaceID,
-} from "hooks/useReplicache";
+import { scanIndex, db, useMutations, useSpaceID } from "hooks/useReplicache";
 import * as Popover from "@radix-ui/react-popover";
 
 import { AttachedCardSection, SingleTextSection } from "./Sections";
@@ -38,6 +33,7 @@ import { useUndoableState } from "hooks/useUndoableState";
 import { Fact } from "data/Facts";
 import { getAndUploadFile } from "src/getAndUploadFile";
 import { useReactions } from "hooks/useReactions";
+import { HighlightCard } from "./HighlightCard";
 
 const borderStyles = (args: { member: boolean }) => {
   switch (true) {
@@ -54,7 +50,7 @@ const contentStyles = (args: { member: boolean }) => {
     case args.member:
       return `bg-white rounded-md mx-2 mt-1 mb-3 px-4 py-4`;
     default:
-      return `px-2 py-2 sm:px-4 sm:py-4`;
+      return `px-3 py-3 sm:px-4 sm:py-4`;
   }
 };
 
@@ -65,7 +61,7 @@ export const CardView = (props: {
 }) => {
   let { authToken } = useAuth();
   let spaceID = useSpaceID();
-  let memberName = useIndex.eav(props.entityID, "member/name");
+  let memberName = db.useEntity(props.entityID, "member/name");
   let { ref } = usePreserveScroll<HTMLDivElement>(props.entityID);
 
   let { mutate, rep } = useMutations();
@@ -115,6 +111,8 @@ export const CardView = (props: {
           ${borderStyles({
             member: !!memberName,
           })}
+            member: !!memberName,
+          })}
           `}
         onDragOver={(e) => e.preventDefault()}
         onDrop={async (e) => {
@@ -140,7 +138,7 @@ export const CardView = (props: {
           <div className="grid shrink-0 grid-cols-[auto_max-content] items-end pl-2 pr-3 pt-2 pb-1 text-white">
             <Member />
             <Link href={`/s/${memberName?.value}`}>
-              <small className="justify-self-start">visit studio</small>
+              <span className="justify-self-start text-sm">visit studio</span>
             </Link>
           </div>
         )}
@@ -152,8 +150,8 @@ export const CardView = (props: {
             grow
             flex-col
             justify-between
-            gap-16
-            overflow-scroll
+            overflow-x-hidden
+            overflow-y-scroll
             ${contentStyles({
               member: !!memberName,
             })}
@@ -171,57 +169,74 @@ export const CardContent = (props: {
   onDelete?: () => void;
   referenceFactID?: string;
 }) => {
-  let cardCreator = useIndex.eav(props.entityID, "card/created-by");
+  let cardCreator = db.useEntity(props.entityID, "card/created-by");
   // returns reference…
-  let cardCreatorName = useIndex.eav(
+  let cardCreatorName = db.useEntity(
     cardCreator?.value.value as string,
     "member/name"
   )?.value;
-  let date = useIndex.eav(props.entityID, "card/date");
+  let date = db.useEntity(props.entityID, "card/date");
   let [dateEditing, setDateEditing] = useUndoableState(false);
+  let memberName = db.useEntity(props.entityID, "member/name");
   let { authorized } = useMutations();
 
   return (
     <>
       {/* START CARD CONTENT */}
       <div className="cardContentWrapper relative">
-        <div className="cardSectionAdder pointer-events-none  sticky top-0 z-10 flex w-full justify-center ">
-          <SectionAdder
-            entityID={props.entityID}
-            setDateEditing={() => {
-              setDateEditing(true);
-            }}
-            dateEditing={dateEditing}
-          />
-        </div>
+        {authorized && (
+          <>
+            <div className="cardSectionAdder pointer-events-none sticky top-0 z-10 mb-32 flex w-full justify-center">
+              <SectionAdder
+                entityID={props.entityID}
+                setDateEditing={() => {
+                  setDateEditing(true);
+                }}
+                dateEditing={dateEditing}
+              />
+            </div>
+            <div className="-mt-[170px]" />
+          </>
+        )}
 
         {/* card info (name and more options menu) */}
         {/* hide for members, who don't have a cardCreatorName */}
-        {cardCreatorName && (
+        {/* AND handle for legacy regular cards w/o cardCreatorName */}
+        {!memberName ? (
           <div
-            className={`cardInfo pointer-events-none relative z-20 mb-3 ${
-              authorized ? "-mt-[42px]" : ""
-            } flex h-[42px] shrink-0 items-center justify-between gap-3`}
+            className={`cardInfo pointer-events-none relative z-20 mb-3 flex h-[42px] shrink-0 items-center justify-between gap-3`}
           >
-            {cardCreatorName ? (
-              <div className="group pointer-events-auto flex place-items-center gap-2">
-                <div className=" h-[32px] w-[32px] rounded-full border border-grey-80 pt-[5px] text-center text-sm text-grey-55">
-                  <div className="w-full text-center">
-                    {cardCreatorName.charAt(0).toUpperCase()}
+            {/* NB: keep wrapper for spacing with CardMoreOptionsMenu even if no cardCreatorName */}
+            <div className="group pointer-events-auto flex place-items-center gap-2">
+              {cardCreatorName ? (
+                <>
+                  <div className="h-[32px] w-[32px] rounded-full border border-grey-80 pt-[5px] text-center text-sm text-grey-55">
+                    <div className="w-full text-center">
+                      {cardCreatorName.charAt(0).toUpperCase()}
+                    </div>
                   </div>
-                </div>
-                <div className="absolute left-8 hidden max-w-[275px] overflow-hidden whitespace-pre rounded-md bg-white px-2 py-1 text-sm text-grey-55 group-hover:block group-focus:block">
-                  by {cardCreatorName}
-                </div>
-              </div>
-            ) : null}
-            <CardMoreOptionsMenu
-              onDelete={props.onDelete}
-              entityID={props.entityID}
-              referenceFactID={props?.referenceFactID}
-            />
+                  <div className="absolute left-8 hidden max-w-[275px] overflow-hidden whitespace-pre rounded-md bg-white px-2 py-1 text-sm text-grey-55 group-hover:block group-focus:block">
+                    by {cardCreatorName}
+                  </div>
+                </>
+              ) : null}
+            </div>
+
+            <div className="flex flex-row gap-2">
+              <HighlightCard entityID={props.entityID} />
+              <CardMoreOptionsMenu
+                onDelete={props.onDelete}
+                entityID={props.entityID}
+                referenceFactID={props?.referenceFactID}
+              />
+            </div>
           </div>
+        ) : (
+          // member card offset only if authed
+          authorized && <div className="mb-3 h-[42px]" />
         )}
+
+        {/* card content wrapper */}
         <div className="cardContent grid-auto-rows z-0 grid gap-3">
           <div className="flex flex-col gap-0">
             <Title entityID={props.entityID} />
@@ -242,28 +257,39 @@ export const CardContent = (props: {
 
           <AttachedCardSection entityID={props.entityID} />
         </div>
+
+        {/* sticky "comments" tab */}
+        <div className="sticky -bottom-4 z-10 -mx-3 mt-16 md:-mx-4">
+          <div className="flex items-end">
+            <div className="w-4 grow border border-transparent border-b-grey-90" />
+
+            <button
+              className="w-fit shrink-0 rounded-t-md border border-grey-90 border-b-white bg-white p-2 text-sm text-grey-55"
+              onClick={() =>
+                document
+                  .getElementById("card-comments")
+                  ?.scrollIntoView({ behavior: "smooth", block: "end" })
+              }
+            >
+              comments
+            </button>
+            <div className="w-full grow border border-transparent border-b-grey-90" />
+          </div>
+          <div className="h-6 rounded-lg bg-white" />
+        </div>
       </div>
       {/* END CARD CONTENT */}
 
       {/* START CARD DISCUSSION */}
-      <div className="cardDiscussionWrapper">
-        {/* sticky "comments" tab */}
-        <div className="sticky -top-4 z-10 -mx-4 mb-4 border-b border-grey-90 bg-white px-4 pt-4">
-          <div className="z-20 -mb-[1px] w-fit rounded-t-md border border-grey-90 border-b-white bg-white p-2 text-sm text-grey-55">
-            comments
-          </div>
-        </div>
-
-        <Discussion entityID={props.entityID} allowReact isRoom={false} />
-      </div>
+      <Discussion entityID={props.entityID} allowReact isRoom={false} />
     </>
   );
 };
 
 const Title = (props: { entityID: string }) => {
   let { authorized } = useMutations();
-  let memberName = useIndex.eav(props.entityID, "member/name");
-  let cardTitle = useIndex.eav(props.entityID, "card/title");
+  let memberName = db.useEntity(props.entityID, "member/name");
+  let cardTitle = db.useEntity(props.entityID, "card/title");
   let titleFact = memberName || cardTitle;
   return (
     <SingleTextSection
@@ -271,8 +297,8 @@ const Title = (props: { entityID: string }) => {
       className="bg-inherit text-xl font-bold"
       onKeyDown={(e) => {
         if (e.key === "Enter") {
-          let className = `${props.entityID}-default-text-section}`;
-          let element = document.getElementById(className);
+          e.preventDefault();
+          let element = document.getElementById("default-text-section");
           element?.focus();
         }
       }}
@@ -289,29 +315,31 @@ const CardMoreOptionsMenu = (props: {
   referenceFactID?: string;
   onDelete?: () => void;
 }) => {
-  let { authorized, mutate, action } = useMutations();
-  let memberName = useIndex.eav(props.entityID, "member/name");
+  let { authorized } = useMutations();
+  let memberName = db.useEntity(props.entityID, "member/name");
   let [areYouSureCardDeletionModalOpen, setAreYouSureCardDeletionModalOpen] =
     useState(false);
+  if (!!memberName) return null;
+  if (!authorized) return null;
 
-  let { query: q } = useRouter();
-
-  return !authorized || !!memberName ? null : (
+  return (
     <Menu as="div" className="pointer-events-auto relative">
       <Menu.Button className={` pt-[6px]`}>
         <MoreOptionsTiny />
       </Menu.Button>
       <MenuContainer>
-        <MenuItem
-          onClick={() => {
-            setAreYouSureCardDeletionModalOpen(true);
-          }}
-        >
-          <p className="font-bold text-accent-red">Delete Card</p>
-          <div className="text-accent-red">
-            <Delete />
-          </div>
-        </MenuItem>
+        {authorized && (
+          <MenuItem
+            onClick={() => {
+              setAreYouSureCardDeletionModalOpen(true);
+            }}
+          >
+            <p className="font-bold text-accent-red">Delete Card</p>
+            <div className="text-accent-red">
+              <Delete />
+            </div>
+          </MenuItem>
+        )}
       </MenuContainer>
       <AreYouSureCardDeletionModal
         open={areYouSureCardDeletionModalOpen}
@@ -385,16 +413,20 @@ const ScheduledDate = (props: {
 
   let date = useMemo(() => {
     if (!props.date) return null;
-    let dateParts = Intl.DateTimeFormat("en", {
-      timeZone: "UTC",
-      month: "short",
-      year: "numeric",
-      day: "numeric",
-    }).formatToParts(new Date(props.date.value.value));
-    let month = dateParts.find((f) => f.type === "month")?.value;
-    let day = dateParts.find((f) => f.type === "day")?.value;
-    let year = dateParts.find((f) => f.type === "year")?.value;
-    return { month, day, year };
+    try {
+      let dateParts = Intl.DateTimeFormat("en", {
+        timeZone: "UTC",
+        month: "short",
+        year: "numeric",
+        day: "numeric",
+      }).formatToParts(new Date(props.date.value.value));
+      let month = dateParts.find((f) => f.type === "month")?.value;
+      let day = dateParts.find((f) => f.type === "day")?.value;
+      let year = dateParts.find((f) => f.type === "year")?.value;
+      return { month, day, year };
+    } catch (e) {
+      return null;
+    }
   }, [props.date]);
 
   if (!props.dateEditing && !date) return null;
@@ -402,13 +434,14 @@ const ScheduledDate = (props: {
   return (
     <div
       id="card-date"
-      className="flex place-items-center gap-2  text-sm italic text-grey-55"
+      className="flex place-items-center gap-2 text-sm italic text-grey-55"
     >
       Scheduled for{" "}
       {props.dateEditing ? (
         <>
           <input
-            className="-ml-1 border-grey-80 py-[2px] px-1 text-grey-55 "
+            className="-ml-1 border-grey-80 py-[2px] px-1 text-grey-55"
+            onBlur={() => props.closeDateEditing()}
             onChange={(e) => {
               setDateInputValue(e.currentTarget.value);
               mutate("assertFact", {
@@ -421,7 +454,6 @@ const ScheduledDate = (props: {
                 },
                 positions: {},
               });
-              props.closeDateEditing();
             }}
             value={dateInputValue}
             type="date"
@@ -430,7 +462,7 @@ const ScheduledDate = (props: {
           <div className="h-6 w-[2px] border-l border-grey-55" />
 
           <button
-            className=" justify-self-center text-sm text-grey-55 hover:text-accent-blue"
+            className="justify-self-center text-sm text-grey-55 hover:text-accent-blue"
             onClick={() => {
               if (props.date) {
                 mutate("retractFact", { id: props.date.id });
@@ -501,9 +533,9 @@ export const SectionAdder = (props: {
   setDateEditing: () => void;
 }) => {
   let { authorized, mutate } = useMutations();
-  let image = useIndex.eav(props.entityID, "card/image");
-  let attachedCards = useIndex.eav(props.entityID, "deck/contains");
-  let date = useIndex.eav(props.entityID, "card/date");
+  let image = db.useEntity(props.entityID, "card/image");
+  let attachedCards = db.useEntity(props.entityID, "deck/contains");
+  let date = db.useEntity(props.entityID, "card/date");
   let reactions = useReactions(props.entityID);
 
   let [reactionPickerOpen, setReactionPickerOpen] = useState(false);
@@ -515,7 +547,7 @@ export const SectionAdder = (props: {
 
   if (!authorized) return null;
   return (
-    <div className="pointer-events-auto flex w-fit items-center gap-1 rounded-full border border-grey-90 bg-white  py-2 px-4 text-grey-55 shadow">
+    <div className="pointer-events-auto flex w-fit items-center gap-1 rounded-full border border-grey-90 bg-white py-2 px-4 text-grey-55 shadow">
       {/* IMAGE ADDER */}
       <MakeImage entity={props.entityID}>
         <div className={`${image ? toggledOnStyle : toggledOffStyle} `}>
@@ -598,7 +630,7 @@ export const SectionAdder = (props: {
           <Popover.Content
             sideOffset={16}
             collisionPadding={{ right: 20 }}
-            className="-mt-[1px] max-w-[320px]"
+            className="-mt-[1px] max-w-[298px]"
           >
             <AddReaction
               entityID={props.entityID}
@@ -608,11 +640,6 @@ export const SectionAdder = (props: {
                   ?.scrollIntoView({ block: "center", behavior: "smooth" })
               }
             />
-            {/* <Popover.Arrow
-              width={16}
-              height={8}
-              className="-z-10 fill-white stroke-grey-80 stroke-2"
-            /> */}
           </Popover.Content>
         </Popover.Portal>
       </Popover.Root>

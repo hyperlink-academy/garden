@@ -3,8 +3,7 @@ import { makeRoute } from "backend/lib/api";
 import { z } from "zod";
 import { space_input } from "./create_space";
 import { authTokenVerifier, verifyIdentity } from "backend/lib/auth";
-import { createClient } from "@supabase/supabase-js";
-import { Database } from "backend/lib/database.types";
+import { createClient } from "backend/lib/supabase";
 
 export const update_self_route = makeRoute({
   route: "update_self",
@@ -13,10 +12,7 @@ export const update_self_route = makeRoute({
     data: space_input,
   }),
   handler: async (msg, env: Env) => {
-    const supabase = createClient<Database>(
-      env.env.SUPABASE_URL,
-      env.env.SUPABASE_API_TOKEN
-    );
+    const supabase = createClient(env.env);
     let session = await verifyIdentity(env.env, msg.authToken);
     if (!session)
       return {

@@ -120,10 +120,13 @@ export function FactWithIndexes<A extends keyof Attribute>(f: Fact<A>) {
     at?: string;
     ave?: string;
     vae?: string;
+    feed?: string;
   } = {
     eav: `${f.entity}-${f.attribute}-${f.id}`,
     aev: `${f.attribute}-${f.entity}-${f.id}`,
   };
+  if (f.schema.type === "feed_post")
+    indexes.feed = `${f.attribute}-${f.value}-${f.id}`;
   if (f.schema.unique) indexes.ave = `${f.attribute}-${f.value}`;
   if (f.schema.type === "reference")
     indexes.vae = `${(f.value as ReferenceType).value}-${f.attribute}`;
@@ -329,8 +332,8 @@ export const makeReplicache = (args: {
   return rep;
 };
 
-export const useIndex = {
-  at<
+export const db = {
+  useTimeAttribute<
     A extends keyof FilterAttributes<{
       type: "timestamp";
       unique: any;
@@ -354,7 +357,7 @@ export const useIndex = {
       "at" + attribute + start
     );
   },
-  eav<A extends keyof Attribute>(
+  useEntity<A extends keyof Attribute>(
     entity: string | null,
     attribute: A
   ): CardinalityResult<A> | null {
@@ -369,7 +372,7 @@ export const useIndex = {
       "eav" + entity + attribute
     );
   },
-  ave<A extends keyof UniqueAttributes>(
+  useUniqueAttribute<A extends keyof UniqueAttributes>(
     attribute: A,
     value: string | undefined
   ) {
@@ -383,7 +386,10 @@ export const useIndex = {
       "ave" + attribute + value
     );
   },
-  aev<A extends keyof Attribute>(attribute: A | null, entity?: string) {
+  useAttribute<A extends keyof Attribute>(
+    attribute: A | null,
+    entity?: string
+  ) {
     return useSubscribe(
       async (tx) => {
         if (!attribute) return [];
@@ -401,7 +407,10 @@ export const useIndex = {
       "aev" + attribute + entity
     );
   },
-  vae<A extends keyof ReferenceAttributes>(entity: string, attribute?: A) {
+  useReference<A extends keyof ReferenceAttributes>(
+    entity: string,
+    attribute?: A
+  ) {
     return useSubscribe(
       async (tx) => {
         let results = await tx
@@ -418,7 +427,7 @@ export const useIndex = {
       "vae" + entity + attribute
     );
   },
-  messages(topic: string) {
+  useMessages(topic: string) {
     return useSubscribe(
       async (tx) => {
         let messages = await tx
@@ -432,7 +441,7 @@ export const useIndex = {
       topic
     );
   },
-  messageByID(id: string | null) {
+  useMessageByID(id: string | null) {
     return useSubscribe(
       async (tx) => {
         if (!id) return null;

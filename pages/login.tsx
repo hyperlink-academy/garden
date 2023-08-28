@@ -46,7 +46,7 @@ export function LoginForm(props: {
   };
   return (
     <div className="grid-auto-rows mx-auto grid max-w-md gap-8">
-      <h1>Hi, Welcome Back!</h1>
+      <h1>Hi, welcome back!</h1>
       <form className="grid w-full gap-4" onSubmit={onSubmit}>
         {status !== "incorrect" ? null : (
           <div className="text-accent-red">

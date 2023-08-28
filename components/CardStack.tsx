@@ -4,7 +4,7 @@ import {
   ReplicacheContext,
   ReplicacheMutators,
   scanIndex,
-  useIndex,
+  db,
   useMutations,
 } from "hooks/useReplicache";
 import { FindOrCreate, useAllItems } from "./FindOrCreateEntity";
@@ -24,7 +24,11 @@ export type StackData = {
 };
 
 export const CardAdder = (
-  props: { openOnAdd?: boolean | undefined; addToEnd?: boolean } & StackData
+  props: {
+    openOnAdd?: boolean | undefined;
+    addToEnd?: boolean;
+    onAdd?: (entityID: string) => void;
+  } & StackData
 ) => {
   let { authorized, mutate, memberEntity, action } = useMutations();
   let rep = useContext(ReplicacheContext);
@@ -34,7 +38,7 @@ export const CardAdder = (
     return null;
   } else
     return (
-      <div className="justify-left flex w-full shrink-0 items-center gap-2 rounded-lg border  border-dashed border-grey-80 px-2 py-1 text-sm text-grey-55 group-hover:border-accent-blue">
+      <div className="justify-left flex w-full shrink-0 items-center gap-2 rounded-lg border border-dashed border-grey-80 px-2 py-1 text-sm text-grey-55 group-hover:border-accent-blue">
         <button
           className="group grow text-left font-bold hover:text-accent-blue"
           onClick={async () => {
@@ -54,13 +58,14 @@ export const CardAdder = (
             } else {
               create(entity, props, rep.rep, mutate);
             }
+            props.onAdd?.(entity);
 
             action.end();
           }}
         >
           <p>create new</p>
         </button>
-        <div className=" h-4 w-[1px] border-l border-dashed text-grey-80" />
+        <div className="h-4 w-[1px] border-l border-dashed text-grey-80" />
         <AddExistingCard
           onAdd={(entity, d) => {
             if (props.openOnAdd) {
@@ -74,6 +79,7 @@ export const CardAdder = (
                     : undefined,
               });
             } else null;
+            props.onAdd?.(entity);
           }}
           addToEnd={props.addToEnd}
           parentID={props.parentID}
@@ -109,7 +115,7 @@ export const AddExistingCard = (
   });
   let items = useAllItems(open);
 
-  const alreadyInEAV = useIndex.eav(props.parentID, props.attribute);
+  const alreadyInEAV = db.useEntity(props.parentID, props.attribute);
 
   let rep = useContext(ReplicacheContext);
   let { authorized, mutate, memberEntity, action } = useMutations();

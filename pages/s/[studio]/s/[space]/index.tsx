@@ -1,5 +1,5 @@
 import { CardViewer } from "components/CardViewerContext";
-import { useIndex, useSpaceID } from "hooks/useReplicache";
+import { db, useSpaceID } from "hooks/useReplicache";
 import { SmallCardDragContext } from "components/DragContext";
 import { Sidebar } from "components/SpaceLayout";
 import { useEffect } from "react";
@@ -8,12 +8,15 @@ import { sortByPosition } from "src/position_helpers";
 import { useUndoableState } from "hooks/useUndoableState";
 import { Room } from "components/Room";
 import { SpaceMetaTitle } from "components/SpaceMetaTitle";
+import type { ServiceWorkerMessages } from "worker";
+import { publishAppEvent } from "hooks/useEvents";
+import { useRouter } from "next/router";
 
 export default function SpacePage() {
   // get first room = your room
   // OR if viewing anon, get first room based on room id
-  let firstRoomByID = useIndex
-    .aev("room/name")
+  let firstRoomByID = db
+    .useAttribute("room/name")
     .sort(sortByPosition("roomList"))[0]?.entity;
   let firstRoom = firstRoomByID;
 
@@ -21,6 +24,7 @@ export default function SpacePage() {
   let [r, setRoom, setRoomWithoutHistory] = useUndoableState<string | null>(
     null
   );
+
   useEffect(() => {
     if (!spaceID) return;
     let room = window.localStorage.getItem(`space/${spaceID}/room`);
@@ -50,9 +54,9 @@ export default function SpacePage() {
             {width > 960 ? (
               <div
                 className="contentLargeSplitLayout no-scrollbar flex w-full flex-row items-stretch gap-4 overflow-x-scroll sm:justify-center sm:gap-4"
-                // you need to add this to the contentSplitLayout class if you are going to scroll across more than 2 panes
-                // it prevents the last pane from sticking to the end
-                // after:content-[""] after:h-full after:w-2 after:block after:shrink-0
+              // you need to add this to the contentSplitLayout class if you are going to scroll across more than 2 panes
+              // it prevents the last pane from sticking to the end
+              // after:content-[""] after:h-full after:w-2 after:block after:shrink-0
               >
                 <div className="roomWrapper flex flex-row rounded-md border border-grey-90">
                   <Sidebar

@@ -13,9 +13,10 @@
       "type": "image/png"
     }
   ],
+  "scope":"https://hyperlink.academy",
   "theme_color": "#fffaf0",
   "background_color": "#fffaf0",
-  "display": "fullscreen",
+  "display": "standalone",
   "orientation": "portrait",
   "start_url": "/pwa?fullscreen=true"
 }

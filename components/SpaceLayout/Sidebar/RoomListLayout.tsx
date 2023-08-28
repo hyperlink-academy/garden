@@ -2,8 +2,6 @@ import { ButtonPrimary, ButtonTertiary } from "components/Buttons";
 import { Modal, Divider } from "components/Layout";
 import { Fact } from "data/Facts";
 import {
-  CollectionList as CollectionListIcon,
-  CollectionPreview as CollectionPreviewIcon,
   Delete,
   RoomCalendar,
   RoomCanvas,
@@ -15,7 +13,7 @@ import {
 import {
   ReplicacheContext,
   scanIndex,
-  useIndex,
+  db,
   useMutations,
 } from "hooks/useReplicache";
 import { useState, useEffect, useContext } from "react";
@@ -37,8 +35,8 @@ export const EditRoomModal = (props: {
 }) => {
   let currentRoomName: Fact<"room/name"> | Fact<"member/name"> | null = null;
   let isMember = false;
-  let sharedRoomName = useIndex.eav(props.currentRoom, "room/name");
-  let memberRoomName = useIndex.eav(props.currentRoom, "member/name");
+  let sharedRoomName = db.useEntity(props.currentRoom, "room/name");
+  let memberRoomName = db.useEntity(props.currentRoom, "member/name");
 
   if (memberRoomName) {
     currentRoomName = memberRoomName;
@@ -46,9 +44,7 @@ export const EditRoomModal = (props: {
   } else currentRoomName = sharedRoomName;
 
   let currentRoomDescription: Fact<"room/description"> | null = null;
-  currentRoomDescription = useIndex.eav(props.currentRoom, "room/description");
-
-  let roomType = useIndex.eav(props.currentRoom, "room/type");
+  currentRoomDescription = db.useEntity(props.currentRoom, "room/description");
 
   let { mutate } = useMutations();
   let [nameState, setNameState] = useState(currentRoomName?.value || "");
@@ -57,16 +53,6 @@ export const EditRoomModal = (props: {
   );
   let [areYouSureRoomDeletionModalOpen, setAreYouSureRoomDeletionModalOpen] =
     useState(false);
-  let currentCollectionType = useIndex.eav(
-    props.currentRoom,
-    "collection/type"
-  );
-  let [collectionType, setCollectionType] = useState(
-    currentCollectionType?.value
-  );
-  useEffect(() => {
-    setCollectionType(currentCollectionType?.value);
-  }, [currentCollectionType?.value]);
 
   useEffect(() => {
     setNameState(currentRoomName?.value || "");
@@ -111,13 +97,7 @@ export const EditRoomModal = (props: {
                 }}
               />
             </div>
-            {roomType?.value === "collection" && (
-              <CollectionType
-                collectionType={collectionType}
-                setCollectionType={setCollectionType}
-                entityID={entityID}
-              />
-            )}
+
             <ButtonPrimary
               content="Edit Room"
               onClick={async () => {
@@ -132,13 +112,6 @@ export const EditRoomModal = (props: {
                   data: {
                     value: nameState,
                   },
-                });
-                await mutate("assertFact", {
-                  entity: props.currentRoom,
-                  factID: ulid(),
-                  attribute: "collection/type",
-                  value: collectionType || "list",
-                  positions: {},
                 });
                 await mutate("assertFact", {
                   entity: props.currentRoom,
@@ -224,43 +197,6 @@ const AreYouSureRoomDeletionModal = (props: {
   );
 };
 
-const CollectionType = (props: {
-  entityID: string;
-  setCollectionType: (
-    value: Fact<"collection/type">["value"] | undefined
-  ) => void;
-  collectionType: Fact<"collection/type">["value"] | undefined;
-}) => {
-  let type = props.collectionType || "list";
-
-  const onClick = (value: Fact<"collection/type">["value"]) => () => {
-    props.setCollectionType(value);
-  };
-  const className = (typeName: Fact<"collection/type">["value"]) =>
-    `p-0.5 text-grey-55 ${
-      type === typeName
-        ? "rounded-md border border-grey-55"
-        : "border border-transparent"
-    }`;
-
-  return (
-    <div className="collectionTypeSelector flex flex-row gap-0.5 place-self-start">
-      <button
-        className={`${className("list")} shrink-0`}
-        onClick={onClick("list")}
-      >
-        <CollectionListIcon />
-      </button>
-      <button
-        className={`${className("cardpreview")} shrink-0`}
-        onClick={onClick("cardpreview")}
-      >
-        <CollectionPreviewIcon />
-      </button>
-    </div>
-  );
-};
-
 export const RoomListItem = (props: {
   onRoomChange: (room: string) => void;
   children: React.ReactNode;
@@ -269,8 +205,8 @@ export const RoomListItem = (props: {
   setRoomEditOpen?: () => void;
 }) => {
   let { memberEntity, authorized } = useMutations();
-  let isMember = !!useIndex.eav(props.roomEntity, "member/name");
-  let roomType = useIndex.eav(props.roomEntity, "room/type");
+  let isMember = !!db.useEntity(props.roomEntity, "member/name");
+  let roomType = db.useEntity(props.roomEntity, "room/type");
 
   let rep = useContext(ReplicacheContext);
   let unreadCount = useSubscribe(
@@ -345,7 +281,7 @@ export const RoomListItem = (props: {
         </div>
         <div className="roomListItemUnreads grow">{props.children}</div>
         {unreadCount && (
-          <div className="unreadCount mt-[6px] ml-1 h-[12px] w-[12px] shrink-0 rounded-full border  border-white bg-accent-gold"></div>
+          <div className="unreadCount mt-[6px] ml-1 h-[12px] w-[12px] shrink-0 rounded-full border border-white bg-accent-gold"></div>
         )}
       </button>
     </div>
@@ -427,7 +363,7 @@ export const DraggableRoomListItem = (props: {
 };
 
 export const RoomListPreview = (props: { entityID: string }) => {
-  let name = useIndex.eav(props.entityID, "room/name");
+  let name = db.useEntity(props.entityID, "room/name");
   return (
     <RoomListItem
       roomEntity={props.entityID}

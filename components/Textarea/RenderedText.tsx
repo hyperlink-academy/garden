@@ -42,7 +42,9 @@ export const RenderedText = forwardRef<
     openLink,
   };
   return (
-    <Linkify options={{ className: "text-accent-blue underline" }}>
+    <Linkify
+      options={{ className: "text-accent-blue underline", target: "_blank" }}
+    >
       <pre
         role="link"
         ref={ref}
@@ -57,29 +59,38 @@ export const RenderedText = forwardRef<
           // One day we should do proper parsing but for now a line-based approach works
           // great
           props.text.split("\n").map((t, key) => {
-            if (t.startsWith("##"))
+            // headers (h1 and h2)
+            if (t.startsWith("# "))
               return (
-                <p className="font-bold text-grey-35" key={key}>
+                <span className="font-bold underline decoration-2" key={key}>
                   {parseLine(t, parseConfig)}
-                </p>
+                </span>
               );
-            if (t.startsWith("#"))
+            if (t.startsWith("## "))
               return (
-                <p className="font-bold underline decoration-2 " key={key}>
+                <span className="font-bold text-grey-35" key={key}>
                   {parseLine(t, parseConfig)}
-                </p>
+                </span>
               );
+            // blockquote
+            if (t.startsWith("> "))
+              return (
+                <span className="text-grey-35" key={key}>
+                  {parseLine(t, parseConfig)}
+                </span>
+              );
+            // numbered list
             if (t.match(/^[0-9]+\./)) {
               let [num, ...rest] = t.split(" ");
               return (
-                <p className="" key={key}>
+                <span className="" key={key}>
                   <strong>{num}</strong>{" "}
                   {parseLine(rest.join(" "), parseConfig)}
-                </p>
+                </span>
               );
             }
 
-            return <p key={key}>{parseLine(t, parseConfig)}</p>;
+            return <span key={key}>{parseLine(t, parseConfig)}</span>;
           })
         ) : (
           <span className="block w-full italic !text-grey-80">

@@ -1,6 +1,6 @@
-import { createClient } from "@supabase/supabase-js";
 import { Bindings } from "backend";
 import z from "zod";
+import { createClient } from "./supabase";
 export type authToken = z.infer<typeof authTokenVerifier>;
 
 export const authTokenVerifier = z.object({
@@ -9,7 +9,7 @@ export const authTokenVerifier = z.object({
 });
 
 export const verifyIdentity = async (env: Bindings, token: authToken) => {
-  const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_API_TOKEN);
+  const supabase = createClient(env);
   let { data: session } = await supabase.auth.setSession(token);
   if (
     session.user?.user_metadata.studio &&

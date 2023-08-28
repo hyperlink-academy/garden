@@ -1,4 +1,4 @@
-import { useIndex } from "hooks/useReplicache";
+import { db } from "hooks/useReplicache";
 import { useState } from "react";
 import { CardPreview, CardPreviewWithData } from "./CardPreview";
 import { CardSmall, RoomSearch } from "./Icons";
@@ -8,7 +8,7 @@ export const SearchRoom = () => {
   let items = useAllItems(true);
   let [searchInput, setSearchInput] = useState("");
   return (
-    <div className="no-scrollbar relative m-2 flex h-full w-[336px] flex-col items-stretch gap-3 overflow-y-scroll text-sm sm:m-4">
+    <div className="no-scrollbar flex h-full w-[336px] flex-col items-stretch overflow-x-hidden overflow-y-scroll p-2 text-sm sm:p-4 ">
       <div className="flex gap-2 rounded-md border border-grey-35 bg-white">
         <input
           value={searchInput}
@@ -45,7 +45,7 @@ export const SearchRoom = () => {
 };
 
 export const useAllItems = (open: boolean) => {
-  let titles = useIndex.aev(open ? "card/title" : null);
+  let titles = db.useAttribute(open ? "card/title" : null);
   return titles
     .map((t) => {
       return {

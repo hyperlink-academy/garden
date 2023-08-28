@@ -1,17 +1,17 @@
 import { useReactions } from "./useReactions";
-import { useIndex } from "./useReplicache";
+import { db } from "./useReplicache";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export type CardPreviewData = ReturnType<typeof useCardPreviewData>;
 export const useCardPreviewData = (entityID: string) => {
-  let isMember = !!useIndex.eav(entityID, "member/name");
+  let isMember = !!db.useEntity(entityID, "member/name");
 
   let reactions = useReactions(entityID);
-  let member = useIndex.eav(entityID, "member/name");
-  let title = useIndex.eav(entityID, "card/title");
-  let content = useIndex.eav(entityID, "card/content");
-  let image = useIndex.eav(entityID, "card/image");
-  let date = useIndex.eav(entityID, "card/date");
+  let member = db.useEntity(entityID, "member/name");
+  let title = db.useEntity(entityID, "card/title");
+  let content = db.useEntity(entityID, "card/content");
+  let image = db.useEntity(entityID, "card/image");
+  let date = db.useEntity(entityID, "card/date");
 
   let imageUrl = !image
     ? undefined

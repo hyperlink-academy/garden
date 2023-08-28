@@ -2,8 +2,7 @@ import { z } from "zod";
 import { Bindings } from "backend";
 import { internalSpaceAPI, makeRoute } from "backend/lib/api";
 import { app_event } from "backend/lib/analytics";
-import { createClient } from "@supabase/supabase-js";
-import { Database } from "backend/lib/database.types";
+import { createClient } from "backend/lib/supabase";
 
 export const SignupRoute = makeRoute({
   route: "signup",
@@ -13,27 +12,20 @@ export const SignupRoute = makeRoute({
   }),
   handler: async (msg, env: Bindings) => {
     let storage: { [k: string]: any } = {};
-    const admin_supabase = createClient<Database>(
-      env.SUPABASE_URL,
-      env.SUPABASE_API_TOKEN
-    );
-    const user_supabase = createClient<Database>(
-      env.SUPABASE_URL,
-      env.SUPABASE_API_TOKEN,
-      {
-        auth: {
-          storage: {
-            getItem: (key) => storage[key],
-            setItem: (key, value) => {
-              storage[key] = value;
-            },
-            removeItem: (key) => {
-              delete storage[key];
-            },
+    const admin_supabase = createClient(env);
+    const user_supabase = createClient(env, {
+      auth: {
+        storage: {
+          getItem: (key) => storage[key],
+          setItem: (key, value) => {
+            storage[key] = value;
+          },
+          removeItem: (key) => {
+            delete storage[key];
           },
         },
-      }
-    );
+      },
+    });
     let { data: session } = await user_supabase.auth.setSession(msg.tokens);
     if (!session?.user) return { data: { success: false } } as const;
 

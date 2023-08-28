@@ -1,16 +1,12 @@
-import { createClient } from "@supabase/supabase-js";
 import { Bindings } from "backend";
 import { makeRoute } from "backend/lib/api";
-import { Database } from "backend/lib/database.types";
+import { createClient } from "backend/lib/supabase";
 import { z } from "zod";
 export const get_space_route = makeRoute({
   route: "get_space",
   input: z.object({ space: z.string(), studio: z.string() }),
   handler: async (msg, env: Bindings) => {
-    const supabase = createClient<Database>(
-      env.SUPABASE_URL,
-      env.SUPABASE_API_TOKEN
-    );
+    const supabase = createClient(env);
 
     let { data } = await supabase
       .from("space_data")

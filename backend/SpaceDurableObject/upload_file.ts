@@ -1,7 +1,6 @@
 import { Env } from ".";
 import { verifyIdentity } from "backend/lib/auth";
-import { createClient } from "@supabase/supabase-js";
-import { Database } from "backend/lib/database.types";
+import { createClient } from "backend/lib/supabase";
 
 async function computeHash(data: ArrayBuffer): Promise<string> {
   const buf = await crypto.subtle.digest("SHA-256", data);
@@ -25,10 +24,7 @@ export const handleFileUpload = async (req: Request, env: Env) => {
   let access_token = req.headers.get("X-Authorization-Access-Token");
   let refresh_token = req.headers.get("X-Authorization-Refresh-Token");
 
-  const supabase = createClient<Database>(
-    env.env.SUPABASE_URL,
-    env.env.SUPABASE_API_TOKEN
-  );
+  const supabase = createClient(env.env);
   if (!access_token || !refresh_token)
     return new Response(
       JSON.stringify({

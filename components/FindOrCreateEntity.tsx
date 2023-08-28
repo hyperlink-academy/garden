@@ -1,5 +1,5 @@
 import { Combobox, Dialog, Transition } from "@headlessui/react";
-import { useIndex } from "hooks/useReplicache";
+import { db } from "hooks/useReplicache";
 import { useRef, useState } from "react";
 import { boolean } from "zod";
 import { ButtonPrimary } from "./Buttons";
@@ -144,26 +144,26 @@ export const FindOrCreate = (props: {
               {/* if isMultiselect = true, take all the stuff in the added[] and display it at the top, with a submit button. If not, show nothing! */}
               {isMultiSelect.current === false ? (
                 <div className="mx-3 mt-2 mb-2">
-                  <small className="hidden italic text-grey-55 sm:block">
+                  <span className="hidden text-sm italic text-grey-55 sm:block">
                     SHIFT + click to select multiple cards!
-                  </small>
-                  <small className="italic text-grey-55  sm:hidden ">
+                  </span>
+                  <span className="text-sm italic text-grey-55 sm:hidden">
                     longpress to select multiple cards!
-                  </small>
+                  </span>
                 </div>
               ) : (
                 <div className="addedList mx-3 mt-2 mb-3 flex flex-col gap-2">
                   {addedItemsList === false ? null : (
                     <ul className="lightBorder no-scrollbar flex flex-col gap-2 bg-bg-blue p-3">
                       {added.length === 0 ? (
-                        <div className="italic text-grey-55 ">
+                        <div className="italic text-grey-55">
                           no cards selected yet!
                         </div>
                       ) : (
                         added.map((addedItem, index) => (
                           <li
                             key={index}
-                            className="addedListItem grid grid-cols-[max-content_auto_max-content] gap-2 "
+                            className="addedListItem grid grid-cols-[max-content_auto_max-content] gap-2"
                           >
                             <div className="pt-[1px]">
                               {addedItem.type === "create" ? (
@@ -310,7 +310,7 @@ const CreateButton = (props: {
   };
 
   return (
-    <div className="flex flex-row ">
+    <div className="flex flex-row">
       <Combobox.Option
         key={"create"}
         value={value}
@@ -388,7 +388,7 @@ const SearchResult = (
             <div
               className={`searchResult grid select-none grid-cols-[min-content_auto_min-content] gap-2 ${
                 props.disabled
-                  ? " cursor-default text-grey-80"
+                  ? "cursor-default text-grey-80"
                   : "cursor-pointer"
               }`}
             >
@@ -446,10 +446,10 @@ const SearchItem: React.FC<
 };
 
 export const useAllItems = (open: boolean) => {
-  let titles = useIndex
-    .aev(open ? "card/title" : null)
+  let titles = db
+    .useAttribute(open ? "card/title" : null)
     .filter((f) => !!f.value);
-  let members = useIndex.aev("member/name");
+  let members = db.useAttribute("member/name");
   return titles
     .map((t) => {
       return {

@@ -3,12 +3,15 @@ import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
 import { Member } from "components/Icons";
 import { BaseSmallCard } from "components/CardPreview/SmallCard";
 import { useAuth } from "hooks/useAuth";
-import { useIndex, useSpaceID } from "hooks/useReplicache";
+import { db, useSpaceID } from "hooks/useReplicache";
 import { useRouter } from "next/router";
 import { SVGProps, useState } from "react";
 import { LogInModal, SignupModal } from "components/LoginModal";
 import Head from "next/head";
 import { useSpaceData } from "hooks/useSpaceData";
+import Link from "next/link";
+import { SpaceCard, SpaceData } from "components/SpacesList";
+import { Divider } from "components/Layout";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export default function JoinSpacePage() {
@@ -19,7 +22,7 @@ export function JoinSpace() {
   let { session, authToken } = useAuth();
   let router = useRouter();
   let code = router.query.code as string | undefined;
-  let isMember = useIndex.ave("space/member", session.session?.studio);
+  let isMember = db.useUniqueAttribute("space/member", session.session?.studio);
   let { data } = useSpaceData(id);
 
   let [state, setState] = useState<"normal" | "signup" | "login">("normal");
@@ -29,93 +32,101 @@ export function JoinSpace() {
     let data = await spaceAPI(`${WORKER_URL}/space/${id}`, "join", {
       authToken,
       code,
-      studio: router.query.studio as string,
     });
     if (data.success) {
       router.push(`/s/${router.query.studio}/s/${router.query.space}`);
     }
   };
+
   if (isMember)
     router.push(`/s/${router.query.studio}/s/${router.query.space}`);
 
-  if (session.loggedIn) {
-    return (
-      <>
-        <Head>
-          <title key="title">{data?.display_name}: you&apos;re invited!</title>
-        </Head>
-
-        <div className="mx-auto flex max-w-3xl flex-col place-items-center gap-6 p-8">
-          <div className="flex flex-col gap-2 text-center ">
-            <h2>You&apos;ve been invited to {data?.display_name}</h2>
-            <p>A new membership card is waiting for you!</p>
-          </div>
-          <div className="relative">
-            <div className="mb-2 p-4">
-              <div
-                className={`memberCardBorder relative h-[94px] w-[160px] grow`}
-              >
-                <BaseSmallCard
-                  isMember
-                  memberName={session.session?.username}
-                  content=""
-                />
-              </div>
-            </div>
-            <div className="absolute top-0 -left-2">
-              <WelcomeSparkle />
-            </div>
-          </div>
-          <ButtonPrimary
-            content="Become a Member!"
-            icon={<Member />}
-            onClick={onClick}
-          />
-        </div>
-      </>
-    );
-  }
   return (
     <>
       <Head>
         <title key="title">{data?.display_name}: you&apos;re invited!</title>
       </Head>
 
-      <div className="mx-auto flex max-w-3xl flex-col place-items-center gap-6 p-8">
-        <div className="flex flex-col gap-2 text-center ">
-          <h2>You&apos;ve been invited to {data?.display_name}</h2>
-        </div>
-        <div className="display flex flex-row gap-2">
-          <ButtonPrimary
-            content="Log In"
-            onClick={() => setState("login")}
-            className="justify-self-center"
-          />
-          <ButtonSecondary
-            content="Sign up"
-            onClick={() => setState("signup")}
-            className="justify-self-center"
-          />
-        </div>
-        <LogInModal
-          isOpen={state === "login"}
-          onClose={() => setState("normal")}
-        />
-        <SignupModal
-          redirectTo={`/s/${router.query.studio}/s/${router.query.space}/${data?.display_name}/join?code=${router.query.code}`}
-          isOpen={state === "signup"}
-          onClose={() => setState("normal")}
-        />
-        <p className="text-center">
-          We&apos;re still in early alpha! If you&apos;d have any questions,
-          email us at{" "}
-          <a
-            href="mailto:contact@hyperlink.academy"
-            className="text-accent-blue"
-          >
-            contact@hyperlink.academy
-          </a>{" "}
+      <div className="mx-auto flex max-w-3xl flex-col place-items-center gap-6 py-8 px-4">
+        <h2>Welcome!</h2>
+        <p className="text-center text-lg">
+          You&apos;ve been invited to join a{" "}
+          <strong>
+            Space<sup className="text-grey-55">†</sup>
+          </strong>
+          :{" "}
         </p>
+        <div className="-mt-4">
+          <SpaceCard small {...(data as SpaceData)} />
+        </div>
+        {session.loggedIn ? (
+          <>
+            <p className="text-center">A membership card is waiting for you!</p>
+            <div className="relative">
+              <div className="mb-2 p-4">
+                <div
+                  className={`memberCardBorder relative h-[94px] w-[160px] grow`}
+                >
+                  <BaseSmallCard
+                    isMember
+                    memberName={session.session?.username}
+                    content=""
+                  />
+                </div>
+              </div>
+              <div className="absolute top-0 -left-2">
+                <WelcomeSparkle />
+              </div>
+            </div>
+            <ButtonPrimary
+              content="Join the Space"
+              icon={<Member />}
+              onClick={onClick}
+            />
+          </>
+        ) : (
+          <>
+            <div className="display flex flex-row gap-2">
+              <ButtonPrimary
+                content="Log In"
+                onClick={() => setState("login")}
+                className="justify-self-center"
+              />
+              <p className="self-center text-sm italic">or</p>
+              <ButtonSecondary
+                content="Sign Up"
+                onClick={() => setState("signup")}
+                className="justify-self-center"
+              />
+            </div>
+            <LogInModal
+              isOpen={state === "login"}
+              onClose={() => setState("normal")}
+            />
+            <SignupModal
+              redirectTo={`/s/${router.query.studio}/s/${router.query.space}/${data?.display_name}/join?code=${router.query.code}`}
+              isOpen={state === "signup"}
+              onClose={() => setState("normal")}
+            />
+          </>
+        )}
+        <div className="flex max-w-sm flex-col gap-4 pt-4 text-center italic">
+          <Divider />
+          <p>
+            <sup className="text-grey-55">†</sup>
+            <strong>Spaces</strong>, on Hyperlink, are collaborative workspaces
+            for doing projects together.
+          </p>
+          <p className="text-center">
+            We&apos;re still in beta! Email if you have any questions:{" "}
+            <a
+              href="mailto:contact@hyperlink.academy"
+              className="text-accent-blue"
+            >
+              contact@hyperlink.academy
+            </a>{" "}
+          </p>
+        </div>
       </div>
     </>
   );

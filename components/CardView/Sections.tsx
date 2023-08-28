@@ -1,6 +1,6 @@
 import { Textarea } from "components/Textarea";
 
-import { useIndex, useMutations } from "hooks/useReplicache";
+import { db, useMutations } from "hooks/useReplicache";
 import { SyntheticEvent, useCallback, useRef, useState } from "react";
 import { FilterAttributes } from "data/Attributes";
 import { useAuth } from "hooks/useAuth";
@@ -9,6 +9,8 @@ import { Autocomplete, useSuggestions } from "components/Autocomplete";
 import { getCoordinatesInTextarea } from "src/getCoordinatesInTextarea";
 import { getLinkAtCursor } from "src/utils";
 import { modifyString, useKeyboardHandling } from "hooks/useKeyboardHandling";
+import { CollectionType } from "components/Room";
+import { sortByPosition } from "src/position_helpers";
 
 export const SingleTextSection = (
   props: {
@@ -25,7 +27,7 @@ export const SingleTextSection = (
     new?: boolean;
   } & JSX.IntrinsicElements["textarea"]
 ) => {
-  let fact = useIndex.eav(props.entityID, props.section);
+  let fact = db.useEntity(props.entityID, props.section);
   let timeout = useRef<null | number>(null);
   let { authorized, mutate, action } = useMutations();
 
@@ -147,7 +149,7 @@ export const SingleTextSection = (
         focused={props.focused}
         previewOnly={props.previewOnly || !authorized}
         placeholder={props.placeholder}
-        className={`w-full bg-inherit ${props.className || ""}`}
+        className={`w-full ${props.className || ""}`}
         spellCheck={false}
         value={(fact?.value as string) || ""}
         onSelect={onSelect}
@@ -227,7 +229,7 @@ export const DateSection = (props: { entityID: string }) => {
   let { session } = useAuth();
   let { mutate, authorized } = useMutations();
 
-  let date = useIndex.eav(props.entityID, "card/date");
+  let date = db.useEntity(props.entityID, "card/date");
   if (!date) return null;
   return (
     <div className="flex gap-2">
@@ -252,15 +254,27 @@ export const DateSection = (props: { entityID: string }) => {
 };
 
 export const AttachedCardSection = (props: { entityID: string }) => {
-  let attachedCards = useIndex.eav(props.entityID, "deck/contains");
+  let attachedCards = db.useEntity(props.entityID, "deck/contains");
+  let currentCollectionType = db.useEntity(props.entityID, "collection/type");
+  let { authorized } = useMutations();
+
   return (
     <>
       {attachedCards && attachedCards.length > 0 && (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-3">
+          <div className="">
+            {authorized && (
+              <CollectionType
+                collectionType={currentCollectionType?.value}
+                entityID={props.entityID}
+              />
+            )}
+          </div>
           <CardCollection
+            editable
             entityID={props.entityID}
             attribute="deck/contains"
-            cards={attachedCards}
+            cards={attachedCards.sort(sortByPosition("eav"))}
           />
         </div>
       )}
