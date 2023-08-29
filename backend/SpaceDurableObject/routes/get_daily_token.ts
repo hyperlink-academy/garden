@@ -77,6 +77,13 @@ export const get_daily_token_route = makeRoute({
       }),
     });
 
-    return { data: { success: true, room, name, token: await token.json() } };
+    return {
+      data: {
+        success: true,
+        room,
+        name,
+        token: (await token.json()) as { token: string },
+      },
+    } as const;
   },
 });
