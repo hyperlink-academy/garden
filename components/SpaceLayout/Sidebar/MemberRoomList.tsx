@@ -6,9 +6,16 @@ import { Modal } from "components/Layout";
 import { useSmoker } from "components/Smoke";
 import { useAuth } from "hooks/useAuth";
 import { db, useMutations, useSpaceID } from "hooks/useReplicache";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { DraggableRoomListItem, RoomListLabel } from "./RoomListLayout";
-import { AddTiny } from "components/Icons";
+import {
+  AddTiny,
+  CallMutedTiny,
+  CallUnMutedTiny,
+  Member,
+  RoomMember,
+} from "components/Icons";
+import { CallContext } from "components/Calls/CallProvider";
 
 export const MemberRoomList = (props: {
   onRoomChange: (room: string) => void;
@@ -17,50 +24,23 @@ export const MemberRoomList = (props: {
 }) => {
   let members = db.useAttribute("member/name");
   let { memberEntity, authorized } = useMutations();
-  let auth = useAuth();
-  let yourUsername = auth.session.session?.username;
 
   let [inviteOpen, setInviteOpen] = useState(false);
   return (
     <div className="flex flex-col gap-0.5">
       <RoomListLabel label="Members" />
       <ul className="sidebarMemberRoomList flex flex-col gap-0.5">
-        {!memberEntity || !yourUsername ? null : (
-          <DraggableRoomListItem
-            draggable={false}
-            factID={
-              members.find((m) => m.entity === memberEntity)?.id as string
-            }
-            onRoomChange={props.onRoomChange}
-            currentRoom={props.currentRoom}
-            entityID={memberEntity}
-            setRoomEditOpen={() => props.setRoomEditOpen}
-          >
-            <div className="flex justify-between gap-2">
-              <Member entityID={memberEntity} />
-              <span className="flex-shrink-0 self-center rounded-md bg-grey-90 px-1 py-0.5 text-xs text-grey-35">
-                you
-              </span>
-            </div>
-          </DraggableRoomListItem>
-        )}
-        {members
-          .filter((f) => f.entity !== memberEntity)
-          .map((member) => {
-            return (
-              <DraggableRoomListItem
-                factID={member.id}
-                draggable={false}
-                key={member.id}
-                onRoomChange={props.onRoomChange}
-                currentRoom={props.currentRoom}
-                entityID={member.entity}
-                setRoomEditOpen={props.setRoomEditOpen}
-              >
-                <Member entityID={member.entity} />
-              </DraggableRoomListItem>
-            );
-          })}
+        {members.map((member) => {
+          return (
+            <MemberRoom
+              key={member.id}
+              onRoomChange={props.onRoomChange}
+              currentRoom={props.currentRoom}
+              entityID={member.entity}
+              memberName={member.value}
+            />
+          );
+        })}
         {!authorized ? null : (
           <>
             <button
@@ -85,17 +65,64 @@ export const MemberRoomList = (props: {
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 
-const Member = (props: { entityID: string }) => {
+const MemberRoom = (props: {
+  entityID: string;
+  memberName: string;
+  onRoomChange: (room: string) => void;
+  currentRoom: string | null;
+}) => {
   let activeSessions =
     db.useReference(props.entityID, "presence/client-member") || [];
-  let memberName = db.useEntity(props.entityID, "member/name");
+  let participant = useParticipantInCall(props.memberName);
+  let bgColor = participant
+    ? participant.tracks.audio.state === "playable"
+      ? "bg-accent-green"
+      : "bg-grey-55"
+    : "bg-accent-blue";
+  let textColor =
+    participant && participant.tracks.audio.state === "playable"
+      ? "text-accent-green"
+      : "text-grey-35";
+
+  let { memberEntity } = useMutations();
+
   return (
-    <span className={`${activeSessions?.length > 0 ? "text-accent-blue" : ""}`}>
-      {memberName?.value}
-    </span>
+    <button
+      onClick={() => props.onRoomChange(props.entityID)}
+      className={`relative flex select-none flex-row gap-1 rounded-md border border-transparent py-0.5 pl-1 pr-1 text-left ${props.entityID === props.currentRoom
+          ? `rounded-md ${bgColor} font-bold text-white`
+          : ` ${textColor} hover:border-grey-80`
+        }`}
+    >
+      <div className="mt-[2px] h-5 w-5 shrink-0 pt-[1px] pl-[2px]">
+        {!participant ? (
+          <RoomMember />
+        ) : participant.tracks.audio.state === "playable" ? (
+          <CallUnMutedTiny />
+        ) : (
+          <CallMutedTiny />
+        )}
+      </div>
+      <div className="flex w-full flex-row justify-between">
+        <div>{props.memberName}</div>
+        <div>
+          {props.entityID === memberEntity ? (
+            <div className="flex-shrink-0 self-center rounded-md bg-grey-90 px-1 py-0.5 text-xs text-grey-35">
+              you
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </button>
   );
 };
 
+function useParticipantInCall(username: string) {
+  let { participants } = useContext(CallContext);
+  return participants.find((p) => p.user_name === username);
+}
+
+>>>>>>> main
 const InviteMember = (props: { open: boolean; onClose: () => void }) => {
   let { authToken, session } = useAuth();
   let isMember = db.useUniqueAttribute("space/member", session.session?.studio);

@@ -25,10 +25,32 @@ export const parseLine = (
     }
   };
   while (position < input.length) {
+    // bold
     matchPairedToken("**", "**", (content) => (
       <strong key={key}>{content}</strong>
     ));
+
+    // italic
     matchPairedToken("*", "*", (content) => <em key={key}>{content}</em>);
+
+    // highlight
+    matchPairedToken("==", "==", (content) => (
+      <span className="bg-bg-gold" key={key}>
+        {content}
+      </span>
+    ));
+
+    // strikethrough
+    matchPairedToken("~~", "~~", (content) => <s key={key}>{content}</s>);
+
+    // inline code
+    matchPairedToken("`", "`", (content) => (
+      <span className="bg-grey-90" key={key}>
+        {content}
+      </span>
+    ));
+
+    // inline wiki-style card links
     if (config.renderLinks)
       matchPairedToken("[[", "]]", (content) =>
         content === "[[]]" ? (

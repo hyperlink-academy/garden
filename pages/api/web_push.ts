@@ -82,6 +82,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       };
       for (let member of spaceMembers.members_in_spaces) {
         if (!member.identity_data) continue;
+        if (member.identity_data.username === notification.data.senderUsername)
+          continue;
         for (let push_subscription of member.identity_data.push_subscriptions) {
           await webpush.sendNotification(
             push_subscription.push_subscription as any,

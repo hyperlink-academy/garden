@@ -57,7 +57,6 @@ self.addEventListener("push", async (event) => {
     self.registration.showNotification(
       `${data.data.title || "Untitled Card"} in ${data.data.spaceName}`,
       {
-        tag: "hyperlink-messages",
         data: data,
         body: `${data.data.senderUsername}: ${data.data.message.content}`,
         icon: "/android-chrome-192x192.png",

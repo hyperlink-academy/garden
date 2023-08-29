@@ -28,6 +28,7 @@ export const SharedRoomList = (props: {
   currentRoom: string | null;
   setRoomEditOpen: () => void;
 }) => {
+  let { authorized } = useMutations();
   let rooms = db.useAttribute("room/name").sort(sortByPosition("roomList"));
   let { onRoomChange, currentRoom } = props;
 
@@ -64,7 +65,7 @@ export const SharedRoomList = (props: {
             return (
               <DraggableRoomListItem
                 {...props}
-                draggable
+                draggable={authorized}
                 key={room.id}
                 entityID={room.entity}
                 factID={room.id}
