@@ -105,7 +105,7 @@ const MediaDeviceSettings = (props: { onSelect: () => void }) => {
         .filter((f) => f.kind === "audioinput")
         .map((d) => {
           return (
-            <RadioGroup.Option value={d.deviceId}>
+            <RadioGroup.Option value={d.deviceId} key={d.deviceId}>
               {({ checked }) => {
                 return (
                   <button className="grid grid-cols-[max-content,auto] gap-2 text-left text-sm">
