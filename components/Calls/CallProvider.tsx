@@ -96,6 +96,9 @@ export const CallProvider = (props: { children: React.ReactNode }) => {
       setParticipants(Object.values(currentRoom.participants()));
     };
     const handleAppMessage = (_msg?: DailyEventObjectAppMessage) => { };
+    room.updateInputSettings({
+      audio: { processor: { type: "noise-cancellation" } },
+    });
     currentRoom.on("app-message", handleAppMessage);
     currentRoom.on("selected-devices-updated", (devices) => {
       if (
