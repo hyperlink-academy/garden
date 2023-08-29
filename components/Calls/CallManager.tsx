@@ -94,7 +94,7 @@ const MediaDeviceSettings = (props: { onSelect: () => void }) => {
   let { devices, setInputDevices, activeDevice } = useContext(CallContext);
   return (
     <RadioGroup
-      className="rounded-lg border border-grey-80 p-2 text-grey-35"
+      className="flex flex-col gap-2 rounded-lg border border-grey-80 p-2 text-grey-35"
       value={activeDevice?.deviceId}
       onChange={(deviceId) => {
         setInputDevices({ audioDeviceId: deviceId });
