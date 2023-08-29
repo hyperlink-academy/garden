@@ -4,6 +4,7 @@ import { Env } from "..";
 import { authTokenVerifier, verifyIdentity } from "backend/lib/auth";
 import { createClient } from "@supabase/supabase-js";
 import { Database } from "backend/lib/database.types";
+import { uuidToBase62 } from "src/uuidHelpers";
 
 export const get_daily_token_route = makeRoute({
   route: "get_daily_token",
@@ -40,13 +41,13 @@ export const get_daily_token_route = makeRoute({
 
     let { data } = await supabase
       .from("space_data")
-      .select(`name, owner:identity_data!space_data_owner_fkey(*)`)
+      .select(`name, owner:identity_data!space_data_owner_fkey(*), id`)
       .eq("do_id", env.id)
       .single();
     if (!data) return { data: { success: false } } as const;
 
     let room;
-    let name = data.owner?.username + "-" + data.name;
+    let name = uuidToBase62(data.id);
     let roomDataRequest = await fetch(`https://api.daily.co/v1/rooms/${name}`, {
       method: "GET",
       headers,
