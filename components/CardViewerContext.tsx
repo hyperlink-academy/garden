@@ -1,3 +1,4 @@
+import { ref } from "data/Facts";
 import { useAppEventListener, publishAppEvent } from "hooks/useEvents";
 import { db, useMutations } from "hooks/useReplicache";
 import { useUndoableState } from "hooks/useUndoableState";
@@ -19,8 +20,8 @@ export const useCardViewer = () => {
 export function CardViewer(props: { room: string | null }) {
   let roomType = db.useEntity(props.room, "room/type")?.value;
   let [history, setHistory] = useUndoableState<{ [k: string]: string[] }>({});
-  let ref = useRef<HTMLDivElement | null>(null);
-  let { mutate, memberEntity } = useMutations();
+  let cardViewerRef = useRef<HTMLDivElement | null>(null);
+  let { mutate, memberEntity, client } = useMutations();
   let unreadBy = db.useEntity(
     props.room ? history[props.room]?.[0] || null : null,
     "card/unread-by"
@@ -36,6 +37,18 @@ export function CardViewer(props: { room: string | null }) {
         });
     }
   }, [history, props.room, unreadBy, memberEntity, mutate]);
+  useEffect(() => {
+    if (!client || !props.room) return;
+    let currentCard = history[props.room]?.[0];
+    if (!currentCard) return;
+    mutate("assertEmphemeralFact", {
+      clientID: client.clientID,
+      entity: client.entity,
+      attribute: "presence/on-card",
+      value: ref(currentCard),
+      positions: {},
+    });
+  }, [props.room, history, client, mutate]);
 
   useAppEventListener(
     "cardviewer.open-card",
@@ -50,7 +63,10 @@ export function CardViewer(props: { room: string | null }) {
         };
       });
       setTimeout(() => {
-        ref.current?.scrollIntoView({ inline: "center", behavior: "smooth" });
+        cardViewerRef.current?.scrollIntoView({
+          inline: "center",
+          behavior: "smooth",
+        });
         if (data.focus) {
           if (data.focus === "content") {
             let element = document.getElementById("default-text-section");
@@ -84,7 +100,10 @@ export function CardViewer(props: { room: string | null }) {
         };
       });
       setTimeout(() => {
-        ref.current?.scrollIntoView({ inline: "center", behavior: "smooth" });
+        cardViewerRef.current?.scrollIntoView({
+          inline: "center",
+          behavior: "smooth",
+        });
       }, 200);
     }
   }, [query.openCard, props.room]);
@@ -106,7 +125,7 @@ export function CardViewer(props: { room: string | null }) {
 
   return (
     <div
-      ref={ref}
+      ref={cardViewerRef}
       id="cardViewerWrapper"
       className={`cardViewerWrapper 
           flex h-full w-[calc(100vw-16px)] 

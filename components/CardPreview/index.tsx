@@ -24,6 +24,7 @@ import { ulid } from "src/ulid";
 import { getAndUploadFile } from "src/getAndUploadFile";
 import { CardPreviewData, useCardPreviewData } from "hooks/CardPreviewData";
 import { useUIState } from "hooks/useUIState";
+import { PresenceBorder } from "components/PresenceBorder";
 
 const borderStyles = (args: { isMember: boolean }) => {
   switch (true) {
@@ -96,52 +97,56 @@ export const CardPreview = (
 
   return (
     <HoverControls {...props}>
-      <div
-        {...handlers}
-        onPointerUp={(e) => {
-          if (!isLongPress.current) props.pointerUpHandler?.(e);
-        }}
-        onDragOver={(e) => e.preventDefault()}
-        onDrop={async (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          if (!authToken || !spaceID) return;
-          let data = await getAndUploadFile(
-            e.dataTransfer.items,
-            authToken,
-            spaceID
-          );
-          if (!data.success) return;
+      <PresenceBorder entityID={props.entityID}>
+        <div
+          {...handlers}
+          onPointerUp={(e) => {
+            if (!isLongPress.current) props.pointerUpHandler?.(e);
+          }}
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (!authToken || !spaceID) return;
+            let data = await getAndUploadFile(
+              e.dataTransfer.items,
+              authToken,
+              spaceID
+            );
+            if (!data.success) return;
 
-          await mutate("assertFact", {
-            entity: props.entityID,
-            factID: ulid(),
-            attribute: "card/image",
-            value: { type: "file", id: data.data.id, filetype: "image" },
-            positions: {},
-          });
-        }}
-        className={`cardPreviewBorder select-none ${
-          isUnread ? "unreadCardGlow" : ""
-        } relative grow overflow-hidden ${borderStyles({ isMember })} ${
-          props.isSelected || (editing && !isMember) ? "selectedCardGlow" : ""
-        } ${props.isOver ? "rounded-[24px] shadow-[0_0_16px_0_#cccccc]" : ""}`}
-        style={{ WebkitTapHighlightColor: "transparent" }}
-      >
-        {props.size === "small" ? (
-          <SmallCardBody
-            {...props}
-            unreadDiscussions={unreadDiscussions}
-            messagesCount={messagesCount}
-          />
-        ) : (
-          <BigCardBody
-            {...props}
-            unreadDiscussions={unreadDiscussions}
-            messagesCount={messagesCount}
-          />
-        )}
-      </div>
+            await mutate("assertFact", {
+              entity: props.entityID,
+              factID: ulid(),
+              attribute: "card/image",
+              value: { type: "file", id: data.data.id, filetype: "image" },
+              positions: {},
+            });
+          }}
+          className={`cardPreviewBorder select-none ${
+            isUnread ? "unreadCardGlow" : ""
+          } relative grow overflow-hidden ${borderStyles({ isMember })} ${
+            props.isSelected || (editing && !isMember) ? "selectedCardGlow" : ""
+          } ${
+            props.isOver ? "rounded-[24px] shadow-[0_0_16px_0_#cccccc]" : ""
+          }`}
+          style={{ WebkitTapHighlightColor: "transparent" }}
+        >
+          {props.size === "small" ? (
+            <SmallCardBody
+              {...props}
+              unreadDiscussions={unreadDiscussions}
+              messagesCount={messagesCount}
+            />
+          ) : (
+            <BigCardBody
+              {...props}
+              unreadDiscussions={unreadDiscussions}
+              messagesCount={messagesCount}
+            />
+          )}
+        </div>
+      </PresenceBorder>
     </HoverControls>
   );
 };

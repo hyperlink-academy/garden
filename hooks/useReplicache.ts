@@ -12,7 +12,14 @@ import {
   Mutations,
   FactInput,
 } from "data/mutations";
-import { createContext, useCallback, useContext, useMemo } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import {
   Puller,
   Pusher,
@@ -148,7 +155,7 @@ function makeMutators(
     ) => {
       let q = scanIndex(tx);
       let context: MutationContext = {
-        runOnServer: async () => { },
+        runOnServer: async () => {},
         scanIndex: q,
         postMessage: async (m) => {
           await tx.put(m.id, MessageWithIndexes(m));
@@ -327,7 +334,7 @@ export const makeReplicache = (args: {
   name: string;
   undoManager: UndoManager;
 }) => {
-  let grabData = function(): {
+  let grabData = function (): {
     rep: Replicache<ReplicacheMutators>;
     undoManager: UndoManager;
   } {
@@ -508,6 +515,20 @@ export const useMutations = () => {
     [session.session?.studio],
     "auth"
   );
+  let client = useSubscribe(
+    async (tx) => {
+      let client = await scanIndex(tx).ave("presence/client-id", tx.clientID);
+      if (!client) return null;
+      return {
+        clientID: client.value,
+        entity: client.entity,
+      };
+    },
+    null,
+    [],
+    "clientEntity"
+  );
+
   let mutate = useCallback(
     function mutate<T extends keyof typeof Mutations>(
       mutation: T,
@@ -542,6 +563,7 @@ export const useMutations = () => {
     rep: rep?.rep,
     authorized: !!auth,
     memberEntity: auth?.entity || null,
+    client,
     mutate,
     action,
   };

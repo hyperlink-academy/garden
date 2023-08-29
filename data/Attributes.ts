@@ -292,6 +292,12 @@ export const DefaultAttributes = {
     unique: false,
     ephemeral: true,
   },
+  "presence/on-card": {
+    type: "reference",
+    cardinality: "one",
+    unique: false,
+    ephemeral: true,
+  },
 } as const;
 
 export const ShortCodes: { [k in keyof Attribute]?: string | undefined } = {
