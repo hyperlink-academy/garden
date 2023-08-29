@@ -58,20 +58,21 @@ let events = [
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 
 export let CallContext = createContext({
-  joinCall: (_room: { id: string }) => new Promise(() => {}),
+  activeDevice: null as MediaDeviceInfo | null,
+  joinCall: (_room: { id: string }) => new Promise(() => { }),
   muted: false,
   videoOn: false,
-  setLocalAudio: (_mute: boolean) => {},
-  setLocalVideo: (_video: boolean) => {},
+  setLocalAudio: (_mute: boolean) => { },
+  setLocalVideo: (_video: boolean) => { },
   setInputDevices: (_devices: {
     audioDeviceId?: string;
     videoDeviceId?: string;
-  }) => {},
-  leaveCall: () => {},
+  }) => { },
+  leaveCall: () => { },
   call: null as { id: string } | null,
   participants: [] as DailyParticipant[],
   devices: [] as MediaDeviceInfo[],
-  sendMessage: (_msg: Message) => {},
+  sendMessage: (_msg: Message) => { },
 });
 
 type Message = { type: "summon"; page: string };
@@ -80,6 +81,7 @@ export const CallProvider = (props: { children: React.ReactNode }) => {
   let [room, setRoom] = useState<DailyCall | null>(null);
   let [call, setInCall] = useState<null | { id: string }>(null);
   let [participants, setParticipants] = useState<DailyParticipant[]>([]);
+  let [activeDevice, setActiveDevice] = useState<null | MediaDeviceInfo>(null);
   let { session, authToken } = useAuth();
   let spaceID = useSpaceID();
   useEffect(() => {
@@ -93,8 +95,17 @@ export const CallProvider = (props: { children: React.ReactNode }) => {
     let updateParticipants = () => {
       setParticipants(Object.values(currentRoom.participants()));
     };
-    const handleAppMessage = (_msg?: DailyEventObjectAppMessage) => {};
+    const handleAppMessage = (_msg?: DailyEventObjectAppMessage) => { };
     currentRoom.on("app-message", handleAppMessage);
+    currentRoom.on("selected-devices-updated", (devices) => {
+      if (
+        !devices ||
+        !devices.devices.mic ||
+        !(devices.devices.mic as MediaDeviceInfo).deviceId
+      )
+        setActiveDevice(null);
+      else setActiveDevice(devices.devices.mic as MediaDeviceInfo);
+    });
     for (let event of events) {
       currentRoom.on(event, updateParticipants);
     }
@@ -173,6 +184,7 @@ export const CallProvider = (props: { children: React.ReactNode }) => {
         joinCall,
         leaveCall,
         participants,
+        activeDevice,
         call,
         setLocalVideo,
         videoOn: !!room?.localVideo(),
