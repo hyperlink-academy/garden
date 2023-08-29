@@ -173,7 +173,7 @@ export const CallProvider = (props: { children: React.ReactNode }) => {
     videoDeviceId?: string;
   }) => {
     if (!room) return;
-    room.setInputDevices(devices);
+    room.setInputDevicesAsync(devices);
   };
 
   const sendMessage = (msg: Message) => {
