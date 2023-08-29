@@ -1,16 +1,13 @@
-import { DailyParticipant } from "@daily-co/daily-js";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useState } from "react";
 import { CallContext } from "./CallProvider";
-import Router from "next/router";
-import { ButtonSecondary } from "components/Buttons";
 import { useMutations } from "hooks/useReplicache";
-import { CloseFilledTiny, Settings, SettingsOutline } from "components/Icons";
+import { CloseFilledTiny, Member, SettingsOutline } from "components/Icons";
 import { RadioGroup } from "@headlessui/react";
 
 export function CallManager(props: { roomID: string }) {
   let {
     call,
-    devices,
+    participants,
     setInputDevices,
     joinCall,
     leaveCall,
@@ -46,14 +43,18 @@ export function CallManager(props: { roomID: string }) {
         <div className="flex flex-col gap-2">
           <div className="flex flex-col">
             <div
-              className={`w-full rounded-t-lg ${muted ? "bg-grey-55" : "bg-[#005B00]"
-                } px-2 py-1 text-white`}
+              className={`flex w-full flex-row justify-between rounded-t-lg ${muted ? "bg-grey-55" : "bg-[#005B00]"
+                } px-3 py-1.5 text-white`}
             >
-              calling...
+              <div>calling...</div>
+              <div className="flex flex-row gap-1">
+                <Member />
+                {participants.length}
+              </div>
             </div>
             <div
               className={`flex w-full  flex-row justify-between gap-1 rounded-b-lg ${muted ? "bg-grey-80" : "bg-accent-green"
-                } px-2 py-1 text-white`}
+                } px-3 py-1.5 text-white`}
             >
               <button
                 onClick={() => setLocalAudio(muted)}
