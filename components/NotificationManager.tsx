@@ -21,7 +21,7 @@ export const NotificationManager = () => {
 
     navigator.serviceWorker
       .getRegistrations()
-      .then(async function (registrations) {
+      .then(async function(registrations) {
         for (let registration of registrations) {
           let current_pushPermissionState =
             await registration.pushManager.permissionState({
@@ -29,9 +29,27 @@ export const NotificationManager = () => {
               userVisibleOnly: true,
             });
           setPushPermissionState(current_pushPermissionState);
+          if (current_pushPermissionState === "granted") {
+            let { data: session } = await supabase.auth.getSession();
+            if (!session.session) return;
+            let subscription = await registration.pushManager.getSubscription();
+            if (!subscription) return;
+
+            let { data: existingSubscription } = await supabase
+              .from("push_subscriptions")
+              .select("*")
+              .eq("endpoint", subscription.endpoint);
+
+            if (!existingSubscription)
+              await supabase.from("push_subscriptions").insert({
+                user_id: session.session.user.id,
+                endpoint: subscription.endpoint,
+                push_subscription: subscription as any,
+              });
+          }
         }
       });
-  }, []);
+  }, [supabase]);
   return (
     <>
       <button className="hover:text-accent-blue" onClick={() => setOpen(true)}>
