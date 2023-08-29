@@ -15,6 +15,7 @@ import { migrations } from "./migrations";
 import { update_self_route } from "./routes/update_self";
 import { delete_self_route } from "./routes/delete_self";
 import { sync_notifications_route } from "./internal_routes/sync_notifications";
+import { get_daily_token_route } from "./routes/get_daily_token";
 import { post_feed_route } from "./routes/post_feed";
 import { get_card_data_route } from "./routes/get_card_data";
 
@@ -38,6 +39,7 @@ let routes = [
   delete_file_upload_route,
   update_self_route,
   delete_self_route,
+  get_daily_token_route,
   post_feed_route,
 ];
 let private_routes = [sync_notifications_route];

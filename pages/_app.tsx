@@ -9,6 +9,7 @@ import Head from "next/head";
 import { SmokeProvider } from "components/Smoke";
 import { SWRConfig } from "swr";
 import { HomeLayout } from "components/HomeLayout";
+import { CallProvider } from "components/Calls/CallProvider";
 
 export default function App({ Component, pageProps }: AppProps) {
   let router = useRouter();
@@ -30,7 +31,9 @@ export default function App({ Component, pageProps }: AppProps) {
           notFound={<div className="p-4">404d space</div>}
           loading={<></>}
         >
-          <Component {...pageProps} />
+          <CallProvider>
+            <Component {...pageProps} />
+          </CallProvider>
         </SpaceSpaceProvider>
       </SharedProviders>
     );

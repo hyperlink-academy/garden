@@ -21,6 +21,7 @@ import * as PopoverRadix from "@radix-ui/react-popover";
 import { ButtonPrimary } from "components/Buttons";
 import { LogInModal } from "components/LoginModal";
 import { useSpaceData } from "hooks/useSpaceData";
+import { CallManager } from "components/Calls/CallManager";
 import { useIdentityData } from "hooks/useIdentityData";
 import { uuidToBase62 } from "src/uuidHelpers";
 import { HelpModal } from "components/HelpCenter";
@@ -123,6 +124,7 @@ const SpaceName = () => {
         onClose={() => setEditModal(false)}
         spaceID={spaceID}
       />
+      {spaceID && data?.display_name && <CallManager roomID={spaceID} />}
     </div>
   );
 };

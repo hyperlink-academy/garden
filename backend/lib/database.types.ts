@@ -223,6 +223,7 @@ export interface Database {
           display_name: string | null
           do_id: string
           end_date: string | null
+          id: string
           image: string | null
           name: string | null
           owner: string
@@ -234,6 +235,7 @@ export interface Database {
           display_name?: string | null
           do_id: string
           end_date?: string | null
+          id?: string
           image?: string | null
           name?: string | null
           owner: string
@@ -245,6 +247,7 @@ export interface Database {
           display_name?: string | null
           do_id?: string
           end_date?: string | null
+          id?: string
           image?: string | null
           name?: string | null
           owner?: string
