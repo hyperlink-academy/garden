@@ -9,5 +9,8 @@ export const createClient = (
   options?: SupabaseClientOptions<any>
 ) =>
   supabaseCreateClient<Database>(env.SUPABASE_URL, env.SUPABASE_API_TOKEN, {
+    auth: {
+      persistSession: false,
+    },
     ...options,
   });
