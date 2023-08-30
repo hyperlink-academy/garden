@@ -40,22 +40,20 @@ export const Sidebar = (props: {
         <Divider />
         <div className="flex flex-row content-between gap-2 pl-2">
           <button
-            className={`flex w-full justify-center rounded-md border p-1 ${
-              props.currentRoom === "search"
+            className={`flex w-full justify-center rounded-md border p-1 ${props.currentRoom === "search"
                 ? "rounded-md border-accent-blue bg-accent-blue font-bold text-white"
                 : " border-grey-80 text-grey-35 hover:bg-bg-blue"
-            }`}
+              }`}
             onClick={() => props.onRoomChange("search")}
           >
             <RoomSearch />
           </button>
 
           <button
-            className={`flex w-full justify-center rounded-md border p-1 ${
-              props.currentRoom === "calendar"
+            className={`flex w-full justify-center rounded-md border p-1 ${props.currentRoom === "calendar"
                 ? "rounded-md border-accent-blue bg-accent-blue font-bold text-white"
                 : " border-grey-80 text-grey-35 hover:bg-bg-blue"
-            }`}
+              }`}
             onClick={() => props.onRoomChange("calendar")}
           >
             <RoomCalendar />
@@ -124,7 +122,7 @@ const SpaceName = () => {
         onClose={() => setEditModal(false)}
         spaceID={spaceID}
       />
-      {spaceID && data?.display_name && <CallManager roomID={spaceID} />}
+      {spaceID && data?.display_name && <CallManager />}
     </div>
   );
 };

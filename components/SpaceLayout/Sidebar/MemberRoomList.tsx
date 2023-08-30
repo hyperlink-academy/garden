@@ -7,15 +7,14 @@ import { useSmoker } from "components/Smoke";
 import { useAuth } from "hooks/useAuth";
 import { db, useMutations, useSpaceID } from "hooks/useReplicache";
 import { useContext, useState } from "react";
-import { DraggableRoomListItem, RoomListLabel } from "./RoomListLayout";
+import { RoomListLabel } from "./RoomListLayout";
 import {
   AddTiny,
   CallMutedTiny,
   CallUnMutedTiny,
-  Member,
   RoomMember,
 } from "components/Icons";
-import { CallContext } from "components/Calls/CallProvider";
+import { useParticipant, useParticipantIds } from "@daily-co/daily-react";
 
 export const MemberRoomList = (props: {
   onRoomChange: (room: string) => void;
@@ -23,7 +22,7 @@ export const MemberRoomList = (props: {
   setRoomEditOpen: () => void;
 }) => {
   let members = db.useAttribute("member/name");
-  let { memberEntity, authorized } = useMutations();
+  let { authorized } = useMutations();
 
   let [inviteOpen, setInviteOpen] = useState(false);
   return (
@@ -116,8 +115,10 @@ const MemberRoom = (props: {
 };
 
 function useParticipantInCall(username: string) {
-  let { participants } = useContext(CallContext);
-  return participants.find((p) => p.user_name === username);
+  let id = useParticipantIds({
+    filter: (participant) => participant.user_name === username,
+  });
+  return useParticipant(id[0]);
 }
 
 const InviteMember = (props: { open: boolean; onClose: () => void }) => {
