@@ -1,10 +1,11 @@
 import { ButtonPrimary } from "components/Buttons";
+import { DotLoader } from "components/DotLoader";
 import { useAuth } from "hooks/useAuth";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
-type Status = "normal" | "invalidEmail" | "confirm";
+type Status = "normal" | "invalidEmail" | "confirm" | "loading";
 export default function SignupPage() {
   return <SignupForm />;
 }
@@ -27,6 +28,7 @@ export function SignupForm(props: { redirectTo?: string }) {
   }, [session, router]);
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setStatus("loading");
     let { data, error } = await signup({
       redirectTo: props.redirectTo,
       email: input.email,
@@ -37,18 +39,16 @@ export function SignupForm(props: { redirectTo?: string }) {
   };
   if (status === "confirm")
     return (
-      <div className="mx-auto max-w-md">
-        <p>
-          Great — please check your email to confirm your account & pick a
-          username!
-        </p>
+      <div className="mx-auto flex max-w-md flex-col gap-4">
+        <h2>Great — please check your email 📬⚡️</h2>
+        <p>Click the link there to confirm your account & pick a username!</p>
       </div>
     );
 
   return (
     <div className="grid-rows-max mx-auto grid max-w-md gap-8">
       <div className="grid-auto-rows grid gap-2">
-        <h1>Hello, welcome to Hyperlink!</h1>
+        <h1>Hi, welcome to Hyperlink!</h1>
         <p className="text-grey-35">
           Already have an account?{" "}
           <Link className="text-accent-blue" href="/login">
@@ -80,8 +80,13 @@ export function SignupForm(props: { redirectTo?: string }) {
           />
         </label>
         {/* fix for gap added by PasswordInput hide/show button */}
-        <div className="-mt-4">
-          <ButtonPrimary type="submit" content="Sign Up!" />
+        <div className="grid-rows-max -mt-4 grid justify-items-end">
+          <ButtonPrimary
+            className="content-end items-end justify-end justify-items-end self-end justify-self-end"
+            type="submit"
+            content={status === "loading" ? "" : "Sign Up!"}
+            icon={status === "loading" ? <DotLoader /> : undefined}
+          />
         </div>
       </form>
       <div className="flex flex-col gap-2 rounded-md bg-bg-gold p-4 text-center">
@@ -89,7 +94,7 @@ export function SignupForm(props: { redirectTo?: string }) {
           we will <strong>only</strong> email you about your account
         </p>
         <p>
-          to receive our newsletter too,{" "}
+          to get our newsletter too,{" "}
           <a
             href="https://buttondown.email/hyperlink/"
             target="_blank"

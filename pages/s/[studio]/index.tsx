@@ -206,7 +206,7 @@ const YourHomeEmpty = (props: { username: string }) => {
 
 const MyHomeEmpty = () => {
   return (
-    <div className="lightBorder my-4 flex flex-col gap-4 border p-4 text-center">
+    <div className="lightBorder my-4 flex flex-col gap-4 border border-dashed p-8 text-center">
       <p>
         Spaces are containers for doing things together: projects, experiments,
         collaboration. Each Space has its own cards, calendar, and members.
@@ -232,7 +232,9 @@ const ExampleSpaces = () => {
           target="_blank"
         >
           <h2>side project</h2>
-          <p className="italic">example: website on pattern languages 🌐</p>
+          <p className="text-sm italic">
+            example: website on pattern languages 🌐
+          </p>
         </a>
         <a
           className="flex w-full flex-col gap-2 self-center rounded-md border bg-white p-2 hover:bg-bg-blue sm:w-1/3 sm:gap-4 sm:p-4"
@@ -240,7 +242,7 @@ const ExampleSpaces = () => {
           target="_blank"
         >
           <h2>creative project with a friend</h2>
-          <p className="italic">example: stuffed animal crafting 🐰</p>
+          <p className="text-sm italic">example: stuffed animal crafting 🐰</p>
         </a>
         <a
           className="flex w-full flex-col gap-2 self-center rounded-md border bg-white p-2 hover:bg-bg-blue sm:w-1/3 sm:gap-4 sm:p-4"
@@ -248,7 +250,9 @@ const ExampleSpaces = () => {
           target="_blank"
         >
           <h2>small group collab</h2>
-          <p className="italic">example: Hyperlink team writing room ✍️</p>
+          <p className="text-sm italic">
+            example: Hyperlink team writing room ✍️
+          </p>
         </a>
       </div>
     </div>

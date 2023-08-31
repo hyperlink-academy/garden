@@ -84,7 +84,7 @@ export function LoginForm(props: {
         </div>
         {/* <Divider /> */}
         <div className="mt-4 flex gap-2">
-          <div className="rounded-md bg-bg-red p-4">
+          <div className="w-1/2 self-center rounded-md bg-bg-red p-4 sm:w-full">
             <p className="text-grey-15">
               lost your password?{" "}
               <Link className="text-accent-blue" href={`/reset-password`}>
@@ -92,16 +92,13 @@ export function LoginForm(props: {
               </Link>
             </p>
           </div>
-          <div className="rounded-md bg-bg-gold p-4">
+          <div className="w-1/2 self-center rounded-md bg-bg-gold p-4 sm:w-full">
             <p className="text-grey-15">
               {" "}
-              looking to sign up?{" "}
-              <a
-                href="mailto:contact@hyperlink.academy"
-                className="text-accent-blue"
-              >
-                email us!
-              </a>
+              new to Hyperlink? <br />
+              <Link className="text-accent-blue" href="/signup">
+                sign up!
+              </Link>{" "}
             </p>
           </div>
         </div>
