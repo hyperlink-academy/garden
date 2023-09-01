@@ -13,8 +13,6 @@ import { Form, SubmitButton } from "./Form";
 export type CreateSpaceFormState = {
   display_name: string;
   description: string;
-  start_date: string;
-  end_date: string;
   image: string | null;
   default_space_image: string | null;
 };
@@ -30,8 +28,6 @@ export const CreateSpace = (props: {
   let [formState, setFormState] = useState<CreateSpaceFormState>({
     display_name: "",
     description: "",
-    start_date: "",
-    end_date: "",
     image: null,
     default_space_image: null,
   });
@@ -82,8 +78,6 @@ export const CreateSpace = (props: {
             setFormState({
               display_name: "",
               description: "",
-              start_date: "",
-              end_date: "",
               image: null,
               default_space_image: null,
             });
@@ -119,16 +113,12 @@ export const EditSpaceModal = (props: {
   let [formState, setFormState] = useState<CreateSpaceFormState>({
     display_name: "",
     description: "",
-    start_date: "",
-    end_date: "",
     image: null,
     default_space_image: null,
   });
   let modified =
     formState.display_name !== data?.display_name ||
     formState.description !== data?.description ||
-    formState.start_date !== data?.start_date ||
-    formState.end_date !== data?.end_date ||
     JSON.stringify(formState.image) !== JSON.stringify(data.image);
 
   useEffect(() => {
@@ -295,39 +285,6 @@ export const CreateSpaceForm = ({
           }}
         />
         <div className="text-xs italic">{formState.description.length}/256</div>
-      </div>
-
-      {/* date section */}
-      <div className="flex flex-wrap justify-between gap-2">
-        <div className="flex flex-col gap-1">
-          <p className="font-bold">Start Date</p>
-          <input
-            type="date"
-            value={formState.start_date}
-            onChange={(e) => {
-              let value = e.currentTarget.value;
-              setFormState((form) => ({
-                ...form,
-                start_date: value,
-              }));
-            }}
-          />
-        </div>
-        <div className="flex flex-col gap-1">
-          <p className="font-bold">End Date</p>
-
-          <input
-            type="date"
-            value={formState.end_date}
-            onChange={(e) => {
-              let value = e.currentTarget.value;
-              setFormState((form) => ({
-                ...form,
-                end_date: value,
-              }));
-            }}
-          />
-        </div>
       </div>
 
       {/* door image selector */}
