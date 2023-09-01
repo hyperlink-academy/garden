@@ -31,18 +31,15 @@ export const useAuthIdentityData = () => {
 export const useAuth = () => {
   const supabaseClient = useSupabaseClient();
   let session = useSession();
-  let { data: identityData } = useIdentityData(
-    session?.user?.user_metadata.username
-  );
 
   return useMemo(
     () => ({
       authToken: !session
         ? null
         : {
-          access_token: session.access_token,
-          refresh_token: session.refresh_token,
-        },
+            access_token: session.access_token,
+            refresh_token: session.refresh_token,
+          },
       session: {
         loggedIn: !!session,
         user: session?.user,
@@ -73,12 +70,13 @@ export const useAuth = () => {
           email: input.email,
           password: input.password,
           options: {
-            emailRedirectTo: `${window.location.origin}/setup${input.redirectTo ? `?redirectTo=${input.redirectTo}` : ""
-              }`,
+            emailRedirectTo: `${window.location.origin}/setup${
+              input.redirectTo ? `?redirectTo=${input.redirectTo}` : ""
+            }`,
           },
         });
       },
     }),
-    [session, supabaseClient.auth, identityData]
+    [session, supabaseClient.auth]
   );
 };
