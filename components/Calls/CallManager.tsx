@@ -96,10 +96,17 @@ export function CallManager() {
 }
 
 const MediaDeviceSettings = (props: { onSelect: () => void }) => {
-  let { setMicrophone, setSpeaker, currentMic, microphones, speakers } =
-    useDevices();
+  let {
+    setMicrophone,
+    setSpeaker,
+    currentMic,
+    microphones,
+    speakers,
+    currentSpeaker,
+  } = useDevices();
   let [view, setView] = useState<"microphone" | "speakers">("microphone");
   let devices = view === "microphone" ? microphones : speakers;
+  let currentDevice = view === "microphone" ? currentMic : currentSpeaker;
   return (
     <div className="flex flex-col gap-2">
       <div className="flex flex-row gap-2">
@@ -120,7 +127,7 @@ const MediaDeviceSettings = (props: { onSelect: () => void }) => {
       </div>
       <RadioGroup
         className="flex flex-col gap-2 rounded-lg border border-grey-80 p-2 text-grey-35"
-        value={currentMic?.device.deviceId}
+        value={currentDevice?.device.deviceId}
         onChange={(deviceId) => {
           if (view === "microphone") setMicrophone(deviceId);
           else setSpeaker(deviceId);
