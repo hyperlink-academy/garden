@@ -23,6 +23,7 @@ import { sortByPosition, updatePositions } from "src/position_helpers";
 import { useCombinedRefs } from "components/Desktop";
 import { ulid } from "src/ulid";
 import { Textarea } from "components/Textarea";
+import { generateKeyBetween } from "src/fractional-indexing";
 
 export const RoomListLabel = (props: { label: string }) => {
   return <div className="px-2 pb-1 font-bold text-grey-35">{props.label}</div>;
@@ -313,6 +314,56 @@ export const DraggableRoomListItem = (props: {
     id: props.factID,
     onDragEnd: async (data) => {
       if (!rep) return;
+      if (data.type === "card") {
+        if (data.parent === props.entityID) return;
+        let roomType = await rep.rep.query((tx) =>
+          scanIndex(tx).eav(props.entityID, "room/type")
+        );
+        if (!roomType) return;
+        if (roomType.value === "collection") {
+          let siblings = (
+            await rep.rep.query((tx) => {
+              return scanIndex(tx).eav(props.entityID, "desktop/contains");
+            })
+          ).sort(sortByPosition("eav"));
+
+          let newIndex = 0;
+          let position = generateKeyBetween(
+            siblings[newIndex]?.positions.eav || null,
+            siblings[newIndex + 1]?.positions.eav || null
+          );
+
+          await mutate("retractFact", { id: data.id });
+          await mutate("addCardToSection", {
+            factID: ulid(),
+            cardEntity: data.entityID,
+            parent: props.entityID,
+            section: "desktop/contains",
+            positions: {
+              eav: position,
+            },
+          });
+        }
+        if (roomType.value === "canvas") {
+          await mutate("retractFact", { id: data.id });
+          await mutate("addCardToDesktop", {
+            factID: ulid(),
+            entity: data.entityID,
+            desktop: props.entityID,
+            position: {
+              y: 64,
+              x: 128,
+              rotation: ((Math.random() * 10000) % 60) / 100 - 0.3,
+              size:
+                data.position?.size === "small"
+                  ? "small"
+                  : data.hideContent
+                  ? "small"
+                  : "big",
+            },
+          });
+        }
+      }
       if (data.type !== "room") return;
       let siblings = (
         await rep.rep.query((tx) => {
