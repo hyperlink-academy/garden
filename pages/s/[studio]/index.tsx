@@ -65,17 +65,18 @@ export default function UserHomePage(props: Props) {
 const HistoryList = (props: { spaces: Array<SpaceData> }) => {
   let now = getCurrentDate();
   let spacesHistory = props.spaces.filter(
-    (s) => s.end_date && s.end_date < now
+    (s) => (s.end_date && s.end_date < now) || s.archived
   );
   let [showHistory, setShowHistory] = useState(false);
+  let { query } = useRouter();
+  let { mutate } = useIdentityData(query.studio as string);
   return (
     <>
       {spacesHistory.length > 0 ? (
         <div className="myStudioCompleted">
           <button
-            className={`flex items-center gap-2 hover:text-accent-blue ${
-              showHistory ? "text-grey-15" : "text-grey-55"
-            }`}
+            className={`flex items-center gap-2 hover:text-accent-blue ${showHistory ? "text-grey-15" : "text-grey-55"
+              }`}
             onClick={() => {
               setShowHistory(!showHistory);
             }}
@@ -88,7 +89,13 @@ const HistoryList = (props: { spaces: Array<SpaceData> }) => {
             )}
           </button>
           <div className={`${showHistory ? "" : "hidden"}`}>
-            <SpaceList small spaces={spacesHistory} />
+            <SpaceList
+              small
+              spaces={spacesHistory}
+              onEdit={() => {
+                mutate();
+              }}
+            />
           </div>
         </div>
       ) : null}
@@ -116,43 +123,24 @@ const List = (props: {
   let myStudioName = session.session?.username;
   let currentStudioName = query.studio;
 
-  let now = getCurrentDate();
-  // upcoming:
-  // start-date = in future
-  const spacesUpcoming = props.spaces.filter(
-    (s) => s?.start_date && s.start_date > now
-  );
+  let spaces = props.spaces.filter((s) => !s.archived);
 
-  // active:
-  // start-date = in past
-  // end-date = in future or unset
-  const spacesActive = props.spaces.filter((s) => {
-    if (!s) return false;
-    if (!s.start_date) {
-      return s.end_date && s.end_date >= now;
-    } else
-      return (
-        s.start_date &&
-        s.start_date <= now &&
-        (!s.end_date || s.end_date >= now)
-      );
-  });
-
-  // unscheduled (implicit draft)
-  // spaces with NEITHER start nor end date
-  const spacesUnscheduled = props.spaces.filter(
-    (s) => !s?.start_date && !s?.end_date
-  );
+  let { mutate } = useIdentityData(query.studio as string);
 
   return (
     <div className="flex flex-col gap-8">
-      {spacesActive.length > 0 ? <SpaceList spaces={spacesActive} /> : null}
+      {spaces.length > 0 ? (
+        <SpaceList
+          spaces={spaces}
+          onEdit={() => {
+            mutate();
+          }}
+        />
+      ) : null}
 
       {/* empty state - if user homepage has NO ACTIVE SPACES */}
       {/* different messages for logged in user vs. viewing someone else's home */}
-      {spacesActive.length == 0 &&
-      spacesUpcoming.length == 0 &&
-      spacesUnscheduled.length == 0 ? (
+      {spaces.length == 0 ? (
         session?.loggedIn && myStudioName == currentStudioName ? (
           <MyHomeEmpty /> /* me as in the logged in user who can make spaces here */
         ) : (
@@ -161,18 +149,7 @@ const List = (props: {
           /> /* you as in I'm viewing a homepage that's not mine-the-authed-user's */
         )
       ) : null}
-      {spacesUpcoming.length > 0 ? (
-        <div className="myStudioUpcoming">
-          <h3>Upcoming</h3>
-          <SpaceList small spaces={spacesUpcoming} />
-        </div>
-      ) : null}
-      {spacesUnscheduled.length > 0 ? (
-        <div className="myStudioUnscheduled">
-          <h3>Unscheduled</h3>
-          <SpaceList small spaces={spacesUnscheduled} />
-        </div>
-      ) : null}
+
       <HistoryList spaces={props.spaces} />
     </div>
   );
