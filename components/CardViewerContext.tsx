@@ -29,7 +29,6 @@ export function CardViewer(props: { room: string | null }) {
   let roomType = db.useEntity(props.room, "room/type")?.value;
   let spaceID = useSpaceID();
 
-  let openCardWithoutHistory = useUIState((s) => s.openCard);
   let closeCard = useUIState((s) => s.closeCard);
 
   let history = useUIState((s) => {
@@ -72,21 +71,6 @@ export function CardViewer(props: { room: string | null }) {
     },
     []
   );
-
-  let { query, replace } = useRouter();
-  useEffect(() => {
-    if (query.openCard) {
-      let entityID = query.openCard as string;
-      if (!props.room || !spaceID) return;
-      let url = new URL(window.location.href);
-      url.searchParams.delete("openCard");
-      replace(url, undefined, { shallow: true });
-      openCardWithoutHistory(spaceID, props.room, entityID);
-      setTimeout(() => {
-        ref.current?.scrollIntoView({ inline: "center", behavior: "smooth" });
-      }, 200);
-    }
-  }, [query.openCard, props.room, spaceID]);
 
   useAppEventListener(
     "cardviewer.close-card",

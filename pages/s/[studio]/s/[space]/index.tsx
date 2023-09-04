@@ -1,5 +1,5 @@
 import { CardViewer } from "components/CardViewerContext";
-import { db, useSpaceID } from "hooks/useReplicache";
+import { db, scanIndex, useMutations, useSpaceID } from "hooks/useReplicache";
 import { SmallCardDragContext } from "components/DragContext";
 import { Sidebar } from "components/SpaceLayout";
 import { useEffect } from "react";
@@ -8,6 +8,7 @@ import { sortByPosition } from "src/position_helpers";
 import { Room } from "components/Room";
 import { SpaceMetaTitle } from "components/SpaceMetaTitle";
 import { useRoom, useSetRoom, useUIState } from "hooks/useUIState";
+import { useRouter } from "next/router";
 
 export default function SpacePage() {
   // get first room = your room
@@ -26,6 +27,33 @@ export default function SpacePage() {
   useEffect(() => {
     if (!r && firstRoom) setRoom(firstRoom);
   }, [r, firstRoom]);
+
+  let { query, replace } = useRouter();
+  let { rep } = useMutations();
+  let openCardWithoutHistory = useUIState((s) => s.openCard);
+  useEffect(() => {
+    if (query.openCard) {
+      (async () => {
+        let entityID = query.openCard as string;
+        if (!room || !spaceID || !rep) return;
+
+        let url = new URL(window.location.href);
+        url.searchParams.delete("openCard");
+        replace(url, undefined, { shallow: true });
+
+        let isRoom = await rep.query((tx) =>
+          scanIndex(tx).eav(entityID, "room/type")
+        );
+        if (isRoom) return setRoom(entityID);
+
+        let parent = await rep.query((tx) =>
+          scanIndex(tx).vae(entityID, "desktop/contains")
+        );
+        if (parent) setRoom(parent[0]?.entity);
+        openCardWithoutHistory(spaceID, room, entityID);
+      })();
+    }
+  }, [rep, query.openCard, room, spaceID]);
 
   useEffect(() => {
     if (!spaceID) return;
