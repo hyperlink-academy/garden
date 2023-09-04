@@ -1,7 +1,7 @@
 import { Fact } from "data/Facts";
-import { scanIndex, db, useMutations } from "hooks/useReplicache";
+import { db, useMutations } from "hooks/useReplicache";
 import { usePreserveScroll } from "hooks/utils";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import useMeasure from "react-use-measure";
 import { CalendarRoom } from "./CalendarRoom";
 import { CardCollection } from "./CardCollection";
@@ -9,18 +9,16 @@ import { useFilteredCards, Filters, FilterByReactions } from "./CardFilter";
 import { Discussion } from "./CardView/Discussion";
 import { Desktop } from "./Desktop";
 import {
-  CollectionList as CollectionListIcon,
   CollectionListTiny,
-  CollectionPreview as CollectionPreviewIcon,
   CollectionPreviewTiny,
   GoToTop,
   MoreOptionsTiny,
 } from "./Icons";
 import { Divider } from "./Layout";
 import { SearchRoom } from "./SearchRoom";
+import { UnreadsRoom } from "./UnreadsRoom";
 import { EditRoomModal } from "./SpaceLayout/Sidebar/RoomListLayout";
 import { RenderedText } from "./Textarea/RenderedText";
-import * as Popover from "@radix-ui/react-popover";
 import { ulid } from "src/ulid";
 
 export const Room = (props: { entityID: string }) => {
@@ -32,6 +30,7 @@ export const Room = (props: { entityID: string }) => {
 
   if (props.entityID === "search") return <SearchRoom />;
   if (props.entityID === "calendar") return <CalendarRoom />;
+  if (props.entityID === "unreads") return <UnreadsRoom />;
 
   return (
     <div
@@ -161,9 +160,8 @@ function RoomHeader(props: {
       </div>
 
       <div
-        className={`roomDescriptionAndFilter z-10 bg-background ${
-          descriptionOpen ? "sticky" : ""
-        }`}
+        className={`roomDescriptionAndFilter z-10 bg-background ${descriptionOpen ? "sticky" : ""
+          }`}
         style={{ top: `${titleHeight}px` }}
         ref={descriptionRef}
       >
@@ -230,11 +228,10 @@ const RoomDescription = (props: {
                 entityID={props.entityID}
               />
               <button
-                className={`${
-                  props.filters.length === 0
+                className={`${props.filters.length === 0
                     ? "text-grey-55 underline"
                     : "font-bold text-accent-blue"
-                }`}
+                  }`}
                 onClick={() => setFiltersOpen(!filtersOpen)}
               >
                 filters({props.filters.length})
@@ -291,10 +288,9 @@ export const CollectionType = (props: {
     });
   };
   const className = (typeName: Fact<"collection/type">["value"]) =>
-    `p-0.5 text-grey-55 ${
-      type === typeName
-        ? "rounded-md border border-grey-55"
-        : "border border-transparent"
+    `p-0.5 text-grey-55 ${type === typeName
+      ? "rounded-md border border-grey-55"
+      : "border border-transparent"
     }`;
 
   return (

@@ -3,12 +3,13 @@ import { useState } from "react";
 import { CardPreview, CardPreviewWithData } from "./CardPreview";
 import { CardSmall, RoomSearch } from "./Icons";
 import { Divider } from "./Layout";
+import { RoomWrapper } from "./RoomLayout";
 
 export const SearchRoom = () => {
   let items = useAllItems(true);
   let [searchInput, setSearchInput] = useState("");
   return (
-    <div className="no-scrollbar flex h-full w-[336px] flex-col items-stretch overflow-x-hidden overflow-y-scroll p-2 text-sm sm:p-4 ">
+    <RoomWrapper>
       <div className="flex gap-2 rounded-md border border-grey-35 bg-white">
         <input
           value={searchInput}
@@ -40,7 +41,7 @@ export const SearchRoom = () => {
             );
           })}
       </div>
-    </div>
+    </RoomWrapper>
   );
 };
 

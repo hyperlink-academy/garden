@@ -6,6 +6,7 @@ import { FindOrCreate, useAllItems } from "./FindOrCreateEntity";
 import { CardSearch } from "./Icons";
 import { Divider } from "./Layout";
 import { useSpaceData } from "hooks/useSpaceData";
+import { RoomWrapper } from "./RoomLayout";
 
 export function CalendarRoom() {
   let { authorized } = useMutations();
@@ -32,7 +33,7 @@ export function CalendarRoom() {
   }
 
   return (
-    <div className="no-scrollbar flex h-full w-[336px] flex-col items-stretch overflow-x-hidden overflow-y-scroll p-2 text-sm sm:p-4">
+    <RoomWrapper>
       <div className="calendarCardList flex h-full flex-col gap-4">
         {days.length > 0 ? (
           days
@@ -107,7 +108,7 @@ export function CalendarRoom() {
           </div>
         )}
       </div>
-    </div>
+    </RoomWrapper>
   );
 }
 

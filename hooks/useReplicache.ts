@@ -408,11 +408,12 @@ export const db = {
     );
   },
   useReference<A extends keyof ReferenceAttributes>(
-    entity: string,
+    entity: string | null,
     attribute?: A
   ) {
     return useSubscribe(
       async (tx) => {
+        if (!entity) return [];
         let results = await tx
           .scan({
             indexName: "vae",
