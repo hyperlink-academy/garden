@@ -41,6 +41,17 @@ export const RenderedText = forwardRef<
     renderLinks: props.renderLinks,
     openLink,
   };
+
+  let newProps = { ...props };
+
+  delete newProps.renderLinks;
+  //@ts-ignore
+  delete newProps.textareaRef;
+  //@ts-ignore
+  delete newProps.entityID;
+  //@ts-ignore
+  delete newProps.autoCompleteCardNames;
+
   return (
     <Linkify
       options={{ className: "text-accent-blue underline", target: "_blank" }}
@@ -48,7 +59,7 @@ export const RenderedText = forwardRef<
       <pre
         role="link"
         ref={ref}
-        {...props}
+        {...newProps}
         className={`${props.className} break-words`}
         style={{
           ...props.style,
