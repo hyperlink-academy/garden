@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useReactions } from "./useReactions";
 import { db } from "./useReplicache";
 
@@ -16,16 +17,19 @@ export const useCardPreviewData = (entityID: string) => {
   let imageUrl = !image
     ? undefined
     : image.value.filetype === "image"
-    ? `${WORKER_URL}/static/${image.value.id}`
-    : image.value.url;
+      ? `${WORKER_URL}/static/${image.value.id}`
+      : image.value.url;
 
-  return {
-    reactions,
-    title,
-    content,
-    imageUrl,
-    isMember,
-    member: member,
-    date,
-  };
+  return useMemo(
+    () => ({
+      reactions,
+      title,
+      content,
+      imageUrl,
+      isMember,
+      member: member,
+      date,
+    }),
+    [reactions, title, content, imageUrl, isMember, member, date]
+  );
 };
