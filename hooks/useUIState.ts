@@ -20,6 +20,7 @@ export let useUIState = create(
       setRoom: (spaceID: string, room: string | undefined) => {
         set((state) => ({
           spaces: {
+            ...state.spaces,
             [spaceID]: {
               ...state.spaces[spaceID],
               activeRoom: room,
@@ -31,7 +32,9 @@ export let useUIState = create(
         console.log("closing card");
         set((state) => ({
           spaces: {
+            ...state.spaces,
             [spaceID]: {
+              ...state.spaces[spaceID],
               rooms: {
                 [roomID]: state.spaces[spaceID]?.rooms[roomID]?.slice(1) || [],
               },
@@ -45,8 +48,11 @@ export let useUIState = create(
           if (currentCard === card) return state;
           return {
             spaces: {
+              ...state.spaces,
               [spaceID]: {
+                ...state.spaces[spaceID],
                 rooms: {
+                  ...state.spaces[spaceID].rooms,
                   [roomID]: [
                     card,
                     ...(state.spaces[spaceID]?.rooms?.[roomID] || []),
