@@ -5,12 +5,9 @@ import { Sidebar } from "components/SpaceLayout";
 import { useEffect } from "react";
 import useWindowDimensions from "hooks/useWindowDimensions";
 import { sortByPosition } from "src/position_helpers";
-import { useUndoableState } from "hooks/useUndoableState";
 import { Room } from "components/Room";
 import { SpaceMetaTitle } from "components/SpaceMetaTitle";
-import type { ServiceWorkerMessages } from "worker";
-import { publishAppEvent } from "hooks/useEvents";
-import { useRouter } from "next/router";
+import { useRoom, useSetRoom, useUIState } from "hooks/useUIState";
 
 export default function SpacePage() {
   // get first room = your room
@@ -21,20 +18,26 @@ export default function SpacePage() {
   let firstRoom = firstRoomByID;
 
   let spaceID = useSpaceID();
-  let [r, setRoom, setRoomWithoutHistory] = useUndoableState<string | null>(
-    null
-  );
+  let r = useRoom();
+  let room = r || firstRoom;
+  let setRoom = useSetRoom();
+  let setRoomWithoutHistory = useUIState((s) => s.setRoom);
+
+  useEffect(() => {
+    if (!r && firstRoom) setRoom(firstRoom);
+  }, [r, firstRoom]);
 
   useEffect(() => {
     if (!spaceID) return;
-    let room = window.localStorage.getItem(`space/${spaceID}/room`);
-    if (room) setRoomWithoutHistory(room);
+    let storedRoom = window.localStorage.getItem(`space/${spaceID}/room`);
+    if (storedRoom) setRoomWithoutHistory(spaceID, storedRoom);
   }, [spaceID, setRoomWithoutHistory]);
-  useEffect(() => {
-    if (r && spaceID) window.localStorage.setItem(`space/${spaceID}/room`, r);
-  }, [r, spaceID]);
 
-  let room = r || firstRoom;
+  useEffect(() => {
+    if (room && spaceID)
+      window.localStorage.setItem(`space/${spaceID}/room`, room);
+  }, [room, spaceID]);
+
   const { width } = useWindowDimensions();
 
   useEffect(() => {
