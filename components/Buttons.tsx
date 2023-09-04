@@ -44,7 +44,7 @@ export function ButtonPrimary(
 
 export function ButtonSecondary(
   props: {
-    content?: string;
+    content?: string | React.ReactNode;
     icon?: React.ReactElement;
   } & ButtonProps
 ) {

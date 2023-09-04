@@ -1,45 +1,61 @@
 import { ref } from "data/Facts";
 import { useAppEventListener, publishAppEvent } from "hooks/useEvents";
-import { db, useMutations } from "hooks/useReplicache";
-import { useUndoableState } from "hooks/useUndoableState";
+import { db, useMutations, useSpaceID } from "hooks/useReplicache";
+import { useOpenCard, useUIState } from "hooks/useUIState";
 import { useRouter } from "next/router";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { CardView } from "./CardView";
 
 export const useCardViewer = () => {
-  return {
-    open: (args: { entityID: string; focus?: "title" | "content" }) => {
+  let spaceID = useSpaceID();
+  let openCard = useOpenCard();
+  let close = useCallback((args: { entityID: string }) => {
+    publishAppEvent("cardviewer.close-card", args);
+  }, []);
+  let open = useCallback(
+    (args: { entityID: string; focus?: "title" | "content" }) => {
+      if (!spaceID) return;
+      openCard(args.entityID);
       publishAppEvent("cardviewer.open-card", args);
     },
-    close: (args: { entityID: string }) => {
-      publishAppEvent("cardviewer.close-card", args);
-    },
+    [spaceID]
+  );
+  return {
+    open,
+    close,
   };
 };
 
 export function CardViewer(props: { room: string | null }) {
   let roomType = db.useEntity(props.room, "room/type")?.value;
-  let [history, setHistory] = useUndoableState<{ [k: string]: string[] }>({});
+  let spaceID = useSpaceID();
+
+  let closeCard = useUIState((s) => s.closeCard);
+
+  let history = useUIState((s) => {
+    if (!spaceID || !props.room) return [];
+    return s.spaces[spaceID]?.rooms?.[props.room] || [];
+  });
   let cardViewerRef = useRef<HTMLDivElement | null>(null);
   let { mutate, memberEntity, client } = useMutations();
   let unreadBy = db.useEntity(
-    props.room ? history[props.room]?.[0] || null : null,
+    props.room ? history[0] || null : null,
     "card/unread-by"
   );
   useEffect(() => {
-    if (props.room && history[props.room]?.[0] && memberEntity) {
+    if (props.room && history[0] && memberEntity) {
       let unread = unreadBy?.find((f) => f.value.value === memberEntity);
       if (unread)
         mutate("markRead", {
           memberEntity,
-          entityID: history[props.room][0],
+          entityID: history[0],
           attribute: "card/unread-by",
         });
     }
   }, [history, props.room, unreadBy, memberEntity, mutate]);
   useEffect(() => {
     if (!client || !props.room) return;
-    let currentCard = history[props.room]?.[0];
+    let currentCard = history[0];
     if (!currentCard) return;
     mutate("assertEmphemeralFact", {
       clientID: client.clientID,
@@ -53,15 +69,6 @@ export function CardViewer(props: { room: string | null }) {
   useAppEventListener(
     "cardviewer.open-card",
     (data) => {
-      setHistory((h) => {
-        if (!props.room) return h;
-        let room = h[props.room] || [];
-        if (room[0] === data.entityID) return h;
-        return {
-          ...h,
-          [props.room]: [data.entityID, ...room],
-        };
-      });
       setTimeout(() => {
         cardViewerRef.current?.scrollIntoView({
           inline: "center",
@@ -78,49 +85,16 @@ export function CardViewer(props: { room: string | null }) {
         }
       }, 10);
     },
-    [props.room]
+    []
   );
-
-  let { query, replace } = useRouter();
-  useEffect(() => {
-    if (query.openCard) {
-      console.log("yo this should work");
-      let entityID = query.openCard as string;
-      if (!props.room) return;
-      let url = new URL(window.location.href);
-      url.searchParams.delete("openCard");
-      replace(url, undefined, { shallow: true });
-      setHistory((h) => {
-        if (!props.room) return h;
-        let room = h[props.room] || [];
-        if (room[0] === entityID) return h;
-        return {
-          ...h,
-          [props.room]: [entityID, ...room],
-        };
-      });
-      setTimeout(() => {
-        cardViewerRef.current?.scrollIntoView({
-          inline: "center",
-          behavior: "smooth",
-        });
-      }, 200);
-    }
-  }, [query.openCard, props.room]);
 
   useAppEventListener(
     "cardviewer.close-card",
-    (data) => {
-      setHistory((h) => {
-        if (!props.room) return h;
-        let room = h[props.room] || [];
-        return {
-          ...h,
-          [props.room]: room.filter((r) => r !== data.entityID),
-        };
-      });
+    () => {
+      if (!props.room || !spaceID) return;
+      closeCard(spaceID, props.room);
     },
-    [props.room]
+    [props.room, spaceID]
   );
 
   return (
@@ -134,20 +108,14 @@ export function CardViewer(props: { room: string | null }) {
           flex-col 
           items-stretch focus:outline-none sm:shrink`}
     >
-      {props.room && history[props.room]?.[0] ? (
+      {props.room && history[0] ? (
         <CardView
-          entityID={history[props.room][0]}
-          key={history[props.room][0]}
-          onDelete={() =>
-            setHistory((h) => {
-              if (!props.room) return h;
-              let room = h[props.room] || [];
-              return {
-                ...h,
-                [props.room]: room.slice(1),
-              };
-            })
-          }
+          entityID={history[0]}
+          key={history[0]}
+          onDelete={() => {
+            if (!props.room || !spaceID) return;
+            closeCard(spaceID, props.room);
+          }}
         />
       ) : (
         <EmptyState roomType={roomType} />

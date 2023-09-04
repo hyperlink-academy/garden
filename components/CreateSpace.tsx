@@ -2,19 +2,23 @@ import { spaceAPI } from "backend/lib/api";
 import { useAuth } from "hooks/useAuth";
 import { ReplicacheContext, useMutations } from "hooks/useReplicache";
 import { useContext, useEffect, useState } from "react";
-import { ButtonPrimary, ButtonSecondary, ButtonTertiary } from "./Buttons";
+import {
+  ButtonLink,
+  ButtonPrimary,
+  ButtonSecondary,
+  ButtonTertiary,
+} from "./Buttons";
 import { DoorSelector } from "./DoorSelector";
 import { SpaceCreate } from "./Icons";
 import { Modal } from "./Layout";
 import { useSpaceData } from "hooks/useSpaceData";
 import { useIdentityData } from "hooks/useIdentityData";
 import { Form, SubmitButton } from "./Form";
+import { DotLoader } from "./DotLoader";
 
 export type CreateSpaceFormState = {
   display_name: string;
   description: string;
-  start_date: string;
-  end_date: string;
   image: string | null;
   default_space_image: string | null;
 };
@@ -30,8 +34,6 @@ export const CreateSpace = (props: {
   let [formState, setFormState] = useState<CreateSpaceFormState>({
     display_name: "",
     description: "",
-    start_date: "",
-    end_date: "",
     image: null,
     default_space_image: null,
   });
@@ -82,8 +84,6 @@ export const CreateSpace = (props: {
             setFormState({
               display_name: "",
               description: "",
-              start_date: "",
-              end_date: "",
               image: null,
               default_space_image: null,
             });
@@ -109,6 +109,7 @@ export const CreateSpace = (props: {
 
 export const EditSpaceModal = (props: {
   open: boolean;
+  onSubmit?: () => void;
   onDelete: () => void;
   onClose: () => void;
   spaceID?: string;
@@ -119,16 +120,12 @@ export const EditSpaceModal = (props: {
   let [formState, setFormState] = useState<CreateSpaceFormState>({
     display_name: "",
     description: "",
-    start_date: "",
-    end_date: "",
     image: null,
     default_space_image: null,
   });
   let modified =
     formState.display_name !== data?.display_name ||
     formState.description !== data?.description ||
-    formState.start_date !== data?.start_date ||
-    formState.end_date !== data?.end_date ||
     JSON.stringify(formState.image) !== JSON.stringify(data.image);
 
   useEffect(() => {
@@ -163,25 +160,35 @@ export const EditSpaceModal = (props: {
               if (!s) return;
               return { ...s, ...formState };
             });
+            props.onSubmit?.();
             props.onClose();
           }}
         >
           <CreateSpaceForm formState={formState} setFormState={setFormState} />
 
-          <div className="flex gap-4 place-self-end">
-            <ButtonPrimary
-              content="Delete this Space"
-              destructive
-              onClick={() => setMode("delete")}
-            />
-
-            <ButtonSecondary
-              content={"Nevermind"}
-              onClick={async () => {
-                props.onClose();
-              }}
-            />
-            <SubmitButton content={"Update"} disabled={!modified} />
+          <div className="flex flex-col gap-3">
+            <hr className="border-grey-55" />
+            <div className="flex flex-row gap-2">
+              <SubmitButton content={"Update"} disabled={!modified} />
+              <ButtonLink
+                content={"nevermind"}
+                onClick={async () => {
+                  props.onClose();
+                }}
+              />
+            </div>
+            <hr className="border-grey-55" />
+            <div className="flex flex-col gap-2">
+              <ArchiveButton
+                spaceID={props.spaceID}
+                onSubmit={props.onSubmit}
+              />
+              <ButtonPrimary
+                content="Delete this Space"
+                destructive
+                onClick={() => setMode("delete")}
+              />
+            </div>
           </div>
         </Form>
       ) : (
@@ -198,6 +205,48 @@ export const EditSpaceModal = (props: {
         </>
       )}
     </Modal>
+  );
+};
+
+const ArchiveButton = (props: { spaceID?: string; onSubmit?: () => void }) => {
+  let { data, mutate } = useSpaceData(props.spaceID);
+  let { authToken } = useAuth();
+  let [loading, setLoading] = useState(false);
+  return (
+    <ButtonSecondary
+      type="button"
+      onClick={async () => {
+        console.log({
+          loading,
+          data,
+          spaceID: props.spaceID,
+          authToken: !authToken,
+        });
+        if (loading || !data || !props.spaceID || !authToken) return;
+        setLoading(true);
+        await spaceAPI(`${WORKER_URL}/space/${props.spaceID}`, "update_self", {
+          authToken,
+          data: {
+            ...data,
+            display_name: data?.display_name || "",
+            description: data.description || "",
+            archived: !data.archived,
+          },
+        });
+        mutate();
+        props.onSubmit?.();
+        setLoading(false);
+      }}
+      content={
+        loading ? (
+          <DotLoader />
+        ) : data?.archived ? (
+          "Un-Archive this Space"
+        ) : (
+          "Archive this Space"
+        )
+      }
+    />
   );
 };
 
@@ -295,39 +344,6 @@ export const CreateSpaceForm = ({
           }}
         />
         <div className="text-xs italic">{formState.description.length}/256</div>
-      </div>
-
-      {/* date section */}
-      <div className="flex flex-wrap justify-between gap-2">
-        <div className="flex flex-col gap-1">
-          <p className="font-bold">Start Date</p>
-          <input
-            type="date"
-            value={formState.start_date}
-            onChange={(e) => {
-              let value = e.currentTarget.value;
-              setFormState((form) => ({
-                ...form,
-                start_date: value,
-              }));
-            }}
-          />
-        </div>
-        <div className="flex flex-col gap-1">
-          <p className="font-bold">End Date</p>
-
-          <input
-            type="date"
-            value={formState.end_date}
-            onChange={(e) => {
-              let value = e.currentTarget.value;
-              setFormState((form) => ({
-                ...form,
-                end_date: value,
-              }));
-            }}
-          />
-        </div>
       </div>
 
       {/* door image selector */}

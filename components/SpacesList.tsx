@@ -15,6 +15,7 @@ import { getCurrentDate } from "src/utils";
 
 export const SpaceList = (props: {
   spaces: Array<SpaceData>;
+  onEdit?: () => void;
   small?: boolean;
 }) => {
   return (
@@ -35,6 +36,7 @@ export const SpaceList = (props: {
         {props.spaces?.map((a) => {
           return (
             <SpaceCard
+              onEdit={props.onEdit}
               small={props.small}
               {...a}
               key={a.do_id}
@@ -48,7 +50,11 @@ export const SpaceList = (props: {
 };
 
 export const SpaceCard = (
-  props: { small?: boolean; editable?: boolean } & SpaceData
+  props: {
+    small?: boolean;
+    editable?: boolean;
+    onEdit?: () => void;
+  } & SpaceData
 ) => {
   let { data } = useSpaceData(props.do_id, props);
   return (
@@ -99,6 +105,7 @@ export const BaseSpaceCard = (props: Parameters<typeof SpaceCard>[0]) => {
                 {props.editable &&
                   (data?.owner?.username == session.session?.username ? (
                     <EditSpaceButton
+                      onEdit={props.onEdit}
                       spaceID={props.do_id}
                       owner={data?.owner?.username}
                     />
@@ -178,6 +185,7 @@ export const BaseSpaceCard = (props: Parameters<typeof SpaceCard>[0]) => {
               <div className="">
                 {data?.owner?.username == session.session?.username ? (
                   <EditSpaceButton
+                    onEdit={props.onEdit}
                     spaceID={props.do_id}
                     owner={data?.owner?.username}
                   />
@@ -214,7 +222,11 @@ export const BaseSpaceCard = (props: Parameters<typeof SpaceCard>[0]) => {
   );
 };
 
-export const EditSpaceButton = (props: { spaceID: string; owner?: string }) => {
+export const EditSpaceButton = (props: {
+  spaceID: string;
+  owner?: string;
+  onEdit?: () => void;
+}) => {
   let [open, setOpen] = useState(false);
   let { authorized } = useMutations();
   let { session } = useAuth();
@@ -239,6 +251,7 @@ export const EditSpaceButton = (props: { spaceID: string; owner?: string }) => {
 
         <div className="text-grey-55 hover:text-accent-blue">
           <EditSpaceModal
+            onSubmit={props.onEdit}
             spaceID={props.spaceID}
             open={open}
             onClose={() => setOpen(false)}

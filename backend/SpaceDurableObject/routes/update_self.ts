@@ -9,7 +9,7 @@ export const update_self_route = makeRoute({
   route: "update_self",
   input: z.object({
     authToken: authTokenVerifier,
-    data: space_input,
+    data: space_input.merge(z.object({ archived: z.boolean().optional() })),
   }),
   handler: async (msg, env: Env) => {
     const supabase = createClient(env.env);
@@ -30,8 +30,7 @@ export const update_self_route = makeRoute({
         default_space_image: msg.data.default_space_image,
         display_name: msg.data.display_name,
         description: msg.data.description,
-        start_date: msg.data.start_date,
-        end_date: msg.data.end_date,
+        archived: msg.data.archived,
       })
       .eq("do_id", env.id);
 

@@ -33,26 +33,56 @@ export const claimRoute = makeRoute({
     let thisEntity = ulid();
     if (creator || space_type) return { data: { success: false } };
     let memberEntity = ulid();
-    let homeEntity = ulid();
+    let canvasRoom = ulid();
+    let collectionRoom = ulid();
+    let chatRoom = ulid();
+
     await Promise.all([
       env.factStore.assertFact({
-        entity: homeEntity,
+        entity: canvasRoom,
         attribute: "home",
         value: flag(),
         positions: {},
       }),
+
       env.factStore.assertFact({
-        entity: homeEntity,
+        entity: canvasRoom,
         attribute: "room/name",
-        value: "Home",
-        positions: {},
+        value: "Canvas",
+        positions: { roomList: "a0" },
       }),
       env.factStore.assertFact({
-        entity: homeEntity,
+        entity: canvasRoom,
         attribute: "room/type",
         value: "canvas",
         positions: {},
       }),
+
+      env.factStore.assertFact({
+        entity: collectionRoom,
+        attribute: "room/name",
+        value: "Collection",
+        positions: { roomList: "c1" },
+      }),
+      env.factStore.assertFact({
+        entity: collectionRoom,
+        attribute: "room/type",
+        value: "collection",
+        positions: {},
+      }),
+      env.factStore.assertFact({
+        entity: chatRoom,
+        attribute: "room/name",
+        value: "Chat",
+        positions: { roomList: "t1" },
+      }),
+      env.factStore.assertFact({
+        entity: chatRoom,
+        attribute: "room/type",
+        value: "chat",
+        positions: {},
+      }),
+
       env.factStore.assertFact({
         entity: memberEntity,
         attribute: "space/member",

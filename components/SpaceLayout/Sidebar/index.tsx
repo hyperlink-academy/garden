@@ -1,14 +1,16 @@
 import Link from "next/link";
 import { Divider, Modal } from "components/Layout";
 import { useAuth } from "hooks/useAuth";
-import { useSpaceID } from "hooks/useReplicache";
+import { db, useMutations, useSpaceID } from "hooks/useReplicache";
 import React, { Fragment, useState } from "react";
 import {
   BackToHome,
+  BellSmall,
   Information,
   MoreOptionsSmall,
   RoomCalendar,
   RoomSearch,
+  UnreadDot,
 } from "../../Icons";
 import { EditSpaceModal } from "components/CreateSpace";
 import { getCurrentDate } from "src/utils";
@@ -31,6 +33,8 @@ export const Sidebar = (props: {
   currentRoom: string | null;
 }) => {
   let { session } = useAuth();
+  let { authorized } = useMutations();
+
   let [roomEditOpen, setRoomEditOpen] = useState(false);
 
   return (
@@ -38,28 +42,16 @@ export const Sidebar = (props: {
       <div className="no-scrollbar flex h-full w-full flex-col gap-4 overflow-y-scroll">
         <SpaceName />
         <Divider />
-        <div className="flex flex-row content-between gap-2 pl-2">
-          <button
-            className={`flex w-full justify-center rounded-md border p-1 ${
-              props.currentRoom === "search"
-                ? "rounded-md border-accent-blue bg-accent-blue font-bold text-white"
-                : " border-grey-80 text-grey-35 hover:bg-bg-blue"
-            }`}
-            onClick={() => props.onRoomChange("search")}
-          >
+        <div className="flex flex-row content-between gap-2 ">
+          <RoomButton {...props} roomID="search">
             <RoomSearch />
-          </button>
+          </RoomButton>
 
-          <button
-            className={`flex w-full justify-center rounded-md border p-1 ${
-              props.currentRoom === "calendar"
-                ? "rounded-md border-accent-blue bg-accent-blue font-bold text-white"
-                : " border-grey-80 text-grey-35 hover:bg-bg-blue"
-            }`}
-            onClick={() => props.onRoomChange("calendar")}
-          >
+          <RoomButton {...props} roomID="calendar">
             <RoomCalendar />
-          </button>
+          </RoomButton>
+
+          <UnreadsRoomButton {...props} />
         </div>
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
@@ -86,6 +78,47 @@ export const Sidebar = (props: {
       </div>
       <SidebarFooter studio={session.session?.username} />
     </div>
+  );
+};
+
+const UnreadsRoomButton = (props: {
+  currentRoom: string | null;
+  onRoomChange: (room: string) => void;
+}) => {
+  let { authorized, memberEntity } = useMutations();
+  let unreadCards = db.useReference(memberEntity, "card/unread-by");
+  let unreadDiscussions = db.useReference(memberEntity, "discussion/unread-by");
+  if (!authorized) return null;
+
+  return (
+    <RoomButton {...props} roomID="unreads">
+      {unreadCards?.length > 0 || unreadDiscussions?.length > 0 ? (
+        <div className="absolute -top-1 -left-1">
+          <UnreadDot />
+        </div>
+      ) : null}
+      <BellSmall />
+    </RoomButton>
+  );
+};
+
+const RoomButton = (props: {
+  roomID: string;
+  currentRoom: string | null;
+  children: React.ReactNode;
+  onRoomChange: (room: string) => void;
+}) => {
+  return (
+    <button
+      className={`relative flex w-full justify-center rounded-md border p-1 ${
+        props.currentRoom === props.roomID
+          ? "rounded-md border-accent-blue bg-accent-blue font-bold text-white"
+          : " border-grey-80 text-grey-35 hover:bg-bg-blue"
+      }`}
+      onClick={() => props.onRoomChange(props.roomID)}
+    >
+      {props.children}
+    </button>
   );
 };
 const SpaceName = () => {
@@ -124,7 +157,7 @@ const SpaceName = () => {
         onClose={() => setEditModal(false)}
         spaceID={spaceID}
       />
-      {spaceID && data?.display_name && <CallManager roomID={spaceID} />}
+      {spaceID && data?.display_name && <CallManager />}
     </div>
   );
 };

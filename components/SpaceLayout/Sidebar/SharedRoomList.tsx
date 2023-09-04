@@ -22,6 +22,7 @@ import {
   RoomChat,
   RoomCollection,
 } from "components/Icons";
+import { useSetRoom } from "hooks/useUIState";
 
 export const SharedRoomList = (props: {
   onRoomChange: (room: string) => void;
@@ -88,6 +89,7 @@ const CreateRoom = () => {
     type: "canvas" as "canvas" | "collection" | "chat",
   });
 
+  let setRoom = useSetRoom();
   let rep = useContext(ReplicacheContext);
   let { setNodeRef: droppableRef, over } = useDroppableZone({
     type: "room",
@@ -148,6 +150,7 @@ const CreateRoom = () => {
               value: roomState.type,
               positions: {},
             });
+            setRoom(room);
             setRoomState({ name: "", type: "canvas" });
             setOpen(false);
           }}

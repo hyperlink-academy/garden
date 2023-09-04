@@ -9,10 +9,12 @@ import { useAuth } from "hooks/useAuth";
 import { useRouter } from "next/router";
 import { Modal } from "components/Layout";
 import { LoginForm } from "./login";
+import { SignupForm } from "./signup";
 
 export default function IndexPage() {
   let textFormat = "mx-auto w-full flex max-w-2xl flex-col gap-4";
   let [logInOpen, setLogInOpen] = useState(false);
+  let [signupOpen, setSignupOpen] = useState(false);
 
   let { session } = useAuth();
   let router = useRouter();
@@ -125,7 +127,6 @@ export default function IndexPage() {
                   style={{ imageRendering: "pixelated" }}
                 />
                 <p className="text-sm italic">
-                  {/* ship your projects; share with friends */}
                   start and finish projects with friends
                 </p>
               </div>
@@ -145,7 +146,7 @@ export default function IndexPage() {
               </div>
             </div>
           </div>
-          <Divider />
+          <DividerSmall />
           {/* hyperlink in action */}
           <div className={`hyperlinkInAction ${textFormat} text-center`}>
             <div className="mb-4 flex flex-col gap-4">
@@ -193,7 +194,6 @@ export default function IndexPage() {
                   </div>
                   <div className="flex w-full flex-row items-center gap-2">
                     <div className="flex h-fit w-full flex-col gap-1 rounded-md border bg-white p-2 text-left text-sm text-grey-80">
-                      {/* <em>add a reply…</em> */}
                       <div className="h-4 w-full rounded-md bg-grey-90"></div>
                       <div className="h-4 w-[80%] rounded-md bg-grey-90"></div>
                     </div>
@@ -223,11 +223,11 @@ export default function IndexPage() {
               </ul>
             </div>
           </div>
-          <Divider />
+          <DividerSmall />
           {/* get started CTA! */}
-          <div className={`getStarted mb-8 text-center ${textFormat}`}>
+          <div className={`getStarted text-center ${textFormat}`}>
             <h2 className="pb-4 text-2xl leading-loose sm:text-3xl sm:leading-[3rem]">
-              <span className="text-xl sm:text-2xl">Spin up your new</span>
+              <span className="text-xl sm:text-2xl">Set up your new</span>
               <br />
               <span className="rounded-md border-b-4 border-accent-blue px-2 py-1">
                 Studio
@@ -241,18 +241,27 @@ export default function IndexPage() {
                 Campus
               </span>
             </h2>
-            <p className="text-xl">
-              Let&apos;s get you signed up! To start, we&apos;d love to get a
-              sense how you imagine using Hyperlink.
-            </p>
             <div className="my-4 flex scale-125 self-center">
-              <a href="mailto:contact@hyperlink.academy">
-                <ButtonPrimary content="send us a note ✨🌱"></ButtonPrimary>
-              </a>
+              <ButtonPrimary
+                content="create your account!"
+                onClick={() => setSignupOpen(true)}
+              />
             </div>
+            <Modal open={signupOpen} onClose={() => setSignupOpen(false)}>
+              <SignupForm />
+            </Modal>
+
+            <p className="text-xl">
+              We&apos;d love to answer any questions & hear more about how you
+              imagine using Hyperlink —{" "}
+              <a
+                href="mailto:contact@hyperlink.academy"
+                className="text-accent-blue"
+              >
+                send us a note ✨🌱
+              </a>
+            </p>
           </div>
-          <DividerSmall />
-          <Divider />
           <DividerSmall />
         </div>
 
@@ -347,26 +356,24 @@ export default function IndexPage() {
                 meaningful things together
               </p>
               <hr className="m-auto my-2 w-[25px] border-grey-80" />
-              <p className="text-sm">
-                still reading? if you&apos;d like to try Hyperlink…
-              </p>
+              <p className="text-sm">intrigued? to try Hyperlink…</p>
               <div className="my-0 flex self-center">
-                <a href="mailto:contact@hyperlink.academy">
-                  <ButtonPrimary content="send us a note ✨🌱"></ButtonPrimary>
-                </a>
+                {/* NB: opens same modal as above - just an extra button here! */}
+                <ButtonPrimary
+                  content="create your account!"
+                  onClick={() => setSignupOpen(true)}
+                />
               </div>
             </div>
           </div>
-          <div className="">
-            <Image
-              src="/landing/creator-landing-cover.png"
-              alt=""
-              width={754}
-              height={574}
-              className="m-auto"
-              style={{ imageRendering: "pixelated" }}
-            />
-          </div>
+          <Image
+            src="/landing/creator-landing-cover.png"
+            alt=""
+            width={754}
+            height={574}
+            className="m-auto"
+            style={{ imageRendering: "pixelated" }}
+          />
         </div>
         {/* END LANDING WRAPPER */}
       </div>

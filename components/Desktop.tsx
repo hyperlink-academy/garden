@@ -5,7 +5,7 @@ import {
   useMutations,
   useSpaceID,
 } from "hooks/useReplicache";
-import { useContext, useMemo, useState } from "react";
+import { useCallback, useContext, useMemo, useState } from "react";
 import { CardPreview } from "./CardPreview";
 import { ulid } from "src/ulid";
 import { FindOrCreate, useAllItems } from "./FindOrCreateEntity";
@@ -65,8 +65,8 @@ export const Desktop = (props: { entityID: string }) => {
               data.position?.size === "small"
                 ? "small"
                 : data.hideContent
-                ? "small"
-                : "big",
+                  ? "small"
+                  : "big",
           },
         });
       } else {
@@ -254,6 +254,42 @@ const DraggableCard = (props: {
   });
   let refs = useCombinedRefs(setNodeRef, setNodeRef2);
   let { close } = useCardViewer();
+  let onRotateDrag = useCallback(
+    (da: number) => {
+      mutate("updatePositionInDesktop", {
+        factID: props.relationshipID,
+        parent: props.parent,
+        dx: 0,
+        dy: 0,
+        da,
+      });
+    },
+    [props.parent, props.relationshipID]
+  );
+  let onDelete = useCallback(() => {
+    mutate("removeCardFromDesktopOrCollection", {
+      factID: props.relationshipID,
+      entityID: props.entityID,
+    });
+    close({ entityID: props.entityID });
+  }, [props.relationshipID, props.entityID, close, mutate]);
+  let dragHandleProps = useMemo(
+    () => ({ listeners, attributes }),
+    [listeners, attributes]
+  );
+  let onResize = useCallback(
+    (size: "big" | "small") => {
+      mutate("updatePositionInDesktop", {
+        factID: props.relationshipID,
+        size: size,
+        parent: props.parent,
+        dx: 0,
+        dy: 0,
+        da: 0,
+      });
+    },
+    [props.relationshipID, props.parent]
+  );
 
   let y = position?.value.y || 0;
   let x = position?.value.x || 0;
@@ -277,14 +313,13 @@ const DraggableCard = (props: {
           <div
             className={``}
             style={{
-              transform: `rotate(${
-                !position
+              transform: `rotate(${!position
                   ? 0
                   : (
-                      Math.floor(position.value.rotation / (Math.PI / 24)) *
-                      (Math.PI / 24)
-                    ).toFixed(2)
-              }rad)`,
+                    Math.floor(position.value.rotation / (Math.PI / 24)) *
+                    (Math.PI / 24)
+                  ).toFixed(2)
+                }rad)`,
             }}
           >
             {/* This is the actual card and its buttons. It also handles size */}
@@ -292,34 +327,11 @@ const DraggableCard = (props: {
               data={data}
               outerControls
               factID={props.relationshipID}
-              onRotateDrag={(da) => {
-                mutate("updatePositionInDesktop", {
-                  factID: props.relationshipID,
-                  parent: props.parent,
-                  dx: 0,
-                  dy: 0,
-                  da,
-                });
-              }}
-              onDelete={() => {
-                mutate("removeCardFromDesktopOrCollection", {
-                  factID: props.relationshipID,
-                  entityID: props.entityID,
-                });
-                close({ entityID: props.entityID });
-              }}
-              dragHandleProps={{ listeners, attributes }}
+              onRotateDrag={onRotateDrag}
+              onDelete={onDelete}
+              dragHandleProps={dragHandleProps}
               size={position?.value.size || "small"}
-              onResize={async (size) => {
-                return await mutate("updatePositionInDesktop", {
-                  factID: props.relationshipID,
-                  size: size,
-                  parent: props.parent,
-                  dx: 0,
-                  dy: 0,
-                  da: 0,
-                });
-              }}
+              onResize={onResize}
               {...props}
             />
           </div>

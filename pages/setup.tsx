@@ -109,11 +109,31 @@ export default function SignupPage() {
       </div>
 
       <form onSubmit={onSubmit} className="grid w-full gap-8">
-        {/* pick a name */}
+        {/* add the app */}
+        {/* TODO: device logic!
+        if on computer…would just prompt to get phone out
+        if on phone…still on setup + skip if already in app? 
+        maybe trigger notif permissions RIGHT HERE??
+        */}
         <div className="flex flex-col gap-4">
           <div className="flex gap-4">
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-blue p-2 text-white">
               1
+            </div>
+            <h2>add the app</h2>
+          </div>
+          <p>For easy access & notifications from collaborators 📬</p>
+          <p className="italic">
+            You can do this now & continue setup on mobile!
+          </p>
+          <AddAppInfo />
+        </div>
+
+        {/* pick a name */}
+        <div className="flex flex-col gap-4">
+          <div className="flex gap-4">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-blue p-2 text-white">
+              2
             </div>
             <h2>pick a name</h2>
           </div>
@@ -144,36 +164,6 @@ export default function SignupPage() {
               }
             />
           </label>
-        </div>
-
-        {/* add the app */}
-
-        {/* TODO: device logic!
-        if on computer…would just prompt to get phone out
-        if on phone…still on setup + skip if already in app? 
-        maybe trigger notif permissions RIGHT HERE??
-        */}
-
-        <div className="flex flex-col gap-4">
-          <div className="flex gap-4">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-blue p-2 text-white">
-              2
-            </div>
-            <h2>add the app</h2>
-          </div>
-          <p>
-            Add on mobile for easy access — and notifications from collaborators
-            📬
-          </p>
-          {/* <ButtonSecondary
-            content="Get the Hyperlink App"
-            icon={<AddTiny />}
-          ></ButtonSecondary> */}
-          <AddAppInfo />
-
-          <p className="italic">
-            You can do this now & continue setup on mobile!
-          </p>
         </div>
 
         {/* get started */}

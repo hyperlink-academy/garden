@@ -31,9 +31,6 @@ export const useAuthIdentityData = () => {
 export const useAuth = () => {
   const supabaseClient = useSupabaseClient();
   let session = useSession();
-  let { data: identityData } = useIdentityData(
-    session?.user?.user_metadata.username
-  );
   let authToken = useMemo(() => {
     if (!session) return null;
     return {
@@ -82,6 +79,6 @@ export const useAuth = () => {
         });
       },
     }),
-    [session, supabaseClient.auth, identityData]
+    [session, supabaseClient.auth]
   );
 };

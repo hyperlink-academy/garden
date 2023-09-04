@@ -7,15 +7,14 @@ import { useSmoker } from "components/Smoke";
 import { useAuth } from "hooks/useAuth";
 import { db, useMutations, useSpaceID } from "hooks/useReplicache";
 import { useContext, useState } from "react";
-import { DraggableRoomListItem, RoomListLabel } from "./RoomListLayout";
+import { RoomListLabel } from "./RoomListLayout";
 import {
   AddTiny,
   CallMutedTiny,
   CallUnMutedTiny,
-  Member,
   RoomMember,
 } from "components/Icons";
-import { CallContext } from "components/Calls/CallProvider";
+import { useParticipant, useParticipantIds } from "@daily-co/daily-react";
 
 export const MemberRoomList = (props: {
   onRoomChange: (room: string) => void;
@@ -23,7 +22,7 @@ export const MemberRoomList = (props: {
   setRoomEditOpen: () => void;
 }) => {
   let members = db.useAttribute("member/name");
-  let { memberEntity, authorized } = useMutations();
+  let { authorized } = useMutations();
 
   let [inviteOpen, setInviteOpen] = useState(false);
   return (
@@ -89,10 +88,11 @@ const MemberRoom = (props: {
   return (
     <button
       onClick={() => props.onRoomChange(props.entityID)}
-      className={`relative flex select-none flex-row gap-1 rounded-md border border-transparent py-0.5 pl-1 pr-1 text-left ${props.entityID === props.currentRoom
+      className={`relative flex select-none flex-row gap-1 rounded-md border border-transparent py-0.5 pl-1 pr-1 text-left ${
+        props.entityID === props.currentRoom
           ? `rounded-md ${bgColor} font-bold text-white`
           : ` ${textColor} hover:border-grey-80`
-        }`}
+      }`}
     >
       <div className="mt-[2px] h-5 w-5 shrink-0 pt-[1px] pl-[2px]">
         {!participant ? (
@@ -118,11 +118,12 @@ const MemberRoom = (props: {
 };
 
 function useParticipantInCall(username: string) {
-  let { participants } = useContext(CallContext);
-  return participants.find((p) => p.user_name === username);
+  let id = useParticipantIds({
+    filter: (participant) => participant.user_name === username,
+  });
+  return useParticipant(id[0]);
 }
 
->>>>>>> main
 const InviteMember = (props: { open: boolean; onClose: () => void }) => {
   let { authToken, session } = useAuth();
   let isMember = db.useUniqueAttribute("space/member", session.session?.studio);

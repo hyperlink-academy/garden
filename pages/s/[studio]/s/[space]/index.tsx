@@ -1,15 +1,13 @@
 import { CardViewer } from "components/CardViewerContext";
-import { db, useSpaceID } from "hooks/useReplicache";
+import { db, scanIndex, useMutations, useSpaceID } from "hooks/useReplicache";
 import { SmallCardDragContext } from "components/DragContext";
 import { Sidebar } from "components/SpaceLayout";
 import { useEffect } from "react";
 import useWindowDimensions from "hooks/useWindowDimensions";
 import { sortByPosition } from "src/position_helpers";
-import { useUndoableState } from "hooks/useUndoableState";
 import { Room } from "components/Room";
 import { SpaceMetaTitle } from "components/SpaceMetaTitle";
-import type { ServiceWorkerMessages } from "worker";
-import { publishAppEvent } from "hooks/useEvents";
+import { useRoom, useSetRoom, useUIState } from "hooks/useUIState";
 import { useRouter } from "next/router";
 import { PresenceHandler } from "components/PresenceHandler";
 
@@ -22,20 +20,53 @@ export default function SpacePage() {
   let firstRoom = firstRoomByID;
 
   let spaceID = useSpaceID();
-  let [r, setRoom, setRoomWithoutHistory] = useUndoableState<string | null>(
-    null
-  );
+  let r = useRoom();
+  let room = r || firstRoom;
+  let setRoom = useSetRoom();
+  let setRoomWithoutHistory = useUIState((s) => s.setRoom);
+
+  useEffect(() => {
+    if (!r && firstRoom) setRoom(firstRoom);
+  }, [r, firstRoom]);
+
+  let { query, replace } = useRouter();
+  let { rep } = useMutations();
+  let openCardWithoutHistory = useUIState((s) => s.openCard);
+  useEffect(() => {
+    if (query.openCard) {
+      (async () => {
+        let entityID = query.openCard as string;
+        if (!room || !spaceID || !rep) return;
+
+        let url = new URL(window.location.href);
+        url.searchParams.delete("openCard");
+        replace(url, undefined, { shallow: true });
+
+        let isRoom = await rep.query((tx) =>
+          scanIndex(tx).eav(entityID, "room/type")
+        );
+        if (isRoom) return setRoom(entityID);
+
+        let parent = await rep.query((tx) =>
+          scanIndex(tx).vae(entityID, "desktop/contains")
+        );
+        if (parent) setRoom(parent[0]?.entity);
+        openCardWithoutHistory(spaceID, room, entityID);
+      })();
+    }
+  }, [rep, query.openCard, room, spaceID]);
 
   useEffect(() => {
     if (!spaceID) return;
-    let room = window.localStorage.getItem(`space/${spaceID}/room`);
-    if (room) setRoomWithoutHistory(room);
+    let storedRoom = window.localStorage.getItem(`space/${spaceID}/room`);
+    if (storedRoom) setRoomWithoutHistory(spaceID, storedRoom);
   }, [spaceID, setRoomWithoutHistory]);
-  useEffect(() => {
-    if (r && spaceID) window.localStorage.setItem(`space/${spaceID}/room`, r);
-  }, [r, spaceID]);
 
-  let room = r || firstRoom;
+  useEffect(() => {
+    if (room && spaceID)
+      window.localStorage.setItem(`space/${spaceID}/room`, room);
+  }, [room, spaceID]);
+
   const { width } = useWindowDimensions();
 
   useEffect(() => {

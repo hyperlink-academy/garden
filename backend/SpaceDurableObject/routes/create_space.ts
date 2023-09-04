@@ -7,8 +7,6 @@ import { Env } from "..";
 
 export const space_input = z.object({
   display_name: z.string().trim().max(64),
-  start_date: z.string(),
-  end_date: z.string(),
   description: z.string().max(256),
   image: z.string().nullable().optional(),
   default_space_image: z.string().nullable().optional(),
@@ -47,8 +45,6 @@ export const create_space_route = makeRoute({
         description: msg.description,
         image: msg.image,
         default_space_image: msg.default_space_image,
-        start_date: msg.start_date,
-        end_date: msg.end_date,
       })
       .select("*, owner:identity_data!space_data_owner_fkey(*)")
       .single();

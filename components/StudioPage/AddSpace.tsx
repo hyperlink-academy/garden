@@ -90,8 +90,6 @@ const AddNewSpace = (props: { onClose: () => void; studioID: string }) => {
   let [formState, setFormState] = useState<CreateSpaceFormState>({
     display_name: "",
     description: "",
-    start_date: "",
-    end_date: "",
     image: null,
     default_space_image: null,
   });

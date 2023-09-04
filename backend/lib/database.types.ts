@@ -218,6 +218,7 @@ export interface Database {
       }
       space_data: {
         Row: {
+          archived: boolean
           default_space_image: string | null
           description: string | null
           display_name: string | null
@@ -230,6 +231,7 @@ export interface Database {
           start_date: string | null
         }
         Insert: {
+          archived?: boolean
           default_space_image?: string | null
           description?: string | null
           display_name?: string | null
@@ -242,6 +244,7 @@ export interface Database {
           start_date?: string | null
         }
         Update: {
+          archived?: boolean
           default_space_image?: string | null
           description?: string | null
           display_name?: string | null
