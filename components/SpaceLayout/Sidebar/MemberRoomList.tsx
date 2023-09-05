@@ -75,17 +75,6 @@ const MemberRoom = (props: {
   let color = db.useEntity(props.entityID, "member/color");
   let participant = useParticipantInCall(props.memberName);
 
-  let bgColor = participant
-    ? participant.tracks.audio.state === "playable"
-      ? "bg-accent-green"
-      : "bg-grey-55"
-    : "bg-accent-blue";
-
-  let textColor =
-    participant && participant.tracks.audio.state === "playable"
-      ? "text-accent-green"
-      : "text-grey-35";
-
   let { memberEntity } = useMutations();
 
   return (
