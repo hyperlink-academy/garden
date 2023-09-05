@@ -12,7 +12,6 @@ import { DisclosureCollapseTiny, DisclosureExpandTiny } from "components/Icons";
 import Head from "next/head";
 import { NotificationManager } from "components/NotificationManager";
 import { HelpExampleSpaces } from "components/HelpCenter";
-import { Divider } from "components/Layout";
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>;
 export default function UserHomePage(props: Props) {
@@ -145,7 +144,10 @@ const List = (props: {
       {/* different messages for logged in user vs. viewing someone else's home */}
       {spaces.length == 0 ? (
         session?.loggedIn && myStudioName == currentStudioName ? (
-          <MyHomeEmpty /> /* me as in the logged in user who can make spaces here */
+          <MyHomeEmpty
+            studioSpaceID={props.id}
+            studioName={myStudioName as string}
+          /> /* me as in the logged in user who can make spaces here */
         ) : (
           <YourHomeEmpty
             username={currentStudioName as string}
@@ -184,7 +186,7 @@ const YourHomeEmpty = (props: { username: string }) => {
   );
 };
 
-const MyHomeEmpty = () => {
+const MyHomeEmpty = (props: { studioSpaceID: string; studioName: string }) => {
   return (
     <div className="lightBorder my-4 flex flex-col gap-4 border border-dashed p-8 text-center">
       <p>
@@ -192,6 +194,13 @@ const MyHomeEmpty = () => {
         collaboration. Each Space has its own cards, calendar, and members.
       </p>
       <p>To get started, make a new Space & invite a friend to join!</p>
+
+      <div className="m-auto">
+        <CreateSpace
+          studioSpaceID={props.studioSpaceID}
+          studioName={props.studioName}
+        />
+      </div>
 
       <hr className="m-auto my-4 w-16 border-dashed border-grey-80" />
 

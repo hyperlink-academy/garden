@@ -147,6 +147,7 @@ export const EditSpaceModal = (props: {
     <Modal open={props.open} onClose={props.onClose}>
       {mode === "normal" ? (
         <Form
+          className="flex flex-col gap-4"
           validate={() => {
             if (!authToken || !props.spaceID) return;
             return { authToken, spaceID: props.spaceID };
@@ -164,31 +165,30 @@ export const EditSpaceModal = (props: {
             props.onClose();
           }}
         >
+          {/* main space settings e.g. name, description, img */}
           <CreateSpaceForm formState={formState} setFormState={setFormState} />
 
-          <div className="flex flex-col gap-3">
-            <hr className="border-grey-55" />
-            <div className="flex flex-row gap-2">
-              <SubmitButton content={"Update"} disabled={!modified} />
-              <ButtonLink
-                content={"nevermind"}
-                onClick={async () => {
-                  props.onClose();
-                }}
-              />
-            </div>
-            <hr className="border-grey-55" />
-            <div className="flex flex-col gap-2">
-              <ArchiveButton
-                spaceID={props.spaceID}
-                onSubmit={props.onSubmit}
-              />
-              <ButtonPrimary
-                content="Delete this Space"
-                destructive
-                onClick={() => setMode("delete")}
-              />
-            </div>
+          {/* update or nevermind */}
+          <div className="flex flex-row gap-2">
+            <SubmitButton content={"Update"} disabled={!modified} />
+            <ButtonLink
+              content={"nevermind"}
+              onClick={async () => {
+                props.onClose();
+              }}
+            />
+          </div>
+
+          <hr className="border-grey-80" />
+
+          {/* archive + delete section */}
+          <div className="flex flex-col gap-2">
+            <ArchiveButton spaceID={props.spaceID} onSubmit={props.onSubmit} />
+            <ButtonPrimary
+              content="Delete this Space"
+              destructive
+              onClick={() => setMode("delete")}
+            />
           </div>
         </Form>
       ) : (
@@ -305,7 +305,7 @@ export const CreateSpaceForm = ({
   setFormState: React.Dispatch<React.SetStateAction<CreateSpaceFormState>>;
 }) => {
   return (
-    <>
+    <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-1">
         <p className="font-bold">Name this Space</p>
         {disableName ? (
@@ -362,6 +362,6 @@ export const CreateSpaceForm = ({
           })
         }
       />
-    </>
+    </div>
   );
 };

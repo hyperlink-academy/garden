@@ -46,15 +46,15 @@ export function SignupForm(props: { redirectTo?: string }) {
     );
 
   return (
-    <div className="grid-rows-max mx-auto grid max-w-md gap-8">
+    <div className="grid-rows-max mx-auto grid w-full max-w-md gap-8">
       <div className="grid-auto-rows grid gap-2">
         <h1>Hi, welcome to Hyperlink!</h1>
         <p className="text-grey-35">
-          Already have an account?{" "}
+          Have an account?{" "}
           <Link className="text-accent-blue" href="/login">
             Log in
           </Link>{" "}
-          instead ✨
+          ✨
         </p>
       </div>
 
@@ -91,16 +91,17 @@ export function SignupForm(props: { redirectTo?: string }) {
       </form>
       <div className="flex flex-col gap-2 rounded-md bg-bg-gold p-4 text-center">
         <p className="text-grey-15">
-          we will <strong>only</strong> email you about your account
+          we&apos;ll <strong>only</strong> email about your account
         </p>
         <p>
-          to get our newsletter too,{" "}
+          want to get our newsletter?{" "}
           <a
             href="https://buttondown.email/hyperlink/"
             target="_blank"
             rel="noopener noreferrer"
             className="text-accent-blue"
           >
+            <br />
             subscribe here 💌
           </a>
         </p>

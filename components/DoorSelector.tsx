@@ -60,19 +60,6 @@ export const DoorSelector = (props: {
         ) : null}
       </div>
       <div>
-        <p className="pb-2">Upload a custom image!</p>
-        <p className="pb-2 text-sm">
-          Crop to 256 x 576 px. Try{" "}
-          <a
-            href="https://museo.app/"
-            className="text-accent-blue"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Museo
-          </a>{" "}
-          for inspo :)
-        </p>
         <AddImage
           onUpload={(imageID) => {
             if (props.selected && !defaultDoorImages.includes(props.selected))
@@ -80,7 +67,10 @@ export const DoorSelector = (props: {
             props.onSelect({ type: "file", filetype: "image", id: imageID });
           }}
         >
-          <SectionImageAdd />
+          <div className="flex gap-2">
+            <p className="">Upload a custom image!</p>
+            <SectionImageAdd />
+          </div>
         </AddImage>
       </div>
     </div>
