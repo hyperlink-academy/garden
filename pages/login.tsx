@@ -1,11 +1,9 @@
-import { ButtonPrimary } from "components/Buttons";
+import { ButtonLink, ButtonPrimary } from "components/Buttons";
 import { useAuth } from "hooks/useAuth";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { DotLoader } from "components/DotLoader";
 import Link from "next/link";
-import { Divide } from "faunadb";
-import { Divider } from "components/Layout";
 
 export default function LoginPage() {
   let router = useRouter();
@@ -26,10 +24,10 @@ export function LoginForm(props: {
     password: "",
   });
 
-  let { login } = useAuth();
-  let [status, setStatus] = useState<"normal" | "incorrect" | "loading">(
-    "normal"
-  );
+  let { login, signup } = useAuth();
+  let [status, setStatus] = useState<
+    "normal" | "incorrect" | "loading" | "confirmEmail"
+  >("normal");
   useEffect(() => {
     setStatus("normal");
   }, [data.email, data.password]);
@@ -38,20 +36,27 @@ export function LoginForm(props: {
     e.preventDefault();
     setStatus("loading");
     let result = await login(data);
-    if (!result?.user) setStatus("incorrect");
+    if (result?.error === "confirmEmail") {
+      setStatus("confirmEmail");
+      return;
+    }
+    if (!result?.data?.user) setStatus("incorrect");
     else {
       setStatus("normal");
-      props.onLogin(result.user.user_metadata as { username?: string });
+      props.onLogin(result.data.user.user_metadata as { username?: string });
     }
   };
   return (
     <div className="grid-auto-rows mx-auto grid max-w-md gap-8">
       <h1>Hi, welcome back!</h1>
       <form className="grid w-full gap-4" onSubmit={onSubmit}>
-        {status !== "incorrect" ? null : (
+        {status === "normal" || status === "loading" ? null : status ===
+          "incorrect" ? (
           <div className="text-accent-red">
-            Your email or password is incorrect
+            Your email or password is incorrect.
           </div>
+        ) : (
+          <ResendEmail {...data} />
         )}
         <label className="grid-flow-rows grid gap-2 font-bold">
           Email
@@ -106,3 +111,31 @@ export function LoginForm(props: {
     </div>
   );
 }
+
+const ResendEmail = (props: { email: string; password: string }) => {
+  let { login, signup } = useAuth();
+  let [status, setStatus] = useState<"normal" | "loading" | "sent">("normal");
+  return (
+    <div>
+      You need to confirm your email.{" "}
+      {status === "loading" ? (
+        <DotLoader />
+      ) : status === "sent" ? (
+        <div>sent</div>
+      ) : (
+        <ButtonLink
+          content="Resend confirmation email?"
+          onClick={async () => {
+            setStatus("loading");
+            let result = await signup({
+              email: props.email,
+              password: props.password,
+            });
+            console.log(result);
+            setStatus("sent");
+          }}
+        />
+      )}
+    </div>
+  );
+};

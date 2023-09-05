@@ -51,14 +51,18 @@ export const useAuth = () => {
         } | null,
       },
       login: async (login_data: { email: string; password: string }) => {
-        if (session) return session;
+        if (session) return { success: true, data: session } as const;
         let res = await workerAPI(WORKER_URL, "login", login_data);
+        console.log(res);
+        if (res.error === "confirmEmail") {
+          return { success: false, error: "confirmEmail" } as const;
+        }
         if (!res.session?.session) return null;
         let { data } = await supabaseClient.auth.setSession(
           res.session?.session
         );
-        if (data) return data;
-        return null;
+        if (data) return { success: true, data };
+        return { success: false, error: "no session" } as const;
       },
       logout: () => {
         supabaseClient.auth.signOut();
@@ -72,9 +76,8 @@ export const useAuth = () => {
           email: input.email,
           password: input.password,
           options: {
-            emailRedirectTo: `${window.location.origin}/setup${
-              input.redirectTo ? `?redirectTo=${input.redirectTo}` : ""
-            }`,
+            emailRedirectTo: `${window.location.origin}/setup${input.redirectTo ? `?redirectTo=${input.redirectTo}` : ""
+              }`,
           },
         });
       },

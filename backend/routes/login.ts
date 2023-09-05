@@ -9,6 +9,7 @@ const Errors = {
   noUser: "noUser",
   incorrectPassword: "incorrectPassword",
   insecureContext: "insecureContext",
+  confirmEmail: "confirmEmail",
 } as const;
 
 export type LoginResponse = ExtractResponse<typeof LoginRoute>;
@@ -25,6 +26,9 @@ export const LoginRoute = makeRoute({
       email: msg.email,
       password: msg.password,
     });
+    if (supabaseLogin.error?.message === "Email not confirmed") {
+      return { data: { success: false, error: Errors.confirmEmail } } as const;
+    }
     if (supabaseLogin.error) {
       let { data: existingUser } = await supabase
         .from("old_identities")
