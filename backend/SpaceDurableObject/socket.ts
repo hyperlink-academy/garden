@@ -7,15 +7,20 @@ export function connect(this: SpaceDurableObject, request: Request): Response {
   }
 
   console.log("yooo connecting socket!");
-  const webSocketPair = new WebSocketPair();
-  const client = webSocketPair[0],
-    server = webSocketPair[1];
+  try {
+    const webSocketPair = new WebSocketPair();
+    const client = webSocketPair[0],
+      server = webSocketPair[1];
 
-  this.state.acceptWebSocket(server);
-  this.poke();
+    this.state.acceptWebSocket(server);
+    this.poke();
 
-  return new Response(null, {
-    status: 101,
-    webSocket: client,
-  });
+    return new Response(null, {
+      status: 101,
+      webSocket: client,
+    });
+  } catch (e) {
+    console.log(e);
+    return new Response(null, { status: 500 });
+  }
 }
