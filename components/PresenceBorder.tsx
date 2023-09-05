@@ -1,18 +1,26 @@
 import { db } from "hooks/useReplicache";
+import { useSpring, animated, useTransition } from "@react-spring/web";
 
-export const PresenceBorder = (props: {
-  children: React.ReactNode;
-  entityID: string;
-}) => {
+export const PresenceBorder = (props: { entityID: string }) => {
   let present = db.useReference(props.entityID, "presence/on-card");
+  let presences = useTransition(present, {
+    keys: (p) => p.entity,
+    from: { top: 32.0 },
+    enter: { top: 4 },
+    leave: { top: 32.0 },
+    config: {
+      precision: 0.1,
+    },
+  });
   return (
     <>
       <div className="absolute right-4 -top-6 flex flex-row-reverse">
-        {present.map((p) => (
-          <Identity entityID={p.entity} key={p.id} />
+        {presences((style, p) => (
+          <animated.span className="absolute" style={style}>
+            <Identity entityID={p.entity} />
+          </animated.span>
         ))}
       </div>
-      {props.children}
     </>
   );
 };
