@@ -109,21 +109,26 @@ export class SpaceDurableObject implements DurableObject {
       },
       factStore: store(this.state.storage, { id: this.state.id.toString() }),
     };
-    switch (path[1]) {
-      case "upload_file": {
-        return handleFileUpload(request, ctx);
+    try {
+      switch (path[1]) {
+        case "upload_file": {
+          return handleFileUpload(request, ctx);
+        }
+        case "socket": {
+          return connect.bind(this)(request);
+        }
+        case "api": {
+          return router(path[2], request, ctx);
+        }
+        case "internal_api": {
+          return internalRouter(path[2], request, ctx);
+        }
+        default:
+          return new Response("", { status: 404 });
       }
-      case "socket": {
-        return connect.bind(this)(request);
-      }
-      case "api": {
-        return router(path[2], request, ctx);
-      }
-      case "internal_api": {
-        return internalRouter(path[2], request, ctx);
-      }
-      default:
-        return new Response("", { status: 404 });
+    } catch (e) {
+      console.log(e);
+      return new Response("An uncaught exception occured", { status: 500 });
     }
   }
   async webSocketMessage(_ws: WebSocket, message: string) {
