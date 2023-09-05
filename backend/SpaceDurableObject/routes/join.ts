@@ -4,7 +4,9 @@ import { authTokenVerifier, verifyIdentity } from "backend/lib/auth";
 import { createClient } from "backend/lib/supabase";
 import { ulid } from "src/ulid";
 import { z } from "zod";
+import { memberColors } from "src/colors";
 import { Env } from "..";
+import { store } from "../fact_store";
 
 export const join_route = makeRoute({
   route: "join",
@@ -46,10 +48,17 @@ export const join_route = makeRoute({
       isMember = !!data;
     }
 
+    let color = await getMemberColor(env.factStore);
     let memberEntity = ulid();
     console.log("creating members");
     console.log(
       await Promise.all([
+        env.factStore.assertFact({
+          entity: memberEntity,
+          attribute: "member/color",
+          value: color,
+          positions: {},
+        }),
         env.factStore.assertFact({
           entity: memberEntity,
           attribute: "space/member",
@@ -89,3 +98,18 @@ export const join_route = makeRoute({
     return { data: { success: true } } as const;
   },
 });
+
+export const getMemberColor = async (fact_store: ReturnType<typeof store>) => {
+  let existingMemberColors = await fact_store.scanIndex.aev("member/color");
+  let color;
+  let unassignedColors = memberColors.filter(
+    (color) =>
+      !existingMemberColors.find((memberColor) => memberColor.value === color)
+  );
+  if (unassignedColors.length === 0)
+    color = memberColors[Math.floor(Math.random() * memberColors.length)];
+  else
+    color =
+      unassignedColors[Math.floor(Math.random() * unassignedColors.length)];
+  return color;
+};

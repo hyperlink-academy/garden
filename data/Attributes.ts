@@ -238,6 +238,11 @@ export const DefaultAttributes = {
     type: "string",
     cardinality: "one",
   },
+  "member/color": {
+    unique: false,
+    type: "string",
+    cardinality: "one",
+  },
   "this/name": {
     unique: true,
     type: "string",

@@ -72,12 +72,15 @@ const MemberRoom = (props: {
 }) => {
   let activeSessions =
     db.useReference(props.entityID, "presence/client-member") || [];
+  let color = db.useEntity(props.entityID, "member/color");
   let participant = useParticipantInCall(props.memberName);
+
   let bgColor = participant
     ? participant.tracks.audio.state === "playable"
       ? "bg-accent-green"
       : "bg-grey-55"
     : "bg-accent-blue";
+
   let textColor =
     participant && participant.tracks.audio.state === "playable"
       ? "text-accent-green"
@@ -87,14 +90,32 @@ const MemberRoom = (props: {
 
   return (
     <button
+      style={{
+        color:
+          props.entityID === props.currentRoom
+            ? "white"
+            : activeSessions.length > 0
+            ? color?.value
+            : undefined,
+        backgroundColor:
+          props.entityID === props.currentRoom ? color?.value : undefined,
+      }}
       onClick={() => props.onRoomChange(props.entityID)}
       className={`relative flex select-none flex-row gap-1 rounded-md border border-transparent py-0.5 pl-1 pr-1 text-left ${
         props.entityID === props.currentRoom
-          ? `rounded-md ${bgColor} font-bold text-white`
-          : ` ${textColor} hover:border-grey-80`
+          ? `rounded-md font-bold text-white`
+          : ` hover:border-grey-80`
       }`}
     >
-      <div className="mt-[2px] h-5 w-5 shrink-0 pt-[1px] pl-[2px]">
+      <div
+        className="mt-[2px] h-5 w-5 shrink-0 pt-[1px] pl-[2px]"
+        style={{
+          color:
+            participant && participant.tracks.audio.state !== "playable"
+              ? "#595959"
+              : undefined,
+        }}
+      >
         {!participant ? (
           <RoomMember />
         ) : participant.tracks.audio.state === "playable" ? (

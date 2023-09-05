@@ -3,6 +3,7 @@ import { flag } from "data/Facts";
 import { ulid } from "src/ulid";
 import { z } from "zod";
 import { Env } from "..";
+import { getMemberColor } from "./join";
 
 let defaultReactions = [
   "😊",
@@ -80,6 +81,12 @@ export const claimRoute = makeRoute({
         entity: chatRoom,
         attribute: "room/type",
         value: "chat",
+        positions: {},
+      }),
+      env.factStore.assertFact({
+        entity: memberEntity,
+        attribute: "member/color",
+        value: await getMemberColor(env.factStore),
         positions: {},
       }),
 

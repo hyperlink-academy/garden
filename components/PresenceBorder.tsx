@@ -4,20 +4,7 @@ export const PresenceBorder = (props: {
   children: React.ReactNode;
   entityID: string;
 }) => {
-  let peoplePresent = db.useReference(props.entityID, "presence/on-card");
-  if (peoplePresent?.length === 0) return <>{props.children}</>;
-  return (
-    <div className="flex flex-col">
-      <div className="text-right">
-        {peoplePresent.map((person) => (
-          <Identity entityID={person.entity} />
-        ))}
-      </div>
-      <div className="flex h-max border-2 border-accent-blue">
-        {props.children}
-      </div>
-    </div>
-  );
+  return props.children;
 };
 
 const Identity = (props: { entityID: string }) => {
