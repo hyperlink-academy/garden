@@ -98,7 +98,11 @@ const MemberRoom = (props: {
             ? color?.value
             : undefined,
         backgroundColor:
-          props.entityID === props.currentRoom ? color?.value : undefined,
+          props.entityID === props.currentRoom
+            ? activeSessions.length > 0
+              ? color?.value
+              : "#0000FF"
+            : undefined,
       }}
       onClick={() => props.onRoomChange(props.entityID)}
       className={`relative flex select-none flex-row gap-1 rounded-md border border-transparent py-0.5 pl-1 pr-1 text-left ${
