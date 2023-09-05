@@ -1,5 +1,10 @@
-import { DailyProvider, DailyAudio, useDaily } from "@daily-co/daily-react";
-import { useCallback } from "react";
+import {
+  DailyProvider,
+  DailyAudio,
+  useDaily,
+  useDailyEvent,
+} from "@daily-co/daily-react";
+import { useCallback, useRef } from "react";
 import { useAuth } from "hooks/useAuth";
 import { useSpaceID } from "hooks/useReplicache";
 import { spaceAPI } from "backend/lib/api";
@@ -8,9 +13,27 @@ export const CallProvider = (props: { children: React.ReactNode }) => {
   return (
     <DailyProvider audioSource videoSource={false}>
       {props.children}
+      <ScreenWake />
       <DailyAudio />
     </DailyProvider>
   );
+};
+
+const ScreenWake = () => {
+  let wakeLock = useRef<null | any>(null);
+  useDailyEvent("joined-meeting", async () => {
+    try {
+      if ("wakeLock" in navigator) {
+        //@ts-ignore
+        wakeLock.current = await navigator.wakeLock.request("screen");
+      }
+    } catch (e) {}
+  });
+  useDailyEvent("left-meeting", async () => {
+    if (wakeLock.current) await wakeLock.current.release();
+    wakeLock.current = null;
+  });
+  return <></>;
 };
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
