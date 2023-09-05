@@ -195,11 +195,11 @@ const HelpShortcuts = () => {
       <h3>text editing</h3>
       <ul className="flex list-disc flex-col gap-1 pl-4 sm:pl-8">
         <li>
-          <TextString>[[</TextString> and search to inline link to a card
-        </li>
-        <li>
           start a line with <TextString>#</TextString> or{" "}
           <TextString>##</TextString> for headers
+        </li>
+        <li>
+          <TextString>[[</TextString> and search to inline link to a card
         </li>
         <li>
           wrap in <TextString>*</TextString> or{" "}
@@ -210,6 +210,18 @@ const HelpShortcuts = () => {
           wrap in <TextString>**</TextString> or{" "}
           <KeyboardKey>ctrl/cmd</KeyboardKey> + <KeyboardKey>b</KeyboardKey> for
           bold
+        </li>
+        <li>
+          wrap in <TextString>==</TextString> for highlight
+        </li>
+        <li>
+          wrap in <TextString>~~</TextString> for strikethrough
+        </li>
+        <li>
+          wrap in <TextString>`</TextString> for inline code
+        </li>
+        <li>
+          start a line with <TextString>&gt;</TextString> for blockquote
         </li>
       </ul>
 
@@ -227,9 +239,16 @@ const HelpShortcuts = () => {
       <h3>rooms & cards</h3>
       <ul className="flex list-disc flex-col gap-1 pl-4 sm:pl-8">
         <li>
-          canvas: <KeyboardKey>ctrl/cmd</KeyboardKey> + click for new card
+          <i>canvas</i>: <KeyboardKey>ctrl/cmd</KeyboardKey> + click for new
+          card
         </li>
-        <li>collection: drag to reorder cards</li>
+        <li>
+          <i>collection</i>: drag to reorder cards
+        </li>
+        <li>
+          <KeyboardKey>alt</KeyboardKey> + <KeyboardKey>↑</KeyboardKey> and{" "}
+          <KeyboardKey>↓</KeyboardKey> to switch rooms
+        </li>
         <li>drag to reorder rooms in sidebar</li>
         <li>drag a card onto another to link them</li>
       </ul>
@@ -243,10 +262,6 @@ const HelpShortcuts = () => {
         <li>
           <KeyboardKey>ctrl/cmd</KeyboardKey> + <KeyboardKey>shift</KeyboardKey>{" "}
           + <KeyboardKey>z</KeyboardKey> = redo
-        </li>
-        <li>
-          <KeyboardKey>alt</KeyboardKey> + <KeyboardKey>↑</KeyboardKey> and{" "}
-          <KeyboardKey>↓</KeyboardKey> to switch rooms
         </li>
       </ul>
     </div>
