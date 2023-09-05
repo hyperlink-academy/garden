@@ -49,13 +49,25 @@ export default function IndexPage() {
                 <div className="m-auto flex flex-row gap-2 self-center">
                   {!session?.loggedIn ? (
                     <>
+                      <ButtonLink
+                        content="sign up"
+                        onClick={() => setSignupOpen(true)}
+                      />
                       <span>
-                        <em>have an account?</em>
+                        <em>or</em>
                       </span>
                       <ButtonLink
                         content="log in"
                         onClick={() => setLogInOpen(true)}
                       />
+                      {/* signup modal */}
+                      <Modal
+                        open={signupOpen}
+                        onClose={() => setSignupOpen(false)}
+                      >
+                        <SignupForm />
+                      </Modal>
+                      {/* login modal */}
                       <Modal
                         open={logInOpen}
                         onClose={() => setLogInOpen(false)}
@@ -242,14 +254,12 @@ export default function IndexPage() {
               </span>
             </h2>
             <div className="my-4 flex scale-125 self-center">
+              {/* NB: opens same modal as above - just an extra button here! */}
               <ButtonPrimary
                 content="create your account!"
                 onClick={() => setSignupOpen(true)}
               />
             </div>
-            <Modal open={signupOpen} onClose={() => setSignupOpen(false)}>
-              <SignupForm />
-            </Modal>
 
             <p className="text-xl">
               We&apos;d love to answer any questions & hear more about how you
