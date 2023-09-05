@@ -1,5 +1,7 @@
 import { Tab } from "@headlessui/react";
-import { Children, Fragment } from "react";
+import { Children, Fragment, useState } from "react";
+import { ButtonSecondary, ButtonPrimary } from "./Buttons";
+import { AddTiny, Settings } from "./Icons";
 import { Modal, ModalFixedHeight } from "./Layout";
 
 export const HelpModal = (props: { open: boolean; onClose: () => void }) => {
@@ -13,9 +15,9 @@ export const HelpModal = (props: { open: boolean; onClose: () => void }) => {
 export const HelpDocs = () => {
   return (
     <>
-      <h3 className="m-auto">Hyperlink Help Center 🌱</h3>
+      <h3 className="m-auto">Hyperlink Help Docs</h3>
       <Tab.Group manual>
-        <Tab.List className="m-auto flex gap-1">
+        <Tab.List className="m-auto flex flex-wrap gap-1">
           <Tab as={Fragment}>
             {({ selected }) => (
               <button
@@ -42,7 +44,7 @@ export const HelpDocs = () => {
               </button>
             )}
           </Tab>
-          <Tab as={Fragment}>
+          {/* <Tab as={Fragment}>
             {({ selected }) => (
               <button
                 className={`rounded-md border p-2 ${
@@ -54,6 +56,32 @@ export const HelpDocs = () => {
                 Changelog
               </button>
             )}
+          </Tab> */}
+          <Tab as={Fragment}>
+            {({ selected }) => (
+              <button
+                className={`rounded-md border p-2 ${
+                  selected
+                    ? "border-accent-blue bg-accent-blue text-white"
+                    : "text-black border-grey-80 bg-white hover:bg-bg-blue"
+                }`}
+              >
+                Examples
+              </button>
+            )}
+          </Tab>
+          <Tab as={Fragment}>
+            {({ selected }) => (
+              <button
+                className={`rounded-md border p-2 ${
+                  selected
+                    ? "border-accent-blue bg-accent-blue text-white"
+                    : "text-black border-grey-80 bg-white hover:bg-bg-blue"
+                }`}
+              >
+                Get the App
+              </button>
+            )}
           </Tab>
         </Tab.List>
         <Tab.Panels>
@@ -63,14 +91,22 @@ export const HelpDocs = () => {
           <Tab.Panel>
             <HelpShortcuts />
           </Tab.Panel>
-          <Tab.Panel>
+          {/* <Tab.Panel>
             <HelpChangelog />
+          </Tab.Panel> */}
+          <Tab.Panel>
+            <HelpExampleSpaces />
+          </Tab.Panel>
+          <Tab.Panel>
+            <HelpAppInfo />
           </Tab.Panel>
         </Tab.Panels>
       </Tab.Group>
     </>
   );
 };
+
+// HELP CONTENT SECTIONS
 
 const HelpHandbook = () => {
   return (
@@ -225,6 +261,79 @@ const HelpChangelog = () => {
     </div>
   );
 };
+
+// also used in homepage empty state
+export const HelpExampleSpaces = () => {
+  return (
+    <div className="flex flex-col gap-4">
+      <h2>Example Spaces</h2>
+      <p className="">Here are a few of our Spaces for inspiration ✨🌱</p>
+
+      <div className="my-4 flex flex-col gap-4">
+        <a
+          className="flex w-full flex-col gap-2 self-center rounded-md border bg-white p-2 hover:bg-bg-blue sm:gap-4 sm:p-4"
+          href="https://hyperlink.academy/s/brendan/s/Website%20Jam:%20pattern.kitchen/website-jam-patternkitchen"
+          target="_blank"
+        >
+          <h2>side project</h2>
+          <p className="text-sm italic">
+            example: website on pattern languages 🌐
+          </p>
+        </a>
+        <a
+          className="flex w-full flex-col gap-2 self-center rounded-md border bg-white p-2 hover:bg-bg-blue sm:gap-4 sm:p-4"
+          href="https://hyperlink.academy/s/celine/s/Stuffy%20Stuff/stuffy-stuff"
+          target="_blank"
+        >
+          <h2>creative project with a friend</h2>
+          <p className="text-sm italic">example: stuffed animal crafting 🐰</p>
+        </a>
+        <a
+          className="flex w-full flex-col gap-2 self-center rounded-md border bg-white p-2 hover:bg-bg-blue sm:gap-4 sm:p-4"
+          href="https://hyperlink.academy/s/brendan/s/23/hyperlink-writing-room-2023"
+          target="_blank"
+        >
+          <h2>small group collab</h2>
+          <p className="text-sm italic">
+            example: Hyperlink team writing room ✍️
+          </p>
+        </a>
+      </div>
+    </div>
+  );
+};
+
+// also used in /setup
+export const HelpAppInfo = () => {
+  return (
+    <div className="flex flex-col gap-4">
+      <h2>Add the App!</h2>
+      <p>
+        Get Hyperlink on your home screen — and get push notifications for
+        activity in your Spaces.
+      </p>
+      <h3>first, grab your phone 📱</h3>
+      <ol className="flex list-decimal flex-col gap-1 pl-8">
+        <li>Open hyperlink.academy in your browser</li>
+        <li>
+          Tap the Share icon (iOS / Safari) or three dot menu (Android / Chrome)
+        </li>
+        <li>Select &quot;Add to Home Screen&quot;</li>
+      </ol>
+      <h3>then, turn on notifications 🔔</h3>
+      <p>Open the app, log in, and from your homepage: </p>
+      <p className="flex gap-2">
+        <span className="inline-block justify-center">
+          <Settings />
+        </span>{" "}
+        → <span className="self-center italic">enable notifications</span>
+      </p>
+      <p>We&apos;ll ping you for new chats & card comments.</p>
+    </div>
+  );
+};
+
+// HELP HELPERS [LOL]
 
 const TextString = (props: { children: React.ReactNode }) => {
   return (

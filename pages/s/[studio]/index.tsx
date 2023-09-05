@@ -11,6 +11,8 @@ import { useState } from "react";
 import { DisclosureCollapseTiny, DisclosureExpandTiny } from "components/Icons";
 import Head from "next/head";
 import { NotificationManager } from "components/NotificationManager";
+import { HelpExampleSpaces } from "components/HelpCenter";
+import { Divider } from "components/Layout";
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>;
 export default function UserHomePage(props: Props) {
@@ -75,8 +77,9 @@ const HistoryList = (props: { spaces: Array<SpaceData> }) => {
       {spacesHistory.length > 0 ? (
         <div className="myStudioCompleted">
           <button
-            className={`flex items-center gap-2 hover:text-accent-blue ${showHistory ? "text-grey-15" : "text-grey-55"
-              }`}
+            className={`flex items-center gap-2 hover:text-accent-blue ${
+              showHistory ? "text-grey-15" : "text-grey-55"
+            }`}
             onClick={() => {
               setShowHistory(!showHistory);
             }}
@@ -190,48 +193,9 @@ const MyHomeEmpty = () => {
       </p>
       <p>To get started, make a new Space & invite a friend to join!</p>
 
-      <ExampleSpaces />
-    </div>
-  );
-};
+      <hr className="m-auto my-4 w-16 border-dashed border-grey-80" />
 
-const ExampleSpaces = () => {
-  return (
-    <div className="flex flex-col gap-4">
-      <p className="m-auto self-center text-lg font-bold">
-        Here are a few Spaces for inspiration ✨🌱
-      </p>
-
-      <div className="my-4 flex flex-col gap-4 sm:flex-row">
-        <a
-          className="flex w-full flex-col gap-2 self-center rounded-md border bg-white p-2 hover:bg-bg-blue sm:w-1/3 sm:gap-4 sm:p-4"
-          href="https://hyperlink.academy/s/brendan/s/Website%20Jam:%20pattern.kitchen/website-jam-patternkitchen"
-          target="_blank"
-        >
-          <h2>side project</h2>
-          <p className="text-sm italic">
-            example: website on pattern languages 🌐
-          </p>
-        </a>
-        <a
-          className="flex w-full flex-col gap-2 self-center rounded-md border bg-white p-2 hover:bg-bg-blue sm:w-1/3 sm:gap-4 sm:p-4"
-          href="https://hyperlink.academy/s/celine/s/Stuffy%20Stuff/stuffy-stuff"
-          target="_blank"
-        >
-          <h2>creative project with a friend</h2>
-          <p className="text-sm italic">example: stuffed animal crafting 🐰</p>
-        </a>
-        <a
-          className="flex w-full flex-col gap-2 self-center rounded-md border bg-white p-2 hover:bg-bg-blue sm:w-1/3 sm:gap-4 sm:p-4"
-          href="https://hyperlink.academy/s/brendan/s/23/hyperlink-writing-room-2023"
-          target="_blank"
-        >
-          <h2>small group collab</h2>
-          <p className="text-sm italic">
-            example: Hyperlink team writing room ✍️
-          </p>
-        </a>
-      </div>
+      <HelpExampleSpaces />
     </div>
   );
 };

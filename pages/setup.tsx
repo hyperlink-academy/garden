@@ -1,9 +1,10 @@
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { workerAPI } from "backend/lib/api";
-import { AddAppInfo } from "components/AddAppInfo";
 import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
 import { DotLoader } from "components/DotLoader";
-import { AddSmall, AddTiny, Settings } from "components/Icons";
+import { HelpAppInfo } from "components/HelpCenter";
+import { Modal } from "components/Layout";
+import { AddTiny } from "components/Icons";
 import { useAuth } from "hooks/useAuth";
 import { useDebouncedEffect } from "hooks/utils";
 import Link from "next/link";
@@ -20,6 +21,7 @@ export default function SignupPage() {
   let [data, setData] = useState({
     username: "",
   });
+  let [open, setOpen] = useState(false);
 
   useDebouncedEffect(
     async () => {
@@ -126,7 +128,16 @@ export default function SignupPage() {
           <p className="italic">
             You can do this now & continue setup on mobile!
           </p>
-          <AddAppInfo />
+          <ButtonSecondary
+            content="Get the Hyperlink App"
+            icon={<AddTiny />}
+            onClick={() => setOpen(true)}
+            type="button"
+          />
+          <Modal open={open} onClose={() => setOpen(false)}>
+            <HelpAppInfo />
+            <ButtonPrimary content="Got It!" onClick={() => setOpen(false)} />
+          </Modal>
         </div>
 
         {/* pick a name */}
