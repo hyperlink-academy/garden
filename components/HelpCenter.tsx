@@ -5,6 +5,14 @@ import { Modal, ModalFixedHeight } from "./Layout";
 export const HelpModal = (props: { open: boolean; onClose: () => void }) => {
   return (
     <ModalFixedHeight open={props.open} onClose={props.onClose}>
+      <HelpDocs />
+    </ModalFixedHeight>
+  );
+};
+
+export const HelpDocs = () => {
+  return (
+    <>
       <h3 className="m-auto">Hyperlink Help Center 🌱</h3>
       <Tab.Group manual>
         <Tab.List className="m-auto flex gap-1">
@@ -60,7 +68,7 @@ export const HelpModal = (props: { open: boolean; onClose: () => void }) => {
           </Tab.Panel>
         </Tab.Panels>
       </Tab.Group>
-    </ModalFixedHeight>
+    </>
   );
 };
 
