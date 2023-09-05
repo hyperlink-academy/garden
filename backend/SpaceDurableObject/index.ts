@@ -145,6 +145,10 @@ export class SpaceDurableObject implements DurableObject {
       console.log("ERROR", e);
     }
   }
+  async webSocketError(_ws: WebSocket, _e: Error) {
+    console.log("ERROR", _e);
+  }
+
   async webSocketClose(_ws: WebSocket) {
     let ws = _ws as unknown as DOWebSocket;
     let data = await ws.deserializeAttachment();
