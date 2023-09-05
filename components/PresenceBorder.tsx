@@ -4,7 +4,7 @@ export const PresenceBorder = (props: {
   children: React.ReactNode;
   entityID: string;
 }) => {
-  return <>props.children</>;
+  return <>{props.children}</>;
 };
 
 const Identity = (props: { entityID: string }) => {
