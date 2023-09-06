@@ -147,7 +147,7 @@ const SpaceName = () => {
           </button>
         )}
       </div>
-      <SpaceStatus openEditModal={() => setEditModal(true)} />
+      {/* <SpaceStatus openEditModal={() => setEditModal(true)} /> */}
       <EditSpaceModal
         open={editModal}
         onDelete={() => {
