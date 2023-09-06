@@ -37,7 +37,7 @@ const Identity = (props: { entityID: string; index: number }) => {
 
   return (
     <animated.span
-      className="relative rounded-t-md px-1.5 py-1 text-white"
+      className="relative rounded-t-md px-1.5 py-1 text-xs font-bold text-white"
       style={{ ...style, backgroundColor: color?.value }}
     >
       {name?.value}
