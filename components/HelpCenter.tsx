@@ -1,5 +1,6 @@
 import { Tab } from "@headlessui/react";
-import { Children, Fragment, useState } from "react";
+import { useRouter } from "next/router";
+import { Children, Fragment, useEffect, useState } from "react";
 import { ButtonSecondary, ButtonPrimary } from "./Buttons";
 import { AddTiny, Settings } from "./Icons";
 import { Modal, ModalFixedHeight } from "./Layout";
@@ -13,10 +14,27 @@ export const HelpModal = (props: { open: boolean; onClose: () => void }) => {
 };
 
 export const HelpDocs = () => {
+  let router = useRouter();
+  let [selectedIndex, setSelectedIndex] = useState(0);
+
+  useEffect(() => {
+    let getDefaultIndex = () => {
+      // below tabs, in order!
+      const tabValues = ["handbook", "shortcuts", "examples", "app"];
+      console.log(tabValues.indexOf(router.query.tab as string));
+      return tabValues.indexOf(router.query.tab as string);
+    };
+    setSelectedIndex(getDefaultIndex());
+  }, [router.query.tab]);
+
   return (
     <>
       <h3 className="m-auto">Hyperlink Help Docs</h3>
-      <Tab.Group manual>
+      <Tab.Group
+        manual
+        selectedIndex={selectedIndex}
+        onChange={setSelectedIndex}
+      >
         <Tab.List className="m-auto flex flex-wrap gap-1">
           <Tab as={Fragment}>
             {({ selected }) => (
