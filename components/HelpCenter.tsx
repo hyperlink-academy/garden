@@ -18,13 +18,11 @@ export const HelpDocs = () => {
   let [selectedIndex, setSelectedIndex] = useState(0);
 
   useEffect(() => {
-    let getDefaultIndex = () => {
-      // below tabs, in order!
-      const tabValues = ["handbook", "shortcuts", "examples", "app"];
-      console.log(tabValues.indexOf(router.query.tab as string));
-      return tabValues.indexOf(router.query.tab as string);
-    };
-    setSelectedIndex(getDefaultIndex());
+    setSelectedIndex(() => {
+      return ["handbook", "shortcuts", "examples", "app"].indexOf(
+        router.query.tab as string
+      );
+    });
   }, [router.query.tab]);
 
   return (
