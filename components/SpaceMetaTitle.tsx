@@ -24,40 +24,25 @@ export const SpaceMetaTitle = () => {
       !window.location.href.includes(slugify(data.display_name))
     ) {
       let url = new URL(window.location.href);
-      url.pathname = `/s/${router.query.studio}/s/${router.query.space
-        }/${slugify(data.display_name)}`;
+      url.pathname = `/s/${router.query.studio}/s/${
+        router.query.space
+      }/${slugify(data.display_name)}`;
       history.replaceState(null, "", url);
     }
   }, [data?.display_name, router]);
 
   let { memberEntity } = useMutations();
+  // NB: we want unreadCount to reflect all unreads - same as in UnreadsRoom
   let unreadCount = useSubscribe(
     rep?.rep,
     async (tx) => {
-      //This is more complicated than you would think as we only want to notify
-      //for cards in rooms directly, and discussions on those cards
       if (!memberEntity) return null;
-      let count = 0;
+      let unreadCards = await scanIndex(tx).vae(memberEntity, "card/unread-by");
       let unreadDiscussions = await scanIndex(tx).vae(
         memberEntity,
         "discussion/unread-by"
       );
-      let unreadCards = await scanIndex(tx).vae(memberEntity, "card/unread-by");
-
-      for (let card of unreadCards) {
-        let inRooms = await scanIndex(tx).vae(card.entity, "desktop/contains");
-        if (inRooms.length > 0) count++;
-      }
-      for (let discussion of unreadDiscussions) {
-        let inRooms = await scanIndex(tx).vae(
-          discussion.entity,
-          "desktop/contains"
-        );
-
-        let isRoom = await scanIndex(tx).eav(discussion.entity, "room/name");
-        if (inRooms.length > 0 || isRoom) count++;
-      }
-
+      let count = unreadCards?.length + unreadDiscussions?.length;
       return count;
     },
     null as number | null,
@@ -66,8 +51,9 @@ export const SpaceMetaTitle = () => {
 
   return (
     <Head>
-      <title key="title">{`${unreadCount && unreadCount > 0 ? `(${unreadCount})` : ""
-        } ${data?.display_name}`}</title>
+      <title key="title">{`${
+        unreadCount && unreadCount > 0 ? `(${unreadCount})` : ""
+      } ${data?.display_name}`}</title>
     </Head>
   );
 };
