@@ -7,8 +7,8 @@ import {
   MessageWithIndexes,
   ReplicacheContext,
 } from "hooks/useReplicache";
-import { useEffect, useRef, useState } from "react";
-import { PullRequest, PushRequest } from "replicache";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { PullRequest, PushRequest, Replicache } from "replicache";
 import { useAuth } from "hooks/useAuth";
 import { useRouter } from "next/router";
 import useSWR, { mutate } from "swr";
@@ -21,7 +21,6 @@ export const SpaceProvider: React.FC<
   React.PropsWithChildren<{ id: string }>
 > = (props) => {
   let [rep, setRep] = useState<ReturnType<typeof makeReplicache>>();
-  const [reconnectSocket, setReconnect] = useState({});
   let [undoManager] = useState(new UndoManager());
 
   useEffect(() => {
@@ -45,35 +44,8 @@ export const SpaceProvider: React.FC<
 
     return () => window.removeEventListener("keydown", handler);
   }, [undoManager]);
-  let socket = useRef<WebSocket>();
-  useEffect(() => {
-    let listener = () => {
-      if (socket.current) socket.current.close();
-    };
-    window.addEventListener("beforeunload", listener);
-    return () => window.removeEventListener("beforeunload", listener);
-  }, []);
+  let reconnect = useWebSocket(props.id, rep);
 
-  useEffect(() => {
-    if (!props.id || !rep) return;
-    socket.current = new WebSocket(`${SOCKET_URL}/space/${props.id}/socket`);
-    socket.current.addEventListener("message", () => {
-      rep?.pull();
-    });
-    socket.current.addEventListener("open", () => {
-      rep?.clientID.then((clientID) => {
-        socket.current?.send(
-          JSON.stringify({
-            type: "init",
-            data: { clientID },
-          })
-        );
-      });
-    });
-    return () => {
-      socket.current?.close();
-    };
-  }, [props.id, rep, reconnectSocket]);
   let { session, authToken } = useAuth();
   useEffect(() => {
     let newRep = makeSpaceReplicache({
@@ -82,11 +54,7 @@ export const SpaceProvider: React.FC<
       authToken,
       undoManager: undoManager,
       onPull: () => {
-        if (socket.current) {
-          if (socket.current.readyState > 1) {
-            setReconnect({});
-          }
-        }
+        reconnect();
       },
     });
     setRep(newRep);
@@ -94,30 +62,6 @@ export const SpaceProvider: React.FC<
       newRep.close();
     };
   }, [props.id, authToken, session.session?.studio, undoManager]);
-  useEffect(() => {
-    if (rep) {
-      rep.clientID.then((clientID) => {
-        if (socket.current) {
-          if (socket.current.readyState === WebSocket.OPEN)
-            socket.current.send(
-              JSON.stringify({
-                type: "init",
-                data: { clientID },
-              })
-            );
-          else
-            socket.current.addEventListener("open", () => {
-              socket.current?.send(
-                JSON.stringify({
-                  type: "init",
-                  data: { clientID },
-                })
-              );
-            });
-        }
-      });
-    }
-  }, [rep]);
 
   return (
     <ReplicacheContext.Provider
@@ -237,3 +181,69 @@ export const makeSpaceReplicache = ({
     },
     undoManager: undoManager,
   });
+
+const useWebSocket = (id: string, rep?: Replicache) => {
+  const [reconnectSocket, setReconnect] = useState({});
+  let socket = useRef<WebSocket>();
+  useEffect(() => {
+    let listener = () => {
+      if (socket.current) socket.current.close();
+    };
+    window.addEventListener("beforeunload", listener);
+    return () => window.removeEventListener("beforeunload", listener);
+  }, []);
+
+  let connectSocket = useCallback((rep?: Replicache) => {
+    if (socket.current && socket.current.readyState === 1) return;
+    socket.current = new WebSocket(`${SOCKET_URL}/space/${id}/socket`);
+    socket.current.addEventListener("message", () => {
+      rep?.pull();
+    });
+    socket.current.addEventListener("open", () => {
+      rep?.clientID.then((clientID) => {
+        socket.current?.send(
+          JSON.stringify({
+            type: "init",
+            data: { clientID },
+          })
+        );
+      });
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!id || !rep) return;
+    connectSocket(rep);
+    return () => {
+      socket.current?.close();
+    };
+  }, [id, rep, reconnectSocket]);
+
+  useEffect(() => {
+    if (rep) {
+      rep.clientID.then((clientID) => {
+        if (socket.current) {
+          if (socket.current.readyState === WebSocket.OPEN)
+            socket.current.send(
+              JSON.stringify({
+                type: "init",
+                data: { clientID },
+              })
+            );
+          else
+            socket.current.addEventListener("open", () => {
+              socket.current?.send(
+                JSON.stringify({
+                  type: "init",
+                  data: { clientID },
+                })
+              );
+            });
+        }
+      });
+    }
+  }, [rep]);
+  return useCallback(() => {
+    if (socket.current?.readyState !== 1) setReconnect({});
+  }, []);
+};
