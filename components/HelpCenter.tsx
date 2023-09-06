@@ -19,9 +19,11 @@ export const HelpDocs = () => {
 
   useEffect(() => {
     setSelectedIndex(() => {
-      return ["handbook", "shortcuts", "examples", "app"].indexOf(
-        router.query.tab as string
-      );
+      return router.query.tab
+        ? ["handbook", "shortcuts", "examples", "app"].indexOf(
+            router.query.tab as string
+          )
+        : 0;
     });
   }, [router.query.tab]);
 
