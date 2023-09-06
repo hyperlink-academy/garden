@@ -147,7 +147,6 @@ const SpaceName = () => {
           </button>
         )}
       </div>
-      {/* <SpaceStatus openEditModal={() => setEditModal(true)} /> */}
       <EditSpaceModal
         open={editModal}
         onDelete={() => {
@@ -240,100 +239,4 @@ const SpaceStudiosList = (props: { username: string }) => {
       </PopoverRadix.Root>
     </>
   ) : null;
-};
-
-export const SpaceStatus = (props: { openEditModal: () => void }) => {
-  let id = useSpaceID();
-  let { data } = useSpaceData(id);
-
-  let { session } = useAuth();
-  let status: "unscheduled" | "ongoing" | "upcoming" | "completed" =
-    "unscheduled";
-
-  // NB: same calculation as SpacesList.tsx
-  // + adding current_day and space_progress
-  let duration_days = undefined;
-  let current_day = undefined;
-  let space_progress = undefined;
-  let now_timestamp = new Date(getCurrentDate()).getTime();
-
-  if (data?.start_date && data?.end_date) {
-    let start_timestamp = new Date(data.start_date).getTime();
-    let end_timestamp = new Date(data.end_date).getTime();
-    let delta_duration = Math.abs(end_timestamp - start_timestamp) / 1000;
-    let delta_now = Math.abs(now_timestamp - start_timestamp) / 1000;
-    duration_days = Math.floor(delta_duration / 86400) + 1;
-    current_day = Math.floor(delta_now / 86400) + 1;
-    space_progress = (current_day / duration_days) * 100; // calc as percent
-  }
-
-  // date logic - this should match studio index.tsx
-  if (
-    // start in past + end missing or in future
-    (data?.start_date &&
-      data?.start_date <= getCurrentDate() &&
-      (!data?.end_date || data?.end_date >= getCurrentDate())) ||
-    // OR no start + future end date
-    (!data?.start_date && data?.end_date && data?.end_date >= getCurrentDate())
-  )
-    status = "ongoing";
-
-  if (data?.start_date && data?.start_date > getCurrentDate())
-    status = "upcoming";
-
-  if (data?.end_date && data?.end_date < getCurrentDate()) status = "completed";
-
-  let statusStyles = "";
-  if (status === "unscheduled")
-    statusStyles = "border border-grey-90 text-grey-55  ";
-  if (status === "upcoming") statusStyles = "text-white bg-grey-15 ";
-  if (status === "ongoing") statusStyles = "text-white bg-[green] ";
-  if (status === "completed") statusStyles = "text-white bg-grey-35 ";
-
-  // unscheduled and your studio - prompt adding dates
-  if (
-    status === "unscheduled" &&
-    session.session &&
-    session.session.username === data?.owner.username
-  )
-    return (
-      <button
-        onClick={() => props.openEditModal()}
-        className={`sidebarSpaceStatus flex w-fit gap-2 rounded-md border border-grey-90 px-2 py-1 text-sm text-grey-55 hover:border-accent-blue hover:text-accent-blue`}
-      >
-        schedule dates
-      </button>
-    );
-
-  // ongoing - just show progress bar
-  if (status === "ongoing" && data?.start_date && data?.end_date)
-    return (
-      <Popover className="w-full cursor-pointer">
-        <Popover.Button as={Fragment}>
-          <div
-            title={`day ${current_day} of ${duration_days}`}
-            className="spaceProgress h-4 w-full rounded-md bg-grey-35"
-          >
-            <div
-              className="h-4 rounded-md border border-grey-35 bg-accent-gold"
-              style={{ width: `${space_progress}%` }}
-            ></div>
-          </div>
-        </Popover.Button>
-        <div className="absolute z-10">
-          <Popover.Panel className="lightBorder z-50 mt-1 flex gap-2 bg-white p-2 text-sm text-grey-35">
-            {`day ${current_day} of ${duration_days}`}
-          </Popover.Panel>
-        </div>
-      </Popover>
-    );
-
-  // otherwise show status - 'upcoming' or 'completed'
-  return (
-    <div
-      className={`${statusStyles} sidebarSpaceStatus flex w-fit gap-2 rounded-md px-2 py-1 text-sm`}
-    >
-      <span>{status}</span>
-    </div>
-  );
 };
