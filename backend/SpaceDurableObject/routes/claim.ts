@@ -50,7 +50,7 @@ export const claimRoute = makeRoute({
       env.factStore.assertFact({
         entity: readmeEntity,
         attribute: "card/content",
-        value: README,
+        value: README.trim(),
         positions: {},
       }),
       env.factStore.assertFact({
