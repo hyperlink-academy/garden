@@ -115,6 +115,7 @@ export function MessageWithIndexes(m: Message) {
   return {
     ...m,
     indexes: {
+      messageByEntity: `${m.entity}`,
       messages: `${m.topic || "general"}-${m.ts}-${m.id}`,
     },
   };
@@ -347,7 +348,7 @@ export const makeReplicache = (args: {
   // let [undoManager] = useState(new UndoManager());
   let rep = new Replicache({
     licenseKey: "l381074b8d5224dabaef869802421225a",
-    schemaVersion: "1.0.1",
+    schemaVersion: "1.0.2",
     name: args.name,
     pushDelay: 500,
     pusher: args.pusher,
@@ -360,6 +361,10 @@ export const makeReplicache = (args: {
       ave: { jsonPointer: "/indexes/ave", allowEmpty: true },
       vae: { jsonPointer: "/indexes/vae", allowEmpty: true },
       at: { jsonPointer: "/indexes/at", allowEmpty: true },
+      messageByEntity: {
+        jsonPointer: "/indexes/messageByEntity",
+        allowEmpty: true,
+      },
       messages: { jsonPointer: "/indexes/messages", allowEmpty: true },
     },
   });
@@ -475,6 +480,21 @@ export const db = {
       [],
       [topic],
       topic
+    );
+  },
+  useMessageByEntity(entity: string | null) {
+    return useSubscribe(
+      async (tx) => {
+        if (!entity) return null;
+        let messages = await tx
+          .scan({ indexName: "messageByEntity", prefix: entity })
+          .values()
+          .toArray();
+        return messages[0] as Message;
+      },
+      null,
+      [entity],
+      "messageByEntity" + entity
     );
   },
   useMessageByID(id: string | null) {

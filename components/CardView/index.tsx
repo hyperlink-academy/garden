@@ -14,7 +14,6 @@ import { scanIndex, db, useMutations, useSpaceID } from "hooks/useReplicache";
 import * as Popover from "@radix-ui/react-popover";
 
 import { AttachedCardSection, SingleTextSection } from "./Sections";
-import { Backlinks } from "./Backlinks";
 import { usePreserveScroll } from "hooks/utils";
 import Link from "next/link";
 import { useAuth } from "hooks/useAuth";
@@ -34,6 +33,7 @@ import { Fact } from "data/Facts";
 import { getAndUploadFile } from "src/getAndUploadFile";
 import { useReactions } from "hooks/useReactions";
 import { HighlightCard } from "./HighlightCard";
+import { CardViewDrawer } from "./CardViewDrawer";
 
 const borderStyles = (args: { member: boolean }) => {
   switch (true) {
@@ -96,7 +96,6 @@ export const CardView = (props: {
 
   return (
     <div className="flex h-full flex-col items-stretch">
-      <Backlinks entityID={props.entityID} />
       <div
         ref={setNodeRef}
         className={`
@@ -109,8 +108,8 @@ export const CardView = (props: {
           max-w-3xl grow
           flex-col items-stretch overflow-y-scroll
           ${borderStyles({
-            member: !!memberName,
-          })}
+          member: !!memberName,
+        })}
             member: !!memberName,
           })}
           `}
@@ -153,8 +152,8 @@ export const CardView = (props: {
             overflow-x-hidden
             overflow-y-scroll
             ${contentStyles({
-              member: !!memberName,
-            })}
+            member: !!memberName,
+          })}
             `}
         >
           <CardContent {...props} />
@@ -257,31 +256,11 @@ export const CardContent = (props: {
 
           <AttachedCardSection entityID={props.entityID} />
         </div>
-
-        {/* sticky "comments" tab */}
-        <div className="sticky -bottom-4 z-10 -mx-3 mt-16 md:-mx-4">
-          <div className="flex items-end">
-            <div className="w-4 grow border border-transparent border-b-grey-90" />
-
-            <button
-              className="w-fit shrink-0 rounded-t-md border border-grey-90 border-b-white bg-white p-2 text-sm text-grey-55"
-              onClick={() =>
-                document
-                  .getElementById("card-comments")
-                  ?.scrollIntoView({ behavior: "smooth", block: "end" })
-              }
-            >
-              comments
-            </button>
-            <div className="w-full grow border border-transparent border-b-grey-90" />
-          </div>
-          <div className="h-6 rounded-lg bg-white" />
-        </div>
       </div>
       {/* END CARD CONTENT */}
 
       {/* START CARD DISCUSSION */}
-      <Discussion entityID={props.entityID} allowReact isRoom={false} />
+      <CardViewDrawer entityID={props.entityID} />
     </>
   );
 };
@@ -590,9 +569,8 @@ export const SectionAdder = (props: {
       {/* END LINKED CARD ADDER */}
       {/* DATE ADDER */}
       <button
-        className={`${
-          date || props.dateEditing ? toggledOnStyle : toggledOffStyle
-        } `}
+        className={`${date || props.dateEditing ? toggledOnStyle : toggledOffStyle
+          } `}
         onClick={() => {
           if (date !== null) {
             document
@@ -617,11 +595,10 @@ export const SectionAdder = (props: {
       >
         <Popover.Trigger className="flex items-center">
           <button
-            className={`${toggledOffStyle} ${
-              !reactionPickerOpen
+            className={`${toggledOffStyle} ${!reactionPickerOpen
                 ? ""
                 : "rounded-md border border-accent-blue p-0.5 text-accent-blue"
-            }`}
+              }`}
           >
             <ReactionAdd />
           </button>
