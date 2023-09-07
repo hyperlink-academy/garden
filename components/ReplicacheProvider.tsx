@@ -192,6 +192,13 @@ const useWebSocket = (id: string, rep?: Replicache) => {
     window.addEventListener("beforeunload", listener);
     return () => window.removeEventListener("beforeunload", listener);
   }, []);
+  useEffect(() => {
+    let listener = () => {
+      if (socket.current?.readyState !== 1 && rep) connectSocket(rep);
+    };
+    window.addEventListener("visibilitychange", listener);
+    return () => window.removeEventListener("visibilitychange", listener);
+  }, [rep]);
 
   let connectSocket = useCallback((rep?: Replicache) => {
     if (socket.current && socket.current.readyState === 1) return;
