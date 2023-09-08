@@ -63,11 +63,7 @@ const BacklinkTab = (props: {
   currentTab: string;
   onClick: () => void;
 }) => {
-  let room = useRoom();
-
-  let rooms = db
-    .useReference(props.entityID, "desktop/contains")
-    .filter((r) => r.entity != room);
+  let rooms = db.useReference(props.entityID, "desktop/contains");
   let cardBacklinks = db.useReference(props.entityID, "deck/contains");
   let messageBacklinks = db.useReference(
     props.entityID,

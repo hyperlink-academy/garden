@@ -8,10 +8,7 @@ import { Message } from "data/Messages";
 import { sortByPosition } from "src/position_helpers";
 
 export const Backlinks = (props: { entityID: string }) => {
-  let room = useRoom();
-  let rooms = db
-    .useReference(props.entityID, "desktop/contains")
-    .filter((r) => r.entity != room);
+  let rooms = db.useReference(props.entityID, "desktop/contains");
   let cardBacklinks = db.useReference(props.entityID, "deck/contains");
   let [cardMessages, roomMessages] = useSubscribe(
     async (tx) => {
