@@ -2,14 +2,16 @@ import { CardPreviewWithData } from "components/CardPreview";
 import { RoomCanvas, RoomChat, RoomCollection } from "components/Icons";
 import { db, scanIndex, useMutations } from "hooks/useReplicache";
 import { useSubscribe } from "hooks/useSubscribe";
-import { useRoom, useSetRoom } from "hooks/useUIState";
+import { useSetRoom } from "hooks/useUIState";
 import { Message } from "data/Messages";
 
 import { sortByPosition } from "src/position_helpers";
+import { useCardViewer } from "components/CardViewerContext";
 
 export const Backlinks = (props: { entityID: string }) => {
   let rooms = db.useReference(props.entityID, "desktop/contains");
   let cardBacklinks = db.useReference(props.entityID, "deck/contains");
+  let { open } = useCardViewer();
   let [cardMessages, roomMessages] = useSubscribe(
     async (tx) => {
       let messages = await scanIndex(tx).vae(
@@ -47,11 +49,28 @@ export const Backlinks = (props: { entityID: string }) => {
         </div>
       )}
       {rooms.map((c) => {
-        return <Room entityID={c.entity} key={c.id} />;
+        return (
+          <Room
+            entityID={c.entity}
+            key={c.id}
+            onClick={() => {
+              setTimeout(() => {
+                document.getElementById("room-wrapper")?.scrollIntoView();
+              }, 300);
+            }}
+          />
+        );
       })}
       {roomMessages.map((m) => (
         <MessageBacklink key={m.id} id={m.id}>
-          <Room entityID={m.topic} />
+          <Room
+            entityID={m.topic}
+            onClick={() => {
+              setTimeout(() => {
+                document.getElementById(m.id)?.scrollIntoView();
+              }, 400);
+            }}
+          />
         </MessageBacklink>
       ))}
       {cards.length + cardMessages.length + inlineBacklinks.length > 0 && (
@@ -89,7 +108,13 @@ export const Backlinks = (props: { entityID: string }) => {
       })}
       {cardMessages.map((c) => {
         return (
-          <MessageBacklink key={c.id} id={c.id}>
+          <MessageBacklink
+            key={c.id}
+            id={c.id}
+            onClick={() => {
+              open({ entityID: c.topic });
+            }}
+          >
             <CardPreviewWithData entityID={c.topic} size={"big"} hideContent />
           </MessageBacklink>
         );
@@ -98,7 +123,11 @@ export const Backlinks = (props: { entityID: string }) => {
   );
 };
 
-const MessageBacklink = (props: { id: string; children: React.ReactNode }) => {
+const MessageBacklink = (props: {
+  id: string;
+  children: React.ReactNode;
+  onClick?: () => void;
+}) => {
   let message = db.useMessageByID(props.id);
   let sender = db.useEntity(message?.sender || null, "member/name");
   if (!message) return null;
@@ -106,7 +135,15 @@ const MessageBacklink = (props: { id: string; children: React.ReactNode }) => {
   let time = message ? new Date(parseInt(message?.ts)) : null;
 
   return (
-    <div className="flex flex-col">
+    <button
+      className="flex flex-col"
+      onClick={() => {
+        props.onClick?.();
+        setTimeout(() => {
+          document.getElementById(props.id)?.scrollIntoView();
+        }, 400);
+      }}
+    >
       {props.children}
       <div className="flex flex-row ">
         <div className="ml-3 h-6 w-3 self-start rounded-bl-md border-b border-l border-dashed border-grey-80" />
@@ -125,11 +162,11 @@ const MessageBacklink = (props: { id: string; children: React.ReactNode }) => {
           <div>{message.content}</div>
         </div>
       </div>
-    </div>
+    </button>
   );
 };
 
-const Room = (props: { entityID: string }) => {
+const Room = (props: { entityID: string; onClick?: () => void }) => {
   let roomName = db.useEntity(props.entityID, "room/name");
   let roomType = db.useEntity(props.entityID, "room/type");
   let setRoom = useSetRoom();
@@ -137,9 +174,7 @@ const Room = (props: { entityID: string }) => {
     <button
       onClick={() => {
         setRoom(props.entityID);
-        setTimeout(() => {
-          document.getElementById("room-wrapper")?.scrollIntoView();
-        }, 300);
+        props.onClick?.();
       }}
       className="flex flex-row items-center gap-2 rounded-md border border-grey-80 bg-background p-2 font-bold text-grey-35"
     >

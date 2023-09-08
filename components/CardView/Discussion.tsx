@@ -1,25 +1,22 @@
-import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
+import { ButtonPrimary } from "components/Buttons";
 import * as Popover from "@radix-ui/react-popover";
 import {
   CardAdd,
   CardSmall,
   CloseLinedTiny,
   Member,
-  ReactionAdd,
   Reply,
   Send,
 } from "components/Icons";
 import { RenderedText } from "components/Textarea/RenderedText";
 import { db, useMutations } from "hooks/useReplicache";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { ulid } from "src/ulid";
 import { Message } from "data/Messages";
 import AutosizeTextarea from "components/Textarea/AutosizeTextarea";
 import { FindOrCreate, useAllItems } from "components/FindOrCreateEntity";
 import { ref } from "data/Facts";
 import { CardPreviewWithData } from "components/CardPreview";
-import { AddReaction } from "./Reactions";
-import { useReactions } from "hooks/useReactions";
 
 export const Discussion = (props: {
   entityID: string;
@@ -84,7 +81,6 @@ export const MessageInput = (props: {
 }) => {
   let [value, setValue] = useState("");
   let [attachedCards, setAttachedCards] = useState<string[]>([]);
-  let [mode, setMode] = useState("normal" as "normal" | "focused" | "reacting");
   let { mutate, memberEntity, authorized } = useMutations();
   let replyMessage = db.useMessageByID(props.reply);
   let replyToName = db.useEntity(replyMessage?.sender || null, "member/name");
@@ -135,13 +131,7 @@ export const MessageInput = (props: {
     );
   };
   return (
-    <div
-      className="messageInput sticky bottom-0 flex w-full flex-col gap-2 pt-1"
-      onBlur={(e) => {
-        if (e.currentTarget.contains(e.relatedTarget)) return;
-        setMode("normal");
-      }}
-    >
+    <div className="messageInput sticky bottom-0 flex w-full flex-col gap-2 pt-1">
       {/* IF MESSAGE IS IN REPLY */}
       {props.reply && (
         <div className="messageInputReply -mb-2">
@@ -167,8 +157,6 @@ export const MessageInput = (props: {
                 send();
               }
             }}
-            onFocus={() => setMode("focused")}
-            onBlur={() => setMode("normal")}
             value={value}
             onChange={(e) => setValue(e.target.value)}
             placeholder=""
@@ -374,6 +362,7 @@ const Message = (props: {
   );
   return (
     <div
+      id={props.id}
       className={`message flex flex-col text-sm first:pt-0 last:pb-2 ${
         !props.multipleFromSameAuthor ? "pt-5" : "pt-1"
       }`}
