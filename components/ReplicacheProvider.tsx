@@ -14,6 +14,7 @@ import { useRouter } from "next/router";
 import useSWR, { mutate } from "swr";
 import { UndoManager } from "@rocicorp/undo";
 import { authToken } from "backend/lib/auth";
+import { atom, useSetAtom } from "jotai";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL as string;
@@ -182,9 +183,14 @@ export const makeSpaceReplicache = ({
     undoManager: undoManager,
   });
 
+export let socketStateAtom = atom<"connecting" | "connected" | "disconnected">(
+  "disconnected"
+);
 const useWebSocket = (id: string, rep?: Replicache) => {
   const [reconnectSocket, setReconnect] = useState({});
+  let setSocketState = useSetAtom(socketStateAtom);
   let socket = useRef<WebSocket>();
+
   useEffect(() => {
     let listener = () => {
       if (socket.current) socket.current.close();
@@ -203,11 +209,16 @@ const useWebSocket = (id: string, rep?: Replicache) => {
   let connectSocket = useCallback((rep?: Replicache) => {
     if (socket.current && socket.current.readyState === 1) return;
     socket.current = new WebSocket(`${SOCKET_URL}/space/${id}/socket`);
+    setSocketState("connecting");
     socket.current.addEventListener("message", () => {
       rep?.pull();
     });
+    socket.current.addEventListener("close", () => {
+      setSocketState("disconnected");
+    });
     socket.current.addEventListener("open", () => {
       rep?.clientID.then((clientID) => {
+      setSocketState("connected");
         socket.current?.send(
           JSON.stringify({
             type: "init",
