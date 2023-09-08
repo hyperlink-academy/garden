@@ -41,13 +41,14 @@ export const Backlinks = (props: { entityID: string }) => {
 
   let cards = cardBacklinks.sort(sortByPosition("vae"));
   let { mutate } = useMutations();
-  if (cards.length === 0) return null;
   return (
     <div className="flex flex-col gap-2">
-      <div>
-        <h4>Rooms</h4>
-        <hr className="border-grey-80" />
-      </div>
+      {rooms.length + roomMessages.length > 0 && (
+        <div>
+          <h4>Rooms</h4>
+          <hr className="border-grey-80" />
+        </div>
+      )}
       {rooms.map((c) => {
         return <Room entityID={c.entity} key={c.id} />;
       })}
@@ -56,10 +57,12 @@ export const Backlinks = (props: { entityID: string }) => {
           <Room entityID={m.topic} />
         </MessageBacklink>
       ))}
-      <div>
-        <h4>Cards</h4>
-        <hr className="border-grey-80" />
-      </div>
+      {cards.length + cardMessages.length + inlineBacklinks.length > 0 && (
+        <div>
+          <h4>Cards</h4>
+          <hr className="border-grey-80" />
+        </div>
+      )}
       {cards.map((c) => {
         return (
           <CardPreviewWithData
