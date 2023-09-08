@@ -8,6 +8,10 @@ import {
   CardSmallLined,
   SectionImageAdd,
   ReactionAdd,
+  GoBackToPage,
+  BackSmall,
+  CloseLinedTiny,
+  GoBackToPageLined,
 } from "components/Icons";
 import { Divider, MenuContainer, MenuItem, Modal } from "components/Layout";
 import { scanIndex, db, useMutations, useSpaceID } from "hooks/useReplicache";
@@ -18,11 +22,9 @@ import { usePreserveScroll } from "hooks/utils";
 import Link from "next/link";
 import { useAuth } from "hooks/useAuth";
 import { MakeImage, ImageSection } from "./ImageSection";
-import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
 import { AddExistingCard } from "components/CardStack";
 import { ButtonPrimary, ButtonTertiary } from "components/Buttons";
-import { Discussion } from "./Discussion";
 import { ulid } from "src/ulid";
 import { AddReaction, Reactions } from "./Reactions";
 import { useDroppableZone } from "components/DragContext";
@@ -34,6 +36,7 @@ import { getAndUploadFile } from "src/getAndUploadFile";
 import { useReactions } from "hooks/useReactions";
 import { HighlightCard } from "./HighlightCard";
 import { CardViewDrawer } from "./CardViewDrawer";
+import { useCloseCard, useRoomHistory } from "hooks/useUIState";
 
 const borderStyles = (args: { member: boolean }) => {
   switch (true) {
@@ -108,8 +111,8 @@ export const CardView = (props: {
           max-w-3xl grow
           flex-col items-stretch overflow-y-scroll
           ${borderStyles({
-          member: !!memberName,
-        })}
+            member: !!memberName,
+          })}
             member: !!memberName,
           })}
           `}
@@ -152,8 +155,8 @@ export const CardView = (props: {
             overflow-x-hidden
             overflow-y-scroll
             ${contentStyles({
-            member: !!memberName,
-          })}
+              member: !!memberName,
+            })}
             `}
         >
           <CardContent {...props} />
@@ -168,12 +171,6 @@ export const CardContent = (props: {
   onDelete?: () => void;
   referenceFactID?: string;
 }) => {
-  let cardCreator = db.useEntity(props.entityID, "card/created-by");
-  // returns reference…
-  let cardCreatorName = db.useEntity(
-    cardCreator?.value.value as string,
-    "member/name"
-  )?.value;
   let date = db.useEntity(props.entityID, "card/date");
   let [dateEditing, setDateEditing] = useUndoableState(false);
   let memberName = db.useEntity(props.entityID, "member/name");
@@ -183,9 +180,10 @@ export const CardContent = (props: {
     <>
       {/* START CARD CONTENT */}
       <div className="cardContentWrapper relative">
-        {authorized && (
-          <>
-            <div className="cardSectionAdder pointer-events-none sticky top-0 z-10 mb-32 flex w-full justify-center">
+        <>
+          <div className="cardSectionAdder pointer-events-none sticky top-0 z-10 mb-32 flex w-full justify-between">
+            <BackButton />
+            {authorized && (
               <SectionAdder
                 entityID={props.entityID}
                 setDateEditing={() => {
@@ -193,33 +191,20 @@ export const CardContent = (props: {
                 }}
                 dateEditing={dateEditing}
               />
-            </div>
-            <div className="-mt-[170px]" />
-          </>
-        )}
+            )}
+            <div className="w-8"></div>
+          </div>
+          <div className="-mt-[170px]" />
+        </>
 
         {/* card info (name and more options menu) */}
         {/* hide for members, who don't have a cardCreatorName */}
         {/* AND handle for legacy regular cards w/o cardCreatorName */}
         {!memberName ? (
           <div
-            className={`cardInfo pointer-events-none relative z-20 mb-3 flex h-[42px] shrink-0 items-center justify-between gap-3`}
+            className={`cardInfo pointer-events-none relative z-20 mb-3 flex h-[42px] w-full shrink-0 items-center justify-end gap-3 `}
           >
             {/* NB: keep wrapper for spacing with CardMoreOptionsMenu even if no cardCreatorName */}
-            <div className="group pointer-events-auto flex place-items-center gap-2">
-              {cardCreatorName ? (
-                <>
-                  <div className="h-[32px] w-[32px] rounded-full border border-grey-80 pt-[5px] text-center text-sm text-grey-55">
-                    <div className="w-full text-center">
-                      {cardCreatorName.charAt(0).toUpperCase()}
-                    </div>
-                  </div>
-                  <div className="absolute left-8 hidden max-w-[275px] overflow-hidden whitespace-pre rounded-md bg-white px-2 py-1 text-sm text-grey-55 group-hover:block group-focus:block">
-                    by {cardCreatorName}
-                  </div>
-                </>
-              ) : null}
-            </div>
 
             <div className="flex flex-row gap-2">
               <HighlightCard entityID={props.entityID} />
@@ -262,6 +247,19 @@ export const CardContent = (props: {
       {/* START CARD DISCUSSION */}
       <CardViewDrawer entityID={props.entityID} />
     </>
+  );
+};
+
+const BackButton = () => {
+  let history = useRoomHistory();
+  let closeCard = useCloseCard();
+  return (
+    <button
+      className="pointer-events-auto mt-3 flex h-min w-fit items-center gap-1 rounded-full border border-grey-90 bg-white p-1 text-grey-55 shadow"
+      onClick={() => closeCard()}
+    >
+      {history.length < 2 ? <CloseLinedTiny /> : <GoBackToPageLined />}
+    </button>
   );
 };
 
@@ -569,8 +567,9 @@ export const SectionAdder = (props: {
       {/* END LINKED CARD ADDER */}
       {/* DATE ADDER */}
       <button
-        className={`${date || props.dateEditing ? toggledOnStyle : toggledOffStyle
-          } `}
+        className={`${
+          date || props.dateEditing ? toggledOnStyle : toggledOffStyle
+        } `}
         onClick={() => {
           if (date !== null) {
             document
@@ -595,10 +594,11 @@ export const SectionAdder = (props: {
       >
         <Popover.Trigger className="flex items-center">
           <button
-            className={`${toggledOffStyle} ${!reactionPickerOpen
+            className={`${toggledOffStyle} ${
+              !reactionPickerOpen
                 ? ""
                 : "rounded-md border border-accent-blue p-0.5 text-accent-blue"
-              }`}
+            }`}
           >
             <ReactionAdd />
           </button>

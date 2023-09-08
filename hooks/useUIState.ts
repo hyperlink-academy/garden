@@ -76,6 +76,16 @@ export let useRoom = () => {
   );
 };
 
+export let useRoomHistory = () => {
+  let spaceID = useSpaceID();
+  return useUIState((state) => {
+    if (!spaceID) return [];
+    let activeRoom = state.spaces[spaceID]?.activeRoom;
+    if (!activeRoom) return [];
+    return state.spaces[spaceID]?.rooms[activeRoom] || [];
+  });
+};
+
 export const useOpenCard = () => {
   let spaceID = useSpaceID();
   let { action } = useMutations();
@@ -102,6 +112,32 @@ export const useOpenCard = () => {
     },
     [spaceID, action]
   );
+};
+
+export const useCloseCard = () => {
+  let spaceID = useSpaceID();
+  let { action } = useMutations();
+  let openCard = useUIState((state) => state.openCard);
+  let closeCard = useUIState((state) => state.closeCard);
+  return useCallback(() => {
+    if (!spaceID) return;
+
+    let room = useUIState.getState().spaces[spaceID]?.activeRoom;
+
+    if (!room) return;
+    let currentCard = useUIState.getState().spaces[spaceID]?.rooms?.[room]?.[0];
+    if (!currentCard) return;
+    closeCard(spaceID as string, room as string);
+    action.add({
+      undo: () => {
+        console.log("undoin");
+        openCard(spaceID as string, room as string, currentCard as string);
+      },
+      redo: () => {
+        closeCard(spaceID as string, room as string);
+      },
+    });
+  }, [spaceID, action]);
 };
 
 export const useSetRoom = () => {
