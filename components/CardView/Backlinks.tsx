@@ -159,7 +159,7 @@ const MessageBacklink = (props: {
               })}
             </div>
           </div>
-          <div>{message.content}</div>
+          <div className="text-left">{message.content}</div>
         </div>
       </div>
     </button>
