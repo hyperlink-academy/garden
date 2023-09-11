@@ -1,6 +1,6 @@
 import { Combobox, Dialog, Transition } from "@headlessui/react";
 import { db } from "hooks/useReplicache";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { boolean } from "zod";
 import { ButtonPrimary } from "./Buttons";
 import {
@@ -39,6 +39,9 @@ export const FindOrCreate = (props: {
   let [added, setAdded] = useState<AddedItem[]>([]);
   let [addedItemsList, setAddedItemsList] = useState(false);
   let isMultiSelect = useRef(false);
+  useEffect(() => {
+    setInput("");
+  }, [props.open]);
 
   // THIS IS WHERE THE RESULTS ARE FILTERED!
   let items = props.items.filter((f) => {
