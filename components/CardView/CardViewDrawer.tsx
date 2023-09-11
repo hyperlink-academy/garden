@@ -3,42 +3,65 @@ import { useRef, useState } from "react";
 import { Backlinks } from "./Backlinks";
 import { Discussion } from "./Discussion";
 
-export const CardViewDrawer = (props: { entityID: string }) => {
+export const CardViewDrawer = (props: {
+  entityID: string;
+  drawerOpen: boolean;
+  setDrawerOpen: () => void;
+  setDrawerClosed: () => void;
+}) => {
   let ref = useRef<HTMLDivElement | null>(null);
   let [tab, setTab] = useState<"comments" | "backlinks">("comments");
   return (
-    <>
-      <div className="sticky -bottom-4 z-10 -mx-3 mt-16  md:-mx-4">
-        <div className="flex items-end gap-2 border-b border-b-grey-80 pl-4">
+    <div className=" z-20">
+      <div className="cardDrawerHeader -mx-3 -mt-5  md:-mx-4">
+        <div className="cardDrawerTabs flex items-end gap-2 border-b border-b-grey-80 pl-4">
           <CommentsTab
             entityID={props.entityID}
             currentTab={tab}
             onClick={() => {
-              setTab("comments");
-              ref.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+              if (tab === "backlinks" || !props.drawerOpen) {
+                props.setDrawerOpen();
+                setTab("comments");
+                ref.current?.scrollIntoView({
+                  behavior: "smooth",
+                  block: "end",
+                });
+              } else {
+                props.setDrawerClosed();
+              }
             }}
           />
           <BacklinkTab
             entityID={props.entityID}
             currentTab={tab}
             onClick={() => {
-              setTab("backlinks");
-              ref.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+              if (tab === "comments" || !props.drawerOpen) {
+                props.setDrawerOpen();
+                setTab("backlinks");
+                ref.current?.scrollIntoView({
+                  behavior: "smooth",
+                  block: "end",
+                });
+              } else {
+                props.setDrawerClosed();
+              }
             }}
           />
         </div>
-        <div className="h-4 w-full bg-white" />
       </div>
-      {/* END CARD CONTENT */}
-
-      {/* START CARD DISCUSSION */}
-      {tab === "comments" ? (
-        <Discussion entityID={props.entityID} allowReact isRoom={false} />
-      ) : (
-        <Backlinks entityID={props.entityID} />
-      )}
-      <div ref={ref} className="scroll-m-8 bg-white" />
-    </>
+      <div
+        className={`cardDrawerContent shrink overflow-y-scroll ${
+          props.drawerOpen ? " mt-4 mb-2  h-fit max-h-[60vh] " : "mb-2 h-0 "
+        }`}
+      >
+        {tab === "comments" ? (
+          <Discussion entityID={props.entityID} allowReact isRoom={false} />
+        ) : (
+          <Backlinks entityID={props.entityID} />
+        )}
+        <div ref={ref} className="scroll-m-8 bg-white" />
+      </div>
+    </div>
   );
 };
 const CommentsTab = (props: {
@@ -97,8 +120,8 @@ const Tab = (props: {
       className={`${
         props.currentTab === props.id
           ? "border-b-white font-bold"
-          : "border-b bg-grey-90"
-      } -mb-[1px] w-fit shrink-0 rounded-t-md border border-grey-80  bg-white px-2  pt-0.5 text-sm text-grey-55`}
+          : "bg-grey-90"
+      } -mb-[1px] w-fit shrink-0 rounded-t-md border border-grey-80  bg-white px-2  pt-0.5 text-sm text-grey-35`}
     >
       {props.text}
     </button>

@@ -148,12 +148,12 @@ export const CardView = (props: {
           ref={ref}
           id="card-container"
           className={`
-            no-scrollbar flex h-full          
+            no-scrollbar  flex   
+            h-full       
             grow
-            flex-col
-            justify-between
+            flex-col items-stretch
             overflow-x-hidden
-            overflow-y-scroll
+            overflow-y-hidden
             ${contentStyles({
               member: !!memberName,
             })}
@@ -175,38 +175,41 @@ export const CardContent = (props: {
   let [dateEditing, setDateEditing] = useUndoableState(false);
   let memberName = db.useEntity(props.entityID, "member/name");
   let { authorized } = useMutations();
+  let [drawerOpen, setDrawerOpen] = useState(false);
 
   return (
     <>
       {/* START CARD CONTENT */}
-      <div className="cardContentWrapper relative">
-        <>
-          <div className="cardSectionAdder pointer-events-none sticky top-0 z-10 mb-32 flex w-full justify-between">
-            <BackButton />
-            {authorized && (
-              <SectionAdder
-                entityID={props.entityID}
-                setDateEditing={() => {
-                  setDateEditing(true);
-                }}
-                dateEditing={dateEditing}
-              />
-            )}
-            <div className="w-8"></div>
-          </div>
-          <div className="-mt-[170px]" />
-        </>
+      <div
+        className={`cardContentWrapper relative flex grow flex-col items-stretch overflow-y-scroll  `}
+        onClick={() => {
+          setDrawerOpen(false);
+        }}
+      >
+        <div className="cardSectionAdder pointer-events-none sticky top-0 z-10 flex w-full  justify-between">
+          <BackButton />
+          {authorized && (
+            <SectionAdder
+              entityID={props.entityID}
+              setDateEditing={() => {
+                setDateEditing(true);
+              }}
+              dateEditing={dateEditing}
+            />
+          )}
+          <div className="w-8"></div>
+        </div>
 
         {/* card info (name and more options menu) */}
         {/* hide for members, who don't have a cardCreatorName */}
         {/* AND handle for legacy regular cards w/o cardCreatorName */}
         {!memberName ? (
           <div
-            className={`cardInfo pointer-events-none relative z-20 mb-3 flex h-[42px] w-full shrink-0 items-center justify-end gap-3 `}
+            className={`cardInfo pointer-events-none relative z-20 mb-3 -mt-[44px] flex h-[42px] w-full shrink-0 items-center justify-end gap-3 `}
           >
             {/* NB: keep wrapper for spacing with CardMoreOptionsMenu even if no cardCreatorName */}
 
-            <div className="flex flex-row gap-2">
+            <div className="flex flex-row gap-2 text-grey-55">
               <HighlightCard entityID={props.entityID} />
               <CardMoreOptionsMenu
                 onDelete={props.onDelete}
@@ -221,7 +224,11 @@ export const CardContent = (props: {
         )}
 
         {/* card content wrapper */}
-        <div className="cardContent grid-auto-rows z-0 grid gap-3">
+        <div
+          className={`cardContent z-0 flex grow flex-col gap-3 pb-10 ${
+            drawerOpen ? "opacity-40" : ""
+          }`}
+        >
           <div className="flex flex-col gap-0">
             <Title entityID={props.entityID} />
             <ScheduledDate
@@ -245,7 +252,16 @@ export const CardContent = (props: {
       {/* END CARD CONTENT */}
 
       {/* START CARD DISCUSSION */}
-      <CardViewDrawer entityID={props.entityID} />
+      <CardViewDrawer
+        entityID={props.entityID}
+        drawerOpen={drawerOpen}
+        setDrawerOpen={() => {
+          setDrawerOpen(true);
+        }}
+        setDrawerClosed={() => {
+          setDrawerOpen(false);
+        }}
+      />
     </>
   );
 };

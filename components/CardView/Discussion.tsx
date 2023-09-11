@@ -49,12 +49,7 @@ export const Discussion = (props: {
   let [reply, setReply] = useState<string | null>(null);
 
   return (
-    // negative margin and padding required to make sure that
-    // the comment section bottoms out with some spacing under it when scrolled to via button
-    <div
-      className="-mb-4 flex grow flex-col justify-end pb-4"
-      id="card-comments"
-    >
+    <div className="flex grow flex-col justify-end " id="card-comments">
       <Messages
         entityID={props.entityID}
         setReply={setReply}
