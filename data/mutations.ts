@@ -52,8 +52,8 @@ export type MutationContext = {
 
 type UniqueFacts = {
   [A in keyof Attribute as Attribute[A]["unique"] extends true
-  ? A
-  : never]: Attribute[A];
+    ? A
+    : never]: Attribute[A];
 };
 
 type OptionalAttribute<A extends keyof Attribute | null> =
@@ -61,8 +61,8 @@ type OptionalAttribute<A extends keyof Attribute | null> =
 export type CardinalityResult<A extends keyof Attribute | null> = null extends A
   ? Fact<keyof Attribute>[]
   : Attribute[OptionalAttribute<A>] extends {
-    cardinality: "one";
-  }
+      cardinality: "one";
+    }
   ? Fact<OptionalAttribute<A>> | null
   : Fact<OptionalAttribute<A>>[];
 
@@ -467,6 +467,24 @@ const initializeClient: Mutation<{
   });
 };
 
+const setClientInCall: Mutation<{
+  clientID: string;
+  clientEntity: string;
+  inCall: boolean;
+}> = async (args, ctx) => {
+  if (args.inCall)
+    await ctx.assertEmphemeralFact(args.clientID, {
+      entity: args.clientEntity,
+      attribute: "presence/in-call",
+      value: true,
+      positions: {},
+    });
+  else {
+    let inCall = await ctx.scanIndex.eav(args.clientEntity, "presence/in-call");
+    if (inCall) await ctx.retractEphemeralFact(args.clientID, inCall.id);
+  }
+};
+
 export const Mutations = {
   markRead,
   deleteEntity,
@@ -485,4 +503,5 @@ export const Mutations = {
   addCardToDesktop,
   addReaction,
   initializeClient,
+  setClientInCall,
 };

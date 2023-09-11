@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { Divider, Modal } from "components/Layout";
+import { Divider } from "components/Layout";
 import { useAuth } from "hooks/useAuth";
 import { db, useMutations, useSpaceID } from "hooks/useReplicache";
-import React, { Fragment, useState } from "react";
+import { useState } from "react";
 import {
   BackToHome,
   BellSmall,
@@ -13,27 +13,23 @@ import {
   UnreadDot,
 } from "../../Icons";
 import { EditSpaceModal } from "components/CreateSpace";
-import { getCurrentDate } from "src/utils";
 import { useRouter } from "next/router";
 import { EditRoomModal } from "./RoomListLayout";
 import { SharedRoomList } from "./SharedRoomList";
-import { MemberRoomList } from "./MemberRoomList";
-import { Popover } from "@headlessui/react";
 import * as PopoverRadix from "@radix-ui/react-popover";
 import { ButtonPrimary } from "components/Buttons";
 import { LogInModal } from "components/LoginModal";
 import { useSpaceData } from "hooks/useSpaceData";
-import { CallManager } from "components/Calls/CallManager";
 import { useIdentityData } from "hooks/useIdentityData";
 import { uuidToBase62 } from "src/uuidHelpers";
 import { HelpModal } from "components/HelpCenter";
+import { People } from "./People";
 
 export const Sidebar = (props: {
   onRoomChange: (room: string) => void;
   currentRoom: string | null;
 }) => {
   let { session } = useAuth();
-  let { authorized } = useMutations();
 
   let [roomEditOpen, setRoomEditOpen] = useState(false);
 
@@ -41,6 +37,7 @@ export const Sidebar = (props: {
     <div className="Sidebar pwa-padding flex h-full w-52 flex-col items-stretch gap-4 rounded-l-[3px] border-r border-grey-90 bg-white p-3 text-grey-35">
       <div className="no-scrollbar flex h-full w-full flex-col gap-4 overflow-y-scroll">
         <SpaceName />
+        <People />
         <Divider />
         <div className="flex flex-row content-between gap-2 ">
           <RoomButton {...props} roomID="search">
@@ -56,13 +53,6 @@ export const Sidebar = (props: {
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
             <SharedRoomList
-              {...props}
-              setRoomEditOpen={() => setRoomEditOpen(true)}
-            />
-          </div>
-
-          <div>
-            <MemberRoomList
               {...props}
               setRoomEditOpen={() => setRoomEditOpen(true)}
             />
@@ -156,7 +146,6 @@ const SpaceName = () => {
         onClose={() => setEditModal(false)}
         spaceID={spaceID}
       />
-      {spaceID && data?.display_name && <CallManager />}
     </div>
   );
 };

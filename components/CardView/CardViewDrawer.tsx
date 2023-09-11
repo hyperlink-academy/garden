@@ -1,5 +1,4 @@
 import { db } from "hooks/useReplicache";
-import { useRoom } from "hooks/useUIState";
 import { useRef, useState } from "react";
 import { Backlinks } from "./Backlinks";
 import { Discussion } from "./Discussion";
@@ -96,8 +95,10 @@ const Tab = (props: {
     <button
       onClick={() => props.onClick()}
       className={`${
-        props.currentTab === props.id ? "font-bold" : "bg-grey-90"
-      } -mb-[1px] w-fit shrink-0 rounded-t-md border border-grey-80 border-b-white bg-white px-2  pt-0.5 text-sm text-grey-55`}
+        props.currentTab === props.id
+          ? "border-b-white font-bold"
+          : "border-b bg-grey-90"
+      } -mb-[1px] w-fit shrink-0 rounded-t-md border border-grey-80  bg-white px-2  pt-0.5 text-sm text-grey-55`}
     >
       {props.text}
     </button>

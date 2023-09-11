@@ -291,6 +291,12 @@ export const DefaultAttributes = {
     unique: true,
     ephemeral: true,
   },
+  "presence/in-room": {
+    type: "reference",
+    cardinality: "one",
+    unique: false,
+    ephemeral: true,
+  },
   "presence/client-member": {
     type: "reference",
     cardinality: "one",
@@ -299,6 +305,12 @@ export const DefaultAttributes = {
   },
   "presence/on-card": {
     type: "reference",
+    cardinality: "one",
+    unique: false,
+    ephemeral: true,
+  },
+  "presence/in-call": {
+    type: "boolean",
     cardinality: "one",
     unique: false,
     ephemeral: true,

@@ -1,15 +1,7 @@
 import { ButtonPrimary, ButtonTertiary } from "components/Buttons";
 import { Modal, Divider } from "components/Layout";
 import { Fact } from "data/Facts";
-import {
-  Delete,
-  RoomCalendar,
-  RoomCanvas,
-  RoomChat,
-  RoomCollection,
-  RoomMember,
-  RoomSearch,
-} from "../../Icons";
+import { Delete, RoomCanvas, RoomChat, RoomCollection } from "../../Icons";
 import {
   ReplicacheContext,
   scanIndex,
@@ -34,15 +26,7 @@ export const EditRoomModal = (props: {
   onClose: () => void;
   currentRoom: string | null;
 }) => {
-  let currentRoomName: Fact<"room/name"> | Fact<"member/name"> | null = null;
-  let isMember = false;
-  let sharedRoomName = db.useEntity(props.currentRoom, "room/name");
-  let memberRoomName = db.useEntity(props.currentRoom, "member/name");
-
-  if (memberRoomName) {
-    currentRoomName = memberRoomName;
-    isMember = true;
-  } else currentRoomName = sharedRoomName;
+  let currentRoomName = db.useEntity(props.currentRoom, "room/name");
 
   let currentRoomDescription: Fact<"room/description"> | null = null;
   currentRoomDescription = db.useEntity(props.currentRoom, "room/description");
@@ -67,77 +51,67 @@ export const EditRoomModal = (props: {
     <Modal open={props.open} onClose={props.onClose}>
       <div className="editRoomModal flex flex-col gap-3 text-grey-35">
         <h3>Room Settings</h3>
-        {isMember ? (
-          <p className="italic text-grey-55">nothing to edit... yet ;)</p>
-        ) : (
-          <>
-            <div className="editRoomName flex flex-col gap-1">
-              <p className="font-bold">Room Name</p>
-              <input
-                className="w-full"
-                value={nameState}
-                placeholder={currentRoomName?.value}
-                onChange={(e) => {
-                  let value = e.currentTarget.value;
-                  setNameState(value);
-                }}
-              />
-            </div>
-            <div className="editRoomDescription flex flex-col gap-1">
-              <p className="font-bold">Description</p>
-              <Textarea
-                className="box-border w-full rounded-md border border-grey-55 p-2"
-                value={descriptionState}
-                maxLength={500}
-                placeholder={
-                  currentRoomDescription?.value || "Add a description..."
-                }
-                onChange={(e) => {
-                  let value = e.currentTarget.value;
-                  setDescriptionState(value);
-                }}
-              />
-            </div>
-
-            <ButtonPrimary
-              content="Edit Room"
-              onClick={async () => {
-                if (
-                  !currentRoomName ||
-                  !props.currentRoom ||
-                  currentRoomName.attribute === "member/name"
-                )
-                  return;
-                await mutate("updateFact", {
-                  id: currentRoomName?.id,
-                  data: {
-                    value: nameState,
-                  },
-                });
-                await mutate("assertFact", {
-                  entity: props.currentRoom,
-                  factID: ulid(),
-                  attribute: "room/description",
-                  value: descriptionState,
-                  positions: {},
-                });
-                props.onClose();
+        <>
+          <div className="editRoomName flex flex-col gap-1">
+            <p className="font-bold">Room Name</p>
+            <input
+              className="w-full"
+              value={nameState}
+              placeholder={currentRoomName?.value}
+              onChange={(e) => {
+                let value = e.currentTarget.value;
+                setNameState(value);
               }}
             />
+          </div>
+          <div className="editRoomDescription flex flex-col gap-1">
+            <p className="font-bold">Description</p>
+            <Textarea
+              className="box-border w-full rounded-md border border-grey-55 p-2"
+              value={descriptionState}
+              maxLength={500}
+              placeholder={
+                currentRoomDescription?.value || "Add a description..."
+              }
+              onChange={(e) => {
+                let value = e.currentTarget.value;
+                setDescriptionState(value);
+              }}
+            />
+          </div>
 
-            <Divider />
-            {isMember ? null : (
-              <ButtonPrimary
-                destructive
-                onClick={() => {
-                  setAreYouSureRoomDeletionModalOpen(true);
-                }}
-                content="Delete Room"
-                icon={<Delete />}
-              />
-            )}
-          </>
-        )}
+          <ButtonPrimary
+            content="Edit Room"
+            onClick={async () => {
+              if (!currentRoomName || !props.currentRoom) return;
+              await mutate("updateFact", {
+                id: currentRoomName?.id,
+                data: {
+                  value: nameState,
+                },
+              });
+              await mutate("assertFact", {
+                entity: props.currentRoom,
+                factID: ulid(),
+                attribute: "room/description",
+                value: descriptionState,
+                positions: {},
+              });
+              props.onClose();
+            }}
+          />
+
+          <Divider />
+
+          <ButtonPrimary
+            destructive
+            onClick={() => {
+              setAreYouSureRoomDeletionModalOpen(true);
+            }}
+            content="Delete Room"
+            icon={<Delete />}
+          />
+        </>
       </div>
       {areYouSureRoomDeletionModalOpen && (
         <AreYouSureRoomDeletionModal
@@ -205,8 +179,7 @@ export const RoomListItem = (props: {
   roomEntity: string;
   setRoomEditOpen?: () => void;
 }) => {
-  let { memberEntity, authorized } = useMutations();
-  let isMember = !!db.useEntity(props.roomEntity, "member/name");
+  let { memberEntity } = useMutations();
   let roomType = db.useEntity(props.roomEntity, "room/type");
 
   let rep = useContext(ReplicacheContext);
@@ -266,18 +239,12 @@ export const RoomListItem = (props: {
                  : "text-grey-55"
              }`}
         >
-          {props.roomEntity === memberEntity || isMember ? (
-            <RoomMember />
-          ) : roomType?.value === "collection" ? (
+          {roomType?.value === "collection" ? (
             <RoomCollection />
           ) : roomType?.value === "canvas" ? (
             <RoomCanvas />
           ) : roomType?.value === "chat" ? (
             <RoomChat />
-          ) : props.roomEntity === "search" ? (
-            <RoomSearch />
-          ) : props.roomEntity === "calendar" ? (
-            <RoomCalendar />
           ) : null}
         </div>
         <div className="roomListItemUnreads grow">{props.children}</div>
