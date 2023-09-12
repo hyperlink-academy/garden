@@ -102,7 +102,7 @@ const JoinCall = () => {
         setLoading(false);
       }}
     >
-      {authorized && loading ? <DotLoader /> : <CallSmall />}
+      {!authorized ? null : loading ? <DotLoader /> : <CallSmall />}
     </button>
   );
 };
@@ -245,7 +245,11 @@ const Member = (props: { entityID: string; showInCall?: boolean }) => {
         ) : (
           <CallMutedTiny />
         )}
-        <div className={`${activeSessions.length > 0 ? "font-bold" : ""}`}>
+        <div
+          className={`break-all ${
+            activeSessions.length > 0 ? "font-bold" : ""
+          }`}
+        >
           {memberEntity === props.entityID ? "You" : name?.value}
         </div>
       </div>
