@@ -38,19 +38,26 @@ export const UnreadsRoom = () => {
         "You have to be a member of this space to have unreads"
       ) : (
         <div className="flex flex-col gap-2">
-          {cachedUnreads
-            .sort((a, b) => {
-              if (a.lastUpdated > b.lastUpdated) return -1;
-              return 0;
-            })
-            .map((unread) => (
-              <CardPreviewWithData
-                hideContent
-                key={unread.id}
-                entityID={unread.entity}
-                size="big"
-              />
-            ))}
+          <h3 className="text-grey-35">Unreads</h3>
+          {cachedUnreads.length === 0 ? (
+            <span className="italic text-grey-55">
+              Cards others make that you haven't yet seen will appear here
+            </span>
+          ) : (
+            cachedUnreads
+              .sort((a, b) => {
+                if (a.lastUpdated > b.lastUpdated) return -1;
+                return 0;
+              })
+              .map((unread) => (
+                <CardPreviewWithData
+                  hideContent
+                  key={unread.id}
+                  entityID={unread.entity}
+                  size="big"
+                />
+              ))
+          )}
         </div>
       )}
     </RoomWrapper>
