@@ -252,6 +252,18 @@ export const RoomListItem = (props: {
         </div>
         {authorized && props.editting ? (
           <SingleTextSection
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                props.setEditting(false);
+              }
+            }}
+            onFocus={(e) => {
+              e.currentTarget.setSelectionRange(
+                e.currentTarget.value.length,
+                e.currentTarget.value.length
+              );
+            }}
             entityID={props.roomEntity}
             section="room/name"
             focused
@@ -401,6 +413,8 @@ export const RoomListPreview = (props: { entityID: string }) => {
   let name = db.useEntity(props.entityID, "room/name");
   return (
     <RoomListItem
+      editting={false}
+      setEditting={() => {}}
       roomEntity={props.entityID}
       onRoomChange={() => {}}
       currentRoom={null}
