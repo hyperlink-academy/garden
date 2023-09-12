@@ -34,8 +34,8 @@ export const Sidebar = (props: {
   let [roomEditOpen, setRoomEditOpen] = useState(false);
 
   return (
-    <div className="Sidebar pwa-padding flex h-full w-52 flex-col items-stretch gap-4 rounded-l-[3px] border-r border-grey-90 bg-white p-3 text-grey-35">
-      <div className="no-scrollbar flex h-full w-full flex-col gap-4 overflow-y-scroll">
+    <div className="Sidebar pwa-padding flex h-full w-52 flex-col items-stretch gap-4 overflow-x-visible rounded-l-[3px] border-r border-grey-90 bg-white  text-grey-35">
+      <div className="no-scrollbar flex h-full w-full flex-col gap-4 overflow-y-scroll px-3 pt-3">
         <SpaceName />
         <People />
         <Divider />
@@ -158,7 +158,7 @@ const SidebarFooter = (props: { studio?: string }) => {
   let [logInOpen, setLogInOpen] = useState(false);
 
   return (
-    <div className="sidebarBackToHome z-10 flex items-center justify-between gap-2 ">
+    <div className="sidebarBackToHome z-10 flex items-center justify-between gap-2 px-3 pb-3">
       {/* login OR home button + studios */}
       {!props.studio ? (
         <div className="grow">
