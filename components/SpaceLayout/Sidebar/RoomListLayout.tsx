@@ -321,6 +321,7 @@ const PresenceDots = (props: { entityID: string }) => {
       {present.map((color) => {
         return (
           <div
+            key={color.id}
             style={{ backgroundColor: color.value }}
             className="h-1 w-1 rounded-full"
           />
