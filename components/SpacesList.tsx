@@ -40,7 +40,7 @@ export const SpaceList = (props: {
               className={`${
                 props.small
                   ? "w-80"
-                  : "min-w-80 flex-1 basis-80 last:max-w-[calc(50%-12px)]"
+                  : "min-w-80 flex-1 basis-80 sm:last:max-w-[calc(50%-12px)]"
               }`}
             >
               <SpaceCard
