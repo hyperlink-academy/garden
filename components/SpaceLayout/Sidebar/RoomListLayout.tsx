@@ -16,10 +16,7 @@ import { useCombinedRefs } from "components/Desktop";
 import { ulid } from "src/ulid";
 import { Textarea } from "components/Textarea";
 import { generateKeyBetween } from "src/fractional-indexing";
-
-export const RoomListLabel = (props: { label: string }) => {
-  return <div className="px-2 pb-1 font-bold text-grey-35">{props.label}</div>;
-};
+import { SingleTextSection } from "components/CardView/Sections";
 
 export const EditRoomModal = (props: {
   open: boolean;
@@ -179,8 +176,9 @@ export const RoomListItem = (props: {
   roomEntity: string;
   setRoomEditOpen?: () => void;
 }) => {
-  let { memberEntity } = useMutations();
+  let { memberEntity, authorized } = useMutations();
   let roomType = db.useEntity(props.roomEntity, "room/type");
+  let [editting, setEditting] = useState(false);
 
   let rep = useContext(ReplicacheContext);
   let unreadCount = useSubscribe(
@@ -224,12 +222,16 @@ export const RoomListItem = (props: {
       <button
         style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
         className="sidebarRoomName flex w-full flex-row gap-1 py-0.5 pl-1 pr-1 text-left"
-        onClick={() =>
+        onClick={(e) => {
+          if (e.detail === 2 && authorized) {
+            setEditting(true);
+            return;
+          }
+
           // don't trigger 'onRoomChange' if room already active (may be trying to setRoomEditOpen instead)
-          props.roomEntity !== props.currentRoom
-            ? props.onRoomChange(props.roomEntity)
-            : undefined
-        }
+          if (props.roomEntity === props.currentRoom) return;
+          props.onRoomChange(props.roomEntity);
+        }}
       >
         <div
           className={` roomListItemIcon mt-[2px] h-5 w-5 shrink-0 pt-[1px] pl-[2px]
@@ -247,7 +249,17 @@ export const RoomListItem = (props: {
             <RoomChat />
           ) : null}
         </div>
-        <div className="roomListItemUnreads grow">{props.children}</div>
+        {authorized && editting ? (
+          <SingleTextSection
+            entityID={props.roomEntity}
+            section="room/name"
+            focused
+            onBlur={() => setEditting(false)}
+            className="border-none bg-inherit p-0 text-inherit"
+          />
+        ) : (
+          <div className="roomListItemUnreads grow">{props.children}</div>
+        )}
         {unreadCount && (
           <div className="unreadCount mt-[6px] ml-1 h-[12px] w-[12px] shrink-0 rounded-full border border-white bg-accent-gold"></div>
         )}

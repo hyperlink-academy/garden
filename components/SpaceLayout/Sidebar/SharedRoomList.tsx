@@ -9,11 +9,7 @@ import {
 } from "hooks/useReplicache";
 import { useContext, useEffect, useState } from "react";
 import { ulid } from "src/ulid";
-import {
-  RoomListLabel,
-  DraggableRoomListItem,
-  RoomListPreview,
-} from "./RoomListLayout";
+import { DraggableRoomListItem, RoomListPreview } from "./RoomListLayout";
 import { sortByPosition, updatePositions } from "src/position_helpers";
 import { useDroppableZone } from "components/DragContext";
 import {
@@ -58,7 +54,7 @@ export const SharedRoomList = (props: {
 
   return (
     <div className="flex flex-col gap-0.5">
-      <RoomListLabel label="Rooms" />
+      <div className="px-2 pb-1 font-bold text-grey-35">Rooms</div>
       <ul className="sidebarSharedRoomList flex flex-col gap-0.5">
         {rooms
           .filter((f) => f.value !== "prompts")
