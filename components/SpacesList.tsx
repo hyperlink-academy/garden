@@ -37,7 +37,11 @@ export const SpaceList = (props: {
           return (
             <div
               key={a.do_id}
-              className={`${props.small ? "w-80" : "min-w-80 flex-1 basis-80"}`}
+              className={`${
+                props.small
+                  ? "w-80"
+                  : "min-w-80 flex-1 basis-80 last:max-w-[calc(50%-12px)]"
+              }`}
             >
               <SpaceCard
                 onEdit={props.onEdit}
