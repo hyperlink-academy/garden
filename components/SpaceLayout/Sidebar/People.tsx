@@ -66,8 +66,7 @@ export const People = () => {
           <CallSettings />
           {expanded && (
             <>
-              <MembersInCall />
-              <hr className="-mx-2 border-grey-80" />
+              <MembersInCall membersLength={members.length} />
               <MembersList
                 onlineMembers={onlineMembers}
                 offlineMembers={offline}
@@ -194,13 +193,16 @@ const MembersList = ({
   );
 };
 
-const MembersInCall = () => {
+const MembersInCall = (props: { membersLength: number }) => {
   let participantIDs = useParticipantIds();
   return (
     <>
       {participantIDs.map((id) => (
         <MemberInCall participantID={id} key={id} />
       ))}
+      {participantIDs.length !== props.membersLength && (
+        <hr className="-mx-2 border-grey-80" />
+      )}
     </>
   );
 };
