@@ -35,13 +35,17 @@ export const SpaceList = (props: {
       >
         {props.spaces?.map((a) => {
           return (
-            <SpaceCard
-              onEdit={props.onEdit}
-              small={props.small}
-              {...a}
+            <div
               key={a.do_id}
-              editable={true}
-            />
+              className={`${props.small ? "w-80" : "min-w-80 flex-1 basis-80"}`}
+            >
+              <SpaceCard
+                onEdit={props.onEdit}
+                small={props.small}
+                {...a}
+                editable={true}
+              />
+            </div>
           );
         })}
       </div>
