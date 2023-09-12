@@ -1,7 +1,13 @@
 import { ButtonPrimary, ButtonTertiary } from "components/Buttons";
 import { Modal, Divider } from "components/Layout";
 import { Fact } from "data/Facts";
-import { Delete, RoomCanvas, RoomChat, RoomCollection } from "../../Icons";
+import {
+  Delete,
+  RoomCanvas,
+  RoomChat,
+  RoomCollection,
+  UnreadDot,
+} from "../../Icons";
 import {
   ReplicacheContext,
   scanIndex,
@@ -9,7 +15,7 @@ import {
   useMutations,
 } from "hooks/useReplicache";
 import { useState, useEffect, useContext } from "react";
-import { useSubscribe } from "replicache-react";
+import { useSubscribe } from "hooks/useSubscribe";
 import { useDraggableCard, useDroppableZone } from "components/DragContext";
 import { sortByPosition, updatePositions } from "src/position_helpers";
 import { useCombinedRefs } from "components/Desktop";
@@ -181,9 +187,7 @@ export const RoomListItem = (props: {
   let { memberEntity, authorized } = useMutations();
   let roomType = db.useEntity(props.roomEntity, "room/type");
 
-  let rep = useContext(ReplicacheContext);
   let unreadCount = useSubscribe(
-    rep?.rep,
     async (tx) => {
       if (!memberEntity) return false;
       let unread = (
@@ -208,7 +212,8 @@ export const RoomListItem = (props: {
       return false;
     },
     false,
-    [memberEntity]
+    [memberEntity],
+    `${props.roomEntity}/unreadCount`
   );
 
   return (
@@ -273,10 +278,54 @@ export const RoomListItem = (props: {
         ) : (
           <div className="roomListItemUnreads grow">{props.children}</div>
         )}
+        <PresenceDots entityID={props.roomEntity} />
         {unreadCount && (
-          <div className="unreadCount mt-[6px] ml-1 h-[12px] w-[12px] shrink-0 rounded-full border border-white bg-accent-gold"></div>
+          <div className="absolute -top-1 -left-1">
+            <UnreadDot />
+          </div>
         )}
       </button>
+    </div>
+  );
+};
+
+const PresenceDots = (props: { entityID: string }) => {
+  let present = useSubscribe(
+    async (tx) => {
+      let sessions = await scanIndex(tx).vae(
+        props.entityID,
+        "presence/in-room"
+      );
+      let members = [] as Fact<"member/color">[];
+      for (let presence of sessions) {
+        let member = await scanIndex(tx).eav(
+          presence.entity,
+          "presence/client-member"
+        );
+        if (member && !members.find((m) => m.entity === member?.value.value)) {
+          let memberColor = await scanIndex(tx).eav(
+            member.value.value,
+            "member/color"
+          );
+          if (memberColor) members.push(memberColor);
+        }
+      }
+      return members;
+    },
+    [],
+    [props.entityID],
+    `${props.entityID}-present-in-room`
+  );
+  return (
+    <div className="my-auto grid grid-cols-2 items-center gap-1">
+      {present.map((color) => {
+        return (
+          <div
+            style={{ backgroundColor: color.value }}
+            className="h-1 w-1 rounded-full"
+          />
+        );
+      })}
     </div>
   );
 };
