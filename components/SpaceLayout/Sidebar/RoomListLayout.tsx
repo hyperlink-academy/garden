@@ -173,12 +173,13 @@ export const RoomListItem = (props: {
   onRoomChange: (room: string) => void;
   children: React.ReactNode;
   currentRoom: string | null;
+  editting: boolean;
+  setEditting: (editing: boolean) => void;
   roomEntity: string;
   setRoomEditOpen?: () => void;
 }) => {
   let { memberEntity, authorized } = useMutations();
   let roomType = db.useEntity(props.roomEntity, "room/type");
-  let [editting, setEditting] = useState(false);
 
   let rep = useContext(ReplicacheContext);
   let unreadCount = useSubscribe(
@@ -224,7 +225,7 @@ export const RoomListItem = (props: {
         className="sidebarRoomName flex w-full flex-row gap-1 py-0.5 pl-1 pr-1 text-left"
         onClick={(e) => {
           if (e.detail === 2 && authorized) {
-            setEditting(true);
+            props.setEditting(true);
             return;
           }
 
@@ -249,12 +250,12 @@ export const RoomListItem = (props: {
             <RoomChat />
           ) : null}
         </div>
-        {authorized && editting ? (
+        {authorized && props.editting ? (
           <SingleTextSection
             entityID={props.roomEntity}
             section="room/name"
             focused
-            onBlur={() => setEditting(false)}
+            onBlur={() => props.setEditting(false)}
             className="border-none bg-inherit p-0 text-inherit"
           />
         ) : (
@@ -278,9 +279,11 @@ export const DraggableRoomListItem = (props: {
   setRoomEditOpen: () => void;
 }) => {
   let rep = useContext(ReplicacheContext);
+
+  let [editting, setEditting] = useState(false);
   const { attributes, listeners, setNodeRef, isOverSomethingElse } =
     useDraggableCard({
-      disabled: !props.draggable,
+      disabled: !props.draggable || editting,
       type: "room",
       entityID: props.entityID,
       id: props.factID,
@@ -380,6 +383,8 @@ export const DraggableRoomListItem = (props: {
       )}
       {isOverSomethingElse ? null : (
         <RoomListItem
+          editting={editting}
+          setEditting={setEditting}
           onRoomChange={props.onRoomChange}
           currentRoom={props.currentRoom}
           roomEntity={props.entityID}
