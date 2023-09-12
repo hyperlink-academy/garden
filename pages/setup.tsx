@@ -10,6 +10,7 @@ import { useDebouncedEffect } from "hooks/utils";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import useSWR from "swr";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export default function SignupPage() {
@@ -22,6 +23,10 @@ export default function SignupPage() {
     username: "",
   });
   let [open, setOpen] = useState(false);
+  let { data: session } = useSWR("session", async () => {
+    let { data } = await supabase.auth.refreshSession();
+    return data;
+  });
 
   useDebouncedEffect(
     async () => {
@@ -41,15 +46,16 @@ export default function SignupPage() {
     [data.username]
   );
 
-  let { authToken: tokens, session } = useAuth();
+  let { authToken: tokens } = useAuth();
   useEffect(() => {
-    if (session?.session?.username) {
+    let username = session?.user?.user_metadata.username;
+    if (username) {
       if (router.query.redirectTo)
         router.push(
           router.query.redirectTo as string,
           router.query.redirectTo as string
         );
-      else router.push(`/s/${session?.session?.username}`);
+      else router.push(`/s/${username}`);
     }
   }, [session, router]);
   const onSubmit = async (e: React.FormEvent) => {
