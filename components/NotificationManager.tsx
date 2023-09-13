@@ -3,7 +3,8 @@ import { Database } from "backend/lib/database.types";
 import { Modal } from "./Layout";
 import { useEffect, useState } from "react";
 import { MoreOptionsTiny, Settings } from "./Icons";
-import { ButtonLink } from "./Buttons";
+import { ButtonLink, ButtonSecondary } from "./Buttons";
+import useSWR from "swr";
 
 export const NotificationManager = () => {
   let supabase = useSupabaseClient<Database>();
@@ -11,6 +12,21 @@ export const NotificationManager = () => {
   let [notificationPermissionState, setNotificationPermissionState] =
     useState("default");
   let [pushPermissionState, setPushPermissionState] = useState("prompt");
+  let [existingSubscription, setExistingSubscription] =
+    useState<PushSubscription | null>(null);
+  useEffect(() => {
+    (async () => {
+      if (!existingSubscription) return;
+
+      let { data: session } = await supabase.auth.getSession();
+      if (!session.session) return;
+      await supabase.from("push_subscriptions").insert({
+        user_id: session.session.user.id,
+        endpoint: existingSubscription.endpoint,
+        push_subscription: existingSubscription as any,
+      });
+    })();
+  }, [existingSubscription]);
   useEffect(() => {
     if (!("Notification" in window)) {
       setNotificationPermissionState("unavailable");
@@ -21,32 +37,16 @@ export const NotificationManager = () => {
 
     navigator.serviceWorker
       .getRegistrations()
-      .then(async function(registrations) {
+      .then(async function (registrations) {
         for (let registration of registrations) {
+          let subscription = await registration.pushManager.getSubscription();
+          setExistingSubscription(subscription);
           let current_pushPermissionState =
             await registration.pushManager.permissionState({
               applicationServerKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
               userVisibleOnly: true,
             });
           setPushPermissionState(current_pushPermissionState);
-          if (current_pushPermissionState === "granted") {
-            let { data: session } = await supabase.auth.getSession();
-            if (!session.session) return;
-            let subscription = await registration.pushManager.getSubscription();
-            if (!subscription) return;
-
-            let { data: existingSubscription } = await supabase
-              .from("push_subscriptions")
-              .select("*")
-              .eq("endpoint", subscription.endpoint);
-
-            if (!existingSubscription)
-              await supabase.from("push_subscriptions").insert({
-                user_id: session.session.user.id,
-                endpoint: subscription.endpoint,
-                push_subscription: subscription as any,
-              });
-          }
         }
       });
   }, [supabase]);
@@ -84,7 +84,8 @@ export const NotificationManager = () => {
         if denied…???
         */}
         {pushPermissionState === "default" ||
-        pushPermissionState === "prompt" ? (
+        pushPermissionState === "prompt" ||
+        (pushPermissionState === "granted" && !existingSubscription) ? (
           <>
             <p>
               Turn on notifications for new chat messages and card comments in
@@ -108,16 +109,43 @@ export const NotificationManager = () => {
                         endpoint: result.endpoint,
                         push_subscription: result as any,
                       });
+
+                      setExistingSubscription(result);
+                      setNotificationPermissionState("granted");
+                      return;
                     }
                   });
-                setNotificationPermissionState("granted");
               }}
               className="w-fit"
               content="enable notifications"
             ></ButtonLink>
           </>
         ) : pushPermissionState === "granted" ? (
-          "You've enabled notifications on this device!"
+          <div>
+            You've enabled notifications on this device!
+            <ButtonSecondary
+              content={"Disable Notifications"}
+              onClick={async () => {
+                navigator.serviceWorker
+                  .getRegistrations()
+                  .then(async function (registrations) {
+                    for (let registration of registrations) {
+                      let push_subscription =
+                        await registration.pushManager.getSubscription();
+                      if (!push_subscription) return;
+                      let { data: session } = await supabase.auth.getSession();
+                      if (!session.session) return;
+                      await supabase
+                        .from("push_subscriptions")
+                        .delete()
+                        .eq("endpoint", push_subscription.endpoint);
+                      await push_subscription.unsubscribe();
+                      setExistingSubscription(null);
+                    }
+                  });
+              }}
+            />
+          </div>
         ) : notificationPermissionState === "unavailable" ? (
           "Notifications unavailable in this browser."
         ) : (
