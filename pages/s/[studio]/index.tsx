@@ -25,7 +25,15 @@ export default function UserHomePage(props: Props) {
   let spaces = [
     ...data.members_in_spaces
       ?.filter((s) => !!s.space_data)
-      .map((s) => s.space_data as SpaceData),
+      .map((s) => s.space_data as SpaceData)
+      .sort((a, b) => {
+        if (!a.lastUpdated || !b.lastUpdated) {
+          if (a.lastUpdated) return -1;
+          if (b.lastUpdated) return 1;
+          return 0;
+        }
+        return a.lastUpdated > b.lastUpdated ? -1 : 1;
+      }),
   ];
 
   return (
