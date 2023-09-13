@@ -20,6 +20,7 @@ import { post_feed_route } from "./routes/post_feed";
 import { get_card_data_route } from "./routes/get_card_data";
 import type { WebSocket as DOWebSocket } from "@cloudflare/workers-types";
 import { leave_route } from "./routes/leave";
+import { createClient } from "backend/lib/supabase";
 
 export type Env = {
   factStore: ReturnType<typeof store>;
@@ -53,7 +54,6 @@ let router = makeRouter(routes);
 let internalRouter = makeRouter(private_routes);
 
 export class SpaceDurableObject implements DurableObject {
-  throttled = false;
   pushLock = new Lock();
   constructor(
     readonly state: DurableObjectState,
@@ -83,18 +83,30 @@ export class SpaceDurableObject implements DurableObject {
       );
     });
   }
-  async poke() {
-    if (this.throttled) {
-      return;
-    }
 
-    this.throttled = true;
-    setTimeout(() => {
-      this.state.getWebSockets().forEach((socket) => {
-        socket.send(JSON.stringify({ type: "poke" }));
-      });
-      this.throttled = false;
-    }, 100);
+  dbThrottle = false;
+  pokeThrottle = false;
+  async poke() {
+    if (!this.pokeThrottle) {
+      this.pokeThrottle = true;
+      setTimeout(() => {
+        this.state.getWebSockets().forEach((socket) => {
+          socket.send(JSON.stringify({ type: "poke" }));
+        });
+        this.pokeThrottle = false;
+      }, 50);
+    }
+    if (!this.dbThrottle) {
+      this.dbThrottle = true;
+      setTimeout(async () => {
+        let supabase = createClient(this.env);
+        await supabase
+          .from("space_data")
+          .update({ lastUpdated: new Date().toISOString() })
+          .eq("do_id", this.state.id.toString());
+        this.dbThrottle = false;
+      }, 2000);
+    }
   }
   async fetch(request: Request) {
     let url = new URL(request.url);

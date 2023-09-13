@@ -226,6 +226,7 @@ export interface Database {
           end_date: string | null
           id: string
           image: string | null
+          lastUpdated: string | null
           name: string | null
           owner: string
           start_date: string | null
@@ -239,6 +240,7 @@ export interface Database {
           end_date?: string | null
           id?: string
           image?: string | null
+          lastUpdated?: string | null
           name?: string | null
           owner: string
           start_date?: string | null
@@ -252,6 +254,7 @@ export interface Database {
           end_date?: string | null
           id?: string
           image?: string | null
+          lastUpdated?: string | null
           name?: string | null
           owner?: string
           start_date?: string | null
