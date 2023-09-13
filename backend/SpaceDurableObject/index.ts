@@ -89,23 +89,33 @@ export class SpaceDurableObject implements DurableObject {
   async poke() {
     if (!this.pokeThrottle) {
       this.pokeThrottle = true;
-      setTimeout(() => {
-        this.state.getWebSockets().forEach((socket) => {
-          socket.send(JSON.stringify({ type: "poke" }));
-        });
-        this.pokeThrottle = false;
-      }, 50);
+      this.state.waitUntil(
+        new Promise<void>((resolve) => {
+          setTimeout(() => {
+            this.state.getWebSockets().forEach((socket) => {
+              socket.send(JSON.stringify({ type: "poke" }));
+            });
+            this.pokeThrottle = false;
+            resolve();
+          }, 50);
+        })
+      );
     }
     if (!this.dbThrottle) {
       this.dbThrottle = true;
-      setTimeout(async () => {
-        let supabase = createClient(this.env);
-        await supabase
-          .from("space_data")
-          .update({ lastUpdated: new Date().toISOString() })
-          .eq("do_id", this.state.id.toString());
-        this.dbThrottle = false;
-      }, 2000);
+      this.state.waitUntil(
+        new Promise<void>((resolve) => {
+          setTimeout(async () => {
+            let supabase = createClient(this.env);
+            await supabase
+              .from("space_data")
+              .update({ lastUpdated: new Date().toISOString() })
+              .eq("do_id", this.state.id.toString());
+            this.dbThrottle = false;
+            resolve();
+          }, 2000);
+        })
+      );
     }
   }
   async fetch(request: Request) {
