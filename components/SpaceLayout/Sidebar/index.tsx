@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { Divider } from "components/Layout";
+import { Divider, Modal } from "components/Layout";
 import { useAuth } from "hooks/useAuth";
 import { db, useMutations, useSpaceID } from "hooks/useReplicache";
+import * as Popover from "@radix-ui/react-popover";
 import { useState } from "react";
 import {
   BackToHome,
@@ -17,13 +18,15 @@ import { useRouter } from "next/router";
 import { EditRoomModal } from "./RoomListLayout";
 import { SharedRoomList } from "./SharedRoomList";
 import * as PopoverRadix from "@radix-ui/react-popover";
-import { ButtonPrimary } from "components/Buttons";
+import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
 import { LogInModal } from "components/LoginModal";
 import { useSpaceData } from "hooks/useSpaceData";
 import { useIdentityData } from "hooks/useIdentityData";
 import { uuidToBase62 } from "src/uuidHelpers";
 import { HelpModal } from "components/HelpCenter";
 import { People } from "./People";
+import { spaceAPI } from "backend/lib/api";
+import { DotLoader } from "components/DotLoader";
 
 export const Sidebar = (props: {
   onRoomChange: (room: string) => void;
@@ -113,10 +116,11 @@ const RoomButton = (props: {
 };
 const SpaceName = () => {
   let spaceID = useSpaceID();
+  let { authorized } = useMutations();
   let { data } = useSpaceData(spaceID);
   let router = useRouter();
   let { session } = useAuth();
-  let authorized =
+  let isOwner =
     session.session && session.session.username === data?.owner.username;
   let [editModal, setEditModal] = useState(false);
   return (
@@ -128,13 +132,15 @@ const SpaceName = () => {
         >
           {data?.display_name}
         </h3>
-        {authorized && (
+        {!authorized ? null : isOwner ? (
           <button
             onClick={() => setEditModal(true)}
             className="shrink-0 rounded-md border border-transparent pt-[1px] hover:border-accent-blue hover:text-accent-blue"
           >
             <MoreOptionsSmall />
           </button>
+        ) : (
+          <MemberOptions />
         )}
       </div>
       <EditSpaceModal
@@ -147,6 +153,68 @@ const SpaceName = () => {
         spaceID={spaceID}
       />
     </div>
+  );
+};
+
+const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
+const MemberOptions = () => {
+  const [leaveModalOpen, setLeaveModalOpen] = useState(false);
+  let { authToken, session } = useAuth();
+  let spaceID = useSpaceID();
+  let router = useRouter();
+  let [loading, setLoading] = useState(false);
+
+  return (
+    <>
+      <Popover.Root>
+        <Popover.Trigger>
+          <button>
+            <MoreOptionsSmall />
+          </button>
+        </Popover.Trigger>
+        <Popover.Portal>
+          <Popover.Content
+            className="z-20 flex max-w-xs flex-col gap-2 rounded-md border-2 border-grey-80 bg-white py-2 drop-shadow-md"
+            sideOffset={-4}
+          >
+            <Popover.Arrow className="fill-grey-80 stroke-grey-80" />
+            <button
+              className="px-2 font-bold text-accent-red hover:bg-bg-blue"
+              onClick={() => setLeaveModalOpen(true)}
+            >
+              Leave space
+            </button>
+          </Popover.Content>
+        </Popover.Portal>
+      </Popover.Root>
+      <Modal open={leaveModalOpen} onClose={() => setLeaveModalOpen(false)}>
+        <h3>Are you sure you want to leave this space?</h3>
+        <div className="flex flex-row gap-2">
+          <ButtonPrimary
+            destructive
+            content={loading ? <DotLoader /> : "Leave"}
+            onClick={async () => {
+              if (!spaceID || !authToken || !session) return;
+
+              setLoading(true);
+              let data = await spaceAPI(
+                `${WORKER_URL}/space/${spaceID}`,
+                "leave",
+                {
+                  authToken,
+                }
+              );
+              router.push("/s/" + session.session?.username);
+              setLoading(false);
+            }}
+          />
+          <ButtonSecondary
+            content="Nevermind"
+            onClick={() => setLeaveModalOpen(false)}
+          />
+        </div>
+      </Modal>
+    </>
   );
 };
 

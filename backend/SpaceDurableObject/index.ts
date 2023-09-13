@@ -19,7 +19,7 @@ import { get_daily_token_route } from "./routes/get_daily_token";
 import { post_feed_route } from "./routes/post_feed";
 import { get_card_data_route } from "./routes/get_card_data";
 import type { WebSocket as DOWebSocket } from "@cloudflare/workers-types";
-import { Fact } from "data/Facts";
+import { leave_route } from "./routes/leave";
 
 export type Env = {
   factStore: ReturnType<typeof store>;
@@ -44,6 +44,7 @@ let routes = [
   delete_self_route,
   get_daily_token_route,
   post_feed_route,
+  leave_route,
 ];
 let private_routes = [sync_notifications_route];
 export type PrivateSpaceRoutes = typeof private_routes;
