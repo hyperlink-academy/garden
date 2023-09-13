@@ -159,15 +159,18 @@ const MembersList = ({
   offlineMembers: Fact<"member/name">[];
 }) => {
   let [offlineExpanded, setOfflineExpanded] = useState(false);
+  let length = offlineMembers.length + onlineMembers.length;
   return (
     <>
       <div>
         {onlineMembers.map((m) => (
           <Member entityID={m.entity} key={m.id} />
         ))}
+        {length <= 4 &&
+          offlineMembers.map((m) => <Member entityID={m.entity} key={m.id} />)}
       </div>
 
-      {offlineMembers.length > 0 && (
+      {offlineMembers.length > 0 && length > 4 && (
         <button
           onClick={() => setOfflineExpanded(!offlineExpanded)}
           className="flex flex-row items-center gap-1 font-bold text-grey-55"
