@@ -41,7 +41,7 @@ export const UnreadsRoom = () => {
           <h3 className="text-grey-35">Unreads</h3>
           {cachedUnreads.length === 0 ? (
             <span className="italic text-grey-55">
-              Cards others make that you haven't yet seen will appear here
+              Cards others make that you haven&apos;t yet seen will appear here
             </span>
           ) : (
             cachedUnreads

@@ -122,7 +122,7 @@ export const NotificationManager = () => {
           </>
         ) : pushPermissionState === "granted" ? (
           <div>
-            You've enabled notifications on this device!
+            You&apos;ve enabled notifications on this device!
             <ButtonSecondary
               content={"Disable Notifications"}
               onClick={async () => {
