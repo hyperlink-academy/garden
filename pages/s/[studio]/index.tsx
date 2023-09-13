@@ -7,7 +7,7 @@ import { useAuth } from "hooks/useAuth";
 import { useRouter } from "next/router";
 import { getCurrentDate } from "src/utils";
 import { useIdentityData } from "hooks/useIdentityData";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DisclosureCollapseTiny, DisclosureExpandTiny } from "components/Icons";
 import Head from "next/head";
 import { NotificationManager } from "components/NotificationManager";
@@ -18,8 +18,19 @@ export default function UserHomePage(props: Props) {
   let { session } = useAuth();
   let { query } = useRouter();
   let { data } = useIdentityData(query.studio as string, props.data);
+  let [sortOrder, _setSortOrder] = useState<"lastUpdated" | "name">(
+    "lastUpdated"
+  );
+  useEffect(() => {
+    let savedSortOrder = localStorage.getItem(`${query.studio}/sortOrder`);
+    if (savedSortOrder) setSortOrder(savedSortOrder as "lastUpdated" | "name");
+  }, [query.studio]);
   if (props.notFound) return <div>404 - page not found!</div>;
   if (!data) return <div>loading </div>;
+  const setSortOrder = (sortOrder: "lastUpdated" | "name") => {
+    _setSortOrder(sortOrder);
+    localStorage.setItem(`${query.studio}/sortOrder`, sortOrder);
+  };
 
   let currentStudioName = query.studio;
   let spaces = [
@@ -27,6 +38,14 @@ export default function UserHomePage(props: Props) {
       ?.filter((s) => !!s.space_data)
       .map((s) => s.space_data as SpaceData)
       .sort((a, b) => {
+        if (sortOrder === "name") {
+          if (!a.display_name || !b.display_name) {
+            if (a.display_name) return -1;
+            if (b.display_name) return 1;
+            return 0;
+          }
+          return a.display_name.localeCompare(b.display_name);
+        }
         if (!a.lastUpdated || !b.lastUpdated) {
           if (a.lastUpdated) return -1;
           if (b.lastUpdated) return 1;
@@ -59,6 +78,25 @@ export default function UserHomePage(props: Props) {
                   studioName={currentStudioName as string}
                 />
               ))}
+          </div>
+          <div className="flex flex-row gap-2 text-sm">
+            sort by:{" "}
+            <button
+              onClick={() => setSortOrder("lastUpdated")}
+              className={`${
+                sortOrder === "lastUpdated" ? "underline" : ""
+              } hover:underline`}
+            >
+              last updated
+            </button>
+            <button
+              onClick={() => setSortOrder("name")}
+              className={`${
+                sortOrder === "name" ? "underline" : ""
+              } hover:underline`}
+            >
+              name
+            </button>
           </div>
           <List
             spaces={spaces}
