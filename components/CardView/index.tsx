@@ -176,6 +176,11 @@ export const CardContent = (props: {
   let memberName = db.useEntity(props.entityID, "member/name");
   let { authorized } = useMutations();
   let [drawerOpen, setDrawerOpen] = useState(false);
+  let cardCreator = db.useEntity(props.entityID, "card/created-by");
+  let cardCreatorName = db.useEntity(
+    cardCreator?.value.value as string,
+    "member/name"
+  )?.value;
 
   return (
     <>
@@ -231,6 +236,7 @@ export const CardContent = (props: {
         >
           <div className="flex flex-col gap-0">
             <Title entityID={props.entityID} />
+
             <ScheduledDate
               entityID={props.entityID}
               date={date}
@@ -247,6 +253,9 @@ export const CardContent = (props: {
           <ImageSection entityID={props.entityID} />
 
           <AttachedCardSection entityID={props.entityID} />
+          <div className=" h-[28px] gap-2  text-sm italic text-grey-55">
+            created by {cardCreatorName}
+          </div>
         </div>
       </div>
       {/* END CARD CONTENT */}

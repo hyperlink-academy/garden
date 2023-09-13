@@ -3,6 +3,7 @@ import { db, useMutations } from "hooks/useReplicache";
 import { useEffect, useState } from "react";
 import { CardPreviewWithData } from "./CardPreview";
 import { RoomWrapper } from "./RoomLayout";
+import { Divider } from "./Layout";
 
 export const UnreadsRoom = () => {
   let { authorized, memberEntity } = useMutations();
@@ -38,11 +39,17 @@ export const UnreadsRoom = () => {
         "You have to be a member of this space to have unreads"
       ) : (
         <div className="flex flex-col gap-2">
-          <h3 className="text-grey-35">Unreads</h3>
+          <div className="sticky flex flex-col gap-2">
+            <h3 className="text-grey-35">Unreads</h3>
+            <Divider />
+          </div>
           {cachedUnreads.length === 0 ? (
-            <span className="italic text-grey-55">
-              Cards others make that you haven&apos;t yet seen will appear here
-            </span>
+            <div className="italic text-grey-55">
+              <p className="pb-2 font-bold">
+                You have no unread cards! <br />
+              </p>
+              New cards and comments you haven&apos;t yet seen will appear here
+            </div>
           ) : (
             cachedUnreads
               .sort((a, b) => {

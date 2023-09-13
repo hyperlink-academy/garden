@@ -160,8 +160,9 @@ function RoomHeader(props: {
       </div>
 
       <div
-        className={`roomDescriptionAndFilter z-10 bg-background ${descriptionOpen ? "sticky" : ""
-          }`}
+        className={`roomDescriptionAndFilter z-10 bg-background ${
+          descriptionOpen ? "sticky" : ""
+        }`}
         style={{ top: `${titleHeight}px` }}
         ref={descriptionRef}
       >
@@ -228,10 +229,11 @@ const RoomDescription = (props: {
                 entityID={props.entityID}
               />
               <button
-                className={`${props.filters.length === 0
+                className={`${
+                  props.filters.length === 0
                     ? "text-grey-55 underline"
                     : "font-bold text-accent-blue"
-                  }`}
+                }`}
                 onClick={() => setFiltersOpen(!filtersOpen)}
               >
                 filters({props.filters.length})
@@ -288,9 +290,10 @@ export const CollectionType = (props: {
     });
   };
   const className = (typeName: Fact<"collection/type">["value"]) =>
-    `p-0.5 text-grey-55 ${type === typeName
-      ? "rounded-md border border-grey-55"
-      : "border border-transparent"
+    `p-0.5 text-grey-55 ${
+      type === typeName
+        ? "rounded-md border border-grey-55"
+        : "border border-transparent"
     }`;
 
   return (

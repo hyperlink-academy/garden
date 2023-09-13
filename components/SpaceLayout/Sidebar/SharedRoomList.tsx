@@ -54,7 +54,6 @@ export const SharedRoomList = (props: {
 
   return (
     <div className="flex flex-col gap-0.5">
-      <div className="px-2 pb-1 font-bold text-grey-35">Rooms</div>
       <ul className="sidebarSharedRoomList flex flex-col gap-0.5">
         {rooms
           .filter((f) => f.value !== "prompts")
