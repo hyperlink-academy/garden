@@ -13,6 +13,7 @@ import {
   CloseFilledTiny,
   DisclosureCollapseTiny,
   DisclosureExpandTiny,
+  MemberAdd,
   RoomMember,
   SettingsOutline,
 } from "components/Icons";
@@ -24,6 +25,16 @@ import { Fact } from "data/Facts";
 import { MediaDeviceSettings } from "components/Calls/CallManager";
 import { useJoinCall } from "components/Calls/CallProvider";
 import { DotLoader } from "components/DotLoader";
+import { useAuth } from "hooks/useAuth";
+import { useSmoker } from "components/Smoke";
+import useSWR from "swr";
+import { spaceAPI } from "backend/lib/api";
+import {
+  ButtonPrimary,
+  ButtonSecondary,
+  ButtonTertiary,
+} from "components/Buttons";
+import { Modal } from "components/Layout";
 
 export const People = () => {
   let members = db.useAttribute("member/name");
@@ -192,6 +203,7 @@ const MembersList = ({
           </div>
         </div>
       )}
+      <InviteMember />
     </>
   );
 };
@@ -282,3 +294,66 @@ function useParticipantInCall(username?: string) {
   });
   return useParticipant(id[0]);
 }
+
+const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
+const InviteMember = () => {
+  let { authToken, session } = useAuth();
+  let [open, setInviteOpen] = useState(false);
+  let isMember = db.useUniqueAttribute("space/member", session.session?.studio);
+  let smoker = useSmoker();
+  const spaceID = useSpaceID();
+  let { data: inviteLink } = useSWR(
+    !isMember ? null : `${WORKER_URL}/space/${spaceID}/get_share_code`,
+    async () => {
+      if (!spaceID || !authToken) return;
+      let code = await spaceAPI(
+        `${WORKER_URL}/space/${spaceID}`,
+        "get_share_code",
+        { authToken }
+      );
+      if (code.success) {
+        return `${document.location.href}/join?code=${code.code}`;
+      }
+    }
+  );
+
+  const getShareLink = async (e: React.MouseEvent) => {
+    if (!inviteLink) return;
+    await navigator.clipboard.writeText(inviteLink);
+    smoker({ position: { x: e.clientX, y: e.clientY }, text: "copied!" });
+  };
+
+  return (
+    <>
+      <ButtonTertiary
+        icon={<MemberAdd />}
+        content="Invite!"
+        onClick={() => setInviteOpen(true)}
+        className="!w-full"
+      />
+      <Modal open={open} onClose={() => setInviteOpen(false)}>
+        <div className="inviteMemberModal flex flex-col place-items-center gap-4 p-4 text-center">
+          <div className="flex flex-col gap-2">
+            <h3>Send this link to invite others to join!</h3>
+            <p>
+              Members each get their own room, and can create and edit cards in
+              this Space.
+            </p>
+          </div>
+          <div className="inviteMemberModalLink flex w-full gap-2">
+            <input
+              className="grow bg-grey-90 text-grey-35"
+              readOnly
+              value={inviteLink}
+              onClick={getShareLink}
+            />
+            <ButtonPrimary
+              onClick={(e) => getShareLink(e)}
+              content={"Copy Invite Link"}
+            />
+          </div>
+        </div>
+      </Modal>
+    </>
+  );
+};
