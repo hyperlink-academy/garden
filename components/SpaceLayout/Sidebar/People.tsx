@@ -10,14 +10,13 @@ import {
   CallMutedTiny,
   CallSmall,
   CallUnMutedTiny,
-  CloseFilledTiny,
   DisclosureCollapseTiny,
   DisclosureExpandTiny,
   MemberAdd,
   RoomMember,
   SettingsOutline,
 } from "components/Icons";
-import { db, useMutations } from "hooks/useReplicache";
+import { db, scanIndex, useMutations, useSpaceID } from "hooks/useReplicache";
 import tailwind from "tailwind.config";
 import { useState } from "react";
 import { useOpenCard } from "hooks/useUIState";
@@ -29,11 +28,7 @@ import { useAuth } from "hooks/useAuth";
 import { useSmoker } from "components/Smoke";
 import useSWR from "swr";
 import { spaceAPI } from "backend/lib/api";
-import {
-  ButtonPrimary,
-  ButtonSecondary,
-  ButtonTertiary,
-} from "components/Buttons";
+import { ButtonPrimary, ButtonTertiary } from "components/Buttons";
 import { Modal } from "components/Layout";
 
 export const People = () => {
