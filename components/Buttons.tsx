@@ -62,7 +62,7 @@ export function ButtonSecondary(
       outline-offset-[-2px] hover:bg-bg-blue 
       hover:text-accent-blue active:bg-bg-blue active:text-accent-blue active:outline active:outline-2 
       disabled:border-grey-90 disabled:bg-grey-90 
-      disabled:text-grey-80 disabled:hover:text-grey-80`}
+      disabled:text-grey-80 disabled:hover:text-grey-80 ${props.className}`}
     >
       {props.icon ? <span className="">{props.icon}</span> : null}
       {props.content ? <span className="">{props.content}</span> : null}
@@ -104,7 +104,7 @@ export function ButtonLink(
       {...{ content: undefined, icon: undefined }}
       className={`${props.className} m-0 ${
         props.onDark ? "text-white" : "text-accent-blue"
-      } flex items-center justify-center gap-2 font-bold disabled:text-grey-80`}
+      } flex items-center justify-center gap-2 font-bold outline-none disabled:text-grey-80`}
     >
       {props.icon ? <span className="">{props.icon}</span> : null}
       {props.content ? <span className="">{props.content}</span> : null}

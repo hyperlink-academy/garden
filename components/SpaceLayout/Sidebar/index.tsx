@@ -27,6 +27,7 @@ import { HelpModal } from "components/HelpCenter";
 import { People } from "./People";
 import { spaceAPI } from "backend/lib/api";
 import { DotLoader } from "components/DotLoader";
+import { Feedback } from "components/Feedback";
 
 export const Sidebar = (props: {
   onRoomChange: (room: string) => void;
@@ -242,58 +243,18 @@ const SidebarFooter = (props: { studio?: string }) => {
         </Link>
       )}
 
-      {/* studio list! */}
-      {authorized && session.session && (
-        <SpaceStudiosList username={session.session.username} />
-      )}
+      <div className="flex flex-row gap-2">
+        <Feedback />
 
-      {/* info / help button */}
-      <button
-        className="hover:text-accent-blue"
-        onClick={() => setInfoOpen(true)}
-      >
-        <Information />
-      </button>
-      <HelpModal open={infoOpen} onClose={() => setInfoOpen(false)} />
+        {/* info / help button */}
+        <button
+          className="hover:text-accent-blue"
+          onClick={() => setInfoOpen(true)}
+        >
+          <Information />
+        </button>
+        <HelpModal open={infoOpen} onClose={() => setInfoOpen(false)} />
+      </div>
     </div>
   );
-};
-
-const SpaceStudiosList = (props: { username: string }) => {
-  let { data } = useIdentityData(props.username);
-  let studios = data?.members_in_studios.map(
-    (s) => s.studios as Exclude<typeof s.studios, null>
-  );
-  return studios && studios.length > 0 ? (
-    <>
-      <PopoverRadix.Root>
-        <PopoverRadix.Trigger>
-          <button className="font-bold text-grey-35 hover:text-accent-blue">
-            Studios
-          </button>
-        </PopoverRadix.Trigger>
-
-        <PopoverRadix.Portal>
-          <PopoverRadix.Content
-            className="relative left-2 z-20 flex max-w-xs flex-col gap-2 rounded-md border-2 border-grey-80 bg-white p-2 drop-shadow-md"
-            sideOffset={4}
-          >
-            <PopoverRadix.Arrow
-              className="fill-grey-80 stroke-grey-80"
-              offset={20}
-              startOffset={20}
-            />
-
-            {studios?.map((s) => (
-              <Link href={`/studio/${uuidToBase62(s.id)}`} key={s.id}>
-                <PopoverRadix.Close className="w-full py-1 px-2 text-left text-grey-35 hover:bg-bg-blue">
-                  {s.name}
-                </PopoverRadix.Close>
-              </Link>
-            ))}
-          </PopoverRadix.Content>
-        </PopoverRadix.Portal>
-      </PopoverRadix.Root>
-    </>
-  ) : null;
 };

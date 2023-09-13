@@ -2,6 +2,7 @@ import { makeRouter } from "./lib/api";
 import { handleOptions } from "./lib/handleOptions";
 import { add_space_to_studio } from "./routes/add_space_to_studio";
 import { create_studio_route } from "./routes/create_studio";
+import { feedback_route } from "./routes/feedback";
 import { get_identity_data_route } from "./routes/get_identity_data";
 import { get_space_route } from "./routes/get_space";
 import { get_space_data_route } from "./routes/get_space_data";
@@ -25,6 +26,7 @@ const Routes = [
   add_space_to_studio,
   update_studio_data,
   create_studio_route,
+  feedback_route,
 ];
 
 export type WorkerRoutes = typeof Routes;
@@ -37,6 +39,7 @@ export type Bindings = {
   SUPABASE_URL: string;
   DAILY_API_KEY: string;
   NEXT_API_URL: string;
+  POSTMARK_API_TOKEN: string;
   RPC_SECRET: string;
   SPACES: DurableObjectNamespace;
   USER_UPLOADS: R2Bucket;
