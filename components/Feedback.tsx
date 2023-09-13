@@ -30,11 +30,11 @@ export const Feedback = () => {
         ) : (
           <div className="flex flex-col gap-3">
             <div>
-              <h3>We'd love to hear your feedback</h3>
+              <h3>We&apos;d love to hear your feedback</h3>
               <p className="text-sm italic text-grey-55">
                 {!session.loggedIn
-                  ? "Thanks for your thoughts! If you'd like us to get back to you, please include your email!"
-                  : "We'll get back to you via email, thanks for your thoughts!"}
+                  ? "Thanks for your thoughts! If you&apos;d like us to get back to you, please include your email!"
+                  : "We&apos;ll get back to you via email, thanks for your thoughts!"}
               </p>
             </div>
             <AutosizeTextarea
