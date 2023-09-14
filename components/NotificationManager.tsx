@@ -4,6 +4,7 @@ import { Modal } from "./Layout";
 import { useEffect, useState } from "react";
 import { Settings } from "./Icons";
 import { ButtonLink, ButtonSecondary } from "./Buttons";
+import { HelpAppInfo } from "./HelpCenter";
 
 export const NotificationManager = () => {
   let supabase = useSupabaseClient<Database>();
@@ -115,7 +116,15 @@ const NotificationModalContent = ({
     notificationPermissionState === "unavailable" ||
     pushPermissionState === "unavailable"
   )
-    return <>Notifications are unavailable in this browser.</>;
+    return (
+      <div className="flex flex-col gap-3">
+        Notifications are unavailable in this browser. To get notifications, get
+        the App!
+        <div className="rounded-md bg-bg-blue p-2">
+          <HelpAppInfo />
+        </div>
+      </div>
+    );
 
   if (
     pushPermissionState === "default" ||
