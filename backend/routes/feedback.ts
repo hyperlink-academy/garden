@@ -20,6 +20,7 @@ export const feedback_route = makeRoute({
         To: "contact@hyperlink.academy",
         From: "feedback@hyperlink.academy",
         Subject: `Feedback from ${msg.email}`,
+        ReplyTo: msg.email,
         TextBody: `Page: ${msg.page}\n\n${msg.content}`,
       }),
     });
