@@ -2,16 +2,15 @@ import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { Database } from "backend/lib/database.types";
 import { Modal } from "./Layout";
 import { useEffect, useState } from "react";
-import { MoreOptionsTiny, Settings } from "./Icons";
+import { Settings } from "./Icons";
 import { ButtonLink, ButtonSecondary } from "./Buttons";
-import useSWR from "swr";
 
 export const NotificationManager = () => {
   let supabase = useSupabaseClient<Database>();
   let [open, setOpen] = useState(false);
   let [notificationPermissionState, setNotificationPermissionState] =
     useState("default");
-  let [pushPermissionState, setPushPermissionState] = useState("prompt");
+  let [pushPermissionState, setPushPermissionState] = useState("unavailable");
   let [existingSubscription, setExistingSubscription] =
     useState<PushSubscription | null>(null);
   useEffect(() => {
@@ -32,11 +31,12 @@ export const NotificationManager = () => {
       setNotificationPermissionState("unavailable");
     } else {
       let notificationPermissionState = Notification.permission;
+      console.log(notificationPermissionState);
       setNotificationPermissionState(notificationPermissionState);
     }
 
     navigator.serviceWorker
-      .getRegistrations()
+      ?.getRegistrations()
       .then(async function (registrations) {
         for (let registration of registrations) {
           let subscription = await registration.pushManager.getSubscription();
@@ -83,75 +83,114 @@ export const NotificationManager = () => {
 
         if denied…???
         */}
-        {pushPermissionState === "default" ||
-        pushPermissionState === "prompt" ||
-        (pushPermissionState === "granted" && !existingSubscription) ? (
-          <>
-            <p>
-              Turn on notifications for new chat messages and card comments in
-              your Spaces.
-            </p>
-            <ButtonLink
-              onClick={() => {
-                navigator.serviceWorker
-                  .getRegistrations()
-                  .then(async function (registrations) {
-                    for (let registration of registrations) {
-                      let result = await registration.pushManager.subscribe({
-                        applicationServerKey:
-                          process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
-                        userVisibleOnly: true,
-                      });
-                      let { data: session } = await supabase.auth.getSession();
-                      if (!session.session) return;
-                      await supabase.from("push_subscriptions").insert({
-                        user_id: session.session.user.id,
-                        endpoint: result.endpoint,
-                        push_subscription: result as any,
-                      });
-
-                      setExistingSubscription(result);
-                      setNotificationPermissionState("granted");
-                      return;
-                    }
-                  });
-              }}
-              className="w-fit"
-              content="enable notifications"
-            ></ButtonLink>
-          </>
-        ) : pushPermissionState === "granted" ? (
-          <div>
-            You&apos;ve enabled notifications on this device!
-            <ButtonSecondary
-              content={"Disable Notifications"}
-              onClick={async () => {
-                navigator.serviceWorker
-                  .getRegistrations()
-                  .then(async function (registrations) {
-                    for (let registration of registrations) {
-                      let push_subscription =
-                        await registration.pushManager.getSubscription();
-                      if (!push_subscription) return;
-                      let { data: session } = await supabase.auth.getSession();
-                      if (!session.session) return;
-                      await supabase
-                        .from("push_subscriptions")
-                        .delete()
-                        .eq("endpoint", push_subscription.endpoint);
-                      await push_subscription.unsubscribe();
-                      setExistingSubscription(null);
-                    }
-                  });
-              }}
-            />
-          </div>
-        ) : notificationPermissionState === "unavailable" ? (
-          "Notifications unavailable in this browser."
-        ) : (
-          "You've denied notifications on this device."
-        )}
+        <NotificationModalContent
+          pushPermissionState={pushPermissionState}
+          notificationPermissionState={notificationPermissionState}
+          existingSubscription={existingSubscription}
+          setExistingSubscription={setExistingSubscription}
+          setNotificationPermissionState={setNotificationPermissionState}
+        />
       </Modal>
+    </>
+  );
+};
+
+const NotificationModalContent = ({
+  notificationPermissionState,
+  pushPermissionState,
+  existingSubscription,
+  setExistingSubscription,
+  setNotificationPermissionState,
+}: {
+  notificationPermissionState: string;
+  pushPermissionState: string;
+  existingSubscription: PushSubscription | null;
+  setExistingSubscription: React.Dispatch<
+    React.SetStateAction<PushSubscription | null>
+  >;
+  setNotificationPermissionState: React.Dispatch<React.SetStateAction<string>>;
+}) => {
+  let supabase = useSupabaseClient<Database>();
+  if (
+    notificationPermissionState === "unavailable" ||
+    pushPermissionState === "unavailable"
+  )
+    return <>Notifications are unavailable in this browser.</>;
+
+  if (
+    pushPermissionState === "default" ||
+    pushPermissionState === "prompt" ||
+    (pushPermissionState === "granted" && !existingSubscription)
+  )
+    return (
+      <>
+        <p>
+          Turn on notifications for new chat messages and card comments in your
+          Spaces.
+        </p>
+        <ButtonLink
+          onClick={() => {
+            navigator.serviceWorker
+              .getRegistrations()
+              .then(async function (registrations) {
+                for (let registration of registrations) {
+                  let result = await registration.pushManager.subscribe({
+                    applicationServerKey:
+                      process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
+                    userVisibleOnly: true,
+                  });
+                  let { data: session } = await supabase.auth.getSession();
+                  if (!session.session) return;
+                  await supabase.from("push_subscriptions").insert({
+                    user_id: session.session.user.id,
+                    endpoint: result.endpoint,
+                    push_subscription: result as any,
+                  });
+
+                  setExistingSubscription(result);
+                  setNotificationPermissionState("granted");
+                  return;
+                }
+              });
+          }}
+          className="w-fit"
+          content="enable notifications"
+        ></ButtonLink>
+      </>
+    );
+
+  if (pushPermissionState === "granted" && existingSubscription)
+    return (
+      <div>
+        You&apos;ve enabled notifications on this device!
+        <ButtonSecondary
+          content={"Disable Notifications"}
+          onClick={async () => {
+            navigator.serviceWorker
+              .getRegistrations()
+              .then(async function (registrations) {
+                for (let registration of registrations) {
+                  let push_subscription =
+                    await registration.pushManager.getSubscription();
+                  if (!push_subscription) return;
+                  let { data: session } = await supabase.auth.getSession();
+                  if (!session.session) return;
+                  await supabase
+                    .from("push_subscriptions")
+                    .delete()
+                    .eq("endpoint", push_subscription.endpoint);
+                  await push_subscription.unsubscribe();
+                  setExistingSubscription(null);
+                }
+              });
+          }}
+        />
+      </div>
+    );
+
+  return (
+    <>
+      You&apos;ve denied notifications on this device, or they are unavailable.
     </>
   );
 };
