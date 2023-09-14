@@ -50,7 +50,7 @@ export const CardViewDrawer = (props: {
         </div>
       </div>
       <div
-        className={`cardDrawerContent shrink overflow-y-scroll ${
+        className={`cardDrawerContent no-scrollbar shrink overflow-y-scroll ${
           props.drawerOpen ? " mt-4 mb-2  h-fit max-h-[60vh] " : "mb-2 h-0 "
         }`}
       >
