@@ -403,17 +403,11 @@ const InviteMember = () => {
       {
         authorized && (
           // (callOngoing ? (
-          <button className=" flex items-center gap-1 text-sm italic text-grey-55">
+          <button className=" flex items-center gap-1 text-sm italic text-grey-55"
+            onClick={()=>setInviteOpen(true)}>
             <AddTiny /> invite
           </button>
         )
-        // ) : (
-        //   <ButtonTertiary
-        //     icon={<MemberAdd />}
-        //     content=""
-        //     onClick={() => setInviteOpen(true)}
-        //   />
-        // ))
       }
       <Modal open={open} onClose={() => setInviteOpen(false)}>
         <div className="inviteMemberModal flex flex-col place-items-center gap-4 p-4 text-center">
