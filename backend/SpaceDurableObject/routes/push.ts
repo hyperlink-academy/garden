@@ -88,6 +88,7 @@ export const push_route = makeRoute({
     });
 
     env.poke();
+    env.updateLastUpdated();
     return { data: { success: true, errors: [] } };
   },
 });

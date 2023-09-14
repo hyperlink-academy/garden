@@ -13,7 +13,6 @@ export function connect(this: SpaceDurableObject, request: Request): Response {
       server = webSocketPair[1];
 
     this.state.acceptWebSocket(server);
-    this.poke();
 
     return new Response(null, {
       status: 101,

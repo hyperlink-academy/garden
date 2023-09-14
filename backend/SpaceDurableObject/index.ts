@@ -27,6 +27,7 @@ export type Env = {
   storage: DurableObjectStorage;
   state: DurableObjectState;
   poke: () => void;
+  updateLastUpdated: () => void;
   pushLock: Lock;
   id: string;
   env: Bindings;
@@ -85,22 +86,7 @@ export class SpaceDurableObject implements DurableObject {
   }
 
   dbThrottle = false;
-  pokeThrottle = false;
-  async poke() {
-    if (!this.pokeThrottle) {
-      this.pokeThrottle = true;
-      this.state.waitUntil(
-        new Promise<void>((resolve) => {
-          setTimeout(() => {
-            this.state.getWebSockets().forEach((socket) => {
-              socket.send(JSON.stringify({ type: "poke" }));
-            });
-            this.pokeThrottle = false;
-            resolve();
-          }, 50);
-        })
-      );
-    }
+  async updateLastUpdated() {
     if (!this.dbThrottle) {
       this.dbThrottle = true;
       this.state.waitUntil(
@@ -118,6 +104,24 @@ export class SpaceDurableObject implements DurableObject {
       );
     }
   }
+
+  pokeThrottle = false;
+  async poke() {
+    if (!this.pokeThrottle) {
+      this.pokeThrottle = true;
+      this.state.waitUntil(
+        new Promise<void>((resolve) => {
+          setTimeout(() => {
+            this.state.getWebSockets().forEach((socket) => {
+              socket.send(JSON.stringify({ type: "poke" }));
+            });
+            this.pokeThrottle = false;
+            resolve();
+          }, 50);
+        })
+      );
+    }
+  }
   async fetch(request: Request) {
     let url = new URL(request.url);
     let path = url.pathname.split("/");
@@ -127,6 +131,7 @@ export class SpaceDurableObject implements DurableObject {
       pushLock: this.pushLock,
       state: this.state,
       id: this.state.id.toString(),
+      updateLastUpdated: () => this.updateLastUpdated(),
       poke: () => {
         this.poke();
       },

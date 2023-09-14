@@ -90,6 +90,7 @@ export const join_route = makeRoute({
     }
 
     env.poke();
+    env.updateLastUpdated();
     app_event(env.env, {
       event: "joined_space",
       user: session.username,
