@@ -229,10 +229,13 @@ const MembersList = ({
           {onlineMembers.map((m) => (
             <Member entityID={m.entity} key={m.id} />
           ))}
-          {length <= 4 &&
-            offlineMembers.map((m) => (
-              <Member entityID={m.entity} key={m.id} />
-            ))}
+        </div>
+      )}
+      {length <= 4 && (
+        <div className="memberList flex flex-col gap-2">
+          {offlineMembers.map((m) => (
+            <Member entityID={m.entity} key={m.id} />
+          ))}
         </div>
       )}
       {offlineMembers.length > 0 && length > 4 && (
