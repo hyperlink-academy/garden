@@ -88,7 +88,20 @@ export const push_route = makeRoute({
     });
 
     env.poke();
-    env.updateLastUpdated();
+    if (
+      msg.mutations.filter((m) => !EphemeralMutations.includes(m.name as any))
+        .length > 0
+    )
+      env.updateLastUpdated();
+
     return { data: { success: true, errors: [] } };
   },
 });
+
+// We need to filter these out to prevent updating lastUpdated just when a
+// client connects and such
+const EphemeralMutations: Array<keyof typeof Mutations> = [
+  "assertEmphemeralFact",
+  "initializeClient",
+  "setClientInCall",
+];
