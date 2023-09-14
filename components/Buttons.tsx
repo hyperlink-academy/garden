@@ -62,7 +62,8 @@ export function ButtonSecondary(
       outline-offset-[-2px] hover:bg-bg-blue 
       hover:text-accent-blue active:bg-bg-blue active:text-accent-blue active:outline active:outline-2 
       disabled:border-grey-90 disabled:bg-grey-90 
-      disabled:text-grey-80 disabled:hover:text-grey-80 ${props.className}`}
+      disabled:text-grey-80 disabled:hover:text-grey-80
+      ${props.className}`}
     >
       {props.icon ? <span className="">{props.icon}</span> : null}
       {props.content ? <span className="">{props.content}</span> : null}
@@ -86,7 +87,7 @@ export function ButtonTertiary(
   active:text-white disabled:border-grey-90 disabled:bg-white disabled:text-grey-80 disabled:hover:text-grey-80 ${props.className} `}
     >
       {props.icon ? <span className="">{props.icon}</span> : null}
-      <span className="">{props.content}</span>
+      {props.content !== "" ? <span className="">{props.content}</span> : null}
     </button>
   );
 }

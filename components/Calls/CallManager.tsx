@@ -15,27 +15,33 @@ export const MediaDeviceSettings = (props: { onSelect: () => void }) => {
   let devices = view === "microphone" ? microphones : speakers;
   let currentDevice = view === "microphone" ? currentMic : currentSpeaker;
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex flex-row gap-2">
+    <div className="flex flex-col pt-2 text-sm">
+      <div className="-mb-[1px] flex flex-row gap-1">
         <button
-          className={`${
-            view === "microphone" ? "text-accent-blue underline" : ""
-          } hover:underline`}
+          className={` rounded-t-md border border-grey-80 px-2 pt-0 ${
+            view === "microphone"
+              ? "z-10 border-b-bg-blue bg-bg-blue pb-0 font-bold"
+              : "-mb-2 pb-2"
+          } `}
           onClick={() => setView("microphone")}
         >
-          microphone
+          mic
         </button>
         <button
-          className={`${
-            view === "speakers" ? "text-accent-blue underline" : ""
-          } hover:underline`}
+          className={` rounded-t-md border border-grey-80 px-2 pt-0 ${
+            view === "speakers"
+              ? "z-10 border-b-bg-blue bg-bg-blue pb-0 font-bold"
+              : ""
+          } `}
           onClick={() => setView("speakers")}
         >
           speaker
         </button>
       </div>
       <RadioGroup
-        className="flex flex-col gap-2 rounded-lg border border-grey-80 p-2 text-grey-35"
+        className={`flex flex-col gap-2 rounded-lg border border-grey-80 bg-bg-blue p-2 text-grey-35 ${
+          view === "microphone" ? "rounded rounded-tl-none " : ""
+        }`}
         value={currentDevice?.device.deviceId}
         onChange={(deviceId) => {
           if (view === "microphone") setMicrophone(deviceId);

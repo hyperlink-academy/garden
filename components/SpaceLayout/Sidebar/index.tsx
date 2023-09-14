@@ -39,9 +39,11 @@ export const Sidebar = (props: {
 
   return (
     <div className="Sidebar pwa-padding flex h-full w-52 flex-col items-stretch gap-4 overflow-x-visible rounded-l-[3px] border-r border-grey-90 bg-white  text-grey-35">
-      <div className="no-scrollbar flex h-full w-full flex-col gap-4 overflow-y-scroll px-3 pt-3">
-        <SpaceName />
-        <People />
+      <div className="no-scrollbar flex h-full w-full flex-col gap-2 overflow-y-scroll px-3 pt-3">
+        <div className="flex flex-col gap-0">
+          <SpaceName />
+          <People />
+        </div>
         <Divider />
         <div className="flex flex-row content-between gap-2 ">
           <RoomButton {...props} roomID="search">
