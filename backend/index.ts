@@ -5,7 +5,10 @@ import { create_studio_route } from "./routes/create_studio";
 import { feedback_route } from "./routes/feedback";
 import { get_identity_data_route } from "./routes/get_identity_data";
 import { get_space_route } from "./routes/get_space";
-import { get_space_data_route } from "./routes/get_space_data";
+import {
+  get_space_data_by_name_route,
+  get_space_data_route,
+} from "./routes/get_space_data";
 import { get_studio_data_route } from "./routes/get_studio_data";
 import { LoginRoute } from "./routes/login";
 import { SignupRoute } from "./routes/signup";
@@ -22,6 +25,7 @@ const Routes = [
   get_identity_data_route,
   get_space_route,
   get_space_data_route,
+  get_space_data_by_name_route,
   get_studio_data_route,
   add_space_to_studio,
   update_studio_data,

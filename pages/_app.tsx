@@ -4,7 +4,6 @@ import React from "react";
 import { Analytics } from "@vercel/analytics/react";
 import { AuthProvider } from "hooks/useAuth";
 import { useRouter } from "next/router";
-import { SpaceSpaceProvider } from "components/ReplicacheProvider";
 import Head from "next/head";
 import { SmokeProvider } from "components/Smoke";
 import { SWRConfig } from "swr";
@@ -27,14 +26,9 @@ export default function App({ Component, pageProps }: AppProps) {
   if (router.pathname.startsWith("/s/[studio]/s/[space]")) {
     return (
       <SharedProviders>
-        <SpaceSpaceProvider
-          notFound={<div className="p-4">404d space</div>}
-          loading={<></>}
-        >
-          <CallProvider>
-            <Component {...pageProps} />
-          </CallProvider>
-        </SpaceSpaceProvider>
+        <CallProvider>
+          <Component {...pageProps} />
+        </CallProvider>
       </SharedProviders>
     );
   }

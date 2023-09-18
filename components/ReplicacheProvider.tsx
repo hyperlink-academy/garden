@@ -1,4 +1,4 @@
-import { spaceAPI, workerAPI } from "backend/lib/api";
+import { spaceAPI } from "backend/lib/api";
 import { z } from "zod";
 import { pullRoute } from "backend/SpaceDurableObject/routes/pull";
 import {
@@ -10,8 +10,6 @@ import {
 import { useCallback, useEffect, useRef, useState } from "react";
 import { PullRequest, PushRequest, Replicache } from "replicache";
 import { useAuth } from "hooks/useAuth";
-import { useRouter } from "next/router";
-import useSWR, { mutate } from "swr";
 import { UndoManager } from "@rocicorp/undo";
 import { authToken } from "backend/lib/auth";
 import { atom, useSetAtom } from "jotai";
@@ -49,6 +47,7 @@ export const SpaceProvider: React.FC<
 
   let { session, authToken } = useAuth();
   useEffect(() => {
+    console.log("yo");
     let newRep = makeSpaceReplicache({
       id: props.id,
       session: session.session?.studio || "unauthorized",
@@ -71,37 +70,6 @@ export const SpaceProvider: React.FC<
       {props.children}
     </ReplicacheContext.Provider>
   );
-};
-
-export const prefetchSpaceId = (studio: string, space: string) => {
-  let id = workerAPI(WORKER_URL, "get_space", {
-    studio: studio,
-    space: space,
-  });
-  mutate("/studio/" + studio + "/space/" + space, id);
-};
-
-export const SpaceSpaceProvider: React.FC<
-  React.PropsWithChildren<{
-    loading: React.ReactElement;
-    notFound: React.ReactElement;
-  }>
-> = (props) => {
-  let router = useRouter();
-  let { data: id } = useSWR(
-    "persist-/studio/" + router.query.studio + "/space/" + router.query.space,
-    () => {
-      let id = workerAPI(WORKER_URL, "get_space", {
-        studio: router.query.studio as string,
-        space: router.query.space as string,
-      });
-      return id;
-    },
-    { revalidateOnFocus: false }
-  );
-  if (!id) return props.loading;
-  if (!id.success) return props.notFound;
-  return <SpaceProvider id={id.id}>{props.children}</SpaceProvider>;
 };
 
 export const makeSpaceReplicache = ({
@@ -218,7 +186,7 @@ const useWebSocket = (id: string, rep?: Replicache) => {
     });
     socket.current.addEventListener("open", () => {
       rep?.clientID.then((clientID) => {
-      setSocketState("connected");
+        setSocketState("connected");
         socket.current?.send(
           JSON.stringify({
             type: "init",

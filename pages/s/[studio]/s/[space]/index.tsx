@@ -11,8 +11,41 @@ import { useRoom, useSetRoom, useUIState } from "hooks/useUIState";
 import { useRouter } from "next/router";
 import { PresenceHandler } from "components/PresenceHandler";
 import { useSpaceSyncState } from "hooks/useSpaceSyncState";
+import { workerAPI } from "backend/lib/api";
+import { WORKER_URL } from "src/constants";
+import { GetStaticPropsContext, InferGetStaticPropsType } from "next/types";
+import { useSpaceData } from "hooks/useSpaceData";
+import { SpaceProvider } from "components/ReplicacheProvider";
 
-export default function SpacePage() {
+export async function getStaticPaths() {
+  return { paths: [], fallback: "blocking" };
+}
+
+export async function getStaticProps(ctx: GetStaticPropsContext) {
+  if (!ctx.params?.space || !ctx.params?.studio)
+    return { props: { notFound: true }, revalidate: 10 } as const;
+  let data = await workerAPI(WORKER_URL, "get_space_data_by_name", {
+    spaceName: ctx.params?.space as string,
+    username: ctx.params?.studio as string,
+  });
+
+  if (!data.success)
+    return { props: { notFound: true }, revalidate: 10 } as const;
+  return { props: { notFound: false, data: data.data } };
+}
+
+type Props = InferGetStaticPropsType<typeof getStaticProps>;
+export default function SpacePage(props: Props) {
+  let { data } = useSpaceData(props.data?.do_id, props.data);
+  if (props.notFound) return <div>404 - page not found!</div>;
+
+  return (
+    <SpaceProvider id={props.data.do_id}>
+      <Space />
+    </SpaceProvider>
+  );
+}
+function Space() {
   useSpaceSyncState();
   let room = useRoom();
   const { width } = useWindowDimensions();
