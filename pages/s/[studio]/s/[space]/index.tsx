@@ -10,63 +10,11 @@ import { SpaceMetaTitle } from "components/SpaceMetaTitle";
 import { useRoom, useSetRoom, useUIState } from "hooks/useUIState";
 import { useRouter } from "next/router";
 import { PresenceHandler } from "components/PresenceHandler";
+import { useSpaceSyncState } from "hooks/useSpaceSyncState";
 
 export default function SpacePage() {
-  // get first room = your room
-  // OR if viewing anon, get first room based on room id
-  let firstRoomByID = db
-    .useAttribute("room/name")
-    .sort(sortByPosition("roomList"))[0]?.entity;
-  let firstRoom = firstRoomByID;
-
-  let spaceID = useSpaceID();
-  let r = useRoom();
-  let room = r || firstRoom;
-  let setRoom = useSetRoom();
-  let setRoomWithoutHistory = useUIState((s) => s.setRoom);
-
-  useEffect(() => {
-    if (!r && firstRoom) setRoom(firstRoom);
-  }, [r, firstRoom]);
-
-  let { query, replace } = useRouter();
-  let { rep } = useMutations();
-  let openCardWithoutHistory = useUIState((s) => s.openCard);
-  useEffect(() => {
-    if (query.openCard) {
-      (async () => {
-        let entityID = query.openCard as string;
-        if (!room || !spaceID || !rep) return;
-
-        let url = new URL(window.location.href);
-        url.searchParams.delete("openCard");
-        replace(url, undefined, { shallow: true });
-
-        let isRoom = await rep.query((tx) =>
-          scanIndex(tx).eav(entityID, "room/type")
-        );
-        if (isRoom) return setRoom(entityID);
-
-        let parent = await rep.query((tx) =>
-          scanIndex(tx).vae(entityID, "desktop/contains")
-        );
-        if (parent) setRoom(parent[0]?.entity);
-        openCardWithoutHistory(spaceID, room, entityID);
-      })();
-    }
-  }, [rep, query.openCard, room, spaceID]);
-
-  useEffect(() => {
-    if (!spaceID) return;
-    let storedRoom = window.localStorage.getItem(`space/${spaceID}/room`);
-    if (storedRoom) setRoomWithoutHistory(spaceID, storedRoom);
-  }, [spaceID, setRoomWithoutHistory]);
-
-  useEffect(() => {
-    if (room && spaceID)
-      window.localStorage.setItem(`space/${spaceID}/room`, room);
-  }, [room, spaceID]);
-
+  useSpaceSyncState();
+  let room = useRoom();
   const { width } = useWindowDimensions();
 
   useEffect(() => {
@@ -92,12 +40,7 @@ export default function SpacePage() {
               // after:content-[""] after:h-full after:w-2 after:block after:shrink-0
               >
                 <div className="roomWrapper flex flex-row rounded-md border border-grey-90">
-                  <Sidebar
-                    onRoomChange={(room) => {
-                      setRoom(room);
-                    }}
-                    currentRoom={room}
-                  />
+                  <Sidebar />
 
                   <div className="desktopWrapper no-scrollbar relative flex h-full flex-shrink-0 flex-col gap-0">
                     <Room entityID={room} key={room} />
@@ -109,16 +52,7 @@ export default function SpacePage() {
             ) : (
               <div className="no-scrollbar flex snap-x snap-mandatory flex-row gap-2 overflow-x-scroll overscroll-x-none scroll-smooth">
                 <div className="snap-end snap-always">
-                  <Sidebar
-                    onRoomChange={(room) => {
-                      setRoom(room);
-                      let roomPane = document.getElementById("roomWrapper");
-                      setTimeout(() => {
-                        roomPane?.scrollIntoView({ behavior: "smooth" });
-                      }, 10);
-                    }}
-                    currentRoom={room}
-                  />
+                  <Sidebar />
                 </div>
                 <div
                   id="roomWrapper"

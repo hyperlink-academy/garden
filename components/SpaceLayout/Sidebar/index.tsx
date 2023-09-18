@@ -17,22 +17,17 @@ import { EditSpaceModal } from "components/CreateSpace";
 import { useRouter } from "next/router";
 import { EditRoomModal } from "./RoomListLayout";
 import { SharedRoomList } from "./SharedRoomList";
-import * as PopoverRadix from "@radix-ui/react-popover";
 import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
 import { LogInModal } from "components/LoginModal";
 import { useSpaceData } from "hooks/useSpaceData";
-import { useIdentityData } from "hooks/useIdentityData";
-import { uuidToBase62 } from "src/uuidHelpers";
 import { HelpModal } from "components/HelpCenter";
 import { People } from "./People";
 import { spaceAPI } from "backend/lib/api";
 import { DotLoader } from "components/DotLoader";
 import { Feedback } from "components/Feedback";
+import { useIsActiveRoom, useRoom, useSetRoom } from "hooks/useUIState";
 
-export const Sidebar = (props: {
-  onRoomChange: (room: string) => void;
-  currentRoom: string | null;
-}) => {
+export const Sidebar = () => {
   let { session } = useAuth();
 
   let [roomEditOpen, setRoomEditOpen] = useState(false);
@@ -46,48 +41,50 @@ export const Sidebar = (props: {
         </div>
         <Divider />
         <div className="flex flex-row content-between gap-2 ">
-          <RoomButton {...props} roomID="search">
+          <RoomButton roomID="search">
             <RoomSearch />
           </RoomButton>
 
-          <RoomButton {...props} roomID="calendar">
+          <RoomButton roomID="calendar">
             <RoomCalendar />
           </RoomButton>
 
-          <UnreadsRoomButton {...props} />
+          <UnreadsRoomButton />
         </div>
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
-            <SharedRoomList
-              {...props}
-              setRoomEditOpen={() => setRoomEditOpen(true)}
-            />
+            <SharedRoomList setRoomEditOpen={() => setRoomEditOpen(true)} />
           </div>
         </div>
-
-        {/* shared; operates on current room */}
-        <EditRoomModal
+        <EditRoomModalWithRoom
           open={roomEditOpen}
           onClose={() => setRoomEditOpen(false)}
-          currentRoom={props.currentRoom}
         />
+
+        {/* shared; operates on current room */}
       </div>
       <SidebarFooter studio={session.session?.username} />
     </div>
   );
 };
 
-const UnreadsRoomButton = (props: {
-  currentRoom: string | null;
-  onRoomChange: (room: string) => void;
+const EditRoomModalWithRoom = (props: {
+  open: boolean;
+  onClose: () => void;
 }) => {
+  let room = useRoom();
+
+  return <EditRoomModal {...props} room={room} />;
+};
+
+const UnreadsRoomButton = () => {
   let { authorized, memberEntity } = useMutations();
   let unreadCards = db.useReference(memberEntity, "card/unread-by");
   let unreadDiscussions = db.useReference(memberEntity, "discussion/unread-by");
   if (!authorized) return null;
 
   return (
-    <RoomButton {...props} roomID="unreads">
+    <RoomButton roomID="unreads">
       {unreadCards?.length > 0 || unreadDiscussions?.length > 0 ? (
         <div className="absolute -top-1 -left-1">
           <UnreadDot />
@@ -98,20 +95,16 @@ const UnreadsRoomButton = (props: {
   );
 };
 
-const RoomButton = (props: {
-  roomID: string;
-  currentRoom: string | null;
-  children: React.ReactNode;
-  onRoomChange: (room: string) => void;
-}) => {
+const RoomButton = (props: { roomID: string; children: React.ReactNode }) => {
+  let isActiveRoom = useIsActiveRoom(props.roomID);
+  let setRoom = useSetRoom();
   return (
     <button
-      className={`relative flex w-full justify-center rounded-md border p-1 ${
-        props.currentRoom === props.roomID
+      className={`relative flex w-full justify-center rounded-md border p-1 ${isActiveRoom
           ? "rounded-md border-accent-blue bg-accent-blue font-bold text-white"
           : " border-grey-80 text-grey-35 hover:bg-bg-blue"
-      }`}
-      onClick={() => props.onRoomChange(props.roomID)}
+        }`}
+      onClick={() => setRoom(props.roomID)}
     >
       {props.children}
     </button>

@@ -266,7 +266,7 @@ function RoomOptions(props: { entityID: string | null }) {
       <EditRoomModal
         open={isRoomEditOpen}
         onClose={() => setIsRoomEditOpen(false)}
-        currentRoom={props.entityID}
+        room={props.entityID}
       />
     </>
   );

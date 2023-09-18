@@ -18,16 +18,13 @@ import {
   RoomChat,
   RoomCollection,
 } from "components/Icons";
-import { useSetRoom } from "hooks/useUIState";
+import { useRoom, useSetRoom } from "hooks/useUIState";
 
-export const SharedRoomList = (props: {
-  onRoomChange: (room: string) => void;
-  currentRoom: string | null;
-  setRoomEditOpen: () => void;
-}) => {
+export const SharedRoomList = (props: { setRoomEditOpen: () => void }) => {
   let { authorized } = useMutations();
   let rooms = db.useAttribute("room/name").sort(sortByPosition("roomList"));
-  let { onRoomChange, currentRoom } = props;
+  let currentRoom = useRoom();
+  let setRoom = useSetRoom();
 
   useEffect(() => {
     let listener = (e: KeyboardEvent) => {
@@ -35,14 +32,14 @@ export const SharedRoomList = (props: {
         let currentIndex = rooms.findIndex((r) => r.entity === currentRoom);
         if (currentIndex === -1) return;
         if (currentIndex > 0) {
-          onRoomChange(rooms[currentIndex - 1].entity);
+          setRoom(rooms[currentIndex - 1].entity);
         }
       }
       if (e.key === "ArrowDown" && e.altKey) {
         let currentIndex = rooms.findIndex((r) => r.entity === currentRoom);
         if (currentIndex === -1) return;
         if (currentIndex < rooms.length) {
-          onRoomChange(rooms[currentIndex + 1].entity);
+          setRoom(rooms[currentIndex + 1].entity);
         }
       }
     };
@@ -50,7 +47,7 @@ export const SharedRoomList = (props: {
     return () => {
       window.removeEventListener("keydown", listener);
     };
-  }, [currentRoom, onRoomChange, rooms]);
+  }, [currentRoom, setRoom, rooms]);
 
   return (
     <div className="flex flex-col gap-0.5">
@@ -177,9 +174,8 @@ const CreateRoom = () => {
                 <RadioGroup.Option value="canvas">
                   {({ checked }) => (
                     <div
-                      className={`${
-                        checked ? "bg-bg-blue" : ""
-                      } flex items-center justify-between gap-2 rounded-md border border-grey-15 p-2 hover:cursor-pointer`}
+                      className={`${checked ? "bg-bg-blue" : ""
+                        } flex items-center justify-between gap-2 rounded-md border border-grey-15 p-2 hover:cursor-pointer`}
                     >
                       <div className="flex items-center gap-2">
                         <RoomCanvas />
@@ -192,9 +188,8 @@ const CreateRoom = () => {
                 <RadioGroup.Option value="collection">
                   {({ checked }) => (
                     <div
-                      className={`${
-                        checked ? "bg-bg-blue" : ""
-                      } flex items-center justify-between gap-2 rounded-md border border-grey-15 p-2 hover:cursor-pointer`}
+                      className={`${checked ? "bg-bg-blue" : ""
+                        } flex items-center justify-between gap-2 rounded-md border border-grey-15 p-2 hover:cursor-pointer`}
                     >
                       <div className="flex items-center gap-2">
                         <RoomCollection />
@@ -207,9 +202,8 @@ const CreateRoom = () => {
                 <RadioGroup.Option value="chat">
                   {({ checked }) => (
                     <div
-                      className={`${
-                        checked ? "bg-bg-blue" : ""
-                      } flex items-center justify-between gap-2 rounded-md border border-grey-15 p-2 hover:cursor-pointer`}
+                      className={`${checked ? "bg-bg-blue" : ""
+                        } flex items-center justify-between gap-2 rounded-md border border-grey-15 p-2 hover:cursor-pointer`}
                     >
                       <div className="flex items-center gap-2">
                         <RoomChat />

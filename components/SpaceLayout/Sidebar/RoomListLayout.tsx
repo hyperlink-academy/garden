@@ -23,16 +23,17 @@ import { ulid } from "src/ulid";
 import { Textarea } from "components/Textarea";
 import { generateKeyBetween } from "src/fractional-indexing";
 import { SingleTextSection } from "components/CardView/Sections";
+import { useIsActiveRoom, useRoom, useSetRoom } from "hooks/useUIState";
 
 export const EditRoomModal = (props: {
   open: boolean;
+  room: string | null;
   onClose: () => void;
-  currentRoom: string | null;
 }) => {
-  let currentRoomName = db.useEntity(props.currentRoom, "room/name");
+  let currentRoomName = db.useEntity(props.room, "room/name");
 
   let currentRoomDescription: Fact<"room/description"> | null = null;
-  currentRoomDescription = db.useEntity(props.currentRoom, "room/description");
+  currentRoomDescription = db.useEntity(props.room, "room/description");
 
   let { mutate } = useMutations();
   let [nameState, setNameState] = useState(currentRoomName?.value || "");
@@ -47,8 +48,7 @@ export const EditRoomModal = (props: {
     setDescriptionState(currentRoomDescription?.value || "");
   }, [currentRoomName?.value, currentRoomDescription?.value, props.open]);
 
-  if (!props.currentRoom) return null;
-  let entityID = props.currentRoom;
+  if (!props.room) return null;
 
   return (
     <Modal open={props.open} onClose={props.onClose}>
@@ -86,7 +86,7 @@ export const EditRoomModal = (props: {
           <ButtonPrimary
             content="Edit Room"
             onClick={async () => {
-              if (!currentRoomName || !props.currentRoom) return;
+              if (!currentRoomName || !props.room) return;
               await mutate("updateFact", {
                 id: currentRoomName?.id,
                 data: {
@@ -94,7 +94,7 @@ export const EditRoomModal = (props: {
                 },
               });
               await mutate("assertFact", {
-                entity: props.currentRoom,
+                entity: props.room,
                 factID: ulid(),
                 attribute: "room/description",
                 value: descriptionState,
@@ -123,7 +123,7 @@ export const EditRoomModal = (props: {
             setAreYouSureRoomDeletionModalOpen(false);
             props.onClose();
           }}
-          entityID={entityID}
+          entityID={props.room}
           currentRoomName={currentRoomName}
         />
       )}
@@ -176,14 +176,14 @@ const AreYouSureRoomDeletionModal = (props: {
 };
 
 export const RoomListItem = (props: {
-  onRoomChange: (room: string) => void;
   children: React.ReactNode;
-  currentRoom: string | null;
   editting: boolean;
   setEditting: (editing: boolean) => void;
   roomEntity: string;
   setRoomEditOpen?: () => void;
 }) => {
+  let isActiveRoom = useIsActiveRoom(props.roomEntity);
+  let setRoom = useSetRoom();
   let { memberEntity, authorized } = useMutations();
   let roomType = db.useEntity(props.roomEntity, "room/type");
 
@@ -218,11 +218,10 @@ export const RoomListItem = (props: {
 
   return (
     <div
-      className={`relative select-none rounded-md border border-transparent ${
-        props.roomEntity === props.currentRoom
+      className={`relative select-none rounded-md border border-transparent ${isActiveRoom
           ? "rounded-md bg-accent-blue font-bold text-white"
           : " text-grey-35 hover:border-grey-80"
-      }`}
+        }`}
     >
       {/* buttom = name + either edit button OR room type icon */}
       <button
@@ -235,17 +234,13 @@ export const RoomListItem = (props: {
           }
 
           // don't trigger 'onRoomChange' if room already active (may be trying to setRoomEditOpen instead)
-          if (props.roomEntity === props.currentRoom) return;
-          props.onRoomChange(props.roomEntity);
+          if (isActiveRoom) return;
+          setRoom(props.roomEntity);
         }}
       >
         <div
           className={` roomListItemIcon mt-[2px] h-5 w-5 shrink-0 pt-[1px] pl-[2px]
-             ${
-               props.roomEntity === props.currentRoom
-                 ? "text-white"
-                 : "text-grey-55"
-             }`}
+             ${isActiveRoom ? "text-white" : "text-grey-55"}`}
         >
           {roomType?.value === "collection" ? (
             <RoomCollection />
@@ -336,8 +331,6 @@ export const DraggableRoomListItem = (props: {
   entityID: string;
   factID: string;
   children: React.ReactNode;
-  onRoomChange: (room: string) => void;
-  currentRoom: string | null;
   setRoomEditOpen: () => void;
 }) => {
   let rep = useContext(ReplicacheContext);
@@ -402,8 +395,8 @@ export const DraggableRoomListItem = (props: {
                 data.position?.size === "small"
                   ? "small"
                   : data.hideContent
-                  ? "small"
-                  : "big",
+                    ? "small"
+                    : "big",
             },
           });
         }
@@ -425,10 +418,12 @@ export const DraggableRoomListItem = (props: {
       });
     },
   });
+
+  let setRoom = useSetRoom();
   useEffect(() => {
     if (over?.type === "room" || !over) return;
     let timeout = window.setTimeout(() => {
-      props.onRoomChange(props.entityID);
+      setRoom(props.entityID);
     }, 500);
     return () => window.clearTimeout(timeout);
   }, [over]);
@@ -447,8 +442,6 @@ export const DraggableRoomListItem = (props: {
         <RoomListItem
           editting={editting}
           setEditting={setEditting}
-          onRoomChange={props.onRoomChange}
-          currentRoom={props.currentRoom}
           roomEntity={props.entityID}
           setRoomEditOpen={props.setRoomEditOpen}
         >
@@ -464,10 +457,8 @@ export const RoomListPreview = (props: { entityID: string }) => {
   return (
     <RoomListItem
       editting={false}
-      setEditting={() => {}}
+      setEditting={() => { }}
       roomEntity={props.entityID}
-      onRoomChange={() => {}}
-      currentRoom={null}
     >
       {name?.value}
     </RoomListItem>

@@ -1,7 +1,8 @@
 import { useCallback } from "react";
+import { sortByPosition } from "src/position_helpers";
 import { create } from "zustand";
 import { combine } from "zustand/middleware";
-import { useMutations, useSpaceID } from "./useReplicache";
+import { db, useMutations, useSpaceID } from "./useReplicache";
 
 export let useUIState = create(
   combine(
@@ -71,9 +72,30 @@ export let useUIState = create(
 
 export let useRoom = () => {
   let spaceID = useSpaceID();
-  return useUIState((state) =>
-    spaceID ? state.spaces[spaceID]?.activeRoom : null
+  let firstRoomByID = db
+    .useAttribute("room/name")
+    .sort(sortByPosition("roomList"))[0]?.entity;
+  return (
+    useUIState((state) =>
+      spaceID ? state.spaces[spaceID]?.activeRoom : null
+    ) || firstRoomByID
   );
+};
+
+export const useIsActiveRoom = (room: string) => {
+  let spaceID = useSpaceID();
+  let firstRoomByID = db
+    .useAttribute("room/name")
+    .sort(sortByPosition("roomList"))[0]?.entity;
+
+  let isActive = useUIState((state) =>
+    spaceID && state.spaces[spaceID]
+      ? state.spaces[spaceID]?.activeRoom === room
+      : null
+  );
+
+  if (isActive === null) return firstRoomByID === room;
+  return isActive;
 };
 
 export let useRoomHistory = () => {
