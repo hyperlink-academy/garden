@@ -12,3 +12,5 @@ public/workbox-*
 .vscode/
 .DS_Store
 .wrangler
+# Sentry Auth Token
+.sentryclirc
