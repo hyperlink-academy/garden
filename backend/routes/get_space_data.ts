@@ -41,7 +41,7 @@ export const get_space_data_by_name_route = makeRoute({
 });
 
 const query =
-  `*, owner:identity_data!space_data_owner_fkey(*), spaces_in_studios(*, studios(do_id, name))` as const;
+  `*, owner:identity_data!space_data_owner_fkey!inner(*), spaces_in_studios(*, studios(do_id, name))` as const;
 
 export type SpaceData = Extract<
   Awaited<ReturnType<typeof get_space_data_route.handler>>,
