@@ -1,5 +1,5 @@
 import { workerAPI } from "backend/lib/api";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 const fetcher = async (name: string) => {
@@ -7,6 +7,11 @@ const fetcher = async (name: string) => {
     name: name,
   });
   if (data.success) return data.data;
+};
+
+export const prefetchIdentityData = async (name: string) => {
+  let data = await fetcher(name);
+  mutate(name, data);
 };
 
 export const useIdentityData = (

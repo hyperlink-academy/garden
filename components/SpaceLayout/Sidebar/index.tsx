@@ -26,10 +26,9 @@ import { spaceAPI } from "backend/lib/api";
 import { DotLoader } from "components/DotLoader";
 import { Feedback } from "components/Feedback";
 import { useIsActiveRoom, useRoom, useSetRoom } from "hooks/useUIState";
+import { prefetchIdentityData } from "hooks/useIdentityData";
 
 export const Sidebar = () => {
-  let { session } = useAuth();
-
   let [roomEditOpen, setRoomEditOpen] = useState(false);
 
   return (
@@ -63,7 +62,7 @@ export const Sidebar = () => {
 
         {/* shared; operates on current room */}
       </div>
-      <SidebarFooter studio={session.session?.username} />
+      <SidebarFooter />
     </div>
   );
 };
@@ -100,10 +99,11 @@ const RoomButton = (props: { roomID: string; children: React.ReactNode }) => {
   let setRoom = useSetRoom();
   return (
     <button
-      className={`relative flex w-full justify-center rounded-md border p-1 ${isActiveRoom
+      className={`relative flex w-full justify-center rounded-md border p-1 ${
+        isActiveRoom
           ? "rounded-md border-accent-blue bg-accent-blue font-bold text-white"
           : " border-grey-80 text-grey-35 hover:bg-bg-blue"
-        }`}
+      }`}
       onClick={() => setRoom(props.roomID)}
     >
       {props.children}
@@ -214,9 +214,8 @@ const MemberOptions = () => {
   );
 };
 
-const SidebarFooter = (props: { studio?: string }) => {
+const SidebarFooter = () => {
   let { session } = useAuth();
-  let authorized = session.loggedIn;
 
   let [infoOpen, setInfoOpen] = useState(false);
   let [logInOpen, setLogInOpen] = useState(false);
@@ -224,7 +223,7 @@ const SidebarFooter = (props: { studio?: string }) => {
   return (
     <div className="sidebarBackToHome z-10 flex items-center justify-between gap-2 px-3 pb-3">
       {/* login OR home button + studios */}
-      {!props.studio ? (
+      {!session.session?.username ? (
         <div className="grow">
           <ButtonPrimary
             content="Log In"
@@ -233,7 +232,14 @@ const SidebarFooter = (props: { studio?: string }) => {
           <LogInModal isOpen={logInOpen} onClose={() => setLogInOpen(false)} />
         </div>
       ) : (
-        <Link className="hover:text-accent-blue" href={`/s/${props.studio}`}>
+        <Link
+          className="hover:text-accent-blue"
+          href={`/s/${session.session.username}`}
+          onPointerDown={() => {
+            if (session.session?.username)
+              prefetchIdentityData(session.session.username);
+          }}
+        >
           <BackToHome />
         </Link>
       )}
