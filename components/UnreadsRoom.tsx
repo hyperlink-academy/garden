@@ -9,6 +9,9 @@ import { CollectionListTiny, CollectionPreviewTiny, GoToTop } from "./Icons";
 export const UnreadsRoom = () => {
   let { authorized, memberEntity } = useMutations();
   let unreadCards = db.useReference(memberEntity, "card/unread-by");
+  let chatRooms = db
+    .useAttribute("room/type")
+    .filter((room) => room.value === "chat");
   let unreadDiscussions = db.useReference(memberEntity, "discussion/unread-by");
   let [scrolledTop, setScrolledTop] = useState(true);
   let [listType, setListType] = useState<"cardpreview" | "list">("list");
@@ -133,16 +136,21 @@ export const UnreadsRoom = () => {
           {cachedUnreads.length === 0 ? (
             <div className="italic text-grey-55">
               <p className="pb-2 font-bold">
-                You have no unread cards! <br />
+                You have no unreads! <br />
               </p>
               New cards and comments you haven&apos;t yet seen will appear here
             </div>
           ) : (
             cachedUnreads
+              .filter(
+                (unread) =>
+                  !chatRooms.find((room) => room.entity === unread.entity)
+              )
               .sort((a, b) => {
                 if (a.lastUpdated > b.lastUpdated) return -1;
                 return 0;
               })
+
               .map((unread) => (
                 <CardPreviewWithData
                   hideContent={listType === "list"}
