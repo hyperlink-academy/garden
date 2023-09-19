@@ -92,6 +92,24 @@ export default function SignupPage() {
       setStatus("complete");
     }
   };
+  if (router.query.error_description)
+    return (
+      <div className="lightBorder flex flex-col gap-2 bg-white p-2">
+        <h1>An error occured</h1>
+        <div>{router.query.error_description}</div>
+        <div>
+          Please try to{" "}
+          <Link className="text-accent-blue" href="/signup">
+            sign up
+          </Link>{" "}
+          or{" "}
+          <Link className="text-accent-blue" href="/login">
+            log in
+          </Link>{" "}
+          again
+        </div>
+      </div>
+    );
 
   if (!tokens)
     return (
