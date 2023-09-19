@@ -40,7 +40,10 @@ export function SignupForm(props: { redirectTo?: string }) {
   if (status === "confirm")
     return (
       <div className="mx-auto flex max-w-md flex-col gap-4">
-        <h2>Great — please check your email 📬⚡️</h2>
+        <h2>
+          Great — please check your email at{" "}
+          <span className="underline">{input.email}</span> 📬⚡️
+        </h2>
         <p>Click the link there to confirm your account & pick a username!</p>
       </div>
     );
