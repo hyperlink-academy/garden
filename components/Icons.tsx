@@ -1083,6 +1083,35 @@ export const GoBackToPage = (props: Props) => {
   );
 };
 
+export const GoToBottom = () => (
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 16 16"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <g clip-path="url(#clip0_3309_780)">
+      <path
+        fill-rule="evenodd"
+        clip-rule="evenodd"
+        d="M6.99382e-07 8C3.13124e-07 12.4183 3.5817 16 8 16C12.4183 16 16 12.4183 16 8C16 3.5817 12.4183 -3.13124e-07 8 -6.99382e-07C3.5817 -1.08564e-06 1.08564e-06 3.5817 6.99382e-07 8ZM8.53033 13.5303L13.3033 8.75736C13.5962 8.46447 13.5962 7.98959 13.3033 7.6967C13.0104 7.40381 12.5355 7.40381 12.2426 7.6967L8.75 11.1893L8.75 3C8.75 2.5858 8.41421 2.25 8 2.25C7.58579 2.25 7.25 2.5858 7.25 3L7.25 11.1893L3.7574 7.6967C3.4645 7.40381 2.9896 7.40381 2.6967 7.6967C2.4038 7.98959 2.4038 8.46447 2.6967 8.75736L7.46967 13.5303C7.76256 13.8232 8.23744 13.8232 8.53033 13.5303Z"
+        fill="currentColor"
+      />
+    </g>
+    <defs>
+      <clipPath id="clip0_3309_780">
+        <rect
+          width="16"
+          height="16"
+          fill="white"
+          transform="translate(16 16) rotate(-180)"
+        />
+      </clipPath>
+    </defs>
+  </svg>
+);
+
 export const GoToTop = (props: Props) => {
   return (
     <svg

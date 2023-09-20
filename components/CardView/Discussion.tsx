@@ -1,22 +1,25 @@
 import { ButtonPrimary } from "components/Buttons";
 import * as Popover from "@radix-ui/react-popover";
 import {
+  ArrowDown,
   CardAdd,
   CardSmall,
   CloseLinedTiny,
+  GoToBottom,
   Member,
   Reply,
   Send,
 } from "components/Icons";
 import { RenderedText } from "components/Textarea/RenderedText";
 import { db, useMutations } from "hooks/useReplicache";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ulid } from "src/ulid";
 import { Message } from "data/Messages";
 import AutosizeTextarea from "components/Textarea/AutosizeTextarea";
 import { FindOrCreate, useAllItems } from "components/FindOrCreateEntity";
 import { ref } from "data/Facts";
 import { CardPreviewWithData } from "components/CardPreview";
+import { useIntersectionObserver } from "hooks/useIntersectionObserver";
 
 export const Discussion = (props: {
   entityID: string;
@@ -74,6 +77,7 @@ export const MessageInput = (props: {
   reply: string | null;
   setReply: (reply: string | null) => void;
 }) => {
+  let [unread, setUnread] = useState<boolean | null>(null);
   let [value, setValue] = useState("");
   let [attachedCards, setAttachedCards] = useState<string[]>([]);
   let { mutate, memberEntity, authorized } = useMutations();
@@ -126,51 +130,67 @@ export const MessageInput = (props: {
     );
   };
   return (
-    <div className="messageInput sticky bottom-0 flex w-full flex-col gap-2 pt-1">
-      {/* IF MESSAGE IS IN REPLY */}
-      {props.reply && (
-        <div className="messageInputReply -mb-2">
-          <div className="flex items-start justify-between gap-2 rounded-md border border-grey-80 bg-white p-2 text-xs italic text-grey-55">
-            <div className="flex flex-col gap-[1px]">
-              <div className="font-bold"> {replyToName?.value}</div>
-              <div>{replyMessage?.content}</div>
-            </div>
-            <button className="" onClick={() => props.setReply(null)}>
-              <CloseLinedTiny />
-            </button>
-          </div>
-          <div className="ml-2 h-2 w-0 border border-grey-80" />
-        </div>
-      )}
-      {/* ACTUAL MESSAGE INPUT */}
-      <div className="flex w-full items-end gap-2">
-        <div className="z-10 flex w-full items-center gap-1 rounded-md border border-grey-55 bg-white p-1 text-sm text-grey-15">
-          <AutosizeTextarea
-            onKeyDown={(e) => {
-              if (!e.shiftKey && e.key === "Enter") {
-                e.preventDefault();
-                send();
-              }
+    <>
+      <NewMessageAnchor setUnreads={setUnread} entityID={props.entityID} />
+      <div className="messageInput sticky bottom-0 flex w-full flex-col gap-2 pt-1">
+        {unread && (
+          <button
+            className="messageInput sticky bottom-0 mx-auto flex  w-fit flex-row items-center justify-between gap-2 rounded-full bg-accent-blue py-1.5 px-4 text-sm font-bold italic text-white"
+            onClick={() => {
+              document
+                .getElementById("card-comments")
+                ?.scrollIntoView({ behavior: "smooth", block: "end" });
             }}
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            placeholder=""
-            className="w-full"
-            id="messageInput"
-          />
-          <div className="place-self-end">
-            <AttachCard
-              attachedCards={attachedCards}
-              setAttachedCards={setAttachedCards}
-            />
+          >
+            <div>unread messages</div>
+            <GoToBottom />
+          </button>
+        )}
+        {/* IF MESSAGE IS IN REPLY */}
+        {props.reply && (
+          <div className="messageInputReply -mb-2">
+            <div className="flex items-start justify-between gap-2 rounded-md border border-grey-80 bg-white p-2 text-xs italic text-grey-55">
+              <div className="flex flex-col gap-[1px]">
+                <div className="font-bold"> {replyToName?.value}</div>
+                <div>{replyMessage?.content}</div>
+              </div>
+              <button className="" onClick={() => props.setReply(null)}>
+                <CloseLinedTiny />
+              </button>
+            </div>
+            <div className="ml-2 h-2 w-0 border border-grey-80" />
           </div>
-        </div>
+        )}
+        {/* ACTUAL MESSAGE INPUT */}
+        <div className="flex w-full items-end gap-2">
+          <div className="z-10 flex w-full items-center gap-1 rounded-md border border-grey-55 bg-white p-1 text-sm text-grey-15">
+            <AutosizeTextarea
+              onKeyDown={(e) => {
+                if (!e.shiftKey && e.key === "Enter") {
+                  e.preventDefault();
+                  send();
+                }
+              }}
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              placeholder=""
+              className="w-full"
+              id="messageInput"
+            />
+            <div className="place-self-end">
+              <AttachCard
+                attachedCards={attachedCards}
+                setAttachedCards={setAttachedCards}
+              />
+            </div>
+          </div>
 
-        <div className="flex h-min justify-end text-grey-55">
-          <ButtonPrimary disabled={!value} onClick={send} icon={<Send />} />
+          <div className="flex h-min justify-end text-grey-55">
+            <ButtonPrimary disabled={!value} onClick={send} icon={<Send />} />
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
@@ -300,7 +320,6 @@ export const Messages = (props: {
 }) => {
   let messages = db.useMessages(props.entityID);
   let { authorized } = useMutations();
-  // no empty state placeholder if it's a chat room
   if (props.isRoom === false && messages.length == 0) return null;
 
   return (
@@ -335,6 +354,36 @@ export const Messages = (props: {
   );
 };
 
+const NewMessageAnchor = (props: {
+  entityID: string;
+  setUnreads: (setter: (unread: boolean | null) => boolean | null) => void;
+}) => {
+  let messages = db.useMessages(props.entityID);
+  let [ref, intersectingState, intersectingRef] =
+    useIntersectionObserver<HTMLDivElement>();
+  useEffect(() => {
+    if (intersectingState) props.setUnreads(() => false);
+  }, [intersectingState]);
+
+  useEffect(() => {
+    if (intersectingRef.current || intersectingRef.current === null)
+      requestAnimationFrame(() => {
+        console.log("scroll into view?");
+        ref.current?.scrollIntoView();
+      });
+    else
+      setTimeout(() => {
+        if (intersectingRef.current) return;
+        props.setUnreads((unread) => (unread === null ? unread : true));
+      }, 1000);
+  }, [messages]);
+  return (
+    <>
+      <div ref={ref} />
+    </>
+  );
+};
+
 const Message = (props: {
   multipleFromSameAuthor: boolean;
   content: string;
@@ -358,9 +407,8 @@ const Message = (props: {
   return (
     <div
       id={props.id}
-      className={`message flex flex-col text-sm first:pt-0 last:pb-2 ${
-        !props.multipleFromSameAuthor ? "pt-5" : "pt-1"
-      }`}
+      className={`message flex flex-col text-sm first:pt-0 last:pb-2 ${!props.multipleFromSameAuthor ? "pt-5" : "pt-1"
+        }`}
     >
       {/* MESSAGE HEADER */}
       {!props.multipleFromSameAuthor && (
