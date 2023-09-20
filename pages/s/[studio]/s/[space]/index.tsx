@@ -16,6 +16,7 @@ import { WORKER_URL } from "src/constants";
 import { GetStaticPropsContext, InferGetStaticPropsType } from "next/types";
 import { useSpaceData } from "hooks/useSpaceData";
 import { SpaceProvider } from "components/ReplicacheProvider";
+import { SWRConfig } from "swr";
 
 export async function getStaticPaths() {
   return { paths: [], fallback: "blocking" };
@@ -36,7 +37,6 @@ export async function getStaticProps(ctx: GetStaticPropsContext) {
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>;
 export default function SpacePage(props: Props) {
-  let { data } = useSpaceData(props.data?.do_id, props.data);
   const [isClient, setIsClient] = useState(false);
   useEffect(() => {
     setIsClient(true);
@@ -45,9 +45,11 @@ export default function SpacePage(props: Props) {
   if (!isClient) return null;
 
   return (
-    <SpaceProvider id={props.data.do_id}>
-      <Space />
-    </SpaceProvider>
+    <SWRConfig value={{ fallback: { [props.data.do_id]: props.data } }}>
+      <SpaceProvider id={props.data.do_id}>
+        <Space />
+      </SpaceProvider>
+    </SWRConfig>
   );
 }
 function Space() {
@@ -73,9 +75,9 @@ function Space() {
             {width > 960 || width === 0 ? (
               <div
                 className="contentLargeSplitLayout no-scrollbar flex w-full flex-row items-stretch gap-4 overflow-x-scroll sm:justify-center sm:gap-4"
-                // you need to add this to the contentSplitLayout class if you are going to scroll across more than 2 panes
-                // it prevents the last pane from sticking to the end
-                // after:content-[""] after:h-full after:w-2 after:block after:shrink-0
+              // you need to add this to the contentSplitLayout class if you are going to scroll across more than 2 panes
+              // it prevents the last pane from sticking to the end
+              // after:content-[""] after:h-full after:w-2 after:block after:shrink-0
               >
                 <div className="roomWrapper flex flex-row rounded-md border border-grey-90">
                   <Sidebar />
