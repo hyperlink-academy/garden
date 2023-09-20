@@ -2,7 +2,7 @@ import { CardViewer } from "components/CardViewerContext";
 import { db, scanIndex, useMutations, useSpaceID } from "hooks/useReplicache";
 import { SmallCardDragContext } from "components/DragContext";
 import { Sidebar } from "components/SpaceLayout";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import useWindowDimensions from "hooks/useWindowDimensions";
 import { sortByPosition } from "src/position_helpers";
 import { Room } from "components/Room";
@@ -37,7 +37,12 @@ export async function getStaticProps(ctx: GetStaticPropsContext) {
 type Props = InferGetStaticPropsType<typeof getStaticProps>;
 export default function SpacePage(props: Props) {
   let { data } = useSpaceData(props.data?.do_id, props.data);
+  const [isClient, setIsClient] = useState(false);
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
   if (props.notFound) return <div>404 - page not found!</div>;
+  if (!isClient) return null;
 
   return (
     <SpaceProvider id={props.data.do_id}>
