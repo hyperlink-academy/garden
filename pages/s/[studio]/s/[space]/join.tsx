@@ -1,4 +1,4 @@
-import { spaceAPI } from "backend/lib/api";
+import { spaceAPI, workerAPI } from "backend/lib/api";
 import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
 import { Member } from "components/Icons";
 import { BaseSmallCard } from "components/CardPreview/SmallCard";
@@ -12,11 +12,38 @@ import { useSpaceData } from "hooks/useSpaceData";
 import Link from "next/link";
 import { SpaceCard, SpaceData } from "components/SpacesList";
 import { Divider } from "components/Layout";
+import { GetStaticPropsContext, InferGetStaticPropsType } from "next";
+import { SpaceProvider } from "components/ReplicacheProvider";
 
-const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
-export default function JoinSpacePage() {
-  return <JoinSpace />;
+export async function getStaticPaths() {
+  return { paths: [], fallback: "blocking" };
 }
+
+export async function getStaticProps(ctx: GetStaticPropsContext) {
+  if (!ctx.params?.space || !ctx.params?.studio)
+    return { props: { notFound: true }, revalidate: 10 } as const;
+  let data = await workerAPI(WORKER_URL, "get_space_data_by_name", {
+    spaceName: ctx.params?.space as string,
+    username: ctx.params?.studio as string,
+  });
+
+  if (!data.success)
+    return { props: { notFound: true }, revalidate: 10 } as const;
+  return { props: { notFound: false, data: data.data } };
+}
+
+type Props = InferGetStaticPropsType<typeof getStaticProps>;
+export default function JoinSpacePage(props: Props) {
+  let { data } = useSpaceData(props.data?.do_id, props.data);
+  if (props.notFound) return <div>404 - page not found!</div>;
+
+  return (
+    <SpaceProvider id={props.data.do_id}>
+      <JoinSpace />
+    </SpaceProvider>
+  );
+}
+const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export function JoinSpace() {
   let id = useSpaceID();
   let { session, authToken } = useAuth();
