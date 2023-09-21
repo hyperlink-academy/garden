@@ -70,23 +70,29 @@ export const RenderedText = forwardRef<
           // One day we should do proper parsing but for now a line-based approach works
           // great
           props.text.split("\n").map((t, key) => {
-            // headers (h1 and h2)
+            // headers (h1 h2 and h3)
             if (t.startsWith("# "))
               return (
-                <span className="font-bold underline decoration-2" key={key}>
+                <span className="font-bold " key={key}>
                   {parseLine(t, parseConfig)}
                 </span>
               );
             if (t.startsWith("## "))
               return (
-                <span className="font-bold text-grey-35" key={key}>
+                <span className="font-bold italic text-grey-35" key={key}>
+                  {parseLine(t, parseConfig)}
+                </span>
+              );
+            if (t.startsWith("### "))
+              return (
+                <span className="italic text-grey-35" key={key}>
                   {parseLine(t, parseConfig)}
                 </span>
               );
             // blockquote
             if (t.startsWith("> "))
               return (
-                <span className="text-grey-35" key={key}>
+                <span className="italic text-grey-55" key={key}>
                   {parseLine(t, parseConfig)}
                 </span>
               );
