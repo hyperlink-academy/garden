@@ -5,9 +5,11 @@ import { useEffect, useState } from "react";
 import { Settings } from "./Icons";
 import { ButtonLink, ButtonSecondary } from "./Buttons";
 import { HelpAppInfo } from "./HelpCenter";
+import { useAuth } from "hooks/useAuth";
 
 export const NotificationManager = () => {
   let supabase = useSupabaseClient<Database>();
+  let { logout } = useAuth();
   let [open, setOpen] = useState(false);
   let [notificationPermissionState, setNotificationPermissionState] =
     useState("default");
@@ -57,6 +59,8 @@ export const NotificationManager = () => {
         <Settings />
       </button>
       <Modal open={open} onClose={() => setOpen(false)}>
+        <h1>Settings</h1>
+        <hr className="border-grey-80" />
         <h3>Push Notifications</h3>
         {/* TODO: per-device logic! */}
         {/* 
@@ -90,6 +94,13 @@ export const NotificationManager = () => {
           existingSubscription={existingSubscription}
           setExistingSubscription={setExistingSubscription}
           setNotificationPermissionState={setNotificationPermissionState}
+        />
+
+        <hr className="border-grey-80" />
+        <ButtonSecondary
+          className="justify-self-end"
+          content="Log out"
+          onClick={() => logout()}
         />
       </Modal>
     </>
