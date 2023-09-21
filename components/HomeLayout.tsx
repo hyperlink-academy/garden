@@ -9,21 +9,27 @@ import * as Popover from "@radix-ui/react-popover";
 import { CreateStudio } from "./CreateStudio";
 import { useIdentityData } from "hooks/useIdentityData";
 import { uuidToBase62 } from "src/uuidHelpers";
+import Head from "next/head";
 
 export const HomeLayout = (props: {
   id: string;
   children: React.ReactNode;
 }) => {
   return (
-    <div className="m-auto flex flex-col overflow-x-hidden bg-white">
-      <div className="sticky top-0">
-        <HomeHeader />
-        <div className="outline-b-0  -mx-0.5 h-3 rounded-t-[8px] border-2 border-b-0 border-grey-80 bg-background" />
+    <>
+      <Head>
+        <meta name="theme-color" content="#FFFFFF" />
+      </Head>
+      <div className="m-auto flex flex-col overflow-x-hidden bg-white">
+        <div className="sticky top-0">
+          <HomeHeader />
+          <div className="outline-b-0  -mx-0.5 h-3 rounded-t-[8px] border-2 border-b-0 border-grey-80 bg-background" />
+        </div>
+        <div className="bg-background p-4">
+          <div className="m-auto max-w-3xl">{props.children}</div>
+        </div>
       </div>
-      <div className="bg-background p-4">
-        <div className="m-auto max-w-3xl">{props.children}</div>
-      </div>
-    </div>
+    </>
   );
 };
 
