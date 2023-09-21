@@ -12,8 +12,8 @@ export const CardViewDrawer = (props: {
   let ref = useRef<HTMLDivElement | null>(null);
   let [tab, setTab] = useState<"comments" | "backlinks">("comments");
   return (
-    <div className=" z-20">
-      <div className="cardDrawerHeader -mx-3 -mt-5  md:-mx-4">
+    <div className="z-10 pb-3 sm:pb-4 ">
+      <div className="cardDrawerHeader -mx-3 -mt-6  md:-mx-4">
         <div className="cardDrawerTabs flex items-end gap-2 border-b border-b-grey-80 pl-4">
           <CommentsTab
             entityID={props.entityID}
@@ -119,9 +119,9 @@ const Tab = (props: {
       onClick={() => props.onClick()}
       className={`${
         props.currentTab === props.id
-          ? "border-b-white font-bold"
+          ? "border-b-white bg-white font-bold"
           : "bg-grey-90"
-      } -mb-[1px] w-fit shrink-0 rounded-t-md border border-grey-80  bg-white px-2  pt-0.5 text-sm text-grey-35`}
+      } -mb-[1px] w-fit shrink-0 rounded-t-md border border-grey-80  px-2  pt-0.5 text-sm text-grey-35`}
     >
       {props.text}
     </button>

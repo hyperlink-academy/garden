@@ -53,7 +53,7 @@ const contentStyles = (args: { member: boolean }) => {
     case args.member:
       return `bg-white rounded-md mx-2 mt-1 mb-3 px-4 py-4`;
     default:
-      return `px-3 py-3 sm:px-4 sm:py-4`;
+      return `px-3  sm:px-4`;
   }
 };
 
@@ -186,7 +186,7 @@ export const CardContent = (props: {
     <>
       {/* START CARD CONTENT */}
       <div
-        className={`cardContentWrapper relative flex grow flex-col items-stretch overflow-y-scroll  `}
+        className={`cardContentWrapper no-scrollbar relative flex grow flex-col items-stretch overflow-y-scroll py-3 sm:py-4 `}
         onClick={() => {
           setDrawerOpen(false);
         }}
