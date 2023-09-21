@@ -367,10 +367,9 @@ const NewMessageAnchor = (props: {
 
   useEffect(() => {
     if (intersectingRef.current || intersectingRef.current === null)
-      requestAnimationFrame(() => {
-        console.log("scroll into view?");
-        ref.current?.scrollIntoView();
-      });
+      setTimeout(() => {
+        ref.current?.scrollIntoView({ block: "end" });
+      }, 100);
     else
       setTimeout(() => {
         if (intersectingRef.current) return;
