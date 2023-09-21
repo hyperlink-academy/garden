@@ -199,7 +199,7 @@ export const EditSpaceModal = (props: {
                 <>
                   <p className="font-bold">This Space is Active</p>
                   <p className="mb-4 text-sm text-grey-35">
-                    It'll appear in the active section on your homepage
+                    It&apos;ll appear in the active section on your homepage
                   </p>
                 </>
               )}
