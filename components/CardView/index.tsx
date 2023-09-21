@@ -148,12 +148,13 @@ export const CardView = (props: {
           ref={ref}
           id="card-container"
           className={`
-            no-scrollbar  flex   
-            h-full       
-            grow
-            flex-col items-stretch
-            overflow-x-hidden
-            overflow-y-hidden
+            no-scrollbar flex 
+            h-full  grow   
+            flex-col       
+            items-stretch
+            overflow-x-hidden overflow-y-hidden
+            pb-3
+            sm:pb-4
             ${contentStyles({
               member: !!memberName,
             })}
@@ -186,7 +187,9 @@ export const CardContent = (props: {
     <>
       {/* START CARD CONTENT */}
       <div
-        className={`cardContentWrapper no-scrollbar relative flex grow flex-col items-stretch overflow-y-scroll py-3 sm:py-4 `}
+        className={`cardContentWrapper no-scrollbar relative flex grow flex-col items-stretch overflow-y-scroll pb-3 sm:pb-4 ${
+          !memberName ? "pt-3 sm:pt-4" : ""
+        }`}
         onClick={() => {
           setDrawerOpen(false);
         }}
@@ -223,10 +226,7 @@ export const CardContent = (props: {
               />
             </div>
           </div>
-        ) : (
-          // member card offset only if authed
-          authorized && <div className="mb-3 h-[42px]" />
-        )}
+        ) : null}
 
         {/* card content wrapper */}
         <div

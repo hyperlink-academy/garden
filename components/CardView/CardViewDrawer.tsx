@@ -12,7 +12,7 @@ export const CardViewDrawer = (props: {
   let ref = useRef<HTMLDivElement | null>(null);
   let [tab, setTab] = useState<"comments" | "backlinks">("comments");
   return (
-    <div className="z-10 pb-3 sm:pb-4 ">
+    <div className="z-10 ">
       <div className="cardDrawerHeader -mx-3 -mt-6  md:-mx-4">
         <div className="cardDrawerTabs flex items-end gap-2 border-b border-b-grey-80 pl-4">
           <CommentsTab
