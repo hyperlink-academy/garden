@@ -1,7 +1,7 @@
 import { db } from "hooks/useReplicache";
 import { useRef, useState } from "react";
 import { Backlinks } from "./Backlinks";
-import { Discussion } from "./Discussion";
+import { DiscussionRoom, MessageInput, Messages } from "./Discussion";
 
 export const CardViewDrawer = (props: {
   entityID: string;
@@ -50,12 +50,12 @@ export const CardViewDrawer = (props: {
         </div>
       </div>
       <div
-        className={`cardDrawerContent no-scrollbar shrink overflow-y-scroll ${
+        className={`cardDrawerContent no-scrollbar relative shrink overflow-x-hidden overflow-y-scroll ${
           props.drawerOpen ? " mt-4 mb-2  h-fit max-h-[60vh] " : "mb-2 h-0 "
         }`}
       >
         {tab === "comments" ? (
-          <Discussion entityID={props.entityID} allowReact isRoom={false} />
+          <DiscussionContent entityID={props.entityID} />
         ) : (
           <Backlinks entityID={props.entityID} />
         )}
@@ -64,6 +64,32 @@ export const CardViewDrawer = (props: {
     </div>
   );
 };
+
+const DiscussionContent = (props: { entityID: string }) => {
+  let [reply, setReply] = useState<string | null>(null);
+  return (
+    <>
+      <div className="flex flex-col-reverse">
+        <Messages
+          entityID={props.entityID}
+          isRoom={false}
+          setReply={setReply}
+        />
+      </div>
+
+      <div className="sticky bottom-0">
+        <MessageInput
+          entityID={props.entityID}
+          allowReact={true}
+          isRoom={false}
+          reply={reply}
+          setReply={setReply}
+        />
+      </div>
+    </>
+  );
+};
+
 const CommentsTab = (props: {
   entityID: string;
   currentTab: string;

@@ -21,7 +21,7 @@ import { ref } from "data/Facts";
 import { CardPreviewWithData } from "components/CardPreview";
 import { useIntersectionObserver } from "hooks/useIntersectionObserver";
 
-export const Discussion = (props: {
+export const DiscussionRoom = (props: {
   entityID: string;
   allowReact?: boolean;
   isRoom: boolean;
@@ -52,20 +52,26 @@ export const Discussion = (props: {
   let [reply, setReply] = useState<string | null>(null);
 
   return (
-    <div className="flex grow flex-col justify-end " id="card-comments">
-      <Messages
-        entityID={props.entityID}
-        setReply={setReply}
-        isRoom={props.isRoom}
-      />
-
-      <MessageInput
-        entityID={props.entityID}
-        allowReact={props.allowReact}
-        isRoom={props.isRoom}
-        reply={reply}
-        setReply={setReply}
-      />
+    <div className="relative h-full">
+      <div
+        className="no-scrollbar relative flex h-full flex-col-reverse overflow-x-hidden overflow-y-scroll p-2 pb-6"
+        id="card-comments"
+      >
+        <Messages
+          entityID={props.entityID}
+          setReply={setReply}
+          isRoom={props.isRoom}
+        />
+      </div>
+      <div className="absolute bottom-0 w-full">
+        <MessageInput
+          entityID={props.entityID}
+          allowReact={props.allowReact}
+          isRoom={props.isRoom}
+          reply={reply}
+          setReply={setReply}
+        />
+      </div>
     </div>
   );
 };
@@ -131,8 +137,7 @@ export const MessageInput = (props: {
   };
   return (
     <>
-      <NewMessageAnchor setUnreads={setUnread} entityID={props.entityID} />
-      <div className="messageInput sticky bottom-0 flex w-full flex-col gap-2 pt-1">
+      <div className="messageInput flex w-full flex-col gap-2 px-2 pt-1 pb-2">
         {unread && (
           <button
             className="messageInput sticky bottom-0 mx-auto flex  w-fit flex-row items-center justify-between gap-2 rounded-full bg-accent-blue py-1.5 px-4 text-sm font-bold italic text-white"
@@ -163,7 +168,7 @@ export const MessageInput = (props: {
         )}
         {/* ACTUAL MESSAGE INPUT */}
         <div className="flex w-full items-end gap-2">
-          <div className="z-10 flex w-full items-center gap-1 rounded-md border border-grey-55 bg-white p-1 text-sm text-grey-15">
+          <div className="flex w-full items-center gap-1 rounded-md border border-grey-55 bg-white p-1 text-sm text-grey-15">
             <AutosizeTextarea
               onKeyDown={(e) => {
                 if (!e.shiftKey && e.key === "Enter") {
@@ -323,17 +328,14 @@ export const Messages = (props: {
   if (props.isRoom === false && messages.length == 0) return null;
 
   return (
-    <div
-      className="messages flex flex-1 flex-col justify-end pb-2"
-      style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
-    >
+    <>
       {messages.length == 0 && authorized ? (
         <div className="messagesEmpty flex flex-col gap-4 text-sm italic text-grey-35">
           <p>Welcome to the chat!</p>
           <p>Still quiet…start the conversation 🌱</p>
         </div>
       ) : null}
-      {messages.map((m, index) => (
+      {[...messages].reverse().map((m, index) => (
         <Message
           multipleFromSameAuthor={
             index > 0 &&
@@ -350,7 +352,7 @@ export const Messages = (props: {
           setReply={props.setReply}
         />
       ))}
-    </div>
+    </>
   );
 };
 
@@ -368,7 +370,9 @@ const NewMessageAnchor = (props: {
   useEffect(() => {
     if (intersectingRef.current || intersectingRef.current === null)
       setTimeout(() => {
-        ref.current?.scrollIntoView({ block: "end" });
+        requestAnimationFrame(() => {
+          ref.current?.scrollIntoView({ block: "end" });
+        });
       }, 100);
     else
       setTimeout(() => {
@@ -406,8 +410,9 @@ const Message = (props: {
   return (
     <div
       id={props.id}
-      className={`message flex flex-col text-sm first:pt-0 last:pb-2 ${!props.multipleFromSameAuthor ? "pt-5" : "pt-1"
-        }`}
+      className={`message flex flex-col text-sm first:pt-0 last:pb-2 ${
+        !props.multipleFromSameAuthor ? "pt-5" : "pt-1"
+      }`}
     >
       {/* MESSAGE HEADER */}
       {!props.multipleFromSameAuthor && (

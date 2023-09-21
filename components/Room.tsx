@@ -6,7 +6,7 @@ import useMeasure from "react-use-measure";
 import { CalendarRoom } from "./CalendarRoom";
 import { CardCollection } from "./CardCollection";
 import { useFilteredCards, Filters, FilterByReactions } from "./CardFilter";
-import { Discussion } from "./CardView/Discussion";
+import { DiscussionRoom } from "./CardView/Discussion";
 import { Desktop } from "./Desktop";
 import {
   CollectionListTiny,
@@ -31,6 +31,12 @@ export const Room = (props: { entityID: string }) => {
   if (props.entityID === "search") return <SearchRoom />;
   if (props.entityID === "calendar") return <CalendarRoom />;
   if (props.entityID === "unreads") return <UnreadsRoom />;
+  if (roomType?.value === "chat")
+    return (
+      <div className="flex h-full w-[336px]">
+        <DiscussionRoom entityID={props.entityID} isRoom />
+      </div>
+    );
 
   return (
     <div
@@ -58,8 +64,6 @@ export const Room = (props: { entityID: string }) => {
               openOnAdd
             />
           </div>
-        ) : roomType?.value === "chat" ? (
-          <Discussion entityID={props.entityID} isRoom={true} />
         ) : (
           <div className="relative flex flex-col">
             <Desktop entityID={props.entityID} />
@@ -160,9 +164,8 @@ function RoomHeader(props: {
       </div>
 
       <div
-        className={`roomDescriptionAndFilter z-10 bg-background ${
-          descriptionOpen ? "sticky" : ""
-        }`}
+        className={`roomDescriptionAndFilter z-10 bg-background ${descriptionOpen ? "sticky" : ""
+          }`}
         style={{ top: `${titleHeight}px` }}
         ref={descriptionRef}
       >
@@ -229,11 +232,10 @@ const RoomDescription = (props: {
                 entityID={props.entityID}
               />
               <button
-                className={`${
-                  props.filters.length === 0
+                className={`${props.filters.length === 0
                     ? "text-grey-55 underline"
                     : "font-bold text-accent-blue"
-                }`}
+                  }`}
                 onClick={() => setFiltersOpen(!filtersOpen)}
               >
                 filters({props.filters.length})
@@ -290,10 +292,9 @@ export const CollectionType = (props: {
     });
   };
   const className = (typeName: Fact<"collection/type">["value"]) =>
-    `p-0.5 text-grey-55 ${
-      type === typeName
-        ? "rounded-md border border-grey-55"
-        : "border border-transparent"
+    `p-0.5 text-grey-55 ${type === typeName
+      ? "rounded-md border border-grey-55"
+      : "border border-transparent"
     }`;
 
   return (
