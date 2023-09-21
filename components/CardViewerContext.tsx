@@ -18,7 +18,7 @@ export const useCardViewer = () => {
       openCard(args.entityID);
       publishAppEvent("cardviewer.open-card", args);
     },
-    [spaceID]
+    [spaceID, openCard]
   );
   return {
     open,

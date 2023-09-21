@@ -1,6 +1,6 @@
 import * as Popover from "@radix-ui/react-popover";
 import { db } from "hooks/useReplicache";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 export const Autocomplete = (props: {
@@ -90,14 +90,17 @@ export const useSuggestions = (props: { disabled: boolean }) => {
   let [suggestionPrefix, setSuggestionPrefix] = useState<undefined | string>();
   let [suggestionIndex, setSuggestionIndex] = useState(0);
   let names = db.useAttribute("card/title");
-  let suggestions =
-    !suggestionPrefix || props.disabled
-      ? []
-      : names.filter((title) =>
-          title.value
-            .toLocaleLowerCase()
-            .includes(suggestionPrefix?.toLocaleLowerCase() || "")
-        );
+  let suggestions = useMemo(
+    () =>
+      !suggestionPrefix || props.disabled
+        ? []
+        : names.filter((title) =>
+            title.value
+              .toLocaleLowerCase()
+              .includes(suggestionPrefix?.toLocaleLowerCase() || "")
+          ),
+    [suggestionPrefix, names, props.disabled]
+  );
   useEffect(() => {
     if (suggestionIndex > suggestions.length - 1)
       setSuggestionIndex(suggestions.length - 1);

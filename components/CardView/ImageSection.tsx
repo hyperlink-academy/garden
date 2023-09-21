@@ -25,7 +25,7 @@ export const MakeImage = (props: {
       });
       setState(null);
     }
-  }, [imageID]);
+  }, [imageID, mutate, props.entity]);
 
   return !authorized ? null : !image ? (
     <AddImage
@@ -70,6 +70,7 @@ export const ImageSection = (props: { entityID: string }) => {
         className="grid auto-rows-max justify-items-center gap-1 pb-2"
       >
         <img
+          alt=""
           className="max-w-full rounded-md hover:cursor-pointer"
           src={
             image.value.filetype === "image"
@@ -111,6 +112,7 @@ export const ImageSection = (props: { entityID: string }) => {
                 <CloseLinedTiny />
               </button>
               <img
+                alt=""
                 className="m-auto"
                 src={
                   image.value.filetype === "image"

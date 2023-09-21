@@ -41,7 +41,12 @@ export const HomeHeader = () => {
     <div className="HomeHeader pwa-padding sticky top-0 z-10 m-auto flex w-full max-w-4xl flex-row justify-between bg-white py-2 px-2">
       <Link href={myStudioName ? `/s/${myStudioName}` : "/"}>
         <span className="flex flex-row items-center font-bold text-grey-35 hover:text-accent-blue">
-          <img src="/android-chrome-192x192.png" width={32} className="-mr-1" />
+          <img
+            src="/android-chrome-192x192.png"
+            width={32}
+            className="-mr-1"
+            alt="home icon"
+          />
           ome
         </span>
       </Link>

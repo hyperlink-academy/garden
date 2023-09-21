@@ -20,6 +20,6 @@ export default function ConfirmEmailPage() {
         return window.location.replace(confirmationURL as string);
       }
     }, 500);
-  }, [session, confirmationURL]);
+  }, [session, confirmationURL, router]);
   return <></>;
 }

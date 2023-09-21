@@ -218,10 +218,11 @@ export const RoomListItem = (props: {
 
   return (
     <div
-      className={`relative select-none rounded-md border border-transparent ${isActiveRoom
+      className={`relative select-none rounded-md border border-transparent ${
+        isActiveRoom
           ? "rounded-md bg-accent-blue font-bold text-white"
           : " text-grey-35 hover:border-grey-80"
-        }`}
+      }`}
     >
       {/* buttom = name + either edit button OR room type icon */}
       <button
@@ -395,8 +396,8 @@ export const DraggableRoomListItem = (props: {
                 data.position?.size === "small"
                   ? "small"
                   : data.hideContent
-                    ? "small"
-                    : "big",
+                  ? "small"
+                  : "big",
             },
           });
         }
@@ -426,7 +427,7 @@ export const DraggableRoomListItem = (props: {
       setRoom(props.entityID);
     }, 500);
     return () => window.clearTimeout(timeout);
-  }, [over]);
+  }, [over, props.entityID, setRoom]);
 
   let refs = useCombinedRefs(setNodeRef, droppableRef);
 
@@ -457,7 +458,7 @@ export const RoomListPreview = (props: { entityID: string }) => {
   return (
     <RoomListItem
       editting={false}
-      setEditting={() => { }}
+      setEditting={() => {}}
       roomEntity={props.entityID}
     >
       {name?.value}

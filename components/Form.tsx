@@ -16,11 +16,11 @@ export function Form<T>(props: {
   onSubmit: (data: T) => Promise<void>;
 }) {
   let [state, setState] = useState<State>("normal");
-  let valid = props.validate();
+  let invalid = !props.validate();
   useEffect(() => {
-    if (!valid) setState("disabled");
+    if (invalid) setState("disabled");
     if (state === "disabled") setState("normal");
-  }, [!valid]);
+  }, [invalid]);
 
   return (
     <FormContext.Provider value={{ state }}>

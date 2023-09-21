@@ -70,7 +70,7 @@ export const SingleTextSection = (
         left: coordinates.left + textareaPosition.left,
       });
     },
-    [setCursorCoordinates]
+    [setCursorCoordinates, close, setSuggestionPrefix]
   );
 
   let onKeyDown = useKeyboardHandling({

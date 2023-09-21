@@ -61,7 +61,7 @@ export const SpaceProvider: React.FC<
     return () => {
       newRep.close();
     };
-  }, [props.id, authToken, session.session?.studio, undoManager]);
+  }, [props.id, authToken, session.session?.studio, undoManager, reconnect]);
 
   return (
     <ReplicacheContext.Provider
@@ -159,6 +159,32 @@ const useWebSocket = (id: string, rep?: Replicache) => {
   let setSocketState = useSetAtom(socketStateAtom);
   let socket = useRef<WebSocket>();
 
+  let connectSocket = useCallback(
+    (rep?: Replicache) => {
+      if (socket.current && socket.current.readyState === 1) return;
+      socket.current = new WebSocket(`${SOCKET_URL}/space/${id}/socket`);
+      setSocketState("connecting");
+      socket.current.addEventListener("message", () => {
+        rep?.pull();
+      });
+      socket.current.addEventListener("close", () => {
+        setSocketState("disconnected");
+      });
+      socket.current.addEventListener("open", () => {
+        rep?.clientID.then((clientID) => {
+          setSocketState("connected");
+          socket.current?.send(
+            JSON.stringify({
+              type: "init",
+              data: { clientID },
+            })
+          );
+        });
+      });
+    },
+    [id, setSocketState]
+  );
+
   useEffect(() => {
     let listener = () => {
       if (socket.current) socket.current.close();
@@ -172,30 +198,7 @@ const useWebSocket = (id: string, rep?: Replicache) => {
     };
     document.addEventListener("visibilitychange", listener);
     return () => document.removeEventListener("visibilitychange", listener);
-  }, [rep]);
-
-  let connectSocket = useCallback((rep?: Replicache) => {
-    if (socket.current && socket.current.readyState === 1) return;
-    socket.current = new WebSocket(`${SOCKET_URL}/space/${id}/socket`);
-    setSocketState("connecting");
-    socket.current.addEventListener("message", () => {
-      rep?.pull();
-    });
-    socket.current.addEventListener("close", () => {
-      setSocketState("disconnected");
-    });
-    socket.current.addEventListener("open", () => {
-      rep?.clientID.then((clientID) => {
-        setSocketState("connected");
-        socket.current?.send(
-          JSON.stringify({
-            type: "init",
-            data: { clientID },
-          })
-        );
-      });
-    });
-  }, []);
+  }, [rep, connectSocket]);
 
   useEffect(() => {
     if (!id || !rep) return;
@@ -203,7 +206,7 @@ const useWebSocket = (id: string, rep?: Replicache) => {
     return () => {
       socket.current?.close();
     };
-  }, [id, rep, reconnectSocket]);
+  }, [id, rep, reconnectSocket, connectSocket]);
 
   useEffect(() => {
     if (rep) {

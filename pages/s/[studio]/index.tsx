@@ -21,16 +21,17 @@ export default function UserHomePage(props: Props) {
   let [sortOrder, _setSortOrder] = useState<"lastUpdated" | "name">(
     "lastUpdated"
   );
-  useEffect(() => {
-    let savedSortOrder = localStorage.getItem(`${query.studio}/sortOrder`);
-    if (savedSortOrder) setSortOrder(savedSortOrder as "lastUpdated" | "name");
-  }, [query.studio]);
-  if (props.notFound) return <div>404 - page not found!</div>;
-  if (!data) return <div>loading </div>;
+
   const setSortOrder = (sortOrder: "lastUpdated" | "name") => {
     _setSortOrder(sortOrder);
     localStorage.setItem(`${query.studio}/sortOrder`, sortOrder);
   };
+  useEffect(() => {
+    let savedSortOrder = localStorage.getItem(`${query.studio}/sortOrder`);
+    if (savedSortOrder) _setSortOrder(savedSortOrder as "lastUpdated" | "name");
+  }, [query.studio, _setSortOrder]);
+  if (props.notFound) return <div>404 - page not found!</div>;
+  if (!data) return <div>loading </div>;
 
   let currentStudioName = query.studio;
   let spaces = [

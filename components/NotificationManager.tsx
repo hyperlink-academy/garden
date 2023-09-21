@@ -26,7 +26,7 @@ export const NotificationManager = () => {
         push_subscription: existingSubscription as any,
       });
     })();
-  }, [existingSubscription]);
+  }, [existingSubscription, supabase]);
   useEffect(() => {
     if (!("Notification" in window)) {
       setNotificationPermissionState("unavailable");
