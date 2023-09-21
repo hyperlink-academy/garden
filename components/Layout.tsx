@@ -51,7 +51,7 @@ export const Modal: React.FC<
     <Dialog
       open={props.open}
       onClose={props.onClose}
-      className="fixed inset-0 z-30 overflow-y-hidden"
+      className="fixed inset-0 z-50 overflow-y-hidden"
     >
       <Dialog.Overlay className={props.dark ? "dark-overlay" : "overlay"} />
       <FloatingContainer
@@ -84,7 +84,7 @@ export const ModalFixedHeight: React.FC<
     <Dialog
       open={props.open}
       onClose={props.onClose}
-      className="fixed inset-0 z-30 overflow-y-hidden"
+      className="fixed inset-0 z-50 overflow-y-hidden"
     >
       <Dialog.Overlay className={props.dark ? "dark-overlay" : "overlay"} />
       <FloatingContainer
@@ -107,7 +107,7 @@ export const LightBoxModal: React.FC<
     <Dialog
       open={props.open}
       onClose={props.onClose}
-      className="fixed inset-0 z-10 overflow-y-hidden"
+      className="fixed inset-0 z-50 overflow-y-hidden"
     >
       <Dialog.Overlay className="overlay" />
       <FloatingContainer
