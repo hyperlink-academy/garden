@@ -41,7 +41,11 @@ export const parseLine = (
     ));
 
     // strikethrough
-    matchPairedToken("~~", "~~", (content) => <s key={key}>{content}</s>);
+    matchPairedToken("~~", "~~", (content) => (
+      <span className="text-grey-55 line-through decoration-grey-80" key={key}>
+        {content}
+      </span>
+    ));
 
     // inline code
     matchPairedToken("`", "`", (content) => (
