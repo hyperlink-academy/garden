@@ -65,8 +65,8 @@ export const Desktop = (props: { entityID: string }) => {
               data.position?.size === "small"
                 ? "small"
                 : data.hideContent
-                  ? "small"
-                  : "big",
+                ? "small"
+                : "big",
           },
         });
       } else {
@@ -264,7 +264,7 @@ const DraggableCard = (props: {
         da,
       });
     },
-    [props.parent, props.relationshipID]
+    [props.parent, props.relationshipID, mutate]
   );
   let onDelete = useCallback(() => {
     mutate("removeCardFromDesktopOrCollection", {
@@ -288,7 +288,7 @@ const DraggableCard = (props: {
         da: 0,
       });
     },
-    [props.relationshipID, props.parent]
+    [props.relationshipID, props.parent, mutate]
   );
 
   let y = position?.value.y || 0;
@@ -313,13 +313,14 @@ const DraggableCard = (props: {
           <div
             className={``}
             style={{
-              transform: `rotate(${!position
+              transform: `rotate(${
+                !position
                   ? 0
                   : (
-                    Math.floor(position.value.rotation / (Math.PI / 24)) *
-                    (Math.PI / 24)
-                  ).toFixed(2)
-                }rad)`,
+                      Math.floor(position.value.rotation / (Math.PI / 24)) *
+                      (Math.PI / 24)
+                    ).toFixed(2)
+              }rad)`,
             }}
           >
             {/* This is the actual card and its buttons. It also handles size */}
