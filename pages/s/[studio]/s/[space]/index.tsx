@@ -69,20 +69,22 @@ function Space() {
       <SpaceMetaTitle />
       <PresenceHandler />
 
-      <div className="pageWrapperflex safari-pwa-height h-[100dvh] flex-col items-stretch justify-items-center gap-2 overflow-hidden sm:gap-4">
-        <div className="pageContent max-w-screen-xl relative mx-auto flex h-full w-full grow items-stretch md:py-6 md:px-4">
+      <div className="spaceWrapperflex safari-pwa-height h-[100dvh] flex-col items-stretch justify-items-center gap-2 overflow-hidden sm:gap-4">
+        <div className="spaceontent max-w-screen-xl relative mx-auto flex h-full w-full grow items-stretch md:py-6 md:px-4">
           <SmallCardDragContext>
             {width > 960 || width === 0 ? (
               <div
-                className="contentLargeSplitLayout no-scrollbar flex w-full flex-row items-stretch gap-4 overflow-x-scroll sm:justify-center sm:gap-4"
-              // you need to add this to the contentSplitLayout class if you are going to scroll across more than 2 panes
-              // it prevents the last pane from sticking to the end
-              // after:content-[""] after:h-full after:w-2 after:block after:shrink-0
+                className="spaceLargeSplitLayout no-scrollbar flex w-full flex-row items-stretch gap-4 overflow-x-scroll sm:justify-center sm:gap-4"
+                // you need to add this to the contentSplitLayout class if you are going to scroll across more than 2 panes
+                // it prevents the last pane from sticking to the end
+                // after:content-[""] after:h-full after:w-2 after:block after:shrink-0
               >
-                <div className="roomWrapper flex flex-row rounded-md border border-grey-90">
-                  <Sidebar />
+                <div className="spaceRoomAndSidebar flex flex-row rounded-md border border-grey-90">
+                  <div className="rounded-l-md border border-transparent border-r-grey-90 bg-white">
+                    <Sidebar />
+                  </div>
 
-                  <div className="desktopWrapper no-scrollbar relative flex h-full flex-shrink-0 flex-col gap-0">
+                  <div className="spcaeRoomWrapper no-scrollbar relative flex h-full flex-shrink-0 flex-col gap-0">
                     <Room entityID={room} key={room} />
                   </div>
                 </div>
@@ -90,13 +92,13 @@ function Space() {
                 <CardViewer room={room} />
               </div>
             ) : (
-              <div className="no-scrollbar flex snap-x snap-mandatory flex-row gap-2 overflow-x-scroll overscroll-x-none scroll-smooth">
-                <div className="snap-end snap-always">
+              <div className="no-scrollbar flex snap-x snap-mandatory flex-row gap-2 overflow-x-scroll overscroll-x-none scroll-smooth py-4">
+                <div className="ml-2 snap-end snap-always rounded-md border border-grey-90 bg-white">
                   <Sidebar />
                 </div>
                 <div
                   id="roomWrapper"
-                  className="roomWrapper pwa-padding relative flex snap-center snap-always flex-row py-4"
+                  className="roomWrapper pwa-padding relative flex snap-center snap-always flex-row "
                 >
                   <div
                     id="desktopWrapper"
@@ -106,7 +108,7 @@ function Space() {
                   </div>
                 </div>
 
-                <div className="pwa-padding py-4 pr-2">
+                <div className="pwa-padding  mr-2">
                   <CardViewer room={room} />
                 </div>
               </div>
