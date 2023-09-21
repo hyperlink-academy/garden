@@ -169,26 +169,60 @@ export const EditSpaceModal = (props: {
           <CreateSpaceForm formState={formState} setFormState={setFormState} />
 
           {/* update or nevermind */}
-          <div className="flex flex-row gap-2">
-            <SubmitButton content={"Update"} disabled={!modified} />
+          <div className="flex flex-row justify-end gap-2">
             <ButtonLink
               content={"nevermind"}
               onClick={async () => {
                 props.onClose();
               }}
             />
+            <SubmitButton content={"Update"} disabled={!modified} />
           </div>
 
           <hr className="border-grey-80" />
 
           {/* archive + delete section */}
           <div className="flex flex-col gap-2">
-            <ArchiveButton spaceID={props.spaceID} onSubmit={props.onSubmit} />
-            <ButtonPrimary
-              content="Delete this Space"
-              destructive
-              onClick={() => setMode("delete")}
-            />
+            <div
+              className={`mx-auto flex w-full flex-col rounded-md border border-grey-80  p-2 text-center ${
+                data?.archived ? "bg-grey-90" : "bg-bg-blue"
+              }`}
+            >
+              {data?.archived ? (
+                <>
+                  <p className="font-bold">This Space is Archived</p>
+                  <p className="mb-4 text-sm text-grey-35">
+                    But you can still edit it at any time!
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="font-bold">This Space is Active</p>
+                  <p className="mb-4 text-sm text-grey-35">
+                    It'll appear in the active section on your homepage
+                  </p>
+                </>
+              )}
+              <div className="mx-auto">
+                <ArchiveButton
+                  spaceID={props.spaceID}
+                  onSubmit={props.onSubmit}
+                />
+              </div>
+            </div>
+            <div className="mx-auto flex w-full flex-col rounded-md border border-grey-80 p-2 text-center">
+              <p className="text-sm text-grey-35">
+                Deleting is permanent and will remove <br />
+                EVERYTHING from this space
+              </p>
+              <div className="mx-auto mt-2">
+                <ButtonPrimary
+                  content="Delete this Space"
+                  destructive
+                  onClick={() => setMode("delete")}
+                />
+              </div>
+            </div>
           </div>
         </Form>
       ) : (
@@ -241,7 +275,7 @@ const ArchiveButton = (props: { spaceID?: string; onSubmit?: () => void }) => {
         loading ? (
           <DotLoader />
         ) : data?.archived ? (
-          "Un-Archive this Space"
+          "Re-Activate this Space"
         ) : (
           "Archive this Space"
         )
@@ -348,6 +382,7 @@ export const CreateSpaceForm = ({
 
       {/* door image selector */}
       <DoorSelector
+        uploadedImage={formState.image}
         selected={formState.image || formState.default_space_image}
         onSelect={(d) =>
           setFormState((form) => {
