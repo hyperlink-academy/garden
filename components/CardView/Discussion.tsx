@@ -54,7 +54,7 @@ export const DiscussionRoom = (props: {
   return (
     <div className="relative h-full">
       <div
-        className="no-scrollbar relative flex h-full flex-col-reverse overflow-x-hidden overflow-y-scroll p-2 pb-6"
+        className="no-scrollbar relative flex h-full flex-col-reverse overflow-x-hidden overflow-y-scroll p-2 pb-12"
         id="card-comments"
       >
         <Messages
@@ -335,12 +335,13 @@ export const Messages = (props: {
           <p>Still quiet…start the conversation 🌱</p>
         </div>
       ) : null}
-      {[...messages].reverse().map((m, index) => (
+      {[...messages].reverse().map((m, index, reversedMessages) => (
         <Message
           multipleFromSameAuthor={
-            index > 0 &&
-            m.sender === messages[index - 1].sender &&
-            parseInt(m.ts) - parseInt(messages[index - 1].ts) < 1000 * 60 * 3
+            index < reversedMessages.length &&
+            m.sender === reversedMessages[index + 1]?.sender &&
+            parseInt(m.ts) - parseInt(reversedMessages[index + 1]?.ts) <
+              1000 * 60 * 3
           }
           author={m.sender}
           date={m.ts}

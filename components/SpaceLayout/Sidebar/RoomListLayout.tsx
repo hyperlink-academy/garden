@@ -280,7 +280,7 @@ export const RoomListItem = (props: {
 
         <PresenceDots entityID={props.roomEntity} />
         {unreadCount && (
-          <div className="absolute top-1 left-1">
+          <div className="absolute top-1 left-0">
             <UnreadDot />
           </div>
         )}
