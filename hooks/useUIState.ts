@@ -30,7 +30,6 @@ export let useUIState = create(
         }));
       },
       closeCard: (spaceID: string, roomID: string) => {
-        console.log("closing card");
         set((state) => ({
           spaces: {
             ...state.spaces,
@@ -120,11 +119,9 @@ export const useOpenCard = () => {
       let room = useUIState.getState().spaces[spaceID]?.activeRoom;
 
       if (!room) return;
-      console.log("open card");
       openCard(spaceID, room, entityID);
       action.add({
         undo: () => {
-          console.log("undoin");
           closeCard(spaceID as string, room as string);
         },
         redo: () => {
@@ -152,7 +149,6 @@ export const useCloseCard = () => {
     closeCard(spaceID as string, room as string);
     action.add({
       undo: () => {
-        console.log("undoin");
         openCard(spaceID as string, room as string, currentCard as string);
       },
       redo: () => {

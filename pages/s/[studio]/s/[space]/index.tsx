@@ -93,7 +93,10 @@ function Space() {
               </div>
             ) : (
               <div className="no-scrollbar pwa-padding flex snap-x snap-mandatory flex-row gap-2 overflow-x-scroll overscroll-x-none scroll-smooth pb-4 pt-2">
-                <div className="ml-2 snap-end snap-always rounded-md border border-grey-90 bg-white">
+                <div
+                  id="sidebarWrapper"
+                  className="ml-2 snap-end snap-always rounded-md border border-grey-90 bg-white"
+                >
                   <Sidebar />
                 </div>
                 <div

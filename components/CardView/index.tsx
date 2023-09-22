@@ -281,7 +281,17 @@ const BackButton = () => {
   return (
     <button
       className="pointer-events-auto mt-3 flex h-min w-fit items-center gap-1 rounded-full border border-grey-90 bg-white p-1 text-grey-55 shadow"
-      onClick={() => closeCard()}
+      onClick={() => {
+        if (history.length < 2) {
+          setTimeout(() => {
+            let roomView = document.getElementById("roomWrapper");
+            if (roomView) {
+              roomView.scrollIntoView({ behavior: "smooth" });
+            }
+          }, 5);
+        }
+        closeCard();
+      }}
     >
       {history.length < 2 ? <CloseLinedTiny /> : <GoBackToPageLined />}
     </button>

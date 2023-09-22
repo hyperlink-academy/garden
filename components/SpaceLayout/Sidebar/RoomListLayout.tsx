@@ -236,9 +236,16 @@ export const RoomListItem = (props: {
             props.setEditting(true);
             return;
           }
+          setTimeout(() => {
+            let roomView = document.getElementById("roomWrapper");
+            if (roomView) {
+              roomView.scrollIntoView({ behavior: "smooth" });
+            }
+          }, 10);
 
           // don't trigger 'onRoomChange' if room already active (may be trying to setRoomEditOpen instead)
           if (isActiveRoom) return;
+
           setRoom(props.roomEntity);
         }}
       >

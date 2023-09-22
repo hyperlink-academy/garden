@@ -104,7 +104,11 @@ const RoomButton = (props: { roomID: string; children: React.ReactNode }) => {
           ? "rounded-md border-accent-blue bg-accent-blue font-bold text-white"
           : " border-grey-80 text-grey-35 hover:bg-bg-blue"
       }`}
-      onClick={() => setRoom(props.roomID)}
+      onClick={() => {
+        let roomView = document.getElementById("roomWrapper");
+        setRoom(props.roomID);
+        roomView ? roomView.scrollIntoView({ behavior: "smooth" }) : null;
+      }}
     >
       {props.children}
     </button>
