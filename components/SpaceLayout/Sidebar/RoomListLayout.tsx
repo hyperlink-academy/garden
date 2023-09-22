@@ -318,7 +318,7 @@ const PresenceDots = (props: { entityID: string }) => {
   );
   return (
     <>
-      {present.length <= 1 ? (
+      {present.length <= 6 ? (
         <div className=" my-auto flex h-max max-h-6 w-4 shrink-0 grow-0 flex-col flex-wrap-reverse items-start justify-center ">
           {present.map((color) => {
             return (
