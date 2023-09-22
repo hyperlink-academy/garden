@@ -6,6 +6,7 @@ import {
   RoomCanvas,
   RoomChat,
   RoomCollection,
+  RoomMember,
   UnreadDot,
 } from "../../Icons";
 import {
@@ -218,16 +219,18 @@ export const RoomListItem = (props: {
 
   return (
     <div
-      className={`relative select-none rounded-md border border-transparent ${
+      className={`relative select-none rounded-md border  ${
         isActiveRoom
-          ? "rounded-md bg-accent-blue font-bold text-white"
-          : " text-grey-35 hover:border-grey-80"
+          ? "rounded-md  border-accent-blue font-bold text-accent-blue"
+          : " border-transparent text-grey-35 hover:border-grey-80"
       }`}
     >
       {/* buttom = name + either edit button OR room type icon */}
       <button
         style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
-        className="sidebarRoomName flex w-full flex-row gap-1 py-0.5 pl-1 pr-1 text-left"
+        className={`sidebarRoom flex w-full flex-row gap-1 py-0.5 pl-1 pr-0.5 text-left ${
+          isActiveRoom ? "font-bold" : ""
+        }`}
         onClick={(e) => {
           if (e.detail === 2 && authorized) {
             props.setEditting(true);
@@ -240,8 +243,8 @@ export const RoomListItem = (props: {
         }}
       >
         <div
-          className={` roomListItemIcon mt-[2px] h-5 w-5 shrink-0 pt-[1px] pl-[2px]
-             ${isActiveRoom ? "text-white" : "text-grey-55"}`}
+          className={` roomListItemIcon mt-[4px] h-4 w-4 shrink-0 
+             ${isActiveRoom ? "text-accent-blue" : "text-grey-55"}`}
         >
           {roomType?.value === "collection" ? (
             <RoomCollection />
@@ -269,14 +272,15 @@ export const RoomListItem = (props: {
             section="room/name"
             focused
             onBlur={() => props.setEditting(false)}
-            className="border-none bg-inherit p-0 text-inherit"
+            className="grow border-none bg-inherit p-0 text-inherit"
           />
         ) : (
-          <div className="roomListItemUnreads grow">{props.children}</div>
+          <div className="roomListName grow">{props.children}</div>
         )}
+
         <PresenceDots entityID={props.roomEntity} />
         {unreadCount && (
-          <div className="absolute -top-1 -left-1">
+          <div className="absolute top-1 left-1">
             <UnreadDot />
           </div>
         )}
@@ -313,17 +317,25 @@ const PresenceDots = (props: { entityID: string }) => {
     `${props.entityID}-present-in-room`
   );
   return (
-    <div className="my-auto grid grid-cols-2 items-center gap-1">
-      {present.map((color) => {
-        return (
-          <div
-            key={color.id}
-            style={{ backgroundColor: color.value }}
-            className="h-1 w-1 rounded-full"
-          />
-        );
-      })}
-    </div>
+    <>
+      {present.length <= 1 ? (
+        <div className=" my-auto flex h-max max-h-6 w-4 shrink-0 grow-0 flex-col flex-wrap-reverse items-start justify-center ">
+          {present.map((color) => {
+            return (
+              <div
+                key={color.id}
+                style={{ backgroundColor: color.value }}
+                className=" h-[7px] w-[7px] rounded-full border border-white"
+              />
+            );
+          })}
+        </div>
+      ) : (
+        <div className=" italics hrink-0 my-auto flex h-max max-h-6 w-4 grow-0 items-start justify-center overflow-visible  whitespace-nowrap text-sm font-normal text-grey-55 ">
+          {present.length}
+        </div>
+      )}
+    </>
   );
 };
 
