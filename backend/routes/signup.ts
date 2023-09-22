@@ -38,6 +38,7 @@ export const SignupRoute = makeRoute({
           username: session.user.user_metadata.username,
         },
       } as const;
+    let username = msg.username.toLowerCase();
 
     let newSpaceID = env.SPACES.newUniqueId();
     // I should make a table and check that this doesn't conflict with old
@@ -45,7 +46,7 @@ export const SignupRoute = makeRoute({
     const { error } = await admin_supabase.from("identity_data").insert({
       id: session.user.id,
       studio: newSpaceID.toString(),
-      username: msg.username.toLowerCase(),
+      username,
     });
 
     if (error)
@@ -54,7 +55,10 @@ export const SignupRoute = makeRoute({
       } as const;
 
     await user_supabase.auth.updateUser({
-      data: { username: msg.username, studio: newSpaceID.toString() },
+      data: {
+        username,
+        studio: newSpaceID.toString(),
+      },
     });
 
     let stub = env.SPACES.get(newSpaceID);
@@ -62,12 +66,12 @@ export const SignupRoute = makeRoute({
     await newSpace("http://internal", "claim", {
       type: "user",
       ownerID: newSpaceID.toString(),
-      ownerName: msg.username,
+      ownerName: username,
     });
     app_event(env, {
       event: "signup",
       spaceID: newSpaceID.toString(),
-      user: msg.username,
+      user: username,
     });
     return { data: { success: true } } as const;
   },
