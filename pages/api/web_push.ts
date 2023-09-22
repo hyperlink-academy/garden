@@ -11,16 +11,19 @@ let bodyParser = z.object({
   sig: z.string(),
 });
 
-export let webPushPayloadParser = z.object({
-  senderStudio: z.string(),
-  spaceID: z.string(),
-  title: z.string(),
-  message: z.object({
-    id: z.string(),
-    content: z.string(),
-    topic: z.string(),
+export let webPushPayloadParser = z.discriminatedUnion("type", [
+  z.object({
+    type: z.literal("new-message"),
+    senderStudio: z.string(),
+    spaceID: z.string(),
+    title: z.string(),
+    message: z.object({
+      id: z.string(),
+      content: z.string(),
+      topic: z.string(),
+    }),
   }),
-});
+]);
 
 webpush.setVapidDetails(
   "mailto:contact@hyperlink.academy",
@@ -59,7 +62,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     }
     let { data } = payloadBody;
 
-    let { data: spaceMembers, error } = await supabase
+    let { data: spaceMembers } = await supabase
       .from("space_data")
       .select(
         "display_name, name, owner:identity_data!space_data_owner_fkey(username), members_in_spaces(identity_data(*, push_subscriptions(*)))"
@@ -72,7 +75,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         type: "new-message",
         data: {
           spaceName: spaceMembers.display_name || "Untitled Space",
-          spaceURL: `/s/${spaceMembers.owner?.username}/s/${spaceMembers.name}?openCard=${data.message.topic}`,
+          spaceURL: `/s/${spaceMembers.owner?.username}/s/${spaceMembers.name}`,
           senderUsername:
             spaceMembers.members_in_spaces.find(
               (f) => f.identity_data?.studio === data.senderStudio

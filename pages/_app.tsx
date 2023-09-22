@@ -9,6 +9,7 @@ import { SmokeProvider } from "components/Smoke";
 import { SWRConfig } from "swr";
 import { HomeLayout } from "components/HomeLayout";
 import { CallProvider } from "components/Calls/CallProvider";
+import { useServiceWorkerMessageChannel } from "hooks/useServiceWorkerMessageChannel";
 
 export default function App({ Component, pageProps }: AppProps) {
   let router = useRouter();
@@ -61,6 +62,7 @@ export default function App({ Component, pageProps }: AppProps) {
 }
 
 const SharedProviders: React.FC<React.PropsWithChildren<unknown>> = (props) => {
+  useServiceWorkerMessageChannel();
   return (
     <SWRCache>
       <SmokeProvider>

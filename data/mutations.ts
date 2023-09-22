@@ -363,6 +363,7 @@ const replyToDiscussion: Mutation<{
     console.log(`${env.env.NEXT_API_URL}/api/web_push`);
     try {
       let payload: z.TypeOf<typeof webPushPayloadParser> = {
+        type: "new-message",
         title: title?.value || "Untitled",
         senderStudio: senderStudio.value,
         message: args.message,
