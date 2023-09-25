@@ -123,7 +123,7 @@ function RoomHeader(props: {
       >
         <div className="roomTitle flex justify-between">
           <button
-            className={`mb-1 text-lg font-bold text-grey-35 `}
+            className={`mb-1 text-left text-lg font-bold text-grey-35 `}
             onClick={() => {
               if (!scrolledTop) {
                 setDescriptionOpen(!descriptionOpen);
@@ -142,11 +142,12 @@ function RoomHeader(props: {
             ) : null}
           </button>
           {authorized && (
-            <div className="roomOptionsWrapper mt-[4px]">
-              {descriptionOpen || scrolledTop ? (
-                <RoomOptions entityID={props.entityID} />
+            <div className="roomOptionsWrapper mt-[4px] flex items-start gap-1">
+              {scrolledTop ? (
+                <div className="w-4" />
               ) : (
                 <button
+                  className="mt-1"
                   onClick={() =>
                     document.getElementById("room-wrapper")?.scrollTo({
                       top: 0,
@@ -158,14 +159,16 @@ function RoomHeader(props: {
                   <GoToTop />
                 </button>
               )}
+              <RoomOptions entityID={props.entityID} />
             </div>
           )}
         </div>
       </div>
 
       <div
-        className={`roomDescriptionAndFilter z-10 bg-background ${descriptionOpen ? "sticky" : ""
-          }`}
+        className={`roomDescriptionAndFilter z-10 bg-background ${
+          descriptionOpen ? "sticky" : ""
+        }`}
         style={{ top: `${titleHeight}px` }}
         ref={descriptionRef}
       >
@@ -232,10 +235,11 @@ const RoomDescription = (props: {
                 entityID={props.entityID}
               />
               <button
-                className={`${props.filters.length === 0
+                className={`${
+                  props.filters.length === 0
                     ? "text-grey-55 underline"
                     : "font-bold text-accent-blue"
-                  }`}
+                }`}
                 onClick={() => setFiltersOpen(!filtersOpen)}
               >
                 filters({props.filters.length})
@@ -292,9 +296,10 @@ export const CollectionType = (props: {
     });
   };
   const className = (typeName: Fact<"collection/type">["value"]) =>
-    `p-0.5 text-grey-55 ${type === typeName
-      ? "rounded-md border border-grey-55"
-      : "border border-transparent"
+    `p-0.5 text-grey-55 ${
+      type === typeName
+        ? "rounded-md border border-grey-55"
+        : "border border-transparent"
     }`;
 
   return (
