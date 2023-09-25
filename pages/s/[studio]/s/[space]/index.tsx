@@ -92,7 +92,7 @@ function Space() {
                 <CardViewer room={room} />
               </div>
             ) : (
-              <div className="no-scrollbar pwa-padding flex snap-x snap-mandatory flex-row overflow-x-scroll overscroll-x-none scroll-smooth pb-3 pt-3">
+              <div className="no-scrollbar pwa-padding mb-3 mt-3 flex snap-x snap-mandatory flex-row overflow-x-scroll overscroll-x-none scroll-smooth">
                 <div
                   id="sidebarWrapper"
                   className="ml-2 snap-end snap-always rounded-md border border-grey-90 bg-white"
@@ -101,7 +101,7 @@ function Space() {
                 </div>
                 <div
                   id="roomWrapper"
-                  className="roomWrapper relative flex snap-center snap-always flex-row px-2 "
+                  className="roomWrapper relative flex snap-center snap-always flex-row bg-test-pink px-2 "
                 >
                   <div
                     id="roomInnerWrapper"

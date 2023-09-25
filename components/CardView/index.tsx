@@ -278,9 +278,12 @@ export const CardContent = (props: {
 const BackButton = () => {
   let history = useRoomHistory();
   let closeCard = useCloseCard();
+  let { authorized } = useMutations();
   return (
     <button
-      className="pointer-events-auto mt-3 flex h-min w-fit items-center gap-1 rounded-full border border-grey-90 bg-white p-1 text-grey-55 shadow"
+      className={`pointer-events-auto  flex h-min w-fit items-center gap-1 rounded-full border border-grey-90 bg-white p-1 text-grey-55 shadow ${
+        !authorized ? "" : "mt-3"
+      }`}
       onClick={() => {
         if (history.length < 2) {
           setTimeout(() => {

@@ -10,6 +10,7 @@ import {
   Reply,
   Send,
 } from "components/Icons";
+import { LoginForm } from "pages/login";
 import { RenderedText } from "components/Textarea/RenderedText";
 import { db, useMutations } from "hooks/useReplicache";
 import { useEffect, useRef, useState } from "react";
@@ -20,6 +21,8 @@ import { FindOrCreate, useAllItems } from "components/FindOrCreateEntity";
 import { ref } from "data/Facts";
 import { CardPreviewWithData } from "components/CardPreview";
 import { useIntersectionObserver } from "hooks/useIntersectionObserver";
+import { Modal } from "components/Layout";
+import router from "next/router";
 
 export const DiscussionRoom = (props: {
   entityID: string;
@@ -89,8 +92,7 @@ export const MessageInput = (props: {
   let { mutate, memberEntity, authorized } = useMutations();
   let replyMessage = db.useMessageByID(props.reply);
   let replyToName = db.useEntity(replyMessage?.sender || null, "member/name");
-
-  if (!authorized) return null;
+  let [loginIsOpen, setLoginOpen] = useState(false);
   const send = async () => {
     if (!memberEntity || !value) return;
     let message: Message = {
@@ -134,67 +136,96 @@ export const MessageInput = (props: {
           ?.scrollIntoView({ behavior: "smooth", block: "end" }),
       50
     );
+    document.getElementById("messageInput")?.focus({ preventScroll: true });
   };
   return (
     <>
-      <div className="messageInput flex w-full flex-col gap-2 px-2 pt-1 pb-2">
-        {unread && (
-          <button
-            className="messageInput sticky bottom-0 mx-auto flex  w-fit flex-row items-center justify-between gap-2 rounded-full bg-accent-blue py-1.5 px-4 text-sm font-bold italic text-white"
-            onClick={() => {
-              document
-                .getElementById("card-comments")
-                ?.scrollIntoView({ behavior: "smooth", block: "end" });
-            }}
-          >
-            <div>unread messages</div>
-            <GoToBottom />
-          </button>
-        )}
-        {/* IF MESSAGE IS IN REPLY */}
-        {props.reply && (
-          <div className="messageInputReply -mb-2">
-            <div className="flex items-start justify-between gap-2 rounded-md border border-grey-80 bg-white p-2 text-xs italic text-grey-55">
-              <div className="flex flex-col gap-[1px]">
-                <div className="font-bold"> {replyToName?.value}</div>
-                <div>{replyMessage?.content}</div>
-              </div>
-              <button className="" onClick={() => props.setReply(null)}>
-                <CloseLinedTiny />
-              </button>
-            </div>
-            <div className="ml-2 h-2 w-0 border border-grey-80" />
+      {!authorized ? (
+        <>
+          <div className="messageLogIn mx-2 mb-2 flex h-[38px] place-items-center gap-2 rounded-md bg-grey-90">
+            <p className=" w-full text-center text-sm italic text-grey-55">
+              <span
+                role="button"
+                className="font-bold text-accent-blue"
+                onClick={() => {
+                  setLoginOpen(true);
+                }}
+              >
+                Log In
+              </span>{" "}
+              to join the discussion!
+            </p>
           </div>
-        )}
-        {/* ACTUAL MESSAGE INPUT */}
-        <div className="flex w-full items-end gap-2">
-          <div className="flex w-full items-center gap-1 rounded-md border border-grey-55 bg-white p-1 text-sm text-grey-15">
-            <AutosizeTextarea
-              onKeyDown={(e) => {
-                if (!e.shiftKey && e.key === "Enter") {
-                  e.preventDefault();
-                  send();
-                }
-              }}
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              placeholder=""
-              className="w-full"
-              id="messageInput"
+          <Modal open={loginIsOpen} onClose={() => setLoginOpen(false)}>
+            <LoginForm
+              onLogin={(s) =>
+                s.username
+                  ? router.push(`/s/${s.username}`)
+                  : router.push("/setup")
+              }
             />
-            <div className="place-self-end">
-              <AttachCard
-                attachedCards={attachedCards}
-                setAttachedCards={setAttachedCards}
-              />
+          </Modal>
+        </>
+      ) : (
+        <div className="messageInput flex w-full flex-col gap-2 bg-test-pink px-2 pt-1 pb-2">
+          {unread && (
+            <button
+              className="messageUnreadsAvailable sticky bottom-0 mx-auto flex  w-fit flex-row items-center justify-between gap-2 rounded-full bg-accent-blue py-1.5 px-4 text-sm font-bold italic text-white"
+              onClick={() => {
+                document
+                  .getElementById("card-comments")
+                  ?.scrollIntoView({ behavior: "smooth", block: "end" });
+              }}
+            >
+              <div>unread messages</div>
+              <GoToBottom />
+            </button>
+          )}
+          {/* IF MESSAGE IS IN REPLY */}
+          {props.reply && (
+            <div className="messageInputReply -mb-2">
+              <div className="flex items-start justify-between gap-2 rounded-md border border-grey-80 bg-white p-2 text-xs italic text-grey-55">
+                <div className="flex flex-col gap-[1px]">
+                  <div className="font-bold"> {replyToName?.value}</div>
+                  <div>{replyMessage?.content}</div>
+                </div>
+                <button className="" onClick={() => props.setReply(null)}>
+                  <CloseLinedTiny />
+                </button>
+              </div>
+              <div className="ml-2 h-2 w-0 border border-grey-80" />
             </div>
-          </div>
+          )}
+          {/* ACTUAL MESSAGE INPUT */}
+          <div className="flex w-full items-end gap-2">
+            <div className="flex w-full items-center gap-1 rounded-md border border-grey-55 bg-white p-1 text-sm text-grey-15">
+              <AutosizeTextarea
+                onKeyDown={(e) => {
+                  if (!e.shiftKey && e.key === "Enter") {
+                    e.preventDefault();
+                    send();
+                  }
+                }}
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                placeholder=""
+                className="w-full"
+                id="messageInput"
+              />
+              <div className="place-self-end">
+                <AttachCard
+                  attachedCards={attachedCards}
+                  setAttachedCards={setAttachedCards}
+                />
+              </div>
+            </div>
 
-          <div className="flex h-min justify-end text-grey-55">
-            <ButtonPrimary disabled={!value} onClick={send} icon={<Send />} />
+            <div className="flex h-min justify-end text-grey-55">
+              <ButtonPrimary disabled={!value} onClick={send} icon={<Send />} />
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </>
   );
 };
