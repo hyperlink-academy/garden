@@ -39,8 +39,8 @@ export function makeAPIClient<R extends Routes<any>>(
   };
 }
 
-type Routes<Env> = POSTRoute<string, any, any, Env>[];
-export const makeRouter = <Env>(routes: Routes<Env>) => {
+type Routes<Env extends {}> = POSTRoute<string, any, any, Env>[];
+export const makeRouter = <Env extends {}>(routes: Routes<Env>) => {
   return async (route: string, request: Request, env: Env) => {
     let status = 200;
     let result;

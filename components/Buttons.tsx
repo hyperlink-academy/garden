@@ -1,4 +1,4 @@
-type ButtonProps = JSX.IntrinsicElements["button"];
+type ButtonProps = Omit<JSX.IntrinsicElements["button"], "content">;
 export function ButtonPrimary(
   props: {
     content?: string | React.ReactNode;
@@ -44,7 +44,7 @@ export function ButtonPrimary(
 
 export function ButtonSecondary(
   props: {
-    content?: string | React.ReactNode;
+    content?: React.ReactNode;
     icon?: React.ReactElement;
   } & ButtonProps
 ) {

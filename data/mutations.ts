@@ -58,13 +58,12 @@ type UniqueFacts = {
 
 type OptionalAttribute<A extends keyof Attribute | null> =
   A extends keyof Attribute ? A : keyof Attribute;
-export type CardinalityResult<A extends keyof Attribute | null> = null extends A
-  ? Fact<keyof Attribute>[]
-  : Attribute[OptionalAttribute<A>] extends {
-      cardinality: "one";
-    }
-  ? Fact<OptionalAttribute<A>> | null
-  : Fact<OptionalAttribute<A>>[];
+export type CardinalityResult<A extends keyof Attribute | null> =
+  Attribute[OptionalAttribute<A>] extends {
+    cardinality: "one";
+  }
+    ? Fact<OptionalAttribute<A>> | null
+    : Fact<OptionalAttribute<A>>[];
 
 type Mutation<T> = (args: T, ctx: MutationContext) => Promise<void>;
 

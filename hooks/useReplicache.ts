@@ -12,14 +12,7 @@ import {
   Mutations,
   FactInput,
 } from "data/mutations";
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { createContext, useCallback, useContext, useMemo } from "react";
 import {
   Puller,
   Pusher,
@@ -405,7 +398,7 @@ export const db = {
       async (tx) => {
         if (!entity) return null;
         let result = await scanIndex(tx).eav(entity, attribute);
-        return (result as CardinalityResult<A>) || null;
+        return result;
       },
       null,
       [attribute, entity],
