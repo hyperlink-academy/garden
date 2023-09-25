@@ -59,7 +59,7 @@ function Space() {
 
   useEffect(() => {
     window.requestAnimationFrame(() => {
-      let roomPane = document.getElementById("desktopWrapper");
+      let roomPane = document.getElementById("roomInnerWrapper");
       roomPane?.scrollIntoView();
     });
   }, []);
@@ -84,7 +84,7 @@ function Space() {
                     <Sidebar />
                   </div>
 
-                  <div className="spcaeRoomWrapper no-scrollbar relative flex h-full flex-shrink-0 flex-col gap-0">
+                  <div className="spaceRoomWrapper no-scrollbar relative flex h-full flex-shrink-0 flex-col gap-0">
                     <Room entityID={room} key={room} />
                   </div>
                 </div>
@@ -92,7 +92,7 @@ function Space() {
                 <CardViewer room={room} />
               </div>
             ) : (
-              <div className="no-scrollbar pwa-padding flex snap-x snap-mandatory flex-row gap-2 overflow-x-scroll overscroll-x-none scroll-smooth pb-4 pt-2">
+              <div className="no-scrollbar pwa-padding flex snap-x snap-mandatory flex-row overflow-x-scroll overscroll-x-none scroll-smooth pb-3 pt-3">
                 <div
                   id="sidebarWrapper"
                   className="ml-2 snap-end snap-always rounded-md border border-grey-90 bg-white"
@@ -101,19 +101,20 @@ function Space() {
                 </div>
                 <div
                   id="roomWrapper"
-                  className="roomWrapper relative flex snap-center snap-always flex-row "
+                  className="roomWrapper relative flex snap-center snap-always flex-row px-2 "
                 >
                   <div
-                    id="desktopWrapper"
-                    className="desktopWrapper no-scrollbar relative flex h-full flex-shrink-0 flex-col gap-0 rounded-md border border-grey-90"
+                    id="roomInnerWrapper"
+                    className="roomInnerWrapper no-scrollbar relative flex h-full flex-shrink-0 flex-col gap-0 rounded-md border border-grey-90 px-2 "
                   >
                     <Room entityID={room} key={room} />
                   </div>
                 </div>
 
-                <div className="mr-2">
+                <div className="snap-start snap-always ">
                   <CardViewer room={room} />
                 </div>
+                <div className="w-2 shrink-0 snap-start" />
               </div>
             )}
           </SmallCardDragContext>

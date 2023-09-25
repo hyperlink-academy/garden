@@ -411,8 +411,8 @@ const Message = (props: {
   return (
     <div
       id={props.id}
-      className={`message flex flex-col text-sm first:pt-0 last:pb-2 ${
-        !props.multipleFromSameAuthor ? "pt-5" : "pt-1"
+      className={`message flex flex-col text-sm first:pb-4 last:pt-0 ${
+        !props.multipleFromSameAuthor ? "pt-4" : "pt-1"
       }`}
     >
       {/* MESSAGE HEADER */}
