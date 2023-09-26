@@ -17,6 +17,8 @@ import { GetStaticPropsContext, InferGetStaticPropsType } from "next/types";
 import { useSpaceData } from "hooks/useSpaceData";
 import { SpaceProvider } from "components/ReplicacheProvider";
 import { SWRConfig } from "swr";
+import { useViewportSize } from "hooks/useViewportSize";
+import { usePreventScroll } from "@react-aria/overlays";
 
 export async function getStaticPaths() {
   return { paths: [], fallback: "blocking" };
@@ -56,6 +58,7 @@ function Space() {
   useSpaceSyncState();
   let room = useRoom();
   const { width } = useWindowDimensions();
+  let height = useViewportSize().height;
 
   useEffect(() => {
     window.requestAnimationFrame(() => {
@@ -63,13 +66,17 @@ function Space() {
       roomPane?.scrollIntoView();
     });
   }, []);
+  usePreventScroll();
 
   return (
     <>
       <SpaceMetaTitle />
       <PresenceHandler />
 
-      <div className="spaceWrapperflex safari-pwa-height h-[100dvh] flex-col items-stretch justify-items-center gap-2 overflow-hidden sm:gap-4">
+      <div
+        style={{ height }}
+        className="spaceWrapperflex safari-pwa-height flex-col items-stretch justify-items-center gap-2 overflow-hidden sm:gap-4"
+      >
         <div className="spaceontent max-w-screen-xl relative mx-auto flex h-full w-full grow items-stretch md:py-6 md:px-4">
           <SmallCardDragContext>
             {width > 960 || width === 0 ? (

@@ -33,6 +33,7 @@
     "@headlessui/react": "^1.7.11",
     "@radix-ui/react-popover": "^1.0.5",
     "@radix-ui/react-slider": "^1.0.0",
+    "@react-aria/overlays": "^3.17.0",
     "@react-spring/web": "^9.7.3",
     "@rocicorp/undo": "^0.2.0",
     "@sentry/nextjs": "^7.69.0",

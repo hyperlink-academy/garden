@@ -37,6 +37,7 @@ import { useReactions } from "hooks/useReactions";
 import { HighlightCard } from "./HighlightCard";
 import { CardViewDrawer } from "./CardViewDrawer";
 import { useCloseCard, useRoomHistory } from "hooks/useUIState";
+import { useViewportSize } from "hooks/useViewportSize";
 
 const borderStyles = (args: { member: boolean }) => {
   switch (true) {
@@ -107,7 +108,7 @@ export const CardView = (props: {
           relative
           mx-auto       
           flex
-          h-full w-full
+          h-[42px] w-full
           max-w-3xl grow
           flex-col items-stretch overflow-y-scroll
           ${borderStyles({

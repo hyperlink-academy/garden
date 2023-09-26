@@ -5,6 +5,7 @@ import { useOpenCard, useUIState } from "hooks/useUIState";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useRef } from "react";
 import { CardView } from "./CardView";
+import { useViewportSize } from "hooks/useViewportSize";
 
 export const useCardViewer = () => {
   let spaceID = useSpaceID();
@@ -87,6 +88,7 @@ export function CardViewer(props: { room: string | null }) {
     },
     []
   );
+  let viewheight = useViewportSize().height;
 
   useAppEventListener(
     "cardviewer.close-card",
@@ -102,7 +104,7 @@ export function CardViewer(props: { room: string | null }) {
       ref={cardViewerRef}
       id="cardViewerWrapper"
       className={`cardViewerWrapper 
-          flex h-full w-[calc(100vw-16px)] 
+          flex  h-full w-[calc(100vw-16px)] 
           max-w-3xl shrink-0        
           touch-pan-x snap-center snap-always
           flex-col 
