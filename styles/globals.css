@@ -243,6 +243,9 @@ textarea {
   .pwa-padding {
     padding-top: env(safe-area-inset-top) !important;
   }
+  .pwa-margin {
+    margin-top: env(safe-area-inset-top) !important;
+  }
 
   .safari-pwa-height {
     height: 100lvh !important;

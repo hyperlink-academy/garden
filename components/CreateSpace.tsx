@@ -2,15 +2,11 @@ import { spaceAPI } from "backend/lib/api";
 import { useAuth } from "hooks/useAuth";
 import { ReplicacheContext, useMutations } from "hooks/useReplicache";
 import { useContext, useEffect, useState } from "react";
-import {
-  ButtonLink,
-  ButtonPrimary,
-  ButtonSecondary,
-  ButtonTertiary,
-} from "./Buttons";
+import { ButtonPrimary, ButtonSecondary } from "./Buttons";
 import { DoorSelector } from "./DoorSelector";
 import { SpaceCreate } from "./Icons";
-import { Modal } from "./Layout";
+import { ModalNew } from "./Modal";
+
 import { useSpaceData } from "hooks/useSpaceData";
 import { useIdentityData } from "hooks/useIdentityData";
 import { Form, SubmitButton } from "./Form";
@@ -49,7 +45,7 @@ export const CreateSpace = (props: {
           onClick={() => setOpen(true)}
         />
       </a>
-      <Modal open={open} onClose={() => setOpen(false)}>
+      <ModalNew open={open} onClose={() => setOpen(false)}>
         <Form
           validate={() => {
             if (
@@ -93,16 +89,10 @@ export const CreateSpace = (props: {
         >
           <CreateSpaceForm formState={formState} setFormState={setFormState} />
           {/* action buttons */}
-          <div className="flex gap-4 place-self-end">
-            <ButtonTertiary
-              content="Nevermind"
-              onClick={() => setOpen(false)}
-            />
 
-            <SubmitButton content="Create!" />
-          </div>
+          <SubmitButton content="Create!" onClose={() => setOpen(false)} />
         </Form>
-      </Modal>
+      </ModalNew>
     </div>
   );
 };
@@ -144,7 +134,14 @@ export const EditSpaceModal = (props: {
 
   let [mode, setMode] = useState<"normal" | "delete">("normal");
   return (
-    <Modal open={props.open} onClose={props.onClose}>
+    <ModalNew
+      header={mode === "normal" ? `Space Settings` : `Delete Space?`}
+      open={props.open}
+      onClose={() => {
+        props.onClose();
+        setMode("normal");
+      }}
+    >
       {mode === "normal" ? (
         <Form
           className="flex flex-col gap-4"
@@ -169,15 +166,7 @@ export const EditSpaceModal = (props: {
           <CreateSpaceForm formState={formState} setFormState={setFormState} />
 
           {/* update or nevermind */}
-          <div className="flex flex-row justify-end gap-2">
-            <ButtonLink
-              content={"nevermind"}
-              onClick={async () => {
-                props.onClose();
-              }}
-            />
-            <SubmitButton content={"Update"} disabled={!modified} />
-          </div>
+          <SubmitButton content="Create!" onClose={async () => props.onClose} />
 
           <hr className="border-grey-80" />
 
@@ -238,7 +227,7 @@ export const EditSpaceModal = (props: {
           )}
         </>
       )}
-    </Modal>
+    </ModalNew>
   );
 };
 
@@ -315,15 +304,12 @@ const DeleteSpaceForm = (props: {
           placeholder=""
           onChange={(e) => setState({ spaceName: e.currentTarget.value })}
         />
-        <div className="flex flex-row gap-2">
-          <ButtonSecondary
-            onClick={async () => {
-              props.onCancel();
-            }}
-            content="Cancel"
-          />
-          <SubmitButton destructive content={"Delete"} />
-        </div>
+
+        <SubmitButton
+          destructive
+          content={"Delete"}
+          onClose={async () => props.onCancel()}
+        />
       </Form>
     </>
   );

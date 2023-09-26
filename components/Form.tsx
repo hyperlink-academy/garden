@@ -1,5 +1,5 @@
 import { useState, createContext, useContext, useEffect } from "react";
-import { ButtonPrimary } from "./Buttons";
+import { ButtonPrimary, ButtonTertiary } from "./Buttons";
 import { DotLoader } from "./DotLoader";
 
 type State = "normal" | "loading" | "success" | "disabled";
@@ -46,14 +46,22 @@ export function SubmitButton(props: {
   content: React.ReactNode;
   destructive?: boolean;
   disabled?: boolean;
+  onClose: () => void;
 }) {
   let { state } = useContext(FormContext);
   return (
-    <ButtonPrimary
-      destructive={props.destructive}
-      type="submit"
-      disabled={state === "disabled"}
-      content={state === "loading" ? <DotLoader /> : props.content}
-    />
+    <div className="mt-4 flex justify-end gap-2">
+      <ButtonTertiary
+        type="reset"
+        onClick={() => props.onClose()}
+        content="nevermind"
+      />
+      <ButtonPrimary
+        destructive={props.destructive}
+        type="submit"
+        disabled={state === "disabled"}
+        content={state === "loading" ? <DotLoader /> : props.content}
+      />
+    </div>
   );
 }

@@ -1,12 +1,12 @@
 import { ButtonPrimary, ButtonTertiary } from "components/Buttons";
 import { Modal, Divider } from "components/Layout";
+import { ModalNew } from "components/Modal";
 import { Fact } from "data/Facts";
 import {
   Delete,
   RoomCanvas,
   RoomChat,
   RoomCollection,
-  RoomMember,
   UnreadDot,
 } from "../../Icons";
 import {
@@ -24,7 +24,8 @@ import { ulid } from "src/ulid";
 import { Textarea } from "components/Textarea";
 import { generateKeyBetween } from "src/fractional-indexing";
 import { SingleTextSection } from "components/CardView/Sections";
-import { useIsActiveRoom, useRoom, useSetRoom } from "hooks/useUIState";
+import { useIsActiveRoom, useSetRoom } from "hooks/useUIState";
+import { Form, SubmitButton } from "components/Form";
 
 export const EditRoomModal = (props: {
   open: boolean;
@@ -52,9 +53,28 @@ export const EditRoomModal = (props: {
   if (!props.room) return null;
 
   return (
-    <Modal open={props.open} onClose={props.onClose}>
-      <div className="editRoomModal flex flex-col gap-3 text-grey-35">
-        <h3>Room Settings</h3>
+    <ModalNew open={props.open} onClose={props.onClose} header="Room Settings">
+      <Form
+        className="editRoomModal flex flex-col gap-3 text-grey-35"
+        validate={() => {}}
+        onSubmit={async () => {
+          if (!currentRoomName || !props.room) return;
+          await mutate("updateFact", {
+            id: currentRoomName?.id,
+            data: {
+              value: nameState,
+            },
+          });
+          await mutate("assertFact", {
+            entity: props.room,
+            factID: ulid(),
+            attribute: "room/description",
+            value: descriptionState,
+            positions: {},
+          });
+          props.onClose();
+        }}
+      >
         <>
           <div className="editRoomName flex flex-col gap-1">
             <p className="font-bold">Room Name</p>
@@ -84,26 +104,7 @@ export const EditRoomModal = (props: {
             />
           </div>
 
-          <ButtonPrimary
-            content="Edit Room"
-            onClick={async () => {
-              if (!currentRoomName || !props.room) return;
-              await mutate("updateFact", {
-                id: currentRoomName?.id,
-                data: {
-                  value: nameState,
-                },
-              });
-              await mutate("assertFact", {
-                entity: props.room,
-                factID: ulid(),
-                attribute: "room/description",
-                value: descriptionState,
-                positions: {},
-              });
-              props.onClose();
-            }}
-          />
+          <SubmitButton content="Edit Room" onClose={props.onClose} />
 
           <Divider />
 
@@ -116,7 +117,7 @@ export const EditRoomModal = (props: {
             icon={<Delete />}
           />
         </>
-      </div>
+      </Form>
       {areYouSureRoomDeletionModalOpen && (
         <AreYouSureRoomDeletionModal
           open={areYouSureRoomDeletionModalOpen}
@@ -128,7 +129,7 @@ export const EditRoomModal = (props: {
           currentRoomName={currentRoomName}
         />
       )}
-    </Modal>
+    </ModalNew>
   );
 };
 

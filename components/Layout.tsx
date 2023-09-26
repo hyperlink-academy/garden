@@ -1,5 +1,8 @@
 import { Dialog, Menu, Transition } from "@headlessui/react";
 import React, { Fragment } from "react";
+import { ButtonPrimary, ButtonTertiary } from "./Buttons";
+import { content } from "tailwind.config";
+import { useViewportSize } from "hooks/useViewportSize";
 
 export const Divider = (props: {
   dark?: boolean;
