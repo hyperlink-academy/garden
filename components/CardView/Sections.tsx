@@ -85,6 +85,38 @@ export const SingleTextSection = (
 
   let textareaRef = useRef<HTMLTextAreaElement | null>(null);
   let previousSelection = useRef<null | { start: number; end: number }>();
+  let updateValue = useCallback(
+    async (value: string, start: number, end: number) => {
+      let previousStart = previousSelection.current?.start;
+      let previousEnd = previousSelection.current?.end;
+      action.add({
+        undo: () => {
+          textareaRef.current?.setSelectionRange(
+            previousStart || null,
+            previousEnd || null
+          );
+        },
+        redo: () => {
+          textareaRef.current?.setSelectionRange(start, end);
+        },
+      });
+      await mutate(
+        props.section === "card/content"
+          ? "updateContentFact"
+          : props.section === "card/title"
+          ? "updateTitleFact"
+          : "assertFact",
+        {
+          entity: props.entityID,
+          attribute: props.section,
+          value: value,
+          positions: fact?.positions || {},
+        }
+      );
+      previousSelection.current = { start, end };
+    },
+    [action, fact?.positions, mutate, props.entityID, props.section]
+  );
 
   return (
     <>
@@ -141,9 +173,28 @@ export const SingleTextSection = (
       <Textarea
         {...props}
         textareaRef={textareaRef}
-        onKeyDown={(e, ref) => {
+        onKeyDown={async (e, ref) => {
           props?.onKeyDown?.(e);
           onKeyDown(e, ref);
+          if (e.key === "Enter" && !e.defaultPrevented) {
+            e.preventDefault();
+            let cursorStart = e.currentTarget.selectionStart;
+            let cursorEnd = e.currentTarget.selectionEnd;
+            if (cursorStart !== cursorEnd) return;
+            let value = e.currentTarget.value;
+            let newValue =
+              value.slice(0, cursorStart) + "\n" + value.slice(cursorStart);
+            await updateValue(newValue, cursorStart + 1, cursorStart + 1);
+
+            setTimeout(
+              () =>
+                textareaRef.current?.setSelectionRange(
+                  cursorStart + 1,
+                  cursorStart + 1
+                ),
+              10
+            );
+          }
         }}
         renderLinks={props.autocompleteCardNames}
         focused={props.focused}
@@ -154,6 +205,7 @@ export const SingleTextSection = (
         value={(fact?.value as string) || ""}
         onSelect={onSelect}
         onChange={async (e) => {
+          console.log("on change");
           if (!timeout.current) action.start();
           else clearTimeout(timeout.current);
           timeout.current = window.setTimeout(() => {
@@ -189,34 +241,7 @@ export const SingleTextSection = (
               left: coordinates.left + textareaPosition.left,
             });
           }
-
-          let previousStart = previousSelection.current?.start;
-          let previousEnd = previousSelection.current?.end;
-          action.add({
-            undo: () => {
-              textareaRef.current?.setSelectionRange(
-                previousStart || null,
-                previousEnd || null
-              );
-            },
-            redo: () => {
-              textareaRef.current?.setSelectionRange(start, end);
-            },
-          });
-          await mutate(
-            props.section === "card/content"
-              ? "updateContentFact"
-              : props.section === "card/title"
-              ? "updateTitleFact"
-              : "assertFact",
-            {
-              entity: props.entityID,
-              attribute: props.section,
-              value: value,
-              positions: fact?.positions || {},
-            }
-          );
-          previousSelection.current = { start, end };
+          updateValue(value, start, end);
         }}
       />
     </>

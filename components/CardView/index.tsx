@@ -519,6 +519,12 @@ const DefaultTextSection = (props: { entityID: string }) => {
   return (
     <SingleTextSection
       autocompleteCardNames
+      onClick={() => {
+        setTimeout(
+          () => document.getElementById("default-text-section")?.focus,
+          2000
+        );
+      }}
       id="default-text-section"
       onPaste={async (e) => {
         if (!authToken || !spaceID) return;

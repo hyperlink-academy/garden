@@ -75,7 +75,7 @@ function Space() {
 
       <div
         style={{ height }}
-        className="spaceWrapperflex safari-pwa-height flex-col items-stretch justify-items-center gap-2 overflow-hidden sm:gap-4"
+        className="spaceWrapperflex  flex-col items-stretch justify-items-center gap-2 overflow-hidden sm:gap-4"
       >
         <div className="spaceontent max-w-screen-xl relative mx-auto flex h-full w-full grow items-stretch md:py-6 md:px-4">
           <SmallCardDragContext>
