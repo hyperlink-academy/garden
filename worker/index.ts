@@ -73,28 +73,30 @@ self.addEventListener("notificationclick", async (event) => {
 self.addEventListener("push", async (event) => {
   const data: HyperlinkNotification = JSON.parse(event?.data?.text() || "{}");
 
-  event?.waitUntil(async () => {
-    if (data.type === "joined-space") {
+  event?.waitUntil(
+    (async () => {
+      if (data.type === "joined-space") {
+        return self.registration.showNotification(
+          `${data.data.newMemberUsername} joined ${data.data.spaceName}`,
+          {
+            data: data,
+            body: `Say hello!`,
+            icon: "/android-chrome-192x192.png",
+            badge: "/android-chrome-192x192.png",
+          }
+        );
+      }
       return self.registration.showNotification(
-        `${data.data.newMemberUsername} joined ${data.data.spaceName}`,
+        `${data.data.title || "Untitled Card"} in ${data.data.spaceName}`,
         {
           data: data,
-          body: `Say hello!`,
+          body: `${data.data.senderUsername}: ${data.data.message.content}`,
           icon: "/android-chrome-192x192.png",
           badge: "/android-chrome-192x192.png",
         }
       );
-    }
-    return self.registration.showNotification(
-      `${data.data.title || "Untitled Card"} in ${data.data.spaceName}`,
-      {
-        data: data,
-        body: `${data.data.senderUsername}: ${data.data.message.content}`,
-        icon: "/android-chrome-192x192.png",
-        badge: "/android-chrome-192x192.png",
-      }
-    );
-  });
+    })()
+  );
 });
 
 const MessageChannels = new Map<
