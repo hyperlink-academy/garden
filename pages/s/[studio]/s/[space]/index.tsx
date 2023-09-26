@@ -101,7 +101,7 @@ function Space() {
                 </div>
                 <div
                   id="roomWrapper"
-                  className="roomWrapper relative flex snap-center snap-always flex-row bg-test-pink px-2 "
+                  className="roomWrapper relative flex snap-center snap-always flex-row  px-2 "
                 >
                   <div
                     id="roomInnerWrapper"

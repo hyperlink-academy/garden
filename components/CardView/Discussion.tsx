@@ -167,7 +167,7 @@ export const MessageInput = (props: {
           </Modal>
         </>
       ) : (
-        <div className="messageInput flex w-full flex-col gap-2 bg-test-pink px-2 pt-1 pb-2">
+        <div className="messageInput flex w-full flex-col gap-2  px-2 pt-1 pb-2">
           {unread && (
             <button
               className="messageUnreadsAvailable sticky bottom-0 mx-auto flex  w-fit flex-row items-center justify-between gap-2 rounded-full bg-accent-blue py-1.5 px-4 text-sm font-bold italic text-white"
