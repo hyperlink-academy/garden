@@ -8,6 +8,7 @@ import { Modal } from "./Layout";
 import Router from "next/router";
 import { useIdentityData } from "hooks/useIdentityData";
 import { uuidToBase62 } from "src/uuidHelpers";
+import { ModalNew } from "./Modal";
 
 let weird_studios = [
   "Bauhaus",
@@ -30,7 +31,7 @@ export const StudioForm = ({
   let example_studio = useRandomValue(weird_studios);
   return (
     <>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-1">
         <p className="font-bold">Name this Studio</p>
         <input
           placeholder={example_studio + "..."}
@@ -85,19 +86,20 @@ export function CreateStudio(props: { username: string }) {
         content={"Create a Studio"}
         onClick={() => setOpen(true)}
       />
-      <Modal open={open} onClose={() => setOpen(false)}>
+      <ModalNew
+        open={open}
+        onClose={() => setOpen(false)}
+        header="Create A New Studio"
+      >
         <form
-          className="flex flex-col gap-8"
+          className="flex flex-col gap-4"
           onSubmit={async (e) => {
             if (!authToken) return;
-            e.preventDefault();
-            setLoading(true);
             let studio = await workerAPI(WORKER_URL, "create_studio", {
               authToken,
               ...formState,
             });
             mutate();
-            setLoading(false);
             if (!studio.success) return;
             setOpen(false);
             setFormState({ name: "", description: "" });
@@ -106,8 +108,8 @@ export function CreateStudio(props: { username: string }) {
         >
           <StudioForm formState={formState} setFormState={setFormState} />
 
-          <div className="flex flex-row justify-end gap-4">
-            <ButtonLink
+          <div className="flex flex-row justify-end gap-2">
+            <ButtonTertiary
               type="reset"
               content="nevermind"
               className="font-normal"
@@ -120,7 +122,7 @@ export function CreateStudio(props: { username: string }) {
             />
           </div>
         </form>
-      </Modal>
+      </ModalNew>
     </>
   );
 }

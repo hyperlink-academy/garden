@@ -43,7 +43,7 @@ export const ModalNew: React.FC<
         px-3 py-4 shadow-drop sm:p-4
         `}
       >
-        {props.header && <h2 className="text-grey-15">{props.header}</h2>}
+        {props.header && <h2 className="">{props.header}</h2>}
         {props.children}
       </div>
     </Dialog>

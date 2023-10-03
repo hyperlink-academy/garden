@@ -47,6 +47,8 @@ export function SubmitButton(props: {
   destructive?: boolean;
   disabled?: boolean;
   onClose: () => void;
+  closeContent?: string;
+  icon?: React.ReactElement;
 }) {
   let { state } = useContext(FormContext);
   return (
@@ -54,13 +56,14 @@ export function SubmitButton(props: {
       <ButtonTertiary
         type="reset"
         onClick={() => props.onClose()}
-        content="nevermind"
+        content={props.closeContent ? `${props.closeContent}` : "nevermind"}
       />
       <ButtonPrimary
         destructive={props.destructive}
         type="submit"
         disabled={state === "disabled"}
         content={state === "loading" ? <DotLoader /> : props.content}
+        icon={props.icon}
       />
     </div>
   );
