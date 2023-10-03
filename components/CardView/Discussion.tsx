@@ -23,6 +23,7 @@ import { CardPreviewWithData } from "components/CardPreview";
 import { useIntersectionObserver } from "hooks/useIntersectionObserver";
 import { Modal } from "components/Layout";
 import router from "next/router";
+import { LogInModal } from "components/LoginModal";
 
 export const DiscussionRoom = (props: {
   entityID: string;
@@ -156,21 +157,21 @@ export const MessageInput = (props: {
               to join the discussion!
             </p>
           </div>
-          <Modal open={loginIsOpen} onClose={() => setLoginOpen(false)}>
-            <LoginForm
-              onLogin={(s) =>
-                s.username
-                  ? router.push(`/s/${s.username}`)
-                  : router.push("/setup")
-              }
-            />
-          </Modal>
+          <LogInModal
+            isOpen={loginIsOpen}
+            onLogin={(s) =>
+              s.username
+                ? router.push(`/s/${s.username}`)
+                : router.push("/setup")
+            }
+            onClose={() => setLoginOpen(false)}
+          />
         </>
       ) : (
-        <div className="messageInput flex w-full flex-col gap-2  px-2 pt-1 pb-2">
+        <div className="messageInput flex w-full flex-col gap-2  px-2 pb-2 pt-1">
           {unread && (
             <button
-              className="messageUnreadsAvailable sticky bottom-0 mx-auto flex  w-fit flex-row items-center justify-between gap-2 rounded-full bg-accent-blue py-1.5 px-4 text-sm font-bold italic text-white"
+              className="messageUnreadsAvailable sticky bottom-0 mx-auto flex  w-fit flex-row items-center justify-between gap-2 rounded-full bg-accent-blue px-4 py-1.5 text-sm font-bold italic text-white"
               onClick={() => {
                 document
                   .getElementById("card-comments")
@@ -269,7 +270,7 @@ const AttachCard = ({
                 {attachedCards.map((card) => {
                   return (
                     <div
-                      className="flex w-full items-start justify-between gap-2 py-1 px-2 text-sm hover:bg-bg-blue"
+                      className="flex w-full items-start justify-between gap-2 px-2 py-1 text-sm hover:bg-bg-blue"
                       key={card}
                     >
                       <AttachedCard entityID={card} />
@@ -286,7 +287,7 @@ const AttachCard = ({
                 })}
                 <button
                   onClick={() => setOpen(true)}
-                  className="flex gap-2 py-1 px-2 text-sm text-grey-55 hover:text-accent-blue"
+                  className="flex gap-2 px-2 py-1 text-sm text-grey-55 hover:text-accent-blue"
                 >
                   <CardAdd />
                   attach another card
@@ -477,7 +478,7 @@ const Message = (props: {
           <div className="ml-2 h-2 w-0 border border-grey-80" />
         </>
       )}
-      <div className="group -mx-4 flex items-end gap-1 py-1 px-4 hover:bg-bg-blue">
+      <div className="group -mx-4 flex items-end gap-1 px-4 py-1 hover:bg-bg-blue">
         <RenderedText
           className="messageContent grow text-sm text-grey-35"
           text={props.content}

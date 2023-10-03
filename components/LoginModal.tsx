@@ -6,12 +6,12 @@ import { Modal } from "./Layout";
 export const LogInModal = (props: {
   isOpen: boolean;
   onClose: () => void;
-  onLogin?: (s) => void;
+  onLogin?: (s: { username?: string }) => void;
 }) => {
   return (
     <ModalNew open={props.isOpen} onClose={props.onClose}>
       <LoginForm
-        onLogin={() => {
+        onLogin={(s) => {
           if (props.onLogin) {
             props.onLogin(s);
           }
