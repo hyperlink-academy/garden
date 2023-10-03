@@ -159,7 +159,7 @@ export const MessageInput = (props: {
           </div>
           <LogInModal
             isOpen={loginIsOpen}
-            onLogin={(s) =>
+            redirectOnLogin={(s) =>
               s.username
                 ? router.push(`/s/${s.username}`)
                 : router.push("/setup")
