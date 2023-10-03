@@ -44,8 +44,42 @@ export const ModalNew: React.FC<
         `}
       >
         {props.header && <h2 className="">{props.header}</h2>}
-        {props.children}
+        {props.open && props.children}
       </div>
     </Dialog>
+  );
+};
+export const ModalButton = (props: {
+  onClose: () => void;
+  onSubmit?: () => void;
+  content: string;
+  closeContent?: string;
+  destructive?: boolean;
+  disabled?: boolean;
+  icon?: React.ReactElement;
+}) => {
+  return (
+    <div className="mt-4 flex justify-end gap-2">
+      <ButtonTertiary
+        type="reset"
+        onClick={() => {
+          props.onClose();
+        }}
+        content={props.closeContent ? `${props.closeContent}` : "nevermind"}
+      />
+      <ButtonPrimary
+        destructive={props.destructive}
+        onClick={() => {
+          if (props.onSubmit) {
+            props.onSubmit();
+          }
+          return;
+        }}
+        content={props.content}
+        type="submit"
+        disabled={props.disabled}
+        icon={props.icon}
+      />
+    </div>
   );
 };

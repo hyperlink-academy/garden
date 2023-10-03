@@ -1,12 +1,24 @@
 import { LoginForm } from "pages/login";
 import { SignupForm } from "pages/signup";
+import { ModalNew } from "./Modal";
 import { Modal } from "./Layout";
 
-export const LogInModal = (props: { isOpen: boolean; onClose: () => void }) => {
+export const LogInModal = (props: {
+  isOpen: boolean;
+  onClose: () => void;
+  onLogin?: (s) => void;
+}) => {
   return (
-    <Modal open={props.isOpen} onClose={props.onClose}>
-      <LoginForm onLogin={() => {}} />
-    </Modal>
+    <ModalNew open={props.isOpen} onClose={props.onClose}>
+      <LoginForm
+        onLogin={() => {
+          if (props.onLogin) {
+            props.onLogin(s);
+          }
+        }}
+        onClose={props.onClose}
+      />
+    </ModalNew>
   );
 };
 
@@ -16,8 +28,8 @@ export const SignupModal = (props: {
   redirectTo?: string;
 }) => {
   return (
-    <Modal open={props.isOpen} onClose={props.onClose}>
-      <SignupForm redirectTo={props.redirectTo} />
-    </Modal>
+    <ModalNew open={props.isOpen} onClose={props.onClose}>
+      <SignupForm redirectTo={props.redirectTo} onClose={props.onClose} />
+    </ModalNew>
   );
 };

@@ -1,15 +1,14 @@
 import { useAuth } from "hooks/useAuth";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { LoginForm } from "pages/login";
 import { useState } from "react";
-import { ButtonLink, ButtonSecondary, ButtonTertiary } from "./Buttons";
-import { Modal } from "./Layout";
+import { ButtonLink } from "./Buttons";
 import * as Popover from "@radix-ui/react-popover";
 import { CreateStudio } from "./CreateStudio";
 import { useIdentityData } from "hooks/useIdentityData";
 import { uuidToBase62 } from "src/uuidHelpers";
 import Head from "next/head";
+import { LogInModal } from "./LoginModal";
 
 export const HomeLayout = (props: {
   id: string;
@@ -98,13 +97,8 @@ const Login = () => {
   return (
     <>
       <ButtonLink content="log in" onClick={() => setIsOpen(true)} />
-      <Modal open={isOpen} onClose={() => setIsOpen(false)}>
-        <LoginForm
-          onLogin={(s) =>
-            s.username ? router.push(`/s/${s.username}`) : router.push("/setup")
-          }
-        />
-      </Modal>
+
+      <LogInModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
     </>
   );
 };

@@ -10,6 +10,7 @@ import { useRouter } from "next/router";
 import { Modal } from "components/Layout";
 import { LoginForm } from "./login";
 import { SignupForm } from "./signup";
+import { LogInModal, SignupModal } from "components/LoginModal";
 
 export default function IndexPage() {
   let textFormat = "mx-auto w-full flex max-w-2xl flex-col gap-4";
@@ -61,25 +62,21 @@ export default function IndexPage() {
                         onClick={() => setLogInOpen(true)}
                       />
                       {/* signup modal */}
-                      <Modal
-                        open={signupOpen}
+                      <SignupModal
+                        isOpen={signupOpen}
                         onClose={() => setSignupOpen(false)}
-                      >
-                        <SignupForm />
-                      </Modal>
+                      />
+
                       {/* login modal */}
-                      <Modal
-                        open={logInOpen}
+                      <LogInModal
+                        isOpen={logInOpen}
                         onClose={() => setLogInOpen(false)}
-                      >
-                        <LoginForm
-                          onLogin={(s) =>
-                            s.username
-                              ? router.push(`/s/${s.username}`)
-                              : router.push("/setup")
-                          }
-                        />
-                      </Modal>
+                        onLogin={(s) =>
+                          s.username
+                            ? router.push(`/s/${s.username}`)
+                            : router.push("/setup")
+                        }
+                      />
                     </>
                   ) : session.session?.username ? (
                     <Link

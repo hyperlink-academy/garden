@@ -1,5 +1,6 @@
 import { ButtonPrimary } from "components/Buttons";
 import { DotLoader } from "components/DotLoader";
+import { ModalButton } from "components/Modal";
 import { useAuth } from "hooks/useAuth";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -9,7 +10,10 @@ type Status = "normal" | "invalidEmail" | "confirm" | "loading";
 export default function SignupPage() {
   return <SignupForm />;
 }
-export function SignupForm(props: { redirectTo?: string }) {
+export function SignupForm(props: {
+  redirectTo?: string;
+  onClose?: () => void;
+}) {
   let [status, setStatus] = useState<Status>("normal");
   let [input, setInput] = useState({
     password: "",
@@ -83,14 +87,27 @@ export function SignupForm(props: { redirectTo?: string }) {
           />
         </label>
         {/* fix for gap added by PasswordInput hide/show button */}
-        <div className="grid-rows-max -mt-4 grid justify-items-end">
-          <ButtonPrimary
-            className="content-end items-end justify-end justify-items-end self-end justify-self-end"
-            type="submit"
+
+        {props.onClose ? (
+          <ModalButton
             content={status === "loading" ? "" : "Sign Up!"}
             icon={status === "loading" ? <DotLoader /> : undefined}
+            onClose={() => {
+              if (props.onClose) {
+                props.onClose();
+              }
+            }}
           />
-        </div>
+        ) : (
+          <div className="grid-rows-max -mt-4 grid justify-items-end">
+            <ButtonPrimary
+              className="content-end items-end justify-end justify-items-end self-end justify-self-end"
+              type="submit"
+              content={status === "loading" ? "" : "Sign Up!"}
+              icon={status === "loading" ? <DotLoader /> : undefined}
+            />
+          </div>
+        )}
       </form>
       <div className="flex flex-col gap-2 rounded-md bg-bg-gold p-4 text-center">
         <p className="text-grey-15">
