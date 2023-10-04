@@ -1,5 +1,3 @@
-import { ButtonPrimary } from "components/Buttons";
-import { Modal } from "components/Layout";
 import { RadioGroup } from "@headlessui/react";
 import {
   useMutations,
@@ -19,6 +17,7 @@ import {
   RoomCollection,
 } from "components/Icons";
 import { useRoom, useSetRoom } from "hooks/useUIState";
+import { ModalButton, ModalNew } from "components/Modal";
 
 export const SharedRoomList = (props: { setRoomEditOpen: () => void }) => {
   let { authorized } = useMutations();
@@ -115,7 +114,7 @@ const CreateRoom = () => {
       )}
       <button
         ref={droppableRef}
-        className="sidebarAddRoom group flex w-full items-center gap-2 rounded-md border border-transparent py-0.5 px-1 text-grey-55 hover:border-accent-blue hover:text-accent-blue"
+        className="sidebarAddRoom group flex w-full items-center gap-2 rounded-md border border-transparent px-1 py-0.5 text-grey-55 hover:border-accent-blue hover:text-accent-blue"
         onClick={async () => {
           setOpen(true);
         }}
@@ -125,7 +124,7 @@ const CreateRoom = () => {
         </div>
         new room
       </button>
-      <Modal open={open} onClose={() => setOpen(false)}>
+      <ModalNew header="Create Room" open={open} onClose={() => setOpen(false)}>
         <form
           onSubmit={async (e) => {
             e.preventDefault();
@@ -148,7 +147,6 @@ const CreateRoom = () => {
           }}
           className="editRoomModal flex flex-col gap-3 text-grey-35"
         >
-          <h3>Room Settings</h3>
           <>
             <div className="editRoomName flex flex-col gap-1">
               <p className="font-bold">Room Name (required)</p>
@@ -174,8 +172,9 @@ const CreateRoom = () => {
                 <RadioGroup.Option value="canvas">
                   {({ checked }) => (
                     <div
-                      className={`${checked ? "bg-bg-blue" : ""
-                        } flex items-center justify-between gap-2 rounded-md border border-grey-15 p-2 hover:cursor-pointer`}
+                      className={`${
+                        checked ? "bg-bg-blue" : ""
+                      } flex items-center justify-between gap-2 rounded-md border border-grey-15 p-2 hover:cursor-pointer`}
                     >
                       <div className="flex items-center gap-2">
                         <RoomCanvas />
@@ -188,8 +187,9 @@ const CreateRoom = () => {
                 <RadioGroup.Option value="collection">
                   {({ checked }) => (
                     <div
-                      className={`${checked ? "bg-bg-blue" : ""
-                        } flex items-center justify-between gap-2 rounded-md border border-grey-15 p-2 hover:cursor-pointer`}
+                      className={`${
+                        checked ? "bg-bg-blue" : ""
+                      } flex items-center justify-between gap-2 rounded-md border border-grey-15 p-2 hover:cursor-pointer`}
                     >
                       <div className="flex items-center gap-2">
                         <RoomCollection />
@@ -202,8 +202,9 @@ const CreateRoom = () => {
                 <RadioGroup.Option value="chat">
                   {({ checked }) => (
                     <div
-                      className={`${checked ? "bg-bg-blue" : ""
-                        } flex items-center justify-between gap-2 rounded-md border border-grey-15 p-2 hover:cursor-pointer`}
+                      className={`${
+                        checked ? "bg-bg-blue" : ""
+                      } flex items-center justify-between gap-2 rounded-md border border-grey-15 p-2 hover:cursor-pointer`}
                     >
                       <div className="flex items-center gap-2">
                         <RoomChat />
@@ -215,14 +216,14 @@ const CreateRoom = () => {
                 </RadioGroup.Option>
               </div>
             </RadioGroup>
-            <ButtonPrimary
-              content="Construct Room!"
-              type="submit"
-              disabled={!roomState.name}
+
+            <ModalButton
+              content="Construct Room"
+              onClose={() => setOpen(false)}
             />
           </>
         </form>
-      </Modal>
+      </ModalNew>
     </>
   );
 };

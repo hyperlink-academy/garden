@@ -1,10 +1,9 @@
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { Database } from "backend/lib/database.types";
-import { Divider, Modal } from "./Layout";
+import { Divider } from "./Layout";
 import { useEffect, useState } from "react";
 import { Settings } from "./Icons";
-import { ButtonLink, ButtonPrimary, ButtonSecondary } from "./Buttons";
-import { HelpAppInfo } from "./HelpCenter";
+import { ButtonPrimary, ButtonSecondary } from "./Buttons";
 import { useAuth } from "hooks/useAuth";
 import { ModalNew } from "./Modal";
 

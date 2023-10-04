@@ -21,7 +21,6 @@ import { FindOrCreate, useAllItems } from "components/FindOrCreateEntity";
 import { ref } from "data/Facts";
 import { CardPreviewWithData } from "components/CardPreview";
 import { useIntersectionObserver } from "hooks/useIntersectionObserver";
-import { Modal } from "components/Layout";
 import router from "next/router";
 import { LogInModal } from "components/LoginModal";
 
@@ -159,11 +158,6 @@ export const MessageInput = (props: {
           </div>
           <LogInModal
             isOpen={loginIsOpen}
-            redirectOnLogin={(s) =>
-              s.username
-                ? router.push(`/s/${s.username}`)
-                : router.push("/setup")
-            }
             onClose={() => setLoginOpen(false)}
           />
         </>

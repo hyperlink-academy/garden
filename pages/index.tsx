@@ -7,9 +7,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "hooks/useAuth";
 import { useRouter } from "next/router";
-import { Modal } from "components/Layout";
-import { LoginForm } from "./login";
-import { SignupForm } from "./signup";
 import { LogInModal, SignupModal } from "components/LoginModal";
 
 export default function IndexPage() {

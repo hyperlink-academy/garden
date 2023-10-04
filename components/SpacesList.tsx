@@ -4,7 +4,6 @@ import { useState } from "react";
 import { ButtonLink } from "./Buttons";
 import { DoorImage } from "./Doors";
 import { Information, Settings } from "./Icons";
-import { Modal } from "./Layout";
 import { useAuth } from "hooks/useAuth";
 import { spacePath } from "hooks/utils";
 import { EditSpaceModal } from "./CreateSpace";
@@ -12,6 +11,7 @@ import { useSpaceData } from "hooks/useSpaceData";
 export type { SpaceData } from "backend/routes/get_space_data";
 import type { SpaceData } from "backend/routes/get_space_data";
 import { getCurrentDate } from "src/utils";
+import { ModalNew } from "./Modal";
 
 export const SpaceList = (props: {
   spaces: Array<SpaceData>;
@@ -39,7 +39,7 @@ export const SpaceList = (props: {
               key={a.do_id}
               className={`${
                 props.small
-                  ? "w-80"
+                  ? ""
                   : "min-w-80 flex-1 basis-80 sm:last:max-w-[calc(50%-12px)]"
               }`}
             >
@@ -295,10 +295,9 @@ const SpaceInfoButton = (props: {
         <Information />
       </button>
 
-      <Modal open={open} onClose={() => setOpen(false)}>
+      <ModalNew header={name} open={open} onClose={() => setOpen(false)}>
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
-            <h3>{name}</h3>
             {description ? (
               <div>{description}</div>
             ) : (
@@ -316,7 +315,7 @@ const SpaceInfoButton = (props: {
             </Link>
           </div>
         </div>
-      </Modal>
+      </ModalNew>
     </>
   );
 };

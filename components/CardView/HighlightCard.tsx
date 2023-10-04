@@ -1,8 +1,8 @@
 import { spaceAPI } from "backend/lib/api";
-import { ButtonLink, ButtonPrimary } from "components/Buttons";
+import { ButtonLink } from "components/Buttons";
 import { CreateStudioPost } from "components/CreateStudioPost";
 import { Note } from "components/Icons";
-import { Modal } from "components/Layout";
+import { ModalNew } from "components/Modal";
 import { useAuth, useAuthIdentityData } from "hooks/useAuth";
 import { useSpaceID } from "hooks/useReplicache";
 import { useSpaceData } from "hooks/useSpaceData";
@@ -35,7 +35,7 @@ export function HighlightCard(props: { entityID: string }) {
       >
         <Note />
       </button>
-      <Modal width="max-w-fit" open={open} onClose={() => setOpen(false)}>
+      <ModalNew width="max-w-fit" open={open} onClose={() => setOpen(false)}>
         <div className="flex flex-col gap-4">
           <h3>Highlight to a Studio!</h3>
 
@@ -102,7 +102,7 @@ export function HighlightCard(props: { entityID: string }) {
             <ButtonLink content={"nevermind"} onClick={() => setOpen(false)} />
           </div>
         </div>
-      </Modal>
+      </ModalNew>
     </>
   );
 }

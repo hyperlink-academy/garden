@@ -13,12 +13,10 @@ import {
   CallUnMutedTiny,
   DisclosureCollapseTiny,
   DisclosureExpandTiny,
-  MemberAdd,
   MoreOptionsSmall,
   RoomMember,
-  SettingsOutline,
 } from "components/Icons";
-import { db, scanIndex, useMutations, useSpaceID } from "hooks/useReplicache";
+import { db, useMutations, useSpaceID } from "hooks/useReplicache";
 import tailwind from "tailwind.config";
 import { useState } from "react";
 import { useOpenCard } from "hooks/useUIState";
@@ -30,12 +28,9 @@ import { useAuth } from "hooks/useAuth";
 import { useSmoker } from "components/Smoke";
 import useSWR from "swr";
 import { spaceAPI } from "backend/lib/api";
-import {
-  ButtonPrimary,
-  ButtonSecondary,
-  ButtonTertiary,
-} from "components/Buttons";
-import { Divider, Modal } from "components/Layout";
+import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
+import { Divider } from "components/Layout";
+import { ModalNew } from "components/Modal";
 
 export const People = () => {
   let members = db.useAttribute("member/name");
@@ -76,10 +71,10 @@ export const People = () => {
             inCall ? "border-accent-blue" : "border-grey-80"
           }  p-2`}
         >
-          <div className="-mx-1 -mt-2 -mb-0.5 flex flex-col gap-[6px]">
+          <div className="-mx-1 -mb-0.5 -mt-2 flex flex-col gap-[6px]">
             <button
               onClick={() => setExpanded(!expanded)}
-              className={`-mx-1 flex justify-between rounded-t-md border border-t-0 border-r-0 border-l-0 bg-bg-blue px-2 py-1 text-xs font-bold text-accent-blue ${
+              className={`-mx-1 flex justify-between rounded-t-md border border-l-0 border-r-0 border-t-0 bg-bg-blue px-2 py-1 text-xs font-bold text-accent-blue ${
                 inCall ? "border-b-accent-blue" : "border-b-grey-80"
               } `}
             >
@@ -400,16 +395,16 @@ const InviteMember = () => {
 
   return (
     <>
-      {
-        authorized && (
-          // (callOngoing ? (
-          <button className=" flex items-center gap-1 text-sm italic text-grey-55"
-            onClick={()=>setInviteOpen(true)}>
-            <AddTiny /> invite
-          </button>
-        )
-      }
-      <Modal open={open} onClose={() => setInviteOpen(false)}>
+      {authorized && (
+        // (callOngoing ? (
+        <button
+          className=" flex items-center gap-1 text-sm italic text-grey-55"
+          onClick={() => setInviteOpen(true)}
+        >
+          <AddTiny /> invite
+        </button>
+      )}
+      <ModalNew open={open} onClose={() => setInviteOpen(false)}>
         <div className="inviteMemberModal flex flex-col place-items-center gap-4 p-4 text-center">
           <div className="flex flex-col gap-2">
             <h3>Send a friend this invite link!</h3>
@@ -428,7 +423,7 @@ const InviteMember = () => {
             <ButtonPrimary onClick={(e) => getShareLink(e)} content={"Copy"} />
           </div>
         </div>
-      </Modal>
+      </ModalNew>
     </>
   );
 };

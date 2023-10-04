@@ -1,8 +1,5 @@
 import { Dialog, Menu, Transition } from "@headlessui/react";
 import React, { Fragment } from "react";
-import { ButtonPrimary, ButtonTertiary } from "./Buttons";
-import { content } from "tailwind.config";
-import { useViewportSize } from "hooks/useViewportSize";
 
 export const Divider = (props: {
   dark?: boolean;
@@ -12,7 +9,7 @@ export const Divider = (props: {
 }) => {
   return (
     <div
-      className={`w-full border-t border-l ${
+      className={`w-full border-l border-t ${
         props.dark ? `border-grey-55` : `border-grey-80`
       } ${props.vertical ? "h-full" : ""} 
       `}
@@ -42,39 +39,6 @@ export const FloatingContainer: React.FC<
   );
 };
 
-export const Modal: React.FC<
-  React.PropsWithChildren<{
-    open: boolean;
-    onClose: () => void;
-    dark?: boolean;
-    width?: string;
-  }>
-> = (props) => {
-  return (
-    <Dialog
-      open={props.open}
-      onClose={props.onClose}
-      className="fixed inset-0 z-50 overflow-y-hidden"
-    >
-      <Dialog.Overlay className={props.dark ? "dark-overlay" : "overlay"} />
-      <FloatingContainer
-        className={`
-              fixed top-1/2 left-1/2 grid max-h-[calc(100%-32px)]
-              w-[calc(100%-32px)] ${
-                props.width ? props.width : "max-w-md"
-              } -translate-x-1/2
-              -translate-y-1/2
-              grid-flow-row
-              gap-4
-              overflow-auto
-              `}
-      >
-        {props.children}
-      </FloatingContainer>
-    </Dialog>
-  );
-};
-
 export const ModalFixedHeight: React.FC<
   React.PropsWithChildren<{
     open: boolean;
@@ -92,7 +56,7 @@ export const ModalFixedHeight: React.FC<
       <Dialog.Overlay className={props.dark ? "dark-overlay" : "overlay"} />
       <FloatingContainer
         className={`
-              fixed top-1/2 left-1/2 grid h-[calc(100%-32px)] w-[calc(100%-32px)] ${
+              fixed left-1/2 top-1/2 grid h-[calc(100%-32px)] w-[calc(100%-32px)] ${
                 props.width ? props.width : "max-w-md"
               } -translate-x-1/2 -translate-y-1/2 grid-flow-row content-start gap-4 overflow-auto
               `}
@@ -117,7 +81,7 @@ export const LightBoxModal: React.FC<
         // override default FloatingContainer border and padding!
         // also change to max-w + w-max, better for narrow images
         className={`
-              fixed top-1/2 left-1/2 grid max-h-[calc(100%-100px)]
+              fixed left-1/2 top-1/2 grid max-h-[calc(100%-100px)]
               w-max
               max-w-[calc(100%-50px)]
               -translate-x-1/2

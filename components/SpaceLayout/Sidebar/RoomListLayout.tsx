@@ -1,6 +1,6 @@
-import { ButtonPrimary, ButtonTertiary } from "components/Buttons";
-import { Modal, Divider } from "components/Layout";
-import { ModalNew } from "components/Modal";
+import { ButtonPrimary } from "components/Buttons";
+import { Divider } from "components/Layout";
+import { ModalButton, ModalNew } from "components/Modal";
 import { Fact } from "data/Facts";
 import {
   Delete,
@@ -115,6 +115,7 @@ export const EditRoomModal = (props: {
             }}
             content="Delete Room"
             icon={<Delete />}
+            className="place-self-end"
           />
         </>
       </Form>
@@ -143,37 +144,23 @@ const AreYouSureRoomDeletionModal = (props: {
   let { mutate } = useMutations();
 
   return (
-    <Modal open={props.open} onClose={props.onClose}>
-      <div className="flex flex-col gap-3 text-grey-35">
-        <div className="modal flex flex-col gap-3">
-          <p className="text-lg font-bold">Are you sure?</p>
-          <p className="text-sm">
-            This will permanently delete the room and its contents.
-          </p>
-          <div className="flex justify-end gap-4">
-            <ButtonTertiary
-              content="Cancel"
-              onClick={() => {
-                props.onClose();
-              }}
-            >
-              Cancel
-            </ButtonTertiary>
-            <ButtonPrimary
-              content="Delete Room"
-              icon={<Delete />}
-              destructive={true}
-              onClick={async () => {
-                await mutate("deleteEntity", { entity: props.entityID });
-                props.onClose();
-              }}
-            >
-              Delete
-            </ButtonPrimary>
-          </div>
-        </div>
+    <ModalNew header="Are You Sure?" open={props.open} onClose={props.onClose}>
+      <div className="flex flex-col gap-3">
+        This will permanently delete the room and its contents.
+        <ModalButton
+          destructive
+          content="Delete Room"
+          icon={<Delete />}
+          onSubmit={async () => {
+            await mutate("deleteEntity", { entity: props.entityID });
+            props.onClose();
+          }}
+          onClose={() => {
+            props.onClose();
+          }}
+        />
       </div>
-    </Modal>
+    </ModalNew>
   );
 };
 
@@ -288,7 +275,7 @@ export const RoomListItem = (props: {
 
         <PresenceDots entityID={props.roomEntity} />
         {unreadCount && (
-          <div className="absolute top-1 left-0">
+          <div className="absolute left-0 top-1">
             <UnreadDot />
           </div>
         )}
