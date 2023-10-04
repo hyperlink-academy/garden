@@ -11,7 +11,7 @@ import { useSpaceData } from "hooks/useSpaceData";
 export type { SpaceData } from "backend/routes/get_space_data";
 import type { SpaceData } from "backend/routes/get_space_data";
 import { getCurrentDate } from "src/utils";
-import { ModalNew } from "./Modal";
+import { Modal } from "./Modal";
 
 export const SpaceList = (props: {
   spaces: Array<SpaceData>;
@@ -295,7 +295,7 @@ const SpaceInfoButton = (props: {
         <Information />
       </button>
 
-      <ModalNew header={name} open={open} onClose={() => setOpen(false)}>
+      <Modal header={name} open={open} onClose={() => setOpen(false)}>
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
             {description ? (
@@ -315,7 +315,7 @@ const SpaceInfoButton = (props: {
             </Link>
           </div>
         </div>
-      </ModalNew>
+      </Modal>
     </>
   );
 };

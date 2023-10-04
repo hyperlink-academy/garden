@@ -1,6 +1,6 @@
 import { LoginForm } from "pages/login";
 import { SignupForm } from "pages/signup";
-import { ModalNew } from "./Modal";
+import { Modal } from "./Modal";
 
 export const LogInModal = (props: {
   isOpen: boolean;
@@ -8,7 +8,7 @@ export const LogInModal = (props: {
   redirectOnLogin?: (s: { username?: string }) => void;
 }) => {
   return (
-    <ModalNew open={props.isOpen} onClose={props.onClose}>
+    <Modal open={props.isOpen} onClose={props.onClose}>
       <LoginForm
         onLogin={(s) => {
           if (props.redirectOnLogin) {
@@ -17,7 +17,7 @@ export const LogInModal = (props: {
         }}
         onClose={props.onClose}
       />
-    </ModalNew>
+    </Modal>
   );
 };
 
@@ -27,8 +27,8 @@ export const SignupModal = (props: {
   redirectTo?: string;
 }) => {
   return (
-    <ModalNew open={props.isOpen} onClose={props.onClose}>
+    <Modal open={props.isOpen} onClose={props.onClose}>
       <SignupForm redirectTo={props.redirectTo} onClose={props.onClose} />
-    </ModalNew>
+    </Modal>
   );
 };

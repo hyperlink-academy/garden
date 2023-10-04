@@ -1,6 +1,6 @@
 import { ButtonPrimary } from "components/Buttons";
 import { DotLoader } from "components/DotLoader";
-import { ModalButton } from "components/Modal";
+import { ModalSubmitButton } from "components/Modal";
 import { useAuth } from "hooks/useAuth";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -89,7 +89,7 @@ export function SignupForm(props: {
         {/* fix for gap added by PasswordInput hide/show button */}
 
         {props.onClose ? (
-          <ModalButton
+          <ModalSubmitButton
             content={status === "loading" ? "" : "Sign Up!"}
             icon={status === "loading" ? <DotLoader /> : undefined}
             onClose={() => {
@@ -169,8 +169,8 @@ function PasswordInput(props: {
         }}
         className={`
         relative
-        top-[-32px]
         left-[-16px]
+        top-[-32px]
         float-right
         cursor-pointer
         hover:cursor-pointer`}

@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { DotLoader } from "components/DotLoader";
 import Link from "next/link";
-import { ModalButton } from "components/Modal";
+import { ModalSubmitButton } from "components/Modal";
 
 export default function LoginPage() {
   let router = useRouter();
@@ -83,7 +83,7 @@ export function LoginForm(props: {
         </label>
 
         {props.onClose ? (
-          <ModalButton
+          <ModalSubmitButton
             content={status === "loading" ? "" : "Log In!"}
             icon={status === "loading" ? <DotLoader /> : undefined}
             onClose={() => {

@@ -3,7 +3,7 @@ import { ButtonLink, ButtonPrimary, ButtonTertiary } from "components/Buttons";
 import { CreateSpaceForm, CreateSpaceFormState } from "components/CreateSpace";
 import { DotLoader } from "components/DotLoader";
 import { SpaceCreate } from "components/Icons";
-import { ModalNew } from "components/Modal";
+import { Modal } from "components/Modal";
 import { useAuth } from "hooks/useAuth";
 import { useIdentityData } from "hooks/useIdentityData";
 import { scanIndex, useMutations } from "hooks/useReplicache";
@@ -29,7 +29,7 @@ export function AddSpace(props: { id: string }) {
         onClick={() => setOpen(true)}
         icon={<SpaceCreate />}
       />
-      <ModalNew header="Add a Space" open={open} onClose={() => setOpen(false)}>
+      <Modal header="Add a Space" open={open} onClose={() => setOpen(false)}>
         {state === "normal" ? (
           <>
             <p>
@@ -69,7 +69,7 @@ export function AddSpace(props: { id: string }) {
         ) : (
           <AddNewSpace onClose={() => setOpen(false)} studioID={props.id} />
         )}
-      </ModalNew>
+      </Modal>
     </>
   );
 }

@@ -7,7 +7,7 @@ import { DotLoader } from "components/DotLoader";
 import { useAuth } from "hooks/useAuth";
 import { spaceAPI, workerAPI } from "backend/lib/api";
 import Router from "next/router";
-import { ModalButton, ModalNew } from "components/Modal";
+import { ModalSubmitButton, Modal } from "components/Modal";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export function StudioOptionsMenu(props: { id: string }) {
@@ -53,11 +53,7 @@ function StudioSettings(props: {
     });
   }, [data?.description, data?.name]);
   return (
-    <ModalNew
-      header="Studio Settings"
-      open={props.open}
-      onClose={props.onClose}
-    >
+    <Modal header="Studio Settings" open={props.open} onClose={props.onClose}>
       {mode === "normal" ? (
         <form
           className="flex flex-col gap-3"
@@ -81,7 +77,7 @@ function StudioSettings(props: {
           }}
         >
           <StudioForm setFormState={setFormState} formState={formState} />
-          <ModalButton
+          <ModalSubmitButton
             content={loading ? "" : "Update Studio"}
             icon={loading ? <DotLoader /> : undefined}
             onClose={() => {
@@ -126,7 +122,7 @@ function StudioSettings(props: {
           )}
         </>
       )}
-    </ModalNew>
+    </Modal>
   );
 }
 
@@ -153,7 +149,7 @@ const DeleteStudioForm = (props: {
           />
         </div>
 
-        <ModalButton
+        <ModalSubmitButton
           content={status === "normal" ? "Delete Studio" : ""}
           icon={status === "normal" ? undefined : <DotLoader />}
           onSubmit={async () => {

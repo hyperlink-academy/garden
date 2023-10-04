@@ -10,7 +10,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
-import { ModalNew } from "components/Modal";
+import { Modal } from "components/Modal";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export default function SignupPage() {
@@ -158,10 +158,10 @@ export default function SignupPage() {
             onClick={() => setOpen(true)}
             type="button"
           />
-          <ModalNew open={open} onClose={() => setOpen(false)}>
+          <Modal open={open} onClose={() => setOpen(false)}>
             <HelpAppInfo />
             <ButtonPrimary content="Got It!" onClick={() => setOpen(false)} />
-          </ModalNew>
+          </Modal>
         </div>
 
         {/* pick a name */}

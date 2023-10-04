@@ -35,7 +35,7 @@ import { useReactions } from "hooks/useReactions";
 import { HighlightCard } from "./HighlightCard";
 import { CardViewDrawer } from "./CardViewDrawer";
 import { useCloseCard, useRoomHistory } from "hooks/useUIState";
-import { ModalNew } from "components/Modal";
+import { Modal } from "components/Modal";
 
 const borderStyles = (args: { member: boolean }) => {
   switch (true) {
@@ -373,7 +373,7 @@ const AreYouSureCardDeletionModal = (props: {
 }) => {
   let { mutate, action } = useMutations();
   return (
-    <ModalNew open={props.open} onClose={props.onClose}>
+    <Modal open={props.open} onClose={props.onClose}>
       <div className="flex flex-col gap-3 text-grey-35">
         <div className="modal flex flex-col gap-3">
           <p className="text-lg font-bold">Are you sure?</p>
@@ -407,7 +407,7 @@ const AreYouSureCardDeletionModal = (props: {
           </div>
         </div>
       </div>
-    </ModalNew>
+    </Modal>
   );
 };
 

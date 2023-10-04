@@ -1,6 +1,6 @@
 import { ButtonPrimary } from "components/Buttons";
 import { Divider } from "components/Layout";
-import { ModalButton, ModalNew } from "components/Modal";
+import { ModalSubmitButton, Modal } from "components/Modal";
 import { Fact } from "data/Facts";
 import {
   Delete,
@@ -53,7 +53,7 @@ export const EditRoomModal = (props: {
   if (!props.room) return null;
 
   return (
-    <ModalNew open={props.open} onClose={props.onClose} header="Room Settings">
+    <Modal open={props.open} onClose={props.onClose} header="Room Settings">
       <Form
         className="editRoomModal flex flex-col gap-3 text-grey-35"
         validate={() => {}}
@@ -130,7 +130,7 @@ export const EditRoomModal = (props: {
           currentRoomName={currentRoomName}
         />
       )}
-    </ModalNew>
+    </Modal>
   );
 };
 
@@ -144,10 +144,10 @@ const AreYouSureRoomDeletionModal = (props: {
   let { mutate } = useMutations();
 
   return (
-    <ModalNew header="Are You Sure?" open={props.open} onClose={props.onClose}>
+    <Modal header="Are You Sure?" open={props.open} onClose={props.onClose}>
       <div className="flex flex-col gap-3">
         This will permanently delete the room and its contents.
-        <ModalButton
+        <ModalSubmitButton
           destructive
           content="Delete Room"
           icon={<Delete />}
@@ -160,7 +160,7 @@ const AreYouSureRoomDeletionModal = (props: {
           }}
         />
       </div>
-    </ModalNew>
+    </Modal>
   );
 };
 

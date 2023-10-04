@@ -30,7 +30,7 @@ import useSWR from "swr";
 import { spaceAPI } from "backend/lib/api";
 import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
 import { Divider } from "components/Layout";
-import { ModalNew } from "components/Modal";
+import { Modal } from "components/Modal";
 
 export const People = () => {
   let members = db.useAttribute("member/name");
@@ -404,7 +404,7 @@ const InviteMember = () => {
           <AddTiny /> invite
         </button>
       )}
-      <ModalNew open={open} onClose={() => setInviteOpen(false)}>
+      <Modal open={open} onClose={() => setInviteOpen(false)}>
         <div className="inviteMemberModal flex flex-col place-items-center gap-4 p-4 text-center">
           <div className="flex flex-col gap-2">
             <h3>Send a friend this invite link!</h3>
@@ -423,7 +423,7 @@ const InviteMember = () => {
             <ButtonPrimary onClick={(e) => getShareLink(e)} content={"Copy"} />
           </div>
         </div>
-      </ModalNew>
+      </Modal>
     </>
   );
 };

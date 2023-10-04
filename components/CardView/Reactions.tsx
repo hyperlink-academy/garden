@@ -1,7 +1,7 @@
 import * as Popover from "@radix-ui/react-popover";
 import { AddSmall, ReactionAdd } from "components/Icons";
 import { Divider } from "components/Layout";
-import { ModalNew } from "components/Modal";
+import { Modal } from "components/Modal";
 import { useSmoker } from "components/Smoke";
 import { ref } from "data/Facts";
 import { useReactions } from "hooks/useReactions";
@@ -135,7 +135,7 @@ export const EditReactions = (props: {
   let smoker = useSmoker();
 
   return (
-    <ModalNew
+    <Modal
       header="Reactions"
       open={props.reactionEditOpen}
       onClose={() => props.onClose()}
@@ -210,7 +210,7 @@ export const EditReactions = (props: {
             ))}
         </div>
       </div>
-    </ModalNew>
+    </Modal>
   );
 };
 

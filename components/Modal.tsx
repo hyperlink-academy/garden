@@ -3,7 +3,7 @@ import { ButtonTertiary, ButtonPrimary } from "./Buttons";
 import { Dialog } from "@headlessui/react";
 // import { usePreventScroll } from "@react-aria/overlays";
 
-export const ModalNew: React.FC<
+export const Modal: React.FC<
   React.PropsWithChildren<{
     open: boolean;
     onClose: () => void;
@@ -51,7 +51,7 @@ export const ModalNew: React.FC<
 };
 
 //Rename to submitModalButton when you do the rename of ModalNew
-export const ModalButton = (props: {
+export const ModalSubmitButton = (props: {
   onClose: () => void;
   onSubmit?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   content: string;

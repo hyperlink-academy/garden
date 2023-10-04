@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { Settings } from "./Icons";
 import { ButtonPrimary, ButtonSecondary } from "./Buttons";
 import { useAuth } from "hooks/useAuth";
-import { ModalNew } from "./Modal";
+import { Modal } from "./Modal";
 
 export const NotificationManager = () => {
   let supabase = useSupabaseClient<Database>();
@@ -58,7 +58,7 @@ export const NotificationManager = () => {
       <button className="hover:text-accent-blue" onClick={() => setOpen(true)}>
         <Settings />
       </button>
-      <ModalNew
+      <Modal
         open={open}
         onClose={() => setOpen(false)}
         header="Personal Settings"
@@ -105,7 +105,7 @@ export const NotificationManager = () => {
             onClick={() => logout()}
           />
         </div>
-      </ModalNew>
+      </Modal>
     </>
   );
 };

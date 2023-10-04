@@ -27,7 +27,7 @@ import { DotLoader } from "components/DotLoader";
 import { Feedback } from "components/Feedback";
 import { useIsActiveRoom, useRoom, useSetRoom } from "hooks/useUIState";
 import { prefetchIdentityData } from "hooks/useIdentityData";
-import { ModalButton, ModalNew } from "components/Modal";
+import { ModalSubmitButton, Modal } from "components/Modal";
 
 export const Sidebar = () => {
   let [roomEditOpen, setRoomEditOpen] = useState(false);
@@ -188,14 +188,14 @@ const MemberOptions = () => {
           </Popover.Content>
         </Popover.Portal>
       </Popover.Root>
-      <ModalNew
+      <Modal
         header="Are You Sure?"
         open={leaveModalOpen}
         onClose={() => setLeaveModalOpen(false)}
       >
         You won&apos;t be able to make any changes to this space anymore. It
         will also be removed from your space list.
-        <ModalButton
+        <ModalSubmitButton
           destructive
           content={loading ? "" : "Leave Space"}
           icon={loading ? <DotLoader /> : undefined}
@@ -215,7 +215,7 @@ const MemberOptions = () => {
             setLoading(false);
           }}
         />
-      </ModalNew>
+      </Modal>
     </>
   );
 };

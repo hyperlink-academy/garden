@@ -5,7 +5,7 @@ import { useState } from "react";
 import { ButtonLink, ButtonSecondary } from "./Buttons";
 import { Send } from "./Icons";
 import AutosizeTextarea from "./Textarea/AutosizeTextarea";
-import { ModalNew } from "./Modal";
+import { Modal } from "./Modal";
 import { Form, SubmitButton } from "./Form";
 
 export const Feedback = () => {
@@ -16,7 +16,7 @@ export const Feedback = () => {
   return (
     <>
       <ButtonLink content="feedback" onClick={() => setOpen(true)} />
-      <ModalNew
+      <Modal
         header="We'd Love Your Feedback!"
         open={open}
         onClose={() => setOpen(false)}
@@ -91,7 +91,7 @@ export const Feedback = () => {
             /> */}
           </Form>
         )}
-      </ModalNew>
+      </Modal>
     </>
   );
 };

@@ -17,7 +17,7 @@ import {
   RoomCollection,
 } from "components/Icons";
 import { useRoom, useSetRoom } from "hooks/useUIState";
-import { ModalButton, ModalNew } from "components/Modal";
+import { ModalSubmitButton, Modal } from "components/Modal";
 
 export const SharedRoomList = (props: { setRoomEditOpen: () => void }) => {
   let { authorized } = useMutations();
@@ -124,7 +124,7 @@ const CreateRoom = () => {
         </div>
         new room
       </button>
-      <ModalNew header="Create Room" open={open} onClose={() => setOpen(false)}>
+      <Modal header="Create Room" open={open} onClose={() => setOpen(false)}>
         <form
           onSubmit={async (e) => {
             e.preventDefault();
@@ -217,13 +217,13 @@ const CreateRoom = () => {
               </div>
             </RadioGroup>
 
-            <ModalButton
+            <ModalSubmitButton
               content="Construct Room"
               onClose={() => setOpen(false)}
             />
           </>
         </form>
-      </ModalNew>
+      </Modal>
     </>
   );
 };
