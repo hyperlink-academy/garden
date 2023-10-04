@@ -55,7 +55,7 @@ export const DiscussionRoom = (props: {
   let [reply, setReply] = useState<string | null>(null);
 
   return (
-    <div className="relative h-full">
+    <div className="relative h-full w-full">
       <div
         className="no-scrollbar relative flex h-full flex-col-reverse overflow-x-hidden overflow-y-scroll p-2 pb-12"
         id="card-comments"
