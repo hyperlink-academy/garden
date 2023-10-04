@@ -4,6 +4,7 @@ import Router from "next/router";
 
 export const useServiceWorkerMessageChannel = () => {
   useEffect(() => {
+    if (!navigator.serviceWorker) return;
     const messageChannel = new MessageChannel();
     let message: ServiceWorkerMessages = { type: "init" };
     navigator.serviceWorker.controller?.postMessage(message, [

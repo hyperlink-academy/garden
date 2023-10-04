@@ -1,7 +1,6 @@
 import { LoginForm } from "pages/login";
 import { SignupForm } from "pages/signup";
 import { ModalNew } from "./Modal";
-import { Modal } from "./Layout";
 
 export const LogInModal = (props: {
   isOpen: boolean;

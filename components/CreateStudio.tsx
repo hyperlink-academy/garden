@@ -4,7 +4,6 @@ import { useAuth } from "hooks/useAuth";
 import { useRandomValue } from "hooks/useRandomValue";
 import { useState } from "react";
 import { DotLoader } from "./DotLoader";
-import { Modal } from "./Layout";
 import Router from "next/router";
 import { useIdentityData } from "hooks/useIdentityData";
 import { uuidToBase62 } from "src/uuidHelpers";

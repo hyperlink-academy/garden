@@ -49,9 +49,11 @@ export const ModalNew: React.FC<
     </Dialog>
   );
 };
+
+//Rename to submitModalButton when you do the rename of ModalNew
 export const ModalButton = (props: {
   onClose: () => void;
-  onSubmit?: () => void;
+  onSubmit?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   content: string;
   closeContent?: string;
   destructive?: boolean;
@@ -65,15 +67,14 @@ export const ModalButton = (props: {
         onClick={() => {
           props.onClose();
         }}
-        content={props.closeContent ? `${props.closeContent}` : "nevermind"}
+        content={props.closeContent ? props.closeContent : "nevermind"}
       />
       <ButtonPrimary
         destructive={props.destructive}
-        onClick={() => {
+        onClick={(e) => {
           if (props.onSubmit) {
-            props.onSubmit();
+            props.onSubmit(e);
           }
-          return;
         }}
         content={props.content}
         type="submit"

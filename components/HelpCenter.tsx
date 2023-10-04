@@ -1,9 +1,8 @@
 import { Tab } from "@headlessui/react";
 import { useRouter } from "next/router";
-import { Children, Fragment, useEffect, useState } from "react";
-import { ButtonSecondary, ButtonPrimary } from "./Buttons";
-import { AddTiny, Settings } from "./Icons";
-import { Modal, ModalFixedHeight } from "./Layout";
+import { Fragment, useEffect, useState } from "react";
+import { Settings } from "./Icons";
+import { ModalFixedHeight } from "./Layout";
 
 export const HelpModal = (props: { open: boolean; onClose: () => void }) => {
   return (
