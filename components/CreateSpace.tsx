@@ -5,7 +5,7 @@ import { useContext, useEffect, useState } from "react";
 import { ButtonPrimary, ButtonSecondary } from "./Buttons";
 import { DoorSelector } from "./DoorSelector";
 import { SpaceCreate } from "./Icons";
-import { ModalNew } from "./Modal";
+import { Modal } from "./Modal";
 
 import { useSpaceData } from "hooks/useSpaceData";
 import { useIdentityData } from "hooks/useIdentityData";
@@ -45,7 +45,7 @@ export const CreateSpace = (props: {
           onClick={() => setOpen(true)}
         />
       </a>
-      <ModalNew open={open} onClose={() => setOpen(false)}>
+      <Modal open={open} onClose={() => setOpen(false)}>
         <Form
           validate={() => {
             if (
@@ -92,7 +92,7 @@ export const CreateSpace = (props: {
 
           <SubmitButton content="Create!" onClose={() => setOpen(false)} />
         </Form>
-      </ModalNew>
+      </Modal>
     </div>
   );
 };
@@ -134,7 +134,7 @@ export const EditSpaceModal = (props: {
 
   let [mode, setMode] = useState<"normal" | "delete">("normal");
   return (
-    <ModalNew
+    <Modal
       header={mode === "normal" ? `Space Settings` : `Delete Space?`}
       open={props.open}
       onClose={() => {
@@ -227,7 +227,7 @@ export const EditSpaceModal = (props: {
           )}
         </>
       )}
-    </ModalNew>
+    </Modal>
   );
 };
 

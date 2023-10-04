@@ -8,12 +8,10 @@ import {
   CardSmallLined,
   SectionImageAdd,
   ReactionAdd,
-  GoBackToPage,
-  BackSmall,
   CloseLinedTiny,
   GoBackToPageLined,
 } from "components/Icons";
-import { Divider, MenuContainer, MenuItem, Modal } from "components/Layout";
+import { Divider, MenuContainer, MenuItem } from "components/Layout";
 import { scanIndex, db, useMutations, useSpaceID } from "hooks/useReplicache";
 import * as Popover from "@radix-ui/react-popover";
 
@@ -37,7 +35,7 @@ import { useReactions } from "hooks/useReactions";
 import { HighlightCard } from "./HighlightCard";
 import { CardViewDrawer } from "./CardViewDrawer";
 import { useCloseCard, useRoomHistory } from "hooks/useUIState";
-import { useViewportSize } from "hooks/useViewportSize";
+import { Modal } from "components/Modal";
 
 const borderStyles = (args: { member: boolean }) => {
   switch (true) {
@@ -138,7 +136,7 @@ export const CardView = (props: {
       >
         {/* IF MEMBER CARD, INCLUDE LINK TO STUDIO  */}
         {!memberName ? null : (
-          <div className="grid shrink-0 grid-cols-[auto_max-content] items-end pl-2 pr-3 pt-2 pb-1 text-white">
+          <div className="grid shrink-0 grid-cols-[auto_max-content] items-end pb-1 pl-2 pr-3 pt-2 text-white">
             <Member />
             <Link href={`/s/${memberName?.value}`}>
               <span className="justify-self-start text-sm">visit studio</span>
@@ -214,7 +212,7 @@ export const CardContent = (props: {
         {/* AND handle for legacy regular cards w/o cardCreatorName */}
         {!memberName ? (
           <div
-            className={`cardInfo pointer-events-none relative z-20 mb-3 -mt-[44px] flex h-[42px] w-full shrink-0 items-center justify-end gap-3 `}
+            className={`cardInfo pointer-events-none relative z-20 -mt-[44px] mb-3 flex h-[42px] w-full shrink-0 items-center justify-end gap-3 `}
           >
             {/* NB: keep wrapper for spacing with CardMoreOptionsMenu even if no cardCreatorName */}
 
@@ -456,7 +454,7 @@ const ScheduledDate = (props: {
       {props.dateEditing ? (
         <>
           <input
-            className="-ml-1 border-grey-80 py-[2px] px-1 text-grey-55"
+            className="-ml-1 border-grey-80 px-1 py-[2px] text-grey-55"
             onBlur={() => props.closeDateEditing()}
             onChange={(e) => {
               setDateInputValue(e.currentTarget.value);
@@ -495,7 +493,7 @@ const ScheduledDate = (props: {
       ) : date ? (
         authorized ? (
           <button
-            className="-ml-[5px] border border-transparent py-[3px] px-1 text-sm italic text-grey-55 underline hover:text-accent-blue"
+            className="-ml-[5px] border border-transparent px-1 py-[3px] text-sm italic text-grey-55 underline hover:text-accent-blue"
             onClick={() => {
               props.openDateEditing();
             }}
@@ -503,7 +501,7 @@ const ScheduledDate = (props: {
             {date.month} {date.day}, {date.year}
           </button>
         ) : (
-          <div className="-ml-[4px] py-1 px-1 text-sm text-grey-55">
+          <div className="-ml-[4px] px-1 py-1 text-sm text-grey-55">
             {date.month} {date.day}, {date.year}
           </div>
         )
@@ -563,7 +561,7 @@ export const SectionAdder = (props: {
 
   if (!authorized) return null;
   return (
-    <div className="pointer-events-auto flex w-fit items-center gap-1 rounded-full border border-grey-90 bg-white py-2 px-4 text-grey-55 shadow">
+    <div className="pointer-events-auto flex w-fit items-center gap-1 rounded-full border border-grey-90 bg-white px-4 py-2 text-grey-55 shadow">
       {/* IMAGE ADDER */}
       <MakeImage entity={props.entityID}>
         <div className={`${image ? toggledOnStyle : toggledOffStyle} `}>

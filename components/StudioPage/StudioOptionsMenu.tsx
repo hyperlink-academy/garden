@@ -1,14 +1,13 @@
 import { MoreOptionsSmall } from "components/Icons";
-import * as Popover from "@radix-ui/react-popover";
 import { useStudioData } from "hooks/useStudioData";
 import { useEffect, useState } from "react";
-import { Modal } from "components/Layout";
 import { StudioForm } from "components/CreateStudio";
-import { ButtonLink, ButtonPrimary, ButtonSecondary } from "components/Buttons";
+import { ButtonPrimary } from "components/Buttons";
 import { DotLoader } from "components/DotLoader";
 import { useAuth } from "hooks/useAuth";
 import { spaceAPI, workerAPI } from "backend/lib/api";
 import Router from "next/router";
+import { ModalSubmitButton, Modal } from "components/Modal";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export function StudioOptionsMenu(props: { id: string }) {
@@ -54,10 +53,10 @@ function StudioSettings(props: {
     });
   }, [data?.description, data?.name]);
   return (
-    <Modal open={props.open} onClose={props.onClose}>
+    <Modal header="Studio Settings" open={props.open} onClose={props.onClose}>
       {mode === "normal" ? (
         <form
-          className="flex flex-col gap-8"
+          className="flex flex-col gap-3"
           onSubmit={async (e) => {
             e.preventDefault();
             if (!authToken) return;
@@ -78,40 +77,37 @@ function StudioSettings(props: {
           }}
         >
           <StudioForm setFormState={setFormState} formState={formState} />
+          <ModalSubmitButton
+            content={loading ? "" : "Update Studio"}
+            icon={loading ? <DotLoader /> : undefined}
+            onClose={() => {
+              props.onClose();
+            }}
+            disabled={!formState.name}
+          />
 
-          <div className="flex flex-row justify-end gap-4">
-            <ButtonLink
-              content="nevermind"
-              className="font-normal"
-              onClick={props.onClose}
-            />
-            <ButtonPrimary
-              type="submit"
-              disabled={!formState.name}
-              content={loading ? <DotLoader /> : "Update Studio"}
-            />
-          </div>
           {data?.creator === session?.user?.id ? (
             <>
               <hr className="border-grey-80" />
-              <div className="flex flex-col gap-2">
-                <div className="flex flex-row items-center justify-between gap-4">
+
+              <div className="lightBorder flex flex-col justify-center gap-4 p-2 text-center">
+                <div className="flex flex-col items-center justify-between gap-2">
                   <h3>Delete Studio</h3>
+                  <p className="text-sm ">
+                    Spaces linked here will NOT be deleted; they will be
+                    available from their members&apos; homepages.
+                    <br />
+                    <span className="font-bold">
+                      You WILL lose all Studio posts / highlights.
+                    </span>
+                  </p>
                 </div>
-                <p className="text-grey-55">
-                  Spaces linked here will NOT be deleted; they will be available
-                  from their members&apos; homepages.
-                </p>
-                <p className="text-grey-55">
-                  You WILL lose all Studio posts / highlights.
-                </p>
-                <div className="flex flex-row justify-end">
-                  <ButtonPrimary
-                    content="Delete Studio"
-                    destructive
-                    onClick={() => setMode("delete")}
-                  />
-                </div>
+                <ButtonPrimary
+                  content="Delete Studio"
+                  destructive
+                  onClick={() => setMode("delete")}
+                  className="mx-auto"
+                />
               </div>
             </>
           ) : null}
@@ -138,41 +134,40 @@ const DeleteStudioForm = (props: {
   let [status, setStatus] = useState<"normal" | "loading">("normal");
   let { authToken } = useAuth();
   let { data } = useStudioData(props.studioID);
+  let { session } = useAuth();
+
   return (
     <>
-      <div className="flex flex-col gap-2">
-        <p className="font-bold">Type the name of this Studio</p>
-        <input
-          className="w-full"
-          value={state.studioName}
-          placeholder=""
-          onChange={(e) => setState({ studioName: e.currentTarget.value })}
-        />
-        <div className="flex flex-row gap-2">
-          <ButtonSecondary
-            onClick={async () => {
-              props.onCancel();
-            }}
-            content="Cancel"
-          />
-          <ButtonPrimary
-            onClick={async () => {
-              if (data?.name !== state.studioName) return;
-              if (!props.studioID || !authToken) return;
-              setStatus("loading");
-              await spaceAPI(
-                `${WORKER_URL}/space/${data.do_id}`,
-                "delete_self",
-                { authToken }
-              );
-              setStatus("normal");
-              Router.push(`/`);
-            }}
-            destructive
-            disabled={data?.name !== state.studioName}
-            content={status === "normal" ? "Delete" : <DotLoader />}
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-1">
+          <p className="font-bold">Type the name of this Studio</p>
+          <input
+            className="w-full"
+            value={state.studioName}
+            placeholder=""
+            onChange={(e) => setState({ studioName: e.currentTarget.value })}
           />
         </div>
+
+        <ModalSubmitButton
+          content={status === "normal" ? "Delete Studio" : ""}
+          icon={status === "normal" ? undefined : <DotLoader />}
+          onSubmit={async () => {
+            if (data?.name !== state.studioName) return;
+            if (!props.studioID || !authToken) return;
+            setStatus("loading");
+            await spaceAPI(`${WORKER_URL}/space/${data.do_id}`, "delete_self", {
+              authToken,
+            });
+            setStatus("normal");
+            Router.push("/s/" + session.session?.username);
+          }}
+          disabled={data?.name !== state.studioName}
+          destructive
+          onClose={async () => {
+            props.onCancel();
+          }}
+        />
       </div>
     </>
   );

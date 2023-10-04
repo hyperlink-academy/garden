@@ -1,8 +1,8 @@
 import { spaceAPI } from "backend/lib/api";
-import { ButtonLink, ButtonPrimary } from "components/Buttons";
+import { ButtonLink } from "components/Buttons";
 import { CreateStudioPost } from "components/CreateStudioPost";
 import { Note } from "components/Icons";
-import { Modal } from "components/Layout";
+import { Modal } from "components/Modal";
 import { useAuth, useAuthIdentityData } from "hooks/useAuth";
 import { useSpaceID } from "hooks/useReplicache";
 import { useSpaceData } from "hooks/useSpaceData";

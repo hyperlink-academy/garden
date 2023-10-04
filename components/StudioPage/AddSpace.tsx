@@ -1,16 +1,9 @@
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { spaceAPI, workerAPI } from "backend/lib/api";
-import { Database } from "backend/lib/database.types";
-import {
-  ButtonLink,
-  ButtonPrimary,
-  ButtonSecondary,
-  ButtonTertiary,
-} from "components/Buttons";
+import { ButtonLink, ButtonPrimary, ButtonTertiary } from "components/Buttons";
 import { CreateSpaceForm, CreateSpaceFormState } from "components/CreateSpace";
 import { DotLoader } from "components/DotLoader";
 import { SpaceCreate } from "components/Icons";
-import { Modal } from "components/Layout";
+import { Modal } from "components/Modal";
 import { useAuth } from "hooks/useAuth";
 import { useIdentityData } from "hooks/useIdentityData";
 import { scanIndex, useMutations } from "hooks/useReplicache";
@@ -36,21 +29,16 @@ export function AddSpace(props: { id: string }) {
         onClick={() => setOpen(true)}
         icon={<SpaceCreate />}
       />
-      <Modal open={open} onClose={() => setOpen(false)}>
+      <Modal header="Add a Space" open={open} onClose={() => setOpen(false)}>
         {state === "normal" ? (
           <>
-            <h2 className="text-center">
-              Add a Space to <span>{data?.name}</span>
-            </h2>
-            <p className="text-center">
+            <p>
               Studio members will be able to <b>post</b> about the Space and{" "}
               <b>highlight cards</b> they appreciate!
             </p>
-            <p className="text-center">
-              They&apos;ll still need an invite to join a Space.
-            </p>
+            <p>They&apos;ll still need an invite to join a Space.</p>
             <button
-              className="rounded-md border-2 border-grey-80 py-3 px-4 hover:border-accent-blue hover:bg-bg-blue"
+              className="rounded-md border-2 border-grey-80 px-4 py-3 hover:border-accent-blue hover:bg-bg-blue"
               onClick={() => {
                 setState("add-new");
               }}
@@ -62,7 +50,7 @@ export function AddSpace(props: { id: string }) {
             </button>
 
             <button
-              className="rounded-md border-2 border-grey-80 py-3 px-4 hover:border-accent-blue hover:bg-bg-blue"
+              className="rounded-md border-2 border-grey-80 px-4 py-3 hover:border-accent-blue hover:bg-bg-blue"
               onClick={() => {
                 setState("add-existing");
               }}
@@ -217,7 +205,7 @@ const AddExistingSpace = (props: { onClose: () => void; studioID: string }) => {
                 addedSpaces.includes(space_data.do_id)
                   ? "border-accent-blue bg-accent-blue text-white"
                   : "border-grey-80 hover:border-accent-blue hover:bg-bg-blue"
-              } py-2 px-3 text-left `}
+              } px-3 py-2 text-left `}
             >
               <h3>{space_data.display_name}</h3>
             </button>

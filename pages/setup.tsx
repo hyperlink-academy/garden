@@ -3,7 +3,6 @@ import { workerAPI } from "backend/lib/api";
 import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
 import { DotLoader } from "components/DotLoader";
 import { HelpAppInfo } from "components/HelpCenter";
-import { Modal } from "components/Layout";
 import { AddTiny } from "components/Icons";
 import { useAuth } from "hooks/useAuth";
 import { useDebouncedEffect } from "hooks/utils";
@@ -11,6 +10,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
+import { Modal } from "components/Modal";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export default function SignupPage() {

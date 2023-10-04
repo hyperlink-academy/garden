@@ -15,7 +15,7 @@ export function ButtonPrimary(
       box-border flex w-max
       items-center justify-center
       gap-2 rounded-md
-      border py-1 px-2 
+      border px-2 py-1 
       font-bold text-white 
 
       outline-offset-[-2px] active:outline active:outline-2 disabled:border-grey-90 
@@ -33,6 +33,7 @@ export function ButtonPrimary(
 
           `
       }
+      ${props.className}
 
       `}
     >
@@ -57,7 +58,7 @@ export function ButtonSecondary(
       items-center justify-center 
       gap-2
       rounded-md border border-accent-blue 
-      bg-white py-1 px-2 font-bold 
+      bg-white px-2 py-1 font-bold 
       text-accent-blue       
       outline-offset-[-2px] hover:bg-bg-blue 
       hover:text-accent-blue active:bg-bg-blue active:text-accent-blue active:outline active:outline-2 
@@ -83,7 +84,7 @@ export function ButtonTertiary(
       {...{ content: undefined, icon: undefined }}
       className={`m-0 flex w-max
   items-center justify-center gap-2 rounded-md border border-grey-55 bg-white
-  py-1 px-2 text-grey-35 hover:border-accent-blue hover:bg-bg-blue hover:text-accent-blue active:bg-accent-blue
+  px-2 py-1 text-grey-35 hover:border-accent-blue hover:bg-bg-blue hover:text-accent-blue active:bg-accent-blue
   active:text-white disabled:border-grey-90 disabled:bg-white disabled:text-grey-80 disabled:hover:text-grey-80 ${props.className} `}
     >
       {props.icon ? <span className="">{props.icon}</span> : null}

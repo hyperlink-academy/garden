@@ -4,11 +4,10 @@ import { useAuth } from "hooks/useAuth";
 import { useRandomValue } from "hooks/useRandomValue";
 import { useState } from "react";
 import { DotLoader } from "./DotLoader";
-import { Modal } from "./Layout";
 import Router from "next/router";
 import { useIdentityData } from "hooks/useIdentityData";
 import { uuidToBase62 } from "src/uuidHelpers";
-import { ModalNew } from "./Modal";
+import { Modal } from "./Modal";
 
 let weird_studios = [
   "Bauhaus",
@@ -86,7 +85,7 @@ export function CreateStudio(props: { username: string }) {
         content={"Create a Studio"}
         onClick={() => setOpen(true)}
       />
-      <ModalNew
+      <Modal
         open={open}
         onClose={() => setOpen(false)}
         header="Create A New Studio"
@@ -122,7 +121,7 @@ export function CreateStudio(props: { username: string }) {
             />
           </div>
         </form>
-      </ModalNew>
+      </Modal>
     </>
   );
 }

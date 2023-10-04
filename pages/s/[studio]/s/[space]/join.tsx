@@ -65,9 +65,6 @@ export function JoinSpace() {
     }
   };
 
-  if (isMember)
-    router.push(`/s/${router.query.studio}/s/${router.query.space}`);
-
   return (
     <>
       <Head>

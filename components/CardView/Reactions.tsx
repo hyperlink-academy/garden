@@ -1,6 +1,7 @@
 import * as Popover from "@radix-ui/react-popover";
-import { AddSmall, CloseLinedTiny, ReactionAdd } from "components/Icons";
-import { Divider, Modal } from "components/Layout";
+import { AddSmall, ReactionAdd } from "components/Icons";
+import { Divider } from "components/Layout";
+import { Modal } from "components/Modal";
 import { useSmoker } from "components/Smoke";
 import { ref } from "data/Facts";
 import { useReactions } from "hooks/useReactions";
@@ -134,15 +135,14 @@ export const EditReactions = (props: {
   let smoker = useSmoker();
 
   return (
-    <Modal open={props.reactionEditOpen} onClose={() => props.onClose()}>
-      <div className="flex flex-col gap-2 p-2">
+    <Modal
+      header="Reactions"
+      open={props.reactionEditOpen}
+      onClose={() => props.onClose()}
+    >
+      <div className="flex flex-col gap-2">
         <div className="flex flex-col gap-0">
-          <div className="flex items-center justify-between">
-            <div className="font-bold text-grey-35">Add New</div>
-            <button className="text-grey-55" onClick={props.onClose}>
-              <CloseLinedTiny />
-            </button>
-          </div>
+          <div className="font-bold text-grey-35">Add New</div>
           <div className="text-sm text-grey-35">
             You can use up to four characters of emojis, text, or even unicode!
           </div>
@@ -187,6 +187,8 @@ export const EditReactions = (props: {
         <div className="my-2">
           <Divider />
         </div>
+        <div className="font-bold text-grey-35">Edit Existing</div>
+
         <div className="mx-auto flex max-h-[440px] flex-wrap place-items-center gap-2 place-self-center overflow-scroll">
           {reactions
             .filter((f) => !!f.value) // strip empty strings
@@ -263,7 +265,7 @@ export const SingleReactionPreview = (props: {
 }) => {
   return (
     <div
-      className={`flex items-center gap-1.5 rounded-md border py-0.5 px-1 text-xs ${
+      className={`flex items-center gap-1.5 rounded-md border px-1 py-0.5 text-xs ${
         props.memberReaction
           ? "border-grey-90 bg-bg-blue"
           : "border-grey-90 bg-background"

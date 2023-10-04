@@ -43,8 +43,9 @@ export function useViewportSize(): ViewportSize {
 }
 
 function getViewportSize(): ViewportSize {
+  if (typeof window === "undefined") return { width: 0, height: 0 };
   return {
-    width: visualViewport?.width || window.innerWidth,
-    height: visualViewport?.height || window.innerHeight,
+    width: visualViewport?.width || window?.innerWidth,
+    height: visualViewport?.height || window?.innerHeight,
   };
 }

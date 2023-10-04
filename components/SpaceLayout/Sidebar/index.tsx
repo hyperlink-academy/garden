@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Divider, Modal } from "components/Layout";
+import { Divider } from "components/Layout";
 import { useAuth } from "hooks/useAuth";
 import { db, useMutations, useSpaceID } from "hooks/useReplicache";
 import * as Popover from "@radix-ui/react-popover";
@@ -27,6 +27,7 @@ import { DotLoader } from "components/DotLoader";
 import { Feedback } from "components/Feedback";
 import { useIsActiveRoom, useRoom, useSetRoom } from "hooks/useUIState";
 import { prefetchIdentityData } from "hooks/useIdentityData";
+import { ModalSubmitButton, Modal } from "components/Modal";
 
 export const Sidebar = () => {
   let [roomEditOpen, setRoomEditOpen] = useState(false);
@@ -85,7 +86,7 @@ const UnreadsRoomButton = () => {
   return (
     <RoomButton roomID="unreads">
       {unreadCards?.length > 0 || unreadDiscussions?.length > 0 ? (
-        <div className="absolute -top-1 -left-1">
+        <div className="absolute -left-1 -top-1">
           <UnreadDot />
         </div>
       ) : null}
@@ -187,32 +188,33 @@ const MemberOptions = () => {
           </Popover.Content>
         </Popover.Portal>
       </Popover.Root>
-      <Modal open={leaveModalOpen} onClose={() => setLeaveModalOpen(false)}>
-        <h3>Are you sure you want to leave this space?</h3>
-        <div className="flex flex-row gap-2">
-          <ButtonPrimary
-            destructive
-            content={loading ? <DotLoader /> : "Leave"}
-            onClick={async () => {
-              if (!spaceID || !authToken || !session) return;
+      <Modal
+        header="Are You Sure?"
+        open={leaveModalOpen}
+        onClose={() => setLeaveModalOpen(false)}
+      >
+        You won&apos;t be able to make any changes to this space anymore. It
+        will also be removed from your space list.
+        <ModalSubmitButton
+          destructive
+          content={loading ? "" : "Leave Space"}
+          icon={loading ? <DotLoader /> : undefined}
+          onClose={() => setLeaveModalOpen(false)}
+          onSubmit={async () => {
+            if (!spaceID || !authToken || !session) return;
 
-              setLoading(true);
-              let data = await spaceAPI(
-                `${WORKER_URL}/space/${spaceID}`,
-                "leave",
-                {
-                  authToken,
-                }
-              );
-              router.push("/s/" + session.session?.username);
-              setLoading(false);
-            }}
-          />
-          <ButtonSecondary
-            content="Nevermind"
-            onClick={() => setLeaveModalOpen(false)}
-          />
-        </div>
+            setLoading(true);
+            let data = await spaceAPI(
+              `${WORKER_URL}/space/${spaceID}`,
+              "leave",
+              {
+                authToken,
+              }
+            );
+            router.push("/s/" + session.session?.username);
+            setLoading(false);
+          }}
+        />
       </Modal>
     </>
   );

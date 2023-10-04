@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { DotLoader } from "components/DotLoader";
 import Link from "next/link";
+import { ModalSubmitButton } from "components/Modal";
 
 export default function LoginPage() {
   let router = useRouter();
@@ -18,6 +19,7 @@ export default function LoginPage() {
 
 export function LoginForm(props: {
   onLogin: (s: { username?: string }) => void;
+  onClose?: () => void;
 }) {
   let [data, setData] = useState({
     email: "",
@@ -79,14 +81,28 @@ export function LoginForm(props: {
             }
           />
         </label>
-        <div className="grid-rows-max grid justify-items-end">
-          <ButtonPrimary
-            className="content-end items-end justify-end justify-items-end self-end justify-self-end"
+
+        {props.onClose ? (
+          <ModalSubmitButton
             content={status === "loading" ? "" : "Log In!"}
             icon={status === "loading" ? <DotLoader /> : undefined}
-            type="submit"
+            onClose={() => {
+              if (props.onClose) {
+                props.onClose();
+              }
+              return;
+            }}
           />
-        </div>
+        ) : (
+          <div className="grid-rows-max grid justify-items-end">
+            <ButtonPrimary
+              className="content-end items-end justify-end justify-items-end self-end justify-self-end"
+              content={status === "loading" ? "" : "Log In!"}
+              icon={status === "loading" ? <DotLoader /> : undefined}
+              type="submit"
+            />
+          </div>
+        )}
         {/* <Divider /> */}
         <div className="mt-4 flex gap-2">
           <div className="w-1/2 self-center rounded-md bg-bg-red p-4 sm:w-full">

@@ -7,9 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "hooks/useAuth";
 import { useRouter } from "next/router";
-import { Modal } from "components/Layout";
-import { LoginForm } from "./login";
-import { SignupForm } from "./signup";
+import { LogInModal, SignupModal } from "components/LoginModal";
 
 export default function IndexPage() {
   let textFormat = "mx-auto w-full flex max-w-2xl flex-col gap-4";
@@ -25,7 +23,7 @@ export default function IndexPage() {
         <title key="title">Hyperlink Academy</title>
       </Head>
       {/* LANDING WRAPPER */}
-      <div className="landing py-4 px-4 md:px-8 md:py-8">
+      <div className="landing px-4 py-4 md:px-8 md:py-8">
         {/* main content - inner wrapper */}
         <div className="m-auto mb-8 flex max-w-6xl flex-col gap-8">
           {/* title */}
@@ -61,25 +59,21 @@ export default function IndexPage() {
                         onClick={() => setLogInOpen(true)}
                       />
                       {/* signup modal */}
-                      <Modal
-                        open={signupOpen}
+                      <SignupModal
+                        isOpen={signupOpen}
                         onClose={() => setSignupOpen(false)}
-                      >
-                        <SignupForm />
-                      </Modal>
+                      />
+
                       {/* login modal */}
-                      <Modal
-                        open={logInOpen}
+                      <LogInModal
+                        isOpen={logInOpen}
                         onClose={() => setLogInOpen(false)}
-                      >
-                        <LoginForm
-                          onLogin={(s) =>
-                            s.username
-                              ? router.push(`/s/${s.username}`)
-                              : router.push("/setup")
-                          }
-                        />
-                      </Modal>
+                        redirectOnLogin={(s) =>
+                          s.username
+                            ? router.push(`/s/${s.username}`)
+                            : router.push("/setup")
+                        }
+                      />
                     </>
                   ) : session.session?.username ? (
                     <Link
@@ -168,7 +162,7 @@ export default function IndexPage() {
               </span>
             </div>
             {/* hyperlink demo layout */}
-            <div className="demoWrapper mt-48 mb-16 scale-100">
+            <div className="demoWrapper mb-16 mt-48 scale-100">
               <Features />
               {/* disclosure section - all features + one video panel */}
               <div className="my-8 flex h-96 w-full rounded-md border-2 shadow-lg">
@@ -188,10 +182,10 @@ export default function IndexPage() {
                 {/* canvas */}
                 <div className="m-2 h-[calc(100%-16px)] w-[calc(30%-8px)] sm:m-4 sm:h-[calc(100%-32px)] sm:w-[calc(30%-16px)]">
                   <div className="relative h-12 w-16 rounded-md border bg-white sm:h-14 sm:w-20"></div>
-                  <div className="unreadCardGlow relative top-4 left-6 h-12 w-16 -rotate-6 rounded-md border bg-white sm:left-10 sm:h-14 sm:w-20"></div>
-                  <div className="relative top-8 left-3 h-12 w-16 rotate-3 rounded-md border bg-white sm:h-14 sm:w-20"></div>
-                  <div className="unreadCardGlow relative top-14 left-2 h-12 w-16 rounded-md border bg-white sm:h-14 sm:w-20"></div>
-                  <div className="relative top-12 left-8 h-12 w-16 rotate-3 rounded-md border bg-white sm:top-8 sm:left-12 sm:h-14 sm:w-20"></div>
+                  <div className="unreadCardGlow relative left-6 top-4 h-12 w-16 -rotate-6 rounded-md border bg-white sm:left-10 sm:h-14 sm:w-20"></div>
+                  <div className="relative left-3 top-8 h-12 w-16 rotate-3 rounded-md border bg-white sm:h-14 sm:w-20"></div>
+                  <div className="unreadCardGlow relative left-2 top-14 h-12 w-16 rounded-md border bg-white sm:h-14 sm:w-20"></div>
+                  <div className="relative left-8 top-12 h-12 w-16 rotate-3 rounded-md border bg-white sm:left-12 sm:top-8 sm:h-14 sm:w-20"></div>
                 </div>
                 {/* open card */}
                 <div className="m-2 flex h-[calc(100%-16px)] w-[calc(45%-16px)] flex-col justify-between gap-4 rounded-md border bg-white p-4 sm:m-4 sm:h-[calc(100%-32px)]">
@@ -276,7 +270,7 @@ export default function IndexPage() {
         </div>
 
         {/* about hyperlink wrapper */}
-        <div className="-mx-4 -mb-4 bg-bg-blue py-8 px-4 sm:-mx-8 sm:-mb-8 sm:px-8">
+        <div className="-mx-4 -mb-4 bg-bg-blue px-4 py-8 sm:-mx-8 sm:-mb-8 sm:px-8">
           {/* who and why */}
           <div className={`whoAndWhy1 text-center ${textFormat}`}>
             <h2 className="text-2xl sm:text-3xl">About Hyperlink</h2>
@@ -303,9 +297,9 @@ export default function IndexPage() {
           </div>
           {/* hyperlink history */}
           <div
-            className={`whoAndWhy2 mt-4 mb-32 items-center text-center ${textFormat}`}
+            className={`whoAndWhy2 mb-32 mt-4 items-center text-center ${textFormat}`}
           >
-            <div className="relative top-6 right-4 flex w-64 rotate-6 flex-col gap-2 rounded-md border bg-white p-4 sm:right-16">
+            <div className="relative right-4 top-6 flex w-64 rotate-6 flex-col gap-2 rounded-md border bg-white p-4 sm:right-16">
               <p className="m-auto w-fit rounded-full bg-accent-gold px-3 py-1 text-xs italic">
                 2020–2021
               </p>
@@ -320,7 +314,7 @@ export default function IndexPage() {
                 </a>
               </button>
             </div>
-            <div className="relative top-8 left-4 flex w-64 -rotate-3 flex-col gap-2 rounded-md border bg-white p-4 sm:left-16">
+            <div className="relative left-4 top-8 flex w-64 -rotate-3 flex-col gap-2 rounded-md border bg-white p-4 sm:left-16">
               <p className="m-auto w-fit rounded-full bg-accent-gold px-3 py-1 text-xs italic">
                 2020–present
               </p>
@@ -335,7 +329,7 @@ export default function IndexPage() {
                 </a>
               </button>
             </div>
-            <div className="relative top-12 right-2 flex w-64 rotate-2 flex-col gap-2 rounded-md border bg-white p-4">
+            <div className="relative right-2 top-12 flex w-64 rotate-2 flex-col gap-2 rounded-md border bg-white p-4">
               <p className="m-auto w-fit rounded-full bg-accent-gold px-3 py-1 text-xs italic">
                 2021
               </p>
@@ -344,7 +338,7 @@ export default function IndexPage() {
                 collaborative digital garden and text-based playground
               </p>
             </div>
-            <div className="relative top-16 left-6 flex w-64 -rotate-3 flex-col gap-2 rounded-md border bg-white p-4 sm:left-20">
+            <div className="relative left-6 top-16 flex w-64 -rotate-3 flex-col gap-2 rounded-md border bg-white p-4 sm:left-20">
               <p className="m-auto w-fit rounded-full bg-accent-gold px-3 py-1 text-xs italic">
                 2022–2023
               </p>
@@ -457,7 +451,7 @@ const Features = () => {
         positionClass="absolute left-2 sm:left-0 bottom-[-88px] z-50"
       />
       {activeVideo && (
-        <div className="absolute left-0 right-0 top-0 bottom-0 z-50 m-auto flex h-fit w-[90%] flex-col items-center gap-2 rounded-md border shadow-lg">
+        <div className="absolute bottom-0 left-0 right-0 top-0 z-50 m-auto flex h-fit w-[90%] flex-col items-center gap-2 rounded-md border shadow-lg">
           <video
             key={activeVideo}
             className="rounded-md shadow-lg"

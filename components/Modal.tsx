@@ -3,7 +3,7 @@ import { ButtonTertiary, ButtonPrimary } from "./Buttons";
 import { Dialog } from "@headlessui/react";
 // import { usePreventScroll } from "@react-aria/overlays";
 
-export const ModalNew: React.FC<
+export const Modal: React.FC<
   React.PropsWithChildren<{
     open: boolean;
     onClose: () => void;
@@ -44,8 +44,43 @@ export const ModalNew: React.FC<
         `}
       >
         {props.header && <h2 className="">{props.header}</h2>}
-        {props.children}
+        {props.open && props.children}
       </div>
     </Dialog>
+  );
+};
+
+//Rename to submitModalButton when you do the rename of ModalNew
+export const ModalSubmitButton = (props: {
+  onClose: () => void;
+  onSubmit?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  content: string;
+  closeContent?: string;
+  destructive?: boolean;
+  disabled?: boolean;
+  icon?: React.ReactElement;
+}) => {
+  return (
+    <div className="mt-4 flex justify-end gap-2">
+      <ButtonTertiary
+        type="reset"
+        onClick={() => {
+          props.onClose();
+        }}
+        content={props.closeContent ? props.closeContent : "nevermind"}
+      />
+      <ButtonPrimary
+        destructive={props.destructive}
+        onClick={(e) => {
+          if (props.onSubmit) {
+            props.onSubmit(e);
+          }
+        }}
+        content={props.content}
+        type="submit"
+        disabled={props.disabled}
+        icon={props.icon}
+      />
+    </div>
   );
 };
