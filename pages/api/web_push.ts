@@ -88,14 +88,14 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         if (member.identity_data.username === notification.data.senderUsername)
           continue;
         for (let push_subscription of member.identity_data.push_subscriptions) {
-          try {
-            await webpush.sendNotification(
+          await webpush
+            .sendNotification(
               push_subscription.push_subscription as any,
               JSON.stringify(notification)
-            );
-          } catch (e) {
-            console.log(e);
-          }
+            )
+            .catch((e) => {
+              console.log(e);
+            });
         }
       }
     }
