@@ -498,12 +498,14 @@ const Message = (props: {
       {attachedCards && (
         <div className="mt-2 flex flex-col gap-1">
           {attachedCards?.map((c) => (
-            <CardPreviewWithData
-              entityID={c.value.value}
-              size="big"
-              hideContent={true}
-              key={c.id}
-            />
+            <div key={c.id} className="w-full">
+              <CardPreviewWithData
+                entityID={c.value.value}
+                size="big"
+                hideContent={true}
+                key={c.id}
+              />
+            </div>
           ))}
         </div>
       )}
