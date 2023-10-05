@@ -252,14 +252,7 @@ const NotificationModalContent = ({
             content="Enable Notifications!"
           ></ButtonPrimary>
         </div>
-        {window.matchMedia("(min-width: 640px)").matches ? (
-          <div className="lightBorder flex flex-col gap-1 px-2 py-3 text-center">
-            <p className="font-bold">
-              Get mobile notifications with our Web App!
-            </p>
-            <p> Navigate back here from a mobile browser to download it.</p>
-          </div>
-        ) : null}
+        <MobilePrompt />
       </>
     );
 
@@ -302,14 +295,7 @@ const NotificationModalContent = ({
           />
         </div>
 
-        {window.matchMedia("(min-width: 640px)").matches ? null : (
-          <div className="lightBorder flex flex-col gap-1 px-2 py-3 text-center">
-            <p className="font-bold">
-              Get mobile notifications with our Web App!
-            </p>
-            <p> Navigate back here from a mobile browser to download it.</p>
-          </div>
-        )}
+        <MobilePrompt />
       </>
     );
 
@@ -322,4 +308,15 @@ const NotificationModalContent = ({
   );
 };
 
-const MobileDownloadPrompt = () => {};
+const MobilePrompt = () => {
+  if (window.matchMedia("(min-width: 640px)").matches)
+    return (
+      <div className="lightBorder flex flex-col gap-1 px-2 py-3 text-center">
+        <p className="font-bold">
+          Get notifications on your phone with our Web App!
+        </p>
+        <p> Navigate back here from a mobile browser to download it.</p>
+      </div>
+    );
+  return null;
+};
