@@ -108,8 +108,10 @@ export const EditRoomModal = (props: {
 
           <ButtonPrimary
             destructive
+            type="button"
             onClick={() => {
               setAreYouSureRoomDeletionModalOpen(true);
+              console.log("yo");
             }}
             content="Delete Room"
             icon={<Delete />}
