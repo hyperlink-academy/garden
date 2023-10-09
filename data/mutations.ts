@@ -7,8 +7,15 @@ import { Message } from "./Messages";
 import { z } from "zod";
 import { webPushPayloadParser } from "pages/api/web_push";
 import { sign } from "src/sign";
+import { ulid } from "src/ulid";
+import { README, README_Title, defaultReactions } from "src/content";
+import { WriteTransaction } from "@rocicorp/reflect";
+import { getMemberColor } from "backend/SpaceDurableObject/routes/join";
+import { generateKeyBetween } from "src/fractional-indexing";
 
 export type MutationContext = {
+  tx: WriteTransaction;
+  auth?: { userID: string; userStudio: string };
   assertEmphemeralFact: <A extends keyof FilterAttributes<{ ephemeral: true }>>(
     clientID: string,
     d: Pick<Fact<A>, "entity" | "attribute" | "value" | "positions"> & {
@@ -24,7 +31,7 @@ export type MutationContext = {
   ) => Promise<{ success: false } | { success: true; factID: string }>;
   updateFact: (
     id: string,
-    data: Partial<Fact<any>>,
+    data: Partial<Fact<keyof Attribute>>,
     undoAction?: boolean
   ) => Promise<{ success: boolean }>;
   runOnServer: (fn: (env: Env) => Promise<void>) => Promise<void>;
@@ -485,6 +492,211 @@ const setClientInCall: Mutation<{
   }
 };
 
+export const initializeSpace: Mutation<{}> = async (args, ctx) => {
+  let thisEntity = ulid();
+  let canvasRoom = ulid();
+  let collectionRoom = ulid();
+  let chatRoom = ulid();
+  let readmeEntity = ulid();
+  let readmeCardPositionFact = ulid();
+
+  await Promise.all([
+    ctx.assertFact({
+      entity: readmeEntity,
+      attribute: "card/title",
+      value: README_Title,
+      positions: {},
+    }),
+    ctx.assertFact({
+      entity: readmeEntity,
+      attribute: "card/content",
+      value: README.trim(),
+      positions: {},
+    }),
+    ctx.assertFact({
+      entity: canvasRoom,
+      factID: readmeCardPositionFact,
+      attribute: "desktop/contains",
+      value: ref(readmeEntity),
+      positions: {},
+    }),
+    ctx.assertFact({
+      entity: readmeCardPositionFact,
+      attribute: "card/position-in",
+      value: { x: 64, y: 32, rotation: 0.2, size: "small", type: "position" },
+      positions: {},
+    }),
+    ctx.assertFact({
+      entity: canvasRoom,
+      attribute: "home",
+      value: flag(),
+      positions: {},
+    }),
+
+    ctx.assertFact({
+      entity: canvasRoom,
+      attribute: "room/name",
+      value: "Canvas",
+      positions: { roomList: "a0" },
+    }),
+    ctx.assertFact({
+      entity: canvasRoom,
+      attribute: "room/type",
+      value: "canvas",
+      positions: {},
+    }),
+
+    ctx.assertFact({
+      entity: collectionRoom,
+      attribute: "room/name",
+      value: "Collection",
+      positions: { roomList: "c1" },
+    }),
+    ctx.assertFact({
+      entity: collectionRoom,
+      attribute: "room/type",
+      value: "collection",
+      positions: {},
+    }),
+    ctx.assertFact({
+      entity: chatRoom,
+      attribute: "room/name",
+      value: "Chat",
+      positions: { roomList: "t1" },
+    }),
+    ctx.assertFact({
+      entity: chatRoom,
+      attribute: "room/type",
+      value: "chat",
+      positions: {},
+    }),
+    ...defaultReactions.map((r) =>
+      ctx.assertFact({
+        entity: thisEntity,
+        attribute: "space/reaction",
+        value: r,
+        positions: {},
+      })
+    ),
+  ]);
+};
+
+const joinSpace: Mutation<{
+  memberEntity: string;
+  username: string;
+  studio: string;
+}> = async ({ memberEntity, username, studio }, ctx) => {
+  let color = await getMemberColor(ctx);
+  await Promise.all([
+    ctx.assertFact({
+      entity: memberEntity,
+      attribute: "member/color",
+      value: color,
+      positions: {},
+    }),
+    ctx.assertFact({
+      entity: memberEntity,
+      attribute: "space/member",
+      value: studio,
+      positions: {},
+    }),
+    ctx.assertFact({
+      entity: memberEntity,
+      attribute: "member/name",
+      value: username,
+      positions: {},
+    }),
+  ]);
+};
+
+const leaveSpace: Mutation<{ memberEntity: string }> = async (
+  { memberEntity },
+  ctx
+) => {
+  //TODO use auth data to make sure users can only leave themselves
+  let references = await ctx.scanIndex.vae(memberEntity);
+  let facts = await ctx.scanIndex.eav(memberEntity, null);
+  await Promise.all(facts.concat(references).map((f) => ctx.retractFact(f.id)));
+};
+
+const postToFeed: Mutation<{
+  cardPosition: { x: number; y: number };
+  contentPosition: { x: number; y: number };
+  content: string;
+  spaceID: string;
+  cardEntity: string;
+}> = async (msg, ctx) => {
+  let entity = ulid();
+  await ctx.assertFact({
+    entity,
+    attribute: "post/attached-card",
+    value: { space_do_id: msg.spaceID, cardEntity: msg.cardEntity },
+    positions: {},
+  });
+
+  await ctx.assertFact({
+    entity,
+    attribute: "card/content",
+    value: msg.content,
+    positions: {},
+  });
+  if (msg.contentPosition)
+    await ctx.assertFact({
+      entity,
+      attribute: "post/content/position",
+      positions: {},
+      value: {
+        type: "position",
+        x: msg.contentPosition?.x || 0,
+        y: msg.contentPosition?.y || 0,
+        rotation: 0,
+        size: "small",
+      },
+    });
+
+  if (msg.contentPosition)
+    await ctx.assertFact({
+      entity,
+      attribute: "post/attached-card/position",
+      positions: {},
+      value: {
+        type: "position",
+        x: msg.cardPosition?.x || 0,
+        y: msg.cardPosition?.y || 0,
+        rotation: 0,
+        size: "small",
+      },
+    });
+
+  await ctx.assertFact({
+    entity,
+    attribute: "card/created-by",
+    value: ref(creator.entity),
+    positions: {},
+  });
+
+  //getClientID somehow
+  let creator = await env.factStore.scanIndex.ave(
+    "space/member",
+    session.studio
+  );
+  let latestPosts = await ctx.scanIndex.aev("feed/post");
+  await ctx.assertFact({
+    entity,
+    attribute: "feed/post",
+    value: generateKeyBetween(
+      null,
+      latestPosts.sort((a, b) => {
+        let aPosition = a.value,
+          bPosition = b.value;
+        if (aPosition === bPosition) return a.id > b.id ? 1 : -1;
+        return aPosition > bPosition ? 1 : -1;
+      })[0]?.value || null
+    ),
+    positions: {},
+  });
+};
+
 export const Mutations = {
   markRead,
   deleteEntity,
@@ -504,4 +716,7 @@ export const Mutations = {
   addReaction,
   initializeClient,
   setClientInCall,
+  initializeSpace,
+  joinSpace,
+  leaveSpace,
 };

@@ -3,6 +3,7 @@ import { makeRoute } from "backend/lib/api";
 import { Env } from "..";
 import { authTokenVerifier, verifyIdentity } from "backend/lib/auth";
 import { createClient } from "backend/lib/supabase";
+import { isMember } from "../lib/isMember";
 
 export const delete_file_upload_route = makeRoute({
   route: "delete_file_upload",
@@ -17,12 +18,7 @@ export const delete_file_upload_route = makeRoute({
       return {
         data: { success: false },
       } as const;
-
-    let isMember = await env.factStore.scanIndex.ave(
-      "space/member",
-      session.studio
-    );
-    if (!isMember)
+    if (!isMember(supabase, env, session.id))
       return { data: { success: false, error: "user is not a member" } };
     await supabase
       .from("file_uploads")

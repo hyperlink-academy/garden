@@ -1,6 +1,6 @@
 import { WorkerRoutes } from "backend";
 import { PrivateSpaceRoutes, SpaceRoutes } from "backend/SpaceDurableObject";
-import { ZodObject, ZodRawShape, z } from "zod";
+import { ZodObject, ZodRawShape, ZodUnion, z } from "zod";
 
 type UnwrapPromise<T> = T extends Promise<infer U> ? U : T;
 

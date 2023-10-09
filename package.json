@@ -35,6 +35,7 @@
     "@radix-ui/react-slider": "^1.0.0",
     "@react-aria/overlays": "^3.17.0",
     "@react-spring/web": "^9.7.3",
+    "@rocicorp/reflect": "^0.35.0",
     "@rocicorp/undo": "^0.2.0",
     "@sentry/nextjs": "^7.69.0",
     "@supabase/auth-helpers-nextjs": "^0.7.4",
@@ -64,6 +65,9 @@
     "web-push": "^3.6.4",
     "zod": "^3.17.10",
     "zustand": "^4.3.8"
+  },
+  "overrides": {
+    "wrangler": "^3.5.1"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20230821.0",

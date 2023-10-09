@@ -1,6 +1,7 @@
 import { Env } from ".";
 import { verifyIdentity } from "backend/lib/auth";
 import { createClient } from "backend/lib/supabase";
+import { isMember } from "./lib/isMember";
 
 async function computeHash(data: ArrayBuffer): Promise<string> {
   const buf = await crypto.subtle.digest("SHA-256", data);
@@ -40,11 +41,7 @@ export const handleFileUpload = async (req: Request, env: Env) => {
     if (!session)
       return new Response(JSON.stringify({ success: false }), { headers });
 
-    let isMember = await env.factStore.scanIndex.ave(
-      "space/member",
-      session.studio
-    );
-    if (!isMember)
+    if (!isMember(supabase, env, session.id))
       return new Response(
         JSON.stringify({ success: false, error: "user is not a member" }),
         { headers }

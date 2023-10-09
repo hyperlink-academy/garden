@@ -8,6 +8,7 @@ export default {
     let fact_store = store(storage, { id: "" });
     let members = await fact_store.scanIndex.aev("space/member");
     for (let member of members) {
+      //@ts-ignore
       let color = await getMemberColor(fact_store);
       await fact_store.assertFact({
         entity: member.entity,

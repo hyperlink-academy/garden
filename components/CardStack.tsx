@@ -2,7 +2,6 @@ import React, { useContext, useState } from "react";
 import { ReferenceAttributes } from "data/Attributes";
 import {
   ReplicacheContext,
-  ReplicacheMutators,
   scanIndex,
   db,
   useMutations,
@@ -12,9 +11,10 @@ import { ulid } from "src/ulid";
 import { sortByPosition } from "src/position_helpers";
 import { generateKeyBetween } from "src/fractional-indexing";
 import { useLongPress } from "hooks/useLongPress";
-import { Replicache } from "replicache";
 import { useCardViewer } from "./CardViewerContext";
 import { CardSearch } from "./Icons";
+import { Reflect } from "@rocicorp/reflect/client";
+import { ReplicacheMutators } from "reflect";
 
 export type StackData = {
   parentID: string;
@@ -175,7 +175,7 @@ export const AddExistingCard = (
 const create = async (
   entity: string,
   props: StackData,
-  rep: Replicache<ReplicacheMutators>,
+  rep: Reflect<ReplicacheMutators>,
   mutate: ReturnType<typeof useMutations>["mutate"]
 ) => {
   let position;

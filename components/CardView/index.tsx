@@ -152,8 +152,7 @@ export const CardView = (props: {
             flex-col       
             items-stretch
             overflow-x-hidden overflow-y-hidden
-            pb-3
-            sm:pb-4
+            pb-0
             ${contentStyles({
               member: !!memberName,
             })}

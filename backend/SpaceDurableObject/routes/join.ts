@@ -7,6 +7,7 @@ import { z } from "zod";
 import { memberColors } from "src/colors";
 import { Env } from "..";
 import { store } from "../fact_store";
+import { MutationContext } from "data/mutations";
 
 export const join_route = makeRoute({
   route: "join",
@@ -48,31 +49,6 @@ export const join_route = makeRoute({
       isMember = !!data;
     }
 
-    let color = await getMemberColor(env.factStore);
-    let memberEntity = ulid();
-    console.log("creating members");
-    console.log(
-      await Promise.all([
-        env.factStore.assertFact({
-          entity: memberEntity,
-          attribute: "member/color",
-          value: color,
-          positions: {},
-        }),
-        env.factStore.assertFact({
-          entity: memberEntity,
-          attribute: "space/member",
-          value: session.studio,
-          positions: {},
-        }),
-        env.factStore.assertFact({
-          entity: memberEntity,
-          attribute: "member/name",
-          value: session.username,
-          positions: {},
-        }),
-      ])
-    );
     if (space_type === "studio") {
       let { data: studio_ID } = await supabase
         .from("studios")
@@ -100,7 +76,7 @@ export const join_route = makeRoute({
   },
 });
 
-export const getMemberColor = async (fact_store: ReturnType<typeof store>) => {
+export const getMemberColor = async (fact_store: MutationContext) => {
   let existingMemberColors = await fact_store.scanIndex.aev("member/color");
   let color;
   let unassignedColors = memberColors.filter(

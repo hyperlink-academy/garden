@@ -11,6 +11,7 @@ export default {
     let promptRoom = rooms.find((r) => r.value === "prompts");
     if (promptRoom) {
       await fact_store.updateFact(promptRoom.id, {
+        //@ts-ignore
         attribute: "promptroom/name",
         value: "Prompt Pool",
       });

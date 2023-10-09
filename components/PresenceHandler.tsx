@@ -2,15 +2,12 @@ import { useMeetingState } from "@daily-co/daily-react";
 import { ref } from "data/Facts";
 import { useMutations } from "hooks/useReplicache";
 import { useRoom } from "hooks/useUIState";
-import { useAtomValue } from "jotai";
 import { useEffect } from "react";
 import { ulid } from "src/ulid";
-import { socketStateAtom } from "./ReplicacheProvider";
 
 export const PresenceHandler = () => {
   let { rep, mutate, authorized, memberEntity, client } = useMutations();
   let room = useRoom();
-  let socketState = useAtomValue(socketStateAtom);
   let meetingState = useMeetingState();
   let inCall = meetingState === "joined-meeting";
   useEffect(() => {
@@ -23,8 +20,7 @@ export const PresenceHandler = () => {
   }, [client?.entity, authorized, inCall, client?.clientID, mutate]);
 
   useEffect(() => {
-    if (!authorized || !rep || !memberEntity || socketState !== "connected")
-      return;
+    if (!authorized || !rep || !memberEntity) return;
     rep.clientID.then((clientID) => {
       mutate("initializeClient", {
         clientID,
@@ -32,7 +28,7 @@ export const PresenceHandler = () => {
         memberEntity: memberEntity as string,
       });
     });
-  }, [rep, authorized, memberEntity, socketState, mutate]);
+  }, [rep, authorized, memberEntity, mutate]);
   useEffect(() => {
     if (!client?.entity || !room || !authorized) return;
     mutate("assertEmphemeralFact", {
