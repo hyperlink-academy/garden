@@ -68,7 +68,7 @@ export const BaseSmallCard = (
         props.entityID && open({ entityID: props.entityID });
       }}
       className={`h-full w-full !bg-cover !bg-center !bg-no-repeat hover:cursor-pointer ${
-        props.isMember ? "pr-1 pl-2 pt-2 pb-1" : "py-2 px-2"
+        props.isMember ? "pb-1 pl-2 pr-1 pt-2" : "px-2 py-2"
       }`}
       style={{
         background: props.imageUrl ? `url(${props.imageUrl})` : "",
@@ -138,7 +138,7 @@ export const BaseSmallCard = (
                   );
               })}
               {props.reactions.length > 1 ? (
-                <span className="rounded-md border border-grey-90 bg-white py-0.5 px-1 text-xs text-grey-55">
+                <span className="rounded-md border border-grey-90 bg-white px-1 py-0.5 text-xs text-grey-55">
                   {`+${props.reactions.length - 1}`}
                 </span>
               ) : (
@@ -151,7 +151,7 @@ export const BaseSmallCard = (
           {/* three states: unread, existing, none */}
           {/* clicking = shortcut to focus input for a new message */}
           <button
-            className={`unreadCount fixed -bottom-[10px] right-[24px] z-50 rounded-md border p-[2px] ${
+            className={`unreadCount fixed -bottom-[10px] right-[24px]  rounded-md border p-[2px] ${
               props.unreadDiscussions
                 ? "unreadCardGlow bg-background text-accent-blue hover:bg-accent-blue hover:text-background"
                 : props.messagesCount && props.messagesCount > 0
@@ -184,8 +184,8 @@ export const BaseSmallCard = (
             flex h-full 
             grow
             items-end overflow-y-hidden 
-            rounded-md bg-white py-1 
-            px-2 font-bold
+            rounded-md bg-white px-2 
+            py-1 font-bold
             leading-tight text-accent-red
             `}
           >
