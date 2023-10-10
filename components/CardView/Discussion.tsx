@@ -29,28 +29,7 @@ export const DiscussionRoom = (props: {
   allowReact?: boolean;
   isRoom: boolean;
 }) => {
-  let unreadBy = db.useEntity(props.entityID, "discussion/unread-by");
-  let [focus, setFocus] = useState(true);
-  let { mutate, memberEntity } = useMutations();
-  useEffect(() => {
-    let callback = () => setFocus(true);
-    window.addEventListener("focus", callback);
-    return () => {
-      window.removeEventListener("focus", callback);
-    };
-  }, []);
-  useEffect(() => {
-    if (props.entityID && memberEntity) {
-      if (!focus) return;
-      let unread = unreadBy?.find((f) => f.value.value === memberEntity);
-      if (unread)
-        mutate("markRead", {
-          memberEntity,
-          entityID: props.entityID,
-          attribute: "discussion/unread-by",
-        });
-    }
-  }, [props.entityID, unreadBy, memberEntity, mutate, focus]);
+  useMarkRead(props.entityID, true);
 
   let [reply, setReply] = useState<string | null>(null);
 
@@ -74,6 +53,31 @@ export const DiscussionRoom = (props: {
       </div>
     </div>
   );
+};
+
+export const useMarkRead = (entityID: string, focused: boolean) => {
+  let unreadBy = db.useEntity(entityID, "discussion/unread-by");
+  let [windowFocus, setWindowFocus] = useState(true);
+  let { mutate, memberEntity } = useMutations();
+  useEffect(() => {
+    let callback = () => setWindowFocus(true);
+    window.addEventListener("focus", callback);
+    return () => {
+      window.removeEventListener("focus", callback);
+    };
+  }, []);
+  useEffect(() => {
+    if (entityID && memberEntity) {
+      if (!windowFocus || !focused) return;
+      let unread = unreadBy?.find((f) => f.value.value === memberEntity);
+      if (unread)
+        mutate("markRead", {
+          memberEntity,
+          entityID: entityID,
+          attribute: "discussion/unread-by",
+        });
+    }
+  }, [entityID, unreadBy, memberEntity, mutate, windowFocus, focused]);
 };
 
 export const MessageWindow = (props: {

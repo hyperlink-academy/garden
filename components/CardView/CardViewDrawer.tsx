@@ -6,6 +6,7 @@ import {
   MessageInput,
   MessageWindow,
   Messages,
+  useMarkRead,
 } from "./Discussion";
 
 export const CardViewDrawer = (props: {
@@ -55,12 +56,14 @@ export const CardViewDrawer = (props: {
         </div>
       </div>
       <MessageWindow
-        className={`cardDrawerContent no-scrollbar relative shrink overflow-x-hidden overflow-y-scroll ${
-          props.drawerOpen ? " mb-2 mt-4  h-fit max-h-[60vh] " : "mb-2 h-0 "
-        }`}
+        className={`cardDrawerContent no-scrollbar relative shrink overflow-x-hidden overflow-y-scroll ${props.drawerOpen ? " mb-2 mt-4  h-fit max-h-[60vh] " : "mb-2 h-0 "
+          }`}
       >
         {tab === "comments" ? (
-          <DiscussionContent entityID={props.entityID} />
+          <DiscussionContent
+            entityID={props.entityID}
+            open={props.drawerOpen}
+          />
         ) : (
           <Backlinks entityID={props.entityID} />
         )}
@@ -70,8 +73,9 @@ export const CardViewDrawer = (props: {
   );
 };
 
-const DiscussionContent = (props: { entityID: string }) => {
+const DiscussionContent = (props: { entityID: string; open: boolean }) => {
   let [reply, setReply] = useState<string | null>(null);
+  useMarkRead(props.entityID, props.open);
   return (
     <>
       <div className="flex flex-col">
@@ -148,11 +152,10 @@ const Tab = (props: {
   return (
     <button
       onClick={() => props.onClick()}
-      className={`${
-        props.currentTab === props.id
+      className={`${props.currentTab === props.id
           ? "border-b-white bg-white font-bold"
           : "bg-grey-90"
-      } -mb-[1px] w-fit shrink-0 rounded-t-md border border-grey-80  px-2  pt-0.5 text-sm text-grey-35`}
+        } -mb-[1px] w-fit shrink-0 rounded-t-md border border-grey-80  px-2  pt-0.5 text-sm text-grey-35`}
     >
       {props.text}
     </button>
