@@ -77,7 +77,7 @@ function Space() {
         style={{ height }}
         className="spaceWrapperflex  flex-col items-stretch justify-items-center gap-2 overflow-hidden sm:gap-4"
       >
-        <div className="spaceontent max-w-screen-xl relative mx-auto flex h-full w-full grow items-stretch md:px-4 md:py-6">
+        <div className="spaceontent max-w-screen-xl relative mx-auto flex h-full w-full grow items-stretch md:py-6 md:px-4">
           <SmallCardDragContext>
             {width > 960 || width === 0 ? (
               <div
@@ -102,13 +102,13 @@ function Space() {
               <div className="no-scrollbar pwa-padding mb-3 mt-3 flex snap-x snap-mandatory flex-row overflow-x-scroll overscroll-x-none scroll-smooth">
                 <div
                   id="sidebarWrapper"
-                  className="ml-2 snap-end rounded-md border border-grey-90 bg-white"
+                  className="ml-2 snap-end snap-always rounded-md border border-grey-90 bg-white"
                 >
                   <Sidebar />
                 </div>
                 <div
                   id="roomWrapper"
-                  className="roomWrapper relative flex snap-center flex-row  px-2 "
+                  className="roomWrapper relative flex snap-center snap-always flex-row  px-2 "
                 >
                   <div
                     id="roomInnerWrapper"
@@ -118,7 +118,7 @@ function Space() {
                   </div>
                 </div>
 
-                <div className="snap-start">
+                <div className="snap-start snap-always ">
                   <CardViewer room={room} />
                 </div>
                 <div className="w-2 shrink-0 snap-start" />
