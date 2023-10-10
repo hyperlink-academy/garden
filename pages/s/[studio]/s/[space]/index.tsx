@@ -13,7 +13,6 @@ import { WORKER_URL } from "src/constants";
 import { GetStaticPropsContext, InferGetStaticPropsType } from "next/types";
 import { SpaceProvider } from "components/ReplicacheProvider";
 import { SWRConfig } from "swr";
-import { useViewportSize } from "hooks/useViewportSize";
 
 export async function getStaticPaths() {
   return { paths: [], fallback: "blocking" };
@@ -53,7 +52,6 @@ function Space() {
   useSpaceSyncState();
   let room = useRoom();
   const { width } = useWindowDimensions();
-  let height = useViewportSize().height;
 
   useEffect(() => {
     window.requestAnimationFrame(() => {
@@ -68,7 +66,7 @@ function Space() {
       <PresenceHandler />
 
       <div
-        style={{ height }}
+        style={{ height: "100dvh" }}
         className="spaceWrapperflex  flex-col items-stretch justify-items-center gap-2 overflow-hidden sm:gap-4"
       >
         <div className="spaceontent max-w-screen-xl relative mx-auto flex h-full w-full grow items-stretch md:px-4 md:py-6">
