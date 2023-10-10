@@ -15,7 +15,6 @@ export const CardViewDrawer = (props: {
   setDrawerOpen: () => void;
   setDrawerClosed: () => void;
 }) => {
-  let ref = useRef<HTMLDivElement | null>(null);
   let [tab, setTab] = useState<"comments" | "backlinks">("comments");
   return (
     <div className="z-10 ">
@@ -28,10 +27,6 @@ export const CardViewDrawer = (props: {
               if (tab === "backlinks" || !props.drawerOpen) {
                 props.setDrawerOpen();
                 setTab("comments");
-                ref.current?.scrollIntoView({
-                  behavior: "smooth",
-                  block: "end",
-                });
               } else {
                 props.setDrawerClosed();
               }
@@ -44,10 +39,6 @@ export const CardViewDrawer = (props: {
               if (tab === "comments" || !props.drawerOpen) {
                 props.setDrawerOpen();
                 setTab("backlinks");
-                ref.current?.scrollIntoView({
-                  behavior: "smooth",
-                  block: "end",
-                });
               } else {
                 props.setDrawerClosed();
               }
@@ -67,7 +58,7 @@ export const CardViewDrawer = (props: {
         ) : (
           <Backlinks entityID={props.entityID} />
         )}
-        <div ref={ref} className="scroll-m-8 bg-white" />
+        <div className="scroll-m-8 bg-white" />
       </MessageWindow>
     </div>
   );
