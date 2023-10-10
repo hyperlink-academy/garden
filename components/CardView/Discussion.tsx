@@ -56,16 +56,13 @@ export const DiscussionRoom = (props: {
 
   return (
     <div className="relative h-full w-full">
-      <div
-        className="no-scrollbar relative flex h-full flex-col-reverse overflow-x-hidden overflow-y-scroll p-2 pb-12"
-        id="card-comments"
-      >
+      <MessageWindow className="no-scrollbar relative flex h-full flex-col overflow-x-hidden overflow-y-scroll p-2 pb-12">
         <Messages
           entityID={props.entityID}
           setReply={setReply}
           isRoom={props.isRoom}
         />
-      </div>
+      </MessageWindow>
       <div className="absolute bottom-0 w-full">
         <MessageInput
           entityID={props.entityID}
@@ -75,6 +72,40 @@ export const DiscussionRoom = (props: {
           setReply={setReply}
         />
       </div>
+    </div>
+  );
+};
+
+export const MessageWindow = (props: {
+  children: React.ReactNode;
+  className: string;
+}) => {
+  let isBottomed = useRef(true);
+  let elRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (isBottomed.current) {
+      requestAnimationFrame(() => {
+        if (!elRef.current) return;
+        console.log(elRef.current.scrollTop);
+        console.log(elRef.current.scrollHeight);
+        elRef.current.scrollTop = elRef.current?.scrollHeight;
+      });
+    }
+  });
+  return (
+    <div
+      onScroll={(e) => {
+        if (!e.isTrusted) return;
+        console.log(e.currentTarget.scrollTop, e.currentTarget.scrollHeight);
+        isBottomed.current =
+          e.currentTarget.scrollTop + e.currentTarget.clientHeight ===
+          e.currentTarget.scrollHeight;
+      }}
+      ref={elRef}
+      className={props.className}
+      id="card-comments"
+    >
+      {props.children}
     </div>
   );
 };
@@ -123,19 +154,11 @@ export const MessageInput = (props: {
     setValue("");
     setAttachedCards([]);
     props.setReply(null);
-    let ScrollContainer = null;
-    if (props.isRoom)
-      ScrollContainer = document.getElementById("roomScrollContainer");
-    else ScrollContainer = document.getElementById("cardContentAndDiscussion");
-    if (ScrollContainer)
-      ScrollContainer?.scrollTo(0, ScrollContainer.scrollHeight);
-    setTimeout(
-      () =>
-        document
-          .getElementById("card-comments")
-          ?.scrollIntoView({ behavior: "smooth", block: "end" }),
-      50
-    );
+    setTimeout(() => {
+      let el = document.getElementById("card-comments");
+      if (!el) return;
+      el.scrollTop = el.scrollHeight;
+    }, 50);
     document.getElementById("messageInput")?.focus({ preventScroll: true });
   };
   return (
@@ -361,12 +384,12 @@ export const Messages = (props: {
           <p>Still quiet…start the conversation 🌱</p>
         </div>
       ) : null}
-      {[...messages].reverse().map((m, index, reversedMessages) => (
+      {[...messages].map((m, index, reversedMessages) => (
         <Message
           multipleFromSameAuthor={
-            index < reversedMessages.length &&
-            m.sender === reversedMessages[index + 1]?.sender &&
-            parseInt(m.ts) - parseInt(reversedMessages[index + 1]?.ts) <
+            index > 0 &&
+            m.sender === reversedMessages[index - 1]?.sender &&
+            parseInt(m.ts) - parseInt(reversedMessages[index - 1]?.ts) <
               1000 * 60 * 3
           }
           author={m.sender}

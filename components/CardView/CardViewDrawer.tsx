@@ -1,7 +1,12 @@
 import { db } from "hooks/useReplicache";
 import { useRef, useState } from "react";
 import { Backlinks } from "./Backlinks";
-import { DiscussionRoom, MessageInput, Messages } from "./Discussion";
+import {
+  DiscussionRoom,
+  MessageInput,
+  MessageWindow,
+  Messages,
+} from "./Discussion";
 
 export const CardViewDrawer = (props: {
   entityID: string;
@@ -49,9 +54,9 @@ export const CardViewDrawer = (props: {
           />
         </div>
       </div>
-      <div
+      <MessageWindow
         className={`cardDrawerContent no-scrollbar relative shrink overflow-x-hidden overflow-y-scroll ${
-          props.drawerOpen ? " mt-4 mb-2  h-fit max-h-[60vh] " : "mb-2 h-0 "
+          props.drawerOpen ? " mb-2 mt-4  h-fit max-h-[60vh] " : "mb-2 h-0 "
         }`}
       >
         {tab === "comments" ? (
@@ -60,7 +65,7 @@ export const CardViewDrawer = (props: {
           <Backlinks entityID={props.entityID} />
         )}
         <div ref={ref} className="scroll-m-8 bg-white" />
-      </div>
+      </MessageWindow>
     </div>
   );
 };
@@ -69,7 +74,7 @@ const DiscussionContent = (props: { entityID: string }) => {
   let [reply, setReply] = useState<string | null>(null);
   return (
     <>
-      <div className="flex flex-col-reverse">
+      <div className="flex flex-col">
         <Messages
           entityID={props.entityID}
           isRoom={false}
