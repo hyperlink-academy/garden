@@ -106,7 +106,7 @@ export function CardViewer(props: { room: string | null }) {
       className={`cardViewerWrapper 
           flex  h-full w-[calc(100vw-16px)] 
           max-w-3xl shrink-0        
-          touch-pan-x snap-center snap-always
+          touch-pan-x snap-center
           flex-col 
           items-stretch focus:outline-none sm:shrink`}
     >
