@@ -34,7 +34,7 @@ import { getAndUploadFile } from "src/getAndUploadFile";
 import { useReactions } from "hooks/useReactions";
 import { HighlightCard } from "./HighlightCard";
 import { CardViewDrawer } from "./CardViewDrawer";
-import { useCloseCard, useRoomHistory } from "hooks/useUIState";
+import { useCloseCard, useRoomHistory, useUIState } from "hooks/useUIState";
 import { Modal } from "components/Modal";
 
 const borderStyles = (args: { member: boolean }) => {
@@ -110,8 +110,8 @@ export const CardView = (props: {
           max-w-3xl grow
           flex-col items-stretch overflow-y-scroll
           ${borderStyles({
-            member: !!memberName,
-          })}
+          member: !!memberName,
+        })}
             member: !!memberName,
           })}
           `}
@@ -155,8 +155,8 @@ export const CardView = (props: {
             pb-3
             sm:pb-4
             ${contentStyles({
-              member: !!memberName,
-            })}
+            member: !!memberName,
+          })}
             `}
         >
           <CardContent {...props} />
@@ -175,7 +175,7 @@ export const CardContent = (props: {
   let [dateEditing, setDateEditing] = useUndoableState(false);
   let memberName = db.useEntity(props.entityID, "member/name");
   let { authorized } = useMutations();
-  let [drawerOpen, setDrawerOpen] = useState(false);
+  let drawerOpen = useUIState((s) => s.cardStates[props.entityID]?.drawerOpen);
   let cardCreator = db.useEntity(props.entityID, "card/created-by");
   let cardCreatorName = db.useEntity(
     cardCreator?.value.value as string,
@@ -186,11 +186,10 @@ export const CardContent = (props: {
     <>
       {/* START CARD CONTENT */}
       <div
-        className={`cardContentWrapper no-scrollbar relative flex grow flex-col items-stretch overflow-y-scroll pb-3 sm:pb-4 ${
-          !memberName ? "pt-3 sm:pt-4" : ""
-        }`}
+        className={`cardContentWrapper no-scrollbar relative flex grow flex-col items-stretch overflow-y-scroll overscroll-y-auto pb-3 sm:pb-4 ${!memberName ? "pt-3 sm:pt-4" : ""
+          }`}
         onClick={() => {
-          setDrawerOpen(false);
+          useUIState.getState().closeDrawer(props.entityID);
         }}
       >
         <div className="cardSectionAdder pointer-events-none sticky top-0 z-10 flex w-full  justify-between">
@@ -229,9 +228,8 @@ export const CardContent = (props: {
 
         {/* card content wrapper */}
         <div
-          className={`cardContent z-0 flex grow flex-col gap-3 pb-10 ${
-            drawerOpen ? "opacity-40" : ""
-          }`}
+          className={`cardContent z-0 flex grow flex-col gap-3 pb-10 ${drawerOpen ? "opacity-40" : ""
+            }`}
         >
           <div className="flex flex-col gap-0">
             <Title entityID={props.entityID} />
@@ -260,16 +258,7 @@ export const CardContent = (props: {
       {/* END CARD CONTENT */}
 
       {/* START CARD DISCUSSION */}
-      <CardViewDrawer
-        entityID={props.entityID}
-        drawerOpen={drawerOpen}
-        setDrawerOpen={() => {
-          setDrawerOpen(true);
-        }}
-        setDrawerClosed={() => {
-          setDrawerOpen(false);
-        }}
-      />
+      <CardViewDrawer entityID={props.entityID} drawerOpen={drawerOpen} />
     </>
   );
 };
@@ -280,9 +269,8 @@ const BackButton = () => {
   let { authorized } = useMutations();
   return (
     <button
-      className={`pointer-events-auto  flex h-min w-fit items-center gap-1 rounded-full border border-grey-90 bg-white p-1 text-grey-55 shadow ${
-        !authorized ? "" : "mt-3"
-      }`}
+      className={`pointer-events-auto  flex h-min w-fit items-center gap-1 rounded-full border border-grey-90 bg-white p-1 text-grey-55 shadow ${!authorized ? "" : "mt-3"
+        }`}
       onClick={() => {
         if (history.length < 2) {
           setTimeout(() => {
@@ -604,9 +592,8 @@ export const SectionAdder = (props: {
       {/* END LINKED CARD ADDER */}
       {/* DATE ADDER */}
       <button
-        className={`${
-          date || props.dateEditing ? toggledOnStyle : toggledOffStyle
-        } `}
+        className={`${date || props.dateEditing ? toggledOnStyle : toggledOffStyle
+          } `}
         onClick={() => {
           if (date !== null) {
             document
@@ -631,11 +618,10 @@ export const SectionAdder = (props: {
       >
         <Popover.Trigger className="flex items-center">
           <button
-            className={`${toggledOffStyle} ${
-              !reactionPickerOpen
+            className={`${toggledOffStyle} ${!reactionPickerOpen
                 ? ""
                 : "rounded-md border border-accent-blue p-0.5 text-accent-blue"
-            }`}
+              }`}
           >
             <ReactionAdd />
           </button>

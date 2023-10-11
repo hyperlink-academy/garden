@@ -9,43 +9,20 @@ import {
   useMarkRead,
 } from "./Discussion";
 import { useViewportSize } from "@react-aria/utils";
+import { useUIState } from "hooks/useUIState";
 
 export const CardViewDrawer = (props: {
   entityID: string;
   drawerOpen: boolean;
-  setDrawerOpen: () => void;
-  setDrawerClosed: () => void;
 }) => {
-  let [tab, setTab] = useState<"comments" | "backlinks">("comments");
+  let drawer = useUIState((s) => s.cardStates[props.entityID]?.drawer);
   let viewportHeight = useViewportSize().height;
   return (
     <div className="z-10 ">
       <div className="cardDrawerHeader -mx-3 -mt-6  md:-mx-4">
         <div className="cardDrawerTabs flex items-end gap-2 border-b border-b-grey-80 pl-4">
-          <CommentsTab
-            entityID={props.entityID}
-            currentTab={tab}
-            onClick={() => {
-              if (tab === "backlinks" || !props.drawerOpen) {
-                props.setDrawerOpen();
-                setTab("comments");
-              } else {
-                props.setDrawerClosed();
-              }
-            }}
-          />
-          <BacklinkTab
-            entityID={props.entityID}
-            currentTab={tab}
-            onClick={() => {
-              if (tab === "comments" || !props.drawerOpen) {
-                props.setDrawerOpen();
-                setTab("backlinks");
-              } else {
-                props.setDrawerClosed();
-              }
-            }}
-          />
+          <CommentsTab entityID={props.entityID} />
+          <BacklinkTab entityID={props.entityID} />
         </div>
       </div>
       <MessageWindow
@@ -57,7 +34,7 @@ export const CardViewDrawer = (props: {
         className={`cardDrawerContent no-scrollbar relative shrink overflow-x-hidden overflow-y-scroll ${props.drawerOpen ? " mb-2 mt-4  h-fit" : "mb-2 h-0 "
           }`}
       >
-        {tab === "comments" ? (
+        {drawer === "comments" ? (
           <DiscussionContent
             entityID={props.entityID}
             open={props.drawerOpen}
@@ -97,27 +74,18 @@ const DiscussionContent = (props: { entityID: string; open: boolean }) => {
   );
 };
 
-const CommentsTab = (props: {
-  entityID: string;
-  currentTab: string;
-  onClick: () => void;
-}) => {
+const CommentsTab = (props: { entityID: string }) => {
   let messages = db.useMessages(props.entityID);
   return (
     <Tab
-      onClick={props.onClick}
-      currentTab={props.currentTab}
+      entityID={props.entityID}
       text={`comments (${messages.length})`}
       id="comments"
     />
   );
 };
 
-const BacklinkTab = (props: {
-  entityID: string;
-  currentTab: string;
-  onClick: () => void;
-}) => {
+const BacklinkTab = (props: { entityID: string }) => {
   let rooms = db.useReference(props.entityID, "desktop/contains");
   let cardBacklinks = db.useReference(props.entityID, "deck/contains");
   let messageBacklinks = db.useReference(
@@ -133,8 +101,7 @@ const BacklinkTab = (props: {
   if (references === 0) return null;
   return (
     <Tab
-      onClick={props.onClick}
-      currentTab={props.currentTab}
+      entityID={props.entityID}
       text={`mentioned in (${references})`}
       id="backlinks"
     />
@@ -142,15 +109,23 @@ const BacklinkTab = (props: {
 };
 
 const Tab = (props: {
-  currentTab: string;
-  id: string;
+  id: "backlinks" | "comments";
   text: string;
-  onClick: () => void;
+  entityID: string;
 }) => {
+  let currentTab =
+    useUIState((s) => s.cardStates[props.entityID]?.drawer) || "comments";
+  let drawerOpen = useUIState((s) => s.cardStates[props.entityID]?.drawerOpen);
   return (
     <button
-      onClick={() => props.onClick()}
-      className={`${props.currentTab === props.id
+      onClick={() => {
+        if (currentTab !== props.id || !drawerOpen) {
+          useUIState.getState().openDrawer(props.entityID, props.id);
+        } else {
+          useUIState.getState().closeDrawer(props.entityID);
+        }
+      }}
+      className={`${currentTab === props.id
           ? "border-b-white bg-white font-bold"
           : "bg-grey-90"
         } -mb-[1px] w-fit shrink-0 rounded-t-md border border-grey-80  px-2  pt-0.5 text-sm text-grey-35`}
