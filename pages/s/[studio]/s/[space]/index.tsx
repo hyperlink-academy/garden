@@ -13,6 +13,8 @@ import { WORKER_URL } from "src/constants";
 import { GetStaticPropsContext, InferGetStaticPropsType } from "next/types";
 import { SpaceProvider } from "components/ReplicacheProvider";
 import { SWRConfig } from "swr";
+import { useViewportSize } from "hooks/useViewportSize";
+import { usePreventResize } from "hooks/usePreventResize";
 
 export async function getStaticPaths() {
   return { paths: [], fallback: "blocking" };
@@ -60,13 +62,16 @@ function Space() {
     });
   }, []);
 
+  let viewheight = useViewportSize().height;
+  usePreventResize();
+
   return (
     <>
       <SpaceMetaTitle />
       <PresenceHandler />
 
       <div
-        style={{ height: "100dvh" }}
+        style={{ height: viewheight }}
         className="spaceWrapperflex  flex-col items-stretch justify-items-center gap-2 overflow-hidden sm:gap-4"
       >
         <div className="spaceontent max-w-screen-xl relative mx-auto flex h-full w-full grow items-stretch md:px-4 md:py-6">
@@ -74,9 +79,9 @@ function Space() {
             {width > 960 || width === 0 ? (
               <div
                 className="spaceLargeSplitLayout no-scrollbar flex w-full flex-row items-stretch gap-4 overflow-x-scroll sm:justify-center sm:gap-4"
-                // you need to add this to the contentSplitLayout class if you are going to scroll across more than 2 panes
-                // it prevents the last pane from sticking to the end
-                // after:content-[""] after:h-full after:w-2 after:block after:shrink-0
+              // you need to add this to the contentSplitLayout class if you are going to scroll across more than 2 panes
+              // it prevents the last pane from sticking to the end
+              // after:content-[""] after:h-full after:w-2 after:block after:shrink-0
               >
                 <div className="spaceRoomAndSidebar flex flex-row rounded-md border border-grey-90">
                   <div className="rounded-l-md border border-transparent border-r-grey-90 bg-white">

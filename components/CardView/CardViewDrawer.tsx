@@ -47,7 +47,7 @@ export const CardViewDrawer = (props: {
         </div>
       </div>
       <MessageWindow
-        className={`cardDrawerContent no-scrollbar relative shrink overflow-x-hidden overflow-y-scroll ${props.drawerOpen ? " mb-2 mt-4  h-fit max-h-[60vh] " : "mb-2 h-0 "
+        className={`cardDrawerContent no-scrollbar relative shrink overflow-x-hidden overflow-y-scroll ${props.drawerOpen ? " mb-2 mt-4  h-fit max-h-[50vh] " : "mb-2 h-0 "
           }`}
       >
         {tab === "comments" ? (
