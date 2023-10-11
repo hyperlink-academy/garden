@@ -100,9 +100,6 @@ export const Backlinks = (props: { entityID: string }) => {
           <CardPreviewWithData
             key={c.id}
             factID={c.id}
-            onDelete={() => {
-              mutate("retractFact", { id: c.id });
-            }}
             entityID={c.entity}
             size={"big"}
           />
