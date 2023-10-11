@@ -64,7 +64,6 @@ export const CardView = (props: {
   let { authToken } = useAuth();
   let spaceID = useSpaceID();
   let memberName = db.useEntity(props.entityID, "member/name");
-  let { ref } = usePreserveScroll<HTMLDivElement>(props.entityID);
 
   let { mutate, rep } = useMutations();
   let { setNodeRef } = useDroppableZone({
@@ -102,13 +101,12 @@ export const CardView = (props: {
         ref={setNodeRef}
         className={`
           card
-          no-scrollbar
           relative
           mx-auto       
           flex
           h-[42px] w-full
           max-w-3xl grow
-          flex-col items-stretch overflow-y-scroll
+          flex-col items-stretch
           ${borderStyles({
           member: !!memberName,
         })}
@@ -144,7 +142,6 @@ export const CardView = (props: {
           </div>
         )}
         <div
-          ref={ref}
           id="card-container"
           className={`
             no-scrollbar flex 
@@ -171,6 +168,7 @@ export const CardContent = (props: {
   onDelete?: () => void;
   referenceFactID?: string;
 }) => {
+  let { ref } = usePreserveScroll<HTMLDivElement>(props.entityID);
   let date = db.useEntity(props.entityID, "card/date");
   let [dateEditing, setDateEditing] = useUndoableState(false);
   let memberName = db.useEntity(props.entityID, "member/name");
@@ -186,6 +184,7 @@ export const CardContent = (props: {
     <>
       {/* START CARD CONTENT */}
       <div
+        ref={ref}
         className={`cardContentWrapper no-scrollbar relative flex grow flex-col items-stretch overflow-y-scroll overscroll-y-auto pb-3 sm:pb-4 ${!memberName ? "pt-3 sm:pt-4" : ""
           }`}
         onClick={() => {
