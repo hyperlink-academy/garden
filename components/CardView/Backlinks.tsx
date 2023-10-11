@@ -36,6 +36,7 @@ export const Backlinks = (props: { entityID: string }) => {
     [props.entityID],
     props.entityID + "messageBacklinks"
   );
+  let title = db.useEntity(props.entityID, "card/title");
   let inlineBacklinks = db.useReference(props.entityID, "card/inline-links-to");
 
   let cards = cardBacklinks.sort(sortByPosition("vae"));
@@ -98,6 +99,7 @@ export const Backlinks = (props: { entityID: string }) => {
       {inlineBacklinks.map((c) => {
         return (
           <CardPreviewWithData
+            focusText={title ? `[[${title.value}]]` : undefined}
             key={c.id}
             factID={c.id}
             entityID={c.entity}

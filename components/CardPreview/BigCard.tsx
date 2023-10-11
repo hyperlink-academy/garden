@@ -18,6 +18,7 @@ export const BigCardBody = (
     entityID: string;
     unreadDiscussions: boolean;
     messagesCount: number;
+    focusText?: string;
   } & Props
 ) => {
   let { authorized } = useMutations();
@@ -142,6 +143,8 @@ export const BigCardBody = (
             >
               {!props.hideContent && (
                 <SingleTextSection
+                  autocompleteCardNames
+                  focusText={props.focusText}
                   placeholder={editing ? "write something..." : ""}
                   entityID={props.entityID}
                   previewOnly={!editing}
