@@ -10,10 +10,9 @@ import {
   Reply,
   Send,
 } from "components/Icons";
-import { LoginForm } from "pages/login";
 import { RenderedText } from "components/Textarea/RenderedText";
 import { db, useMutations } from "hooks/useReplicache";
-import { useEffect, useRef, useState } from "react";
+import { HTMLAttributes, useEffect, useRef, useState } from "react";
 import { ulid } from "src/ulid";
 import { Message } from "data/Messages";
 import AutosizeTextarea from "components/Textarea/AutosizeTextarea";
@@ -21,7 +20,6 @@ import { FindOrCreate, useAllItems } from "components/FindOrCreateEntity";
 import { ref } from "data/Facts";
 import { CardPreviewWithData } from "components/CardPreview";
 import { useIntersectionObserver } from "hooks/useIntersectionObserver";
-import router from "next/router";
 import { LogInModal } from "components/LoginModal";
 
 export const DiscussionRoom = (props: {
@@ -81,6 +79,7 @@ export const useMarkRead = (entityID: string, focused: boolean) => {
 };
 
 export const MessageWindow = (props: {
+  style?: HTMLAttributes<HTMLDivElement>["style"];
   children: React.ReactNode;
   className: string;
 }) => {
@@ -98,6 +97,7 @@ export const MessageWindow = (props: {
   });
   return (
     <div
+      style={props.style}
       onScroll={(e) => {
         if (!e.isTrusted) return;
         console.log(e.currentTarget.scrollTop, e.currentTarget.scrollHeight);
@@ -394,7 +394,7 @@ export const Messages = (props: {
             index > 0 &&
             m.sender === reversedMessages[index - 1]?.sender &&
             parseInt(m.ts) - parseInt(reversedMessages[index - 1]?.ts) <
-              1000 * 60 * 3
+            1000 * 60 * 3
           }
           author={m.sender}
           date={m.ts}
@@ -464,9 +464,8 @@ const Message = (props: {
   return (
     <div
       id={props.id}
-      className={`message flex flex-col text-sm first:pb-4 last:pt-0 ${
-        !props.multipleFromSameAuthor ? "pt-4" : "pt-1"
-      }`}
+      className={`message flex flex-col text-sm first:pb-4 last:pt-0 ${!props.multipleFromSameAuthor ? "pt-4" : "pt-1"
+        }`}
     >
       {/* MESSAGE HEADER */}
       {!props.multipleFromSameAuthor && (

@@ -8,6 +8,7 @@ import {
   Messages,
   useMarkRead,
 } from "./Discussion";
+import { useViewportSize } from "@react-aria/utils";
 
 export const CardViewDrawer = (props: {
   entityID: string;
@@ -16,6 +17,7 @@ export const CardViewDrawer = (props: {
   setDrawerClosed: () => void;
 }) => {
   let [tab, setTab] = useState<"comments" | "backlinks">("comments");
+  let viewportHeight = useViewportSize().height;
   return (
     <div className="z-10 ">
       <div className="cardDrawerHeader -mx-3 -mt-6  md:-mx-4">
@@ -47,7 +49,12 @@ export const CardViewDrawer = (props: {
         </div>
       </div>
       <MessageWindow
-        className={`cardDrawerContent no-scrollbar relative shrink overflow-x-hidden overflow-y-scroll ${props.drawerOpen ? " mb-2 mt-4  h-fit max-h-[50vh] " : "mb-2 h-0 "
+        style={{
+          maxHeight: props.drawerOpen
+            ? `min(60vh, ${viewportHeight - 128}px)`
+            : "",
+        }}
+        className={`cardDrawerContent no-scrollbar relative shrink overflow-x-hidden overflow-y-scroll ${props.drawerOpen ? " mb-2 mt-4  h-fit" : "mb-2 h-0 "
           }`}
       >
         {tab === "comments" ? (
