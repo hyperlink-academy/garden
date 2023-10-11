@@ -189,7 +189,7 @@ const CollectionList = (props: {
         />
       ))}
       {over && over.type === "card" && (
-        <div className="opacity-60">
+        <div className="pb-2 opacity-60">
           <CardPreview
             data={over.data}
             entityID={over.entityID}
@@ -295,9 +295,8 @@ const DraggableCard = (props: {
       <div
         ref={refs}
         style={{}}
-        className={`pb-2 ${
-          isDragging ? `opacity-60 ${isOverSomethingElse ? "-mt-2" : ""}` : ""
-        }`}
+        className={`pb-2 ${isDragging ? `opacity-60 ${isOverSomethingElse ? "" : ""}` : ""
+          }`}
       >
         {over && over.entityID !== props.entityID && over.type === "card" && (
           <div className="pb-2 opacity-60">
@@ -322,7 +321,6 @@ const DraggableCard = (props: {
                 factID: props.id,
                 entityID: props.entityID,
               });
-              close({ entityID: props.entityID });
             }}
           />
         )}
