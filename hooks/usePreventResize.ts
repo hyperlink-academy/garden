@@ -14,7 +14,7 @@ export function usePreventResize() {
     if (preventResizeCount === 1) {
       if (isIOS()) {
         restore = preventResize();
-      } else restore = () => { };
+      } else restore = () => {};
     }
 
     return () => {
@@ -64,7 +64,7 @@ const preventResize = () => {
     let target = e.target as HTMLElement;
 
     // Apply this change if we're not already focused on the target element
-    if (willOpenKeyboard(target) && target !== document.activeElement) {
+    if (willOpenKeyboard(target)) {
       e.preventDefault();
 
       // Apply a transform to trick Safari into thinking the input is at the top of the page
