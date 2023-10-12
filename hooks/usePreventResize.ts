@@ -1,5 +1,5 @@
 import { useLayoutEffect } from "react";
-import { isIOS } from "@react-aria/utils";
+import { chain, isIOS } from "@react-aria/utils";
 
 // Adapted from https://github.com/adobe/react-spectrum/blob/main/packages/%40react-aria/overlays/src/usePreventScroll.ts
 
@@ -27,6 +27,23 @@ export function usePreventResize() {
 }
 
 const preventResize = () => {
+  let scrollable: Element;
+  let onTouchStart = (e: TouchEvent) => {
+    // Store the nearest scrollable parent element from the element that the user touched.
+    scrollable = getScrollParent(e.target as Element);
+  };
+
+  let onTouchMove = (e: TouchEvent) => {
+    // Prevent scrolling the window.
+    if (
+      !scrollable ||
+      scrollable === document.documentElement ||
+      scrollable === document.body
+    ) {
+      e.preventDefault();
+      return;
+    }
+  };
   let onFocus = (e: FocusEvent) => {
     let target = e.target as HTMLElement;
     if (willOpenKeyboard(target)) {
@@ -77,16 +94,59 @@ const preventResize = () => {
       });
     }
   };
+  let scrollX = window.scrollX;
+  let scrollY = window.scrollY;
+
+  let onWindowScroll = (e: Event) => {
+    // Last resort. If the window scrolled, scroll it back to the top.
+    // It should always be at the top because the body will have a negative margin (see below).
+    e.preventDefault();
+    window.scrollTo(0, 0);
+  };
+
+  let restoreStyles = chain(
+    setStyle(
+      document.documentElement,
+      "paddingRight",
+      `${window.innerWidth - document.documentElement.clientWidth}px`
+    ),
+
+    setStyle(document.body, "touch-action", "none"),
+    setStyle(document.documentElement, "overflow-y", "hidden"),
+    setStyle(document.body, "marginTop", `-${scrollY}px`)
+  );
+  window.addEventListener("scroll", onWindowScroll);
+  document.addEventListener("touchstart", onTouchStart, {
+    passive: false,
+    capture: true,
+  });
+  document.addEventListener("touchmove", onTouchMove, {
+    passive: false,
+    capture: true,
+  });
   document.addEventListener("touchend", onTouchEnd, {
     passive: false,
     capture: true,
   });
   document.addEventListener("focus", onFocus, true);
   return () => {
+    restoreStyles();
+    window.removeEventListener("scroll", onWindowScroll);
     document.removeEventListener("touchend", onTouchEnd);
+    document.removeEventListener("touchstart", onTouchStart);
+    document.removeEventListener("touchmove", onTouchStart);
     document.removeEventListener("focus", onFocus);
   };
 };
+
+function setStyle(element: HTMLElement, style: any, value: string) {
+  let cur = element.style[style];
+  element.style[style] = value;
+
+  return () => {
+    element.style[style] = cur;
+  };
+}
 
 function scrollIntoView(target: Element | null) {
   let root = document.scrollingElement || document.documentElement;
