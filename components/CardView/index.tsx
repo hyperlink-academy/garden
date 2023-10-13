@@ -594,7 +594,7 @@ export const SectionAdder = (props: {
         className={`${date || props.dateEditing ? toggledOnStyle : toggledOffStyle
           } `}
         onClick={() => {
-          if (date !== null) {
+          if (date) {
             document
               .getElementById("card-container")
               ?.scrollTo({ top: 0, behavior: "smooth" });
