@@ -3,7 +3,7 @@ export type Json =
   | number
   | boolean
   | null
-  | { [key: string]: Json }
+  | { [key: string]: Json | undefined }
   | Json[]
 
 export interface Database {
@@ -219,6 +219,7 @@ export interface Database {
       space_data: {
         Row: {
           archived: boolean
+          created_at: string | null
           default_space_image: string | null
           description: string | null
           display_name: string | null
@@ -233,6 +234,7 @@ export interface Database {
         }
         Insert: {
           archived?: boolean
+          created_at?: string | null
           default_space_image?: string | null
           description?: string | null
           display_name?: string | null
@@ -247,6 +249,7 @@ export interface Database {
         }
         Update: {
           archived?: boolean
+          created_at?: string | null
           default_space_image?: string | null
           description?: string | null
           display_name?: string | null
