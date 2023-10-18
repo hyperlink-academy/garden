@@ -4,6 +4,7 @@ import { RenderedText } from "./RenderedText";
 
 export const Textarea = (
   props: {
+    entityID?: string;
     previewOnly?: boolean;
     focused?: boolean;
     renderLinks?: boolean;

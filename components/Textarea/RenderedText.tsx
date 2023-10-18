@@ -2,6 +2,8 @@ import React, { forwardRef, useCallback, useContext } from "react";
 import Linkify from "linkify-react";
 import { parseLine } from "src/parseMarkdownLine";
 import { useCardViewer } from "components/CardViewerContext";
+import { ref } from "data/Facts";
+
 import {
   ReplicacheContext,
   scanIndex,
@@ -11,8 +13,12 @@ import { ulid } from "src/ulid";
 
 export const RenderedText = forwardRef<
   HTMLPreElement,
-  { text: string; renderLinks?: boolean } & JSX.IntrinsicElements["pre"]
->((props, ref) => {
+  {
+    text: string;
+    renderLinks?: boolean;
+    entityID?: string;
+  } & JSX.IntrinsicElements["pre"]
+>((props, elRef) => {
   let { open } = useCardViewer();
   let { mutate, authorized, memberEntity } = useMutations();
   let rep = useContext(ReplicacheContext);
@@ -29,6 +35,13 @@ export const RenderedText = forwardRef<
           title: link.slice(2, -2),
           memberEntity,
         });
+        if (props.entityID)
+          await mutate("assertFact", {
+            entity: props.entityID,
+            attribute: "card/inline-links-to",
+            value: ref(entityID),
+            positions: {},
+          });
 
         open({ entityID });
         return;
@@ -58,7 +71,7 @@ export const RenderedText = forwardRef<
     >
       <pre
         role="link"
-        ref={ref}
+        ref={elRef}
         {...newProps}
         className={`${props.className} break-words`}
         style={{
