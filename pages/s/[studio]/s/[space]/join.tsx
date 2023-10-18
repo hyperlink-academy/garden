@@ -5,7 +5,7 @@ import { BaseSmallCard } from "components/CardPreview/SmallCard";
 import { useAuth } from "hooks/useAuth";
 import { db, useSpaceID } from "hooks/useReplicache";
 import { useRouter } from "next/router";
-import { SVGProps, useState } from "react";
+import { SVGProps, useEffect, useState } from "react";
 import { LogInModal, SignupModal } from "components/LoginModal";
 import Head from "next/head";
 import { useSpaceData } from "hooks/useSpaceData";
@@ -64,6 +64,10 @@ export function JoinSpace() {
       router.push(`/s/${router.query.studio}/s/${router.query.space}`);
     }
   };
+  useEffect(() => {
+    if (!!isMember)
+      router.push(`/s/${router.query.studio}/s/${router.query.space}`);
+  }, [!!isMember]);
 
   return (
     <>
@@ -71,7 +75,7 @@ export function JoinSpace() {
         <title key="title">{data?.display_name}: you&apos;re invited!</title>
       </Head>
 
-      <div className="mx-auto flex max-w-3xl flex-col place-items-center gap-6 py-8 px-4">
+      <div className="mx-auto flex max-w-3xl flex-col place-items-center gap-6 px-4 py-8">
         <h2>Welcome!</h2>
         <p className="text-center text-lg">
           You&apos;ve been invited to join a{" "}
@@ -83,7 +87,7 @@ export function JoinSpace() {
         <div className="-mt-4">
           <SpaceCard small {...(data as SpaceData)} />
         </div>
-        {session.loggedIn ? (
+        {session.loggedIn && authToken ? (
           <>
             <p className="text-center">A membership card is waiting for you!</p>
             <div className="relative">
@@ -98,7 +102,7 @@ export function JoinSpace() {
                   />
                 </div>
               </div>
-              <div className="absolute top-0 -left-2">
+              <div className="absolute -left-2 top-0">
                 <WelcomeSparkle />
               </div>
             </div>

@@ -54,9 +54,8 @@ export const EditRoomModal = (props: {
 
   return (
     <Modal open={props.open} onClose={props.onClose} header="Room Settings">
-      <Form
+      <form
         className="editRoomModal flex flex-col gap-3 text-grey-35"
-        validate={() => {}}
         onSubmit={async () => {
           if (!currentRoomName || !props.room) return;
           await mutate("updateFact", {
@@ -103,22 +102,23 @@ export const EditRoomModal = (props: {
               }}
             />
           </div>
-
-          <SubmitButton content="Edit Room" onClose={props.onClose} />
+          <ModalSubmitButton content="Edit Room" onClose={props.onClose} />
 
           <Divider />
 
           <ButtonPrimary
             destructive
+            type="button"
             onClick={() => {
               setAreYouSureRoomDeletionModalOpen(true);
+              console.log("yo");
             }}
             content="Delete Room"
             icon={<Delete />}
             className="place-self-end"
           />
         </>
-      </Form>
+      </form>
       {areYouSureRoomDeletionModalOpen && (
         <AreYouSureRoomDeletionModal
           open={areYouSureRoomDeletionModalOpen}

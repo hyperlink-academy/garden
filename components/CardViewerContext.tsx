@@ -2,10 +2,10 @@ import { ref } from "data/Facts";
 import { useAppEventListener, publishAppEvent } from "hooks/useEvents";
 import { db, useMutations, useSpaceID } from "hooks/useReplicache";
 import { useOpenCard, useUIState } from "hooks/useUIState";
-import { useRouter } from "next/router";
 import { useCallback, useEffect, useRef } from "react";
 import { CardView } from "./CardView";
 import { useViewportSize } from "hooks/useViewportSize";
+import { isIOS } from "@react-aria/utils";
 
 export const useCardViewer = () => {
   let spaceID = useSpaceID();
@@ -18,6 +18,29 @@ export const useCardViewer = () => {
       if (!spaceID) return;
       openCard(args.entityID);
       publishAppEvent("cardviewer.open-card", args);
+      if (args.focus) {
+        let fakeInput: HTMLInputElement | null = null;
+        if (isIOS()) {
+          //Safari doesn't let you focus outside a user-triggered event loop, so we have to create a fake input to focus
+          fakeInput = document.createElement("input");
+          fakeInput.setAttribute("type", "text");
+          fakeInput.style.position = "absolute";
+          fakeInput.style.display = "hidden";
+          fakeInput.style.fontSize = "16px"; // disable auto zoom
+          document.body.appendChild(fakeInput);
+          fakeInput.focus();
+        }
+
+        setTimeout(() => {
+          let element = document.getElementById(
+            args.focus === "content" ? "default-text-section" : "card-title"
+          );
+          element?.focus();
+          fakeInput?.remove();
+        }, 10);
+      }
+      if (isIOS() && args.focus) {
+      }
     },
     [spaceID, openCard]
   );
@@ -75,15 +98,6 @@ export function CardViewer(props: { room: string | null }) {
           inline: "center",
           behavior: "smooth",
         });
-        if (data.focus) {
-          if (data.focus === "content") {
-            let element = document.getElementById("default-text-section");
-            console.log(element);
-            element?.focus();
-          }
-          if (data.focus === "title")
-            document.getElementById("card-title")?.focus();
-        }
       }, 10);
     },
     []

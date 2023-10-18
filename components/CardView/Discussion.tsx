@@ -10,10 +10,9 @@ import {
   Reply,
   Send,
 } from "components/Icons";
-import { LoginForm } from "pages/login";
 import { RenderedText } from "components/Textarea/RenderedText";
 import { db, useMutations } from "hooks/useReplicache";
-import { useEffect, useRef, useState } from "react";
+import { HTMLAttributes, useEffect, useRef, useState } from "react";
 import { ulid } from "src/ulid";
 import { Message } from "data/Messages";
 import AutosizeTextarea from "components/Textarea/AutosizeTextarea";
@@ -21,7 +20,6 @@ import { FindOrCreate, useAllItems } from "components/FindOrCreateEntity";
 import { ref } from "data/Facts";
 import { CardPreviewWithData } from "components/CardPreview";
 import { useIntersectionObserver } from "hooks/useIntersectionObserver";
-import router from "next/router";
 import { LogInModal } from "components/LoginModal";
 
 export const DiscussionRoom = (props: {
@@ -29,43 +27,19 @@ export const DiscussionRoom = (props: {
   allowReact?: boolean;
   isRoom: boolean;
 }) => {
-  let unreadBy = db.useEntity(props.entityID, "discussion/unread-by");
-  let [focus, setFocus] = useState(true);
-  let { mutate, memberEntity } = useMutations();
-  useEffect(() => {
-    let callback = () => setFocus(true);
-    window.addEventListener("focus", callback);
-    return () => {
-      window.removeEventListener("focus", callback);
-    };
-  }, []);
-  useEffect(() => {
-    if (props.entityID && memberEntity) {
-      if (!focus) return;
-      let unread = unreadBy?.find((f) => f.value.value === memberEntity);
-      if (unread)
-        mutate("markRead", {
-          memberEntity,
-          entityID: props.entityID,
-          attribute: "discussion/unread-by",
-        });
-    }
-  }, [props.entityID, unreadBy, memberEntity, mutate, focus]);
+  useMarkRead(props.entityID, true);
 
   let [reply, setReply] = useState<string | null>(null);
 
   return (
     <div className="relative h-full w-full">
-      <div
-        className="no-scrollbar relative flex h-full flex-col-reverse overflow-x-hidden overflow-y-scroll p-2 pb-12"
-        id="card-comments"
-      >
+      <MessageWindow className="no-scrollbar relative flex h-full flex-col overflow-x-hidden overflow-y-scroll p-2 pb-12">
         <Messages
           entityID={props.entityID}
           setReply={setReply}
           isRoom={props.isRoom}
         />
-      </div>
+      </MessageWindow>
       <div className="absolute bottom-0 w-full">
         <MessageInput
           entityID={props.entityID}
@@ -75,6 +49,67 @@ export const DiscussionRoom = (props: {
           setReply={setReply}
         />
       </div>
+    </div>
+  );
+};
+
+export const useMarkRead = (entityID: string, focused: boolean) => {
+  let unreadBy = db.useEntity(entityID, "discussion/unread-by");
+  let [windowFocus, setWindowFocus] = useState(true);
+  let { mutate, memberEntity } = useMutations();
+  useEffect(() => {
+    let callback = () => setWindowFocus(true);
+    window.addEventListener("focus", callback);
+    return () => {
+      window.removeEventListener("focus", callback);
+    };
+  }, []);
+  useEffect(() => {
+    if (entityID && memberEntity) {
+      if (!windowFocus || !focused) return;
+      let unread = unreadBy?.find((f) => f.value.value === memberEntity);
+      if (unread)
+        mutate("markRead", {
+          memberEntity,
+          entityID: entityID,
+          attribute: "discussion/unread-by",
+        });
+    }
+  }, [entityID, unreadBy, memberEntity, mutate, windowFocus, focused]);
+};
+
+export const MessageWindow = (props: {
+  style?: HTMLAttributes<HTMLDivElement>["style"];
+  children: React.ReactNode;
+  className: string;
+}) => {
+  let isBottomed = useRef(true);
+  let elRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (isBottomed.current) {
+      requestAnimationFrame(() => {
+        if (!elRef.current) return;
+        console.log(elRef.current.scrollTop);
+        console.log(elRef.current.scrollHeight);
+        elRef.current.scrollTop = elRef.current?.scrollHeight;
+      });
+    }
+  });
+  return (
+    <div
+      style={props.style}
+      onScroll={(e) => {
+        if (!e.isTrusted) return;
+        console.log(e.currentTarget.scrollTop, e.currentTarget.scrollHeight);
+        isBottomed.current =
+          e.currentTarget.scrollTop + e.currentTarget.clientHeight ===
+          e.currentTarget.scrollHeight;
+      }}
+      ref={elRef}
+      className={props.className}
+      id="card-comments"
+    >
+      {props.children}
     </div>
   );
 };
@@ -123,19 +158,11 @@ export const MessageInput = (props: {
     setValue("");
     setAttachedCards([]);
     props.setReply(null);
-    let ScrollContainer = null;
-    if (props.isRoom)
-      ScrollContainer = document.getElementById("roomScrollContainer");
-    else ScrollContainer = document.getElementById("cardContentAndDiscussion");
-    if (ScrollContainer)
-      ScrollContainer?.scrollTo(0, ScrollContainer.scrollHeight);
-    setTimeout(
-      () =>
-        document
-          .getElementById("card-comments")
-          ?.scrollIntoView({ behavior: "smooth", block: "end" }),
-      50
-    );
+    setTimeout(() => {
+      let el = document.getElementById("card-comments");
+      if (!el) return;
+      el.scrollTop = el.scrollHeight;
+    }, 50);
     document.getElementById("messageInput")?.focus({ preventScroll: true });
   };
   return (
@@ -361,13 +388,13 @@ export const Messages = (props: {
           <p>Still quiet…start the conversation 🌱</p>
         </div>
       ) : null}
-      {[...messages].reverse().map((m, index, reversedMessages) => (
+      {[...messages].map((m, index, reversedMessages) => (
         <Message
           multipleFromSameAuthor={
-            index < reversedMessages.length &&
-            m.sender === reversedMessages[index + 1]?.sender &&
-            parseInt(m.ts) - parseInt(reversedMessages[index + 1]?.ts) <
-              1000 * 60 * 3
+            index > 0 &&
+            m.sender === reversedMessages[index - 1]?.sender &&
+            parseInt(m.ts) - parseInt(reversedMessages[index - 1]?.ts) <
+            1000 * 60 * 3
           }
           author={m.sender}
           date={m.ts}
@@ -437,9 +464,8 @@ const Message = (props: {
   return (
     <div
       id={props.id}
-      className={`message flex flex-col text-sm first:pb-4 last:pt-0 ${
-        !props.multipleFromSameAuthor ? "pt-4" : "pt-1"
-      }`}
+      className={`message flex flex-col text-sm first:pb-4 last:pt-0 ${!props.multipleFromSameAuthor ? "pt-4" : "pt-1"
+        }`}
     >
       {/* MESSAGE HEADER */}
       {!props.multipleFromSameAuthor && (
@@ -498,12 +524,14 @@ const Message = (props: {
       {attachedCards && (
         <div className="mt-2 flex flex-col gap-1">
           {attachedCards?.map((c) => (
-            <CardPreviewWithData
-              entityID={c.value.value}
-              size="big"
-              hideContent={true}
-              key={c.id}
-            />
+            <div key={c.id} className="w-full">
+              <CardPreviewWithData
+                entityID={c.value.value}
+                size="big"
+                hideContent={true}
+                key={c.id}
+              />
+            </div>
           ))}
         </div>
       )}

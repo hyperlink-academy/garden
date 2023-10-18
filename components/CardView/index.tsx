@@ -34,7 +34,7 @@ import { getAndUploadFile } from "src/getAndUploadFile";
 import { useReactions } from "hooks/useReactions";
 import { HighlightCard } from "./HighlightCard";
 import { CardViewDrawer } from "./CardViewDrawer";
-import { useCloseCard, useRoomHistory } from "hooks/useUIState";
+import { useCloseCard, useRoomHistory, useUIState } from "hooks/useUIState";
 import { Modal } from "components/Modal";
 
 const borderStyles = (args: { member: boolean }) => {
@@ -64,7 +64,6 @@ export const CardView = (props: {
   let { authToken } = useAuth();
   let spaceID = useSpaceID();
   let memberName = db.useEntity(props.entityID, "member/name");
-  let { ref } = usePreserveScroll<HTMLDivElement>(props.entityID);
 
   let { mutate, rep } = useMutations();
   let { setNodeRef } = useDroppableZone({
@@ -102,16 +101,15 @@ export const CardView = (props: {
         ref={setNodeRef}
         className={`
           card
-          no-scrollbar
           relative
           mx-auto       
           flex
           h-[42px] w-full
           max-w-3xl grow
-          flex-col items-stretch overflow-y-scroll
+          flex-col items-stretch
           ${borderStyles({
-            member: !!memberName,
-          })}
+          member: !!memberName,
+        })}
             member: !!memberName,
           })}
           `}
@@ -144,7 +142,6 @@ export const CardView = (props: {
           </div>
         )}
         <div
-          ref={ref}
           id="card-container"
           className={`
             no-scrollbar flex 
@@ -154,8 +151,8 @@ export const CardView = (props: {
             overflow-x-hidden overflow-y-hidden
             pb-0
             ${contentStyles({
-              member: !!memberName,
-            })}
+            member: !!memberName,
+          })}
             `}
         >
           <CardContent {...props} />
@@ -170,11 +167,12 @@ export const CardContent = (props: {
   onDelete?: () => void;
   referenceFactID?: string;
 }) => {
+  let { ref } = usePreserveScroll<HTMLDivElement>(props.entityID);
   let date = db.useEntity(props.entityID, "card/date");
   let [dateEditing, setDateEditing] = useUndoableState(false);
   let memberName = db.useEntity(props.entityID, "member/name");
   let { authorized } = useMutations();
-  let [drawerOpen, setDrawerOpen] = useState(false);
+  let drawerOpen = useUIState((s) => s.cardStates[props.entityID]?.drawerOpen);
   let cardCreator = db.useEntity(props.entityID, "card/created-by");
   let cardCreatorName = db.useEntity(
     cardCreator?.value.value as string,
@@ -185,11 +183,11 @@ export const CardContent = (props: {
     <>
       {/* START CARD CONTENT */}
       <div
-        className={`cardContentWrapper no-scrollbar relative flex grow flex-col items-stretch overflow-y-scroll pb-3 sm:pb-4 ${
-          !memberName ? "pt-3 sm:pt-4" : ""
-        }`}
+        ref={ref}
+        className={`cardContentWrapper no-scrollbar relative flex grow flex-col items-stretch overflow-y-scroll overscroll-y-auto pb-3 sm:pb-4 ${!memberName ? "pt-3 sm:pt-4" : ""
+          }`}
         onClick={() => {
-          setDrawerOpen(false);
+          useUIState.getState().closeDrawer(props.entityID);
         }}
       >
         <div className="cardSectionAdder pointer-events-none sticky top-0 z-10 flex w-full  justify-between">
@@ -228,9 +226,8 @@ export const CardContent = (props: {
 
         {/* card content wrapper */}
         <div
-          className={`cardContent z-0 flex grow flex-col gap-3 pb-10 ${
-            drawerOpen ? "opacity-40" : ""
-          }`}
+          className={`cardContent z-0 flex grow flex-col gap-3 pb-10 ${drawerOpen ? "opacity-40" : ""
+            }`}
         >
           <div className="flex flex-col gap-0">
             <Title entityID={props.entityID} />
@@ -259,16 +256,7 @@ export const CardContent = (props: {
       {/* END CARD CONTENT */}
 
       {/* START CARD DISCUSSION */}
-      <CardViewDrawer
-        entityID={props.entityID}
-        drawerOpen={drawerOpen}
-        setDrawerOpen={() => {
-          setDrawerOpen(true);
-        }}
-        setDrawerClosed={() => {
-          setDrawerOpen(false);
-        }}
-      />
+      <CardViewDrawer entityID={props.entityID} drawerOpen={drawerOpen} />
     </>
   );
 };
@@ -279,9 +267,8 @@ const BackButton = () => {
   let { authorized } = useMutations();
   return (
     <button
-      className={`pointer-events-auto  flex h-min w-fit items-center gap-1 rounded-full border border-grey-90 bg-white p-1 text-grey-55 shadow ${
-        !authorized ? "" : "mt-3"
-      }`}
+      className={`pointer-events-auto  flex h-min w-fit items-center gap-1 rounded-full border border-grey-90 bg-white p-1 text-grey-55 shadow ${!authorized ? "" : "mt-3"
+        }`}
       onClick={() => {
         if (history.length < 2) {
           setTimeout(() => {
@@ -603,11 +590,10 @@ export const SectionAdder = (props: {
       {/* END LINKED CARD ADDER */}
       {/* DATE ADDER */}
       <button
-        className={`${
-          date || props.dateEditing ? toggledOnStyle : toggledOffStyle
-        } `}
+        className={`${date || props.dateEditing ? toggledOnStyle : toggledOffStyle
+          } `}
         onClick={() => {
-          if (date !== null) {
+          if (date) {
             document
               .getElementById("card-container")
               ?.scrollTo({ top: 0, behavior: "smooth" });
@@ -630,11 +616,10 @@ export const SectionAdder = (props: {
       >
         <Popover.Trigger className="flex items-center">
           <button
-            className={`${toggledOffStyle} ${
-              !reactionPickerOpen
+            className={`${toggledOffStyle} ${!reactionPickerOpen
                 ? ""
                 : "rounded-md border border-accent-blue p-0.5 text-accent-blue"
-            }`}
+              }`}
           >
             <ReactionAdd />
           </button>

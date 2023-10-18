@@ -19,7 +19,7 @@ export const Modal: React.FC<
     <Dialog
       open={props.open}
       onClose={props.onClose}
-      className="fixed inset-0 z-50 overflow-y-hidden"
+      className="fixed inset-0 z-40 overflow-y-hidden"
     >
       <Dialog.Overlay className={props.dark ? "dark-overlay" : "overlay"} />
       <div

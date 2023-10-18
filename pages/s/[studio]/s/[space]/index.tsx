@@ -1,24 +1,20 @@
 import { CardViewer } from "components/CardViewerContext";
-import { db, scanIndex, useMutations, useSpaceID } from "hooks/useReplicache";
 import { SmallCardDragContext } from "components/DragContext";
 import { Sidebar } from "components/SpaceLayout";
 import { useEffect, useState } from "react";
 import useWindowDimensions from "hooks/useWindowDimensions";
-import { sortByPosition } from "src/position_helpers";
 import { Room } from "components/Room";
 import { SpaceMetaTitle } from "components/SpaceMetaTitle";
-import { useRoom, useSetRoom, useUIState } from "hooks/useUIState";
-import { useRouter } from "next/router";
+import { useRoom } from "hooks/useUIState";
 import { PresenceHandler } from "components/PresenceHandler";
 import { useSpaceSyncState } from "hooks/useSpaceSyncState";
 import { workerAPI } from "backend/lib/api";
 import { WORKER_URL } from "src/constants";
 import { GetStaticPropsContext, InferGetStaticPropsType } from "next/types";
-import { useSpaceData } from "hooks/useSpaceData";
 import { SpaceProvider } from "components/ReplicacheProvider";
 import { SWRConfig } from "swr";
 import { useViewportSize } from "hooks/useViewportSize";
-import { usePreventScroll } from "@react-aria/overlays";
+import { usePreventResize } from "hooks/usePreventResize";
 
 export async function getStaticPaths() {
   return { paths: [], fallback: "blocking" };
@@ -58,7 +54,6 @@ function Space() {
   useSpaceSyncState();
   let room = useRoom();
   const { width } = useWindowDimensions();
-  let height = useViewportSize().height;
 
   useEffect(() => {
     window.requestAnimationFrame(() => {
@@ -66,7 +61,9 @@ function Space() {
       roomPane?.scrollIntoView();
     });
   }, []);
-  usePreventScroll();
+
+  let viewheight = useViewportSize().height;
+  usePreventResize();
 
   return (
     <>
@@ -74,17 +71,17 @@ function Space() {
       <PresenceHandler />
 
       <div
-        style={{ height }}
+        style={{ height: viewheight }}
         className="spaceWrapperflex  flex-col items-stretch justify-items-center gap-2 overflow-hidden sm:gap-4"
       >
-        <div className="spaceontent max-w-screen-xl relative mx-auto flex h-full w-full grow items-stretch md:py-6 md:px-4">
+        <div className="spaceontent max-w-screen-xl relative mx-auto flex h-full w-full grow items-stretch md:px-4 md:py-6">
           <SmallCardDragContext>
             {width > 960 || width === 0 ? (
               <div
                 className="spaceLargeSplitLayout no-scrollbar flex w-full flex-row items-stretch gap-4 overflow-x-scroll sm:justify-center sm:gap-4"
-                // you need to add this to the contentSplitLayout class if you are going to scroll across more than 2 panes
-                // it prevents the last pane from sticking to the end
-                // after:content-[""] after:h-full after:w-2 after:block after:shrink-0
+              // you need to add this to the contentSplitLayout class if you are going to scroll across more than 2 panes
+              // it prevents the last pane from sticking to the end
+              // after:content-[""] after:h-full after:w-2 after:block after:shrink-0
               >
                 <div className="spaceRoomAndSidebar flex flex-row rounded-md border border-grey-90">
                   <div className="rounded-l-md border border-transparent border-r-grey-90 bg-white">

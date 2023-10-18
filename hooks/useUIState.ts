@@ -15,9 +15,40 @@ export let useUIState = create(
           };
         };
       },
+      cardStates: {} as {
+        [entityID: string]: {
+          drawer: null | "backlinks" | "comments";
+          drawerOpen: boolean;
+        };
+      },
       focusedCard: undefined as string | undefined,
     },
     (set) => ({
+      openDrawer: (entityID: string, drawer: "backlinks" | "comments") => {
+        set((state) => ({
+          ...state,
+          cardStates: {
+            ...state.cardStates,
+            [entityID]: {
+              ...state.cardStates[entityID],
+              drawer,
+              drawerOpen: true,
+            },
+          },
+        }));
+      },
+      closeDrawer: (entityID: string) => {
+        set((state) => ({
+          ...state,
+          cardStates: {
+            ...state.cardStates,
+            [entityID]: {
+              ...state.cardStates[entityID],
+              drawerOpen: false,
+            },
+          },
+        }));
+      },
       setRoom: (spaceID: string, room: string | undefined) => {
         set((state) => ({
           spaces: {

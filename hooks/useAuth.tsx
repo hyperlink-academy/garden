@@ -1,5 +1,5 @@
 import { workerAPI } from "backend/lib/api";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   SessionContextProvider,
   useSession,
@@ -17,9 +17,26 @@ export const AuthProvider: React.FC<React.PropsWithChildren<unknown>> = (
   return (
     <SessionContextProvider supabaseClient={supabaseClient}>
       {props.children}
+      <RefreshSession />
     </SessionContextProvider>
   );
 };
+
+const RefreshSession = () => {
+  const supabaseClient = useSupabaseClient();
+  let session = useSession();
+  useEffect(() => {
+    if (!session || !session.expires_at) return;
+    let days_until_expired =
+      (session.expires_at - Date.now() / 1000) / (60 * 60 * 24);
+    console.log(days_until_expired);
+    if (days_until_expired < 3.5) {
+      supabaseClient.auth.refreshSession();
+    }
+  }, [session]);
+  return <></>;
+};
+
 export const useAuthIdentityData = () => {
   let session = useSession();
   let { data: identityData } = useIdentityData(
@@ -76,8 +93,9 @@ export const useAuth = () => {
           email: input.email,
           password: input.password,
           options: {
-            emailRedirectTo: `${window.location.origin}/setup${input.redirectTo ? `?redirectTo=${input.redirectTo}` : ""
-              }`,
+            emailRedirectTo: `${window.location.origin}/setup${
+              input.redirectTo ? `?redirectTo=${input.redirectTo}` : ""
+            }`,
           },
         });
       },

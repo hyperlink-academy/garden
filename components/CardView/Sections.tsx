@@ -14,6 +14,7 @@ import { sortByPosition } from "src/position_helpers";
 
 export const SingleTextSection = (
   props: {
+    focusText?: string;
     autocompleteCardNames?: boolean;
     entityID: string;
     section: keyof FilterAttributes<{
@@ -104,8 +105,8 @@ export const SingleTextSection = (
         props.section === "card/content"
           ? "updateContentFact"
           : props.section === "card/title"
-          ? "updateTitleFact"
-          : "assertFact",
+            ? "updateTitleFact"
+            : "assertFact",
         {
           entity: props.entityID,
           attribute: props.section,
@@ -117,6 +118,17 @@ export const SingleTextSection = (
     },
     [action, fact?.positions, mutate, props.entityID, props.section]
   );
+
+  let value = fact?.value;
+  if (props.focusText && props.previewOnly && fact) {
+    let lines = fact?.value.split("\n");
+    let line = lines?.findIndex((line) =>
+      line.includes(props.focusText as string)
+    );
+    if (line && line > -1) {
+      value = lines.slice(Math.max(0, line - 1), line + 1).join("\n");
+    }
+  }
 
   return (
     <>
@@ -202,7 +214,7 @@ export const SingleTextSection = (
         placeholder={props.placeholder}
         className={`w-full ${props.className || ""}`}
         spellCheck={false}
-        value={(fact?.value as string) || ""}
+        value={value || ""}
         onSelect={onSelect}
         onChange={async (e) => {
           console.log("on change");

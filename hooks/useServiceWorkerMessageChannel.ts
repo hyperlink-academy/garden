@@ -14,7 +14,9 @@ export const useServiceWorkerMessageChannel = () => {
       let data: ServiceWorkerMessages = event.data;
       if (data.type === "navigate")
         Router.push(
-          `${data.spaceURL}${data.card ? `?openCard=${data.card}` : ""}`
+          `${data.spaceURL}${data.card ? `?openCard=${data.card}` : ""}`,
+          undefined,
+          { shallow: true }
         );
     };
 
