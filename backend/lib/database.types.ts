@@ -113,14 +113,17 @@ export interface Database {
       }
       members_in_spaces: {
         Row: {
+          joined_at: string | null
           member: string
           space_do_id: string
         }
         Insert: {
+          joined_at?: string | null
           member: string
           space_do_id: string
         }
         Update: {
+          joined_at?: string | null
           member?: string
           space_do_id?: string
         }
