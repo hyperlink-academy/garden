@@ -105,8 +105,8 @@ export const SingleTextSection = (
         props.section === "card/content"
           ? "updateContentFact"
           : props.section === "card/title"
-            ? "updateTitleFact"
-            : "assertFact",
+          ? "updateTitleFact"
+          : "assertFact",
         {
           entity: props.entityID,
           attribute: props.section,
@@ -299,13 +299,16 @@ export const AttachedCardSection = (props: { entityID: string }) => {
     <>
       {attachedCards && attachedCards.length > 0 && (
         <div className="flex flex-col gap-3">
-          <div className="">
+          <div className="flex flex-row gap-1">
             {authorized && (
               <CollectionType
                 collectionType={currentCollectionType?.value}
                 entityID={props.entityID}
               />
-            )}
+            )}{" "}
+            <span className="text-sm text-grey-35">
+              ({attachedCards.length})
+            </span>
           </div>
           <CardCollection
             editable
