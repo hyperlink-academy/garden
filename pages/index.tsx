@@ -62,12 +62,20 @@ export default function IndexPage() {
                       <SignupModal
                         isOpen={signupOpen}
                         onClose={() => setSignupOpen(false)}
+                        onSwitchToLogIn={() => {
+                          setLogInOpen(true);
+                          setSignupOpen(false);
+                        }}
                       />
 
                       {/* login modal */}
                       <LogInModal
                         isOpen={logInOpen}
                         onClose={() => setLogInOpen(false)}
+                        onSwitchToSignUp={() => {
+                          setLogInOpen(false);
+                          setSignupOpen(true);
+                        }}
                         redirectOnLogin={(s) =>
                           s.username
                             ? router.push(`/s/${s.username}`)
