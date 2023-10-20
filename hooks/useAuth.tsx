@@ -29,7 +29,6 @@ const RefreshSession = () => {
     if (!session || !session.expires_at) return;
     let days_until_expired =
       (session.expires_at - Date.now() / 1000) / (60 * 60 * 24);
-    console.log(days_until_expired);
     if (days_until_expired < 3.5) {
       supabaseClient.auth.refreshSession();
     }
