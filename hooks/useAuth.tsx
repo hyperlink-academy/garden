@@ -26,11 +26,13 @@ const RefreshSession = () => {
   const supabaseClient = useSupabaseClient();
   let session = useSession();
   useEffect(() => {
+    console.log(session);
     if (!session || !session.expires_at) return;
+    console.log("yo");
     let days_until_expired =
       (session.expires_at - Date.now() / 1000) / (60 * 60 * 24);
-    console.log(days_until_expired);
-    if (days_until_expired < 3.5) {
+    if (days_until_expired < 3.5 && session.expires_in > 32000) {
+      console.log("refreshing");
       supabaseClient.auth.refreshSession();
     }
   }, [session]);
