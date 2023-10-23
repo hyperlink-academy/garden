@@ -1,7 +1,12 @@
 import { Bindings } from "backend";
 import { createClient } from "./supabase";
 
-type AppEvents = "signup" | "create_space" | "joined_space" | "created_card";
+type AppEvents =
+  | "signup"
+  | "create_space"
+  | "joined_space"
+  | "created_card"
+  | "sent_message";
 
 export const app_event = async (
   env: Bindings,
