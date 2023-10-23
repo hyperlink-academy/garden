@@ -7,6 +7,7 @@ import { Message } from "./Messages";
 import { z } from "zod";
 import { webPushPayloadParser } from "pages/api/web_push";
 import { sign } from "src/sign";
+import { app_event } from "backend/lib/analytics";
 
 export type MutationContext = {
   assertEmphemeralFact: <A extends keyof FilterAttributes<{ ephemeral: true }>>(
@@ -27,7 +28,9 @@ export type MutationContext = {
     data: Partial<Fact<any>>,
     undoAction?: boolean
   ) => Promise<{ success: boolean }>;
-  runOnServer: (fn: (env: Env) => Promise<void>) => Promise<void>;
+  runOnServer: (
+    fn: (env: Env, userID: string) => Promise<void>
+  ) => Promise<void>;
   retractFact: (id: string, undoAction?: boolean) => Promise<void>;
   retractEphemeralFact: (clientID: string, id: string) => Promise<void>;
   scanIndex: {
@@ -212,6 +215,13 @@ const createCard: Mutation<{
     },
     ctx
   );
+  await ctx.runOnServer(async (env, userID) => {
+    await app_event(env.env, {
+      event: "created_card",
+      spaceID: env.id,
+      user: userID,
+    });
+  });
 };
 
 export type FactInput = {
@@ -352,12 +362,18 @@ const replyToDiscussion: Mutation<{
     args.message.sender,
     "space/member"
   );
-  await ctx.runOnServer(async (env) => {
+  await ctx.runOnServer(async (env, userID) => {
     if (!senderStudio) return;
 
     let title: Fact<"room/name" | "card/title"> | null =
       await ctx.scanIndex.eav(args.discussion, "card/title");
     if (!title) title = await ctx.scanIndex.eav(args.discussion, "room/name");
+
+    await app_event(env.env, {
+      event: "sent_message",
+      spaceID: env.id,
+      user: userID,
+    });
 
     console.log(`${env.env.NEXT_API_URL}/api/web_push`);
     try {

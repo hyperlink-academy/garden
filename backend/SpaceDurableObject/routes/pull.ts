@@ -60,11 +60,6 @@ export const pullRoute = makeRoute({
       lastUpdated: newLastUpdated,
       ephemeralFacts: ephemeralFacts.map((f) => f.id),
     };
-    app_event(env.env, {
-      event: "pulled_from_space",
-      user: "",
-      spaceID: env.id,
-    });
 
     return {
       data: {
