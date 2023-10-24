@@ -1,5 +1,5 @@
 import { Fact } from "data/Facts";
-import { db, useMutations } from "hooks/useReplicache";
+import { db, useMutations, useSpaceID } from "hooks/useReplicache";
 import { usePreserveScroll } from "hooks/utils";
 import { useEffect, useState } from "react";
 import useMeasure from "react-use-measure";
@@ -20,6 +20,9 @@ import { UnreadsRoom } from "./UnreadsRoom";
 import { EditRoomModal } from "./SpaceLayout/Sidebar/RoomListLayout";
 import { RenderedText } from "./Textarea/RenderedText";
 import { ulid } from "src/ulid";
+import { useAuth } from "hooks/useAuth";
+import { getAndUploadFile } from "src/getAndUploadFile";
+import { create } from "components/CardStack";
 
 export const Room = (props: { entityID: string }) => {
   let roomType = db.useEntity(props.entityID, "room/type");
@@ -27,6 +30,10 @@ export const Room = (props: { entityID: string }) => {
 
   let { reactions, filters, setFilters, cardsFiltered, total } =
     useFilteredCards(props.entityID, "desktop/contains");
+
+  let { authToken } = useAuth();
+  let { authorized, mutate, rep, action } = useMutations();
+  let spaceID = useSpaceID();
 
   if (props.entityID === "search") return <SearchRoom />;
   if (props.entityID === "calendar") return <CalendarRoom />;
@@ -41,6 +48,52 @@ export const Room = (props: { entityID: string }) => {
   return (
     <div
       id="room-wrapper"
+      onPaste={async (e) => {
+        if (!authToken || !spaceID || !roomType || !rep) return;
+        if (roomType.value === "chat") return;
+        let data = await getAndUploadFile(
+          e.clipboardData.items,
+          authToken,
+          spaceID
+        );
+        if (!data.success) return;
+        let newCard = ulid();
+        action.start();
+        let factID = ulid();
+        await create(
+          newCard,
+          {
+            addToEnd: true,
+            parentID: props.entityID,
+            positionKey: "eav",
+            attribute: "desktop/contains",
+          },
+          rep,
+          mutate,
+          factID
+        );
+        await mutate("assertFact", {
+          entity: newCard,
+          attribute: "card/image",
+          value: { type: "file", id: data.data.id, filetype: "image" },
+          positions: {},
+        });
+        if (roomType.value === "canvas") {
+          await mutate("assertFact", {
+            entity: factID,
+            attribute: "card/position-in",
+            value: {
+              type: "position",
+              x: 0,
+              y: 0,
+              rotation: 1 - Math.random() * 2,
+              size: "small",
+            },
+            positions: {},
+          });
+        }
+        action.end();
+      }}
       ref={ref}
       className="no-scrollbar flex h-full w-[336px] flex-col items-stretch overflow-x-hidden overflow-y-scroll p-2 pt-0 text-sm sm:p-4 sm:pt-0"
     >

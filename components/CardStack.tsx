@@ -172,11 +172,12 @@ export const AddExistingCard = (
   );
 };
 
-const create = async (
+export const create = async (
   entity: string,
   props: StackData,
   rep: Replicache<ReplicacheMutators>,
-  mutate: ReturnType<typeof useMutations>["mutate"]
+  mutate: ReturnType<typeof useMutations>["mutate"],
+  factID?: string
 ) => {
   let position;
   let positionKey = "eav";
@@ -198,7 +199,7 @@ const create = async (
   }
 
   await mutate("addCardToSection", {
-    factID: ulid(),
+    factID: factID || ulid(),
     cardEntity: entity,
     parent: props.parentID,
     section: props.attribute,
