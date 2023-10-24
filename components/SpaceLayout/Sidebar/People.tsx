@@ -410,7 +410,8 @@ const InviteMember = () => {
             <h3>Send a friend this invite link!</h3>
             <p>
               They can use it to become a space member. <br /> Members can
-              create and edit cards.
+              create and edit cards. Members have full access to the space and
+              can invite other members.
             </p>
           </div>
           <div className="inviteMemberModalLink flex w-full gap-2">
