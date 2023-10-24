@@ -11,6 +11,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { Modal } from "components/Modal";
+import { Divider } from "components/Layout";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export default function SignupPage() {
@@ -129,102 +130,81 @@ export default function SignupPage() {
     );
 
   return (
-    <div className="grid-rows-max mx-auto grid max-w-md gap-8">
-      <div className="grid-auto-rows grid gap-2">
-        <h1>Set up your Homepage!</h1>
-      </div>
+    <Modal open={true} onClose={() => {}}>
+      <div className="flex max-w-md flex-col gap-4">
+        <div className=" h-[140px] w-[164px] bg-test-pink" />
 
-      <form onSubmit={onSubmit} className="grid w-full gap-8">
-        {/* add the app */}
-        {/* TODO: device logic!
-        if on computer…would just prompt to get phone out
-        if on phone…still on setup + skip if already in app? 
-        maybe trigger notif permissions RIGHT HERE??
-        */}
-        <div className="flex flex-col gap-4">
-          <div className="flex gap-4">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-blue p-2 text-white">
-              1
-            </div>
-            <h2>add the app</h2>
-          </div>
-          <p>For easy access & notifications from collaborators 📬</p>
-          <p className="italic">
-            You can do this now & continue setup on mobile!
-          </p>
-          <ButtonSecondary
-            content="Get the Hyperlink App"
-            icon={<AddTiny />}
-            onClick={() => setOpen(true)}
-            type="button"
-          />
-          <Modal open={open} onClose={() => setOpen(false)}>
-            <HelpAppInfo />
-            <ButtonPrimary content="Got It!" onClick={() => setOpen(false)} />
-          </Modal>
+        <div className="grid-auto-rows grid gap-2">
+          <h2>Hi! It&apos;s nice to meet you!</h2>
         </div>
 
-        {/* pick a name */}
-        <div className="flex flex-col gap-4">
-          <div className="flex gap-4">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-blue p-2 text-white">
-              2
-            </div>
-            <h2>pick a name</h2>
-          </div>
-          <p>
-            How others see you — and the name of your Hyperlink Homepage, where
-            all your Spaces live 🏡
-          </p>
-          <label className="grid-flow-rows grid gap-2 font-bold">
-            <span>
-              Username{" "}
-              <span className="text-sm font-normal">
-                (numbers, letters, and underscores only)
-              </span>
-            </span>
-            {status === "invalidUsername" ? (
-              <p className="pb-1 font-bold text-accent-red">
-                Sorry, that username is not available!
-              </p>
-            ) : null}
-            <input
-              type="text"
-              minLength={3}
-              required
-              pattern="[A-Za-z_0-9]+"
-              value={data.username}
-              onChange={(e) =>
-                setData({ ...data, username: e.currentTarget.value })
-              }
-            />
-          </label>
-        </div>
+        <form onSubmit={onSubmit} className="grid w-full gap-4 text-grey-35">
+          {/* pick a name */}
+          <div className="flex flex-col gap-4">
+            <label className="grid-flow-rows grid gap-2 font-bold">
+              <div className="flex flex-col gap-0">
+                Pick a Username
+                <p className="text-sm font-normal text-grey-55">
+                  Unique, no special characters or spaces!
+                </p>
+              </div>
+              <div className="flex flex-col gap-1">
+                <input
+                  type="text"
+                  minLength={3}
+                  required
+                  pattern="[A-Za-z_0-9]+"
+                  title="No special characters or spaces please!"
+                  value={data.username}
+                  onChange={(e) =>
+                    setData({ ...data, username: e.currentTarget.value })
+                  }
+                />
+                {data.username.match(/^[A-Za-z_0-9]+$/) === null &&
+                data.username !== "" ? (
+                  <p className="text-sm  font-normal text-accent-red">
+                    No special characters or spaces please!
+                  </p>
+                ) : null}
 
-        {/* get started */}
-        <div className="flex flex-col gap-4">
-          <div className="flex gap-4">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-blue p-2 text-white">
-              3
-            </div>
-            <h2>get started</h2>
+                {status === "invalidUsername" ? (
+                  <p className="text-sm font-normal text-accent-red">
+                    Sorry, that username is not available!
+                  </p>
+                ) : null}
+              </div>
+            </label>
           </div>
-          <p>
-            Make your first Space — you&apos;ll find some inspiration on your
-            Homepage ✨
-          </p>
+
           <ButtonPrimary
+            className="place-self-end"
             disabled={
               status === "invalidUsername" ||
               data.username.match(/^[A-Za-z_0-9]+$/) === null
             }
             type="submit"
-            content={
-              status === "loading" ? <DotLoader /> : "Create your Homepage!"
-            }
+            content={status === "loading" ? <DotLoader /> : "Get Started!"}
           />
+        </form>
+        <Divider />
+        {/* get started */}
+        <div className="lightBorder flex flex-col gap-4 bg-bg-blue p-3 text-sm">
+          <div className="flex flex-col gap-2">
+            <p className="font-bold italic">psst, you should get the app!</p>
+            <div className="flex flex-col gap-1 text-sm text-grey-55">
+              <p>
+                Hyperlink is a great place for collaboration. Get the app for
+                updates when someone comments, or messages you.
+              </p>
+
+              <p>
+                Log in on a mobile browser, and open your settings to find out
+                how.
+              </p>
+            </div>
+          </div>
         </div>
-      </form>
-    </div>
+      </div>
+    </Modal>
   );
 }
