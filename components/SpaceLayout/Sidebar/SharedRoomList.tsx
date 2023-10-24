@@ -129,18 +129,7 @@ const CreateRoom = () => {
           onSubmit={async (e) => {
             e.preventDefault();
             let room = ulid();
-            await mutate("assertFact", {
-              entity: room,
-              attribute: "room/name",
-              value: roomState.name,
-              positions: {},
-            });
-            await mutate("assertFact", {
-              entity: room,
-              attribute: "room/type",
-              value: roomState.type,
-              positions: {},
-            });
+            await mutate("createRoom", { entity: room, ...roomState });
             setRoom(room);
             setRoomState({ name: "", type: "canvas" });
             setOpen(false);

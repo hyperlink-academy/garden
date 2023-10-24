@@ -6,7 +6,8 @@ type AppEvents =
   | "create_space"
   | "joined_space"
   | "created_card"
-  | "sent_message";
+  | "sent_message"
+  | "created_room";
 
 export const app_event = async (
   env: Bindings,

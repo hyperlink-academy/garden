@@ -401,6 +401,32 @@ const replyToDiscussion: Mutation<{
   });
 };
 
+const createRoom: Mutation<{
+  entity: string;
+  type: "canvas" | "collection" | "chat";
+  name: string;
+}> = async (args, ctx) => {
+  await ctx.assertFact({
+    entity: args.entity,
+    attribute: "room/name",
+    value: args.name,
+    positions: {},
+  });
+  await ctx.assertFact({
+    entity: args.entity,
+    attribute: "room/type",
+    value: args.type,
+    positions: {},
+  });
+  await ctx.runOnServer(async (env, userID) => {
+    await app_event(env.env, {
+      event: "created_room",
+      spaceID: env.id,
+      user: userID,
+    });
+  });
+};
+
 const deleteEntity: Mutation<{ entity: string }> = async (args, ctx) => {
   let references = await ctx.scanIndex.vae(args.entity);
   let facts = await ctx.scanIndex.eav(args.entity, null);
@@ -520,4 +546,5 @@ export const Mutations = {
   addReaction,
   initializeClient,
   setClientInCall,
+  createRoom,
 };
