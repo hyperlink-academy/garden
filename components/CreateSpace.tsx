@@ -37,9 +37,10 @@ export const CreateSpace = (props: {
   let rep = useContext(ReplicacheContext);
   if (!authorized) return null;
   return (
-    <div className="flex gap-2">
-      <a className="place-self-center">
+    <div className="">
+      <a className="flex w-full place-items-center">
         <ButtonSecondary
+          className="mx-auto"
           icon={<SpaceCreate />}
           content="Create New Space!"
           onClick={() => setOpen(true)}

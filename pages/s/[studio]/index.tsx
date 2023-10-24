@@ -11,7 +11,8 @@ import { useEffect, useState } from "react";
 import { DisclosureCollapseTiny, DisclosureExpandTiny } from "components/Icons";
 import Head from "next/head";
 import { NotificationManager } from "components/NotificationManager";
-import { HelpExampleSpaces } from "components/HelpCenter";
+import { Divider } from "components/Layout";
+import { NewStudio } from "./newStudio";
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>;
 export default function UserHomePage(props: Props) {
@@ -80,25 +81,28 @@ export default function UserHomePage(props: Props) {
                 />
               ))}
           </div>
-          <div className="flex flex-row gap-2 text-sm">
-            sort by:{" "}
-            <button
-              onClick={() => setSortOrder("lastUpdated")}
-              className={`${
-                sortOrder === "lastUpdated" ? "underline" : ""
-              } hover:underline`}
-            >
-              last updated
-            </button>
-            <button
-              onClick={() => setSortOrder("name")}
-              className={`${
-                sortOrder === "name" ? "underline" : ""
-              } hover:underline`}
-            >
-              name
-            </button>
-          </div>
+          <Divider />
+          {spaces.length === 0 ? null : (
+            <div className="flex flex-row gap-2 text-sm">
+              sort by:{" "}
+              <button
+                onClick={() => setSortOrder("lastUpdated")}
+                className={`${
+                  sortOrder === "lastUpdated" ? "underline" : ""
+                } hover:underline`}
+              >
+                last updated
+              </button>
+              <button
+                onClick={() => setSortOrder("name")}
+                className={`${
+                  sortOrder === "name" ? "underline" : ""
+                } hover:underline`}
+              >
+                name
+              </button>
+            </div>
+          )}
           <List
             spaces={spaces}
             id={data.studio}
@@ -191,7 +195,7 @@ const List = (props: {
       {/* different messages for logged in user vs. viewing someone else's home */}
       {spaces.length == 0 ? (
         session?.loggedIn && myStudioName == currentStudioName ? (
-          <MyHomeEmpty
+          <NewStudio
             studioSpaceID={props.id}
             studioName={myStudioName as string}
           /> /* me as in the logged in user who can make spaces here */
@@ -229,29 +233,6 @@ const YourHomeEmpty = (props: { username: string }) => {
     <div className="lightBorder my-4 flex flex-col gap-4 border p-4">
       <p>This person has no active Spaces.</p>
       <p>Check back later, or invite {props.username} to collaborate!</p>
-    </div>
-  );
-};
-
-const MyHomeEmpty = (props: { studioSpaceID: string; studioName: string }) => {
-  return (
-    <div className="lightBorder my-4 flex flex-col gap-4 border border-dashed p-8 text-center">
-      <p>
-        Spaces are containers for doing things together: projects, experiments,
-        collaboration. Each Space has its own cards, calendar, and members.
-      </p>
-      <p>To get started, make a new Space & invite a friend to join!</p>
-
-      <div className="m-auto">
-        <CreateSpace
-          studioSpaceID={props.studioSpaceID}
-          studioName={props.studioName}
-        />
-      </div>
-
-      <hr className="m-auto my-4 w-16 border-dashed border-grey-80" />
-
-      <HelpExampleSpaces />
     </div>
   );
 };
