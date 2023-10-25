@@ -32,7 +32,7 @@ export const Room = (props: { entityID: string }) => {
     useFilteredCards(props.entityID, "desktop/contains");
 
   let { authToken } = useAuth();
-  let { authorized, mutate, rep, action } = useMutations();
+  let { authorized, mutate, rep, action, memberEntity } = useMutations();
   let spaceID = useSpaceID();
 
   if (props.entityID === "search") return <SearchRoom />;
@@ -49,7 +49,8 @@ export const Room = (props: { entityID: string }) => {
     <div
       id="room-wrapper"
       onPaste={async (e) => {
-        if (!authToken || !spaceID || !roomType || !rep) return;
+        if (!authToken || !spaceID || !roomType || !rep || !memberEntity)
+          return;
         if (roomType.value === "chat") return;
         let data = await getAndUploadFile(
           e.clipboardData.items,
@@ -60,6 +61,11 @@ export const Room = (props: { entityID: string }) => {
         let newCard = ulid();
         action.start();
         let factID = ulid();
+        await mutate("createCard", {
+          memberEntity,
+          entityID: newCard,
+          title: "",
+        });
         await create(
           newCard,
           {
