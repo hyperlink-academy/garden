@@ -103,10 +103,14 @@ const removeCardFromDesktopOrCollection: Mutation<{
       acc &&
       (!f.value ||
         f.attribute === "card/created-by" ||
-        f.attribute === "card/unread-by")
+        f.attribute === "card/unread-by") &&
+      !f.schema.ephemeral
     );
   }, true);
-  if (deleteable && references.length === 1) {
+  if (
+    deleteable &&
+    references.filter((f) => !f.schema.ephemeral).length === 1
+  ) {
     await Promise.all(
       facts.concat(references).map((f) => ctx.retractFact(f.id))
     );
