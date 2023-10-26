@@ -15,8 +15,9 @@ import { CardPreview } from "./CardPreview";
 import { pointerWithinOrRectIntersection } from "src/customCollisionDetection";
 import { RoomListPreview } from "./SpaceLayout/Sidebar/RoomListLayout";
 import { animated, useSpring } from "@react-spring/web";
-import { CardPreviewData } from "hooks/CardPreviewData";
+import { CardPreviewData, EmptyCardData } from "hooks/CardPreviewData";
 import { Fact } from "data/Facts";
+import { BaseSmallCard } from "./CardPreview/SmallCard";
 
 export const SmallCardDragContext = (props: {
   children: React.ReactNode;
@@ -85,7 +86,7 @@ export const SmallCardDragContext = (props: {
       {props.children}
 
       <DragOverlay dropAnimation={null} adjustScale={false}>
-        {active?.entityID ? (
+        {active ? (
           <AnimatedPickup>
             {active.type === "card" ? (
               <div
@@ -111,14 +112,23 @@ export const SmallCardDragContext = (props: {
                   hideContent={active.hideContent}
                 />
                 {over?.type === "linkCard" && (
-                  <span className="absolute -top-2 -left-2 text-accent-blue">
+                  <span className="absolute -left-2 -top-2 text-accent-blue">
                     <AddSmall />
                   </span>
                 )}
               </div>
-            ) : (
+            ) : active.type === "room" ? (
               <RoomListPreview entityID={active.entityID} />
-            )}
+            ) : active.type === "new-card" ? (
+              <div className="absolute" style={{ transform: "rotate(0rad)" }}>
+                <CardPreview
+                  outerControls
+                  entityID={""}
+                  size="small"
+                  data={EmptyCardData}
+                />
+              </div>
+            ) : null}
           </AnimatedPickup>
         ) : null}
       </DragOverlay>
@@ -151,6 +161,7 @@ export type DraggableData = {
       data: CardPreviewData;
     }
   | { type: "room" }
+  | { type: "new-card" }
 );
 
 export type DroppableData = {

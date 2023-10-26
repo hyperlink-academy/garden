@@ -46,39 +46,63 @@ export const Desktop = (props: { entityID: string }) => {
         });
     },
     onDragEnd: async (data, rect) => {
-      if (!rect || !droppableRect.current || !rep || data.type !== "card")
+      if (!rect || !droppableRect.current || !rep || data.type === "room")
         return;
       let newPosition = {
         y: snap(rect.top - droppableRect.current?.top),
         x: snap(rect.left - droppableRect.current.left),
       };
-      if (data.parent !== props.entityID) {
-        await mutate("retractFact", { id: data.id });
+
+      if (data.type === "new-card") {
+        console.log("yo");
+        if (!memberEntity) return;
+        let entityID = ulid();
+        await mutate("createCard", {
+          entityID,
+          title: "",
+          memberEntity,
+        });
+
         await mutate("addCardToDesktop", {
           factID: ulid(),
-          entity: data.entityID,
+          entity: entityID,
           desktop: props.entityID,
           position: {
             ...newPosition,
             rotation: 0,
-            size:
-              data.position?.size === "small"
-                ? "small"
-                : data.hideContent
-                ? "small"
-                : "big",
+            size: "small",
           },
         });
-      } else {
-        let position = data.position;
-        if (!position) return;
-        await mutate("updatePositionInDesktop", {
-          factID: data.id,
-          parent: props.entityID,
-          dx: newPosition.x - position.x,
-          dy: newPosition.y - position.y,
-          da: 0,
-        });
+      }
+      if (data.type === "card") {
+        if (data.parent !== props.entityID) {
+          await mutate("retractFact", { id: data.id });
+          await mutate("addCardToDesktop", {
+            factID: ulid(),
+            entity: data.entityID,
+            desktop: props.entityID,
+            position: {
+              ...newPosition,
+              rotation: 0,
+              size:
+                data.position?.size === "small"
+                  ? "small"
+                  : data.hideContent
+                  ? "small"
+                  : "big",
+            },
+          });
+        } else {
+          let position = data.type === "card" ? data.position : { x: 0, y: 0 };
+          if (!position) return;
+          await mutate("updatePositionInDesktop", {
+            factID: data.id,
+            parent: props.entityID,
+            dx: newPosition.x - position.x,
+            dy: newPosition.y - position.y,
+            da: 0,
+          });
+        }
       }
     },
   });

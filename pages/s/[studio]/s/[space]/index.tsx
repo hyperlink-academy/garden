@@ -79,9 +79,9 @@ function Space() {
             {width > 960 || width === 0 ? (
               <div
                 className="spaceLargeSplitLayout no-scrollbar flex w-full flex-row items-stretch gap-4 overflow-x-scroll sm:justify-center sm:gap-4"
-              // you need to add this to the contentSplitLayout class if you are going to scroll across more than 2 panes
-              // it prevents the last pane from sticking to the end
-              // after:content-[""] after:h-full after:w-2 after:block after:shrink-0
+                // you need to add this to the contentSplitLayout class if you are going to scroll across more than 2 panes
+                // it prevents the last pane from sticking to the end
+                // after:content-[""] after:h-full after:w-2 after:block after:shrink-0
               >
                 <div className="spaceRoomAndSidebar flex flex-row rounded-md border border-grey-90">
                   <div className="rounded-l-md border border-transparent border-r-grey-90 bg-white">
@@ -96,7 +96,7 @@ function Space() {
                 <CardViewer room={room} />
               </div>
             ) : (
-              <div className="no-scrollbar pwa-padding mb-3 mt-3 flex snap-x snap-mandatory flex-row overflow-x-scroll overscroll-x-none scroll-smooth">
+              <div className="no-scrollbar pwa-padding mb-3 mt-3 flex snap-x snap-mandatory flex-row overflow-y-hidden overflow-x-scroll overscroll-x-none scroll-smooth">
                 <div
                   id="sidebarWrapper"
                   className="ml-2 snap-end snap-always rounded-md border border-grey-90 bg-white"

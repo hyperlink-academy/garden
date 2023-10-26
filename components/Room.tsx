@@ -1,5 +1,5 @@
 import { Fact } from "data/Facts";
-import { db, useMutations, useSpaceID } from "hooks/useReplicache";
+import { db, scanIndex, useMutations, useSpaceID } from "hooks/useReplicache";
 import { usePreserveScroll } from "hooks/utils";
 import { useEffect, useState } from "react";
 import useMeasure from "react-use-measure";
@@ -9,6 +9,7 @@ import { useFilteredCards, Filters, FilterByReactions } from "./CardFilter";
 import { DiscussionRoom } from "./CardView/Discussion";
 import { Desktop } from "./Desktop";
 import {
+  CardAdd,
   CollectionListTiny,
   CollectionPreviewTiny,
   GoToTop,
@@ -22,7 +23,11 @@ import { RenderedText } from "./Textarea/RenderedText";
 import { ulid } from "src/ulid";
 import { useAuth } from "hooks/useAuth";
 import { getAndUploadFile } from "src/getAndUploadFile";
-import { create } from "components/CardStack";
+import { AddExistingCard, create } from "components/CardStack";
+import { useDraggable } from "@dnd-kit/core";
+import { useDraggableCard } from "./DragContext";
+import { sortByPosition } from "src/position_helpers";
+import { generateKeyBetween } from "src/fractional-indexing";
 
 export const Room = (props: { entityID: string }) => {
   let roomType = db.useEntity(props.entityID, "room/type");
@@ -130,6 +135,129 @@ export const Room = (props: { entityID: string }) => {
           </div>
         )
       ) : null}
+
+      <AddCardButton
+        roomEntity={props.entityID}
+        getViewHeight={() =>
+          ref.current ? ref?.current.clientHeight + ref.current.scrollTop : 0
+        }
+      />
+    </div>
+  );
+};
+
+const AddCardButton = (props: {
+  roomEntity: string;
+  getViewHeight: () => number | undefined;
+}) => {
+  let [entityID] = useState(ulid());
+  let roomType = db.useEntity(props.roomEntity, "room/type");
+  const { attributes, listeners, setNodeRef } = useDraggableCard({
+    id: "new-card",
+    entityID,
+    type: "new-card",
+  });
+  let { mutate, memberEntity, authorized, rep } = useMutations();
+  if (!authorized || !roomType || roomType?.value === "chat") return null;
+  return (
+    <div className="absolute bottom-0 left-[136px] z-[2] -mb-1 flex h-8 w-16 items-center justify-center rounded-t-full border border-b-0 border-grey-80 bg-background text-center">
+      <button
+        ref={setNodeRef}
+        {...attributes}
+        {...listeners}
+        onClick={async () => {
+          if (!roomType || !memberEntity || !authorized || !rep) return;
+          if (roomType.value === "chat") return;
+          let newEntity = ulid();
+          await mutate("createCard", {
+            entityID,
+            title: "",
+            memberEntity,
+          });
+          if (roomType.value === "collection") {
+            let siblings = (
+              await rep.query((tx) => {
+                return scanIndex(tx).eav(props.roomEntity, "desktop/contains");
+              })
+            ).sort(sortByPosition("eav"));
+            let newIndex = siblings.length - 1;
+            let position = generateKeyBetween(
+              siblings[newIndex]?.positions.eav || null,
+              siblings[newIndex + 1]?.positions.eav || null
+            );
+
+            await mutate("addCardToSection", {
+              factID: ulid(),
+              cardEntity: newEntity,
+              parent: props.roomEntity,
+              section: "desktop/contains",
+              positions: {
+                eav: position,
+              },
+            });
+          }
+          if (roomType.value === "canvas") {
+            let viewHeight = props.getViewHeight() || 128;
+            mutate("addCardToDesktop", {
+              entity: newEntity,
+              factID: ulid(),
+              desktop: props.roomEntity,
+              position: {
+                rotation: 0,
+                size: "small",
+                x: 64,
+                y: viewHeight - 256,
+              },
+            });
+          }
+        }}
+        className="outline-none hover:text-accent-blue"
+      >
+        <div className="-mt-4">
+          <svg
+            width="40"
+            height="40"
+            viewBox="0 0 59 49"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <rect
+              x="6.5"
+              y="25.5"
+              width="38"
+              height="23"
+              rx="2"
+              fill="white"
+              stroke="#E6E6E6"
+            />
+            <rect
+              x="4.5"
+              y="17.5"
+              width="44"
+              height="27"
+              rx="2"
+              fill="white"
+              stroke="#E6E6E6"
+            />
+            <rect
+              x="0.5"
+              y="5.57422"
+              width="52.7448"
+              height="33.8959"
+              rx="2.5"
+              fill="white"
+              stroke="#CCCCCC"
+            />
+            <circle cx="51.0182" cy="7.44226" r="6.09656" fill="#FFFAF0" />
+            <path
+              fill-rule="evenodd"
+              clip-rule="evenodd"
+              d="M51.0186 14.8848C55.1289 14.8848 58.4609 11.5527 58.4609 7.44238C58.4609 3.33207 55.1289 0 51.0186 0C46.9082 0 43.5762 3.33207 43.5762 7.44238C43.5762 11.5527 46.9082 14.8848 51.0186 14.8848ZM51.0161 2.08852C51.5684 2.08852 52.0161 2.53624 52.0161 3.08852V6.44274H55.3731C55.9254 6.44274 56.3731 6.89046 56.3731 7.44274C56.3731 7.99503 55.9254 8.44274 55.3731 8.44274H52.0161V11.796C52.0161 12.3483 51.5684 12.796 51.0161 12.796C50.4638 12.796 50.0161 12.3483 50.0161 11.796V8.44274H46.6656C46.1133 8.44274 45.6656 7.99503 45.6656 7.44274C45.6656 6.89046 46.1133 6.44274 46.6656 6.44274H50.0161V3.08852C50.0161 2.53624 50.4638 2.08852 51.0161 2.08852Z"
+              fill="#8C8C8C"
+            />
+          </svg>
+        </div>
+      </button>
     </div>
   );
 };
