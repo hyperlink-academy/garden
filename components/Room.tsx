@@ -150,11 +150,9 @@ const AddCardButton = (props: {
   roomEntity: string;
   getViewHeight: () => number | undefined;
 }) => {
-  let [entityID] = useState(ulid());
   let roomType = db.useEntity(props.roomEntity, "room/type");
   const { attributes, listeners, setNodeRef } = useDraggableCard({
     id: "new-card",
-    entityID,
     type: "new-card",
   });
   let { mutate, memberEntity, authorized, rep } = useMutations();
@@ -170,7 +168,7 @@ const AddCardButton = (props: {
           if (roomType.value === "chat") return;
           let newEntity = ulid();
           await mutate("createCard", {
-            entityID,
+            entityID: newEntity,
             title: "",
             memberEntity,
           });

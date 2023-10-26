@@ -72,6 +72,11 @@ export const CardView = (props: {
     type: "linkCard",
     onDragEnd: async (data) => {
       if (!rep) return;
+
+      let entityID;
+      if (data.type === "room") return;
+      if (data.type === "card") entityID = data.entityID;
+      else entityID = ulid();
       mutate("retractFact", { id: data.id });
 
       let siblings =
@@ -85,7 +90,7 @@ export const CardView = (props: {
       let position = generateKeyBetween(null, firstPosition || null);
       await mutate("addCardToSection", {
         factID: ulid(),
-        cardEntity: data.entityID,
+        cardEntity: entityID,
         parent: props.entityID,
         section: "deck/contains",
         positions: {

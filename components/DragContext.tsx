@@ -147,12 +147,13 @@ const AnimatedPickup = (props: { children: React.ReactNode }) => {
 
 export type DraggableData = {
   id: string;
-  entityID: string;
   disabled?: boolean;
   onDragStart?: (data: DraggableData) => void | Promise<void>;
 } & (
   | {
       type: "card";
+
+      entityID: string;
       position?: Fact<"card/position-in">["value"];
       size?: "big" | "small";
       outerControls?: boolean;
@@ -160,7 +161,11 @@ export type DraggableData = {
       hideContent: boolean;
       data: CardPreviewData;
     }
-  | { type: "room" }
+  | {
+      type: "room";
+
+      entityID: string;
+    }
   | { type: "new-card" }
 );
 
@@ -185,7 +190,7 @@ export const useDraggableCard = (data: DraggableData) => {
   let isOverSomethingElse =
     draggable.isDragging &&
     draggable.over &&
-    draggable.over?.data.current?.entityID !== data.entityID;
+    draggable.over?.data.current?.id !== data.id;
   return { ...draggable, isOverSomethingElse };
 };
 
