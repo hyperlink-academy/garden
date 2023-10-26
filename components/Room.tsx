@@ -201,7 +201,8 @@ const AddCardButton = (props: {
               factID: ulid(),
               desktop: props.roomEntity,
               position: {
-                rotation: 0,
+                rotation: 1 - Math.random() * 2,
+                size: "small",
                 size: "small",
                 x: 64,
                 y: viewHeight - 256,
