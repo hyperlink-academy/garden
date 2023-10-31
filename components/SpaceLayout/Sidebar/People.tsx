@@ -382,7 +382,7 @@ const InviteMember = () => {
         { authToken }
       );
       if (code.success) {
-        return `${document.location.href}/join?code=${code.code}`;
+        return `${document.location.protocol}//${document.location.host}${document.location.pathname}/join?code=${code.code}`;
       }
     }
   );
