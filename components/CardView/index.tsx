@@ -36,6 +36,7 @@ import { HighlightCard } from "./HighlightCard";
 import { CardViewDrawer } from "./CardViewDrawer";
 import { useCloseCard, useRoomHistory, useUIState } from "hooks/useUIState";
 import { Modal } from "components/Modal";
+import { Title } from "./Title";
 
 const borderStyles = (args: { member: boolean }) => {
   switch (true) {
@@ -113,8 +114,8 @@ export const CardView = (props: {
           max-w-3xl grow
           flex-col items-stretch
           ${borderStyles({
-          member: !!memberName,
-        })}
+            member: !!memberName,
+          })}
             member: !!memberName,
           })}
           `}
@@ -157,8 +158,8 @@ export const CardView = (props: {
             pb-3
             sm:pb-4
             ${contentStyles({
-            member: !!memberName,
-          })}
+              member: !!memberName,
+            })}
             `}
         >
           <CardContent {...props} />
@@ -190,8 +191,9 @@ export const CardContent = (props: {
       {/* START CARD CONTENT */}
       <div
         ref={ref}
-        className={`cardContentWrapper no-scrollbar relative flex grow flex-col items-stretch overflow-y-scroll overscroll-y-auto pb-3 sm:pb-4 ${!memberName ? "pt-3 sm:pt-4" : ""
-          }`}
+        className={`cardContentWrapper no-scrollbar relative flex grow flex-col items-stretch overflow-y-scroll overscroll-y-auto pb-3 sm:pb-4 ${
+          !memberName ? "pt-3 sm:pt-4" : ""
+        }`}
         onClick={() => {
           useUIState.getState().closeDrawer(props.entityID);
         }}
@@ -232,8 +234,9 @@ export const CardContent = (props: {
 
         {/* card content wrapper */}
         <div
-          className={`cardContent z-0 flex grow flex-col gap-3 pb-10 ${drawerOpen ? "opacity-40" : ""
-            }`}
+          className={`cardContent z-0 flex grow flex-col gap-3 pb-10 ${
+            drawerOpen ? "opacity-40" : ""
+          }`}
         >
           <div className="flex flex-col gap-0">
             <Title entityID={props.entityID} />
@@ -273,8 +276,9 @@ const BackButton = () => {
   let { authorized } = useMutations();
   return (
     <button
-      className={`pointer-events-auto  flex h-min w-fit items-center gap-1 rounded-full border border-grey-90 bg-white p-1 text-grey-55 shadow ${!authorized ? "" : "mt-3"
-        }`}
+      className={`pointer-events-auto  flex h-min w-fit items-center gap-1 rounded-full border border-grey-90 bg-white p-1 text-grey-55 shadow ${
+        !authorized ? "" : "mt-3"
+      }`}
       onClick={() => {
         if (history.length < 2) {
           setTimeout(() => {
@@ -289,30 +293,6 @@ const BackButton = () => {
     >
       {history.length < 2 ? <CloseLinedTiny /> : <GoBackToPageLined />}
     </button>
-  );
-};
-
-const Title = (props: { entityID: string }) => {
-  let { authorized } = useMutations();
-  let memberName = db.useEntity(props.entityID, "member/name");
-  let cardTitle = db.useEntity(props.entityID, "card/title");
-  let titleFact = memberName || cardTitle;
-  return (
-    <SingleTextSection
-      id="card-title"
-      className="bg-inherit text-xl font-bold"
-      onKeyDown={(e) => {
-        if (e.key === "Enter") {
-          e.preventDefault();
-          let element = document.getElementById("default-text-section");
-          element?.focus();
-        }
-      }}
-      entityID={props.entityID}
-      section={titleFact?.attribute || "card/title"}
-      previewOnly={titleFact?.attribute === "member/name"}
-      placeholder={authorized ? "Untitled" : "Untitled"}
-    />
   );
 };
 
@@ -596,8 +576,9 @@ export const SectionAdder = (props: {
       {/* END LINKED CARD ADDER */}
       {/* DATE ADDER */}
       <button
-        className={`${date || props.dateEditing ? toggledOnStyle : toggledOffStyle
-          } `}
+        className={`${
+          date || props.dateEditing ? toggledOnStyle : toggledOffStyle
+        } `}
         onClick={() => {
           if (date) {
             document
@@ -622,10 +603,11 @@ export const SectionAdder = (props: {
       >
         <Popover.Trigger className="flex items-center">
           <button
-            className={`${toggledOffStyle} ${!reactionPickerOpen
+            className={`${toggledOffStyle} ${
+              !reactionPickerOpen
                 ? ""
                 : "rounded-md border border-accent-blue p-0.5 text-accent-blue"
-              }`}
+            }`}
           >
             <ReactionAdd />
           </button>

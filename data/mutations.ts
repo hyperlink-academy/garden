@@ -531,7 +531,23 @@ const setClientInCall: Mutation<{
   }
 };
 
+const replaceCard: Mutation<{ currentCard: string; newCard: string }> = async (
+  args,
+  ctx
+) => {
+  let referenceFacts = await ctx.scanIndex.vae(args.currentCard);
+  let facts = await ctx.scanIndex.eav(args.currentCard, null);
+  console.log(referenceFacts.map((f) => f.attribute));
+  await Promise.all([
+    ...referenceFacts.map((f) =>
+      ctx.updateFact(f.id, { value: ref(args.newCard) })
+    ),
+    ...facts.map((f) => ctx.retractFact(f.id)),
+  ]);
+};
+
 export const Mutations = {
+  replaceCard,
   markRead,
   deleteEntity,
   createCard,
