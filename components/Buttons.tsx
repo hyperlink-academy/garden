@@ -74,7 +74,7 @@ export function ButtonSecondary(
 
 export function ButtonTertiary(
   props: {
-    content: string;
+    content: React.ReactNode;
     icon?: React.ReactElement;
   } & ButtonProps
 ) {

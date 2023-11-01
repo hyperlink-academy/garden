@@ -13,6 +13,7 @@ import {
   CallUnMutedTiny,
   DisclosureCollapseTiny,
   DisclosureExpandTiny,
+  MemberAdd,
   MoreOptionsSmall,
   RoomMember,
 } from "components/Icons";
@@ -28,7 +29,11 @@ import { useAuth } from "hooks/useAuth";
 import { useSmoker } from "components/Smoke";
 import useSWR from "swr";
 import { spaceAPI } from "backend/lib/api";
-import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
+import {
+  ButtonPrimary,
+  ButtonSecondary,
+  ButtonTertiary,
+} from "components/Buttons";
 import { Divider } from "components/Layout";
 import { Modal } from "components/Modal";
 
@@ -42,6 +47,7 @@ export const People = () => {
     .map((m) => m.value.value);
   let uniqueSessions = new Set(activeSessions);
   let [expanded, setExpanded] = useState(false);
+  let { authorized } = useMutations();
 
   let onlineMembers = members.filter((f) => uniqueSessions.has(f.entity));
   let offline = members.filter((f) => !uniqueSessions.has(f.entity));
@@ -50,18 +56,17 @@ export const People = () => {
   let inCall = meetingState === "joined-meeting";
 
   return (
-    <div className="flex flex-col gap-0">
+    <div className="flex flex-col gap-2 border-t border-grey-80 p-2">
       <div className="flex flex-row items-center justify-between text-grey-55">
         <button
           onClick={() => setExpanded(!expanded)}
           className={`flex h-[28px] items-center gap-1 text-sm font-bold text-grey-55  hover:text-accent-blue
            `}
         >
-          {expanded ? <DisclosureExpandTiny /> : <DisclosureCollapseTiny />}
-
+          Members{" "}
           {uniqueSessions.size > 1
-            ? `${uniqueSessions.size}/${members.length} online`
-            : `${members.length} members`}
+            ? `(${uniqueSessions.size}/${members.length})`
+            : `(${members.length})`}
         </button>
         {!callOngoing && <JoinCall />}
       </div>
@@ -95,11 +100,12 @@ export const People = () => {
             </div>
           )}
         </div>
-      ) : expanded ? (
-        <div className="flex flex-col gap-2 rounded-md border border-grey-80 p-2">
+      ) : (
+        <div className="flex flex-col gap-2">
           <MembersList onlineMembers={onlineMembers} offlineMembers={offline} />
         </div>
-      ) : null}
+      )}
+      {authorized && <InviteMember />}
     </div>
   );
 };
@@ -212,11 +218,6 @@ const MembersList = ({
   let [offlineExpanded, setOfflineExpanded] = useState(false);
   let length = offlineMembers.length + onlineMembers.length;
 
-  let membersInCall = db.useAttribute("presence/in-call");
-  let callOngoing = membersInCall.length > 0;
-
-  let { authorized } = useMutations();
-
   return (
     <>
       {onlineMembers.length > 0 && (
@@ -257,12 +258,6 @@ const MembersList = ({
             </div>
           )}
         </div>
-      )}
-      {authorized && (
-        <>
-          <Divider />
-          <InviteMember />
-        </>
       )}
     </>
   );
@@ -366,8 +361,6 @@ const InviteMember = () => {
   let { authToken, session } = useAuth();
   let [open, setInviteOpen] = useState(false);
   let isMember = db.useUniqueAttribute("space/member", session.session?.studio);
-  let membersInCall = db.useAttribute("presence/in-call");
-  let callOngoing = membersInCall.length > 0;
   let { authorized } = useMutations();
 
   let smoker = useSmoker();
@@ -397,12 +390,12 @@ const InviteMember = () => {
     <>
       {authorized && (
         // (callOngoing ? (
-        <button
-          className=" flex items-center gap-1 text-sm italic text-grey-55"
+        <ButtonTertiary
+          className=" flex !w-full items-center gap-1 text-sm italic text-grey-55"
           onClick={() => setInviteOpen(true)}
-        >
-          <AddTiny /> invite
-        </button>
+          icon={<MemberAdd />}
+          content="Invite!"
+        />
       )}
       <Modal open={open} onClose={() => setInviteOpen(false)}>
         <div className="inviteMemberModal flex flex-col place-items-center gap-4 p-4 text-center">

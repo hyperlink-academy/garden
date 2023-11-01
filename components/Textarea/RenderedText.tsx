@@ -48,7 +48,7 @@ export const RenderedText = forwardRef<
       }
       open({ entityID: entity.entity });
     },
-    [open, rep?.rep, authorized, memberEntity, mutate]
+    [open, rep?.rep, authorized, memberEntity, mutate, props.entityID]
   );
   let parseConfig = {
     renderLinks: props.renderLinks,

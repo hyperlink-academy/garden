@@ -11,13 +11,15 @@ import {
   MoreOptionsSmall,
   RoomCalendar,
   RoomSearch,
+  SidebarIcon,
+  StudioFilled,
   UnreadDot,
 } from "../../Icons";
 import { EditSpaceModal } from "components/CreateSpace";
 import { useRouter } from "next/router";
 import { EditRoomModal } from "./RoomListLayout";
 import { SharedRoomList } from "./SharedRoomList";
-import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
+import { ButtonPrimary, ButtonTertiary } from "components/Buttons";
 import { LogInModal } from "components/LoginModal";
 import { useSpaceData } from "hooks/useSpaceData";
 import { HelpModal } from "components/HelpCenter";
@@ -28,18 +30,21 @@ import { Feedback } from "components/Feedback";
 import { useIsActiveRoom, useRoom, useSetRoom } from "hooks/useUIState";
 import { prefetchIdentityData } from "hooks/useIdentityData";
 import { ModalSubmitButton, Modal } from "components/Modal";
+import { useUIState } from "hooks/useUIState";
 
-export const Sidebar = () => {
+export const Sidebar = (props: { mobile?: boolean }) => {
   let [roomEditOpen, setRoomEditOpen] = useState(false);
+  let setMobileSidebarOpen = useUIState((s) => s.setMobileSidebarOpen);
 
   return (
     <div className="Sidebar flex h-full w-52 flex-col items-stretch gap-4 overflow-x-visible   text-grey-35">
       <div className="no-scrollbar flex h-full w-full flex-col gap-2 overflow-y-scroll px-3 pt-3">
-        <div className="flex flex-col gap-0">
-          <SpaceName />
-          <People />
-        </div>
-        <Divider />
+        {props.mobile && (
+          <>
+            <SpaceName />
+            <Divider />
+          </>
+        )}
         <div className="flex flex-row content-between gap-2 ">
           <RoomButton roomID="search">
             <RoomSearch />
@@ -63,7 +68,15 @@ export const Sidebar = () => {
 
         {/* shared; operates on current room */}
       </div>
-      <SidebarFooter />
+      <People />
+      {props.mobile && (
+        <div className="flex flex-row justify-between p-2 pt-0 text-grey-55">
+          <button onClick={() => setMobileSidebarOpen()}>
+            <SidebarIcon />
+          </button>
+          <LoginOrHome />
+        </div>
+      )}
     </div>
   );
 };
@@ -115,7 +128,8 @@ const RoomButton = (props: { roomID: string; children: React.ReactNode }) => {
     </button>
   );
 };
-const SpaceName = () => {
+
+export const SpaceName = () => {
   let spaceID = useSpaceID();
   let { authorized } = useMutations();
   let { data } = useSpaceData(spaceID);
@@ -220,48 +234,36 @@ const MemberOptions = () => {
   );
 };
 
-const SidebarFooter = () => {
+const LoginOrHome = () => {
   let { session } = useAuth();
 
   let [infoOpen, setInfoOpen] = useState(false);
   let [logInOpen, setLogInOpen] = useState(false);
 
-  return (
-    <div className="sidebarBackToHome z-10 flex items-center justify-between gap-2 px-3 pb-3">
-      {/* login OR home button + studios */}
-      {!session.session?.username ? (
-        <div className="grow">
-          <ButtonPrimary
-            content="Log In"
-            onClick={() => setLogInOpen(!logInOpen)}
-          />
-          <LogInModal isOpen={logInOpen} onClose={() => setLogInOpen(false)} />
-        </div>
-      ) : (
-        <Link
-          className="hover:text-accent-blue"
-          href={`/s/${session.session.username}`}
-          onPointerDown={() => {
-            if (session.session?.username)
-              prefetchIdentityData(session.session.username);
-          }}
-        >
-          <BackToHome />
-        </Link>
-      )}
-
-      <div className="flex flex-row gap-2">
-        <Feedback />
-
-        {/* info / help button */}
-        <button
-          className="hover:text-accent-blue"
-          onClick={() => setInfoOpen(true)}
-        >
-          <Information />
-        </button>
-        <HelpModal open={infoOpen} onClose={() => setInfoOpen(false)} />
-      </div>
+  return !session.session?.username ? (
+    <div>
+      <ButtonPrimary
+        content="Log In"
+        onClick={() => setLogInOpen(!logInOpen)}
+      />
+      <LogInModal isOpen={logInOpen} onClose={() => setLogInOpen(false)} />
     </div>
+  ) : (
+    <Link
+      className="hover:text-accent-blue"
+      href={`/s/${session.session.username}`}
+      onPointerDown={() => {
+        if (session.session?.username)
+          prefetchIdentityData(session.session.username);
+      }}
+    >
+      <ButtonTertiary
+        content={
+          <div className="flex flex-row gap-2">
+            Back Home <StudioFilled />
+          </div>
+        }
+      />
+    </Link>
   );
 };
