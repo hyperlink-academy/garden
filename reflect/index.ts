@@ -10,6 +10,7 @@ import { Database } from "backend/lib/database.types";
 import { createClient } from "@supabase/supabase-js";
 import { authTokenVerifier } from "backend/lib/auth";
 import { z } from "zod";
+import { migrations } from "./migrations";
 
 export { makeOptions as default };
 
@@ -18,29 +19,6 @@ export type ReplicacheMutators = {
     tx: WriteTransaction,
     args: Parameters<(typeof Mutations)[k]>[0]
   ) => Promise<void>;
-} & { initializeSpace: typeof initializeSpace };
-
-const initializeSpace = async (
-  tx: WriteTransaction,
-  args: { id: string; facts: Fact<any>[]; messages: Message[] }
-) => {
-  let initalized = await tx.get("initialized");
-  if (initalized) return;
-  for (let fact of args.facts) {
-    if (fact.retracted) continue;
-    let indexes = FactIndexes(fact, fact.schema);
-    for (let key of Object.values(indexes)) {
-      await tx.put(key, fact);
-    }
-  }
-
-  for (let message of args.messages) {
-    let indexes = MessageIndexes(message);
-    for (let key of Object.values(indexes)) {
-      if (key) await tx.put(key, message);
-    }
-  }
-  await tx.put("initialized", true);
 };
 
 export const mutators = {
@@ -56,7 +34,6 @@ export const mutators = {
       ];
     })
   ),
-  initializeSpace,
 } as ReplicacheMutators;
 
 type Auth = {
@@ -66,6 +43,29 @@ type Auth = {
 
 function makeOptions(): ReflectServerOptions<ReplicacheMutators> {
   return {
+    roomStartHandler: async (tx, roomID) => {
+      let lastAppliedMigration = await tx.get<string>(
+        "meta-lastAppliedMigration"
+      );
+      let pendingMigrations = migrations.filter(
+        (m) => !lastAppliedMigration || m.date > lastAppliedMigration
+      );
+
+      if (pendingMigrations.length === 0) return;
+      try {
+        for (let i = 0; i < pendingMigrations.length; i++) {
+          await pendingMigrations[i].run(tx, {
+            roomID,
+          });
+        }
+      } catch (e) {
+        console.log("CONSTRUCTOR ERROR", e);
+      }
+      await tx.set(
+        "meta-lastAppliedMigration",
+        pendingMigrations[pendingMigrations.length - 1].date
+      );
+    },
     mutators,
     authHandler: async (auth_string, roomID): Promise<Auth> => {
       let auth: { authToken: { access_token: string; refresh_token: string } };
@@ -175,7 +175,7 @@ export const makeMutationContext = (tx: WriteTransaction): MutationContext => ({
   postMessage: async (message) => {
     let indexes = MessageIndexes(message);
     for (let key of Object.values(indexes)) {
-      if (key) await tx.put(key, message);
+      if (key) await tx.set(key, message);
     }
     return { success: false };
   },
@@ -194,7 +194,7 @@ export const makeMutationContext = (tx: WriteTransaction): MutationContext => ({
     };
     let newIndexes = FactIndexes(fact, Attribute[fact.attribute]);
     for (let key of Object.values(newIndexes)) {
-      await tx.put(key, fact);
+      await tx.set(key, fact);
     }
     return { success: true };
   },
@@ -239,10 +239,10 @@ export const makeMutationContext = (tx: WriteTransaction): MutationContext => ({
     };
     let indexes = FactIndexes(fact, schema);
     for (let key of Object.values(indexes)) {
-      await tx.put(key, fact);
+      await tx.set(key, fact);
     }
     for (let key of Object.values(EphemeralIndex(fact, clientID))) {
-      await tx.put(key, fact);
+      await tx.set(key, fact);
     }
 
     return { success: true, factID: fact.id };
@@ -286,7 +286,7 @@ export const makeMutationContext = (tx: WriteTransaction): MutationContext => ({
     };
     let indexes = FactIndexes(fact, schema);
     for (let key of Object.values(indexes)) {
-      await tx.put(key, fact);
+      await tx.set(key, fact);
     }
     return { success: true, factID: fact.id };
   },

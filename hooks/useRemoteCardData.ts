@@ -22,7 +22,7 @@ export const useRemoteCardData = (do_id?: string, cardEntity?: string) => {
       setRep(undefined);
     };
   }, [do_id, authToken, session.session?.studio]);
-  return useSubscribe(
+  let data = useSubscribe(
     rep,
     async (tx) => {
       if (!cardEntity) return null;
@@ -46,4 +46,6 @@ export const useRemoteCardData = (do_id?: string, cardEntity?: string) => {
     null,
     [cardEntity]
   );
+
+  return { data };
 };

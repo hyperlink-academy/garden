@@ -1,7 +1,7 @@
 import { spaceAPI } from "backend/lib/api";
 import { useAuth } from "hooks/useAuth";
-import { ReplicacheContext, useMutations } from "hooks/useReplicache";
-import { useContext, useEffect, useState } from "react";
+import { useMutations } from "hooks/useReplicache";
+import { useEffect, useState } from "react";
 import { ButtonPrimary, ButtonSecondary } from "./Buttons";
 import { DoorSelector } from "./DoorSelector";
 import { SpaceCreate } from "./Icons";
@@ -34,7 +34,6 @@ export const CreateSpace = (props: {
     default_space_image: null,
   });
   let auth = useAuth();
-  let rep = useContext(ReplicacheContext);
   if (!authorized) return null;
   return (
     <div className="flex gap-2">
@@ -83,7 +82,6 @@ export const CreateSpace = (props: {
               image: null,
               default_space_image: null,
             });
-            rep?.rep.pull();
             setOpen(false);
           }}
         >
