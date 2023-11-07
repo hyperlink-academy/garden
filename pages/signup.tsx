@@ -1,5 +1,6 @@
 import { ButtonPrimary } from "components/Buttons";
 import { DotLoader } from "components/DotLoader";
+import { OAuth } from "components/LoginModal";
 import { ModalSubmitButton } from "components/Modal";
 import { useAuth } from "hooks/useAuth";
 import Link from "next/link";
@@ -133,17 +134,7 @@ export function SignupForm(props: {
         <p className="shrink-0 italic text-grey-55">or</p>
         <hr className="grow" />
       </div>
-      <div className="signUpSSO flex flex-col gap-2 font-bold text-grey-35">
-        <button className="lightBorder flex w-full items-center  justify-center gap-4 py-2 hover:border-accent-blue hover:bg-bg-blue">
-          <img src="/sso/google.svg" width={24} alt="google" />
-          <p>Sign Up with Google</p>
-        </button>
-        <button className="lightBorder flex w-full items-center justify-center gap-4 py-2 hover:border-accent-blue hover:bg-bg-blue">
-          <img src="/sso/apple.svg" width={24} alt="apple" />
-
-          <p>Sign Up with Apple</p>
-        </button>
-      </div>
+      <OAuth actionLabel="Sign Up" />
       {/* <div className="flex flex-col gap-2 rounded-md bg-bg-gold p-4 text-center">
         <p className="text-grey-15">
           we&apos;ll <strong>only</strong> email about your account

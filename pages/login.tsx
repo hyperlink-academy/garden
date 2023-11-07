@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { DotLoader } from "components/DotLoader";
 import Link from "next/link";
 import { ModalSubmitButton } from "components/Modal";
+import { OAuth } from "components/LoginModal";
 
 export default function LoginPage() {
   let router = useRouter();
@@ -146,17 +147,7 @@ export function LoginForm(props: {
         <p className="shrink-0 italic text-grey-55">or</p>
         <hr className="grow" />
       </div>
-      <div className="LogInSSO flex flex-col gap-2 font-bold text-grey-35">
-        <button className="lightBorder flex w-full items-center  justify-center gap-4 py-2 hover:border-accent-blue hover:bg-bg-blue">
-          <img src="/sso/google.svg" width={24} alt="google" />
-          <p>Log In with Google</p>
-        </button>
-        <button className="lightBorder flex w-full items-center justify-center gap-4 py-2 hover:border-accent-blue hover:bg-bg-blue">
-          <img src="/sso/apple.svg" width={24} alt="apple" />
-
-          <p>Log In with Apple</p>
-        </button>
-      </div>
+      <OAuth actionLabel="Log In" />
     </div>
   );
 }
