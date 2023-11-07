@@ -11,10 +11,6 @@ export const Autocomplete = (props: {
   onClick: (item: string) => void;
   suggestionPrefix: string;
 }) => {
-  const previousSelected = useRef(0);
-  useEffect(() => {
-    previousSelected.current === props.selected;
-  });
   return (
     <Popover.Root open>
       {createPortal(
@@ -41,7 +37,6 @@ export const Autocomplete = (props: {
                 <ListItem
                   key={result}
                   onClick={props.onClick}
-                  previousSelectedIndex={previousSelected.current}
                   index={index}
                   selectedIndex={props.selected}
                   value={result}
@@ -59,7 +54,6 @@ const ListItem = (props: {
   value: string;
   index: number;
   onClick: (item: string) => void;
-  previousSelectedIndex: number;
   selectedIndex: number;
 }) => {
   let el = useRef<HTMLLIElement>(null);
@@ -77,7 +71,7 @@ const ListItem = (props: {
         e.preventDefault();
         props.onClick(props.value);
       }}
-      className={`py-1 px-2 hover:cursor-pointer hover:bg-bg-blue ${
+      className={`px-2 py-1 hover:cursor-pointer hover:bg-bg-blue ${
         props.index === props.selectedIndex ? "bg-bg-blue" : ""
       }`}
     >

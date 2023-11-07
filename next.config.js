@@ -2,10 +2,12 @@
  * @type {import('next').NextConfig}
  */
 const { withSentryConfig } = require("@sentry/nextjs");
+const withMDX = require("@next/mdx")();
 
 const nextConfig = {
   /* config options here */
   reactStrictMode: true,
+  pageExtensions: ["js", "jsx", "mdx", "ts", "tsx"],
   async rewrites() {
     return [
       {
@@ -56,7 +58,7 @@ const withPWA = require("next-pwa")({
 });
 
 module.exports = withSentryConfig(
-  withPWA(nextConfig),
+  withMDX(withPWA(nextConfig)),
   {
     // For all available options, see:
     // https://github.com/getsentry/sentry-webpack-plugin#options
