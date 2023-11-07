@@ -7,6 +7,7 @@ import { Message } from "./Messages";
 import { z } from "zod";
 import { webPushPayloadParser } from "pages/api/web_push";
 import { sign } from "src/sign";
+import { app_event } from "backend/lib/analytics";
 
 export type MutationContext = {
   assertEmphemeralFact: <A extends keyof FilterAttributes<{ ephemeral: true }>>(
@@ -27,7 +28,9 @@ export type MutationContext = {
     data: Partial<Fact<any>>,
     undoAction?: boolean
   ) => Promise<{ success: boolean }>;
-  runOnServer: (fn: (env: Env) => Promise<void>) => Promise<void>;
+  runOnServer: (
+    fn: (env: Env, userID: string) => Promise<void>
+  ) => Promise<void>;
   retractFact: (id: string, undoAction?: boolean) => Promise<void>;
   retractEphemeralFact: (clientID: string, id: string) => Promise<void>;
   scanIndex: {
@@ -100,10 +103,14 @@ const removeCardFromDesktopOrCollection: Mutation<{
       acc &&
       (!f.value ||
         f.attribute === "card/created-by" ||
-        f.attribute === "card/unread-by")
+        f.attribute === "card/unread-by") &&
+      !f.schema.ephemeral
     );
   }, true);
-  if (deleteable && references.length === 1) {
+  if (
+    deleteable &&
+    references.filter((f) => !f.schema.ephemeral).length === 1
+  ) {
     await Promise.all(
       facts.concat(references).map((f) => ctx.retractFact(f.id))
     );
@@ -212,6 +219,13 @@ const createCard: Mutation<{
     },
     ctx
   );
+  await ctx.runOnServer(async (env, userID) => {
+    await app_event(env.env, {
+      event: "created_card",
+      spaceID: env.id,
+      user: userID,
+    });
+  });
 };
 
 export type FactInput = {
@@ -352,12 +366,18 @@ const replyToDiscussion: Mutation<{
     args.message.sender,
     "space/member"
   );
-  await ctx.runOnServer(async (env) => {
+  await ctx.runOnServer(async (env, userID) => {
     if (!senderStudio) return;
 
     let title: Fact<"room/name" | "card/title"> | null =
       await ctx.scanIndex.eav(args.discussion, "card/title");
     if (!title) title = await ctx.scanIndex.eav(args.discussion, "room/name");
+
+    await app_event(env.env, {
+      event: "sent_message",
+      spaceID: env.id,
+      user: userID,
+    });
 
     console.log(`${env.env.NEXT_API_URL}/api/web_push`);
     try {
@@ -382,6 +402,32 @@ const replyToDiscussion: Mutation<{
     } catch (e) {
       console.log(e);
     }
+  });
+};
+
+const createRoom: Mutation<{
+  entity: string;
+  type: "canvas" | "collection" | "chat";
+  name: string;
+}> = async (args, ctx) => {
+  await ctx.assertFact({
+    entity: args.entity,
+    attribute: "room/name",
+    value: args.name,
+    positions: {},
+  });
+  await ctx.assertFact({
+    entity: args.entity,
+    attribute: "room/type",
+    value: args.type,
+    positions: {},
+  });
+  await ctx.runOnServer(async (env, userID) => {
+    await app_event(env.env, {
+      event: "created_room",
+      spaceID: env.id,
+      user: userID,
+    });
   });
 };
 
@@ -485,7 +531,23 @@ const setClientInCall: Mutation<{
   }
 };
 
+const replaceCard: Mutation<{ currentCard: string; newCard: string }> = async (
+  args,
+  ctx
+) => {
+  let referenceFacts = await ctx.scanIndex.vae(args.currentCard);
+  let facts = await ctx.scanIndex.eav(args.currentCard, null);
+  console.log(referenceFacts.map((f) => f.attribute));
+  await Promise.all([
+    ...referenceFacts.map((f) =>
+      ctx.updateFact(f.id, { value: ref(args.newCard) })
+    ),
+    ...facts.map((f) => ctx.retractFact(f.id)),
+  ]);
+};
+
 export const Mutations = {
+  replaceCard,
   markRead,
   deleteEntity,
   createCard,
@@ -504,4 +566,5 @@ export const Mutations = {
   addReaction,
   initializeClient,
   setClientInCall,
+  createRoom,
 };

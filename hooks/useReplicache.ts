@@ -190,11 +190,15 @@ function makeMutators(
             | Fact<keyof Attribute>
             | undefined;
           if (!existingFact) return { success: false };
-          await tx.put(id, {
-            ...existingFact,
-            ...data,
-            positions: { ...existingFact.positions, ...data.positions },
-          });
+
+          await tx.put(
+            id,
+            FactWithIndexes({
+              ...existingFact,
+              ...data,
+              positions: { ...existingFact.positions, ...data.positions },
+            })
+          );
 
           if (!undoAction) {
             undoManager.add({

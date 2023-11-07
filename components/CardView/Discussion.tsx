@@ -89,8 +89,6 @@ export const MessageWindow = (props: {
     if (isBottomed.current) {
       requestAnimationFrame(() => {
         if (!elRef.current) return;
-        console.log(elRef.current.scrollTop);
-        console.log(elRef.current.scrollHeight);
         elRef.current.scrollTop = elRef.current?.scrollHeight;
       });
     }
@@ -394,7 +392,7 @@ export const Messages = (props: {
             index > 0 &&
             m.sender === reversedMessages[index - 1]?.sender &&
             parseInt(m.ts) - parseInt(reversedMessages[index - 1]?.ts) <
-            1000 * 60 * 3
+              1000 * 60 * 3
           }
           author={m.sender}
           date={m.ts}
@@ -464,8 +462,9 @@ const Message = (props: {
   return (
     <div
       id={props.id}
-      className={`message flex flex-col text-sm first:pb-4 last:pt-0 ${!props.multipleFromSameAuthor ? "pt-4" : "pt-1"
-        }`}
+      className={`message flex flex-col text-sm first:pb-4 last:pt-0 ${
+        !props.multipleFromSameAuthor ? "pt-4" : "pt-1"
+      }`}
     >
       {/* MESSAGE HEADER */}
       {!props.multipleFromSameAuthor && (

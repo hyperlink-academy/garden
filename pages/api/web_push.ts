@@ -23,6 +23,11 @@ export let webPushPayloadParser = z.discriminatedUnion("type", [
       topic: z.string(),
     }),
   }),
+  z.object({
+    type: z.literal("new-member"),
+    username: z.string(),
+    spaceID: z.string(),
+  }),
 ]);
 
 webpush.setVapidDetails(
@@ -71,21 +76,43 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       .single();
 
     if (spaceMembers) {
-      let notification: HyperlinkNotification = {
-        type: "new-message",
-        data: {
-          spaceName: spaceMembers.display_name || "Untitled Space",
-          spaceURL: `/s/${spaceMembers.owner?.username}/s/${spaceMembers.name}`,
-          senderUsername:
-            spaceMembers.members_in_spaces.find(
-              (f) => f.identity_data?.studio === data.senderStudio
-            )?.identity_data?.username || "",
-          ...payloadBody.data,
-        },
-      };
+      let notification: HyperlinkNotification;
+      if (data.type === "new-message") {
+        let senderStudio = data.senderStudio;
+        notification = {
+          type: "new-message",
+          data: {
+            spaceName: spaceMembers.display_name || "Untitled Space",
+            spaceURL: `/s/${spaceMembers.owner?.username}/s/${spaceMembers.name}`,
+            senderUsername:
+              spaceMembers.members_in_spaces.find(
+                (f) => f.identity_data?.studio === senderStudio
+              )?.identity_data?.username || "",
+            ...data,
+          },
+        };
+      } else
+        notification = {
+          type: "joined-space",
+          data: {
+            spaceName: spaceMembers.display_name || "Untitled Space",
+            spaceURL: `/s/${spaceMembers.owner?.username}/s/${spaceMembers.name}`,
+            spaceID: data.spaceID,
+            newMemberUsername: data.username,
+          },
+        };
+
       for (let member of spaceMembers.members_in_spaces) {
         if (!member.identity_data) continue;
-        if (member.identity_data.username === notification.data.senderUsername)
+        if (
+          notification.type === "new-message" &&
+          member.identity_data.username === notification.data.senderUsername
+        )
+          continue;
+        if (
+          notification.type === "joined-space" &&
+          member.identity_data.username === notification.data.newMemberUsername
+        )
           continue;
         for (let push_subscription of member.identity_data.push_subscriptions) {
           await webpush

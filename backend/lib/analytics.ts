@@ -1,17 +1,22 @@
 import { Bindings } from "backend";
+import { createClient } from "./supabase";
 
 type AppEvents =
   | "signup"
   | "create_space"
   | "joined_space"
-  | "pushed_to_space"
-  | "pulled_from_space"
-  | "created_card";
+  | "created_card"
+  | "sent_message"
+  | "created_room";
 
-export const app_event = (
-  env: Pick<Bindings, "APP_EVENT_ANALYTICS">,
+export const app_event = async (
+  env: Bindings,
   event: { event: AppEvents; user: string; spaceID: string }
 ) => {
+  let supabase = createClient(env);
+  await supabase
+    .from("space_events")
+    .insert({ event: event.event, user: event.user, space: event.spaceID });
   env.APP_EVENT_ANALYTICS?.writeDataPoint({
     blobs: [event.event, event.spaceID, event.user],
     doubles: [],

@@ -67,7 +67,8 @@ export let useUIState = create(
             [spaceID]: {
               ...state.spaces[spaceID],
               rooms: {
-                [roomID]: state.spaces[spaceID]?.rooms[roomID]?.slice(1) || [],
+                [roomID]:
+                  state.spaces?.[spaceID]?.rooms?.[roomID]?.slice(1) || [],
               },
             },
           },

@@ -69,7 +69,8 @@ export const push_route = makeRoute({
       try {
         await Mutations[name](mutation.args, {
           ...fact_store,
-          runOnServer: (fn) => fn({ ...env, factStore: fact_store }),
+          runOnServer: (fn) =>
+            fn({ ...env, factStore: fact_store }, session?.id as string),
         });
       } catch (e) {
         console.log(
@@ -81,11 +82,6 @@ export const push_route = makeRoute({
     cachedStore.put<number>(`lastMutationID-${msg.clientID}`, lastMutationID);
     await cachedStore.flush();
     release();
-    app_event(env.env, {
-      event: "pushed_to_space",
-      spaceID: env.id,
-      user: session.username,
-    });
 
     env.poke();
     if (

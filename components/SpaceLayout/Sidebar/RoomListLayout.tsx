@@ -441,7 +441,7 @@ export const DraggableRoomListItem = (props: {
   let obj = { ...listeners, ...attributes };
   return (
     <div {...obj} ref={refs} className={``}>
-      {over && over.entityID !== props.entityID && over.type === "room" && (
+      {over && over.type === "room" && over.entityID !== props.entityID && (
         <div className="opacity-60">
           <RoomListPreview entityID={over.entityID} />
         </div>

@@ -116,9 +116,7 @@ export default function UserHomePage(props: Props) {
 
 const HistoryList = (props: { spaces: Array<SpaceData> }) => {
   let now = getCurrentDate();
-  let spacesHistory = props.spaces.filter(
-    (s) => (s.end_date && s.end_date < now) || s.archived
-  );
+  let spacesHistory = props.spaces.filter((s) => s.archived);
   let [showHistory, setShowHistory] = useState(false);
   let { query } = useRouter();
   let { mutate } = useIdentityData(query.studio as string);

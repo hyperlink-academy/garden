@@ -274,6 +274,43 @@ export interface Database {
           }
         ]
       }
+      space_events: {
+        Row: {
+          at: string
+          event: string
+          id: number
+          space: string
+          user: string
+        }
+        Insert: {
+          at?: string
+          event: string
+          id?: number
+          space: string
+          user: string
+        }
+        Update: {
+          at?: string
+          event?: string
+          id?: number
+          space?: string
+          user?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "space_events_space_fkey"
+            columns: ["space"]
+            referencedRelation: "space_data"
+            referencedColumns: ["do_id"]
+          },
+          {
+            foreignKeyName: "space_events_user_fkey"
+            columns: ["user"]
+            referencedRelation: "identity_data"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       spaces_in_studios: {
         Row: {
           space: string

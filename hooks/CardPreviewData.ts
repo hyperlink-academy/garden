@@ -17,8 +17,8 @@ export const useCardPreviewData = (entityID: string) => {
   let imageUrl = !image
     ? undefined
     : image.value.filetype === "image"
-      ? `${WORKER_URL}/static/${image.value.id}`
-      : image.value.url;
+    ? `${WORKER_URL}/static/${image.value.id}`
+    : image.value.url;
 
   return useMemo(
     () => ({
@@ -32,4 +32,14 @@ export const useCardPreviewData = (entityID: string) => {
     }),
     [reactions, title, content, imageUrl, isMember, member, date]
   );
+};
+
+export const EmptyCardData = {
+  reactions: [],
+  title: null,
+  content: null,
+  imageUrl: undefined,
+  isMember: false,
+  member: null,
+  date: null,
 };
