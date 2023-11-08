@@ -158,7 +158,7 @@ const AddCardButton = (props: {
   let { mutate, memberEntity, authorized, rep } = useMutations();
   if (!authorized || !roomType || roomType?.value === "chat") return null;
   return (
-    <div className="absolute bottom-0 left-[136px] z-[2] -mb-1 flex h-8 w-16 items-center justify-center rounded-t-full border border-b-0 border-grey-80 bg-background text-center">
+    <div className="absolute bottom-0 left-[136px] z-[2] -mb-[1px] flex h-8 w-16 items-center justify-center rounded-t-full border border-b-0 border-grey-80 bg-background text-center">
       <button
         ref={setNodeRef}
         {...attributes}
