@@ -22,8 +22,8 @@ import { BaseSmallCard } from "./CardPreview/SmallCard";
 export const SmallCardDragContext = (props: {
   children: React.ReactNode;
   activationConstraints?:
-    | { delay: number; tolerance: number }
-    | { distance: number };
+  | { delay: number; tolerance: number }
+  | { distance: number };
   noDeleteZone?: boolean;
 }) => {
   let [active, setActiveCard] = useState<DraggableData | null>(null);
@@ -88,28 +88,35 @@ export const SmallCardDragContext = (props: {
       <DragOverlay dropAnimation={null} adjustScale={false}>
         {active ? (
           <AnimatedPickup>
-            {active.type === "card" ? (
+            {active.type === "card" || active.type === "search-card" ? (
               <div
                 className={``}
                 style={{
-                  transform: `rotate(${
-                    !active.position?.rotation
+                  transform: `rotate(${active.type === "search-card" || !active.position?.rotation
                       ? 0
                       : (
-                          Math.floor(
-                            active.position?.rotation / (Math.PI / 24)
-                          ) *
-                          (Math.PI / 24)
-                        ).toFixed(2)
-                  }rad)`,
+                        Math.floor(
+                          active.position?.rotation / (Math.PI / 24)
+                        ) *
+                        (Math.PI / 24)
+                      ).toFixed(2)
+                    }rad)`,
                 }}
               >
                 <CardPreview
                   data={active.data}
-                  outerControls={active.outerControls}
+                  outerControls={
+                    active.type === "search-card" ? false : active.outerControls
+                  }
                   entityID={active.entityID}
-                  size={active.position?.size || active.size || "small"}
-                  hideContent={active.hideContent}
+                  size={
+                    active.type === "search-card"
+                      ? "big"
+                      : active.position?.size || active.size || "small"
+                  }
+                  hideContent={
+                    active.type === "search-card" ? true : active.hideContent
+                  }
                 />
                 {over?.type === "linkCard" && (
                   <span className="absolute -left-2 -top-2 text-accent-blue">
@@ -150,7 +157,7 @@ export type DraggableData = {
   disabled?: boolean;
   onDragStart?: (data: DraggableData) => void | Promise<void>;
 } & (
-  | {
+    | {
       type: "card";
 
       entityID: string;
@@ -161,13 +168,13 @@ export type DraggableData = {
       hideContent: boolean;
       data: CardPreviewData;
     }
-  | {
+    | {
       type: "room";
-
       entityID: string;
     }
-  | { type: "new-card" }
-);
+    | { type: "new-card" }
+    | { data: CardPreviewData; type: "search-card"; entityID: string }
+  );
 
 export type DroppableData = {
   id: string;
