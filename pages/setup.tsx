@@ -131,9 +131,13 @@ export default function SignupPage() {
 
   return (
     <Modal open={true} onClose={() => {}}>
-      <div className="flex max-w-md flex-col gap-4">
-        <div className=" h-[140px] w-[164px] bg-test-pink" />
-
+      <div className="flex max-w-md flex-col gap-2">
+        <img
+          className="place-self-end"
+          width={"264px"}
+          alt="a house in an overgrown field"
+          src="/img/spotIllustration/welcome.png"
+        />
         <div className="grid-auto-rows grid gap-2">
           <h2>Hi! It&apos;s nice to meet you!</h2>
         </div>

@@ -58,18 +58,30 @@ export function SignupForm(props: {
   };
   if (status === "confirm")
     return (
-      <div className="signUpConfirmEmail mx-auto flex max-w-md flex-col gap-4">
-        <h2>
-          Great — please check your email at{" "}
-          <span className="underline">{input.email}</span> 📬⚡️
-        </h2>
-        <p>Click the link there to confirm your account & pick a username!</p>
+      <div className="signUpConfirmEmail flex w-full flex-col gap-2">
+        <img
+          className=""
+          width={"220px"}
+          alt="an overgrown USPS collection box"
+          src="/img/spotIllustration/checkMail.png"
+        />
+        <h2>Confirm your email! </h2>{" "}
+        <p>
+          {" "}
+          We send a confirmation link to{" "}
+          <span className="font-bold">{input.email}</span>{" "}
+        </p>
       </div>
     );
 
   return (
     <div className="flex w-full flex-col gap-2">
-      <div className=" h-[140px] w-[164px] bg-test-pink" />
+      <img
+        className="place-self-end"
+        width={"264px"}
+        alt="a house in an overgrown field"
+        src="/img/spotIllustration/welcome.png"
+      />
       <div className="flex items-baseline justify-between gap-1 pt-4">
         <h2 className="text-grey-15">Sign Up!</h2>
         <p className="text-grey-55">
@@ -86,7 +98,6 @@ export function SignupForm(props: {
           </button>
         </p>
       </div>
-
       <form onSubmit={onSubmit} className="flex flex-col gap-2 ">
         <ErrorMessage status={status} />
         <label className="flex w-full flex-col gap-1 font-bold">
