@@ -66,7 +66,6 @@ export const useFilteredCards = (
 
   let cardsFiltered = cards.filter((card) => {
     let passed = true;
-    console.log(filters);
     for (let filter of filters) {
       if (filter.not)
         passed = passed && !card.reactions.includes(filter.reaction);

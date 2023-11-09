@@ -98,7 +98,6 @@ export const MessageWindow = (props: {
       style={props.style}
       onScroll={(e) => {
         if (!e.isTrusted) return;
-        console.log(e.currentTarget.scrollTop, e.currentTarget.scrollHeight);
         isBottomed.current =
           e.currentTarget.scrollTop + e.currentTarget.clientHeight ===
           e.currentTarget.scrollHeight;
