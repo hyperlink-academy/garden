@@ -16,6 +16,11 @@ export function useRoomShortcuts() {
   let rooms = db.useAttribute("room/name").sort(sortByPosition("roomList"));
   useEffect(() => {
     let listener = (e: KeyboardEvent) => {
+      if (
+        document.activeElement?.tagName === "TEXTAREA" ||
+        document.activeElement?.tagName === "INPUT"
+      )
+        return;
       if (e.key === "ArrowUp" && e.altKey) {
         let currentIndex = rooms.findIndex((r) => r.entity === currentRoom);
         if (currentIndex === -1) return;
