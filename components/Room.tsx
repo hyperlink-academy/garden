@@ -9,7 +9,6 @@ import { useFilteredCards, Filters, FilterByReactions } from "./CardFilter";
 import { DiscussionRoom } from "./CardView/Discussion";
 import { Desktop } from "./Desktop";
 import {
-  CardAdd,
   CollectionListTiny,
   CollectionPreviewTiny,
   GoToTop,
@@ -23,8 +22,7 @@ import { RenderedText } from "./Textarea/RenderedText";
 import { ulid } from "src/ulid";
 import { useAuth } from "hooks/useAuth";
 import { getAndUploadFile } from "src/getAndUploadFile";
-import { AddExistingCard, create } from "components/CardStack";
-import { useDraggable } from "@dnd-kit/core";
+import { create } from "components/CardStack";
 import { useDraggableCard } from "./DragContext";
 import { sortByPosition } from "src/position_helpers";
 import { generateKeyBetween } from "src/fractional-indexing";
@@ -37,7 +35,7 @@ export const Room = (props: { entityID: string }) => {
     useFilteredCards(props.entityID, "desktop/contains");
 
   let { authToken } = useAuth();
-  let { authorized, mutate, rep, action, memberEntity } = useMutations();
+  let { mutate, rep, action, memberEntity } = useMutations();
   let spaceID = useSpaceID();
 
   if (props.entityID === "search") return <SearchRoom />;

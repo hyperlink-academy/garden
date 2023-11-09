@@ -3,6 +3,7 @@ import { sortByPosition } from "src/position_helpers";
 import { create } from "zustand";
 import { combine } from "zustand/middleware";
 import { db, useMutations, useSpaceID } from "./useReplicache";
+import { Filters } from "components/CardFilter";
 
 export let useUIState = create(
   combine(
@@ -13,6 +14,11 @@ export let useUIState = create(
           rooms: {
             [roomID: string]: string[];
           };
+        };
+      },
+      roomStates: {} as {
+        [entityID: string]: {
+          filters: Filters;
         };
       },
       cardStates: {} as {
@@ -56,6 +62,17 @@ export let useUIState = create(
             [spaceID]: {
               ...state.spaces[spaceID],
               activeRoom: room,
+            },
+          },
+        }));
+      },
+      setFilters: (entityID: string, filters: Filters) => {
+        set((state) => ({
+          roomStates: {
+            ...state.roomStates,
+            [entityID]: {
+              ...state.roomStates[entityID],
+              filters,
             },
           },
         }));

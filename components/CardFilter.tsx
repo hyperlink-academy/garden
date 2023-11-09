@@ -1,6 +1,7 @@
 import { scanIndex } from "hooks/useReplicache";
 import { useSubscribe } from "hooks/useSubscribe";
-import { useState, useEffect } from "react";
+import { useUIState } from "hooks/useUIState";
+import { useEffect } from "react";
 import { sortByPosition } from "src/position_helpers";
 import { z } from "zod";
 
@@ -33,7 +34,8 @@ export const useFilteredCards = (
     `${entityID}-cards`
   );
 
-  let [filters, setFilters] = useState<Filters>([]);
+  let filters = useUIState((s) => s.roomStates[entityID]?.filters ?? []);
+  let setFilters = useUIState((s) => s.setFilters);
 
   // set filter values based on local storage
   useEffect(() => {
@@ -43,7 +45,7 @@ export const useFilteredCards = (
       );
       if (filterString) {
         let parsed = FilterVerifier.safeParse(JSON.parse(filterString));
-        if (parsed.success) setFilters(parsed.data);
+        if (parsed.success) setFilters(entityID, parsed.data);
       }
     } catch (e) {}
   }, [entityID]);
@@ -64,6 +66,7 @@ export const useFilteredCards = (
 
   let cardsFiltered = cards.filter((card) => {
     let passed = true;
+    console.log(filters);
     for (let filter of filters) {
       if (filter.not)
         passed = passed && !card.reactions.includes(filter.reaction);
@@ -72,7 +75,16 @@ export const useFilteredCards = (
     return passed;
   });
 
-  return { reactions, filters, setFilters, cardsFiltered, total: cards.length };
+  return {
+    reactions,
+    filters,
+    setFilters: (f: Filters | ((oldFilters: Filters) => Filters)) => {
+      if (typeof f === "function") setFilters(entityID, f(filters));
+      else setFilters(entityID, f);
+    },
+    cardsFiltered,
+    total: cards.length,
+  };
 };
 
 export function FilterByReactions(props: {

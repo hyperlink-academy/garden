@@ -3,6 +3,7 @@ import { useOpenCard, useRoom, useSetRoom, useUIState } from "./useUIState";
 import { db, scanIndex, useMutations, useSpaceID } from "./useReplicache";
 import { sortByPosition } from "src/position_helpers";
 import { ReadTransaction } from "replicache";
+import { Filters } from "components/CardFilter";
 
 export function useSpaceShortcuts() {
   useRoomShortcuts();
@@ -41,6 +42,7 @@ export function useCardShortcuts() {
   let spaceID = useSpaceID();
   let openCard = useOpenCard();
   let { rep } = useMutations();
+  let filters = useUIState((s) => s.roomStates[currentRoom]?.filters);
 
   useEffect(() => {
     if (!rep || !currentRoom) return;
@@ -54,17 +56,17 @@ export function useCardShortcuts() {
           state.spaces[spaceID]?.rooms?.[currentRoom]?.[0] || null;
 
         let sortedCards = await r.query((tx) =>
-          getSortedCards(tx, currentRoom)
+          getSortedCards(tx, currentRoom, filters)
         );
         if (!sortedCards) return;
-        if (!currentCard) {
-          openCard(sortedCards[sortedCards.length - 1].value.value);
-          return;
-        }
+
         let currentIndex = sortedCards.findIndex(
           (r) => r.value.value === currentCard
         );
-        if (currentIndex === -1) return;
+        if (!currentCard || currentIndex === -1) {
+          openCard(sortedCards[sortedCards.length - 1].value.value);
+          return;
+        }
         if (currentIndex > 0) {
           openCard(sortedCards[currentIndex - 1].value.value);
         }
@@ -75,17 +77,17 @@ export function useCardShortcuts() {
         let currentCard =
           state.spaces[spaceID]?.rooms?.[currentRoom]?.[0] || null;
         let sortedCards = await r.query((tx) =>
-          getSortedCards(tx, currentRoom)
+          getSortedCards(tx, currentRoom, filters)
         );
 
         if (!sortedCards) return;
-        if (!currentCard) {
-          openCard(sortedCards[0].value.value);
-          return;
-        }
         let currentIndex = sortedCards.findIndex(
           (r) => r.value.value === currentCard
         );
+        if (!currentCard || currentIndex === -1) {
+          openCard(sortedCards[0]?.value.value);
+          return;
+        }
         if (currentIndex === -1) return;
         if (currentIndex < sortedCards.length - 1) {
           openCard(sortedCards[currentIndex + 1].value.value);
@@ -96,11 +98,38 @@ export function useCardShortcuts() {
     return () => {
       window.removeEventListener("keydown", listener);
     };
-  }, [currentRoom, rep, openCard]);
+  }, [currentRoom, rep, openCard, filters]);
 }
 
-const getSortedCards = async (tx: ReadTransaction, room: string) => {
+const getSortedCards = async (
+  tx: ReadTransaction,
+  room: string,
+  filters: Filters
+) => {
   let cards = await scanIndex(tx).eav(room, "desktop/contains");
+  if (filters.length > 0) {
+    cards = (
+      await Promise.all(
+        cards.map(async (c) => {
+          let reactions = (
+            await scanIndex(tx).eav(c.value.value, "card/reaction")
+          ).map((r) => r.value);
+          return {
+            ...c,
+            reactions,
+          };
+        })
+      )
+    ).filter((card) => {
+      let passed = true;
+      for (let filter of filters) {
+        if (filter.not)
+          passed = passed && !card.reactions.includes(filter.reaction);
+        else passed = passed && card.reactions.includes(filter.reaction);
+      }
+      return passed;
+    });
+  }
   let roomType = await scanIndex(tx).eav(room, "room/type");
   if (!roomType) return null;
   if (roomType.value == "collection") {
@@ -129,5 +158,6 @@ const getSortedCards = async (tx: ReadTransaction, room: string) => {
       return rowA - rowB; // Otherwise, sort by row number ascending
     });
   }
+
   return cards;
 };
