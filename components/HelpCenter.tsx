@@ -246,18 +246,22 @@ const HelpShortcuts = () => {
       <h3>rooms & cards</h3>
       <ul className="flex list-disc flex-col gap-1 pl-4 sm:pl-8">
         <li>
+          <KeyboardKey>alt</KeyboardKey> + <KeyboardKey>↑</KeyboardKey> and{" "}
+          <KeyboardKey>↓</KeyboardKey> to switch rooms
+        </li>
+        <li>
+          <KeyboardKey>shift</KeyboardKey> + <KeyboardKey>↑</KeyboardKey> and{" "}
+          <KeyboardKey>↓</KeyboardKey> to navigate between cards in a room
+        </li>
+        <li>
           <i>canvas</i>: <KeyboardKey>ctrl/cmd</KeyboardKey> + click for new
           card
         </li>
         <li>
           <i>collection</i>: drag to reorder cards
         </li>
-        <li>
-          <KeyboardKey>alt</KeyboardKey> + <KeyboardKey>↑</KeyboardKey> and{" "}
-          <KeyboardKey>↓</KeyboardKey> to switch rooms
-        </li>
         <li>drag to reorder rooms in sidebar</li>
-        <li>drag a card onto another to link them</li>
+        <li>drag a card onto another to add it as a linked card</li>
       </ul>
 
       <h3>general</h3>
@@ -362,7 +366,7 @@ export const HelpAppInfo = () => {
 
 const TextString = (props: { children: React.ReactNode }) => {
   return (
-    <code className="rounded-md border border-grey-55 bg-grey-90 px-[2px] py-[2px] text-xs">
+    <code className="rounded-md border border-grey-80 bg-grey-90 px-[4px] py-[4px] text-xs">
       {props.children}
     </code>
   );
@@ -370,7 +374,7 @@ const TextString = (props: { children: React.ReactNode }) => {
 
 const KeyboardKey = (props: { children: React.ReactNode }) => {
   return (
-    <code className="rounded-md bg-grey-35 px-[4px] py-[2px] text-xs text-white shadow shadow-accent-gold">
+    <code className="rounded-md bg-grey-35 px-[6px] py-[4px] text-xs text-white shadow shadow-accent-gold">
       {props.children}
     </code>
   );
