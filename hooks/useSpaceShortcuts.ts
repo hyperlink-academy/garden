@@ -57,6 +57,10 @@ export function useCardShortcuts() {
           getSortedCards(tx, currentRoom)
         );
         if (!sortedCards) return;
+        if (!currentCard) {
+          openCard(sortedCards[sortedCards.length - 1].value.value);
+          return;
+        }
         let currentIndex = sortedCards.findIndex(
           (r) => r.value.value === currentCard
         );
@@ -73,7 +77,12 @@ export function useCardShortcuts() {
         let sortedCards = await r.query((tx) =>
           getSortedCards(tx, currentRoom)
         );
+
         if (!sortedCards) return;
+        if (!currentCard) {
+          openCard(sortedCards[0].value.value);
+          return;
+        }
         let currentIndex = sortedCards.findIndex(
           (r) => r.value.value === currentCard
         );
