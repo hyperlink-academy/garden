@@ -15,6 +15,7 @@ import { SpaceProvider } from "components/ReplicacheProvider";
 import { SWRConfig } from "swr";
 import { useViewportSize } from "hooks/useViewportSize";
 import { usePreventResize } from "hooks/usePreventResize";
+import { useSpaceShortcuts } from "hooks/useSpaceShortcuts";
 
 export async function getStaticPaths() {
   return { paths: [], fallback: "blocking" };
@@ -52,6 +53,7 @@ export default function SpacePage(props: Props) {
 }
 function Space() {
   useSpaceSyncState();
+  useSpaceShortcuts();
   let room = useRoom();
   const { width } = useWindowDimensions();
 
@@ -79,9 +81,9 @@ function Space() {
             {width > 960 || width === 0 ? (
               <div
                 className="spaceLargeSplitLayout no-scrollbar flex w-full flex-row items-stretch gap-4 overflow-x-scroll sm:justify-center sm:gap-4"
-                // you need to add this to the contentSplitLayout class if you are going to scroll across more than 2 panes
-                // it prevents the last pane from sticking to the end
-                // after:content-[""] after:h-full after:w-2 after:block after:shrink-0
+              // you need to add this to the contentSplitLayout class if you are going to scroll across more than 2 panes
+              // it prevents the last pane from sticking to the end
+              // after:content-[""] after:h-full after:w-2 after:block after:shrink-0
               >
                 <div className="spaceRoomAndSidebar flex flex-row rounded-md border border-grey-90">
                   <div className="rounded-l-md border border-transparent border-r-grey-90 bg-white">
