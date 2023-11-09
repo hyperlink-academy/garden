@@ -447,7 +447,7 @@ const addReaction: Mutation<{
 }> = async (args, ctx) => {
   let reactions = await ctx.scanIndex.eav(args.cardEntity, "card/reaction");
   for (let reaction of reactions) {
-    let author = await ctx.scanIndex.eav(reaction.entity, "reaction/author");
+    let author = await ctx.scanIndex.eav(reaction.id, "reaction/author");
     if (
       author?.value.value === args.memberEntity &&
       reaction.value === args.reaction
