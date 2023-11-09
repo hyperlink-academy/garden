@@ -9,6 +9,7 @@ export function useSpaceShortcuts() {
   useRoomShortcuts();
   useCardShortcuts();
 }
+
 export function useRoomShortcuts() {
   let currentRoom = useRoom();
   let setRoom = useSetRoom();
@@ -49,6 +50,11 @@ export function useCardShortcuts() {
     let r = rep;
     let listener = async (e: KeyboardEvent) => {
       if (document.activeElement?.tagName === "TEXTAREA") return;
+      if (e.key === "Enter") {
+        let el = document.getElementById("card-title");
+        e.preventDefault();
+        if (el) el.focus();
+      }
       if (e.key === "ArrowUp" && e.shiftKey) {
         let state = useUIState.getState();
         if (!spaceID) return;
