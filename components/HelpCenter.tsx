@@ -134,9 +134,6 @@ const HelpHandbook = () => {
         Welcome! Hyperlink is a place to do meaningful things — creative
         projects; book clubs; learning groups — together on the internet.
       </p>
-      {/* <p>
-        Here&apos;s a <em>very short handbook</em>:
-      </p> */}
       <DividerTiny />
       <p>
         Activity on Hyperlink happens in <strong>Spaces</strong> — small worlds
@@ -154,9 +151,6 @@ const HelpHandbook = () => {
         <li className="marker:text-accent-gold">
           Talk together with <strong>chats</strong> & <strong>comments</strong>
         </li>
-        {/* <li className="marker:text-accent-blue">
-          <strong>Invite others</strong> to join & explore with you
-        </li> */}
       </ul>
       <DividerTiny />
       <p>
@@ -192,34 +186,6 @@ const HelpHandbook = () => {
         any time :)
       </p>
       <p>—The Hyperlink Team</p>
-      {/* <p>
-        When you open the app, you&apos;ll land in your{" "}
-        <strong>homeroom</strong> — your home base for all Spaces you create or
-        join.
-      </p> */}
-      {/* <p>
-        You can also make <strong>Studios</strong> — where a group can collect
-        Spaces to share work across many projects.
-      </p> */}
-      {/* <p>To get started:</p> */}
-      {/* <ul className="flex list-disc flex-col gap-1 pl-4 sm:pl-8">
-        <li className="marker:text-accent-blue">Make a Space</li>
-        <li className="marker:text-accent-red">Invite a friend</li>
-        <li className="marker:text-accent-gold">Add ideas, riff, play…</li>
-      </ul> */}
-      {/* <p>
-        And repeat! Over time your Spaces on Hyperlink form an ecosystem: seeds
-        of ideas, active projects, archives of past work, communities of
-        collaborators.
-      </p> */}
-      {/* <p>
-        Questions?{" "}
-        <a href="mailto:contact@hyperlink.academy" className="text-accent-blue">
-          Email us
-        </a>{" "}
-        any time. Always evolving, ears open for suggestions :)
-      </p> */}
-      {/* <p>—The Hyperlink Team</p> */}
     </div>
   );
 };
