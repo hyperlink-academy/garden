@@ -49,9 +49,14 @@ export function useCardShortcuts() {
     if (!rep || !currentRoom) return;
     let r = rep;
     let listener = async (e: KeyboardEvent) => {
-      if (document.activeElement?.tagName === "TEXTAREA") return;
+      if (
+        document.activeElement?.tagName === "TEXTAREA" ||
+        document.activeElement?.tagName === "INPUT"
+      )
+        return;
       if (e.key === "Enter") {
         let el = document.getElementById("card-title");
+        console.log(el);
         e.preventDefault();
         if (el) el.focus();
       }
