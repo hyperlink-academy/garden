@@ -5,7 +5,7 @@ import {
   ReplicacheContext,
   scanIndex,
 } from "hooks/useReplicache";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { ulid } from "src/ulid";
 import { DraggableRoomListItem, RoomListPreview } from "./RoomListLayout";
 import { sortByPosition, updatePositions } from "src/position_helpers";
@@ -16,37 +16,12 @@ import {
   RoomChat,
   RoomCollection,
 } from "components/Icons";
-import { useRoom, useSetRoom } from "hooks/useUIState";
+import { useSetRoom } from "hooks/useUIState";
 import { ModalSubmitButton, Modal } from "components/Modal";
 
 export const SharedRoomList = (props: { setRoomEditOpen: () => void }) => {
   let { authorized } = useMutations();
   let rooms = db.useAttribute("room/name").sort(sortByPosition("roomList"));
-  let currentRoom = useRoom();
-  let setRoom = useSetRoom();
-
-  useEffect(() => {
-    let listener = (e: KeyboardEvent) => {
-      if (e.key === "ArrowUp" && e.altKey) {
-        let currentIndex = rooms.findIndex((r) => r.entity === currentRoom);
-        if (currentIndex === -1) return;
-        if (currentIndex > 0) {
-          setRoom(rooms[currentIndex - 1].entity);
-        }
-      }
-      if (e.key === "ArrowDown" && e.altKey) {
-        let currentIndex = rooms.findIndex((r) => r.entity === currentRoom);
-        if (currentIndex === -1) return;
-        if (currentIndex < rooms.length) {
-          setRoom(rooms[currentIndex + 1].entity);
-        }
-      }
-    };
-    window.addEventListener("keydown", listener);
-    return () => {
-      window.removeEventListener("keydown", listener);
-    };
-  }, [currentRoom, setRoom, rooms]);
 
   return (
     <div className="flex flex-col gap-0.5">

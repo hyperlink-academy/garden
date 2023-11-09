@@ -8,31 +8,20 @@ import {
   useMutations,
   useSpaceID,
 } from "hooks/useReplicache";
-import { useSubscribe } from "hooks/useSubscribe";
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useContext } from "react";
 import { generateKeyBetween } from "src/fractional-indexing";
 import { getAndUploadFile } from "src/getAndUploadFile";
 import { sortByPosition, updatePositions } from "src/position_helpers";
 import { ulid } from "src/ulid";
 import { CardPreview } from "./CardPreview";
 import { CardAdder } from "./CardStack";
-import { useCardViewer } from "./CardViewerContext";
 import { useCombinedRefs } from "./Desktop";
 import {
   DraggableData,
   useDraggableCard,
   useDroppableZone,
 } from "./DragContext";
-import * as z from "zod";
 import { useUIState } from "hooks/useUIState";
-
-let FilterVerifier = z.array(
-  z.object({
-    reaction: z.string(),
-    not: z.boolean(),
-  })
-);
-type Filters = z.TypeOf<typeof FilterVerifier>;
 
 export const CardCollection = (props: {
   entityID: string;

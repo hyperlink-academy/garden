@@ -393,7 +393,7 @@ export default function IndexPage() {
   );
 }
 
-const Divider = () => (
+export const Divider = () => (
   <div className="m-auto my-4 rounded-md bg-accent-gold p-4 sm:my-8 sm:p-8">
     <div className="rounded-md bg-accent-red p-4 sm:p-8">
       <div className="rounded-md bg-accent-blue p-2 sm:p-4"></div>
@@ -401,10 +401,18 @@ const Divider = () => (
   </div>
 );
 
-const DividerSmall = () => (
+export const DividerSmall = () => (
   <div className="m-auto my-2 rounded-md bg-accent-gold p-2 sm:my-4 sm:p-4">
     <div className="rounded-md bg-accent-red p-2 sm:p-4">
       <div className="rounded-md bg-accent-blue p-1 sm:p-2"></div>
+    </div>
+  </div>
+);
+
+export const DividerTiny = () => (
+  <div className="m-auto my-1 rounded-md bg-accent-gold p-1 sm:my-2 sm:p-2">
+    <div className="rounded-md bg-accent-red p-1 sm:p-2">
+      <div className="rounded-md bg-accent-blue p-0.5 sm:p-1"></div>
     </div>
   </div>
 );

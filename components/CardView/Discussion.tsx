@@ -98,7 +98,6 @@ export const MessageWindow = (props: {
       style={props.style}
       onScroll={(e) => {
         if (!e.isTrusted) return;
-        console.log(e.currentTarget.scrollTop, e.currentTarget.scrollHeight);
         isBottomed.current =
           e.currentTarget.scrollTop + e.currentTarget.clientHeight ===
           e.currentTarget.scrollHeight;
@@ -381,9 +380,9 @@ export const Messages = (props: {
   return (
     <>
       {messages.length == 0 && authorized ? (
-        <div className="messagesEmpty flex flex-col gap-4 text-sm italic text-grey-35">
+        <div className="messagesEmpty mt-auto flex flex-col gap-4 py-1 text-sm italic text-grey-35">
           <p>Welcome to the chat!</p>
-          <p>Still quiet…start the conversation 🌱</p>
+          <p>Go ahead, start the conversation 🌱</p>
         </div>
       ) : null}
       {[...messages].map((m, index, reversedMessages) => (
@@ -462,7 +461,7 @@ const Message = (props: {
   return (
     <div
       id={props.id}
-      className={`message flex flex-col text-sm first:pb-4 last:pt-0 ${
+      className={`message flex flex-col text-sm first:mt-auto ${
         !props.multipleFromSameAuthor ? "pt-4" : "pt-1"
       }`}
     >
