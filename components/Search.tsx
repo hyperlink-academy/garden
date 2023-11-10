@@ -9,6 +9,7 @@ import { CloseLinedTiny, RoomSearch } from "./Icons";
 import { animated, useSpring } from "@react-spring/web";
 import useMeasure from "react-use-measure";
 import { useCombinedRefs } from "./Desktop";
+import { focusElement } from "src/utils";
 
 export function Search() {
   let [input, setInput] = useState("");
@@ -114,19 +115,14 @@ export const MobileSearch = () => {
       setState("normal");
     }
   }, [focused]);
-  let { setNodeRef } = useDroppableZone({
-    id: "mobile-search-overlay",
-    entityID: "",
-    type: "dropzone",
-    onDragEnter: () => {
-      setState("dragging");
-    },
-  });
 
   let { setNodeRef: drawerDroppableRef } = useDroppableZone({
     id: "mobile-search-drawer",
     entityID: "",
     type: "dropzone",
+    onDragExit: () => {
+      setState("dragging");
+    },
     onDragEnter: () => {
       setState("open");
     },
@@ -138,9 +134,7 @@ export const MobileSearch = () => {
       <button
         onClick={() => {
           setState("open");
-          setTimeout(() => {
-            inputRef.current?.focus();
-          }, 50);
+          focusElement(inputRef.current);
         }}
       >
         <RoomSearch height={24} width={24} />
@@ -148,7 +142,6 @@ export const MobileSearch = () => {
       {state === "open" && (
         <animated.div
           className="fixed inset-0 z-50 bg-grey-15"
-          ref={setNodeRef}
           style={opacity}
         />
       )}
@@ -158,10 +151,10 @@ export const MobileSearch = () => {
         ref={ref}
       >
         <div
-          className="relative flex h-[40vh] w-full flex-col gap-2 rounded-md border border-b-0 border-grey-90 bg-white p-2"
+          className="relative z-0 flex h-[40vh] w-full flex-col gap-2 overflow-y-scroll rounded-md border border-b-0 border-grey-90 bg-white p-2"
           ref={refCombined}
         >
-          <div className="flex flex-row justify-between gap-2">
+          <div className="sticky top-0 z-10 flex flex-row justify-between gap-2">
             <div className="relative w-full">
               <RoomSearch className="absolute right-2 top-2 text-grey-55" />
               <input
