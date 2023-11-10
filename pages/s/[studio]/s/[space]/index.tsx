@@ -190,17 +190,31 @@ const MobileLayout = ({ room }: { room: string }) => {
 
 const MobileSidebar = () => {
   let open = useUIState((s) => s.mobileSidebarOpen);
+  let setSidebarOpen = useUIState((s) => s.setMobileSidebarOpen);
   let { left } = useSpring({ left: open ? 0 : -222, config: springConfig });
+  let opacity = useSpring({
+    opacity: open ? 0 : 0,
+  });
   let viewheight = useViewportSize().height;
   return createPortal(
-    <animated.div
-      style={{ height: viewheight, left }}
-      className="fixed top-0 z-30 ml-2 snap-end snap-always p-1 pl-0"
-    >
-      <div className="h-full rounded-md border border-grey-90 bg-white">
-        <Sidebar mobile />
-      </div>
-    </animated.div>,
+    <>
+      <animated.div
+        style={{ height: viewheight, left }}
+        className="fixed top-0 z-30 ml-2 snap-end snap-always p-1 pl-0"
+      >
+        <div className="h-full rounded-md border border-grey-90 bg-white">
+          <Sidebar mobile />
+        </div>
+      </animated.div>
+
+      {open && (
+        <animated.div
+          className="fixed inset-0 z-20 bg-grey-15"
+          onClick={() => setSidebarOpen(false)}
+          style={opacity}
+        />
+      )}
+    </>,
     document.body
   );
 };
