@@ -5,7 +5,13 @@ import {
   useMutations,
   useSpaceID,
 } from "hooks/useReplicache";
-import { useCallback, useContext, useMemo, useState } from "react";
+import {
+  MutableRefObject,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+} from "react";
 import { CardPreview } from "./CardPreview";
 import { ulid } from "src/ulid";
 import { FindOrCreate, useAllItems } from "./FindOrCreateEntity";
@@ -455,11 +461,13 @@ export const HelpToast = (props: { helpText: string }) => {
   );
 };
 export function useCombinedRefs<T>(
-  ...refs: ((node: T) => void)[]
+  ...refs: Array<((node: T) => void) | MutableRefObject<T>>
 ): (node: T) => void {
   return useMemo(
     () => (node: T) => {
-      refs.forEach((ref) => ref(node));
+      refs.forEach((ref) =>
+        typeof ref === "function" ? ref(node) : (ref.current = node)
+      );
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     refs

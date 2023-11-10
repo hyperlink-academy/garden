@@ -15,12 +15,7 @@ import { SpaceProvider } from "components/ReplicacheProvider";
 import { SWRConfig } from "swr";
 import { useViewportSize } from "hooks/useViewportSize";
 import { usePreventResize } from "hooks/usePreventResize";
-import {
-  Information,
-  Question,
-  SidebarIcon,
-  StudioFilled,
-} from "components/Icons";
+import { Question, SidebarIcon, StudioFilled } from "components/Icons";
 import { SpaceName } from "components/SpaceLayout/Sidebar";
 import { config, useSpring, animated } from "@react-spring/web";
 import { createPortal } from "react-dom";
@@ -28,7 +23,7 @@ import { useAuth } from "hooks/useAuth";
 import { ButtonPrimary } from "components/Buttons";
 import { LogInModal } from "components/LoginModal";
 import Link from "next/link";
-import { Search } from "components/Search";
+import { Search, MobileSearch } from "components/Search";
 import { HelpModal } from "components/HelpCenter";
 
 export async function getStaticPaths() {
@@ -185,7 +180,7 @@ const MobileLayout = ({ room }: { room: string }) => {
             <SidebarIcon />
           </button>
         </div>
-        search
+        <MobileSearch />
       </div>
 
       <MobileSidebar />
