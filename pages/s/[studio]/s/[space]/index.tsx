@@ -229,6 +229,18 @@ const MobileSidebar = ({
     },
   });
 
+  const bindSidebar = useGesture({
+    onDragEnd: (data) => {
+      if (
+        data.direction[0] < 0 &&
+        data.velocity[0] > 0.1 &&
+        data.velocity[1] < 0.5
+      ) {
+        setSidebarOpen(false);
+      }
+    },
+  });
+
   return createPortal(
     <>
       {
@@ -243,7 +255,10 @@ const MobileSidebar = ({
         style={{ height: viewheight, left }}
         className="fixed top-0 z-30 ml-2 snap-end snap-always p-1 pl-0"
       >
-        <div className="h-full rounded-md border border-grey-90 bg-white">
+        <div
+          className="h-full touch-none rounded-md border border-grey-90 bg-white"
+          {...bindSidebar()}
+        >
           <Sidebar mobile />
         </div>
       </animated.div>
