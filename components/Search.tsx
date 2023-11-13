@@ -26,13 +26,13 @@ export function Search() {
           <Popover.Content
             ref={ref}
             onOpenAutoFocus={(e) => e.preventDefault()}
-            className={`-mr-4 flex flex-col gap-2 px-2 ${focused
-                ? "-mt-2 rounded-md border-grey-90 bg-white py-2 drop-shadow-lg"
+            className={`no-scrollbar z-0 -mr-4 flex max-h-80 flex-col gap-2 overflow-x-scroll px-2 ${focused
+                ? "-mt-2 rounded-md border-grey-90 bg-white py-2 shadow-drop"
                 : ""
               }`}
             style={{ width: "var(--radix-popper-anchor-width)" }}
           >
-            <div className="relative">
+            <div className="sticky top-0 z-20">
               <RoomSearch className="absolute right-2 top-2 text-grey-55" />
               <input
                 value={input}
@@ -41,7 +41,7 @@ export function Search() {
                 placeholder="search cards..."
               />
             </div>
-            <div className="flex flex-col gap-1">
+            <div className="z-10 flex w-full flex-col gap-1">
               {focused && (
                 <div className="flex flex-col gap-2 pb-2 text-grey-55">
                   <p className="text-sm">
@@ -78,10 +78,7 @@ const DraggableCard = (props: {
 
   return (
     <>
-      <div
-        ref={setNodeRef}
-        className={`flex flex-col pb-2 ${isDragging ? `opacity-60` : ""}`}
-      >
+      <div ref={setNodeRef} className={`${isDragging ? `opacity-60` : ""}`}>
         <CardPreview
           data={data}
           entityID={props.entityID}
