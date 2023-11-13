@@ -164,7 +164,7 @@ const MobileLayout = ({ room }: { room: string }) => {
       >
         <div
           id="roomWrapper"
-          className="roomWrapper relative flex snap-center snap-always flex-row  px-2 "
+          className="roomWrapper relative flex snap-start snap-always flex-row  px-2 "
         >
           <div
             id="roomInnerWrapper"
@@ -174,7 +174,7 @@ const MobileLayout = ({ room }: { room: string }) => {
           </div>
         </div>
 
-        <div className="snap-start snap-always ">
+        <div className="snap-center snap-always ">
           <CardViewer room={room} />
         </div>
         <div className="w-2 shrink-0 snap-start" />
@@ -253,7 +253,7 @@ const MobileSidebar = ({
       }
       <animated.div
         style={{ height: viewheight, left }}
-        className="fixed top-0 z-30 ml-2 snap-end snap-always p-1 pl-0"
+        className="fixed top-0 z-30 ml-2 p-1 pl-0"
       >
         <div
           className="h-full touch-none rounded-md border border-grey-90 bg-white"
