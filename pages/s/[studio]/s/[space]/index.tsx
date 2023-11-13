@@ -205,10 +205,11 @@ const MobileSidebar = ({
     config: springConfig,
   });
   let opacity = useSpring({
-    opacity: open ? 0 : 0,
+    opacity: open ? 0.2 : 0,
   });
   let viewheight = useViewportSize().height;
-  const bind = useGesture(
+  let overlayRef = useRef<HTMLDivElement>(null);
+  useGesture(
     {
       onDrag: (data) => {
         if (containerRef.current?.scrollLeft === 0 && data.direction[0] > 0) {
@@ -227,8 +228,17 @@ const MobileSidebar = ({
       }
     },
   });
+
   return createPortal(
     <>
+      {
+        <animated.div
+          {...bindOverlay()}
+          onClick={() => setSidebarOpen(false)}
+          className="fixed inset-0 z-20 touch-none bg-grey-15"
+          style={{ ...opacity, display: open ? "block" : "none" }}
+        />
+      }
       <animated.div
         style={{ height: viewheight, left }}
         className="fixed top-0 z-30 ml-2 snap-end snap-always p-1 pl-0"
@@ -237,15 +247,6 @@ const MobileSidebar = ({
           <Sidebar mobile />
         </div>
       </animated.div>
-
-      {open && (
-        <animated.div
-          {...bindOverlay()}
-          className="fixed inset-0 z-20 bg-grey-15"
-          onClick={() => setSidebarOpen(false)}
-          style={opacity}
-        />
-      )}
     </>,
     document.body
   );
