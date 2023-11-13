@@ -1,7 +1,7 @@
 import { CardViewer } from "components/CardViewerContext";
 import { SmallCardDragContext } from "components/DragContext";
 import { Sidebar } from "components/SpaceLayout";
-import { useEffect, useState } from "react";
+import { MutableRefObject, useEffect, useRef, useState } from "react";
 import useWindowDimensions from "hooks/useWindowDimensions";
 import { Room } from "components/Room";
 import { SpaceMetaTitle } from "components/SpaceMetaTitle";
@@ -25,6 +25,7 @@ import { LogInModal } from "components/LoginModal";
 import Link from "next/link";
 import { Search, MobileSearch } from "components/Search";
 import { HelpModal } from "components/HelpCenter";
+import { useGesture } from "@use-gesture/react";
 
 export async function getStaticPaths() {
   return { paths: [], fallback: "blocking" };
@@ -154,9 +155,13 @@ const LoginButton = () => {
 
 const MobileLayout = ({ room }: { room: string }) => {
   let setSidebarOpen = useUIState((s) => s.setMobileSidebarOpen);
+  let ref = useRef<HTMLDivElement>(null);
   return (
     <div className="flex h-full w-full flex-col">
-      <div className="no-scrollbar pwa-padding my-2 flex h-full snap-x snap-mandatory flex-row overflow-y-hidden overflow-x-scroll overscroll-x-none scroll-smooth">
+      <div
+        className="no-scrollbar pwa-padding my-2 flex h-full snap-x snap-mandatory flex-row overflow-y-hidden overflow-x-scroll overscroll-x-none scroll-smooth"
+        ref={ref}
+      >
         <div
           id="roomWrapper"
           className="roomWrapper relative flex snap-center snap-always flex-row  px-2 "
@@ -183,19 +188,45 @@ const MobileLayout = ({ room }: { room: string }) => {
         <MobileSearch />
       </div>
 
-      <MobileSidebar />
+      <MobileSidebar containerRef={ref} />
     </div>
   );
 };
 
-const MobileSidebar = () => {
+const MobileSidebar = ({
+  containerRef,
+}: {
+  containerRef: MutableRefObject<HTMLDivElement | null>;
+}) => {
   let open = useUIState((s) => s.mobileSidebarOpen);
   let setSidebarOpen = useUIState((s) => s.setMobileSidebarOpen);
-  let { left } = useSpring({ left: open ? 0 : -222, config: springConfig });
+  let { left } = useSpring({
+    left: open ? 0 : -222,
+    config: springConfig,
+  });
   let opacity = useSpring({
     opacity: open ? 0 : 0,
   });
   let viewheight = useViewportSize().height;
+  const bind = useGesture(
+    {
+      onDrag: (data) => {
+        if (containerRef.current?.scrollLeft === 0 && data.direction[0] > 0) {
+          console.log(data);
+          setSidebarOpen(true);
+        }
+      },
+    },
+    { target: containerRef }
+  );
+
+  const bindOverlay = useGesture({
+    onDrag: (data) => {
+      if (data.direction[0] < 0) {
+        setSidebarOpen(false);
+      }
+    },
+  });
   return createPortal(
     <>
       <animated.div
@@ -209,6 +240,7 @@ const MobileSidebar = () => {
 
       {open && (
         <animated.div
+          {...bindOverlay()}
           className="fixed inset-0 z-20 bg-grey-15"
           onClick={() => setSidebarOpen(false)}
           style={opacity}
