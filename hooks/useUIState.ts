@@ -58,6 +58,7 @@ export let useUIState = create(
       },
       setRoom: (spaceID: string, room: string | undefined) => {
         set((state) => ({
+          mobileSidebarOpen: false,
           spaces: {
             ...state.spaces,
             [spaceID]: {
