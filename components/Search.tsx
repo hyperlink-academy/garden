@@ -34,10 +34,11 @@ export function Search() {
           <Popover.Content
             ref={ref}
             onOpenAutoFocus={(e) => e.preventDefault()}
-            className={`no-scrollbar z-0 -mr-4 flex max-h-80 flex-col gap-2 overflow-x-scroll px-2 text-sm ${open
+            className={`no-scrollbar z-0 -mr-4 flex max-h-80 flex-col gap-2 overflow-x-scroll px-2 text-sm ${
+              open
                 ? "-mt-2 rounded-md border-grey-90 bg-white py-2 shadow-drop"
                 : ""
-              }`}
+            }`}
             style={{ width: "var(--radix-popper-anchor-width)" }}
           >
             <div className="sticky top-0 z-20">
@@ -187,8 +188,20 @@ export const MobileSearch = () => {
     <>
       <button
         onClick={() => {
-          setState("open");
-          focusElement(inputRef.current);
+          let fakeInput = document.createElement("input");
+          fakeInput.setAttribute("type", "text");
+          fakeInput.style.position = "absolute";
+          fakeInput.style.display = "hidden";
+          fakeInput.style.fontSize = "16px"; // disable auto zoom
+          document.body.appendChild(fakeInput);
+          fakeInput.focus();
+          setTimeout(() => {
+            setState("open");
+            focusElement(inputRef.current);
+            setTimeout(() => {
+              fakeInput?.remove();
+            }, 20);
+          }, 100);
         }}
       >
         <RoomSearch height={24} width={24} />
