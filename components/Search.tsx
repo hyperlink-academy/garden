@@ -21,7 +21,11 @@ export function Search() {
     (c) => c.value && (!input || c.value.includes(input))
   );
   let exactMatch = input && !!cards.find((c) => c.value === input);
+  let [open, setOpen] = useState(false);
   let [focused, ref] = useIsElementOrChildFocused();
+  useEffect(() => {
+    setOpen(focused);
+  }, [focused]);
   return (
     <Popover.Root open>
       <div style={{ width: 336 }}>
@@ -30,7 +34,7 @@ export function Search() {
           <Popover.Content
             ref={ref}
             onOpenAutoFocus={(e) => e.preventDefault()}
-            className={`no-scrollbar z-0 -mr-4 flex max-h-80 flex-col gap-2 overflow-x-scroll px-2 text-sm ${focused
+            className={`no-scrollbar z-0 -mr-4 flex max-h-80 flex-col gap-2 overflow-x-scroll px-2 text-sm ${open
                 ? "-mt-2 rounded-md border-grey-90 bg-white py-2 shadow-drop"
                 : ""
               }`}
@@ -51,7 +55,7 @@ export function Search() {
               />
             </div>
             <div className="z-10 flex w-full flex-col gap-1">
-              {focused && (
+              {open && (
                 <div className="flex flex-col gap-2 pb-2 text-grey-55">
                   <p className="text-sm">
                     <i>hold and drag cards to move to room</i>
@@ -59,7 +63,7 @@ export function Search() {
                   {input && results.length > 0 && <hr />}
                 </div>
               )}
-              {focused &&
+              {open &&
                 input.length > 0 &&
                 results.map((c) => (
                   <DraggableCard
@@ -68,7 +72,9 @@ export function Search() {
                     hideContent
                   />
                 ))}
-              {focused && input && !exactMatch && <NewCard title={input} />}
+              {open && input && !exactMatch && (
+                <NewCard title={input} onClick={() => setOpen(false)} />
+              )}
             </div>
           </Popover.Content>
         </Popover.Portal>
@@ -77,7 +83,7 @@ export function Search() {
   );
 }
 
-const NewCard = (props: { title: string }) => {
+const NewCard = (props: { title: string; onClick: () => void }) => {
   let { authorized, mutate, memberEntity } = useMutations();
   const { attributes, listeners, setNodeRef, isDragging } = useDraggableCard({
     id: "new-search-card" + props.title,
@@ -99,6 +105,7 @@ const NewCard = (props: { title: string }) => {
           title: props.title,
           memberEntity,
         });
+        props.onClick();
         open({ entityID, focus: "content" });
       }}
       className={`touch-none ${isDragging ? `opacity-60` : ""}`}
@@ -152,12 +159,16 @@ export const MobileSearch = () => {
     (c) => c.value && (!input || c.value.includes(input))
   );
   let exactMatch = input && !!cards.find((c) => c.value === input);
+  let [open, setOpen] = useState(false);
   let [focused, ref] = useIsElementOrChildFocused();
   useEffect(() => {
-    if (!focused) {
+    setOpen(focused);
+  }, [focused]);
+  useEffect(() => {
+    if (!open) {
       setState("normal");
     }
-  }, [focused]);
+  }, [open]);
 
   let { setNodeRef: drawerDroppableRef } = useDroppableZone({
     id: "mobile-search-drawer",
@@ -222,7 +233,9 @@ export const MobileSearch = () => {
             results.map((c) => (
               <DraggableCard entityID={c.entity} key={c.entity} hideContent />
             ))}
-          {focused && input && !exactMatch && <NewCard title={input} />}
+          {open && input && !exactMatch && (
+            <NewCard title={input} onClick={() => setOpen(false)} />
+          )}
         </div>
       </animated.div>
     </>
