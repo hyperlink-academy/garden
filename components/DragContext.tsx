@@ -9,7 +9,7 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { AddSmall } from "components/Icons";
+import { AddSmall, AddTiny } from "components/Icons";
 import { useRef, useState } from "react";
 import { CardPreview, PlaceholderNewCard } from "./CardPreview";
 import { pointerWithinOrRectIntersection } from "src/customCollisionDetection";
@@ -17,13 +17,12 @@ import { RoomListPreview } from "./SpaceLayout/Sidebar/RoomListLayout";
 import { animated, useSpring } from "@react-spring/web";
 import { CardPreviewData, EmptyCardData } from "hooks/CardPreviewData";
 import { Fact } from "data/Facts";
-import { BaseSmallCard } from "./CardPreview/SmallCard";
 
 export const SmallCardDragContext = (props: {
   children: React.ReactNode;
   activationConstraints?:
-  | { delay: number; tolerance: number }
-  | { distance: number };
+    | { delay: number; tolerance: number }
+    | { distance: number };
   noDeleteZone?: boolean;
 }) => {
   let [active, setActiveCard] = useState<DraggableData | null>(null);
@@ -92,15 +91,16 @@ export const SmallCardDragContext = (props: {
               <div
                 className={``}
                 style={{
-                  transform: `rotate(${active.type === "search-card" || !active.position?.rotation
+                  transform: `rotate(${
+                    active.type === "search-card" || !active.position?.rotation
                       ? 0
                       : (
-                        Math.floor(
-                          active.position?.rotation / (Math.PI / 24)
-                        ) *
-                        (Math.PI / 24)
-                      ).toFixed(2)
-                    }rad)`,
+                          Math.floor(
+                            active.position?.rotation / (Math.PI / 24)
+                          ) *
+                          (Math.PI / 24)
+                        ).toFixed(2)
+                  }rad)`,
                 }}
               >
                 <CardPreview
@@ -118,11 +118,6 @@ export const SmallCardDragContext = (props: {
                     active.type === "search-card" ? true : active.hideContent
                   }
                 />
-                {over?.type === "linkCard" && (
-                  <span className="absolute -left-2 -top-2 text-accent-blue">
-                    <AddSmall />
-                  </span>
-                )}
               </div>
             ) : active.type === "room" ? (
               <RoomListPreview entityID={active.entityID} />
@@ -137,6 +132,22 @@ export const SmallCardDragContext = (props: {
               </div>
             ) : active.type === "new-search-card" ? (
               <PlaceholderNewCard title={active.title} />
+            ) : null}
+            {(over?.type === "linkCard" ||
+              over?.type === "card" ||
+              over?.type === "dropzone") &&
+            (active.type !== "card" || active.parent !== over.entityID) ? (
+              <div className="absolute -bottom-3 right-4 flex flex-row items-center gap-2 rounded-md bg-accent-blue px-2 py-1 align-middle font-bold text-white">
+                <AddTiny width={12} height={12} />{" "}
+                {active.type === "card" &&
+                (active.size === "small" || !active.size) ? (
+                  <span>Add</span>
+                ) : (
+                  <span>
+                    Add to {over.type === "linkCard" ? "Card" : "Room"}
+                  </span>
+                )}
+              </div>
             ) : null}
           </AnimatedPickup>
         ) : null}
@@ -159,7 +170,7 @@ export type DraggableData = {
   disabled?: boolean;
   onDragStart?: (data: DraggableData) => void | Promise<void>;
 } & (
-    | {
+  | {
       type: "card";
 
       entityID: string;
@@ -170,14 +181,14 @@ export type DraggableData = {
       hideContent: boolean;
       data: CardPreviewData;
     }
-    | {
+  | {
       type: "room";
       entityID: string;
     }
-    | { type: "new-card" }
-    | { data: CardPreviewData; type: "search-card"; entityID: string }
-    | { type: "new-search-card"; title: string }
-  );
+  | { type: "new-card" }
+  | { data: CardPreviewData; type: "search-card"; entityID: string }
+  | { type: "new-search-card"; title: string }
+);
 
 export type DroppableData = {
   id: string;
