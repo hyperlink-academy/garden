@@ -26,7 +26,7 @@ export function Search() {
           <Popover.Content
             ref={ref}
             onOpenAutoFocus={(e) => e.preventDefault()}
-            className={`no-scrollbar z-0 -mr-4 flex max-h-80 flex-col gap-2 overflow-x-scroll px-2 ${focused
+            className={`no-scrollbar z-0 -mr-4 flex max-h-80 flex-col gap-2 overflow-x-scroll px-2 text-sm ${focused
                 ? "-mt-2 rounded-md border-grey-90 bg-white py-2 shadow-drop"
                 : ""
               }`}
@@ -35,6 +35,11 @@ export function Search() {
             <div className="sticky top-0 z-20">
               <RoomSearch className="absolute right-2 top-2 text-grey-55" />
               <input
+                onKeyDown={(e) => {
+                  if (e.key === "Escape") {
+                    e.currentTarget.blur();
+                  }
+                }}
                 value={input}
                 onChange={(e) => setInput(e.currentTarget.value)}
                 className="w-full px-2 py-1 outline-none"
@@ -47,7 +52,7 @@ export function Search() {
                   <p className="text-sm">
                     <i>hold and drag cards to move to room</i>
                   </p>
-                  <hr />
+                  {input && results.length > 0 && <hr />}
                 </div>
               )}
               {focused &&

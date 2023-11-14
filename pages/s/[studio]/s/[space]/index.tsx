@@ -83,7 +83,7 @@ function Space() {
 
       <div
         style={{ height: viewheight }}
-        className="spaceontent max-w-screen-xl relative mx-auto flex h-full w-full grow md:px-4 md:py-6"
+        className="spacecontent max-w-screen-xl relative mx-auto flex h-full w-full grow md:px-4 md:py-4 md:pb-2"
       >
         <SmallCardDragContext>
           {width > 960 || width === 0 ? (
