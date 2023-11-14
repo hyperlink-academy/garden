@@ -265,7 +265,7 @@ let useOnDragEndCollection = (props: {
 
       let newIndex = props.entityID
         ? siblings.findIndex((f) => f.value.value === props.entityID) - 1
-        : siblings.length;
+        : siblings.length - 1;
       if (data.type === "new-card") {
         let entityID = ulid();
         if (memberEntity) {
