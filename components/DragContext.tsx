@@ -11,7 +11,7 @@ import {
 } from "@dnd-kit/core";
 import { AddSmall } from "components/Icons";
 import { useRef, useState } from "react";
-import { CardPreview } from "./CardPreview";
+import { CardPreview, PlaceholderNewCard } from "./CardPreview";
 import { pointerWithinOrRectIntersection } from "src/customCollisionDetection";
 import { RoomListPreview } from "./SpaceLayout/Sidebar/RoomListLayout";
 import { animated, useSpring } from "@react-spring/web";
@@ -22,7 +22,7 @@ import { BaseSmallCard } from "./CardPreview/SmallCard";
 export const SmallCardDragContext = (props: {
   children: React.ReactNode;
   activationConstraints?:
-    | { delay: number; tolerance: number }
+  | { delay: number; tolerance: number }
   | { distance: number };
   noDeleteZone?: boolean;
 }) => {
@@ -135,6 +135,8 @@ export const SmallCardDragContext = (props: {
                   data={EmptyCardData}
                 />
               </div>
+            ) : active.type === "new-search-card" ? (
+              <PlaceholderNewCard title={active.title} />
             ) : null}
           </AnimatedPickup>
         ) : null}
@@ -174,6 +176,7 @@ export type DraggableData = {
     }
     | { type: "new-card" }
     | { data: CardPreviewData; type: "search-card"; entityID: string }
+    | { type: "new-search-card"; title: string }
   );
 
 export type DroppableData = {

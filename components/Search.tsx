@@ -1,15 +1,18 @@
-import { db } from "hooks/useReplicache";
+import { db, useMutations } from "hooks/useReplicache";
 import { useEffect, useRef, useState } from "react";
-import { CardPreview } from "./CardPreview";
+import { CardPreview, PlaceholderNewCard } from "./CardPreview";
 import * as Popover from "@radix-ui/react-popover";
 import { useCardPreviewData } from "hooks/CardPreviewData";
 import { useIsElementOrChildFocused } from "hooks/utils";
 import { useDraggableCard, useDroppableZone } from "./DragContext";
-import { CloseLinedTiny, RoomSearch } from "./Icons";
+import { ChatEmptyTiny, CloseLinedTiny, RoomSearch } from "./Icons";
 import { animated, useSpring } from "@react-spring/web";
 import useMeasure from "react-use-measure";
 import { useCombinedRefs } from "./Desktop";
 import { focusElement } from "src/utils";
+import { useOpenCard } from "hooks/useUIState";
+import { ulid } from "src/ulid";
+import { useCardViewer } from "./CardViewerContext";
 
 export function Search() {
   let [input, setInput] = useState("");
@@ -17,10 +20,11 @@ export function Search() {
   let results = cards.filter(
     (c) => c.value && (!input || c.value.includes(input))
   );
+  let exactMatch = input && !!cards.find((c) => c.value === input);
   let [focused, ref] = useIsElementOrChildFocused();
   return (
     <Popover.Root open>
-      <div style={{ width: 420 }}>
+      <div style={{ width: 336 }}>
         <Popover.Anchor />
         <Popover.Portal>
           <Popover.Content
@@ -58,8 +62,13 @@ export function Search() {
               {focused &&
                 input.length > 0 &&
                 results.map((c) => (
-                  <DraggableCard entityID={c.entity} key={c.id} hideContent />
+                  <DraggableCard
+                    entityID={c.entity}
+                    key={c.entity}
+                    hideContent
+                  />
                 ))}
+              {focused && input && !exactMatch && <NewCard title={input} />}
             </div>
           </Popover.Content>
         </Popover.Portal>
@@ -67,6 +76,37 @@ export function Search() {
     </Popover.Root>
   );
 }
+
+const NewCard = (props: { title: string }) => {
+  let { authorized, mutate, memberEntity } = useMutations();
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggableCard({
+    id: "new-search-card" + props.title,
+    type: "new-search-card",
+    title: props.title,
+  });
+  let { open } = useCardViewer();
+  if (!authorized) return null;
+  return (
+    <div
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
+      onClick={async () => {
+        if (!authorized || !memberEntity) return;
+        let entityID = ulid();
+        await mutate("createCard", {
+          entityID,
+          title: props.title,
+          memberEntity,
+        });
+        open({ entityID, focus: "content" });
+      }}
+      className={`touch-none ${isDragging ? `opacity-60` : ""}`}
+    >
+      <PlaceholderNewCard title={props.title} />
+    </div>
+  );
+};
 
 const DraggableCard = (props: {
   editable?: boolean;
@@ -111,6 +151,7 @@ export const MobileSearch = () => {
   let results = cards.filter(
     (c) => c.value && (!input || c.value.includes(input))
   );
+  let exactMatch = input && !!cards.find((c) => c.value === input);
   let [focused, ref] = useIsElementOrChildFocused();
   useEffect(() => {
     if (!focused) {
@@ -179,8 +220,9 @@ export const MobileSearch = () => {
           </div>
           {input.length > 0 &&
             results.map((c) => (
-              <DraggableCard entityID={c.entity} key={c.id} hideContent />
+              <DraggableCard entityID={c.entity} key={c.entity} hideContent />
             ))}
+          {focused && input && !exactMatch && <NewCard title={input} />}
         </div>
       </animated.div>
     </>

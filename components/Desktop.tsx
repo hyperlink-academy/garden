@@ -81,6 +81,27 @@ export const Desktop = (props: { entityID: string }) => {
           });
           break;
         }
+        case "new-search-card": {
+          if (!memberEntity) return;
+          let entityID = ulid();
+          await mutate("createCard", {
+            entityID,
+            title: data.title,
+            memberEntity,
+          });
+
+          await mutate("addCardToDesktop", {
+            factID: ulid(),
+            entity: entityID,
+            desktop: props.entityID,
+            position: {
+              ...newPosition,
+              rotation: 0,
+              size: "small",
+            },
+          });
+          break;
+        }
         case "search-card": {
           await mutate("addCardToDesktop", {
             factID: ulid(),

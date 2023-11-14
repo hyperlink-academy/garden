@@ -14,7 +14,7 @@ import { generateKeyBetween } from "src/fractional-indexing";
 import { getAndUploadFile } from "src/getAndUploadFile";
 import { sortByPosition, updatePositions } from "src/position_helpers";
 import { ulid } from "src/ulid";
-import { CardPreview } from "./CardPreview";
+import { CardPreview, PlaceholderNewCard } from "./CardPreview";
 import { CardAdder } from "./CardStack";
 import { useCardViewer } from "./CardViewerContext";
 import { useCombinedRefs } from "./Desktop";
@@ -166,6 +166,8 @@ const CollectionList = (props: {
           </div>
         ) : over.type === "new-card" ? (
           <NewCardPreview />
+        ) : over.type === "new-search-card" ? (
+          <PlaceholderNewCard title={over.title} />
         ) : null
       ) : null}
       <CardAdder
@@ -215,22 +217,30 @@ const DraggableCard = (props: {
     <>
       <div
         ref={refs}
-        className={`flex flex-col pb-2 ${isDragging ? `opacity-60 ${isOverSomethingElse ? "-mt-2" : ""}` : ""
-          }`}
+        className={`flex flex-col pb-2 ${
+          isDragging ? `opacity-60 ${isOverSomethingElse ? "-mt-2" : ""}` : ""
+        }`}
       >
-        {over && (over.type === "card" || over.type === "search-card")
-          ? over.entityID !== props.entityID && (
+        {over &&
+          (over.type === "card" || over.type === "search-card" ? (
+            over.entityID !== props.entityID && (
+              <div className="pb-2 opacity-60">
+                <CardPreview
+                  data={over.data}
+                  editable={props.editable}
+                  entityID={over.entityID}
+                  size={"big"}
+                  hideContent={props.hideContent}
+                />
+              </div>
+            )
+          ) : over.type === "new-card" ? (
+            <NewCardPreview />
+          ) : over.type === "new-search-card" ? (
             <div className="pb-2 opacity-60">
-              <CardPreview
-                data={over.data}
-                editable={props.editable}
-                entityID={over.entityID}
-                size={"big"}
-                hideContent={props.hideContent}
-              />
+              <PlaceholderNewCard title={over.title} />
             </div>
-          )
-          : over && over.type === "new-card" && <NewCardPreview />}
+          ) : null)}
         {isOverSomethingElse ? null : (
           <CardPreview
             data={data}
@@ -290,6 +300,27 @@ let useOnDragEndCollection = (props: {
             await mutate("createCard", {
               entityID,
               title: "",
+              memberEntity,
+            });
+
+            await mutate("addCardToSection", {
+              factID: ulid(),
+              cardEntity: entityID,
+              parent: props.parent,
+              section: props.attribute,
+              positions: {
+                eav: position,
+              },
+            });
+          }
+          break;
+        }
+        case "new-search-card": {
+          let entityID = ulid();
+          if (memberEntity) {
+            await mutate("createCard", {
+              entityID,
+              title: data.title,
               memberEntity,
             });
 
