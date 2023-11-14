@@ -22,7 +22,7 @@ import { BaseSmallCard } from "./CardPreview/SmallCard";
 export const SmallCardDragContext = (props: {
   children: React.ReactNode;
   activationConstraints?:
-  | { delay: number; tolerance: number }
+    | { delay: number; tolerance: number }
   | { distance: number };
   noDeleteZone?: boolean;
 }) => {
@@ -179,7 +179,7 @@ export type DraggableData = {
 export type DroppableData = {
   id: string;
   entityID: string;
-  type: "card" | "room" | "dropzone" | "linkCard";
+  type: "card" | "room" | "dropzone" | "linkCard" | "trigger";
   onDragEnter?: (data: DraggableData) => void | Promise<void>;
   onDragExit?: (data: DraggableData) => void | Promise<void>;
   onDragEnd?: (

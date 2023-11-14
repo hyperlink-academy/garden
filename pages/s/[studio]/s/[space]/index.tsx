@@ -1,5 +1,5 @@
 import { CardViewer } from "components/CardViewerContext";
-import { SmallCardDragContext } from "components/DragContext";
+import { SmallCardDragContext, useDroppableZone } from "components/DragContext";
 import { Sidebar } from "components/SpaceLayout";
 import { MutableRefObject, useEffect, useRef, useState } from "react";
 import useWindowDimensions from "hooks/useWindowDimensions";
@@ -26,6 +26,7 @@ import Link from "next/link";
 import { Search, MobileSearch } from "components/Search";
 import { HelpModal } from "components/HelpCenter";
 import { useGesture } from "@use-gesture/react";
+import { useDndContext } from "@dnd-kit/core";
 
 export async function getStaticPaths() {
   return { paths: [], fallback: "blocking" };
@@ -156,6 +157,20 @@ const LoginButton = () => {
 const MobileLayout = ({ room }: { room: string }) => {
   let setSidebarOpen = useUIState((s) => s.setMobileSidebarOpen);
   let ref = useRef<HTMLDivElement>(null);
+  let { setNodeRef: droppableRef, over } = useDroppableZone({
+    type: "trigger",
+    id: "mobile-sidebar-button",
+    entityID: "mobile-sidebar-button",
+  });
+
+  useEffect(() => {
+    if (over?.type === "room" || !over) return;
+    let timeout = window.setTimeout(() => {
+      setSidebarOpen(true);
+    }, 500);
+    return () => window.clearTimeout(timeout);
+  }, [over]);
+
   return (
     <div className="flex h-full w-full flex-col">
       <div
@@ -180,7 +195,7 @@ const MobileLayout = ({ room }: { room: string }) => {
         <div className="w-2 shrink-0 snap-start" />
       </div>
       <div className="flex flex-row justify-between px-2 pb-1">
-        <div className="flex flex-row gap-2 text-grey-55">
+        <div className="flex flex-row gap-2 text-grey-55" ref={droppableRef}>
           <button onClick={() => setSidebarOpen()}>
             <SidebarIcon />
           </button>
@@ -208,12 +223,29 @@ const MobileSidebar = ({
     opacity: open ? 0.2 : 0,
   });
   let viewheight = useViewportSize().height;
-  let overlayRef = useRef<HTMLDivElement>(null);
+  let { setNodeRef: droppableRef, over } = useDroppableZone({
+    type: "trigger",
+    id: "mobile-sidebar-overlay",
+    entityID: "mobile-sidebar-overlay",
+  });
+  let { active } = useDndContext();
+
+  useEffect(() => {
+    if (over?.type === "room" || !over) return;
+    let timeout = window.setTimeout(() => {
+      setSidebarOpen(false);
+    }, 500);
+    return () => window.clearTimeout(timeout);
+  }, [over]);
   useGesture(
     {
       onDrag: (data) => {
-        if (containerRef.current?.scrollLeft === 0 && data.direction[0] > 0) {
-          console.log(data);
+        if (
+          containerRef.current?.scrollLeft === 0 &&
+          data.direction[0] > 0 &&
+          data.distance[0] > 8
+        ) {
+          if (active?.data) return;
           setSidebarOpen(true);
         }
       },
@@ -247,13 +279,15 @@ const MobileSidebar = ({
         <animated.div
           {...bindOverlay()}
           onClick={() => setSidebarOpen(false)}
-          className="fixed inset-0 z-20 touch-none bg-grey-15"
+          className="fixed inset-0 z-40 bg-grey-15"
           style={{ ...opacity, display: open ? "block" : "none" }}
-        />
+        >
+          <div className="z-40 ml-auto h-full w-2/3" ref={droppableRef} />
+        </animated.div>
       }
       <animated.div
         style={{ height: viewheight, left }}
-        className="fixed top-0 z-30 ml-2 p-1 pl-0"
+        className="fixed top-0 z-50 ml-2 p-1 pl-0"
       >
         <div
           className="h-full touch-none rounded-md border border-grey-90 bg-white"
