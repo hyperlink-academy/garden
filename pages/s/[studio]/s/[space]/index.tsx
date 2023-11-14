@@ -27,6 +27,7 @@ import { Search, MobileSearch } from "components/Search";
 import { HelpModal } from "components/HelpCenter";
 import { useGesture } from "@use-gesture/react";
 import { useDndContext } from "@dnd-kit/core";
+import { useSpaceShortcuts } from "hooks/useSpaceShortcuts";
 
 export async function getStaticPaths() {
   return { paths: [], fallback: "blocking" };
@@ -64,6 +65,7 @@ export default function SpacePage(props: Props) {
 }
 function Space() {
   useSpaceSyncState();
+  useSpaceShortcuts();
   let room = useRoom();
   const { width } = useWindowDimensions();
 

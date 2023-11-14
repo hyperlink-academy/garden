@@ -8,31 +8,21 @@ import {
   useMutations,
   useSpaceID,
 } from "hooks/useReplicache";
-import { useSubscribe } from "hooks/useSubscribe";
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useContext } from "react";
 import { generateKeyBetween } from "src/fractional-indexing";
 import { getAndUploadFile } from "src/getAndUploadFile";
 import { sortByPosition, updatePositions } from "src/position_helpers";
 import { ulid } from "src/ulid";
 import { CardPreview, PlaceholderNewCard } from "./CardPreview";
 import { CardAdder } from "./CardStack";
-import { useCardViewer } from "./CardViewerContext";
 import { useCombinedRefs } from "./Desktop";
 import {
   DraggableData,
   useDraggableCard,
   useDroppableZone,
 } from "./DragContext";
-import * as z from "zod";
 import { useUIState } from "hooks/useUIState";
-
-let FilterVerifier = z.array(
-  z.object({
-    reaction: z.string(),
-    not: z.boolean(),
-  })
-);
-type Filters = z.TypeOf<typeof FilterVerifier>;
+import { useDebouncedValue } from "hooks/useDebouncedValue";
 
 export const CardCollection = (props: {
   entityID: string;
@@ -204,12 +194,14 @@ const DraggableCard = (props: {
 
   let { mutate } = useMutations();
   let onDragEnd = useOnDragEndCollection(props);
-  let { setNodeRef: draggableRef, over } = useDroppableZone({
+  let { setNodeRef: draggableRef, over: _over } = useDroppableZone({
     type: "card",
     entityID: props.entityID,
     id: props.id,
     onDragEnd,
   });
+
+  let over = useDebouncedValue(_over, 20);
 
   let refs = useCombinedRefs(draggableRef, setNodeRef);
 
@@ -285,7 +277,7 @@ let useOnDragEndCollection = (props: {
 
       let newIndex = props.entityID
         ? siblings.findIndex((f) => f.value.value === props.entityID) - 1
-        : siblings.length;
+        : siblings.length - 1;
 
       let position = generateKeyBetween(
         siblings[newIndex]?.positions.eav || null,
