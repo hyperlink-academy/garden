@@ -22,6 +22,7 @@ import {
   useDroppableZone,
 } from "./DragContext";
 import { useUIState } from "hooks/useUIState";
+import { useDebouncedValue } from "hooks/useDebouncedValue";
 
 export const CardCollection = (props: {
   entityID: string;
@@ -191,12 +192,14 @@ const DraggableCard = (props: {
 
   let { mutate } = useMutations();
   let onDragEnd = useOnDragEndCollection(props);
-  let { setNodeRef: draggableRef, over } = useDroppableZone({
+  let { setNodeRef: draggableRef, over: _over } = useDroppableZone({
     type: "card",
     entityID: props.entityID,
     id: props.id,
     onDragEnd,
   });
+
+  let over = useDebouncedValue(_over, 20);
 
   let refs = useCombinedRefs(draggableRef, setNodeRef);
 
