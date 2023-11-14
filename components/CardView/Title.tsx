@@ -121,11 +121,11 @@ const AutocompleteItem = (props: {
         e.preventDefault();
         props.complete(props.entity);
       }}
-      className={`flex w-full flex-row gap-1 px-2 ${
+      className={`flex w-full flex-row gap-1 px-2 text-left ${
         props.selected === props.index ? "bg-bg-blue" : ""
       }`}
     >
-      <CardSmall />
+      <CardSmall className="shrink-0 grow-0" />
       {props.name}
     </button>
   );
