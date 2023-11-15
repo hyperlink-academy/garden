@@ -1,4 +1,4 @@
-import { db, useMutations } from "hooks/useReplicache";
+import { db, scanIndex, useMutations } from "hooks/useReplicache";
 import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { CardPreview, PlaceholderNewCard } from "./CardPreview";
 import * as Popover from "@radix-ui/react-popover";
@@ -15,10 +15,11 @@ import { animated, useSpring } from "@react-spring/web";
 import useMeasure from "react-use-measure";
 import { useCombinedRefs } from "./Desktop";
 import { focusElement } from "src/utils";
-import { useOpenCard } from "hooks/useUIState";
+import { useOpenCard, useRoom, useUIState } from "hooks/useUIState";
 import { ulid } from "src/ulid";
 import { useCardViewer } from "./CardViewerContext";
 import { BigCardBody } from "./CardPreview/BigCard";
+import { useGesture } from "@use-gesture/react";
 
 let useSearch = () => {
   let [input, setInput] = useState("");
@@ -69,7 +70,7 @@ export function Search() {
               open
                 ? "-mt-2 rounded-md border-grey-90 bg-white py-2 shadow-drop"
                 : ""
-            }`}
+              }`}
             style={{ width: "var(--radix-popper-anchor-width)" }}
           >
             <div className="sticky top-0 z-20 px-2">
@@ -141,9 +142,8 @@ export function Search() {
               )}
               {open && input && !exactMatch && (
                 <div
-                  className={`p-2 ${
-                    suggestionIndex === results.length ? "bg-bg-blue" : ""
-                  }`}
+                  className={`p-2 ${suggestionIndex === results.length ? "bg-bg-blue" : ""
+                    }`}
                 >
                   <NewCard title={input} onClick={() => setOpen(false)} />
                 </div>
@@ -251,10 +251,6 @@ export const MobileSearch = () => {
     opacity: state === "open" ? 0.2 : 0,
   });
   let [open, setOpen] = useState(false);
-  let [focused, ref] = useIsElementOrChildFocused();
-  useEffect(() => {
-    setOpen(focused);
-  }, [focused]);
   useEffect(() => {
     if (!open) {
       setState("normal");
@@ -271,42 +267,36 @@ export const MobileSearch = () => {
   });
   let refCombined = useCombinedRefs(drawerDroppableRef, measure);
   let inputRef = useRef<HTMLInputElement>(null);
+
+  const bindOverlay = useGesture({
+    onDrag: (data) => {
+      if (data.direction[1] > 0) {
+        inputRef.current?.blur();
+        setState("normal");
+      }
+    },
+  });
+
   return (
     <>
       <button
         className="flex h-8 w-8 items-center justify-center rounded-md border border-grey-55"
         onClick={() => {
-          let fakeInput = document.createElement("input");
-          fakeInput.setAttribute("type", "text");
-
-          fakeInput.style.position = "fixed";
-          fakeInput.style.height = "0px";
-          fakeInput.style.width = "0px";
-          fakeInput.style.fontSize = "16px"; // disable auto zoom
-          document.body.appendChild(fakeInput);
-          fakeInput.focus();
-          setTimeout(() => {
-            setState("open");
-            focusElement(inputRef.current);
-            setTimeout(() => {
-              fakeInput?.remove();
-            }, 20);
-          }, 100);
+          setState("open");
+          inputRef.current?.focus();
         }}
       >
         <SearchSmall />
       </button>
       {state === "open" && (
         <animated.div
+          {...bindOverlay()}
+          onClick={() => setState("normal")}
           className="fixed inset-0 z-50 bg-grey-15"
           style={opacity}
         />
       )}
-      <animated.div
-        className="fixed left-0 z-50 w-full px-2"
-        style={style}
-        ref={ref}
-      >
+      <animated.div className="fixed left-0 z-50 w-full px-2" style={style}>
         <div
           className="no-scrollbar relative z-0 flex h-[40vh] w-full flex-col gap-2 overflow-y-scroll rounded-md border border-b-0 border-grey-90 bg-white pt-2"
           ref={refCombined}
@@ -315,7 +305,7 @@ export const MobileSearch = () => {
             <div className="relative w-full">
               <RoomSearch className="absolute right-2 top-2 text-grey-55" />
               <input
-                className="w-full px-2 py-1 outline-none"
+                className={`w-full px-2 py-1 outline-none`}
                 onKeyDown={(e) => {
                   if (e.key === "Escape") {
                     setState("normal");
