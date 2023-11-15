@@ -62,7 +62,7 @@ const CollectionList = (props: {
   });
   let { setNodeRef, over } = useDroppableZone({
     type: "dropzone",
-    entityID: "",
+    entityID: props.entityID,
     id: "add-card-dropzone",
     onDragEnd,
   });
@@ -196,7 +196,7 @@ const DraggableCard = (props: {
   let onDragEnd = useOnDragEndCollection(props);
   let { setNodeRef: draggableRef, over: _over } = useDroppableZone({
     type: "card",
-    entityID: props.entityID,
+    entityID: props.parent,
     id: props.id,
     onDragEnd,
   });
