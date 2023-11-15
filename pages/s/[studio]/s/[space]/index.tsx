@@ -77,6 +77,9 @@ function Space() {
   }, []);
 
   let viewheight = useViewportSize().height;
+  let heightSpring = useSpring({
+    height: viewheight,
+  });
   usePreventResize();
 
   return (
@@ -84,8 +87,8 @@ function Space() {
       <SpaceMetaTitle />
       <PresenceHandler />
 
-      <div
-        style={{ height: viewheight }}
+      <animated.div
+        style={heightSpring}
         className="spacecontent max-w-screen-xl relative mx-auto flex h-full w-full grow md:px-4 md:py-4 md:pb-2"
       >
         <SmallCardDragContext>
@@ -95,7 +98,7 @@ function Space() {
             <MobileLayout room={room} />
           )}
         </SmallCardDragContext>
-      </div>
+      </animated.div>
     </>
   );
 }
