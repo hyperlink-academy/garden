@@ -39,8 +39,9 @@ export function focusElement(element?: HTMLElement | null) {
     //Safari doesn't let you focus outside a user-triggered event loop, so we have to create a fake input to focus
     fakeInput = document.createElement("input");
     fakeInput.setAttribute("type", "text");
-    fakeInput.style.position = "absolute";
-    fakeInput.style.display = "hidden";
+    fakeInput.style.position = "fixed";
+    fakeInput.style.height = "0px";
+    fakeInput.style.width = "0px";
     fakeInput.style.fontSize = "16px"; // disable auto zoom
     document.body.appendChild(fakeInput);
     fakeInput.focus();

@@ -5,7 +5,12 @@ import * as Popover from "@radix-ui/react-popover";
 import { useCardPreviewData } from "hooks/CardPreviewData";
 import { useIsElementOrChildFocused } from "hooks/utils";
 import { useDraggableCard, useDroppableZone } from "./DragContext";
-import { ChatEmptyTiny, CloseLinedTiny, RoomSearch } from "./Icons";
+import {
+  ChatEmptyTiny,
+  CloseLinedTiny,
+  RoomSearch,
+  SearchSmall,
+} from "./Icons";
 import { animated, useSpring } from "@react-spring/web";
 import useMeasure from "react-use-measure";
 import { useCombinedRefs } from "./Desktop";
@@ -194,8 +199,10 @@ export const MobileSearch = () => {
         onClick={() => {
           let fakeInput = document.createElement("input");
           fakeInput.setAttribute("type", "text");
-          fakeInput.style.position = "absolute";
-          fakeInput.style.display = "hidden";
+
+          fakeInput.style.position = "fixed";
+          fakeInput.style.height = "0px";
+          fakeInput.style.width = "0px";
           fakeInput.style.fontSize = "16px"; // disable auto zoom
           document.body.appendChild(fakeInput);
           fakeInput.focus();
