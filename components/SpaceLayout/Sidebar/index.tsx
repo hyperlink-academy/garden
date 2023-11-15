@@ -141,7 +141,7 @@ export const SpaceName = (props: { className?: string }) => {
   let [editModal, setEditModal] = useState(false);
   return (
     <div className={`SidebarSpaceInfo flex flex-col gap-2 ${props.className}`}>
-      <div className="flex items-start justify-between gap-2 bg-inherit">
+      <div className="flex w-full flex-row items-start justify-between gap-2 bg-inherit pr-4">
         <Truncate className="w-full max-w-xs bg-inherit">
           <h3 className="SpaceName ">{data?.display_name}</h3>
         </Truncate>

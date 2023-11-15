@@ -26,7 +26,7 @@ export function Truncate(props: {
     <div className={`${props.className} relative`}>
       <div
         ref={ref}
-        className={`no-scrollbar w-full overflow-x-auto whitespace-nowrap`}
+        className={`no-scrollbar overflow-x-auto whitespace-nowrap`}
       >
         {props.children}
       </div>

@@ -14,13 +14,21 @@ import { useOpenCard } from "hooks/useUIState";
 import { ulid } from "src/ulid";
 import { useCardViewer } from "./CardViewerContext";
 
-export function Search() {
+let useSearch = () => {
   let [input, setInput] = useState("");
   let cards = db.useAttribute("card/title");
   let results = cards.filter(
-    (c) => c.value && (!input || c.value.includes(input))
+    (c) =>
+      c.value &&
+      (!input ||
+        c.value.toLocaleLowerCase().includes(input.toLocaleLowerCase()))
   );
   let exactMatch = input && !!cards.find((c) => c.value === input);
+  return { input, setInput, results, exactMatch };
+};
+
+export function Search() {
+  let { input, setInput, results, exactMatch } = useSearch();
   let [open, setOpen] = useState(false);
   let [focused, ref] = useIsElementOrChildFocused();
   useEffect(() => {
@@ -146,9 +154,8 @@ const DraggableCard = (props: {
 };
 
 export const MobileSearch = () => {
-  let [input, setInput] = useState("");
+  let { input, setInput, results, exactMatch } = useSearch();
   let [state, setState] = useState<"normal" | "open" | "dragging">("normal");
-  let cards = db.useAttribute("card/title");
   let [measure, { height }] = useMeasure();
   let style = useSpring({
     y: state === "open" ? -1 * height + 39 : state === "dragging" ? -16 : 38,
@@ -156,10 +163,6 @@ export const MobileSearch = () => {
   let opacity = useSpring({
     opacity: state === "open" ? 0.2 : 0,
   });
-  let results = cards.filter(
-    (c) => c.value && (!input || c.value.includes(input))
-  );
-  let exactMatch = input && !!cards.find((c) => c.value === input);
   let [open, setOpen] = useState(false);
   let [focused, ref] = useIsElementOrChildFocused();
   useEffect(() => {
