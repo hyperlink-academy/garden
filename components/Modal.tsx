@@ -1,6 +1,8 @@
 import { useViewportSize } from "hooks/useViewportSize";
 import { ButtonTertiary, ButtonPrimary } from "./Buttons";
 import { Dialog } from "@headlessui/react";
+import { useEffect } from "react";
+import { useUIState } from "hooks/useUIState";
 // import { usePreventScroll } from "@react-aria/overlays";
 
 export const Modal: React.FC<
@@ -13,6 +15,10 @@ export const Modal: React.FC<
   }>
 > = (props) => {
   let viewheight = useViewportSize().height;
+  let setMobileSidebarOpen = useUIState((s) => s.setMobileSidebarOpen);
+  useEffect(() => {
+    if (props.open) setMobileSidebarOpen(false);
+  }, [props.open, setMobileSidebarOpen]);
   // usePreventScroll();
 
   return (
