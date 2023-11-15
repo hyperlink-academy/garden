@@ -117,7 +117,7 @@ const DesktopLayout = ({ room }: { room: string }) => {
             </>
           )}
           <div className="text-grey-35">
-            <SpaceName />
+            <SpaceName className="bg-background" />
           </div>
           {!session.loggedIn && <LoginButton />}
         </div>

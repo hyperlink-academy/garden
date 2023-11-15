@@ -31,6 +31,7 @@ import { useIsActiveRoom, useRoom, useSetRoom } from "hooks/useUIState";
 import { prefetchIdentityData } from "hooks/useIdentityData";
 import { ModalSubmitButton, Modal } from "components/Modal";
 import { useUIState } from "hooks/useUIState";
+import { Truncate } from "components/Truncate";
 
 export const Sidebar = (props: { mobile?: boolean }) => {
   let [roomEditOpen, setRoomEditOpen] = useState(false);
@@ -41,7 +42,7 @@ export const Sidebar = (props: { mobile?: boolean }) => {
       <div className="no-scrollbar flex h-full w-full flex-col gap-2 overflow-y-scroll px-3 pt-3">
         {props.mobile && (
           <>
-            <SpaceName />
+            <SpaceName className="bg-white" />
             <Divider />
           </>
         )}
@@ -129,7 +130,7 @@ const RoomButton = (props: { roomID: string; children: React.ReactNode }) => {
   );
 };
 
-export const SpaceName = () => {
+export const SpaceName = (props: { className?: string }) => {
   let spaceID = useSpaceID();
   let { authorized } = useMutations();
   let { data } = useSpaceData(spaceID);
@@ -139,14 +140,11 @@ export const SpaceName = () => {
     session.session && session.session.username === data?.owner.username;
   let [editModal, setEditModal] = useState(false);
   return (
-    <div className="SidebarSpaceInfo flex flex-col gap-2">
-      <div className="flex items-start justify-between gap-2">
-        <h3
-          className="SpaceName"
-          style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
-        >
-          {data?.display_name}
-        </h3>
+    <div className={`SidebarSpaceInfo flex flex-col gap-2 ${props.className}`}>
+      <div className="flex items-start justify-between gap-2 bg-inherit">
+        <Truncate className="w-full max-w-xs bg-inherit">
+          <h3 className="SpaceName ">{data?.display_name}</h3>
+        </Truncate>
         {!authorized ? null : isOwner ? (
           <button
             onClick={() => setEditModal(true)}
