@@ -1,5 +1,5 @@
 import { db, useMutations } from "hooks/useReplicache";
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { CardPreview, PlaceholderNewCard } from "./CardPreview";
 import * as Popover from "@radix-ui/react-popover";
 import { useCardPreviewData } from "hooks/CardPreviewData";
@@ -18,6 +18,7 @@ import { focusElement } from "src/utils";
 import { useOpenCard } from "hooks/useUIState";
 import { ulid } from "src/ulid";
 import { useCardViewer } from "./CardViewerContext";
+import { BigCardBody } from "./CardPreview/BigCard";
 
 let useSearch = () => {
   let [input, setInput] = useState("");
@@ -25,6 +26,7 @@ let useSearch = () => {
   let results = cards.filter(
     (c) =>
       c.value &&
+      input.length > 2 &&
       (!input ||
         c.value.toLocaleLowerCase().includes(input.toLocaleLowerCase()))
   );
@@ -34,11 +36,27 @@ let useSearch = () => {
 
 export function Search() {
   let { input, setInput, results, exactMatch } = useSearch();
+  let { open: openCard } = useCardViewer();
   let [open, setOpen] = useState(false);
   let [focused, ref] = useIsElementOrChildFocused();
+  let inputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    let listener = (e: KeyboardEvent) => {
+      if (e.key == "k" && (e.metaKey || e.ctrlKey)) {
+        setOpen(true);
+        inputRef.current?.focus();
+        e.preventDefault();
+      }
+    };
+    document.addEventListener("keydown", listener);
+    return () => document.removeEventListener("keydown", listener);
+  }, []);
+  let [suggestionIndex, setSuggestionIndex] = useState<number>(0);
   useEffect(() => {
     setOpen(focused);
   }, [focused]);
+
+  let { authorized, mutate, memberEntity } = useMutations();
   return (
     <Popover.Root open>
       <div style={{ width: 336 }}>
@@ -47,19 +65,57 @@ export function Search() {
           <Popover.Content
             ref={ref}
             onOpenAutoFocus={(e) => e.preventDefault()}
-            className={`no-scrollbar z-0 -mr-4 flex max-h-80 flex-col gap-2 overflow-x-scroll px-2 text-sm ${
+            className={`no-scrollbar z-0 -mr-4 flex max-h-80 flex-col gap-2 overflow-x-scroll text-sm ${
               open
                 ? "-mt-2 rounded-md border-grey-90 bg-white py-2 shadow-drop"
                 : ""
             }`}
             style={{ width: "var(--radix-popper-anchor-width)" }}
           >
-            <div className="sticky top-0 z-20">
+            <div className="sticky top-0 z-20 px-2">
               <RoomSearch className="absolute right-2 top-2 text-grey-55" />
               <input
-                onKeyDown={(e) => {
+                ref={inputRef}
+                onKeyDown={async (e) => {
+                  console.log(e);
                   if (e.key === "Escape") {
                     e.currentTarget.blur();
+                  }
+                  if (e.key === "Enter") {
+                    //New Card
+                    if (suggestionIndex === results.length && !exactMatch) {
+                      if (!authorized || !memberEntity) return;
+                      let entityID = ulid();
+                      await mutate("createCard", {
+                        entityID,
+                        title: input,
+                        memberEntity,
+                      });
+                      openCard({ entityID, focus: "content" });
+                      setOpen(false);
+                    } else {
+                      let entityID = results[suggestionIndex].entity;
+                      setOpen(false);
+                      e.currentTarget.blur();
+                      openCard({ entityID, focus: "content" });
+                    }
+                  }
+
+                  if (
+                    (e.key === "j" && (e.metaKey || e.ctrlKey)) ||
+                    e.key === "ArrowDown"
+                  ) {
+                    e.preventDefault();
+                    if (suggestionIndex < results.length)
+                      setSuggestionIndex((s) => s + 1);
+                  }
+
+                  if (
+                    (e.key === "k" && (e.metaKey || e.ctrlKey)) ||
+                    e.key === "ArrowUp"
+                  ) {
+                    e.preventDefault();
+                    if (suggestionIndex > 0) setSuggestionIndex((s) => s - 1);
                   }
                 }}
                 value={input}
@@ -68,26 +124,29 @@ export function Search() {
                 placeholder="search cards..."
               />
             </div>
-            <div className="z-10 flex w-full flex-col gap-1">
+            <div className="z-10 flex w-full flex-col">
               {open && (
-                <div className="flex flex-col gap-2 pb-2 text-grey-55">
+                <div className="flex flex-col gap-2 px-2 pb-2 text-grey-55">
                   <p className="text-sm">
                     <i>hold and drag cards to move to room</i>
                   </p>
                   {input && results.length > 0 && <hr />}
                 </div>
               )}
-              {open &&
-                input.length > 0 &&
-                results.map((c) => (
-                  <DraggableCard
-                    entityID={c.entity}
-                    key={c.entity}
-                    hideContent
-                  />
-                ))}
+              {open && input.length > 0 && (
+                <SearchResults
+                  results={results}
+                  suggestionIndex={suggestionIndex}
+                />
+              )}
               {open && input && !exactMatch && (
-                <NewCard title={input} onClick={() => setOpen(false)} />
+                <div
+                  className={`p-2 ${
+                    suggestionIndex === results.length ? "bg-bg-blue" : ""
+                  }`}
+                >
+                  <NewCard title={input} onClick={() => setOpen(false)} />
+                </div>
               )}
             </div>
           </Popover.Content>
@@ -96,6 +155,24 @@ export function Search() {
     </Popover.Root>
   );
 }
+let SearchResults = (props: {
+  results: { entity: string }[];
+  suggestionIndex: number | null;
+}) => {
+  console.log(props.suggestionIndex);
+  return (
+    <>
+      {props.results.map((c, index) => (
+        <DraggableCard
+          entityID={c.entity}
+          key={c.entity}
+          hideContent
+          selected={index === props.suggestionIndex}
+        />
+      ))}
+    </>
+  );
+};
 
 const NewCard = (props: { title: string; onClick: () => void }) => {
   let { authorized, mutate, memberEntity } = useMutations();
@@ -130,6 +207,7 @@ const NewCard = (props: { title: string; onClick: () => void }) => {
 };
 
 const DraggableCard = (props: {
+  selected?: boolean;
   editable?: boolean;
   entityID: string;
   hideContent?: boolean;
@@ -141,9 +219,13 @@ const DraggableCard = (props: {
     type: "search-card",
     entityID: props.entityID,
   });
+  let ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (props.selected) ref.current?.scrollIntoView({ block: "center" });
+  }, [props.selected]);
 
   return (
-    <>
+    <div ref={ref} className={`${props.selected ? "bg-bg-blue" : ""} p-2`}>
       <div ref={setNodeRef} className={`${isDragging ? `opacity-60` : ""}`}>
         <CardPreview
           data={data}
@@ -154,7 +236,7 @@ const DraggableCard = (props: {
           hideContent={props.hideContent}
         />
       </div>
-    </>
+    </div>
   );
 };
 
