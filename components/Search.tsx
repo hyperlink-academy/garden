@@ -308,10 +308,10 @@ export const MobileSearch = () => {
         ref={ref}
       >
         <div
-          className="relative z-0 flex h-[40vh] w-full flex-col gap-2 overflow-y-scroll rounded-md border border-b-0 border-grey-90 bg-white p-2"
+          className="no-scrollbar relative z-0 flex h-[40vh] w-full flex-col gap-2 overflow-y-scroll rounded-md border border-b-0 border-grey-90 bg-white pt-2"
           ref={refCombined}
         >
-          <div className="sticky top-0 z-10 flex flex-row justify-between gap-2">
+          <div className="sticky top-0 z-10 flex flex-row justify-between gap-2 px-2">
             <div className="relative w-full">
               <RoomSearch className="absolute right-2 top-2 text-grey-55" />
               <input
@@ -332,13 +332,17 @@ export const MobileSearch = () => {
               <CloseLinedTiny />
             </button>
           </div>
-          {input.length > 0 &&
-            results.map((c) => (
-              <DraggableCard entityID={c.entity} key={c.entity} hideContent />
-            ))}
-          {open && input && !exactMatch && (
-            <NewCard title={input} onClick={() => setOpen(false)} />
-          )}
+          <div className="flex flex-col">
+            {input.length > 0 &&
+              results.map((c) => (
+                <DraggableCard entityID={c.entity} key={c.entity} hideContent />
+              ))}
+            {open && input && !exactMatch && (
+              <div className="p-2">
+                <NewCard title={input} onClick={() => setOpen(false)} />
+              </div>
+            )}
+          </div>
         </div>
       </animated.div>
     </>
