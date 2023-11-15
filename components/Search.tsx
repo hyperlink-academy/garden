@@ -190,6 +190,7 @@ export const MobileSearch = () => {
   return (
     <>
       <button
+        className="flex h-8 w-8 items-center justify-center rounded-md border border-grey-55"
         onClick={() => {
           let fakeInput = document.createElement("input");
           fakeInput.setAttribute("type", "text");
@@ -207,7 +208,7 @@ export const MobileSearch = () => {
           }, 100);
         }}
       >
-        <RoomSearch height={24} width={24} />
+        <SearchSmall />
       </button>
       {state === "open" && (
         <animated.div
