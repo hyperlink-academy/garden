@@ -136,6 +136,8 @@ export const SpaceName = (props: { className?: string }) => {
   let { data } = useSpaceData(spaceID);
   let router = useRouter();
   let { session } = useAuth();
+
+  let setMobileSidebarOpen = useUIState((s) => s.setMobileSidebarOpen);
   let isOwner =
     session.session && session.session.username === data?.owner.username;
   let [editModal, setEditModal] = useState(false);
@@ -147,7 +149,10 @@ export const SpaceName = (props: { className?: string }) => {
         </Truncate>
         {!authorized ? null : isOwner ? (
           <button
-            onClick={() => setEditModal(true)}
+            onClick={() => {
+              setEditModal(true);
+              setMobileSidebarOpen(false);
+            }}
             className="shrink-0 rounded-md border border-transparent pt-[1px] hover:border-accent-blue hover:text-accent-blue"
           >
             <MoreOptionsSmall />
