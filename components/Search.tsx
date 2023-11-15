@@ -160,10 +160,10 @@ const DraggableCard = (props: {
 
 export const MobileSearch = () => {
   let { input, setInput, results, exactMatch } = useSearch();
-  let [state, setState] = useState<"normal" | "open" | "dragging">("normal");
+  let [state, setState] = useState<"normal" | "open">("normal");
   let [measure, { height }] = useMeasure();
   let style = useSpring({
-    y: state === "open" ? -1 * height + 39 : state === "dragging" ? -16 : 38,
+    y: state === "open" ? -1 * height + 39 : 38,
   });
   let opacity = useSpring({
     opacity: state === "open" ? 0.2 : 0,
@@ -184,10 +184,7 @@ export const MobileSearch = () => {
     entityID: "",
     type: "dropzone",
     onDragExit: () => {
-      setState("dragging");
-    },
-    onDragEnter: () => {
-      setState("open");
+      setState("normal");
     },
   });
   let refCombined = useCombinedRefs(drawerDroppableRef, measure);
