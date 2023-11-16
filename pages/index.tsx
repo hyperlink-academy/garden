@@ -268,7 +268,6 @@ export default function IndexPage() {
           </div>
           <DividerSmall />
         </div>
-
         {/* about hyperlink wrapper */}
         <div className="-mx-4 -mb-4 bg-bg-blue px-4 py-8 sm:-mx-8 sm:-mb-8 sm:px-8">
           {/* who and why */}
@@ -380,6 +379,16 @@ export default function IndexPage() {
           />
         </div>
         {/* END LANDING WRAPPER */}
+      </div>
+      <hr className=" border-grey-80" />
+      <div className="flex flex-row gap-2 px-2 text-sm italic text-grey-55">
+        <Link href="/privacy" className="hover:text-accent-blue">
+          privacy policy
+        </Link>{" "}
+        |{" "}
+        <Link href="/terms" className="hover:text-accent-blue">
+          terms
+        </Link>
       </div>
     </>
   );
