@@ -11,6 +11,8 @@ import { createClient } from "@supabase/supabase-js";
 import { authTokenVerifier } from "backend/lib/auth";
 import { z } from "zod";
 import { migrations } from "./migrations";
+import { initialize } from "next/dist/server/lib/render-server";
+import { initializeSpace } from "./initializeSpace";
 
 export { makeOptions as default };
 
@@ -65,9 +67,10 @@ function makeOptions(): ReflectServerOptions<ReplicacheMutators> {
         "meta-lastAppliedMigration",
         pendingMigrations[pendingMigrations.length - 1].date
       );
+      await initializeSpace(tx);
     },
     mutators,
-    authHandler: async (auth_string, roomID): Promise<Auth> => {
+    authHandler: async (auth_string, roomID, env): Promise<Auth> => {
       let auth: { authToken: { access_token: string; refresh_token: string } };
       try {
         auth = z
@@ -76,10 +79,10 @@ function makeOptions(): ReflectServerOptions<ReplicacheMutators> {
       } catch (e) {
         return { userID: "unauthorized", authorized: false };
       }
-      //TODO Hardcode this before pushing to prod for now
+
       let supabase = createClient<Database>(
-        "https://epzrqdtswyqvjtketjhe.supabase.co",
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwenJxZHRzd3lxdmp0a2V0amhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NzkyNDk3NzIsImV4cCI6MTk5NDgyNTc3Mn0.yj_htmdUK7-SUOoFfXfW1-SnGzVW2ucOCZfXOR6JvBM",
+        env.SUPABASE_URL,
+        env.SUPABASE_API_KEY,
         {
           auth: {
             persistSession: false,

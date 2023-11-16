@@ -39,7 +39,7 @@ export const SpaceProvider: React.FC<
       mutators: mutators,
       auth: JSON.stringify({ authToken }),
       userID: session.session?.studio || "unauthorized",
-      socketOrigin: "ws://127.0.0.1:8080",
+      server: process.env.NEXT_PUBLIC_REFLECT_SERVER,
       roomID: props.id,
     });
     setRep(newRep);
