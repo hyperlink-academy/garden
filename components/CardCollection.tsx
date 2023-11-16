@@ -13,7 +13,7 @@ import { generateKeyBetween } from "src/fractional-indexing";
 import { getAndUploadFile } from "src/getAndUploadFile";
 import { sortByPosition, updatePositions } from "src/position_helpers";
 import { ulid } from "src/ulid";
-import { CardPreview } from "./CardPreview";
+import { CardPreview, PlaceholderNewCard } from "./CardPreview";
 import { CardAdder } from "./CardStack";
 import { useCombinedRefs } from "./Desktop";
 import {
@@ -62,7 +62,7 @@ const CollectionList = (props: {
   });
   let { setNodeRef, over } = useDroppableZone({
     type: "dropzone",
-    entityID: "",
+    entityID: props.entityID,
     id: "add-card-dropzone",
     onDragEnd,
   });
@@ -156,6 +156,8 @@ const CollectionList = (props: {
           </div>
         ) : over.type === "new-card" ? (
           <NewCardPreview />
+        ) : over.type === "new-search-card" ? (
+          <PlaceholderNewCard title={over.title} />
         ) : null
       ) : null}
       <CardAdder
@@ -194,7 +196,7 @@ const DraggableCard = (props: {
   let onDragEnd = useOnDragEndCollection(props);
   let { setNodeRef: draggableRef, over: _over } = useDroppableZone({
     type: "card",
-    entityID: props.entityID,
+    entityID: props.parent,
     id: props.id,
     onDragEnd,
   });
@@ -211,8 +213,9 @@ const DraggableCard = (props: {
           isDragging ? `opacity-60 ${isOverSomethingElse ? "-mt-2" : ""}` : ""
         }`}
       >
-        {over && over.type === "card"
-          ? over.entityID !== props.entityID && (
+        {over &&
+          (over.type === "card" || over.type === "search-card" ? (
+            over.entityID !== props.entityID && (
               <div className="pb-2 opacity-60">
                 <CardPreview
                   data={over.data}
@@ -223,7 +226,13 @@ const DraggableCard = (props: {
                 />
               </div>
             )
-          : over && over.type === "new-card" && <NewCardPreview />}
+          ) : over.type === "new-card" ? (
+            <NewCardPreview />
+          ) : over.type === "new-search-card" ? (
+            <div className="pb-2 opacity-60">
+              <PlaceholderNewCard title={over.title} />
+            </div>
+          ) : null)}
         {isOverSomethingElse ? null : (
           <CardPreview
             data={data}
@@ -269,42 +278,57 @@ let useOnDragEndCollection = (props: {
       let newIndex = props.entityID
         ? siblings.findIndex((f) => f.value.value === props.entityID) - 1
         : siblings.length - 1;
-      if (data.type === "new-card") {
-        let entityID = ulid();
-        if (memberEntity) {
-          await mutate("createCard", {
-            entityID,
-            title: "",
-            memberEntity,
-          });
 
-          console.log(newIndex, siblings.length);
-          let position = generateKeyBetween(
-            siblings[newIndex]?.positions.eav || null,
-            siblings[newIndex + 1]?.positions.eav || null
-          );
+      let position = generateKeyBetween(
+        siblings[newIndex]?.positions.eav || null,
+        siblings[newIndex + 1]?.positions.eav || null
+      );
+      switch (data.type) {
+        case "room":
+          break;
+        case "new-card": {
+          let entityID = ulid();
+          if (memberEntity) {
+            await mutate("createCard", {
+              entityID,
+              title: "",
+              memberEntity,
+            });
 
-          console.log("adding card");
-          await mutate("addCardToSection", {
-            factID: ulid(),
-            cardEntity: entityID,
-            parent: props.parent,
-            section: props.attribute,
-            positions: {
-              eav: position,
-            },
-          });
+            await mutate("addCardToSection", {
+              factID: ulid(),
+              cardEntity: entityID,
+              parent: props.parent,
+              section: props.attribute,
+              positions: {
+                eav: position,
+              },
+            });
+          }
+          break;
         }
-      }
+        case "new-search-card": {
+          let entityID = ulid();
+          if (memberEntity) {
+            await mutate("createCard", {
+              entityID,
+              title: data.title,
+              memberEntity,
+            });
 
-      if (data.type === "card") {
-        if (data.parent !== props.parent) {
-          let position = generateKeyBetween(
-            siblings[newIndex]?.positions.eav || null,
-            siblings[newIndex + 1]?.positions.eav || null
-          );
-
-          await mutate("retractFact", { id: data.id });
+            await mutate("addCardToSection", {
+              factID: ulid(),
+              cardEntity: entityID,
+              parent: props.parent,
+              section: props.attribute,
+              positions: {
+                eav: position,
+              },
+            });
+          }
+          break;
+        }
+        case "search-card": {
           await mutate("addCardToSection", {
             factID: ulid(),
             cardEntity: data.entityID,
@@ -314,18 +338,37 @@ let useOnDragEndCollection = (props: {
               eav: position,
             },
           });
-        } else {
-          let currentIndex = siblings.findIndex(
-            (f) => f.value.value === data.entityID
-          );
-          let newPositions = updatePositions("eav", siblings, [
-            [siblings[currentIndex].id, newIndex],
-          ]);
-          mutate("updatePositions", {
-            positionKey: "eav",
-            newPositions,
-          });
+          break;
         }
+        case "card": {
+          if (data.parent !== props.parent) {
+            await mutate("retractFact", { id: data.id });
+            await mutate("addCardToSection", {
+              factID: ulid(),
+              cardEntity: data.entityID,
+              parent: props.parent,
+              section: props.attribute,
+              positions: {
+                eav: position,
+              },
+            });
+          } else {
+            let currentIndex = siblings.findIndex(
+              (f) => f.value.value === data.entityID
+            );
+            let newPositions = updatePositions("eav", siblings, [
+              [siblings[currentIndex].id, newIndex],
+            ]);
+            mutate("updatePositions", {
+              positionKey: "eav",
+              newPositions,
+            });
+          }
+
+          break;
+        }
+        default:
+          data satisfies never;
       }
       action.end();
     },

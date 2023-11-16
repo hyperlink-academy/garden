@@ -11,13 +11,15 @@ import {
   MoreOptionsSmall,
   RoomCalendar,
   RoomSearch,
+  SidebarIcon,
+  StudioFilled,
   UnreadDot,
 } from "../../Icons";
 import { EditSpaceModal } from "components/CreateSpace";
 import { useRouter } from "next/router";
 import { EditRoomModal } from "./RoomListLayout";
 import { SharedRoomList } from "./SharedRoomList";
-import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
+import { ButtonPrimary, ButtonTertiary } from "components/Buttons";
 import { LogInModal } from "components/LoginModal";
 import { useSpaceData } from "hooks/useSpaceData";
 import { HelpModal } from "components/HelpCenter";
@@ -28,29 +30,29 @@ import { Feedback } from "components/Feedback";
 import { useIsActiveRoom, useRoom, useSetRoom } from "hooks/useUIState";
 import { prefetchIdentityData } from "hooks/useIdentityData";
 import { ModalSubmitButton, Modal } from "components/Modal";
+import { useUIState } from "hooks/useUIState";
+import { Truncate } from "components/Truncate";
 
-export const Sidebar = () => {
+export const Sidebar = (props: { mobile?: boolean }) => {
   let [roomEditOpen, setRoomEditOpen] = useState(false);
+  let setMobileSidebarOpen = useUIState((s) => s.setMobileSidebarOpen);
 
   return (
     <div className="Sidebar flex h-full w-52 flex-col items-stretch gap-4 overflow-x-visible   text-grey-35">
       <div className="no-scrollbar flex h-full w-full flex-col gap-2 overflow-y-scroll px-3 pt-3">
-        <div className="flex flex-col gap-0">
-          <SpaceName />
-          <People />
+        {props.mobile && (
+          <>
+            <SpaceName className="bg-white" />
+            <Divider />
+          </>
+        )}
+        <div className="flex flex-col">
+          <UnreadsRoomButton />
+          <RoomButton roomID="calendar">
+            <RoomCalendar /> Calendar
+          </RoomButton>
         </div>
         <Divider />
-        <div className="flex flex-row content-between gap-2 ">
-          <RoomButton roomID="search">
-            <RoomSearch />
-          </RoomButton>
-
-          <RoomButton roomID="calendar">
-            <RoomCalendar />
-          </RoomButton>
-
-          <UnreadsRoomButton />
-        </div>
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
             <SharedRoomList setRoomEditOpen={() => setRoomEditOpen(true)} />
@@ -63,7 +65,15 @@ export const Sidebar = () => {
 
         {/* shared; operates on current room */}
       </div>
-      <SidebarFooter />
+      <People />
+      {props.mobile && (
+        <div className="flex flex-row justify-between p-2 pt-0 text-grey-55">
+          <button onClick={() => setMobileSidebarOpen()}>
+            <SidebarIcon />
+          </button>
+          <LoginOrHome />
+        </div>
+      )}
     </div>
   );
 };
@@ -90,7 +100,7 @@ const UnreadsRoomButton = () => {
           <UnreadDot />
         </div>
       ) : null}
-      <BellSmall />
+      <BellSmall /> Unreads
     </RoomButton>
   );
 };
@@ -100,10 +110,10 @@ const RoomButton = (props: { roomID: string; children: React.ReactNode }) => {
   let setRoom = useSetRoom();
   return (
     <button
-      className={`relative flex w-full justify-center rounded-md border p-1 ${
+      className={`relative flex w-full items-center gap-1 rounded-md border border-white p-1 ${
         isActiveRoom
-          ? "rounded-md border-accent-blue bg-accent-blue font-bold text-white"
-          : " border-grey-80 text-grey-35 hover:bg-bg-blue"
+          ? "rounded-md border border-accent-blue bg-accent-blue font-bold text-white"
+          : "text-grey-35 hover:border hover:border-grey-80"
       }`}
       onClick={() => {
         let roomView = document.getElementById("roomWrapper");
@@ -115,27 +125,30 @@ const RoomButton = (props: { roomID: string; children: React.ReactNode }) => {
     </button>
   );
 };
-const SpaceName = () => {
+
+export const SpaceName = (props: { className?: string }) => {
   let spaceID = useSpaceID();
   let { authorized } = useMutations();
   let { data } = useSpaceData(spaceID);
   let router = useRouter();
   let { session } = useAuth();
+
+  let setMobileSidebarOpen = useUIState((s) => s.setMobileSidebarOpen);
   let isOwner =
     session.session && session.session.username === data?.owner.username;
   let [editModal, setEditModal] = useState(false);
   return (
-    <div className="SidebarSpaceInfo flex flex-col gap-2">
-      <div className="flex items-start justify-between gap-2">
-        <h3
-          className="SpaceName"
-          style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
-        >
-          {data?.display_name}
-        </h3>
+    <div className={`SidebarSpaceInfo flex flex-col gap-2 ${props.className}`}>
+      <div className="flex w-full flex-row items-start justify-between gap-2 bg-inherit pr-4">
+        <Truncate className="w-full max-w-xs bg-inherit">
+          <h3 className="SpaceName ">{data?.display_name}</h3>
+        </Truncate>
         {!authorized ? null : isOwner ? (
           <button
-            onClick={() => setEditModal(true)}
+            onClick={() => {
+              setEditModal(true);
+              setMobileSidebarOpen(false);
+            }}
             className="shrink-0 rounded-md border border-transparent pt-[1px] hover:border-accent-blue hover:text-accent-blue"
           >
             <MoreOptionsSmall />
@@ -220,48 +233,36 @@ const MemberOptions = () => {
   );
 };
 
-const SidebarFooter = () => {
+const LoginOrHome = () => {
   let { session } = useAuth();
 
   let [infoOpen, setInfoOpen] = useState(false);
   let [logInOpen, setLogInOpen] = useState(false);
 
-  return (
-    <div className="sidebarBackToHome z-10 flex items-center justify-between gap-2 px-3 pb-3">
-      {/* login OR home button + studios */}
-      {!session.session?.username ? (
-        <div className="grow">
-          <ButtonPrimary
-            content="Log In"
-            onClick={() => setLogInOpen(!logInOpen)}
-          />
-          <LogInModal isOpen={logInOpen} onClose={() => setLogInOpen(false)} />
-        </div>
-      ) : (
-        <Link
-          className="hover:text-accent-blue"
-          href={`/s/${session.session.username}`}
-          onPointerDown={() => {
-            if (session.session?.username)
-              prefetchIdentityData(session.session.username);
-          }}
-        >
-          <BackToHome />
-        </Link>
-      )}
-
-      <div className="flex flex-row gap-2">
-        <Feedback />
-
-        {/* info / help button */}
-        <button
-          className="hover:text-accent-blue"
-          onClick={() => setInfoOpen(true)}
-        >
-          <Information />
-        </button>
-        <HelpModal open={infoOpen} onClose={() => setInfoOpen(false)} />
-      </div>
+  return !session.session?.username ? (
+    <div>
+      <ButtonPrimary
+        content="Log In"
+        onClick={() => setLogInOpen(!logInOpen)}
+      />
+      <LogInModal isOpen={logInOpen} onClose={() => setLogInOpen(false)} />
     </div>
+  ) : (
+    <Link
+      className="hover:text-accent-blue"
+      href={`/s/${session.session.username}`}
+      onPointerDown={() => {
+        if (session.session?.username)
+          prefetchIdentityData(session.session.username);
+      }}
+    >
+      <ButtonTertiary
+        content={
+          <div className="flex flex-row gap-2">
+            Back Home <StudioFilled />
+          </div>
+        }
+      />
+    </Link>
   );
 };

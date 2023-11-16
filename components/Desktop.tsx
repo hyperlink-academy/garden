@@ -5,7 +5,13 @@ import {
   useMutations,
   useSpaceID,
 } from "hooks/useReplicache";
-import { useCallback, useContext, useMemo, useState } from "react";
+import {
+  MutableRefObject,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+} from "react";
 import { CardPreview } from "./CardPreview";
 import { ulid } from "src/ulid";
 import { FindOrCreate, useAllItems } from "./FindOrCreateEntity";
@@ -53,29 +59,50 @@ export const Desktop = (props: { entityID: string }) => {
         x: snap(rect.left - droppableRect.current.left),
       };
 
-      if (data.type === "new-card") {
-        if (!memberEntity) return;
-        let entityID = ulid();
-        await mutate("createCard", {
-          entityID,
-          title: "",
-          memberEntity,
-        });
+      switch (data.type) {
+        case "new-card": {
+          if (!memberEntity) return;
+          let entityID = ulid();
+          await mutate("createCard", {
+            entityID,
+            title: "",
+            memberEntity,
+          });
 
-        await mutate("addCardToDesktop", {
-          factID: ulid(),
-          entity: entityID,
-          desktop: props.entityID,
-          position: {
-            ...newPosition,
-            rotation: 0,
-            size: "small",
-          },
-        });
-      }
-      if (data.type === "card") {
-        if (data.parent !== props.entityID) {
-          await mutate("retractFact", { id: data.id });
+          await mutate("addCardToDesktop", {
+            factID: ulid(),
+            entity: entityID,
+            desktop: props.entityID,
+            position: {
+              ...newPosition,
+              rotation: 0,
+              size: "small",
+            },
+          });
+          break;
+        }
+        case "new-search-card": {
+          if (!memberEntity) return;
+          let entityID = ulid();
+          await mutate("createCard", {
+            entityID,
+            title: data.title,
+            memberEntity,
+          });
+
+          await mutate("addCardToDesktop", {
+            factID: ulid(),
+            entity: entityID,
+            desktop: props.entityID,
+            position: {
+              ...newPosition,
+              rotation: 0,
+              size: "small",
+            },
+          });
+          break;
+        }
+        case "search-card": {
           await mutate("addCardToDesktop", {
             factID: ulid(),
             entity: data.entityID,
@@ -83,24 +110,45 @@ export const Desktop = (props: { entityID: string }) => {
             position: {
               ...newPosition,
               rotation: 0,
-              size:
-                data.position?.size === "small"
-                  ? "small"
-                  : data.hideContent
-                  ? "small"
-                  : "big",
+              size: "small",
             },
           });
-        } else {
-          let position = data.type === "card" ? data.position : { x: 0, y: 0 };
-          if (!position) return;
-          await mutate("updatePositionInDesktop", {
-            factID: data.id,
-            parent: props.entityID,
-            dx: newPosition.x - position.x,
-            dy: newPosition.y - position.y,
-            da: 0,
-          });
+          break;
+        }
+        case "card": {
+          if (data.parent !== props.entityID) {
+            await mutate("retractFact", { id: data.id });
+            await mutate("addCardToDesktop", {
+              factID: ulid(),
+              entity: data.entityID,
+              desktop: props.entityID,
+              position: {
+                ...newPosition,
+                rotation: 0,
+                size:
+                  data.position?.size === "small"
+                    ? "small"
+                    : data.hideContent
+                      ? "small"
+                      : "big",
+              },
+            });
+          } else {
+            let position =
+              data.type === "card" ? data.position : { x: 0, y: 0 };
+            if (!position) return;
+            await mutate("updatePositionInDesktop", {
+              factID: data.id,
+              parent: props.entityID,
+              dx: newPosition.x - position.x,
+              dy: newPosition.y - position.y,
+              da: 0,
+            });
+          }
+          break;
+        }
+        default: {
+          data satisfies never;
         }
       }
     },
@@ -255,9 +303,12 @@ const DraggableCard = (props: {
       if (!rep) return;
       let entityID;
       if (data.type === "room") return;
-      if (data.type === "card") entityID = data.entityID;
+      if (data.type === "card") {
+        entityID = data.entityID;
+        mutate("retractFact", { id: data.id });
+      }
+      if (data.type === "search-card") entityID = data.entityID;
       else entityID = ulid();
-      mutate("retractFact", { id: data.id });
 
       let siblings =
         (await rep.query((tx) => {
@@ -340,14 +391,13 @@ const DraggableCard = (props: {
           <div
             className={``}
             style={{
-              transform: `rotate(${
-                !position
+              transform: `rotate(${!position
                   ? 0
                   : (
-                      Math.floor(position.value.rotation / (Math.PI / 24)) *
-                      (Math.PI / 24)
-                    ).toFixed(2)
-              }rad)`,
+                    Math.floor(position.value.rotation / (Math.PI / 24)) *
+                    (Math.PI / 24)
+                  ).toFixed(2)
+                }rad)`,
             }}
           >
             {/* This is the actual card and its buttons. It also handles size */}
@@ -435,11 +485,13 @@ export const HelpToast = (props: { helpText: string }) => {
   );
 };
 export function useCombinedRefs<T>(
-  ...refs: ((node: T) => void)[]
+  ...refs: Array<((node: T) => void) | MutableRefObject<T>>
 ): (node: T) => void {
   return useMemo(
     () => (node: T) => {
-      refs.forEach((ref) => ref(node));
+      refs.forEach((ref) =>
+        typeof ref === "function" ? ref(node) : (ref.current = node)
+      );
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     refs

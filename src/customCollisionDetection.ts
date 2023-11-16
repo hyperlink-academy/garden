@@ -85,7 +85,7 @@ export const cardStackCollisionDetection: CollisionDetection = ({
     const { id } = droppableContainer;
     const rect = droppableRects.get(id);
 
-    let draggingRect = { ...collisionRect, height: 1 };
+    let draggingRect = { ...collisionRect, height: -1 };
     if (rect) {
       const [intersectionRatio, targetRatio] = getIntersectionRatio(
         rect,
@@ -114,6 +114,11 @@ export function pointerWithinOrRectIntersection(
 ) {
   // First, let's see if there are any collisions with the pointer
   const pointerCollisions = pointerWithin(args);
+  if (pointerCollisions.length > 0) {
+    return pointerCollisions.sort((a, b) =>
+      b.id === "mobile-sidebar-overlay" ? 1 : 0
+    );
+  }
 
   return pointerCollisions;
   // Collision detection algorithms return an array of collisions
