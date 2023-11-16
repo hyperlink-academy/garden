@@ -15,7 +15,6 @@ import {
   MoreOptionsTiny,
 } from "./Icons";
 import { Divider } from "./Layout";
-import { SearchRoom } from "./SearchRoom";
 import { UnreadsRoom } from "./UnreadsRoom";
 import { EditRoomModal } from "./SpaceLayout/Sidebar/RoomListLayout";
 import { RenderedText } from "./Textarea/RenderedText";
@@ -38,7 +37,6 @@ export const Room = (props: { entityID: string }) => {
   let { mutate, rep, action, memberEntity } = useMutations();
   let spaceID = useSpaceID();
 
-  if (props.entityID === "search") return <SearchRoom />;
   if (props.entityID === "calendar") return <CalendarRoom />;
   if (props.entityID === "unreads") return <UnreadsRoom />;
   if (roomType?.value === "chat")
