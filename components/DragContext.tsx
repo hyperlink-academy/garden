@@ -192,6 +192,7 @@ export type DraggableData = {
 
 export type DroppableData = {
   id: string;
+  disabled?: boolean;
   entityID: string;
   type: "card" | "room" | "dropzone" | "linkCard" | "trigger";
   onDragEnter?: (data: DraggableData) => void | Promise<void>;
@@ -219,6 +220,7 @@ export const useDroppableZone = (data: DroppableData) => {
   let [over, setOver] = useState<DraggableData | null>(null);
   let droppable = useDroppable({
     id: data.id,
+    disabled: data.disabled,
     resizeObserverConfig: {
       updateMeasurementsFor: [],
       timeout: 50,

@@ -250,20 +250,15 @@ export const MobileSearch = () => {
   let opacity = useSpring({
     opacity: state === "open" ? 0.2 : 0,
   });
-  let [open, setOpen] = useState(false);
-  useEffect(() => {
-    if (!open) {
-      setState("normal");
-    }
-  }, [open]);
 
   let { setNodeRef: drawerDroppableRef } = useDroppableZone({
+    disabled: state !== "open",
     id: "mobile-search-drawer",
     entityID: "",
-    type: "dropzone",
     onDragExit: () => {
       setState("normal");
     },
+    type: "dropzone",
   });
   let refCombined = useCombinedRefs(drawerDroppableRef, measure);
   let inputRef = useRef<HTMLInputElement>(null);
@@ -327,9 +322,9 @@ export const MobileSearch = () => {
               results.map((c) => (
                 <DraggableCard entityID={c.entity} key={c.entity} hideContent />
               ))}
-            {open && input && !exactMatch && (
+            {input && !exactMatch && (
               <div className="p-2">
-                <NewCard title={input} onClick={() => setOpen(false)} />
+                <NewCard title={input} onClick={() => setState("normal")} />
               </div>
             )}
           </div>
