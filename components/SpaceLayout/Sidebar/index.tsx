@@ -46,17 +46,13 @@ export const Sidebar = (props: { mobile?: boolean }) => {
             <Divider />
           </>
         )}
-        <div className="flex flex-row content-between gap-2 ">
-          <RoomButton roomID="search">
-            <RoomSearch />
-          </RoomButton>
-
-          <RoomButton roomID="calendar">
-            <RoomCalendar />
-          </RoomButton>
-
+        <div className="flex flex-col">
           <UnreadsRoomButton />
+          <RoomButton roomID="calendar">
+            <RoomCalendar /> Calendar
+          </RoomButton>
         </div>
+        <Divider />
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
             <SharedRoomList setRoomEditOpen={() => setRoomEditOpen(true)} />
@@ -104,7 +100,7 @@ const UnreadsRoomButton = () => {
           <UnreadDot />
         </div>
       ) : null}
-      <BellSmall />
+      <BellSmall /> Unreads
     </RoomButton>
   );
 };
@@ -114,10 +110,10 @@ const RoomButton = (props: { roomID: string; children: React.ReactNode }) => {
   let setRoom = useSetRoom();
   return (
     <button
-      className={`relative flex w-full justify-center rounded-md border p-1 ${
+      className={`relative flex w-full items-center gap-1 rounded-md border border-white p-1 ${
         isActiveRoom
-          ? "rounded-md border-accent-blue bg-accent-blue font-bold text-white"
-          : " border-grey-80 text-grey-35 hover:bg-bg-blue"
+          ? "rounded-md border border-accent-blue bg-accent-blue font-bold text-white"
+          : "text-grey-35 hover:border hover:border-grey-80"
       }`}
       onClick={() => {
         let roomView = document.getElementById("roomWrapper");
