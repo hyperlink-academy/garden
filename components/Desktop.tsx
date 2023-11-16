@@ -303,9 +303,12 @@ const DraggableCard = (props: {
       if (!rep) return;
       let entityID;
       if (data.type === "room") return;
-      if (data.type === "card") entityID = data.entityID;
+      if (data.type === "card") {
+        entityID = data.entityID;
+        mutate("retractFact", { id: data.id });
+      }
+      if (data.type === "search-card") entityID = data.entityID;
       else entityID = ulid();
-      mutate("retractFact", { id: data.id });
 
       let siblings =
         (await rep.query((tx) => {
