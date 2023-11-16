@@ -166,7 +166,7 @@ export const EditSpaceModal = (props: {
           <CreateSpaceForm formState={formState} setFormState={setFormState} />
 
           {/* update or nevermind */}
-          <SubmitButton content="Create!" onClose={async () => props.onClose} />
+          <SubmitButton content="Update!" onClose={async () => props.onClose} />
 
           <hr className="border-grey-80" />
 
