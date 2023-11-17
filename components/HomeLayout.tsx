@@ -37,7 +37,7 @@ export const HomeHeader = () => {
   let myStudioName = session.session?.username;
 
   return (
-    <div className="HomeHeader pwa-padding sticky top-0 z-10 m-auto flex w-full max-w-4xl flex-row justify-between bg-white px-2 py-2">
+    <div className="HomeHeader pwa-padding sticky top-0 z-10 m-auto flex w-full max-w-4xl flex-row justify-between bg-white px-4 py-2 md:px-0">
       <Link href={myStudioName ? `/s/${myStudioName}` : "/"}>
         <span className="flex flex-row items-center font-bold text-grey-35 hover:text-accent-blue">
           <img
