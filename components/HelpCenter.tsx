@@ -1,13 +1,23 @@
 import { Tab } from "@headlessui/react";
 import { useRouter } from "next/router";
 import { Fragment, useEffect, useState } from "react";
-import { Settings } from "./Icons";
+import { CloseLinedTiny, Settings } from "./Icons";
 import { ModalFixedHeight } from "./Layout";
 import { DividerSmall, DividerTiny } from "pages";
 
 export const HelpModal = (props: { open: boolean; onClose: () => void }) => {
   return (
     <ModalFixedHeight open={props.open} onClose={props.onClose}>
+      <div className="jusify-between flex items-center">
+        <h3 className="m-auto grow">Help Docs</h3>
+        <button
+          onClick={() => props.onClose()}
+          className="shrink-0 grow-0 text-grey-55 hover:text-accent-blue"
+        >
+          <CloseLinedTiny />
+        </button>{" "}
+      </div>
+
       <HelpDocs />
     </ModalFixedHeight>
   );
@@ -29,7 +39,6 @@ export const HelpDocs = () => {
 
   return (
     <>
-      <h3 className="m-auto">Hyperlink Help Docs</h3>
       <Tab.Group
         manual
         selectedIndex={selectedIndex}
@@ -129,7 +138,6 @@ export const HelpDocs = () => {
 const HelpHandbook = () => {
   return (
     <div className="flex flex-col gap-4">
-      <h2>Handbook</h2>
       <p>
         Welcome! Hyperlink is a place to do meaningful things — creative
         projects; book clubs; learning groups — together on the internet.
@@ -193,8 +201,6 @@ const HelpHandbook = () => {
 const HelpShortcuts = () => {
   return (
     <div className="flex flex-col gap-4">
-      <h2>Shortcuts</h2>
-
       <p>
         An evolving list of shortcuts you may find helpful in using Hyperlink!
       </p>
@@ -282,7 +288,6 @@ const HelpShortcuts = () => {
 const HelpChangelog = () => {
   return (
     <div className="flex flex-col gap-4">
-      <h2>Changelog</h2>
       <p>TBD, changelog coming soon!</p>
     </div>
   );
@@ -292,7 +297,6 @@ const HelpChangelog = () => {
 export const HelpExampleSpaces = () => {
   return (
     <div className="flex flex-col gap-4">
-      <h2>Example Spaces</h2>
       <p className="">Here are a few of our Spaces for inspiration ✨🌱</p>
 
       <div className="my-4 flex flex-col gap-4">
@@ -336,7 +340,6 @@ export const HelpExampleSpaces = () => {
 export const HelpAppInfo = () => {
   return (
     <div className="flex flex-col gap-4">
-      <h2>Add the App!</h2>
       <p>
         Get Hyperlink on your home screen — and get push notifications for
         activity in your Spaces.
