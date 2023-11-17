@@ -5,6 +5,7 @@ import { ModalSubmitButton } from "components/Modal";
 import { useAuth } from "hooks/useAuth";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { Divider } from "pages";
 import { useEffect, useState } from "react";
 
 type Status = "normal" | "invalidEmail" | "confirm" | "loading";
@@ -68,9 +69,23 @@ export function SignupForm(props: {
         <h2>Confirm your email! </h2>{" "}
         <p>
           {" "}
-          We send a confirmation link to{" "}
+          We sent a confirmation link to{" "}
           <span className="font-bold">{input.email}</span>{" "}
         </p>
+        <hr className="my-2 text-grey-80" />
+        <div className="lightBorder bg-bg-blue p-3">
+          <a
+            href="https://buttondown.email/hyperlink/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-bold text-accent-blue"
+          >
+            And subscribe to our newsletter 💌
+          </a>
+          <p className="text-grey-55">
+            We send them rarely, for big announcements and updates!
+          </p>
+        </div>
       </div>
     );
 

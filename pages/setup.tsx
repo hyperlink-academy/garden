@@ -116,8 +116,8 @@ export default function SignupPage() {
   if (!tokens) return <LoginPage />;
 
   return (
-    <Modal open={true} onClose={() => {}}>
-      <div className="flex max-w-md flex-col gap-2">
+    <div className=" -my-4 mx-auto flex h-screen  max-w-md flex-col items-center justify-center gap-4 ">
+      <div className="lightBorder flex max-w-md flex-col gap-2  bg-white p-4">
         <img
           className="place-self-end"
           width={"264px"}
@@ -195,6 +195,6 @@ export default function SignupPage() {
           </div>
         </div>
       </div>
-    </Modal>
+    </div>
   );
 }
