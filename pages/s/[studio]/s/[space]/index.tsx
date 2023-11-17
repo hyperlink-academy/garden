@@ -284,7 +284,7 @@ const MobileSidebar = ({
         <animated.div
           {...bindOverlay()}
           onClick={() => setSidebarOpen(false)}
-          className="fixed inset-0 z-40 bg-grey-15"
+          className="fixed inset-0 z-40 touch-none bg-grey-15"
           style={{ ...opacity, display: open ? "block" : "none" }}
         >
           <div className="z-40 ml-auto h-full w-2/3" ref={droppableRef} />
