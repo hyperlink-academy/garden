@@ -79,7 +79,7 @@ export function SignupForm(props: {
       <img
         className="place-self-end"
         width={"264px"}
-        alt="a house in an overgrown field"
+        alt="a small house in an overgrown field"
         src="/img/spotIllustration/welcome.png"
       />
       <div className="flex items-baseline justify-between gap-1 pt-4">

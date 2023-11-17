@@ -115,7 +115,7 @@ function NewPasswordForm() {
     await supabase.auth.updateUser({ password: newPassword });
     let { data: user } = await supabase.auth.getUser();
     console.log(user);
-    if (!user.user?.user_metadata) router.push("/setup");
+    if (!user.user?.user_metadata.username) router.push("/setup");
     else router.push(`/s/${user.user?.user_metadata?.username}`);
   };
 

@@ -65,7 +65,12 @@ export function LoginForm(props: {
   };
   return (
     <div className="flex flex-col gap-2">
-      <div className=" h-[140px] w-[164px] bg-test-pink" />
+      <img
+        className="rounded-md"
+        width={"216px"}
+        alt="an overgrown porch at night, with a light on in the window/"
+        src="/img/spotIllustration/login.png"
+      />
       <div className="mt-4 flex items-baseline justify-between">
         <h2 className="text-grey-15">Log in</h2>{" "}
         <p>

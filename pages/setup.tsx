@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { Modal } from "components/Modal";
 import { Divider } from "components/Layout";
+import LoginPage from "pages/login";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export default function SignupPage() {
@@ -112,22 +113,7 @@ export default function SignupPage() {
       </div>
     );
 
-  if (!tokens)
-    return (
-      <div className="grid-rows-max mx-auto grid max-w-md gap-4">
-        <h1>Set up your Homepage!</h1>
-        <p>
-          To continue,{" "}
-          <Link className="text-accent-blue" href="/signup">
-            sign up
-          </Link>{" "}
-          or{" "}
-          <Link className="text-accent-blue" href="/login">
-            log in
-          </Link>
-        </p>
-      </div>
-    );
+  if (!tokens) return <LoginPage />;
 
   return (
     <Modal open={true} onClose={() => {}}>
