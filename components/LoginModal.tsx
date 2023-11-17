@@ -10,7 +10,7 @@ export const LogInModal = (props: {
   onSwitchToSignUp?: () => void;
 }) => {
   return (
-    <Modal open={props.isOpen} onClose={props.onClose}>
+    <Modal open={props.isOpen} onClose={props.onClose} noCloseButton>
       <LoginForm
         onLogin={(s) => {
           if (props.redirectOnLogin) {
@@ -31,7 +31,7 @@ export const SignupModal = (props: {
   onSwitchToLogIn?: () => void;
 }) => {
   return (
-    <Modal open={props.isOpen} onClose={props.onClose}>
+    <Modal open={props.isOpen} onClose={props.onClose} noCloseButton>
       <SignupForm
         redirectTo={props.redirectTo}
         onClose={props.onClose}

@@ -15,7 +15,7 @@ export const HelpModal = (props: { open: boolean; onClose: () => void }) => {
           className="shrink-0 grow-0 text-grey-55 hover:text-accent-blue"
         >
           <CloseLinedTiny />
-        </button>{" "}
+        </button>
       </div>
 
       <HelpDocs />

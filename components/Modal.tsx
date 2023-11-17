@@ -12,6 +12,7 @@ export const Modal: React.FC<
     dark?: boolean;
     width?: string;
     header?: string;
+    noCloseButton?: boolean;
   }>
 > = (props) => {
   let viewheight = useViewportSize().height;
@@ -48,15 +49,20 @@ export const Modal: React.FC<
         px-3 py-4 shadow-drop sm:p-4
         `}
       >
-        <div className="flex w-full items-center">
-          {<h2 className="grow">{props.header && props.header}</h2>}
-          <button
-            className="shrink0 grow-0 text-grey-55 hover:text-accent-blue"
-            onClick={() => props.onClose()}
-          >
-            <CloseLinedTiny />
-          </button>
-        </div>
+        {!props.header && props.noCloseButton ? null : (
+          <div className="flex w-full items-center">
+            <h2 className="grow">{props.header && props.header}</h2>
+            {!props.noCloseButton && (
+              <button
+                className="shrink0 grow-0 text-grey-55 hover:text-accent-blue"
+                onClick={() => props.onClose()}
+              >
+                <CloseLinedTiny />
+              </button>
+            )}
+          </div>
+        )}
+
         {props.open && props.children}
       </div>
     </Dialog>
