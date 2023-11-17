@@ -25,24 +25,26 @@ import { create } from "components/CardStack";
 import { useDraggableCard } from "./DragContext";
 import { sortByPosition } from "src/position_helpers";
 import { generateKeyBetween } from "src/fractional-indexing";
+import { useRoom } from "hooks/useUIState";
 
-export const Room = (props: { entityID: string }) => {
-  let roomType = db.useEntity(props.entityID, "room/type");
-  let { ref } = usePreserveScroll<HTMLDivElement>(props.entityID);
+export const Room = () => {
+  let room = useRoom();
+  let roomType = db.useEntity(room, "room/type");
+  let { ref } = usePreserveScroll<HTMLDivElement>(room);
 
   let { reactions, filters, setFilters, cardsFiltered, total } =
-    useFilteredCards(props.entityID, "desktop/contains");
+    useFilteredCards(room, "desktop/contains");
 
   let { authToken } = useAuth();
   let { mutate, rep, action, memberEntity } = useMutations();
   let spaceID = useSpaceID();
 
-  if (props.entityID === "calendar") return <CalendarRoom />;
-  if (props.entityID === "unreads") return <UnreadsRoom />;
+  if (room === "calendar") return <CalendarRoom />;
+  if (room === "unreads") return <UnreadsRoom />;
   if (roomType?.value === "chat")
     return (
       <div className="flex h-full w-[336px]">
-        <DiscussionRoom entityID={props.entityID} isRoom />
+        <DiscussionRoom entityID={room} isRoom />
       </div>
     );
 
@@ -71,7 +73,7 @@ export const Room = (props: { entityID: string }) => {
           newCard,
           {
             addToEnd: true,
-            parentID: props.entityID,
+            parentID: room,
             positionKey: "eav",
             attribute: "desktop/contains",
           },
@@ -107,33 +109,33 @@ export const Room = (props: { entityID: string }) => {
       <RoomHeader
         totalCount={total}
         filteredCount={cardsFiltered.length}
-        entityID={props.entityID}
+        entityID={room}
         reactions={reactions}
         filters={filters}
         setFilters={setFilters}
       />
 
       {/* per-room wrappers + components */}
-      {props.entityID ? (
+      {room ? (
         roomType?.value === "collection" ? (
           <div className="flex grow flex-col gap-2 pb-3">
             <CardCollection
               cards={cardsFiltered}
-              entityID={props.entityID}
+              entityID={room}
               attribute="desktop/contains"
               openOnAdd
             />
           </div>
         ) : (
           <div className="relative flex flex-col">
-            <Desktop entityID={props.entityID} />
+            <Desktop entityID={room} />
             <div className="desktopBackground absolute h-full w-full grow" />
           </div>
         )
       ) : null}
 
       <AddCardButton
-        roomEntity={props.entityID}
+        roomEntity={room}
         getViewHeight={() =>
           ref.current ? ref?.current.clientHeight + ref.current.scrollTop : 0
         }

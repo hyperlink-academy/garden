@@ -1,7 +1,7 @@
 import { ref } from "data/Facts";
 import { useAppEventListener, publishAppEvent } from "hooks/useEvents";
 import { db, useMutations, useSpaceID } from "hooks/useReplicache";
-import { useOpenCard, useUIState } from "hooks/useUIState";
+import { useOpenCard, useRoom, useUIState } from "hooks/useUIState";
 import { useCallback, useEffect, useRef } from "react";
 import { CardView } from "./CardView";
 import { useViewportSize } from "hooks/useViewportSize";
@@ -35,24 +35,25 @@ export const useCardViewer = () => {
   };
 };
 
-export function CardViewer(props: { room: string | null }) {
-  let roomType = db.useEntity(props.room, "room/type")?.value;
+export function CardViewer() {
+  let room = useRoom();
+  let roomType = db.useEntity(room, "room/type")?.value;
   let spaceID = useSpaceID();
 
   let closeCard = useUIState((s) => s.closeCard);
 
   let history = useUIState((s) => {
-    if (!spaceID || !props.room) return [];
-    return s.spaces[spaceID]?.rooms?.[props.room] || [];
+    if (!spaceID || !room) return [];
+    return s.spaces[spaceID]?.rooms?.[room] || [];
   });
   let cardViewerRef = useRef<HTMLDivElement | null>(null);
   let { mutate, memberEntity, client } = useMutations();
   let unreadBy = db.useEntity(
-    props.room ? history[0] || null : null,
+    room ? history[0] || null : null,
     "card/unread-by"
   );
   useEffect(() => {
-    if (props.room && history[0] && memberEntity) {
+    if (room && history[0] && memberEntity) {
       let unread = unreadBy?.find((f) => f.value.value === memberEntity);
       if (unread)
         mutate("markRead", {
@@ -61,9 +62,9 @@ export function CardViewer(props: { room: string | null }) {
           attribute: "card/unread-by",
         });
     }
-  }, [history, props.room, unreadBy, memberEntity, mutate]);
+  }, [history, room, unreadBy, memberEntity, mutate]);
   useEffect(() => {
-    if (!client || !props.room) return;
+    if (!client || !room) return;
     let currentCard = history[0];
     if (!currentCard) return;
     mutate("assertEmphemeralFact", {
@@ -73,7 +74,7 @@ export function CardViewer(props: { room: string | null }) {
       value: ref(currentCard),
       positions: {},
     });
-  }, [props.room, history, client, mutate]);
+  }, [room, history, client, mutate]);
 
   useAppEventListener(
     "cardviewer.open-card",
@@ -92,10 +93,10 @@ export function CardViewer(props: { room: string | null }) {
   useAppEventListener(
     "cardviewer.close-card",
     () => {
-      if (!props.room || !spaceID) return;
-      closeCard(spaceID, props.room);
+      if (!room || !spaceID) return;
+      closeCard(spaceID, room);
     },
-    [props.room, spaceID]
+    [room, spaceID]
   );
 
   return (
@@ -109,13 +110,13 @@ export function CardViewer(props: { room: string | null }) {
           flex-col 
           items-stretch focus:outline-none sm:shrink`}
     >
-      {props.room && history[0] ? (
+      {room && history[0] ? (
         <CardView
           entityID={history[0]}
           key={history[0]}
           onDelete={() => {
-            if (!props.room || !spaceID) return;
-            closeCard(spaceID, props.room);
+            if (!room || !spaceID) return;
+            closeCard(spaceID, room);
           }}
         />
       ) : (

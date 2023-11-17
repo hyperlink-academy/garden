@@ -66,7 +66,6 @@ export default function SpacePage(props: Props) {
 function Space() {
   useSpaceSyncState();
   useSpaceShortcuts();
-  let room = useRoom();
   const { width } = useWindowDimensions();
 
   useEffect(() => {
@@ -92,18 +91,14 @@ function Space() {
         className="spacecontent max-w-screen-xl relative mx-auto flex h-full w-full grow md:px-4 md:py-4 md:pb-2"
       >
         <SmallCardDragContext>
-          {width > 960 || width === 0 ? (
-            <DesktopLayout room={room} />
-          ) : (
-            <MobileLayout room={room} />
-          )}
+          {width > 960 || width === 0 ? <DesktopLayout /> : <MobileLayout />}
         </SmallCardDragContext>
       </animated.div>
     </>
   );
 }
 
-const DesktopLayout = ({ room }: { room: string }) => {
+const DesktopLayout = () => {
   let { session } = useAuth();
   return (
     <div className="no-scrollbar mx-auto flex h-full flex-col gap-2 overflow-x-scroll">
@@ -136,11 +131,11 @@ const DesktopLayout = ({ room }: { room: string }) => {
           </div>
 
           <div className="spaceRoomWrapper no-scrollbar relative flex h-full flex-shrink-0 flex-col gap-0">
-            <Room entityID={room} key={room} />
+            <Room />
           </div>
         </div>
 
-        <CardViewer room={room} />
+        <CardViewer />
       </div>
     </div>
   );
@@ -159,7 +154,7 @@ const LoginButton = () => {
   );
 };
 
-const MobileLayout = ({ room }: { room: string }) => {
+const MobileLayout = () => {
   let setSidebarOpen = useUIState((s) => s.setMobileSidebarOpen);
   let ref = useRef<HTMLDivElement>(null);
   let { setNodeRef: droppableRef, over } = useDroppableZone({
@@ -190,12 +185,12 @@ const MobileLayout = ({ room }: { room: string }) => {
             id="roomInnerWrapper"
             className="roomInnerWrapper no-scrollbar relative flex h-full flex-shrink-0 flex-col gap-0 rounded-md border border-grey-90 px-2 "
           >
-            <Room entityID={room} key={room} />
+            <Room />
           </div>
         </div>
 
         <div className="snap-center snap-always ">
-          <CardViewer room={room} />
+          <CardViewer />
         </div>
         <div className="w-2 shrink-0 snap-start" />
       </div>
