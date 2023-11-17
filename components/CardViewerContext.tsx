@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef } from "react";
 import { CardView } from "./CardView";
 import { useViewportSize } from "hooks/useViewportSize";
 import { isIOS } from "@react-aria/utils";
+import { focusElement } from "src/utils";
 
 export const useCardViewer = () => {
   let spaceID = useSpaceID();
@@ -19,27 +20,11 @@ export const useCardViewer = () => {
       openCard(args.entityID);
       publishAppEvent("cardviewer.open-card", args);
       if (args.focus) {
-        let fakeInput: HTMLInputElement | null = null;
-        if (isIOS()) {
-          //Safari doesn't let you focus outside a user-triggered event loop, so we have to create a fake input to focus
-          fakeInput = document.createElement("input");
-          fakeInput.setAttribute("type", "text");
-          fakeInput.style.position = "absolute";
-          fakeInput.style.display = "hidden";
-          fakeInput.style.fontSize = "16px"; // disable auto zoom
-          document.body.appendChild(fakeInput);
-          fakeInput.focus();
-        }
-
-        setTimeout(() => {
-          let element = document.getElementById(
+        focusElement(
+          document.getElementById(
             args.focus === "content" ? "default-text-section" : "card-title"
-          );
-          element?.focus();
-          fakeInput?.remove();
-        }, 10);
-      }
-      if (isIOS() && args.focus) {
+          )
+        );
       }
     },
     [spaceID, openCard]

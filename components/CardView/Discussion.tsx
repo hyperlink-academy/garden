@@ -240,7 +240,14 @@ export const MessageInput = (props: {
             </div>
 
             <div className="flex h-min justify-end text-grey-55">
-              <ButtonPrimary disabled={!value} onClick={send} icon={<Send />} />
+              <ButtonPrimary
+                disabled={!value}
+                onClick={(e) => {
+                  e.preventDefault();
+                  send();
+                }}
+                icon={<Send />}
+              />
             </div>
           </div>
         </div>

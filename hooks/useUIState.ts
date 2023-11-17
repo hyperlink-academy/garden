@@ -8,6 +8,7 @@ import { Filters } from "components/CardFilter";
 export let useUIState = create(
   combine(
     {
+      mobileSidebarOpen: false,
       spaces: {} as {
         [spaceID: string]: {
           activeRoom?: string;
@@ -30,6 +31,12 @@ export let useUIState = create(
       focusedCard: undefined as string | undefined,
     },
     (set) => ({
+      setMobileSidebarOpen: (open?: boolean) => {
+        set((state) => ({
+          mobileSidebarOpen:
+            open === undefined ? !state.mobileSidebarOpen : open,
+        }));
+      },
       openDrawer: (entityID: string, drawer: "backlinks" | "comments") => {
         set((state) => ({
           ...state,
@@ -57,6 +64,7 @@ export let useUIState = create(
       },
       setRoom: (spaceID: string, room: string | undefined) => {
         set((state) => ({
+          mobileSidebarOpen: false,
           spaces: {
             ...state.spaces,
             [spaceID]: {

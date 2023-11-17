@@ -17,6 +17,7 @@ import {
   Puller,
   Pusher,
   ReadTransaction,
+  ReadonlyJSONValue,
   Replicache,
   WriteTransaction,
 } from "replicache";
@@ -370,6 +371,14 @@ export const makeReplicache = (args: {
 };
 
 export const db = {
+  useQuery<A extends ReadonlyJSONValue>(
+    query: (tx: ReadTransaction) => Promise<A>,
+
+    defaultValue: A,
+    deps: any[]
+  ) {
+    return useSubscribe(query, defaultValue, deps, "query");
+  },
   useTimeAttribute<
     A extends keyof FilterAttributes<{
       type: "timestamp";
