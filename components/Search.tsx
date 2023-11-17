@@ -20,6 +20,7 @@ import { ulid } from "src/ulid";
 import { useCardViewer } from "./CardViewerContext";
 import { BigCardBody } from "./CardPreview/BigCard";
 import { useGesture } from "@use-gesture/react";
+import { useViewportSize } from "hooks/useViewportSize";
 
 let useSearch = () => {
   let [input, setInput] = useState("");
@@ -70,7 +71,7 @@ export function Search() {
               open
                 ? "-mt-2 rounded-md border-grey-90 bg-white py-2 shadow-drop"
                 : ""
-              }`}
+            }`}
             style={{ width: "var(--radix-popper-anchor-width)" }}
           >
             <div className="sticky top-0 z-20 px-2">
@@ -142,8 +143,9 @@ export function Search() {
               )}
               {open && input && !exactMatch && (
                 <div
-                  className={`p-2 ${suggestionIndex === results.length ? "bg-bg-blue" : ""
-                    }`}
+                  className={`p-2 ${
+                    suggestionIndex === results.length ? "bg-bg-blue" : ""
+                  }`}
                 >
                   <NewCard title={input} onClick={() => setOpen(false)} />
                 </div>
@@ -255,12 +257,12 @@ export const MobileSearch = () => {
     disabled: state !== "open",
     id: "mobile-search-drawer",
     entityID: "",
-    onDragExit: () => {
+    onDragEnter: () => {
       setState("normal");
     },
     type: "dropzone",
   });
-  let refCombined = useCombinedRefs(drawerDroppableRef, measure);
+  let refCombined = useCombinedRefs(measure);
   let inputRef = useRef<HTMLInputElement>(null);
 
   const bindOverlay = useGesture({
@@ -271,6 +273,7 @@ export const MobileSearch = () => {
       }
     },
   });
+  let viewportHeight = useViewportSize().height;
 
   return (
     <>
@@ -284,16 +287,24 @@ export const MobileSearch = () => {
         <SearchSmall />
       </button>
       {state === "open" && (
-        <animated.div
-          {...bindOverlay()}
-          onClick={() => setState("normal")}
-          className="fixed inset-0 z-50 bg-grey-15"
-          style={opacity}
-        />
+        <>
+          <animated.div
+            {...bindOverlay()}
+            onClick={() => setState("normal")}
+            className="fixed inset-0 z-50 bg-grey-15"
+            style={opacity}
+          />
+          <div
+            style={{ height: viewportHeight * 0.45 }}
+            ref={drawerDroppableRef}
+            className="fixed inset-0 z-40"
+          />
+        </>
       )}
       <animated.div className="fixed left-0 z-50 w-full px-2" style={style}>
         <div
-          className="no-scrollbar relative z-0 flex h-[40vh] w-full flex-col gap-2 overflow-y-scroll rounded-md border border-b-0 border-grey-90 bg-white pt-2"
+          style={{ height: viewportHeight * 0.5 }}
+          className="no-scrollbar relative z-0 flex  w-full flex-col gap-2 overflow-y-scroll rounded-md border border-b-0 border-grey-90 bg-white pt-2"
           ref={refCombined}
         >
           <div className="sticky top-0 z-10 flex flex-row justify-between gap-2 px-2">
