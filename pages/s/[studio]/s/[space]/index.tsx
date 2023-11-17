@@ -248,7 +248,8 @@ const MobileSidebar = ({
         if (
           containerRef.current?.scrollLeft === 0 &&
           data.direction[0] > 0 &&
-          data.distance[0] > 8
+          data.distance[0] > 8 &&
+          data.distance[1] < 8
         ) {
           if (active?.data) return;
           setSidebarOpen(true);
