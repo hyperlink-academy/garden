@@ -91,7 +91,7 @@ export function LoginForm(props: {
         <label className="flex flex-col gap-1 font-bold">
           Email
           <input
-            className="w-full"
+            className="w-full font-normal"
             type="email"
             required
             value={data.email}
@@ -110,6 +110,7 @@ export function LoginForm(props: {
             </Link>
           </div>
           <input
+            className="font-normal"
             type="password"
             value={data.password}
             required

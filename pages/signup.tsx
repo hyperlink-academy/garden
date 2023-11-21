@@ -119,6 +119,7 @@ export function SignupForm(props: {
         <label className="flex w-full flex-col gap-1 font-bold">
           Email
           <input
+            className="font-normal"
             required
             minLength={7}
             type="email"
@@ -208,7 +209,7 @@ function PasswordInput(props: {
       <input
         required
         minLength={8}
-        className="signupPasswordInput relative w-full pr-16"
+        className="signupPasswordInput relative w-full pr-16 font-normal"
         autoComplete="new-password"
         value={props.value}
         type={visible ? "text" : "password"}
