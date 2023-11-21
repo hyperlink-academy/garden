@@ -73,7 +73,7 @@ export function SignupForm(props: {
           <span className="font-bold">{input.email}</span>{" "}
         </p>
         <hr className="my-2 text-grey-80" />
-        <div className="lightBorder bg-bg-blue p-3">
+        <div className="lightBorder flex flex-col gap-2 bg-bg-blue p-3">
           <a
             href="https://buttondown.email/hyperlink/"
             target="_blank"
@@ -83,7 +83,8 @@ export function SignupForm(props: {
             And subscribe to our newsletter 💌
           </a>
           <p className="text-grey-55">
-            We send them rarely, for big announcements and updates!
+            for occasional announcements & updates — otherwise we{" "}
+            <strong>only</strong> email about your account
           </p>
         </div>
       </div>
