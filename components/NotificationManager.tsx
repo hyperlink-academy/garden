@@ -140,10 +140,12 @@ const NotificationModalContent = ({
     // This what you see in the mobile browser and in certain other desktop browsers like Arc
     return (
       <div className="flex flex-col gap-3 text-grey-35">
-        <h3 className="m-auto w-fit -skew-x-6 rounded-md bg-accent-gold px-4 py-2 text-center">
-          Add the Hyperlink app!
-        </h3>
-        <HelpAppInfo />
+        <div className="lightBorder flex flex-col gap-4 p-4">
+          <h3 className="m-auto w-fit -rotate-2 -skew-x-6 rounded-md bg-accent-gold px-4 py-2 text-center">
+            Get the Hyperlink app!
+          </h3>
+          <HelpAppInfo />
+        </div>
       </div>
     );
 

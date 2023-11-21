@@ -97,7 +97,7 @@ export default function SignupPage() {
   if (router.query.error_description)
     return (
       <div className="lightBorder flex flex-col gap-2 bg-white p-2">
-        <h1>An error occured</h1>
+        <h1>Sorry, an error occurred</h1>
         <div>{router.query.error_description}</div>
         <div>
           Please try to{" "}
@@ -117,34 +117,35 @@ export default function SignupPage() {
 
   return (
     <div className=" -my-4 mx-auto flex h-screen  max-w-md flex-col items-center justify-center gap-4 ">
-      <div className="lightBorder flex max-w-md flex-col gap-2  bg-white p-4">
+      <div className="lightBorder flex max-w-md flex-col gap-4 bg-white p-4">
         <img
           className="place-self-end"
           width={"264px"}
           alt="a house in an overgrown field"
           src="/img/spotIllustration/welcome.png"
         />
-        <div className="grid-auto-rows grid gap-2">
-          <h2>Hi! It&apos;s nice to meet you!</h2>
+        <div className="grid-auto-rows m-auto grid gap-2">
+          <h2>Hi, welcome to Hyperlink!</h2>
         </div>
 
         <form onSubmit={onSubmit} className="grid w-full gap-4 text-grey-35">
-          {/* pick a name */}
+          {/* pick a username */}
           <div className="flex flex-col gap-4">
             <label className="grid-flow-rows grid gap-2 font-bold">
-              <div className="flex flex-col gap-0">
+              <div className="flex flex-col gap-1">
                 Pick a Username
                 <p className="text-sm font-normal text-grey-55">
-                  Unique, no special characters or spaces!
+                  numbers, letters, and underscores only
                 </p>
               </div>
               <div className="flex flex-col gap-1">
                 <input
+                  className="font-normal"
                   type="text"
                   minLength={3}
                   required
                   pattern="[A-Za-z_0-9]+"
-                  title="No special characters or spaces please!"
+                  title="Pick a Username"
                   value={data.username}
                   onChange={(e) =>
                     setData({ ...data, username: e.currentTarget.value })
@@ -176,20 +177,24 @@ export default function SignupPage() {
             content={status === "loading" ? <DotLoader /> : "Get Started!"}
           />
         </form>
-        <Divider />
+        {/* <Divider /> */}
         {/* get started */}
-        <div className="lightBorder flex flex-col gap-4 bg-bg-blue p-3 text-sm">
-          <div className="flex flex-col gap-2">
-            <p className="font-bold italic">psst, you should get the app!</p>
-            <div className="flex flex-col gap-1 text-sm text-grey-55">
+        <div className="lightBorder flex flex-col gap-4 bg-bg-blue p-4 text-sm">
+          <div className="flex flex-col gap-4">
+            {/* <p className="font-bold italic">psst, you should get the app!</p> */}
+            <h3 className="m-auto w-fit -rotate-2 -skew-x-6 rounded-md bg-accent-gold px-4 py-2 text-center">
+              Get the Hyperlink app!
+            </h3>
+
+            <div className="flex flex-col gap-2 text-sm text-grey-55">
               <p>
-                Hyperlink is a great place for collaboration. Get the app for
-                updates when someone comments, or messages you.
+                Hyperlink is made for collaboration. Get the app for
+                notifications from others in shared Spaces.
               </p>
 
               <p>
-                Log in on a mobile browser, and open your settings to find out
-                how.
+                Log in on a mobile browser and open your settings to find out
+                how ✨
               </p>
             </div>
           </div>
