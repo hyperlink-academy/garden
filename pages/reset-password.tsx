@@ -20,8 +20,8 @@ export default function LoginPage() {
     });
   }, [supabase]);
   return (
-    <div className=" mx-auto -mt-4 flex h-screen max-w-md items-center">
-      <div className="lightBorder h-fit w-full bg-white p-4 ">
+    <div className="mx-auto -mt-4 flex h-[calc(100vh-1rem)] max-w-md items-center">
+      <div className="lightBorder h-fit w-full bg-white p-4">
         {state === "new-password" || state === "signed-in" ? (
           <NewPasswordForm />
         ) : (
