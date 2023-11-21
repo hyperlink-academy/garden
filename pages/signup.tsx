@@ -94,7 +94,9 @@ export function SignupForm(props: {
     <div className="flex w-full flex-col gap-2">
       <img
         className="place-self-end"
+        // className="w-[298px] place-self-end sm:w-[346px]"
         width={"264px"}
+        // width={"346px"}
         alt="a small house in an overgrown field"
         src="/img/spotIllustration/welcome.png"
       />

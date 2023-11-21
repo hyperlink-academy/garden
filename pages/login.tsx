@@ -66,7 +66,7 @@ export function LoginForm(props: {
   return (
     <div className="flex flex-col gap-2">
       <img
-        className="rounded-md"
+        className="w-full rounded-md"
         width={"216px"}
         alt="an overgrown porch at night, with a light on in the window/"
         src="/img/spotIllustration/login.png"
