@@ -6,6 +6,7 @@ import { Settings } from "./Icons";
 import { ButtonPrimary, ButtonSecondary } from "./Buttons";
 import { useAuth } from "hooks/useAuth";
 import { Modal } from "./Modal";
+import { HelpAppInfo } from "./HelpCenter";
 
 export const NotificationManager = () => {
   let supabase = useSupabaseClient<Database>();
@@ -89,21 +90,22 @@ export const NotificationManager = () => {
 
         if denied…???
         */}
-        <NotificationModalContent
-          pushPermissionState={pushPermissionState}
-          notificationPermissionState={notificationPermissionState}
-          existingSubscription={existingSubscription}
-          setExistingSubscription={setExistingSubscription}
-          setNotificationPermissionState={setNotificationPermissionState}
-        />
-
-        <hr className="border-grey-55" />
-        <div className="lightBorder px-2 py-3">
+        <div className="flex flex-col gap-4">
+          <NotificationModalContent
+            pushPermissionState={pushPermissionState}
+            notificationPermissionState={notificationPermissionState}
+            existingSubscription={existingSubscription}
+            setExistingSubscription={setExistingSubscription}
+            setNotificationPermissionState={setNotificationPermissionState}
+          />
+          <hr className="border-grey-55" />
+          {/* <div className="lightBorder px-2 py-3"> */}
           <ButtonSecondary
             className="mx-auto"
             content="Log out"
             onClick={() => logout()}
           />
+          {/* </div> */}
         </div>
       </Modal>
     </>
@@ -138,69 +140,11 @@ const NotificationModalContent = ({
     // This what you see in the mobile browser and in certain other desktop browsers like Arc
     return (
       <div className="flex flex-col gap-3 text-grey-35">
-        <div className="lightBorder  flex flex-col gap-1 px-3 py-3">
-          <p className="pb-3 text-center font-bold">
-            Get the Web App to enable <br /> push notifications!
-          </p>
-          {/* <p className="text-sm">
-            We only notify you about new chat messages and comments in your
-            Spaces.
-          </p> */}
-          {/* if iOs */}
-          {isIos ? (
-            <>
-              <p>From your mobile browser...</p>
-              <ol className="flex list-outside list-decimal flex-col gap-2 pl-8">
-                <li>
-                  <div className="pb-2">
-                    <span className="font-bold">Safari</span>
-                    <br /> Select the &quot;Share&quot; icon at the bottom of
-                    the browser window.
-                  </div>
-                  <div>
-                    <span className="font-bold">NOT Safari</span> <br />
-                    Open the browser menu in the bottom right of the window and
-                    select &quot;Share&quot;.
-                  </div>
-                </li>
-                <Divider />
-                <li>Select &quot;Add to Home Screen&quot;.</li>
-                <Divider />
-                <li>
-                  Follow the prompts to download the app to your home screen.
-                </li>
-                <Divider />
-                <li>
-                  <p className="font-bold">
-                    Using your new Web App open up this settings page and enable
-                    notifications!
-                  </p>
-                </li>
-              </ol>
-            </>
-          ) : (
-            <>
-              <p className="pb-2">From your mobile browser...</p>
-              <ol className="flex list-outside list-decimal flex-col gap-4 pl-8">
-                <li>
-                  Open the browser menu in the top right of the browser window
-                </li>
-                <Divider />
-                <li>Select &quot;Add to Home Screen&quot;.</li>
-                <Divider />
-                <li>
-                  Follow the prompts to download the app to your home screen.
-                </li>
-                <Divider />
-                <li>
-                  <p className="font-bold">
-                    Using your new Web App open up this settings page and enable
-                    notifications!
-                  </p>
-                </li>
-              </ol>
-            </>
-          )}
+        <div className="lightBorder flex flex-col gap-4 p-4">
+          <h3 className="m-auto w-fit -rotate-2 -skew-x-6 rounded-md bg-accent-gold px-4 py-2 text-center">
+            Get the Hyperlink app!
+          </h3>
+          <HelpAppInfo />
         </div>
       </div>
     );
@@ -256,7 +200,7 @@ const NotificationModalContent = ({
       </>
     );
 
-  // this is what you see if you enabled notifcations on both desktop and mobile
+  // this is what you see if you enabled notifications on both desktop and mobile
   if (pushPermissionState === "granted" && existingSubscription)
     return (
       <>
@@ -313,9 +257,9 @@ const MobilePrompt = () => {
     return (
       <div className="lightBorder flex flex-col gap-1 px-2 py-3 text-center">
         <p className="font-bold">
-          Get notifications on your phone with our Web App!
+          Get notifications on your phone with our web app!
         </p>
-        <p> Navigate back here from a mobile browser to download it.</p>
+        <p> Navigate back here from a mobile browser to install it ✨</p>
       </div>
     );
   return null;
