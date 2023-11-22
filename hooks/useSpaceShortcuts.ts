@@ -50,7 +50,7 @@ export function useCardShortcuts() {
   let spaceID = useSpaceID();
   let openCard = useOpenCard();
   let { rep } = useMutations();
-  let filters = useUIState((s) => s.roomStates[currentRoom]?.filters);
+  let filters = useUIState((s) => s.roomStates[currentRoom]?.filters) || [];
 
   useEffect(() => {
     if (!rep || !currentRoom) return;
@@ -68,6 +68,7 @@ export function useCardShortcuts() {
         if (el) el.focus();
       }
       if (e.key === "ArrowUp" && e.shiftKey) {
+        e.preventDefault();
         let state = useUIState.getState();
         if (!spaceID) return;
         let currentCard =
@@ -90,6 +91,7 @@ export function useCardShortcuts() {
         }
       }
       if (e.key === "ArrowDown" && e.shiftKey) {
+        e.preventDefault();
         let state = useUIState.getState();
         if (!spaceID) return;
         let currentCard =
