@@ -220,6 +220,9 @@ export const MessageInput = (props: {
             <div className="flex w-full items-center gap-1 rounded-md border border-grey-55 bg-white p-1 text-sm text-grey-15">
               <AutosizeTextarea
                 onKeyDown={(e) => {
+                  if (e.key === "Escape") {
+                    e.currentTarget.blur();
+                  }
                   if (!e.shiftKey && e.key === "Enter") {
                     e.preventDefault();
                     send();
