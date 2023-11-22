@@ -122,8 +122,8 @@ export const useKeyboardHandling = (deps: {
             let length = match[1].length;
             e.preventDefault();
             transact((text) => {
-              text.insert(start, `\n${" ".repeat(length)}-`);
-            }, length + 2);
+              text.insert(start, `\n${" ".repeat(length)}- `);
+            }, length + 3);
           }
           break;
         }
