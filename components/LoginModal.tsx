@@ -54,13 +54,13 @@ export const OAuth = (props: { actionLabel: string }) => {
         <img src="/sso/google.svg" width={24} alt="google" />
         <p>{props.actionLabel} with Google</p>
       </button>
-      <button
+      {/* <button
         className={buttonClass}
         onClick={() => supabase.auth.signInWithOAuth({ provider: "apple" })}
       >
         <img src="/sso/apple.svg" width={24} alt="apple" />
         <p>{props.actionLabel} with Apple</p>
-      </button>
+      </button> */}
     </div>
   );
 };
