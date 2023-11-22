@@ -115,7 +115,7 @@ const DesktopLayout = () => {
               </Link>
             </>
           )}
-          <SpaceName className="grow bg-background" />
+          <SpaceName className="grow bg-background" />{" "}
           {!session.loggedIn && <LoginButton />}
         </div>
         <div className="spaceHeaderSearch flex w-[368px] shrink-0 flex-row gap-2">

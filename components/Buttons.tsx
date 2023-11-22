@@ -13,10 +13,11 @@ export function ButtonPrimary(
       className={`
       m-0  
       box-border flex w-max
-      items-center justify-center
-      gap-2 rounded-md
-      border px-2 py-1 
-      font-bold text-white 
+      shrink-0 items-center
+      justify-center gap-2
+      rounded-md border px-2 
+      py-1 font-bold 
+      text-white
 
       outline-offset-[-2px] active:outline active:outline-2 disabled:border-grey-90 
       disabled:bg-grey-90 disabled:text-grey-80 disabled:hover:text-grey-80 
