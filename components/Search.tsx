@@ -1,26 +1,19 @@
-import { db, scanIndex, useMutations } from "hooks/useReplicache";
-import { memo, useEffect, useMemo, useRef, useState } from "react";
+import { db, useMutations } from "hooks/useReplicache";
+import { useEffect, useRef, useState } from "react";
 import { CardPreview, PlaceholderNewCard } from "./CardPreview";
 import * as Popover from "@radix-ui/react-popover";
 import { useCardPreviewData } from "hooks/CardPreviewData";
 import { useIsElementOrChildFocused } from "hooks/utils";
 import { useDraggableCard, useDroppableZone } from "./DragContext";
-import {
-  ChatEmptyTiny,
-  CloseLinedTiny,
-  RoomSearch,
-  SearchSmall,
-} from "./Icons";
+import { CloseLinedTiny, Question, RoomSearch, SearchSmall } from "./Icons";
 import { animated, useSpring } from "@react-spring/web";
 import useMeasure from "react-use-measure";
 import { useCombinedRefs } from "./Desktop";
-import { focusElement } from "src/utils";
-import { useOpenCard, useRoom, useUIState } from "hooks/useUIState";
 import { ulid } from "src/ulid";
 import { useCardViewer } from "./CardViewerContext";
-import { BigCardBody } from "./CardPreview/BigCard";
 import { useGesture } from "@use-gesture/react";
 import { useViewportSize } from "hooks/useViewportSize";
+import { HelpModal } from "./HelpCenter";
 
 let useSearch = () => {
   let [input, setInput] = useState("");
@@ -137,6 +130,7 @@ export function Search() {
               )}
               {open && input.length > 0 && (
                 <SearchResults
+                  onClick={() => setOpen(false)}
                   results={results}
                   suggestionIndex={suggestionIndex}
                 />
@@ -159,6 +153,7 @@ export function Search() {
 }
 let SearchResults = (props: {
   results: { entity: string }[];
+  onClick: () => void;
   suggestionIndex: number | null;
 }) => {
   console.log(props.suggestionIndex);
@@ -166,6 +161,7 @@ let SearchResults = (props: {
     <>
       {props.results.map((c, index) => (
         <DraggableCard
+          onClick={props.onClick}
           entityID={c.entity}
           key={c.entity}
           hideContent
@@ -209,6 +205,7 @@ const NewCard = (props: { title: string; onClick: () => void }) => {
 };
 
 const DraggableCard = (props: {
+  onClick?: () => void;
   selected?: boolean;
   editable?: boolean;
   entityID: string;
@@ -230,6 +227,7 @@ const DraggableCard = (props: {
     <div ref={ref} className={`${props.selected ? "bg-bg-blue" : ""} p-2`}>
       <div ref={setNodeRef} className={`${isDragging ? `opacity-60` : ""}`}>
         <CardPreview
+          onClick={props.onClick}
           data={data}
           entityID={props.entityID}
           size="big"
@@ -331,7 +329,15 @@ export const MobileSearch = () => {
           <div className="flex flex-col">
             {input.length > 0 &&
               results.map((c) => (
-                <DraggableCard entityID={c.entity} key={c.entity} hideContent />
+                <DraggableCard
+                  entityID={c.entity}
+                  key={c.entity}
+                  hideContent
+                  onClick={() => {
+                    inputRef.current?.blur();
+                    setState("normal");
+                  }}
+                />
               ))}
             {input && !exactMatch && (
               <div className="p-2">
