@@ -93,19 +93,10 @@ export function SignupForm(props: {
   return (
     <div className="flex w-full flex-col gap-2">
       <img
-<<<<<<< HEAD
-        className="place-self-end"
-        // className="w-[298px] place-self-end sm:w-[346px]"
-        width={"264px"}
-        // width={"346px"}
-        alt="a small house in an overgrown field"
-        src="/img/spotIllustration/welcome.png"
-=======
         className="rounded-md"
         width={"216px"}
         alt="a boat soaring over a pastoral plain"
         src="/img/spotIllustration/signup.png"
->>>>>>> f443f98 (swapped out new login and sign up illustrations)
       />
       <div className="flex items-baseline justify-between gap-1 pt-4">
         <h2 className="text-grey-15">Sign Up!</h2>

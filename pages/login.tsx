@@ -117,18 +117,6 @@ export function LoginForm(props: {
               <p className="">reset</p>
             </Link>
           </div>
-<<<<<<< HEAD
-          <input
-            className="font-normal"
-            type="password"
-            value={data.password}
-            required
-            onChange={(e) =>
-              setData({ ...data, password: e.currentTarget.value })
-            }
-          />
-=======
->>>>>>> f443f98 (swapped out new login and sign up illustrations)
         </label>
         {status === "normal" || status === "loading" ? null : status ===
           "incorrect" ? (
