@@ -68,7 +68,7 @@ export function LoginForm(props: {
       <img
         className="w-full rounded-md"
         width={"216px"}
-        alt="an overgrown porch at night, with a light on in the window/"
+        alt="a desktop covered in tictures, paper, and plants"
         src="/img/spotIllustration/login.png"
       />
       <div className="mt-4 flex items-baseline justify-between">
@@ -98,7 +98,15 @@ export function LoginForm(props: {
             onChange={(e) => setData({ ...data, email: e.currentTarget.value })}
           />
         </label>
-        <label className="flex flex-col gap-1 font-bold">
+        <label className="flex flex-col-reverse gap-1 font-bold">
+          <input
+            type="password"
+            value={data.password}
+            required
+            onChange={(e) =>
+              setData({ ...data, password: e.currentTarget.value })
+            }
+          />
           <div className="flex items-baseline justify-between">
             Password{" "}
             <Link
@@ -109,6 +117,7 @@ export function LoginForm(props: {
               <p className="">reset</p>
             </Link>
           </div>
+<<<<<<< HEAD
           <input
             className="font-normal"
             type="password"
@@ -118,6 +127,8 @@ export function LoginForm(props: {
               setData({ ...data, password: e.currentTarget.value })
             }
           />
+=======
+>>>>>>> f443f98 (swapped out new login and sign up illustrations)
         </label>
         {status === "normal" || status === "loading" ? null : status ===
           "incorrect" ? (
