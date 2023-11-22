@@ -75,7 +75,7 @@ export function Search() {
             style={{ width: "var(--radix-popper-anchor-width)" }}
           >
             <div className="sticky top-0 z-20 px-2">
-              <RoomSearch className="absolute right-2 top-2 text-grey-55" />
+              <RoomSearch className="absolute right-4 top-2 text-grey-55" />
               <input
                 ref={inputRef}
                 onKeyDown={async (e) => {

@@ -22,6 +22,7 @@ export function useRoomShortcuts() {
       )
         return;
       if (e.key === "ArrowUp" && e.altKey) {
+        e.preventDefault();
         let currentIndex = rooms.findIndex((r) => r.entity === currentRoom);
         if (currentIndex === -1) return;
         if (currentIndex > 0) {
@@ -29,9 +30,10 @@ export function useRoomShortcuts() {
         }
       }
       if (e.key === "ArrowDown" && e.altKey) {
+        e.preventDefault();
         let currentIndex = rooms.findIndex((r) => r.entity === currentRoom);
         if (currentIndex === -1) return;
-        if (currentIndex < rooms.length) {
+        if (currentIndex < rooms.length - 1) {
           setRoom(rooms[currentIndex + 1].entity);
         }
       }

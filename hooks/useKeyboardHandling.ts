@@ -114,6 +114,17 @@ export const useKeyboardHandling = (deps: {
             close();
             break;
           }
+          let currentLine = value.slice(0, start).split("\n").pop();
+          if (!currentLine) break;
+          const match = currentLine.match(/^(\s*)-/);
+          if (match) {
+            console.log(match);
+            let length = match[1].length;
+            e.preventDefault();
+            transact((text) => {
+              text.insert(start, `\n${" ".repeat(length)}-`);
+            }, length + 2);
+          }
           break;
         }
         case "Tab": {
@@ -127,6 +138,22 @@ export const useKeyboardHandling = (deps: {
             }
             break;
           }
+
+          let lineIndex = value.lastIndexOf("\n", start - 1);
+          if (lineIndex === -1) break;
+          let currentLine = value.slice(lineIndex + 1, start);
+          if (!currentLine) break;
+          const match = currentLine.match(/^(\s*)-/);
+          if (match) {
+            e.preventDefault();
+            transact((text) => {
+              if (e.shiftKey) {
+                if (currentLine[0] === "-") return;
+                text.delete(lineIndex + 1, 2);
+              } else text.insert(lineIndex + 1, "  ");
+            });
+          }
+
           break;
         }
         case "ArrowUp": {
