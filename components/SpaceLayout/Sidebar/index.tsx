@@ -191,7 +191,7 @@ const MemberOptions = () => {
     <>
       <Popover.Root>
         <Popover.Trigger>
-          <button>
+          <button className="shrink-0 rounded-md border border-transparent pt-[1px] hover:border-accent-blue hover:text-accent-blue">
             <MoreOptionsSmall className="pt-2" />
           </button>
         </Popover.Trigger>
