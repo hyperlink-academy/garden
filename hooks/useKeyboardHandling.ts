@@ -161,9 +161,10 @@ export const useKeyboardHandling = (deps: {
           const match = currentLine.match(/^(\s*)-/);
           if (match) {
             e.preventDefault();
-            if (e.shiftKey && currentLine[0] !== "-")
+            if (e.shiftKey) {
+              if (currentLine[0] === "-") break;
               transact((text) => text.delete(lineIndex + 1, 2), -2);
-            else {
+            } else {
               let previousLine = value
                 .slice(0, lineIndex)
                 .split("\n")
