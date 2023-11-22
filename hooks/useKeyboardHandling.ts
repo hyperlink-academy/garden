@@ -42,7 +42,13 @@ export const useKeyboardHandling = (deps: {
         offset: [number, number] | number = [0, 0],
         undo: boolean = true
       ) => {
-        if (undo) action.start();
+        let isUndoing = false;
+        if (undo) {
+          try {
+            action.start();
+            isUndoing = true;
+          } catch (e) {}
+        }
         let [newValue, cursors] = modifyString(
           value,
           [start, end],
@@ -80,7 +86,7 @@ export const useKeyboardHandling = (deps: {
             cursors[1] + offsets[1]
           );
         }, 10);
-        if (undo) action.end();
+        if (undo && isUndoing) action.end();
       };
 
       switch (e.key) {
@@ -114,8 +120,17 @@ export const useKeyboardHandling = (deps: {
             close();
             break;
           }
+          let lineIndex = value.lastIndexOf("\n", start - 1);
           let currentLine = value.slice(0, start).split("\n").pop();
           if (!currentLine) break;
+          if (currentLine.match(/^(\s*)-\s*$/)) {
+            e.preventDefault();
+            let delLength = currentLine.length;
+            transact((text) => {
+              text.delete(lineIndex + 1, delLength - 1);
+            }, -1 * delLength);
+            break;
+          }
           const match = currentLine.match(/^(\s*)-/);
           if (match) {
             console.log(match);
@@ -146,12 +161,18 @@ export const useKeyboardHandling = (deps: {
           const match = currentLine.match(/^(\s*)-/);
           if (match) {
             e.preventDefault();
-            transact((text) => {
-              if (e.shiftKey) {
-                if (currentLine[0] === "-") return;
-                text.delete(lineIndex + 1, 2);
-              } else text.insert(lineIndex + 1, "  ");
-            });
+            if (e.shiftKey && currentLine[0] !== "-")
+              transact((text) => text.delete(lineIndex + 1, 2), -2);
+            else {
+              let previousLine = value
+                .slice(0, lineIndex)
+                .split("\n")
+                .pop()
+                ?.match(/^(\s*)/);
+              if (!previousLine || previousLine[0].length !== match[1].length)
+                return;
+              transact((text) => text.insert(lineIndex + 1, "  "));
+            }
           }
 
           break;
