@@ -12,7 +12,7 @@ import { DisclosureCollapseTiny, DisclosureExpandTiny } from "components/Icons";
 import Head from "next/head";
 import { NotificationManager } from "components/NotificationManager";
 import { Divider } from "components/Layout";
-import { NewStudio } from "./newStudio";
+import { NewStudio } from "components/newStudio";
 import { HelpExampleSpaces } from "components/HelpCenter";
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>;
