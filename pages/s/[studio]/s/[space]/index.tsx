@@ -102,24 +102,23 @@ const DesktopLayout = () => {
   let { session } = useAuth();
   return (
     <div className="no-scrollbar mx-auto flex h-full flex-col gap-2 overflow-x-scroll">
-      <div className="flex flex-row justify-between">
-        <div className="flex flex-row items-stretch gap-2 font-bold">
+      <div className="spaceHeader flex w-full flex-row  justify-stretch gap-4 ">
+        <div className="spaceHeaderInfo flex min-w-0 shrink grow  flex-row items-stretch gap-2 font-bold">
           {session.session && (
             <>
               <Link
                 href={`/s/${session.session.username}`}
-                className="flex flex-row gap-2"
+                className="flex flex-row items-center gap-1 text-grey-55 "
               >
-                <StudioFilled className="text-grey-55" /> <span> /</span>
+                <StudioFilled className="hover:text-accent-blue" />
+                <span className="text-lg"> /</span>
               </Link>
             </>
           )}
-          <div className="text-grey-35">
-            <SpaceName className="bg-background" />
-          </div>
+          <SpaceName className="grow bg-background" />
           {!session.loggedIn && <LoginButton />}
         </div>
-        <div className="flex flex-row gap-2">
+        <div className="spaceHeaderSearch flex w-[368px] shrink-0 flex-row gap-2">
           <HelpButton />
           <Search />
         </div>

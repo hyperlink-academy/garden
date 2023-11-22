@@ -138,11 +138,20 @@ export const SpaceName = (props: { className?: string }) => {
     session.session && session.session.username === data?.owner.username;
   let [editModal, setEditModal] = useState(false);
   return (
-    <div className={`SidebarSpaceInfo flex flex-col gap-2 ${props.className}`}>
-      <div className="flex w-full flex-row items-start justify-between gap-2 bg-inherit pr-4">
-        <Truncate className="w-full max-w-xs bg-inherit">
-          <h3 className="SpaceName ">{data?.display_name}</h3>
-        </Truncate>
+    <div
+      className={`spaceName flex w-full min-w-0 flex-col gap-2 text-grey-35 ${props.className}`}
+    >
+      <div className="flex flex-row items-start gap-2 bg-inherit ">
+        {window.matchMedia("(max-width: 640px)") ? (
+          <h3 className="SpaceName whitespace-normal">{data?.display_name}</h3>
+        ) : (
+          <Truncate className=" max-w-xs overflow-hidden  bg-inherit sm:max-w-none">
+            <h3 className="SpaceName whitespace-nowrap ">
+              {data?.display_name}
+            </h3>
+          </Truncate>
+        )}
+
         {!authorized ? null : isOwner ? (
           <button
             onClick={() => {
