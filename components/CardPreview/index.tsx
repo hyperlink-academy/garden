@@ -41,6 +41,7 @@ export type Props = {
   size: "big" | "small";
   onRotateDrag?: (da: number) => void;
   onDelete?: () => void;
+  onClick?: () => void;
   outerControls?: boolean;
   hideContent?: boolean;
   editable?: boolean;
@@ -105,6 +106,9 @@ export const CardPreview = (
           if (!isLongPress.current) props.pointerUpHandler?.(e);
         }}
         onDragOver={(e) => e.preventDefault()}
+        onClick={() => {
+          props.onClick?.();
+        }}
         onDrop={async (e) => {
           e.preventDefault();
           e.stopPropagation();
