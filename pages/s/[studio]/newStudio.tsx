@@ -45,7 +45,8 @@ export const NewStudio = (props: {
             studioName={props.studioName}
           />
           <p className="text-sm text-grey-55">
-            We'll keep the test space around, <br /> in case you need it again
+            We&apos;ll keep the test space around, <br /> in case you need it
+            again
           </p>
         </div>
       </div>
