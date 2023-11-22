@@ -72,7 +72,6 @@ export function Search() {
               <input
                 ref={inputRef}
                 onKeyDown={async (e) => {
-                  console.log(e);
                   if (e.key === "Escape") {
                     e.currentTarget.blur();
                   }
@@ -156,7 +155,6 @@ let SearchResults = (props: {
   onClick: () => void;
   suggestionIndex: number | null;
 }) => {
-  console.log(props.suggestionIndex);
   return (
     <>
       {props.results.map((c, index) => (

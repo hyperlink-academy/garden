@@ -315,7 +315,6 @@ const updateTitleFact: Mutation<{
     args.entity,
     "card/inline-links-to"
   );
-  console.log(existingLinks);
   let oldTitle = await ctx.scanIndex.eav(args.entity, "card/title");
   if (!oldTitle) {
     await ctx.assertFact({ ...args, positions: {} });
@@ -379,7 +378,6 @@ const replyToDiscussion: Mutation<{
       user: userID,
     });
 
-    console.log(`${env.env.NEXT_API_URL}/api/web_push`);
     try {
       let payload: z.TypeOf<typeof webPushPayloadParser> = {
         type: "new-message",
@@ -434,7 +432,6 @@ const createRoom: Mutation<{
 const deleteEntity: Mutation<{ entity: string }> = async (args, ctx) => {
   let references = await ctx.scanIndex.vae(args.entity);
   let facts = await ctx.scanIndex.eav(args.entity, null);
-  console.log("deleting?");
   await Promise.all(facts.concat(references).map((f) => ctx.retractFact(f.id)));
 };
 
@@ -537,7 +534,6 @@ const replaceCard: Mutation<{ currentCard: string; newCard: string }> = async (
 ) => {
   let referenceFacts = await ctx.scanIndex.vae(args.currentCard);
   let facts = await ctx.scanIndex.eav(args.currentCard, null);
-  console.log(referenceFacts.map((f) => f.attribute));
   await Promise.all([
     ...referenceFacts.map((f) =>
       ctx.updateFact(f.id, { value: ref(args.newCard) })

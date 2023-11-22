@@ -92,7 +92,6 @@ export const useKeyboardHandling = (deps: {
       switch (e.key) {
         case "Escape": {
           if (suggestions.length > 0) {
-            console.log(suggestions);
             e.preventDefault();
             close();
           }
@@ -133,7 +132,6 @@ export const useKeyboardHandling = (deps: {
           }
           const match = currentLine.match(/^(\s*)-/);
           if (match) {
-            console.log(match);
             let length = match[1].length;
             e.preventDefault();
             transact((text) => {

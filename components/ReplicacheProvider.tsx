@@ -47,7 +47,6 @@ export const SpaceProvider: React.FC<
 
   let { session, authToken } = useAuth();
   useEffect(() => {
-    console.log("yo");
     let newRep = makeSpaceReplicache({
       id: props.id,
       session: session.session?.studio || "unauthorized",

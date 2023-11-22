@@ -27,7 +27,6 @@ export const PresenceTag = (props: { entityID: string; size: string }) => {
     [],
     [props.entityID]
   );
-  console.log(present);
 
   return (
     <>
