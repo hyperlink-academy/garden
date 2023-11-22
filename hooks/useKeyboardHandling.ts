@@ -169,7 +169,7 @@ export const useKeyboardHandling = (deps: {
                 .split("\n")
                 .pop()
                 ?.match(/^(\s*)/);
-              if (!previousLine || previousLine[0].length !== match[1].length)
+              if (!previousLine || previousLine[0].length < match[1].length)
                 return;
               transact((text) => text.insert(lineIndex + 1, "  "));
             }
