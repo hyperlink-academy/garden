@@ -118,7 +118,7 @@ const DesktopLayout = () => {
           <SpaceName className="grow bg-background" />{" "}
           {!session.loggedIn && <LoginButton />}
         </div>
-        <div className="spaceHeaderSearch flex w-[368px] shrink-0 flex-row gap-2">
+        <div className="spaceHeaderSearch flex w-[360px] shrink-0 flex-row gap-0">
           <HelpButton />
           <Search />
         </div>
@@ -305,7 +305,10 @@ const HelpButton = () => {
   let [open, setOpen] = useState(false);
   return (
     <>
-      <button onClick={() => setOpen(true)} className="text-grey-55">
+      <button
+        onClick={() => setOpen(true)}
+        className=" -mr-[6px] ml-[6px] text-grey-55 "
+      >
         <Question />
       </button>
       <HelpModal open={open} onClose={() => setOpen(false)} />

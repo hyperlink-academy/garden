@@ -128,9 +128,11 @@ export const CardPreview = (
             positions: {},
           });
         }}
-        className={`cardPreviewBorder select-none ${isUnread ? "unreadCardGlow" : ""
-          } relative grow overflow-hidden ${borderStyles({ isMember })} ${props.isSelected || (editing && !isMember) ? "selectedCardGlow" : ""
-          } ${props.isOver ? "rounded-[24px] shadow-[0_0_16px_0_#cccccc]" : ""}`}
+        className={`cardPreviewBorder select-none ${
+          isUnread ? "unreadCardGlow" : ""
+        } relative grow overflow-hidden ${borderStyles({ isMember })} ${
+          props.isSelected || (editing && !isMember) ? "selectedCardGlow" : ""
+        } ${props.isOver ? "rounded-[24px] shadow-[0_0_16px_0_#cccccc]" : ""}`}
         style={{ WebkitTapHighlightColor: "transparent" }}
       >
         {props.size === "small" ? (
@@ -210,7 +212,7 @@ export const HoverControls = (
       {/* Rotate and Resize Handle */}
 
       {authorized && !props.outerControls ? null : (authorized &&
-        props.onDelete) ||
+          props.onDelete) ||
         (authorized && props.onResize) ||
         (authorized && props.onRotateDrag) ? (
         <div className="z-50 flex flex-col justify-between gap-1 pb-1 text-grey-80 opacity-0 group-hover:opacity-100">

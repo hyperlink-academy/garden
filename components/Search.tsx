@@ -208,6 +208,7 @@ const DraggableCard = (props: {
   editable?: boolean;
   entityID: string;
   hideContent?: boolean;
+  width?: string;
 }) => {
   let data = useCardPreviewData(props.entityID);
   const { attributes, listeners, setNodeRef, isDragging } = useDraggableCard({
@@ -222,8 +223,11 @@ const DraggableCard = (props: {
   }, [props.selected]);
 
   return (
-    <div ref={ref} className={`${props.selected ? "bg-bg-blue" : ""} p-2`}>
-      <div ref={setNodeRef} className={`${isDragging ? `opacity-60` : ""}`}>
+    <div
+      ref={ref}
+      className={`${props.selected ? " bg-bg-blue" : ""} px-2 py-1`}
+    >
+      <div ref={setNodeRef} className={`${isDragging ? ` opacity-60` : ""}`}>
         <CardPreview
           onClick={props.onClick}
           data={data}
