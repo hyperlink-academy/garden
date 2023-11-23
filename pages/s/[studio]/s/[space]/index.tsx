@@ -170,11 +170,27 @@ const MobileLayout = () => {
     return () => window.clearTimeout(timeout);
   }, [over]);
 
+  let bind = useGesture(
+    {
+      onDrag: (data) => {
+        if (
+          data.currentTarget?.scrollLeft === 0 &&
+          data.direction[0] > 0 &&
+          data.distance[0] > 8 &&
+          data.distance[1] < 8
+        ) {
+          if (active?.data) return;
+          setSidebarOpen(true);
+        }
+      },
+    }
+  );
+
   return (
     <div className="flex h-full w-full flex-col">
       <div
         className="no-scrollbar pwa-padding my-2 flex h-full snap-x snap-mandatory flex-row overflow-y-hidden overflow-x-scroll overscroll-x-none scroll-smooth"
-        ref={ref}
+        {...bind()}
       >
         <div
           id="roomWrapper"
@@ -202,16 +218,12 @@ const MobileLayout = () => {
         <MobileSearch />
       </div>
 
-      <MobileSidebar containerRef={ref} />
+      <MobileSidebar />
     </div>
   );
 };
 
-const MobileSidebar = ({
-  containerRef,
-}: {
-  containerRef: MutableRefObject<HTMLDivElement | null>;
-}) => {
+const MobileSidebar = () => {
   let open = useUIState((s) => s.mobileSidebarOpen);
   let setSidebarOpen = useUIState((s) => s.setMobileSidebarOpen);
   let { left } = useSpring({
@@ -236,22 +248,7 @@ const MobileSidebar = ({
     }, 500);
     return () => window.clearTimeout(timeout);
   }, [over]);
-  useGesture(
-    {
-      onDrag: (data) => {
-        if (
-          containerRef.current?.scrollLeft === 0 &&
-          data.direction[0] > 0 &&
-          data.distance[0] > 8 &&
-          data.distance[1] < 8
-        ) {
-          if (active?.data) return;
-          setSidebarOpen(true);
-        }
-      },
-    },
-    { target: containerRef }
-  );
+ 
 
   const bindOverlay = useGesture({
     onDrag: (data) => {
