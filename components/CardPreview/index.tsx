@@ -269,7 +269,7 @@ export const HoverControls = (
 
 export const PlaceholderNewCard = (props: { title: string }) => {
   return (
-    <div className="flex flex-col gap-2 rounded-md border border-dashed border-accent-blue bg-white p-2 text-accent-blue">
+    <div className="searchNewCard flex flex-col gap-2 rounded-md border border-dashed border-accent-blue bg-white p-2 text-accent-blue">
       <p className="text-base font-bold">{props.title}</p>
       <div className="flex flex-row gap-2">
         <ChatEmptyTiny /> 0

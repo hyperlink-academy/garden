@@ -14,6 +14,7 @@ import { useCardViewer } from "./CardViewerContext";
 import { useGesture } from "@use-gesture/react";
 import { useViewportSize } from "hooks/useViewportSize";
 import { HelpModal } from "./HelpCenter";
+import { Divider } from "./Layout";
 
 let useSearch = () => {
   let [input, setInput] = useState("");
@@ -60,15 +61,19 @@ export function Search() {
           <Popover.Content
             ref={ref}
             onOpenAutoFocus={(e) => e.preventDefault()}
-            className={`no-scrollbar z-0 -mr-4 flex max-h-80 flex-col gap-2 overflow-x-scroll text-sm ${
-              open
-                ? "-mt-2 rounded-md border-grey-90 bg-white py-2 shadow-drop"
-                : ""
+            className={`no-scrollbar z-0 -mr-4 flex max-h-80 flex-col gap-1  overflow-x-scroll pb-1 text-sm ${
+              open ? "-mt-2 rounded-md border-grey-90 bg-white shadow-drop" : ""
             }`}
             style={{ width: "var(--radix-popper-anchor-width)" }}
           >
-            <div className="sticky top-0 z-20 px-2">
-              <RoomSearch className="absolute right-4 top-2 text-grey-55" />
+            <div
+              className={`sticky top-0 z-20 px-2 ${open && "bg-white pt-2"} `}
+            >
+              <RoomSearch
+                className={`absolute right-4  text-grey-55 ${
+                  open ? "top-4" : "top-2"
+                }`}
+              />
               <input
                 ref={inputRef}
                 onKeyDown={async (e) => {
@@ -114,29 +119,43 @@ export function Search() {
                 }}
                 value={input}
                 onChange={(e) => setInput(e.currentTarget.value)}
-                className="w-full px-2 py-1 outline-none"
+                className={`w-full px-2 py-1 outline-none ${
+                  open && "bg-white"
+                }`}
                 placeholder="search cards..."
+                onFocus={(e) =>
+                  e.currentTarget.setSelectionRange(
+                    0,
+                    e.currentTarget.value.length
+                  )
+                }
               />
-            </div>
-            <div className="z-10 flex w-full flex-col">
               {open && (
-                <div className="flex flex-col gap-2 px-2 pb-2 text-grey-55">
-                  <p className="text-sm">
-                    <i>hold and drag cards to move to room</i>
+                <div className="flex flex-col gap-1 pt-2 text-grey-55">
+                  <p className="text-xs">
+                    <i>click to open, drag to add to room</i>
                   </p>
-                  {input && results.length > 0 && <hr />}
+                  {input && results.length > 0 && <Divider />}
                 </div>
               )}
-              {open && input.length > 0 && (
+            </div>
+            <div className="z-10 flex w-full flex-col">
+              {open && input.length > 0 ? (
                 <SearchResults
                   onClick={() => setOpen(false)}
                   results={results}
                   suggestionIndex={suggestionIndex}
                 />
-              )}
-              {open && input && !exactMatch && (
+              ) : !authorized && input.length > 3 ? (
+                <SearchResults
+                  onClick={() => setOpen(false)}
+                  results={results}
+                  suggestionIndex={suggestionIndex}
+                />
+              ) : null}
+              {open && input && !exactMatch && authorized && (
                 <div
-                  className={`p-2 ${
+                  className={`px-2 py-1 ${
                     suggestionIndex === results.length ? "bg-bg-blue" : ""
                   }`}
                 >
