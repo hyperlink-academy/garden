@@ -1,11 +1,11 @@
 import { CardViewer } from "components/CardViewerContext";
 import { SmallCardDragContext, useDroppableZone } from "components/DragContext";
 import { Sidebar } from "components/SpaceLayout";
-import { MutableRefObject, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import useWindowDimensions from "hooks/useWindowDimensions";
 import { Room } from "components/Room";
 import { SpaceMetaTitle } from "components/SpaceMetaTitle";
-import { useRoom, useUIState } from "hooks/useUIState";
+import { useUIState } from "hooks/useUIState";
 import { PresenceHandler } from "components/PresenceHandler";
 import { useSpaceSyncState } from "hooks/useSpaceSyncState";
 import { workerAPI } from "backend/lib/api";
@@ -17,7 +17,7 @@ import { useViewportSize } from "hooks/useViewportSize";
 import { usePreventResize } from "hooks/usePreventResize";
 import { Question, SidebarIcon, StudioFilled } from "components/Icons";
 import { SpaceName } from "components/SpaceLayout/Sidebar";
-import { config, useSpring, animated } from "@react-spring/web";
+import { useSpring, animated } from "@react-spring/web";
 import { createPortal } from "react-dom";
 import { useAuth } from "hooks/useAuth";
 import { ButtonPrimary } from "components/Buttons";
@@ -170,21 +170,20 @@ const MobileLayout = () => {
     return () => window.clearTimeout(timeout);
   }, [over]);
 
-  let bind = useGesture(
-    {
-      onDrag: (data) => {
-        if (
-          data.currentTarget?.scrollLeft === 0 &&
-          data.direction[0] > 0 &&
-          data.distance[0] > 8 &&
-          data.distance[1] < 8
-        ) {
-          if (active?.data) return;
-          setSidebarOpen(true);
-        }
-      },
-    }
-  );
+  let { active } = useDndContext();
+  let bind = useGesture({
+    onDrag: (data) => {
+      if (
+        (data.currentTarget as HTMLElement)?.scrollLeft === 0 &&
+        data.direction[0] > 0 &&
+        data.distance[0] > 8 &&
+        data.distance[1] < 8
+      ) {
+        if (active?.data) return;
+        setSidebarOpen(true);
+      }
+    },
+  });
 
   return (
     <div className="flex h-full w-full flex-col">
@@ -239,7 +238,6 @@ const MobileSidebar = () => {
     id: "mobile-sidebar-overlay",
     entityID: "mobile-sidebar-overlay",
   });
-  let { active } = useDndContext();
 
   useEffect(() => {
     if (over?.type === "room" || !over) return;
@@ -248,7 +246,6 @@ const MobileSidebar = () => {
     }, 500);
     return () => window.clearTimeout(timeout);
   }, [over]);
- 
 
   const bindOverlay = useGesture({
     onDrag: (data) => {
