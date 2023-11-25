@@ -1,5 +1,6 @@
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
+import useWindowDimensions from "./useWindowDimensions";
 
 export function usePrevious<T>(value: T) {
   const ref = useRef<T>();
@@ -86,4 +87,9 @@ export function useIsElementOrChildFocused() {
   }, [ref]);
 
   return [isFocused, ref] as const;
+}
+
+export function useIsMobile() {
+  const { width } = useWindowDimensions();
+  return width > 960 || width === 0;
 }

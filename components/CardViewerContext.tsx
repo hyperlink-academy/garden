@@ -7,6 +7,7 @@ import { CardView } from "./CardView";
 import { useViewportSize } from "hooks/useViewportSize";
 import { isIOS } from "@react-aria/utils";
 import { focusElement } from "src/utils";
+import { useIsMobile } from "hooks/utils";
 
 export const useCardViewer = () => {
   let spaceID = useSpaceID();
@@ -127,6 +128,8 @@ export function CardViewer() {
 }
 
 const EmptyState = (props: { roomType: string | undefined }) => {
+  let isMobile = useIsMobile();
+  if (isMobile) return null;
   return (
     <div className="no-scrollbar relative flex h-full w-full max-w-3xl snap-y snap-mandatory snap-start flex-col gap-6 overflow-y-scroll rounded-lg border border-dashed border-grey-80 p-4 text-grey-35">
       <div className="m-auto flex flex-col gap-4 text-center">
