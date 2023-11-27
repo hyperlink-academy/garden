@@ -122,13 +122,25 @@ export const useKeyboardHandling = (deps: {
           let lineIndex = value.lastIndexOf("\n", start - 1);
           let currentLine = value.slice(0, start).split("\n").pop();
           if (!currentLine) break;
-          if (currentLine.match(/^(\s*)-\s*$/)) {
+          if (
+            currentLine.match(/^(\s*)-\s*$/) ||
+            currentLine.match(/^(\s*)(\d+)\.\s*$/)
+          ) {
             e.preventDefault();
             let delLength = currentLine.length;
             transact((text) => {
               text.delete(lineIndex + 1, delLength - 1);
             }, -1 * delLength);
             break;
+          }
+          let numberMatch = currentLine.match(/^(\s*)(\d+)\.\s*/);
+          if (numberMatch) {
+            let length = numberMatch[1].length;
+            let number = parseInt(numberMatch[2]) + 1;
+            e.preventDefault();
+            transact((text) => {
+              text.insert(start, `\n${" ".repeat(length)}${number}. `);
+            }, length + number.toString().length + 3);
           }
           const match = currentLine.match(/^(\s*)-/);
           if (match) {
