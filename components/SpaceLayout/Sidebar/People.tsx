@@ -398,13 +398,13 @@ const InviteMember = () => {
         />
       )}
       <Modal open={open} onClose={() => setInviteOpen(false)}>
-        <div className="inviteMemberModal flex flex-col place-items-center gap-4 p-4 text-center">
+        <div className="inviteMemberModal flex flex-col place-items-center gap-4 p-0 text-center">
           <div className="flex flex-col gap-2">
-            <h3>Send a friend this invite link!</h3>
+            <h3>Send a friend this invite link…</h3>
+            <p>So they can join as a member of this Space!</p>
             <p>
-              They can use it to become a space member. <br /> Members can
-              create and edit cards. Members have full access to the space and
-              can invite other members.
+              Members have full access — they can create and edit cards, and
+              invite other members.
             </p>
           </div>
           <div className="inviteMemberModalLink flex w-full gap-2">
