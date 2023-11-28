@@ -122,7 +122,7 @@ export function Search() {
                 className={`w-full px-2 py-1 outline-none ${
                   open && "bg-white"
                 }`}
-                placeholder="search cards..."
+                placeholder="search cards (ctrl/⌘ K)"
                 onFocus={(e) =>
                   e.currentTarget.setSelectionRange(
                     0,
