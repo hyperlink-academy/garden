@@ -25,7 +25,7 @@ export const HomeLayout = (props: {
           <div className="outline-b-0  -mx-0.5 h-3 rounded-t-[8px] border-2 border-b-0 border-grey-80 bg-background" />
         </div>
         <div className="bg-background p-4">
-          <div className="m-auto max-w-3xl">{props.children}</div>
+          <div className="m-auto max-w-4xl">{props.children}</div>
         </div>
       </div>
     </>
@@ -37,7 +37,7 @@ export const HomeHeader = () => {
   let myStudioName = session.session?.username;
 
   return (
-    <div className="HomeHeader pwa-padding sticky top-0 z-10 m-auto flex w-full max-w-4xl flex-row justify-between bg-white py-2 px-2">
+    <div className="HomeHeader pwa-padding sticky top-0 z-10 m-auto flex w-full max-w-4xl flex-row justify-between bg-white px-4 py-2 md:px-0">
       <Link href={myStudioName ? `/s/${myStudioName}` : "/"}>
         <span className="flex flex-row items-center font-bold text-grey-35 hover:text-accent-blue">
           <img
@@ -77,7 +77,7 @@ const StudiosList = (props: { username: string }) => {
 
             {studios?.map((s) => (
               <Link href={`/studio/${uuidToBase62(s.id)}`} key={s.id}>
-                <Popover.Close className="w-full py-1 px-2 text-left text-grey-35 hover:bg-bg-blue">
+                <Popover.Close className="w-full px-2 py-1 text-left text-grey-35 hover:bg-bg-blue">
                   {s.name}
                 </Popover.Close>
               </Link>

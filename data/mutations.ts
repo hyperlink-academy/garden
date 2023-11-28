@@ -12,6 +12,7 @@ import { README, README_Title, defaultReactions } from "src/content";
 import { WriteTransaction } from "@rocicorp/reflect";
 import { getMemberColor } from "backend/SpaceDurableObject/routes/join";
 import { generateKeyBetween } from "src/fractional-indexing";
+import { app_event } from "backend/lib/analytics";
 
 export type MutationContext = {
   tx: WriteTransaction;
@@ -34,7 +35,9 @@ export type MutationContext = {
     data: Partial<Fact<keyof Attribute>>,
     undoAction?: boolean
   ) => Promise<{ success: boolean }>;
-  runOnServer: (fn: (env: Env) => Promise<void>) => Promise<void>;
+  runOnServer: (
+    fn: (env: Env, userID: string) => Promise<void>
+  ) => Promise<void>;
   retractFact: (id: string, undoAction?: boolean) => Promise<void>;
   retractEphemeralFact: (clientID: string, id: string) => Promise<void>;
   scanIndex: {
@@ -107,10 +110,14 @@ const removeCardFromDesktopOrCollection: Mutation<{
       acc &&
       (!f.value ||
         f.attribute === "card/created-by" ||
-        f.attribute === "card/unread-by")
+        f.attribute === "card/unread-by") &&
+      !f.schema.ephemeral
     );
   }, true);
-  if (deleteable && references.length === 1) {
+  if (
+    deleteable &&
+    references.filter((f) => !f.schema.ephemeral).length === 1
+  ) {
     await Promise.all(
       facts.concat(references).map((f) => ctx.retractFact(f.id))
     );
@@ -219,6 +226,13 @@ const createCard: Mutation<{
     },
     ctx
   );
+  await ctx.runOnServer(async (env, userID) => {
+    await app_event(env.env, {
+      event: "created_card",
+      spaceID: env.id,
+      user: userID,
+    });
+  });
 };
 
 export type FactInput = {
@@ -308,7 +322,6 @@ const updateTitleFact: Mutation<{
     args.entity,
     "card/inline-links-to"
   );
-  console.log(existingLinks);
   let oldTitle = await ctx.scanIndex.eav(args.entity, "card/title");
   if (!oldTitle) {
     await ctx.assertFact({ ...args, positions: {} });
@@ -359,14 +372,19 @@ const replyToDiscussion: Mutation<{
     args.message.sender,
     "space/member"
   );
-  await ctx.runOnServer(async (env) => {
+  await ctx.runOnServer(async (env, userID) => {
     if (!senderStudio) return;
 
     let title: Fact<"room/name" | "card/title"> | null =
       await ctx.scanIndex.eav(args.discussion, "card/title");
     if (!title) title = await ctx.scanIndex.eav(args.discussion, "room/name");
 
-    console.log(`${env.env.NEXT_API_URL}/api/web_push`);
+    await app_event(env.env, {
+      event: "sent_message",
+      spaceID: env.id,
+      user: userID,
+    });
+
     try {
       let payload: z.TypeOf<typeof webPushPayloadParser> = {
         type: "new-message",
@@ -392,10 +410,35 @@ const replyToDiscussion: Mutation<{
   });
 };
 
+const createRoom: Mutation<{
+  entity: string;
+  type: "canvas" | "collection" | "chat";
+  name: string;
+}> = async (args, ctx) => {
+  await ctx.assertFact({
+    entity: args.entity,
+    attribute: "room/name",
+    value: args.name,
+    positions: {},
+  });
+  await ctx.assertFact({
+    entity: args.entity,
+    attribute: "room/type",
+    value: args.type,
+    positions: {},
+  });
+  await ctx.runOnServer(async (env, userID) => {
+    await app_event(env.env, {
+      event: "created_room",
+      spaceID: env.id,
+      user: userID,
+    });
+  });
+};
+
 const deleteEntity: Mutation<{ entity: string }> = async (args, ctx) => {
   let references = await ctx.scanIndex.vae(args.entity);
   let facts = await ctx.scanIndex.eav(args.entity, null);
-  console.log("deleting?");
   await Promise.all(facts.concat(references).map((f) => ctx.retractFact(f.id)));
 };
 
@@ -408,7 +451,7 @@ const addReaction: Mutation<{
 }> = async (args, ctx) => {
   let reactions = await ctx.scanIndex.eav(args.cardEntity, "card/reaction");
   for (let reaction of reactions) {
-    let author = await ctx.scanIndex.eav(reaction.entity, "reaction/author");
+    let author = await ctx.scanIndex.eav(reaction.id, "reaction/author");
     if (
       author?.value.value === args.memberEntity &&
       reaction.value === args.reaction
@@ -697,7 +740,22 @@ const postToFeed: Mutation<{
   });
 };
 
+const replaceCard: Mutation<{ currentCard: string; newCard: string }> = async (
+  args,
+  ctx
+) => {
+  let referenceFacts = await ctx.scanIndex.vae(args.currentCard);
+  let facts = await ctx.scanIndex.eav(args.currentCard, null);
+  await Promise.all([
+    ...referenceFacts.map((f) =>
+      ctx.updateFact(f.id, { value: ref(args.newCard) })
+    ),
+    ...facts.map((f) => ctx.retractFact(f.id)),
+  ]);
+};
+
 export const Mutations = {
+  replaceCard,
   markRead,
   deleteEntity,
   createCard,
@@ -719,4 +777,5 @@ export const Mutations = {
   initializeSpace,
   joinSpace,
   leaveSpace,
+  createRoom,
 };

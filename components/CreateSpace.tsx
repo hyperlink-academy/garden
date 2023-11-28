@@ -36,9 +36,10 @@ export const CreateSpace = (props: {
   let auth = useAuth();
   if (!authorized) return null;
   return (
-    <div className="flex gap-2">
-      <a className="place-self-center">
+    <div className="">
+      <a className="flex w-full place-items-center">
         <ButtonSecondary
+          className="mx-auto"
           icon={<SpaceCreate />}
           content="Create New Space!"
           onClick={() => setOpen(true)}
@@ -164,7 +165,7 @@ export const EditSpaceModal = (props: {
           <CreateSpaceForm formState={formState} setFormState={setFormState} />
 
           {/* update or nevermind */}
-          <SubmitButton content="Create!" onClose={async () => props.onClose} />
+          <SubmitButton content="Update!" onClose={async () => props.onClose} />
 
           <hr className="border-grey-80" />
 

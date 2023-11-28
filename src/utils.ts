@@ -1,3 +1,5 @@
+import { isIOS } from "@react-aria/utils";
+
 export const getCurrentDate = () => {
   const date = new Date();
   const year = date.getFullYear();
@@ -28,4 +30,25 @@ export function getLinkAtCursor(text: string, cursor: number) {
     start,
     end,
   };
+}
+
+export function focusElement(element?: HTMLElement | null) {
+  if (!element) return;
+  let fakeInput: HTMLInputElement | null = null;
+  if (isIOS()) {
+    //Safari doesn't let you focus outside a user-triggered event loop, so we have to create a fake input to focus
+    fakeInput = document.createElement("input");
+    fakeInput.setAttribute("type", "text");
+    fakeInput.style.position = "fixed";
+    fakeInput.style.height = "0px";
+    fakeInput.style.width = "0px";
+    fakeInput.style.fontSize = "16px"; // disable auto zoom
+    document.body.appendChild(fakeInput);
+    fakeInput.focus();
+  }
+
+  setTimeout(() => {
+    element?.focus();
+    fakeInput?.remove();
+  }, 10);
 }

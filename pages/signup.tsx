@@ -1,18 +1,34 @@
 import { ButtonPrimary } from "components/Buttons";
 import { DotLoader } from "components/DotLoader";
+import { OAuth } from "components/LoginModal";
 import { ModalSubmitButton } from "components/Modal";
 import { useAuth } from "hooks/useAuth";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { Divider } from "pages";
 import { useEffect, useState } from "react";
 
 type Status = "normal" | "invalidEmail" | "confirm" | "loading";
 export default function SignupPage() {
-  return <SignupForm />;
+  return (
+    <div className=" -my-4 mx-auto flex h-screen  max-w-md flex-col items-center justify-center gap-4">
+      <h1 className="w-full">
+        Welcome to{" "}
+        <Link className="text-accent-blue hover:underline" href="/">
+          Hyperlink Academy
+        </Link>
+        !
+      </h1>
+      <div className="lightBorder w-full bg-white p-4">
+        <SignupForm />
+      </div>
+    </div>
+  );
 }
 export function SignupForm(props: {
   redirectTo?: string;
   onClose?: () => void;
+  onSwitchToLogIn?: () => void;
 }) {
   let [status, setStatus] = useState<Status>("normal");
   let [input, setInput] = useState({
@@ -43,33 +59,67 @@ export function SignupForm(props: {
   };
   if (status === "confirm")
     return (
-      <div className="mx-auto flex max-w-md flex-col gap-4">
-        <h2>
-          Great — please check your email at{" "}
-          <span className="underline">{input.email}</span> 📬⚡️
-        </h2>
-        <p>Click the link there to confirm your account & pick a username!</p>
+      <div className="signUpConfirmEmail flex w-full flex-col gap-2">
+        <img
+          className=""
+          width={"220px"}
+          alt="an overgrown USPS collection box"
+          src="/img/spotIllustration/checkMail.png"
+        />
+        <h2>Confirm your email! </h2>{" "}
+        <p>
+          {" "}
+          We sent a confirmation link to{" "}
+          <span className="font-bold">{input.email}</span>{" "}
+        </p>
+        <hr className="my-2 text-grey-80" />
+        <div className="lightBorder flex flex-col gap-2 bg-bg-blue p-3">
+          <a
+            href="https://buttondown.email/hyperlink/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-bold text-accent-blue"
+          >
+            And subscribe to our newsletter 💌
+          </a>
+          <p className="text-grey-55">
+            for occasional announcements & updates — otherwise we{" "}
+            <strong>only</strong> email about your account
+          </p>
+        </div>
       </div>
     );
 
   return (
-    <div className="grid-rows-max mx-auto grid w-full max-w-md gap-8">
-      <div className="grid-auto-rows grid gap-2">
-        <h1>Hi, welcome to Hyperlink!</h1>
-        <p className="text-grey-35">
-          Have an account?{" "}
-          <Link className="text-accent-blue" href="/login">
-            Log in
-          </Link>{" "}
-          ✨
+    <div className="flex w-full flex-col gap-2">
+      <img
+        className="rounded-md"
+        width={"216px"}
+        alt="a boat soaring over a pastoral plain"
+        src="/img/spotIllustration/signup.png"
+      />
+      <div className="flex items-baseline justify-between gap-1 pt-4">
+        <h2 className="text-grey-15">Sign Up!</h2>
+        <p className="text-grey-55">
+          or{" "}
+          <button
+            className="font-bold text-accent-blue hover:underline"
+            onClick={() => {
+              if (props.onSwitchToLogIn) {
+                props.onSwitchToLogIn();
+              } else router.push("/login");
+            }}
+          >
+            log in
+          </button>
         </p>
       </div>
-
-      <form onSubmit={onSubmit} className="grid w-full gap-4">
+      <form onSubmit={onSubmit} className="flex flex-col gap-2 ">
         <ErrorMessage status={status} />
-        <label className="grid-flow-rows grid gap-2 font-bold">
+        <label className="flex w-full flex-col gap-1 font-bold">
           Email
           <input
+            className="font-normal"
             required
             minLength={7}
             type="email"
@@ -79,7 +129,7 @@ export function SignupForm(props: {
             }
           />
         </label>
-        <label className="grid-flow-rows grid gap-2 font-bold">
+        <label className="flex w-full flex-col gap-1 font-bold">
           Password
           <PasswordInput
             value={input.password}
@@ -99,17 +149,21 @@ export function SignupForm(props: {
             }}
           />
         ) : (
-          <div className="grid-rows-max -mt-4 grid justify-items-end">
-            <ButtonPrimary
-              className="content-end items-end justify-end justify-items-end self-end justify-self-end"
-              type="submit"
-              content={status === "loading" ? "" : "Sign Up!"}
-              icon={status === "loading" ? <DotLoader /> : undefined}
-            />
-          </div>
+          <ButtonPrimary
+            className=" signUpSubmit  float-right mt-4 content-end items-end justify-end justify-items-end self-end justify-self-end"
+            type="submit"
+            content={status === "loading" ? "" : "Sign Up!"}
+            icon={status === "loading" ? <DotLoader /> : undefined}
+          />
         )}
       </form>
-      <div className="flex flex-col gap-2 rounded-md bg-bg-gold p-4 text-center">
+      <div className="signUpDivider flex items-center gap-2 py-2 text-grey-80">
+        <hr className="grow" />{" "}
+        <p className="shrink-0 italic text-grey-55">or</p>
+        <hr className="grow" />
+      </div>
+      <OAuth actionLabel="Sign Up" />
+      {/* <div className="flex flex-col gap-2 rounded-md bg-bg-gold p-4 text-center">
         <p className="text-grey-15">
           we&apos;ll <strong>only</strong> email about your account
         </p>
@@ -125,7 +179,7 @@ export function SignupForm(props: {
             subscribe here 💌
           </a>
         </p>
-      </div>
+      </div> */}
     </div>
   );
 }
@@ -151,11 +205,11 @@ function PasswordInput(props: {
 }) {
   let [visible, setVisible] = useState(false);
   return (
-    <div>
+    <div className="signupPassword relative">
       <input
         required
         minLength={8}
-        className="relative w-full"
+        className="signupPasswordInput relative w-full pr-16 font-normal"
         autoComplete="new-password"
         value={props.value}
         type={visible ? "text" : "password"}
@@ -168,10 +222,9 @@ function PasswordInput(props: {
           setVisible(!visible);
         }}
         className={`
-        relative
-        left-[-16px]
-        top-[-32px]
-        float-right
+        absolute
+        right-[16px]
+        top-[10px]
         cursor-pointer
         hover:cursor-pointer`}
       >

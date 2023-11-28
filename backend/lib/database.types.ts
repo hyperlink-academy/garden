@@ -113,14 +113,17 @@ export interface Database {
       }
       members_in_spaces: {
         Row: {
+          joined_at: string | null
           member: string
           space_do_id: string
         }
         Insert: {
+          joined_at?: string | null
           member: string
           space_do_id: string
         }
         Update: {
+          joined_at?: string | null
           member?: string
           space_do_id?: string
         }
@@ -266,6 +269,43 @@ export interface Database {
           {
             foreignKeyName: "space_data_owner_fkey"
             columns: ["owner"]
+            referencedRelation: "identity_data"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      space_events: {
+        Row: {
+          at: string
+          event: string
+          id: number
+          space: string
+          user: string
+        }
+        Insert: {
+          at?: string
+          event: string
+          id?: number
+          space: string
+          user: string
+        }
+        Update: {
+          at?: string
+          event?: string
+          id?: number
+          space?: string
+          user?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "space_events_space_fkey"
+            columns: ["space"]
+            referencedRelation: "space_data"
+            referencedColumns: ["do_id"]
+          },
+          {
+            foreignKeyName: "space_events_user_fkey"
+            columns: ["user"]
             referencedRelation: "identity_data"
             referencedColumns: ["id"]
           }

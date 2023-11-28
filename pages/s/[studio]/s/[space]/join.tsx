@@ -14,6 +14,7 @@ import { SpaceCard, SpaceData } from "components/SpacesList";
 import { Divider } from "components/Layout";
 import { GetStaticPropsContext, InferGetStaticPropsType } from "next";
 import { SpaceProvider } from "components/ReplicacheProvider";
+import { SWRConfig } from "swr";
 
 export async function getStaticPaths() {
   return { paths: [], fallback: "blocking" };
@@ -34,13 +35,14 @@ export async function getStaticProps(ctx: GetStaticPropsContext) {
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>;
 export default function JoinSpacePage(props: Props) {
-  let { data } = useSpaceData(props.data?.do_id, props.data);
   if (props.notFound) return <div>404 - page not found!</div>;
 
   return (
-    <SpaceProvider id={props.data.do_id}>
-      <JoinSpace />
-    </SpaceProvider>
+    <SWRConfig value={{ fallback: { [props.data.do_id]: props.data } }}>
+      <SpaceProvider id={props.data.do_id}>
+        <JoinSpace />
+      </SpaceProvider>
+    </SWRConfig>
   );
 }
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;

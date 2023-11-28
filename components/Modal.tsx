@@ -1,7 +1,9 @@
 import { useViewportSize } from "hooks/useViewportSize";
 import { ButtonTertiary, ButtonPrimary } from "./Buttons";
 import { Dialog } from "@headlessui/react";
-// import { usePreventScroll } from "@react-aria/overlays";
+import { useEffect } from "react";
+import { useUIState } from "hooks/useUIState";
+import { CloseLinedTiny } from "./Icons";
 
 export const Modal: React.FC<
   React.PropsWithChildren<{
@@ -10,10 +12,14 @@ export const Modal: React.FC<
     dark?: boolean;
     width?: string;
     header?: string;
+    noCloseButton?: boolean;
   }>
 > = (props) => {
   let viewheight = useViewportSize().height;
-  // usePreventScroll();
+  let setMobileSidebarOpen = useUIState((s) => s.setMobileSidebarOpen);
+  useEffect(() => {
+    if (props.open) setMobileSidebarOpen(false);
+  }, [props.open, setMobileSidebarOpen]);
 
   return (
     <Dialog
@@ -43,14 +49,26 @@ export const Modal: React.FC<
         px-3 py-4 shadow-drop sm:p-4
         `}
       >
-        {props.header && <h2 className="">{props.header}</h2>}
+        {!props.header && props.noCloseButton ? null : (
+          <div className="flex w-full items-center">
+            <h2 className="grow">{props.header && props.header}</h2>
+            {!props.noCloseButton && (
+              <button
+                className="shrink0 grow-0 text-grey-55 hover:text-accent-blue"
+                onClick={() => props.onClose()}
+              >
+                <CloseLinedTiny />
+              </button>
+            )}
+          </div>
+        )}
+
         {props.open && props.children}
       </div>
     </Dialog>
   );
 };
 
-//Rename to submitModalButton when you do the rename of ModalNew
 export const ModalSubmitButton = (props: {
   onClose: () => void;
   onSubmit?: (e: React.MouseEvent<HTMLButtonElement>) => void;

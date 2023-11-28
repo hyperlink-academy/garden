@@ -62,12 +62,20 @@ export default function IndexPage() {
                       <SignupModal
                         isOpen={signupOpen}
                         onClose={() => setSignupOpen(false)}
+                        onSwitchToLogIn={() => {
+                          setLogInOpen(true);
+                          setSignupOpen(false);
+                        }}
                       />
 
                       {/* login modal */}
                       <LogInModal
                         isOpen={logInOpen}
                         onClose={() => setLogInOpen(false)}
+                        onSwitchToSignUp={() => {
+                          setLogInOpen(false);
+                          setSignupOpen(true);
+                        }}
                         redirectOnLogin={(s) =>
                           s.username
                             ? router.push(`/s/${s.username}`)
@@ -268,7 +276,6 @@ export default function IndexPage() {
           </div>
           <DividerSmall />
         </div>
-
         {/* about hyperlink wrapper */}
         <div className="-mx-4 -mb-4 bg-bg-blue px-4 py-8 sm:-mx-8 sm:-mb-8 sm:px-8">
           {/* who and why */}
@@ -381,11 +388,21 @@ export default function IndexPage() {
         </div>
         {/* END LANDING WRAPPER */}
       </div>
+      <hr className=" border-grey-80" />
+      <div className="flex flex-row gap-2 px-2 text-sm italic text-grey-55">
+        <Link href="/privacy" className="hover:text-accent-blue">
+          privacy policy
+        </Link>{" "}
+        |{" "}
+        <Link href="/terms" className="hover:text-accent-blue">
+          terms
+        </Link>
+      </div>
     </>
   );
 }
 
-const Divider = () => (
+export const Divider = () => (
   <div className="m-auto my-4 rounded-md bg-accent-gold p-4 sm:my-8 sm:p-8">
     <div className="rounded-md bg-accent-red p-4 sm:p-8">
       <div className="rounded-md bg-accent-blue p-2 sm:p-4"></div>
@@ -393,10 +410,18 @@ const Divider = () => (
   </div>
 );
 
-const DividerSmall = () => (
+export const DividerSmall = () => (
   <div className="m-auto my-2 rounded-md bg-accent-gold p-2 sm:my-4 sm:p-4">
     <div className="rounded-md bg-accent-red p-2 sm:p-4">
       <div className="rounded-md bg-accent-blue p-1 sm:p-2"></div>
+    </div>
+  </div>
+);
+
+export const DividerTiny = () => (
+  <div className="m-auto my-1 rounded-md bg-accent-gold p-1 sm:my-2 sm:p-2">
+    <div className="rounded-md bg-accent-red p-1 sm:p-2">
+      <div className="rounded-md bg-accent-blue p-0.5 sm:p-1"></div>
     </div>
   </div>
 );

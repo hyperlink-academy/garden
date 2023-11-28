@@ -36,6 +36,7 @@ import { HighlightCard } from "./HighlightCard";
 import { CardViewDrawer } from "./CardViewDrawer";
 import { useCloseCard, useRoomHistory, useUIState } from "hooks/useUIState";
 import { Modal } from "components/Modal";
+import { Title } from "./Title";
 
 const borderStyles = (args: { member: boolean }) => {
   switch (true) {
@@ -72,7 +73,15 @@ export const CardView = (props: {
     type: "linkCard",
     onDragEnd: async (data) => {
       if (!rep) return;
-      mutate("retractFact", { id: data.id });
+
+      let entityID;
+      if (data.type === "room") return;
+      if (data.type === "card") {
+        entityID = data.entityID;
+        mutate("retractFact", { id: data.id });
+      }
+      if (data.type === "search-card") entityID = data.entityID;
+      else entityID = ulid();
 
       let siblings =
         (await rep.query((tx) => {
@@ -85,7 +94,7 @@ export const CardView = (props: {
       let position = generateKeyBetween(null, firstPosition || null);
       await mutate("addCardToSection", {
         factID: ulid(),
-        cardEntity: data.entityID,
+        cardEntity: entityID,
         parent: props.entityID,
         section: "deck/contains",
         positions: {
@@ -184,7 +193,7 @@ export const CardContent = (props: {
       {/* START CARD CONTENT */}
       <div
         ref={ref}
-        className={`cardContentWrapper no-scrollbar relative flex grow flex-col items-stretch overflow-y-scroll overscroll-y-auto pb-3 sm:pb-4 ${!memberName ? "pt-3 sm:pt-4" : ""
+        className={`cardContentWrapper no-scrollbar relative z-0 flex grow flex-col items-stretch overflow-y-scroll overscroll-y-auto pb-3 sm:pb-4 ${!memberName ? "pt-3 sm:pt-4" : ""
           }`}
         onClick={() => {
           useUIState.getState().closeDrawer(props.entityID);
@@ -283,30 +292,6 @@ const BackButton = () => {
     >
       {history.length < 2 ? <CloseLinedTiny /> : <GoBackToPageLined />}
     </button>
-  );
-};
-
-const Title = (props: { entityID: string }) => {
-  let { authorized } = useMutations();
-  let memberName = db.useEntity(props.entityID, "member/name");
-  let cardTitle = db.useEntity(props.entityID, "card/title");
-  let titleFact = memberName || cardTitle;
-  return (
-    <SingleTextSection
-      id="card-title"
-      className="bg-inherit text-xl font-bold"
-      onKeyDown={(e) => {
-        if (e.key === "Enter") {
-          e.preventDefault();
-          let element = document.getElementById("default-text-section");
-          element?.focus();
-        }
-      }}
-      entityID={props.entityID}
-      section={titleFact?.attribute || "card/title"}
-      previewOnly={titleFact?.attribute === "member/name"}
-      placeholder={authorized ? "Untitled" : "Untitled"}
-    />
   );
 };
 
@@ -436,7 +421,6 @@ const ScheduledDate = (props: {
       id="card-date"
       className="flex place-items-center gap-2 text-sm italic text-grey-55"
     >
-      Scheduled for{" "}
       {props.dateEditing ? (
         <>
           <input

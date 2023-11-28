@@ -8,27 +8,21 @@ import {
   useMutations,
   useSpaceID,
 } from "hooks/useReplicache";
-import { useSubscribe } from "hooks/useSubscribe";
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext } from "react";
 import { generateKeyBetween } from "src/fractional-indexing";
 import { getAndUploadFile } from "src/getAndUploadFile";
 import { sortByPosition, updatePositions } from "src/position_helpers";
 import { ulid } from "src/ulid";
-import { CardPreview } from "./CardPreview";
+import { CardPreview, PlaceholderNewCard } from "./CardPreview";
 import { CardAdder } from "./CardStack";
-import { useCardViewer } from "./CardViewerContext";
 import { useCombinedRefs } from "./Desktop";
-import { useDraggableCard, useDroppableZone } from "./DragContext";
-import * as z from "zod";
+import {
+  DraggableData,
+  useDraggableCard,
+  useDroppableZone,
+} from "./DragContext";
 import { useUIState } from "hooks/useUIState";
-
-let FilterVerifier = z.array(
-  z.object({
-    reaction: z.string(),
-    not: z.boolean(),
-  })
-);
-type Filters = z.TypeOf<typeof FilterVerifier>;
+import { useDebouncedValue } from "hooks/useDebouncedValue";
 
 export const CardCollection = (props: {
   entityID: string;
@@ -61,55 +55,16 @@ const CollectionList = (props: {
   let rep = useContext(ReplicacheContext);
   let spaceID = useSpaceID();
   let { authToken } = useAuth();
-  let { mutate, action } = useMutations();
-  let focusedCard = useUIState((s) => s.focusedCard);
-  // Handles reordering cards in list via drag and drop
+  let { mutate } = useMutations();
+  let onDragEnd = useOnDragEndCollection({
+    parent: props.entityID,
+    attribute: props.attribute,
+  });
   let { setNodeRef, over } = useDroppableZone({
     type: "dropzone",
-    entityID: "",
+    entityID: props.entityID,
     id: "add-card-dropzone",
-    onDragEnd: async (data) => {
-      if (!rep) return;
-      if (data.type !== "card") return;
-      action.start();
-
-      let siblings = (
-        await rep.rep.query((tx) => {
-          return scanIndex(tx).eav(props.entityID, props.attribute);
-        })
-      ).sort(sortByPosition("eav"));
-
-      let newIndex = siblings.length - 1;
-      if (data.parent !== props.entityID) {
-        let position = generateKeyBetween(
-          siblings[newIndex]?.positions.eav || null,
-          siblings[newIndex + 1]?.positions.eav || null
-        );
-
-        await mutate("retractFact", { id: data.id });
-        await mutate("addCardToSection", {
-          factID: ulid(),
-          cardEntity: data.entityID,
-          parent: props.entityID,
-          section: props.attribute,
-          positions: {
-            eav: position,
-          },
-        });
-      } else {
-        let currentIndex = siblings.findIndex(
-          (f) => f.value.value === data.entityID
-        );
-        let newPositions = updatePositions("eav", siblings, [
-          [siblings[currentIndex].id, newIndex],
-        ]);
-        mutate("updatePositions", {
-          positionKey: "eav",
-          newPositions,
-        });
-      }
-      action.end();
-    },
+    onDragEnd,
   });
   const onAdd = (entity: string) => {
     if (props.editable) {
@@ -188,17 +143,23 @@ const CollectionList = (props: {
           id={card.id}
         />
       ))}
-      {over && over.type === "card" && (
-        <div className="pb-2 opacity-60">
-          <CardPreview
-            data={over.data}
-            entityID={over.entityID}
-            size={"big"}
-            hideContent={props.collectionType !== "cardpreview"}
-            editable={props.editable}
-          />
-        </div>
-      )}
+      {over ? (
+        over.type === "card" ? (
+          <div className="pb-2 opacity-60">
+            <CardPreview
+              data={over.data}
+              entityID={over.entityID}
+              size={"big"}
+              hideContent={props.collectionType !== "cardpreview"}
+              editable={props.editable}
+            />
+          </div>
+        ) : over.type === "new-card" ? (
+          <NewCardPreview />
+        ) : over.type === "new-search-card" ? (
+          <PlaceholderNewCard title={over.title} />
+        ) : null
+      ) : null}
       <CardAdder
         parentID={props.entityID}
         attribute={props.attribute}
@@ -210,10 +171,6 @@ const CollectionList = (props: {
     </div>
   );
 };
-
-// I need to extract this to be used on the desktop as well
-// I also need to extract out the useDraggable and useDroppable hooks with
-// specific types
 
 const DraggableCard = (props: {
   editable?: boolean;
@@ -235,59 +192,16 @@ const DraggableCard = (props: {
       size: "big",
     });
 
-  let rep = useContext(ReplicacheContext);
-  let { mutate, action } = useMutations();
-  let { setNodeRef: draggableRef, over } = useDroppableZone({
+  let { mutate } = useMutations();
+  let onDragEnd = useOnDragEndCollection(props);
+  let { setNodeRef: draggableRef, over: _over } = useDroppableZone({
     type: "card",
-    entityID: props.entityID,
+    entityID: props.parent,
     id: props.id,
-    onDragEnd: async (data) => {
-      if (!rep) return;
-      if (data.type !== "card") return;
-      action.start();
-
-      let siblings = (
-        await rep.rep.query((tx) => {
-          return scanIndex(tx).eav(props.parent, props.attribute);
-        })
-      ).sort(sortByPosition("eav"));
-
-      let newIndex = siblings.findIndex(
-        (f) => f.value.value === props.entityID
-      );
-      if (data.parent !== props.parent) {
-        let position = generateKeyBetween(
-          siblings[newIndex - 1]?.positions.eav || null,
-          siblings[newIndex]?.positions.eav || null
-        );
-
-        await mutate("retractFact", { id: data.id });
-        await mutate("addCardToSection", {
-          factID: ulid(),
-          cardEntity: data.entityID,
-          parent: props.parent,
-          section: props.attribute,
-          positions: {
-            eav: position,
-          },
-        });
-      } else {
-        let currentIndex = siblings.findIndex(
-          (f) => f.value.value === data.entityID
-        );
-        let newPositions = updatePositions("eav", siblings, [
-          [siblings[currentIndex].id, newIndex - 1],
-        ]);
-        mutate("updatePositions", {
-          positionKey: "eav",
-          newPositions,
-        });
-      }
-      action.end();
-    },
+    onDragEnd,
   });
 
-  let { close } = useCardViewer();
+  let over = useDebouncedValue(_over, 20);
 
   let refs = useCombinedRefs(draggableRef, setNodeRef);
 
@@ -295,20 +209,30 @@ const DraggableCard = (props: {
     <>
       <div
         ref={refs}
-        className={`flex flex-col pb-2 ${isDragging ? `opacity-60 ${isOverSomethingElse ? "-mt-2" : ""}` : ""
-          }`}
+        className={`flex flex-col pb-2 ${
+          isDragging ? `opacity-60 ${isOverSomethingElse ? "-mt-2" : ""}` : ""
+        }`}
       >
-        {over && over.entityID !== props.entityID && over.type === "card" && (
-          <div className="pb-2 opacity-60">
-            <CardPreview
-              data={over.data}
-              editable={props.editable}
-              entityID={over.entityID}
-              size={"big"}
-              hideContent={props.hideContent}
-            />
-          </div>
-        )}
+        {over &&
+          (over.type === "card" || over.type === "search-card" ? (
+            over.entityID !== props.entityID && (
+              <div className="pb-2 opacity-60">
+                <CardPreview
+                  data={over.data}
+                  editable={props.editable}
+                  entityID={over.entityID}
+                  size={"big"}
+                  hideContent={props.hideContent}
+                />
+              </div>
+            )
+          ) : over.type === "new-card" ? (
+            <NewCardPreview />
+          ) : over.type === "new-search-card" ? (
+            <div className="pb-2 opacity-60">
+              <PlaceholderNewCard title={over.title} />
+            </div>
+          ) : null)}
         {isOverSomethingElse ? null : (
           <CardPreview
             data={data}
@@ -327,5 +251,127 @@ const DraggableCard = (props: {
         )}
       </div>
     </>
+  );
+};
+
+const NewCardPreview = () => (
+  <div className="mb-2 h-4 w-full rounded-md border border-dashed border-grey-80" />
+);
+
+let useOnDragEndCollection = (props: {
+  parent: string;
+  entityID?: string;
+  attribute: "desktop/contains" | "deck/contains";
+}) => {
+  let { mutate, action, memberEntity, rep } = useMutations();
+  return useCallback(
+    async (data: DraggableData) => {
+      if (!rep) return;
+      action.start();
+
+      let siblings = (
+        await rep.query((tx) => {
+          return scanIndex(tx).eav(props.parent, props.attribute);
+        })
+      ).sort(sortByPosition("eav"));
+
+      let newIndex = props.entityID
+        ? siblings.findIndex((f) => f.value.value === props.entityID) - 1
+        : siblings.length - 1;
+
+      let position = generateKeyBetween(
+        siblings[newIndex]?.positions.eav || null,
+        siblings[newIndex + 1]?.positions.eav || null
+      );
+      switch (data.type) {
+        case "room":
+          break;
+        case "new-card": {
+          let entityID = ulid();
+          if (memberEntity) {
+            await mutate("createCard", {
+              entityID,
+              title: "",
+              memberEntity,
+            });
+
+            await mutate("addCardToSection", {
+              factID: ulid(),
+              cardEntity: entityID,
+              parent: props.parent,
+              section: props.attribute,
+              positions: {
+                eav: position,
+              },
+            });
+          }
+          break;
+        }
+        case "new-search-card": {
+          let entityID = ulid();
+          if (memberEntity) {
+            await mutate("createCard", {
+              entityID,
+              title: data.title,
+              memberEntity,
+            });
+
+            await mutate("addCardToSection", {
+              factID: ulid(),
+              cardEntity: entityID,
+              parent: props.parent,
+              section: props.attribute,
+              positions: {
+                eav: position,
+              },
+            });
+          }
+          break;
+        }
+        case "search-card": {
+          await mutate("addCardToSection", {
+            factID: ulid(),
+            cardEntity: data.entityID,
+            parent: props.parent,
+            section: props.attribute,
+            positions: {
+              eav: position,
+            },
+          });
+          break;
+        }
+        case "card": {
+          if (data.parent !== props.parent) {
+            await mutate("retractFact", { id: data.id });
+            await mutate("addCardToSection", {
+              factID: ulid(),
+              cardEntity: data.entityID,
+              parent: props.parent,
+              section: props.attribute,
+              positions: {
+                eav: position,
+              },
+            });
+          } else {
+            let currentIndex = siblings.findIndex(
+              (f) => f.value.value === data.entityID
+            );
+            let newPositions = updatePositions("eav", siblings, [
+              [siblings[currentIndex].id, newIndex],
+            ]);
+            mutate("updatePositions", {
+              positionKey: "eav",
+              newPositions,
+            });
+          }
+
+          break;
+        }
+        default:
+          data satisfies never;
+      }
+      action.end();
+    },
+    [mutate, memberEntity, props, action, rep]
   );
 };

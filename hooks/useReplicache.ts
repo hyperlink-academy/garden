@@ -8,6 +8,7 @@ import { Fact } from "data/Facts";
 import { Message } from "data/Messages";
 import { CardinalityResult, Mutations } from "data/mutations";
 import { createContext, useCallback, useContext, useMemo } from "react";
+import { ReadTransaction, ReadonlyJSONValue } from "replicache";
 import { useSubscribe } from "hooks/useSubscribe";
 import { useAuth } from "./useAuth";
 import { UndoManager } from "@rocicorp/undo";
@@ -22,6 +23,14 @@ export let ReplicacheContext = createContext<{
 } | null>(null);
 
 export const db = {
+  useQuery<A extends ReadonlyJSONValue>(
+    query: (tx: ReadTransaction) => Promise<A>,
+
+    defaultValue: A,
+    deps: any[]
+  ) {
+    return useSubscribe(query, defaultValue, deps, "query");
+  },
   useTimeAttribute<
     A extends keyof FilterAttributes<{
       type: "timestamp";

@@ -42,7 +42,13 @@ export const useKeyboardHandling = (deps: {
         offset: [number, number] | number = [0, 0],
         undo: boolean = true
       ) => {
-        if (undo) action.start();
+        let isUndoing = false;
+        if (undo) {
+          try {
+            action.start();
+            isUndoing = true;
+          } catch (e) {}
+        }
         let [newValue, cursors] = modifyString(
           value,
           [start, end],
@@ -80,13 +86,12 @@ export const useKeyboardHandling = (deps: {
             cursors[1] + offsets[1]
           );
         }, 10);
-        if (undo) action.end();
+        if (undo && isUndoing) action.end();
       };
 
       switch (e.key) {
         case "Escape": {
           if (suggestions.length > 0) {
-            console.log(suggestions);
             e.preventDefault();
             close();
           }
@@ -114,6 +119,37 @@ export const useKeyboardHandling = (deps: {
             close();
             break;
           }
+          let lineIndex = value.lastIndexOf("\n", start - 1);
+          let currentLine = value.slice(0, start).split("\n").pop();
+          if (!currentLine) break;
+          if (
+            currentLine.match(/^(\s*)-\s*$/) ||
+            currentLine.match(/^(\s*)(\d+)\.\s*$/)
+          ) {
+            e.preventDefault();
+            let delLength = currentLine.length;
+            transact((text) => {
+              text.delete(lineIndex + 1, delLength - 1);
+            }, -1 * delLength);
+            break;
+          }
+          let numberMatch = currentLine.match(/^(\s*)(\d+)\.\s*/);
+          if (numberMatch) {
+            let length = numberMatch[1].length;
+            let number = parseInt(numberMatch[2]) + 1;
+            e.preventDefault();
+            transact((text) => {
+              text.insert(start, `\n${" ".repeat(length)}${number}. `);
+            }, length + number.toString().length + 3);
+          }
+          const match = currentLine.match(/^(\s*)-/);
+          if (match) {
+            let length = match[1].length;
+            e.preventDefault();
+            transact((text) => {
+              text.insert(start, `\n${" ".repeat(length)}- `);
+            }, length + 3);
+          }
           break;
         }
         case "Tab": {
@@ -127,6 +163,29 @@ export const useKeyboardHandling = (deps: {
             }
             break;
           }
+
+          let lineIndex = value.lastIndexOf("\n", start - 1);
+          if (lineIndex === -1) break;
+          let currentLine = value.slice(lineIndex + 1, start);
+          if (!currentLine) break;
+          const match = currentLine.match(/^(\s*)-/);
+          if (match) {
+            e.preventDefault();
+            if (e.shiftKey) {
+              if (currentLine[0] === "-") break;
+              transact((text) => text.delete(lineIndex + 1, 2), -2);
+            } else {
+              let previousLine = value
+                .slice(0, lineIndex)
+                .split("\n")
+                .pop()
+                ?.match(/^(\s*)/);
+              if (!previousLine || previousLine[0].length < match[1].length)
+                return;
+              transact((text) => text.insert(lineIndex + 1, "  "));
+            }
+          }
+
           break;
         }
         case "ArrowUp": {

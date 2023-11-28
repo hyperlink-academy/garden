@@ -2,12 +2,12 @@ import { app_event } from "backend/lib/analytics";
 import { makeRoute } from "backend/lib/api";
 import { authTokenVerifier, verifyIdentity } from "backend/lib/auth";
 import { createClient } from "backend/lib/supabase";
-import { ulid } from "src/ulid";
 import { z } from "zod";
 import { memberColors } from "src/colors";
 import { Env } from "..";
-import { store } from "../fact_store";
 import { MutationContext } from "data/mutations";
+import { webPushPayloadParser } from "pages/api/web_push";
+import { sign } from "src/sign";
 
 export const join_route = makeRoute({
   route: "join",
@@ -64,6 +64,23 @@ export const join_route = makeRoute({
         .from("members_in_spaces")
         .insert({ space_do_id: env.id, member: session.id });
     }
+
+    let payload: z.TypeOf<typeof webPushPayloadParser> = {
+      type: "new-member",
+      username: session.username,
+      spaceID: env.id,
+    };
+    let payloadString = JSON.stringify(payload);
+    fetch(`${env.env.NEXT_API_URL}/api/web_push`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        payload: payloadString,
+        sig: await sign(payloadString, env.env.RPC_SECRET),
+      }),
+    });
 
     env.poke();
     env.updateLastUpdated();

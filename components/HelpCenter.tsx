@@ -1,12 +1,23 @@
 import { Tab } from "@headlessui/react";
 import { useRouter } from "next/router";
 import { Fragment, useEffect, useState } from "react";
-import { Settings } from "./Icons";
+import { CloseLinedTiny, Settings } from "./Icons";
 import { ModalFixedHeight } from "./Layout";
+import { DividerSmall, DividerTiny } from "pages";
 
 export const HelpModal = (props: { open: boolean; onClose: () => void }) => {
   return (
     <ModalFixedHeight open={props.open} onClose={props.onClose}>
+      <div className="jusify-between flex items-center">
+        <h3 className="m-auto grow">Help Docs</h3>
+        <button
+          onClick={() => props.onClose()}
+          className="shrink-0 grow-0 text-grey-55 hover:text-accent-blue"
+        >
+          <CloseLinedTiny />
+        </button>
+      </div>
+
       <HelpDocs />
     </ModalFixedHeight>
   );
@@ -28,7 +39,6 @@ export const HelpDocs = () => {
 
   return (
     <>
-      <h3 className="m-auto">Hyperlink Help Docs</h3>
       <Tab.Group
         manual
         selectedIndex={selectedIndex}
@@ -128,73 +138,61 @@ export const HelpDocs = () => {
 const HelpHandbook = () => {
   return (
     <div className="flex flex-col gap-4">
-      <h2>Handbook</h2>
-
       <p>
         Welcome! Hyperlink is a place to do meaningful things — creative
         projects; book clubs; learning groups — together on the internet.
       </p>
-
-      <p>
-        Here&apos;s a <em>very short handbook</em>:
-      </p>
-
+      <DividerTiny />
       <p>
         Activity on Hyperlink happens in <strong>Spaces</strong> — small worlds
-        for shared projects.
+        for shared work.
       </p>
-
       <p>In a Space, you can:</p>
-
       <ul className="flex list-disc flex-col gap-1 pl-4 sm:pl-8">
         <li className="marker:text-accent-blue">
-          Create <strong>cards</strong> for meaningful things: ideas, tasks,
-          questions, inspo…
+          Make <strong>cards</strong> for meaningful things, like ideas, tasks,
+          and questions
         </li>
         <li className="marker:text-accent-red">
           Organize & work with cards in <strong>rooms</strong>
         </li>
         <li className="marker:text-accent-gold">
-          Talk together in <strong>chats</strong> & <strong>comments</strong>
+          Talk together with <strong>chats</strong> & <strong>comments</strong>
+        </li>
+      </ul>
+      <DividerTiny />
+      <p>
+        The magic multiplies when you invite others to join & explore with you:
+      </p>
+      <ul className="flex list-disc flex-col gap-1 pl-4 sm:pl-8">
+        <li className="marker:text-accent-blue">
+          <strong>notifications</strong>, for pings on Space activity
+        </li>
+        <li className="marker:text-accent-red">
+          <strong>unreads</strong>, to see what&apos;s new in one place
+        </li>
+        <li className="marker:text-accent-gold">
+          <strong>live presence</strong>, to see where others are in the Space
         </li>
         <li className="marker:text-accent-blue">
-          <strong>Invite others</strong> to join & explore with you
+          <strong>audio calls</strong>, to hang & explore together
         </li>
       </ul>
-
       <p>
-        When you open the app, you&apos;ll land in your{" "}
-        <strong>homeroom</strong> — your home base for all Spaces you create or
-        join.
+        To get started, <strong>make a Space</strong> and{" "}
+        <strong>invite a friend</strong> to jam, riff, play…
       </p>
-
       <p>
-        You can also make <strong>Studios</strong> — where a group can collect
-        Spaces to share work across many projects.
+        And repeat! Over time your Spaces on Hyperlink form an ecosystem:
+        seedlings, active projects, archives, communities of collaborators.
       </p>
-
-      <p>To get started:</p>
-
-      <ul className="flex list-disc flex-col gap-1 pl-4 sm:pl-8">
-        <li className="marker:text-accent-blue">Make a Space</li>
-        <li className="marker:text-accent-red">Invite a friend</li>
-        <li className="marker:text-accent-gold">Add ideas, riff, play…</li>
-      </ul>
-
       <p>
-        And repeat! Over time your Spaces on Hyperlink form an ecosystem: seeds
-        of ideas, active projects, archives of past work, communities of
-        collaborators.
-      </p>
-
-      <p>
-        Questions?{" "}
+        Questions? Suggestions?{" "}
         <a href="mailto:contact@hyperlink.academy" className="text-accent-blue">
           Email us
         </a>{" "}
-        any time. Always evolving, ears open for suggestions :)
+        any time :)
       </p>
-
       <p>—The Hyperlink Team</p>
     </div>
   );
@@ -203,8 +201,6 @@ const HelpHandbook = () => {
 const HelpShortcuts = () => {
   return (
     <div className="flex flex-col gap-4">
-      <h2>Shortcuts</h2>
-
       <p>
         An evolving list of shortcuts you may find helpful in using Hyperlink!
       </p>
@@ -256,18 +252,22 @@ const HelpShortcuts = () => {
       <h3>rooms & cards</h3>
       <ul className="flex list-disc flex-col gap-1 pl-4 sm:pl-8">
         <li>
+          <KeyboardKey>alt</KeyboardKey> + <KeyboardKey>↑</KeyboardKey> and{" "}
+          <KeyboardKey>↓</KeyboardKey> to switch rooms
+        </li>
+        <li>
+          <KeyboardKey>shift</KeyboardKey> + <KeyboardKey>↑</KeyboardKey> and{" "}
+          <KeyboardKey>↓</KeyboardKey> to navigate between cards in a room
+        </li>
+        <li>
           <i>canvas</i>: <KeyboardKey>ctrl/cmd</KeyboardKey> + click for new
           card
         </li>
         <li>
           <i>collection</i>: drag to reorder cards
         </li>
-        <li>
-          <KeyboardKey>alt</KeyboardKey> + <KeyboardKey>↑</KeyboardKey> and{" "}
-          <KeyboardKey>↓</KeyboardKey> to switch rooms
-        </li>
         <li>drag to reorder rooms in sidebar</li>
-        <li>drag a card onto another to link them</li>
+        <li>drag a card onto another to add it as a linked card</li>
       </ul>
 
       <h3>general</h3>
@@ -288,7 +288,6 @@ const HelpShortcuts = () => {
 const HelpChangelog = () => {
   return (
     <div className="flex flex-col gap-4">
-      <h2>Changelog</h2>
       <p>TBD, changelog coming soon!</p>
     </div>
   );
@@ -298,7 +297,6 @@ const HelpChangelog = () => {
 export const HelpExampleSpaces = () => {
   return (
     <div className="flex flex-col gap-4">
-      <h2>Example Spaces</h2>
       <p className="">Here are a few of our Spaces for inspiration ✨🌱</p>
 
       <div className="my-4 flex flex-col gap-4">
@@ -306,6 +304,7 @@ export const HelpExampleSpaces = () => {
           className="flex w-full flex-col gap-2 self-center rounded-md border bg-white p-2 hover:bg-bg-blue sm:gap-4 sm:p-4"
           href="https://hyperlink.academy/s/brendan/s/Website%20Jam:%20pattern.kitchen/website-jam-patternkitchen"
           target="_blank"
+          rel="noopener noreferrer"
         >
           <h2>side project</h2>
           <p className="text-sm italic">
@@ -316,6 +315,7 @@ export const HelpExampleSpaces = () => {
           className="flex w-full flex-col gap-2 self-center rounded-md border bg-white p-2 hover:bg-bg-blue sm:gap-4 sm:p-4"
           href="https://hyperlink.academy/s/celine/s/Stuffy%20Stuff/stuffy-stuff"
           target="_blank"
+          rel="noopener noreferrer"
         >
           <h2>creative project with a friend</h2>
           <p className="text-sm italic">example: stuffed animal crafting 🐰</p>
@@ -324,6 +324,7 @@ export const HelpExampleSpaces = () => {
           className="flex w-full flex-col gap-2 self-center rounded-md border bg-white p-2 hover:bg-bg-blue sm:gap-4 sm:p-4"
           href="https://hyperlink.academy/s/brendan/s/23/hyperlink-writing-room-2023"
           target="_blank"
+          rel="noopener noreferrer"
         >
           <h2>small group collab</h2>
           <p className="text-sm italic">
@@ -339,7 +340,6 @@ export const HelpExampleSpaces = () => {
 export const HelpAppInfo = () => {
   return (
     <div className="flex flex-col gap-4">
-      <h2>Add the App!</h2>
       <p>
         Get Hyperlink on your home screen — and get push notifications for
         activity in your Spaces.
@@ -369,7 +369,7 @@ export const HelpAppInfo = () => {
 
 const TextString = (props: { children: React.ReactNode }) => {
   return (
-    <code className="rounded-md border border-grey-55 bg-grey-90 px-[2px] py-[2px] text-xs">
+    <code className="rounded-md border border-grey-80 bg-grey-90 px-[4px] py-[4px] text-xs">
       {props.children}
     </code>
   );
@@ -377,7 +377,7 @@ const TextString = (props: { children: React.ReactNode }) => {
 
 const KeyboardKey = (props: { children: React.ReactNode }) => {
   return (
-    <code className="rounded-md bg-grey-35 px-[4px] py-[2px] text-xs text-white shadow shadow-accent-gold">
+    <code className="rounded-md bg-grey-35 px-[6px] py-[4px] text-xs text-white shadow shadow-accent-gold">
       {props.children}
     </code>
   );

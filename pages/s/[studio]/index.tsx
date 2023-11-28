@@ -11,6 +11,8 @@ import { useEffect, useState } from "react";
 import { DisclosureCollapseTiny, DisclosureExpandTiny } from "components/Icons";
 import Head from "next/head";
 import { NotificationManager } from "components/NotificationManager";
+import { Divider } from "components/Layout";
+import { NewStudio } from "components/newStudio";
 import { HelpExampleSpaces } from "components/HelpCenter";
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>;
@@ -80,25 +82,28 @@ export default function UserHomePage(props: Props) {
                 />
               ))}
           </div>
-          <div className="flex flex-row gap-2 text-sm">
-            sort by:{" "}
-            <button
-              onClick={() => setSortOrder("lastUpdated")}
-              className={`${
-                sortOrder === "lastUpdated" ? "underline" : ""
-              } hover:underline`}
-            >
-              last updated
-            </button>
-            <button
-              onClick={() => setSortOrder("name")}
-              className={`${
-                sortOrder === "name" ? "underline" : ""
-              } hover:underline`}
-            >
-              name
-            </button>
-          </div>
+          <Divider />
+          {spaces.length === 0 ? null : (
+            <div className="flex flex-row gap-2 text-sm">
+              sort by:{" "}
+              <button
+                onClick={() => setSortOrder("lastUpdated")}
+                className={`${
+                  sortOrder === "lastUpdated" ? "underline" : ""
+                } hover:underline`}
+              >
+                last updated
+              </button>
+              <button
+                onClick={() => setSortOrder("name")}
+                className={`${
+                  sortOrder === "name" ? "underline" : ""
+                } hover:underline`}
+              >
+                name
+              </button>
+            </div>
+          )}
           <List
             spaces={spaces}
             id={data.studio}
@@ -112,9 +117,7 @@ export default function UserHomePage(props: Props) {
 
 const HistoryList = (props: { spaces: Array<SpaceData> }) => {
   let now = getCurrentDate();
-  let spacesHistory = props.spaces.filter(
-    (s) => (s.end_date && s.end_date < now) || s.archived
-  );
+  let spacesHistory = props.spaces.filter((s) => s.archived);
   let [showHistory, setShowHistory] = useState(false);
   let { query } = useRouter();
   let { mutate } = useIdentityData(query.studio as string);
@@ -191,6 +194,10 @@ const List = (props: {
       {/* different messages for logged in user vs. viewing someone else's home */}
       {spaces.length == 0 ? (
         session?.loggedIn && myStudioName == currentStudioName ? (
+          // <NewStudio
+          //   studioSpaceID={props.id}
+          //   studioName={myStudioName as string}
+          // />
           <MyHomeEmpty
             studioSpaceID={props.id}
             studioName={myStudioName as string}
@@ -232,7 +239,6 @@ const YourHomeEmpty = (props: { username: string }) => {
     </div>
   );
 };
-
 const MyHomeEmpty = (props: { studioSpaceID: string; studioName: string }) => {
   return (
     <div className="lightBorder my-4 flex flex-col gap-4 border border-dashed p-8 text-center">

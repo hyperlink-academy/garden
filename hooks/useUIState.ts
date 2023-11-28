@@ -3,16 +3,23 @@ import { sortByPosition } from "src/position_helpers";
 import { create } from "zustand";
 import { combine } from "zustand/middleware";
 import { db, useMutations, useSpaceID } from "./useReplicache";
+import { Filters } from "components/CardFilter";
 
 export let useUIState = create(
   combine(
     {
+      mobileSidebarOpen: false,
       spaces: {} as {
         [spaceID: string]: {
           activeRoom?: string;
           rooms: {
             [roomID: string]: string[];
           };
+        };
+      },
+      roomStates: {} as {
+        [entityID: string]: {
+          filters: Filters;
         };
       },
       cardStates: {} as {
@@ -24,6 +31,12 @@ export let useUIState = create(
       focusedCard: undefined as string | undefined,
     },
     (set) => ({
+      setMobileSidebarOpen: (open?: boolean) => {
+        set((state) => ({
+          mobileSidebarOpen:
+            open === undefined ? !state.mobileSidebarOpen : open,
+        }));
+      },
       openDrawer: (entityID: string, drawer: "backlinks" | "comments") => {
         set((state) => ({
           ...state,
@@ -51,11 +64,23 @@ export let useUIState = create(
       },
       setRoom: (spaceID: string, room: string | undefined) => {
         set((state) => ({
+          mobileSidebarOpen: false,
           spaces: {
             ...state.spaces,
             [spaceID]: {
               ...state.spaces[spaceID],
               activeRoom: room,
+            },
+          },
+        }));
+      },
+      setFilters: (entityID: string, filters: Filters) => {
+        set((state) => ({
+          roomStates: {
+            ...state.roomStates,
+            [entityID]: {
+              ...state.roomStates[entityID],
+              filters,
             },
           },
         }));
@@ -67,7 +92,8 @@ export let useUIState = create(
             [spaceID]: {
               ...state.spaces[spaceID],
               rooms: {
-                [roomID]: state.spaces[spaceID]?.rooms[roomID]?.slice(1) || [],
+                [roomID]:
+                  state.spaces?.[spaceID]?.rooms?.[roomID]?.slice(1) || [],
               },
             },
           },

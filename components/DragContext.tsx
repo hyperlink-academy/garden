@@ -9,13 +9,13 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { AddSmall } from "components/Icons";
+import { AddSmall, AddTiny } from "components/Icons";
 import { useRef, useState } from "react";
-import { CardPreview } from "./CardPreview";
+import { CardPreview, PlaceholderNewCard } from "./CardPreview";
 import { pointerWithinOrRectIntersection } from "src/customCollisionDetection";
 import { RoomListPreview } from "./SpaceLayout/Sidebar/RoomListLayout";
 import { animated, useSpring } from "@react-spring/web";
-import { CardPreviewData } from "hooks/CardPreviewData";
+import { CardPreviewData, EmptyCardData } from "hooks/CardPreviewData";
 import { Fact } from "data/Facts";
 
 export const SmallCardDragContext = (props: {
@@ -85,14 +85,15 @@ export const SmallCardDragContext = (props: {
       {props.children}
 
       <DragOverlay dropAnimation={null} adjustScale={false}>
-        {active?.entityID ? (
+        {active ? (
           <AnimatedPickup>
-            {active.type === "card" ? (
+            {active.type === "card" || active.type === "search-card" ? (
               <div
-                className={``}
+                className={`${active.type === "search-card" ? "w-[314px]" : ""}
+                }`}
                 style={{
                   transform: `rotate(${
-                    !active.position?.rotation
+                    active.type === "search-card" || !active.position?.rotation
                       ? 0
                       : (
                           Math.floor(
@@ -105,20 +106,52 @@ export const SmallCardDragContext = (props: {
               >
                 <CardPreview
                   data={active.data}
-                  outerControls={active.outerControls}
+                  outerControls={
+                    active.type === "search-card" ? false : active.outerControls
+                  }
                   entityID={active.entityID}
-                  size={active.position?.size || active.size || "small"}
-                  hideContent={active.hideContent}
+                  size={
+                    active.type === "search-card"
+                      ? "big"
+                      : active.position?.size || active.size || "small"
+                  }
+                  hideContent={
+                    active.type === "search-card" ? true : active.hideContent
+                  }
                 />
-                {over?.type === "linkCard" && (
-                  <span className="absolute -top-2 -left-2 text-accent-blue">
-                    <AddSmall />
+              </div>
+            ) : active.type === "room" ? (
+              <RoomListPreview entityID={active.entityID} />
+            ) : active.type === "new-card" ? (
+              <div style={{ transform: "rotate(0rad)" }}>
+                <CardPreview
+                  outerControls
+                  entityID={""}
+                  size="small"
+                  data={EmptyCardData}
+                />
+              </div>
+            ) : active.type === "new-search-card" ? (
+              <div className="w-[314px]">
+                <PlaceholderNewCard title={active.title} />
+              </div>
+            ) : null}
+            {(over?.type === "linkCard" ||
+              over?.type === "card" ||
+              over?.type === "dropzone") &&
+            (active.type !== "card" || active.parent !== over.entityID) ? (
+              <div className="absolute -bottom-3 right-4 flex flex-row items-center gap-2 rounded-md bg-accent-blue px-2 py-1 align-middle font-bold text-white">
+                <AddTiny width={12} height={12} />{" "}
+                {active.type === "card" &&
+                (active.size === "small" || !active.size) ? (
+                  <span>Add</span>
+                ) : (
+                  <span>
+                    Add to {over.type === "linkCard" ? "Card" : "Room"}
                   </span>
                 )}
               </div>
-            ) : (
-              <RoomListPreview entityID={active.entityID} />
-            )}
+            ) : null}
           </AnimatedPickup>
         ) : null}
       </DragOverlay>
@@ -129,7 +162,7 @@ export const SmallCardDragContext = (props: {
 const AnimatedPickup = (props: { children: React.ReactNode }) => {
   let spring = useSpring({ from: { scale: 1 }, to: { scale: 1.02 } });
   return (
-    <animated.div className="relative text-sm drop-shadow" style={spring}>
+    <animated.div className="relative w-fit text-sm drop-shadow" style={spring}>
       {props.children}
     </animated.div>
   );
@@ -137,12 +170,13 @@ const AnimatedPickup = (props: { children: React.ReactNode }) => {
 
 export type DraggableData = {
   id: string;
-  entityID: string;
   disabled?: boolean;
   onDragStart?: (data: DraggableData) => void | Promise<void>;
 } & (
   | {
       type: "card";
+
+      entityID: string;
       position?: Fact<"card/position-in">["value"];
       size?: "big" | "small";
       outerControls?: boolean;
@@ -150,13 +184,20 @@ export type DraggableData = {
       hideContent: boolean;
       data: CardPreviewData;
     }
-  | { type: "room" }
+  | {
+      type: "room";
+      entityID: string;
+    }
+  | { type: "new-card" }
+  | { data: CardPreviewData; type: "search-card"; entityID: string }
+  | { type: "new-search-card"; title: string }
 );
 
 export type DroppableData = {
   id: string;
+  disabled?: boolean;
   entityID: string;
-  type: "card" | "room" | "dropzone" | "linkCard";
+  type: "card" | "room" | "dropzone" | "linkCard" | "trigger";
   onDragEnter?: (data: DraggableData) => void | Promise<void>;
   onDragExit?: (data: DraggableData) => void | Promise<void>;
   onDragEnd?: (
@@ -174,7 +215,7 @@ export const useDraggableCard = (data: DraggableData) => {
   let isOverSomethingElse =
     draggable.isDragging &&
     draggable.over &&
-    draggable.over?.data.current?.entityID !== data.entityID;
+    draggable.over?.data.current?.id !== data.id;
   return { ...draggable, isOverSomethingElse };
 };
 
@@ -182,6 +223,7 @@ export const useDroppableZone = (data: DroppableData) => {
   let [over, setOver] = useState<DraggableData | null>(null);
   let droppable = useDroppable({
     id: data.id,
+    disabled: data.disabled,
     resizeObserverConfig: {
       updateMeasurementsFor: [],
       timeout: 50,

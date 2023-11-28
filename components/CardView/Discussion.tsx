@@ -89,8 +89,6 @@ export const MessageWindow = (props: {
     if (isBottomed.current) {
       requestAnimationFrame(() => {
         if (!elRef.current) return;
-        console.log(elRef.current.scrollTop);
-        console.log(elRef.current.scrollHeight);
         elRef.current.scrollTop = elRef.current?.scrollHeight;
       });
     }
@@ -100,7 +98,6 @@ export const MessageWindow = (props: {
       style={props.style}
       onScroll={(e) => {
         if (!e.isTrusted) return;
-        console.log(e.currentTarget.scrollTop, e.currentTarget.scrollHeight);
         isBottomed.current =
           e.currentTarget.scrollTop + e.currentTarget.clientHeight ===
           e.currentTarget.scrollHeight;
@@ -223,6 +220,9 @@ export const MessageInput = (props: {
             <div className="flex w-full items-center gap-1 rounded-md border border-grey-55 bg-white p-1 text-sm text-grey-15">
               <AutosizeTextarea
                 onKeyDown={(e) => {
+                  if (e.key === "Escape") {
+                    e.currentTarget.blur();
+                  }
                   if (!e.shiftKey && e.key === "Enter") {
                     e.preventDefault();
                     send();
@@ -243,7 +243,14 @@ export const MessageInput = (props: {
             </div>
 
             <div className="flex h-min justify-end text-grey-55">
-              <ButtonPrimary disabled={!value} onClick={send} icon={<Send />} />
+              <ButtonPrimary
+                disabled={!value}
+                onClick={(e) => {
+                  e.preventDefault();
+                  send();
+                }}
+                icon={<Send />}
+              />
             </div>
           </div>
         </div>
@@ -383,9 +390,9 @@ export const Messages = (props: {
   return (
     <>
       {messages.length == 0 && authorized ? (
-        <div className="messagesEmpty flex flex-col gap-4 text-sm italic text-grey-35">
+        <div className="messagesEmpty mt-auto flex flex-col gap-4 py-1 text-sm italic text-grey-35">
           <p>Welcome to the chat!</p>
-          <p>Still quiet…start the conversation 🌱</p>
+          <p>Go ahead, start the conversation 🌱</p>
         </div>
       ) : null}
       {[...messages].map((m, index, reversedMessages) => (
@@ -394,7 +401,7 @@ export const Messages = (props: {
             index > 0 &&
             m.sender === reversedMessages[index - 1]?.sender &&
             parseInt(m.ts) - parseInt(reversedMessages[index - 1]?.ts) <
-            1000 * 60 * 3
+              1000 * 60 * 3
           }
           author={m.sender}
           date={m.ts}
@@ -464,8 +471,9 @@ const Message = (props: {
   return (
     <div
       id={props.id}
-      className={`message flex flex-col text-sm first:pb-4 last:pt-0 ${!props.multipleFromSameAuthor ? "pt-4" : "pt-1"
-        }`}
+      className={`message flex flex-col text-sm first:mt-auto ${
+        !props.multipleFromSameAuthor ? "pt-4" : "pt-1"
+      }`}
     >
       {/* MESSAGE HEADER */}
       {!props.multipleFromSameAuthor && (

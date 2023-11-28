@@ -1,25 +1,40 @@
 import { ButtonLink, ButtonPrimary } from "components/Buttons";
 import { useAuth } from "hooks/useAuth";
-import { useRouter } from "next/router";
+import router, { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { DotLoader } from "components/DotLoader";
 import Link from "next/link";
 import { ModalSubmitButton } from "components/Modal";
+import { OAuth } from "components/LoginModal";
 
 export default function LoginPage() {
   let router = useRouter();
   return (
-    <LoginForm
-      onLogin={(s) => {
-        s.username ? router.push(`/s/${s.username}`) : router.push("/setup");
-      }}
-    />
+    <div className=" -my-4 mx-auto flex h-screen  max-w-md flex-col items-center justify-center gap-4">
+      <h1 className="w-full">
+        Welcome Back to{" "}
+        <Link className="text-accent-blue hover:underline" href="/">
+          Hyperlink
+        </Link>
+        !
+      </h1>
+      <div className="lightBorder w-full bg-white p-4">
+        <LoginForm
+          onLogin={(s) => {
+            s.username
+              ? router.push(`/s/${s.username}`)
+              : router.push("/setup");
+          }}
+        />{" "}
+      </div>
+    </div>
   );
 }
 
 export function LoginForm(props: {
   onLogin: (s: { username?: string }) => void;
   onClose?: () => void;
+  onSwitchToSignUp?: () => void;
 }) {
   let [data, setData] = useState({
     email: "",
@@ -49,29 +64,41 @@ export function LoginForm(props: {
     }
   };
   return (
-    <div className="grid-auto-rows mx-auto grid max-w-md gap-8">
-      <h1>Hi, welcome back!</h1>
-      <form className="grid w-full gap-4" onSubmit={onSubmit}>
-        {status === "normal" || status === "loading" ? null : status ===
-          "incorrect" ? (
-          <div className="text-accent-red">
-            Your email or password is incorrect.
-          </div>
-        ) : (
-          <ResendEmail {...data} />
-        )}
-        <label className="grid-flow-rows grid gap-2 font-bold">
+    <div className="flex flex-col gap-2">
+      <img
+        className="rounded-md"
+        width={"216px"}
+        alt="a desktop covered in tictures, paper, and plants"
+        src="/img/spotIllustration/login.png"
+      />
+      <div className="mt-4 flex items-baseline justify-between">
+        <h2 className="text-grey-15">Log in</h2>{" "}
+        <p>
+          or{" "}
+          <button
+            className="font-bold text-accent-blue hover:underline"
+            onClick={() => {
+              if (props.onSwitchToSignUp) {
+                props.onSwitchToSignUp();
+              } else router.push("/signup");
+            }}
+          >
+            sign up
+          </button>
+        </p>
+      </div>
+      <form className="grid w-full gap-2" onSubmit={onSubmit}>
+        <label className="flex flex-col gap-1 font-bold">
           Email
           <input
-            className="w-[100%]]"
+            className="w-full font-normal"
             type="email"
             required
             value={data.email}
             onChange={(e) => setData({ ...data, email: e.currentTarget.value })}
           />
         </label>
-        <label className="grid-flow-rows grid gap-2 font-bold">
-          Password
+        <label className="flex flex-col-reverse gap-1 font-bold">
           <input
             type="password"
             value={data.password}
@@ -80,7 +107,25 @@ export function LoginForm(props: {
               setData({ ...data, password: e.currentTarget.value })
             }
           />
+          <div className="flex items-baseline justify-between">
+            Password{" "}
+            <Link
+              className="font-normal text-accent-blue
+            "
+              href={`/reset-password`}
+            >
+              <p className="">reset</p>
+            </Link>
+          </div>
         </label>
+        {status === "normal" || status === "loading" ? null : status ===
+          "incorrect" ? (
+          <div className="text-sm text-accent-red">
+            Your email or password is incorrect.
+          </div>
+        ) : (
+          <ResendEmail {...data} />
+        )}
 
         {props.onClose ? (
           <ModalSubmitButton
@@ -94,36 +139,20 @@ export function LoginForm(props: {
             }}
           />
         ) : (
-          <div className="grid-rows-max grid justify-items-end">
-            <ButtonPrimary
-              className="content-end items-end justify-end justify-items-end self-end justify-self-end"
-              content={status === "loading" ? "" : "Log In!"}
-              icon={status === "loading" ? <DotLoader /> : undefined}
-              type="submit"
-            />
-          </div>
+          <ButtonPrimary
+            className="place-self-end"
+            content={status === "loading" ? "" : "Log In!"}
+            icon={status === "loading" ? <DotLoader /> : undefined}
+            type="submit"
+          />
         )}
-        {/* <Divider /> */}
-        <div className="mt-4 flex gap-2">
-          <div className="w-1/2 self-center rounded-md bg-bg-red p-4 sm:w-full">
-            <p className="text-grey-15">
-              lost your password?{" "}
-              <Link className="text-accent-blue" href={`/reset-password`}>
-                reset it here
-              </Link>
-            </p>
-          </div>
-          <div className="w-1/2 self-center rounded-md bg-bg-gold p-4 sm:w-full">
-            <p className="text-grey-15">
-              {" "}
-              new to Hyperlink? <br />
-              <Link className="text-accent-blue" href="/signup">
-                sign up!
-              </Link>{" "}
-            </p>
-          </div>
-        </div>
       </form>
+      <div className="LogInDivider flex items-center gap-2 py-2 text-grey-80">
+        <hr className="grow" />{" "}
+        <p className="shrink-0 italic text-grey-55">or</p>
+        <hr className="grow" />
+      </div>
+      <OAuth actionLabel="Log In" />
     </div>
   );
 }

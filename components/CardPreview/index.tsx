@@ -8,6 +8,7 @@ import {
   useSpaceID,
 } from "hooks/useReplicache";
 import {
+  ChatEmptyTiny,
   CloseLinedTiny,
   DragRotateHandle,
   MakeBigHandle,
@@ -40,6 +41,7 @@ export type Props = {
   size: "big" | "small";
   onRotateDrag?: (da: number) => void;
   onDelete?: () => void;
+  onClick?: () => void;
   outerControls?: boolean;
   hideContent?: boolean;
   editable?: boolean;
@@ -103,6 +105,9 @@ export const CardPreview = (
           if (!isLongPress.current) props.pointerUpHandler?.(e);
         }}
         onDragOver={(e) => e.preventDefault()}
+        onClick={() => {
+          props.onClick?.();
+        }}
         onDrop={async (e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -122,9 +127,11 @@ export const CardPreview = (
             positions: {},
           });
         }}
-        className={`cardPreviewBorder select-none ${isUnread ? "unreadCardGlow" : ""
-          } relative grow overflow-hidden ${borderStyles({ isMember })} ${props.isSelected || (editing && !isMember) ? "selectedCardGlow" : ""
-          } ${props.isOver ? "rounded-[24px] shadow-[0_0_16px_0_#cccccc]" : ""}`}
+        className={`cardPreviewBorder select-none ${
+          isUnread ? "unreadCardGlow" : ""
+        } relative grow overflow-hidden ${borderStyles({ isMember })} ${
+          props.isSelected || (editing && !isMember) ? "selectedCardGlow" : ""
+        } ${props.isOver ? "rounded-[24px] shadow-[0_0_16px_0_#cccccc]" : ""}`}
         style={{ WebkitTapHighlightColor: "transparent" }}
       >
         {props.size === "small" ? (
@@ -204,7 +211,7 @@ export const HoverControls = (
       {/* Rotate and Resize Handle */}
 
       {authorized && !props.outerControls ? null : (authorized &&
-        props.onDelete) ||
+          props.onDelete) ||
         (authorized && props.onResize) ||
         (authorized && props.onRotateDrag) ? (
         <div className="z-50 flex flex-col justify-between gap-1 pb-1 text-grey-80 opacity-0 group-hover:opacity-100">
@@ -255,6 +262,17 @@ export const HoverControls = (
         <div className="w-[12px]"> </div>
       )}
       {/* End Rotate and Resize Handle */}
+    </div>
+  );
+};
+
+export const PlaceholderNewCard = (props: { title: string }) => {
+  return (
+    <div className="searchNewCard flex flex-col gap-2 rounded-md border border-dashed border-accent-blue bg-white p-2 text-accent-blue">
+      <p className="text-base font-bold">{props.title}</p>
+      <div className="flex flex-row gap-2">
+        <ChatEmptyTiny /> 0
+      </div>
     </div>
   );
 };
