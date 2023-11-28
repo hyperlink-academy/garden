@@ -422,7 +422,6 @@ const ScheduledDate = (props: {
       id="card-date"
       className="flex place-items-center gap-2 text-sm italic text-grey-55"
     >
-      Scheduled for{" "}
       {props.dateEditing ? (
         <>
           <input
