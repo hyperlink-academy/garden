@@ -21,12 +21,11 @@ export const PresenceHandler = () => {
 
   useEffect(() => {
     if (!authorized || !rep || !memberEntity) return;
-    rep.clientID.then((clientID) => {
-      mutate("initializeClient", {
-        clientID,
-        clientEntity: ulid(),
-        memberEntity: memberEntity as string,
-      });
+    let clientID = rep.clientID;
+    mutate("initializeClient", {
+      clientID,
+      clientEntity: ulid(),
+      memberEntity: memberEntity as string,
     });
   }, [rep, authorized, memberEntity, mutate]);
   useEffect(() => {
