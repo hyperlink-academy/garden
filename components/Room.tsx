@@ -301,12 +301,12 @@ function RoomHeader(props: {
   return (
     <>
       <div
-        className="roomHeader sticky top-0 z-20 bg-background pt-2 sm:pt-4"
+        className="roomHeader sticky top-0 z-20 bg-background pt-2 sm:pt-3"
         ref={titleRef}
       >
         <div className="roomTitle flex justify-between">
           <button
-            className={`mb-1 text-left text-lg font-bold text-grey-35 `}
+            className={` text-left text-lg font-bold text-grey-35 `}
             onClick={() => {
               if (!scrolledTop) {
                 setDescriptionOpen(!descriptionOpen);
@@ -325,7 +325,7 @@ function RoomHeader(props: {
             ) : null}
           </button>
           {authorized && (
-            <div className="roomOptionsWrapper mt-[4px] flex items-start gap-1">
+            <div className="roomOptionsWrapper mt-[1px] flex items-start gap-1">
               {scrolledTop ? (
                 <div className="w-4" />
               ) : (
@@ -448,7 +448,7 @@ function RoomOptions(props: { entityID: string | null }) {
     <>
       <button
         onClick={() => setIsRoomEditOpen(true)}
-        className={` flex rounded-md border border-transparent pt-[4px] align-top hover:border-white`}
+        className={` flex rounded-md border border-transparent px-[2px] py-[4px] align-top hover:border-accent-blue hover:text-accent-blue`}
       >
         <MoreOptionsTiny />
       </button>

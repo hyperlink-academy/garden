@@ -75,8 +75,8 @@ export const UnreadsRoom = () => {
           {/* HEY START SOME SHIT */}
 
           <>
-            <div className="roomHeader sticky top-0 z-20 bg-background pt-2 sm:-mx-4 sm:px-4 sm:pt-4">
-              <div className="roomTitle  flex justify-between">
+            <div className="roomHeader sticky top-0 z-20 flex flex-col gap-1 bg-background pt-2 sm:-mx-4 sm:px-4 sm:pt-3">
+              <div className="roomTitle flex justify-between">
                 <button
                   className={`mb-1 text-lg font-bold text-grey-35 `}
                   onClick={() =>
