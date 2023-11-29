@@ -114,8 +114,17 @@ export const Textarea = (
         await Promise.all([props.onChange(e)]);
       }}
       onBlur={(e) => {
-        setFocused(false);
-        setInitialCursor(null);
+        let target = e.currentTarget;
+        setTimeout(() => {
+          if (
+            target &&
+            document.hasFocus() &&
+            !target.contains(document.activeElement)
+          ) {
+            setFocused(false);
+            setInitialCursor(null);
+          }
+        }, 0);
         props.onBlur?.(e);
       }}
       ref={(node) => {
