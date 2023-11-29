@@ -19,8 +19,10 @@ import AutosizeTextarea from "components/Textarea/AutosizeTextarea";
 import { FindOrCreate, useAllItems } from "components/FindOrCreateEntity";
 import { ref } from "data/Facts";
 import { CardPreviewWithData } from "components/CardPreview";
-import { useIntersectionObserver } from "hooks/useIntersectionObserver";
 import { LogInModal } from "components/LoginModal";
+import { RoomHeader } from "components/Room";
+import { useRoom } from "hooks/useUIState";
+import { useFilteredCards } from "../CardFilter";
 
 export const DiscussionRoom = (props: {
   entityID: string;
@@ -28,12 +30,24 @@ export const DiscussionRoom = (props: {
   isRoom: boolean;
 }) => {
   useMarkRead(props.entityID, true);
-
   let [reply, setReply] = useState<string | null>(null);
+  let room = useRoom();
+  let { reactions, filters, setFilters, cardsFiltered, total } =
+    useFilteredCards(room, "desktop/contains");
 
   return (
     <div className="relative h-full w-full">
-      <MessageWindow className="no-scrollbar relative flex h-full flex-col overflow-x-hidden overflow-y-scroll p-2 pb-12">
+      <div className="absolute w-full px-3 sm:px-4">
+        <RoomHeader
+          totalCount={total}
+          filteredCount={cardsFiltered.length}
+          entityID={room}
+          reactions={reactions}
+          filters={filters}
+          setFilters={setFilters}
+        />
+      </div>
+      <MessageWindow className="no-scrollbar relative flex h-full flex-col overflow-x-hidden overflow-y-scroll p-3 pb-12 sm:p-4 sm:pb-12">
         <Messages
           entityID={props.entityID}
           setReply={setReply}
@@ -217,7 +231,7 @@ export const MessageInput = (props: {
           )}
           {/* ACTUAL MESSAGE INPUT */}
           <div className="flex w-full items-end gap-2">
-            <div className="flex w-full items-center gap-1 rounded-md border border-grey-55 bg-white p-1 text-sm text-grey-15">
+            <div className="flex w-full items-center gap-1 rounded-md border border-grey-55 bg-white px-2 py-1 text-sm text-grey-15">
               <AutosizeTextarea
                 onKeyDown={(e) => {
                   if (e.key === "Escape") {
@@ -413,37 +427,6 @@ export const Messages = (props: {
           setReply={props.setReply}
         />
       ))}
-    </>
-  );
-};
-
-const NewMessageAnchor = (props: {
-  entityID: string;
-  setUnreads: (setter: (unread: boolean | null) => boolean | null) => void;
-}) => {
-  let messages = db.useMessages(props.entityID);
-  let [ref, intersectingState, intersectingRef] =
-    useIntersectionObserver<HTMLDivElement>();
-  useEffect(() => {
-    if (intersectingState) props.setUnreads(() => false);
-  }, [intersectingState]);
-
-  useEffect(() => {
-    if (intersectingRef.current || intersectingRef.current === null)
-      setTimeout(() => {
-        requestAnimationFrame(() => {
-          ref.current?.scrollIntoView({ block: "end" });
-        });
-      }, 100);
-    else
-      setTimeout(() => {
-        if (intersectingRef.current) return;
-        props.setUnreads((unread) => (unread === null ? unread : true));
-      }, 1000);
-  }, [messages]);
-  return (
-    <>
-      <div ref={ref} />
     </>
   );
 };

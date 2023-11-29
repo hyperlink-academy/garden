@@ -204,7 +204,7 @@ const MobileLayout = () => {
         >
           <div
             id="roomInnerWrapper"
-            className="roomInnerWrapper no-scrollbar relative flex h-full flex-shrink-0 flex-col gap-0 rounded-md border border-grey-90 px-2 "
+            className="roomInnerWrapper no-scrollbar relative flex h-full flex-shrink-0 flex-col gap-0 rounded-md border border-grey-90 "
           >
             <Room />
           </div>

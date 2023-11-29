@@ -104,7 +104,7 @@ export const Room = () => {
         action.end();
       }}
       ref={ref}
-      className="no-scrollbar flex h-full w-[336px] flex-col items-stretch overflow-x-hidden overflow-y-scroll p-2 pt-0 text-sm sm:p-4 sm:pt-0"
+      className="no-scrollbar flex h-full w-[336px] flex-col items-stretch overflow-x-hidden overflow-y-scroll p-3 pt-0 text-sm sm:p-4 sm:pt-0"
     >
       <RoomHeader
         totalCount={total}
@@ -258,7 +258,7 @@ const AddCardButton = (props: {
   );
 };
 
-function RoomHeader(props: {
+export function RoomHeader(props: {
   filteredCount: number;
   totalCount: number;
   entityID: string;
@@ -301,7 +301,7 @@ function RoomHeader(props: {
   return (
     <>
       <div
-        className="roomHeader sticky top-0 z-20 bg-background pt-2 sm:pt-3"
+        className="roomHeader sticky top-0 z-20 bg-background pt-3"
         ref={titleRef}
       >
         <div className="roomTitle flex justify-between">
