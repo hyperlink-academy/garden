@@ -42,7 +42,14 @@ export const Sidebar = (props: { mobile?: boolean }) => {
       <div className="no-scrollbar flex h-full w-full flex-col gap-2 overflow-y-scroll px-3 pt-3">
         {props.mobile && (
           <>
-            <SpaceName className="bg-white" />
+            <div className={`spaceName flex w-full bg-white text-grey-35`}>
+              <div className="flex w-full flex-row items-start gap-2 ">
+                <div className="grow">
+                  <SpaceName />
+                </div>
+                <SpaceOptions />
+              </div>
+            </div>
             <Divider />
           </>
         )}
@@ -126,7 +133,24 @@ const RoomButton = (props: { roomID: string; children: React.ReactNode }) => {
   );
 };
 
-export const SpaceName = (props: { className?: string }) => {
+export const SpaceName = (props: { truncate?: boolean }) => {
+  let spaceID = useSpaceID();
+  let { data } = useSpaceData(spaceID);
+
+  return (
+    <div className={`spaceName flex min-w-0 bg-inherit text-grey-35`}>
+      {props.truncate ? (
+        <Truncate className="w-full max-w-none overflow-hidden bg-inherit">
+          <h3 className="SpaceName whitespace-nowrap">{data?.display_name}</h3>
+        </Truncate>
+      ) : (
+        <h3 className="SpaceName whitespace-normal">{data?.display_name}</h3>
+      )}
+    </div>
+  );
+};
+
+export const SpaceOptions = () => {
   let spaceID = useSpaceID();
   let { authorized } = useMutations();
   let { data } = useSpaceData(spaceID);
@@ -137,35 +161,23 @@ export const SpaceName = (props: { className?: string }) => {
   let isOwner =
     session.session && session.session.username === data?.owner.username;
   let [editModal, setEditModal] = useState(false);
-  return (
-    <div
-      className={`spaceName flex w-full min-w-0 flex-col gap-2 text-grey-35 ${props.className}`}
-    >
-      <div className="flex flex-row items-start gap-2 bg-inherit ">
-        {window.matchMedia("(max-width: 640px)") ? (
-          <h3 className="SpaceName whitespace-normal">{data?.display_name}</h3>
-        ) : (
-          <Truncate className=" max-w-xs overflow-hidden  bg-inherit sm:max-w-none">
-            <h3 className="SpaceName whitespace-nowrap ">
-              {data?.display_name}
-            </h3>
-          </Truncate>
-        )}
 
-        {!authorized ? null : isOwner ? (
-          <button
-            onClick={() => {
-              setEditModal(true);
-              setMobileSidebarOpen(false);
-            }}
-            className="shrink-0 rounded-md border border-transparent pt-[1px] hover:border-accent-blue hover:text-accent-blue"
-          >
-            <MoreOptionsSmall className="" />
-          </button>
-        ) : (
-          <MemberOptions />
-        )}
-      </div>
+  return (
+    <>
+      {!authorized ? null : isOwner ? (
+        <button
+          onClick={() => {
+            setEditModal(true);
+            setMobileSidebarOpen(false);
+          }}
+          className="shrink-0 rounded-md border border-transparent pt-[1px] hover:border-accent-blue hover:text-accent-blue"
+        >
+          <MoreOptionsSmall className="" />
+        </button>
+      ) : (
+        <MemberOptions />
+      )}
+
       <EditSpaceModal
         open={editModal}
         onDelete={() => {
@@ -175,11 +187,10 @@ export const SpaceName = (props: { className?: string }) => {
         onClose={() => setEditModal(false)}
         spaceID={spaceID}
       />
-    </div>
+    </>
   );
 };
 
-const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 const MemberOptions = () => {
   const [leaveModalOpen, setLeaveModalOpen] = useState(false);
   let { authToken, session } = useAuth();
@@ -226,13 +237,6 @@ const MemberOptions = () => {
             if (!spaceID || !authToken || !session) return;
 
             setLoading(true);
-            let data = await spaceAPI(
-              `${WORKER_URL}/space/${spaceID}`,
-              "leave",
-              {
-                authToken,
-              }
-            );
             router.push("/s/" + session.session?.username);
             setLoading(false);
           }}

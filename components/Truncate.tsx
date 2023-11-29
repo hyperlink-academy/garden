@@ -1,5 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 
+// NOTES FOR USING TRUNCATE It's kinda finiky.
+// When implementing as a wrapper, you need to pass down a bg explicitly in the classname <Truncate clasname="bg-inherit">
+
+// If the truncate is part of flex-row, you need to make sure the width of the flexbox is not overflowing.
+// You can combine overflow-hidden and w-full but you also need to apply a min-w-0
+// See existing implementations for examples
+
 export function Truncate(props: {
   children: React.ReactNode;
   className?: string;
@@ -31,11 +38,13 @@ export function Truncate(props: {
         {props.children}
       </div>
       {scrollLeft > 0 && (
-        <div className="absolute bottom-0.5 left-0 bg-inherit pr-0.5">…</div>
+        <div className=" absolute bottom-[2px] left-0 bg-inherit pr-0.5">…</div>
       )}
       {scrollWidth > clientWidth &&
         scrollLeft + clientWidth < scrollWidth - 5 && (
-          <div className="absolute bottom-0.5 right-0 bg-inherit pl-0.5">…</div>
+          <div className=" absolute -right-[1px] bottom-[2px] bg-inherit pl-0.5">
+            …
+          </div>
         )}
     </div>
   );
