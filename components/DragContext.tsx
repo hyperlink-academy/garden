@@ -162,7 +162,7 @@ export const SmallCardDragContext = (props: {
 const AnimatedPickup = (props: { children: React.ReactNode }) => {
   let spring = useSpring({ from: { scale: 1 }, to: { scale: 1.02 } });
   return (
-    <animated.div className="relative w-fit text-sm drop-shadow" style={spring}>
+    <animated.div className="relative text-sm drop-shadow" style={spring}>
       {props.children}
     </animated.div>
   );
