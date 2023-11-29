@@ -259,7 +259,7 @@ export const RoomListItem = (props: {
             }}
             onFocus={(e) => {
               e.currentTarget.setSelectionRange(
-                e.currentTarget.value.length,
+                0,
                 e.currentTarget.value.length
               );
             }}
@@ -267,7 +267,7 @@ export const RoomListItem = (props: {
             section="room/name"
             focused
             onBlur={() => props.setEditting(false)}
-            className="grow border-none bg-inherit p-0 text-inherit"
+            className={`grow border-none bg-inherit p-0 font-normal italic text-inherit`}
           />
         ) : (
           <div className="roomListName grow">{props.children}</div>

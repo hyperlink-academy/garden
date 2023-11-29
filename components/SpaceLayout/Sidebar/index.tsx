@@ -103,7 +103,7 @@ const UnreadsRoomButton = () => {
   return (
     <RoomButton roomID="unreads">
       {unreadCards?.length > 0 || unreadDiscussions?.length > 0 ? (
-        <div className="absolute -left-1 -top-1">
+        <div className="absolute left-0 top-1">
           <UnreadDot />
         </div>
       ) : null}
@@ -117,7 +117,7 @@ const RoomButton = (props: { roomID: string; children: React.ReactNode }) => {
   let setRoom = useSetRoom();
   return (
     <button
-      className={`relative flex w-full items-center gap-1 rounded-md border border-white p-1 ${
+      className={`relative flex w-full items-center gap-1 rounded-md border border-white px-1 py-0.5 ${
         isActiveRoom
           ? "rounded-md border border-accent-blue bg-accent-blue font-bold text-white"
           : "text-grey-35 hover:border hover:border-grey-80"
