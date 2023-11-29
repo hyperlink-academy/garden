@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { RadioGroup } from "@headlessui/react";
 import { useDevices } from "@daily-co/daily-react";
+import { CloseLinedTiny } from "components/Icons";
 
 export const MediaDeviceSettings = (props: { onSelect: () => void }) => {
   let {
@@ -16,26 +17,32 @@ export const MediaDeviceSettings = (props: { onSelect: () => void }) => {
   let currentDevice = view === "microphone" ? currentMic : currentSpeaker;
   return (
     <div className="flex flex-col pt-2 text-sm">
-      <div className="-mb-[1px] flex flex-row gap-1">
-        <button
-          className={` rounded-t-md border border-grey-80 px-2 pt-0 ${
-            view === "microphone"
-              ? "z-10 border-b-bg-blue bg-bg-blue pb-0 font-bold"
-              : "-mb-2 pb-2"
-          } `}
-          onClick={() => setView("microphone")}
-        >
-          mic
-        </button>
-        <button
-          className={` rounded-t-md border border-grey-80 px-2 pt-0 ${
-            view === "speakers"
-              ? "z-10 border-b-bg-blue bg-bg-blue pb-0 font-bold"
-              : ""
-          } `}
-          onClick={() => setView("speakers")}
-        >
-          speaker
+      <div className="flex justify-between">
+        <div className="-mb-[1px] flex flex-row gap-1">
+          <button
+            className={` rounded-t-md border border-grey-80 px-2 pt-0 ${
+              view === "microphone"
+                ? "z-10 border-b-bg-blue bg-bg-blue pb-0 font-bold text-accent-blue"
+                : "-mb-2 pb-2"
+            } `}
+            onClick={() => setView("microphone")}
+          >
+            mic
+          </button>
+          <button
+            className={` rounded-t-md border border-grey-80 px-2 pt-0 ${
+              view === "speakers"
+                ? "z-10 border-b-bg-blue bg-bg-blue pb-0 font-bold text-accent-blue"
+                : ""
+            } `}
+            onClick={() => setView("speakers")}
+          >
+            speaker
+          </button>
+        </div>
+        <button className="mr-1" onClick={() => props.onSelect()}>
+          {" "}
+          <CloseLinedTiny />
         </button>
       </div>
       <RadioGroup
@@ -64,7 +71,7 @@ export const MediaDeviceSettings = (props: { onSelect: () => void }) => {
                       }`}
                     >
                       {checked && (
-                        <div className="mt-[2px] ml-[2px] h-2 w-2 rounded-full bg-accent-blue" />
+                        <div className="ml-[2px] mt-[2px] h-2 w-2 rounded-full bg-accent-blue" />
                       )}
                     </div>
                     <div>{d.device.label}</div>

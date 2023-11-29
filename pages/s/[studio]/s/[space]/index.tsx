@@ -16,7 +16,7 @@ import { SWRConfig } from "swr";
 import { useViewportSize } from "hooks/useViewportSize";
 import { usePreventResize } from "hooks/usePreventResize";
 import { Question, SidebarIcon, StudioFilled } from "components/Icons";
-import { SpaceName } from "components/SpaceLayout/Sidebar";
+import { SpaceName, SpaceOptions } from "components/SpaceLayout/Sidebar";
 import { useSpring, animated } from "@react-spring/web";
 import { createPortal } from "react-dom";
 import { useAuth } from "hooks/useAuth";
@@ -115,7 +115,14 @@ const DesktopLayout = () => {
               </Link>
             </>
           )}
-          <SpaceName className="grow bg-background" />
+          <div
+            className={`spaceName flex w-full min-w-0 grow bg-background text-grey-35`}
+          >
+            <div className="flex w-full flex-row items-start gap-2 bg-inherit ">
+              <SpaceName truncate />
+              <SpaceOptions />
+            </div>
+          </div>
           {!session.loggedIn && <LoginButton />}
         </div>
         <div className="spaceHeaderSearch flex w-[360px] shrink-0 flex-row gap-0">

@@ -29,13 +29,10 @@ import { useAuth } from "hooks/useAuth";
 import { useSmoker } from "components/Smoke";
 import useSWR from "swr";
 import { spaceAPI } from "backend/lib/api";
-import {
-  ButtonPrimary,
-  ButtonSecondary,
-  ButtonTertiary,
-} from "components/Buttons";
-import { Divider } from "components/Layout";
+import { ButtonPrimary, ButtonTertiary } from "components/Buttons";
 import { Modal } from "components/Modal";
+import { Divider } from "components/Layout";
+import { Truncate } from "components/Truncate";
 
 export const People = () => {
   let members = db.useAttribute("member/name");
@@ -46,66 +43,63 @@ export const People = () => {
     .useAttribute("presence/client-member")
     .map((m) => m.value.value);
   let uniqueSessions = new Set(activeSessions);
-  let [expanded, setExpanded] = useState(false);
   let { authorized } = useMutations();
+  let [onlineExpanded, setOnlineExpanded] = useState(true);
+  let [offlineExpanded, setOfflineExpanded] = useState(false);
+  let [callExpanded, setCallExpanded] = useState(true);
 
   let onlineMembers = members.filter((f) => uniqueSessions.has(f.entity));
-  let offline = members.filter((f) => !uniqueSessions.has(f.entity));
-
-  let meetingState = useMeetingState();
-  let inCall = meetingState === "joined-meeting";
+  let offlineMembers = members.filter((f) => !uniqueSessions.has(f.entity));
 
   return (
-    <div className="flex flex-col gap-2 border-t border-grey-80 p-2">
-      <div className="flex flex-row items-center justify-between text-grey-55">
+    <div className="people flex flex-col border-t border-grey-80 px-3 pb-2 text-sm">
+      <div className="peopleOnline  mt-1 flex  flex-col ">
         <button
-          onClick={() => setExpanded(!expanded)}
-          className={`flex h-[28px] items-center gap-1 text-sm font-bold text-grey-55  hover:text-accent-blue
-           `}
+          onClick={() => {
+            if (onlineExpanded) {
+              setOnlineExpanded(false);
+              setCallExpanded(false);
+            }
+            if (!onlineExpanded) {
+              setOnlineExpanded(true);
+              setCallExpanded(true);
+            }
+          }}
+          className={` h-[28px]  gap-1 text-left text-sm  font-bold text-grey-35  hover:text-accent-blue`}
         >
-          Members{" "}
-          {uniqueSessions.size > 1
-            ? `(${uniqueSessions.size}/${members.length})`
-            : `(${members.length})`}
+          Online {onlineExpanded === false && `(${onlineMembers.length})`}
         </button>
-        {!callOngoing && <JoinCall />}
+
+        {callOngoing ? (
+          <CallPanel
+            callExpanded={callExpanded}
+            toggleCallExpanded={() => setCallExpanded(!callExpanded)}
+          />
+        ) : null}
+        {onlineExpanded ? (
+          <MembersOnline onlineMembers={onlineMembers} />
+        ) : null}
       </div>
-      {callOngoing ? (
-        <div
-          className={`flex flex-col gap-2 rounded-md border ${
-            inCall ? "border-accent-blue" : "border-grey-80"
-          }  p-2`}
-        >
-          <div className="-mx-1 -mb-0.5 -mt-2 flex flex-col gap-[6px]">
+      {offlineMembers.length === 0 ? null : (
+        <>
+          <Divider />
+          <div className="peopleOffline mb-2 flex  flex-col ">
             <button
-              onClick={() => setExpanded(!expanded)}
-              className={`-mx-1 flex justify-between rounded-t-md border border-l-0 border-r-0 border-t-0 bg-bg-blue px-2 py-1 text-xs font-bold text-accent-blue ${
-                inCall ? "border-b-accent-blue" : "border-b-grey-80"
-              } `}
+              onClick={() => setOfflineExpanded(!offlineExpanded)}
+              className={`h-[28px]  gap-1 text-left text-sm font-bold  text-grey-55  hover:text-accent-blue`}
             >
-              <div>call ongoing</div>
-              <div className="flex items-center gap-0.5">
-                {membersInCall.length} <RoomMember />
-              </div>
+              Offline{" "}
+              {offlineExpanded === false && `(${offlineMembers.length})`}
             </button>
-            {inCall ? <CallSettings /> : <JoinCall />}
+
+            {offlineExpanded ? (
+              <MembersOffline offlineMembers={offlineMembers} />
+            ) : null}
+            {authorized && <InviteMember />}
           </div>
-          {expanded && (
-            <div className="flex flex-col gap-2 pt-1">
-              <MembersInCall membersLength={members.length} />
-              <MembersList
-                onlineMembers={onlineMembers}
-                offlineMembers={offline}
-              />
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className="flex flex-col gap-2">
-          <MembersList onlineMembers={onlineMembers} offlineMembers={offline} />
-        </div>
+        </>
       )}
-      {authorized && <InviteMember />}
+      {!callOngoing && <JoinCall />}
     </div>
   );
 };
@@ -124,7 +118,7 @@ const JoinCall = () => {
     <>
       {authorized &&
         (callOngoing ? (
-          <ButtonSecondary
+          <ButtonPrimary
             onClick={async (e) => {
               e.preventDefault();
               if (loading || inCall) return;
@@ -134,11 +128,11 @@ const JoinCall = () => {
             }}
             content={loading ? <DotLoader /> : "Join Call!"}
             icon={<CallSmall />}
-            className={`${callOngoing ? "!w-full grow " : ""}`}
+            className={` !w-full grow `}
           />
         ) : (
-          <button
-            className="rounded-md   hover:text-accent-blue"
+          <ButtonTertiary
+            className={` !w-full grow `}
             onClick={async (e) => {
               e.preventDefault();
               if (loading || inCall) return;
@@ -146,16 +140,74 @@ const JoinCall = () => {
               await joinCall();
               setLoading(false);
             }}
-          >
-            {loading ? (
-              <div className="-mt-1 h-[28px] ">
-                <DotLoader />{" "}
-              </div>
-            ) : (
-              <CallSmall />
-            )}
-          </button>
+            content={
+              loading ? (
+                <div className="-mt-1 flex h-[28px] items-center">
+                  <DotLoader />
+                </div>
+              ) : (
+                "Start Call"
+              )
+            }
+            icon={loading ? <></> : <CallSmall />}
+          />
         ))}
+    </>
+  );
+};
+
+const CallPanel = (props: {
+  callExpanded: boolean;
+  toggleCallExpanded: () => void;
+}) => {
+  let meetingState = useMeetingState();
+  let members = db.useAttribute("member/name");
+  let membersInCall = db.useAttribute("presence/in-call");
+
+  let localPariticpant = useLocalParticipant();
+  let muted = localPariticpant?.tracks.audio.state !== "playable";
+
+  let activeSessions = db
+    .useAttribute("presence/client-member")
+    .map((m) => m.value.value);
+
+  let inCall = meetingState === "joined-meeting";
+  return (
+    <>
+      <div className="peopleCallPanel mb-2">
+        <div
+          className={`peopleCallPanelHeader flex w-full flex-col gap-1 rounded-t-md border p-2 pt-0 text-left text-xs font-bold ${
+            !inCall
+              ? "border-accent-blue bg-bg-blue text-accent-blue"
+              : muted
+              ? "border-grey-55 bg-grey-55 text-white"
+              : "border-accent-blue bg-accent-blue text-white"
+          } ${props.callExpanded && inCall ? "" : "rounded-b-md"}`}
+        >
+          <button
+            className="w-full pt-2 text-left"
+            onClick={() => props.toggleCallExpanded()}
+          >
+            {inCall ? "in call..." : "call ongoing..."}
+          </button>
+          {inCall ? <CallSettings /> : <JoinCall />}
+        </div>
+        {props.callExpanded && inCall && (
+          <div
+            className={`peopleCallPanelMembers -mt-[1px]  rounded-b-md border px-2 pb-2 pt-1 ${
+              !inCall
+                ? "border-accent-blue"
+                : muted
+                ? "border-grey-55 "
+                : "border border-accent-blue"
+            }`}
+          >
+            <div className="flex flex-col gap-2 pt-1">
+              <MembersInCall membersLength={members.length} />
+            </div>
+          </div>
+        )}
+      </div>
     </>
   );
 };
@@ -170,22 +222,22 @@ const CallSettings = () => {
   let inCall = meetingState === "joined-meeting";
   let call = useDaily();
   return (
-    <div>
-      <div className="flex flex-row justify-between gap-1">
-        <div className="flex w-full flex-row gap-1">
+    <>
+      <div className="flex w-full justify-between gap-1 selection:flex-row">
+        <div className="flex w-full flex-row gap-2">
           <button
-            onClick={() => call?.setLocalAudio(muted)}
-            className={`${
-              muted
-                ? "border-grey-55 bg-grey-55 hover:bg-white"
-                : " border-accent-blue bg-accent-blue text-white"
-            } grow rounded-md border px-2 py-1 text-sm font-bold`}
+            onClick={(e) => {
+              call?.setLocalAudio(muted);
+            }}
+            className={`
+             grow rounded-md border border-white bg-white px-2 py-0 text-sm font-bold ${
+               muted ? "text-grey-55 " : "text-accent-blue"
+             }`}
           >
-            {muted ? "speak" : "mute"}
+            {muted ? "unmute" : "mute"}
           </button>
-
           <button
-            className="shrink-0 rounded-md border px-2 py-1 text-sm font-bold hover:border-accent-red hover:text-accent-red"
+            className="shrink-0 rounded-md border border-white px-2 py-0 text-sm font-bold hover:border-accent-red hover:text-accent-red"
             onClick={(e) => {
               e.preventDefault();
               if (inCall) return call?.leave();
@@ -195,7 +247,7 @@ const CallSettings = () => {
           </button>
         </div>
         <button
-          className="flex w-6 items-center justify-center"
+          className="flex w-4 items-center justify-center"
           onClick={() => setSettingsOpen((s) => !s)}
         >
           <MoreOptionsSmall />
@@ -204,7 +256,43 @@ const CallSettings = () => {
       {settingsOpen && (
         <MediaDeviceSettings onSelect={() => setSettingsOpen(false)} />
       )}
-    </div>
+    </>
+  );
+};
+
+const MembersOnline = ({
+  onlineMembers,
+}: {
+  onlineMembers: Fact<"member/name">[];
+}) => {
+  return (
+    <>
+      {onlineMembers.length > 0 && (
+        <div className="peopleOnlineList mb-2 flex flex-col gap-2">
+          {onlineMembers.map((m) => (
+            <Member entityID={m.entity} key={m.id} />
+          ))}
+        </div>
+      )}
+    </>
+  );
+};
+
+const MembersOffline = ({
+  offlineMembers,
+}: {
+  offlineMembers: Fact<"member/name">[];
+}) => {
+  return (
+    <>
+      {offlineMembers.length > 0 && (
+        <div className="peopleOfflineList mb-2 flex flex-col gap-2">
+          {offlineMembers.map((m) => (
+            <Member entityID={m.entity} key={m.id} />
+          ))}
+        </div>
+      )}
+    </>
   );
 };
 
@@ -270,9 +358,6 @@ const MembersInCall = (props: { membersLength: number }) => {
       {participantIDs.map((id) => (
         <MemberInCall participantID={id} key={id} />
       ))}
-      {participantIDs.length !== props.membersLength && (
-        <hr className="-mx-2 border-grey-80" />
-      )}
     </>
   );
 };
@@ -302,7 +387,7 @@ const Member = (props: { entityID: string; showInCall?: boolean }) => {
   return (
     <div>
       <div
-        className="flex w-full flex-row items-start gap-1 overflow-hidden"
+        className="flex w-full flex-row items-start gap-1 overflow-hidden bg-white"
         style={{
           color:
             activeSessions.length > 0
@@ -310,7 +395,7 @@ const Member = (props: { entityID: string; showInCall?: boolean }) => {
               : tailwind.theme.colors["grey-55"],
         }}
       >
-        <div className="mt-0.5 ">
+        <div className="mt-0.5 shrink-0 ">
           {!participant ? (
             <RoomMember />
           ) : participant.tracks.audio.state === "playable" ? (
@@ -321,7 +406,7 @@ const Member = (props: { entityID: string; showInCall?: boolean }) => {
             </div>
           )}
         </div>
-        <div>
+        <div className="w-full min-w-0 grow bg-inherit">
           <div
             className={`break-all text-sm ${
               activeSessions.length > 0 ? "font-bold" : ""
@@ -330,17 +415,19 @@ const Member = (props: { entityID: string; showInCall?: boolean }) => {
             {memberEntity === props.entityID ? "You" : name?.value}
           </div>
           {cardTitle && memberEntity !== props.entityID && (
-            <div className="max-w-full truncate whitespace-nowrap text-xs italic text-grey-55">
+            <div className="flex w-full min-w-0  gap-[5px] overflow-hidden bg-inherit text-xs italic text-grey-55">
               in{" "}
-              <span
-                role="button"
-                className="underline hover:cursor-pointer"
-                onClick={() => {
-                  if (onCard) open(onCard.value.value);
-                }}
-              >
-                {cardTitle?.value || "Untitled Card"}
-              </span>
+              <Truncate className="w-full min-w-0 grow overflow-hidden bg-inherit ">
+                <div
+                  role="button"
+                  className="over:cursor-pointer whitespace-nowrap underline"
+                  onClick={() => {
+                    if (onCard) open(onCard.value.value);
+                  }}
+                >
+                  {cardTitle?.value || "Untitled Card"}
+                </div>
+              </Truncate>
             </div>
           )}
         </div>
@@ -390,12 +477,13 @@ const InviteMember = () => {
     <>
       {authorized && (
         // (callOngoing ? (
-        <ButtonTertiary
-          className=" flex !w-full items-center gap-1 text-sm italic text-grey-55"
+
+        <button
+          className="flex items-center gap-2 text-sm italic text-grey-55"
           onClick={() => setInviteOpen(true)}
-          icon={<MemberAdd />}
-          content="Invite!"
-        />
+        >
+          <AddTiny className="text-grey-80" /> invite
+        </button>
       )}
       <Modal open={open} onClose={() => setInviteOpen(false)}>
         <div className="inviteMemberModal flex flex-col place-items-center gap-4 p-0 text-center">
