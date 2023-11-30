@@ -111,7 +111,7 @@ export const CardView = (props: {
       let position = generateKeyBetween(null, firstPosition || null);
       await mutate("addCardToSection", {
         factID: ulid(),
-        cardEntity: entityID,
+        cardEntity: entityID as string,
         parent: props.entityID,
         section: "deck/contains",
         positions: {
