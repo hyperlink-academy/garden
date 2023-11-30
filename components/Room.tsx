@@ -13,6 +13,7 @@ import {
   CollectionPreviewTiny,
   GoToTop,
   MoreOptionsTiny,
+  RoomCollection,
 } from "./Icons";
 import { Divider } from "./Layout";
 import { UnreadsRoom } from "./UnreadsRoom";
@@ -26,6 +27,7 @@ import { useDraggableCard } from "./DragContext";
 import { sortByPosition } from "src/position_helpers";
 import { generateKeyBetween } from "src/fractional-indexing";
 import { useRoom } from "hooks/useUIState";
+import { SingleTextSection } from "./CardView/Sections";
 
 export const Room = () => {
   let room = useRoom();
@@ -266,9 +268,9 @@ export function RoomHeader(props: {
   filters: Filters;
   setFilters: (f: (old: Filters) => Filters) => void;
 }) {
-  let roomType = db.useEntity(props.entityID, "room/type");
   let [descriptionOpen, setDescriptionOpen] = useState(false);
   let [scrolledTop, setScrolledTop] = useState(true);
+  let [nameEditting, setNameEditting] = useState(false);
 
   let [titleRef, { height: titleHeight }] = useMeasure();
   let [descriptionRef, { height: descriptionHeight }] = useMeasure();
@@ -307,30 +309,45 @@ export function RoomHeader(props: {
         <div className="roomTitle flex justify-between">
           <button
             className={` text-left text-lg font-bold text-grey-35 `}
-            onClick={() => {
-              if (!scrolledTop) {
-                setDescriptionOpen(!descriptionOpen);
-              } else return;
+            onClick={(e) => {
+              if (authorized) {
+                setNameEditting(true);
+                return;
+              }
             }}
           >
-            {roomName?.value}{" "}
-            {roomType?.value === "collection" ? (
-              <span className="text-sm text-grey-35">
-                (
-                {props.totalCount === props.filteredCount
-                  ? props.totalCount
-                  : `${props.filteredCount}/${props.totalCount}`}
-                )
-              </span>
-            ) : null}
+            {authorized && nameEditting ? (
+              <SingleTextSection
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    setNameEditting(false);
+                  }
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.setSelectionRange(
+                    0,
+                    e.currentTarget.value.length
+                  );
+                }}
+                entityID={props.entityID}
+                section="room/name"
+                focused
+                onBlur={() => setNameEditting(false)}
+                className={`grow border-none bg-inherit p-0 font-normal italic text-inherit`}
+              />
+            ) : (
+              roomName?.value
+            )}
           </button>
+
           {authorized && (
-            <div className="roomOptionsWrapper mt-[1px] flex items-start gap-1">
+            <div className="roomOptionsWrapper mt-[1px] flex items-start gap-1 text-grey-35">
               {scrolledTop ? (
                 <div className="w-4" />
               ) : (
                 <button
-                  className="mt-1"
+                  className="mt-1 "
                   onClick={() =>
                     document.getElementById("room-wrapper")?.scrollTo({
                       top: 0,
@@ -360,6 +377,8 @@ export function RoomHeader(props: {
           reactions={props.reactions}
           filters={props.filters}
           setFilters={props.setFilters}
+          filteredCount={props.filteredCount}
+          totalCount={props.totalCount}
         />
       </div>
       <div
@@ -381,11 +400,17 @@ const RoomDescription = (props: {
   filters: Filters;
   setFilters: (f: (old: Filters) => Filters) => void;
   entityID: string;
+  filteredCount: number;
+  totalCount: number;
 }) => {
   let roomDescription = db.useEntity(props.entityID, "room/description");
   let roomType = db.useEntity(props.entityID, "room/type");
   let currentCollectionType = db.useEntity(props.entityID, "collection/type");
   let [filtersOpen, setFiltersOpen] = useState(false);
+  let { authorized } = useMutations();
+
+  let [descriptionEditting, setDescriptionEditting] = useState(false);
+
   // let [collectionType, setCollectionType] = useState(
   //   currentCollectionType?.value
   // );
@@ -396,37 +421,67 @@ const RoomDescription = (props: {
 
   return (
     <>
-      <div id="roomDescription" className="flex flex-col gap-2">
+      <div id="roomDescription" className="flex flex-col gap-1 ">
         {roomDescription?.value && (
-          <RenderedText
-            className="text-base text-grey-35"
-            id="roomDescriptionY"
-            style={{
-              whiteSpace: "pre-wrap",
-              fontFamily: "inherit",
-              width: "100%",
-              zIndex: 10,
+          <button
+            className={` pt-1 text-left text-base text-grey-35`}
+            onClick={(e) => {
+              if (authorized) {
+                setDescriptionEditting(true);
+                return;
+              }
             }}
-            text={roomDescription?.value || ""}
-          />
+          >
+            {authorized && descriptionEditting ? (
+              <SingleTextSection
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    setDescriptionEditting(false);
+                  }
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.setSelectionRange(
+                    0,
+                    e.currentTarget.value.length
+                  );
+                }}
+                entityID={props.entityID}
+                section="room/description"
+                focused
+                onBlur={() => setDescriptionEditting(false)}
+                className={`grow border-none bg-inherit p-0 font-normal italic text-inherit`}
+              />
+            ) : (
+              roomDescription?.value
+            )}
+          </button>
         )}
+
         {roomType?.value === "collection" ? (
-          <div className="flex flex-col gap-1 pt-2">
-            <div className="roomFilterAndToggle flex justify-between text-sm">
+          <div className="flex flex-col gap-1 pt-1">
+            <div className="roomCollectionOptions flex justify-between text-sm">
+              <div className="roomCountAndFilter flex gap-2">
+                <div className="roomCardCount flex items-center gap-1 text-sm font-bold text-grey-35">
+                  <RoomCollection className="shrink-0" />
+                  {props.totalCount === props.filteredCount
+                    ? props.totalCount
+                    : `${props.filteredCount}/${props.totalCount}`}{" "}
+                </div>
+                <div className="my-0.5 border-l-[1px] text-grey-55" />
+                <button
+                  className={`text-grey-55 ${
+                    props.filters.length === 0 ? " " : "font-bold "
+                  }`}
+                  onClick={() => setFiltersOpen(!filtersOpen)}
+                >
+                  filters({props.filters.length})
+                </button>
+              </div>
               <CollectionType
                 collectionType={currentCollectionType?.value}
                 entityID={props.entityID}
               />
-              <button
-                className={`${
-                  props.filters.length === 0
-                    ? "text-grey-55 underline"
-                    : "font-bold text-accent-blue"
-                }`}
-                onClick={() => setFiltersOpen(!filtersOpen)}
-              >
-                filters({props.filters.length})
-              </button>
             </div>
             <div className={`${filtersOpen ? "" : "hidden"}`}>
               <FilterByReactions
