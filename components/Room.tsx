@@ -28,6 +28,7 @@ import { sortByPosition } from "src/position_helpers";
 import { generateKeyBetween } from "src/fractional-indexing";
 import { useRoom } from "hooks/useUIState";
 import { SingleTextSection } from "./CardView/Sections";
+import { useCardViewer } from "./CardViewerContext";
 
 export const Room = () => {
   let room = useRoom();
@@ -150,6 +151,7 @@ const AddCardButton = (props: {
   roomEntity: string;
   getViewHeight: () => number | undefined;
 }) => {
+  let { open } = useCardViewer();
   let roomType = db.useEntity(props.roomEntity, "room/type");
   const { attributes, listeners, setNodeRef } = useDraggableCard({
     id: "new-card",
@@ -172,6 +174,7 @@ const AddCardButton = (props: {
             title: "",
             memberEntity,
           });
+
           if (roomType.value === "collection") {
             let siblings = (
               await rep.query((tx) => {
@@ -208,6 +211,9 @@ const AddCardButton = (props: {
               },
             });
           }
+          open({ entityID: newEntity, focus: "title" });
+
+          //open the card
         }}
         className="outline-none hover:text-accent-blue"
       >

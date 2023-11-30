@@ -70,6 +70,7 @@ export const SmallCardDragContext = (props: {
             active,
             activeData.rect.current.translated
           );
+        active?.onDragEnd?.(overData);
         setActiveCard(null);
         setOver(null);
       }}
@@ -190,6 +191,7 @@ export type DraggableData = {
   id: string;
   disabled?: boolean;
   onDragStart?: (data: DraggableData) => void | Promise<void>;
+  onDragEnd?: (over: DroppableData) => void | Promise<void>;
 } & (
   | {
       type: "card";

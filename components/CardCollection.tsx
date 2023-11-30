@@ -23,6 +23,7 @@ import {
 } from "./DragContext";
 import { useRemoveCardFromRoomHistory, useUIState } from "hooks/useUIState";
 import { useDebouncedValue } from "hooks/useDebouncedValue";
+import { useCardViewer } from "./CardViewerContext";
 
 export const CardCollection = (props: {
   entityID: string;
@@ -271,6 +272,8 @@ let useOnDragEndCollection = (props: {
   attribute: "desktop/contains" | "deck/contains";
 }) => {
   let { mutate, action, memberEntity, rep } = useMutations();
+  let { open } = useCardViewer();
+
   return useCallback(
     async (data: DraggableData) => {
       if (!rep) return;
@@ -333,6 +336,8 @@ let useOnDragEndCollection = (props: {
               },
             });
           }
+          open({ entityID: entityID, focus: "title" });
+
           break;
         }
         case "search-card": {
@@ -345,6 +350,8 @@ let useOnDragEndCollection = (props: {
               eav: position,
             },
           });
+          open({ entityID: data.entityID, focus: "title" });
+
           break;
         }
         case "card": {
@@ -379,6 +386,6 @@ let useOnDragEndCollection = (props: {
       }
       action.end();
     },
-    [mutate, memberEntity, props, action, rep]
+    [mutate, memberEntity, props, action, rep, open]
   );
 };
