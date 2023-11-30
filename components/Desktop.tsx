@@ -23,6 +23,7 @@ import { generateKeyBetween } from "src/fractional-indexing";
 import { useAuth } from "hooks/useAuth";
 import { getAndUploadFile } from "src/getAndUploadFile";
 import { useCardPreviewData } from "hooks/CardPreviewData";
+import { useRemoveCardFromRoomHistory } from "hooks/useUIState";
 
 const GRID_SIZE = 8;
 const snap = (x: number) => Math.round(x / GRID_SIZE) * GRID_SIZE;
@@ -320,7 +321,7 @@ const DraggableCard = (props: {
     },
   });
   let refs = useCombinedRefs(setNodeRef, setNodeRef2);
-  let { close } = useCardViewer();
+  let removeCardFromRoomHistory = useRemoveCardFromRoomHistory();
   let onRotateDrag = useCallback(
     (da: number) => {
       mutate("updatePositionInDesktop", {
@@ -338,8 +339,17 @@ const DraggableCard = (props: {
       factID: props.relationshipID,
       entityID: props.entityID,
     });
-    close({ entityID: props.entityID });
-  }, [props.relationshipID, props.entityID, close, mutate]);
+    removeCardFromRoomHistory({
+      cardEntity: props.entityID,
+      room: props.parent,
+    });
+  }, [
+    props.relationshipID,
+    props.entityID,
+    removeCardFromRoomHistory,
+    mutate,
+    props.parent,
+  ]);
   let dragHandleProps = useMemo(
     () => ({ listeners, attributes }),
     [listeners, attributes]

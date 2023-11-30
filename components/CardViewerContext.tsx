@@ -1,7 +1,12 @@
 import { ref } from "data/Facts";
 import { useAppEventListener, publishAppEvent } from "hooks/useEvents";
 import { db, useMutations, useSpaceID } from "hooks/useReplicache";
-import { useOpenCard, useRoom, useUIState } from "hooks/useUIState";
+import {
+  useOpenCard,
+  useRemoveCardFromRoomHistory,
+  useRoom,
+  useUIState,
+} from "hooks/useUIState";
 import { useCallback, useEffect, useRef } from "react";
 import { CardView } from "./CardView";
 import { useViewportSize } from "hooks/useViewportSize";
@@ -12,9 +17,7 @@ import { useIsMobile } from "hooks/utils";
 export const useCardViewer = () => {
   let spaceID = useSpaceID();
   let openCard = useOpenCard();
-  let close = useCallback((args: { entityID: string }) => {
-    publishAppEvent("cardviewer.close-card", args);
-  }, []);
+
   let open = useCallback(
     (args: { entityID: string; focus?: "title" | "content" }) => {
       if (!spaceID) return;
@@ -32,7 +35,6 @@ export const useCardViewer = () => {
   );
   return {
     open,
-    close,
   };
 };
 
@@ -40,8 +42,6 @@ export function CardViewer() {
   let room = useRoom();
   let roomType = db.useEntity(room, "room/type")?.value;
   let spaceID = useSpaceID();
-
-  let closeCard = useUIState((s) => s.closeCard);
 
   let history = useUIState((s) => {
     if (!spaceID || !room) return [];
@@ -90,15 +90,7 @@ export function CardViewer() {
     []
   );
   let viewheight = useViewportSize().height;
-
-  useAppEventListener(
-    "cardviewer.close-card",
-    () => {
-      if (!room || !spaceID) return;
-      closeCard(spaceID, room);
-    },
-    [room, spaceID]
-  );
+  let removeCardFromRoomHistory = useRemoveCardFromRoomHistory();
 
   return (
     <div
@@ -116,8 +108,7 @@ export function CardViewer() {
           entityID={history[0]}
           key={history[0]}
           onDelete={() => {
-            if (!room || !spaceID) return;
-            closeCard(spaceID, room);
+            removeCardFromRoomHistory({ cardEntity: history[0], room });
           }}
         />
       ) : (

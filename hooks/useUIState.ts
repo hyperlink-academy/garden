@@ -85,20 +85,7 @@ export let useUIState = create(
           },
         }));
       },
-      closeCard: (spaceID: string, roomID: string) => {
-        set((state) => ({
-          spaces: {
-            ...state.spaces,
-            [spaceID]: {
-              ...state.spaces[spaceID],
-              rooms: {
-                [roomID]:
-                  state.spaces?.[spaceID]?.rooms?.[roomID]?.slice(1) || [],
-              },
-            },
-          },
-        }));
-      },
+      closeCard: (spaceID: string, roomID: string) => {},
       openCard: (spaceID: string, roomID: string, card: string) => {
         set((state) => {
           let currentCard = state.spaces[spaceID]?.rooms?.[roomID]?.[0];
@@ -190,17 +177,84 @@ export const useOpenCard = () => {
   );
 };
 
+export const useRemoveCardFromRoomHistory = () => {
+  let spaceID = useSpaceID();
+  let { action } = useMutations();
+  return useCallback(
+    ({ cardEntity, room }: { cardEntity: string; room: string }) => {
+      if (!spaceID) return;
+      let sID = spaceID;
+
+      if (!room) return;
+      let history = useUIState.getState().spaces[spaceID]?.rooms?.[room] || [];
+      useUIState.setState((state) => ({
+        spaces: {
+          ...state.spaces,
+          [sID]: {
+            ...state.spaces[sID],
+            rooms: {
+              [room]: history.filter((h) => h !== cardEntity),
+            },
+          },
+        },
+      }));
+      action.add({
+        undo: () => {
+          useUIState.setState((state) => ({
+            spaces: {
+              ...state.spaces,
+              [sID]: {
+                ...state.spaces[sID],
+                rooms: {
+                  [room]: history,
+                },
+              },
+            },
+          }));
+        },
+        redo: () => {
+          useUIState.setState((state) => ({
+            spaces: {
+              ...state.spaces,
+              [sID]: {
+                ...state.spaces[sID],
+                rooms: {
+                  [room]: history.filter((h) => h !== cardEntity),
+                },
+              },
+            },
+          }));
+        },
+      });
+    },
+    [spaceID, action]
+  );
+};
+
 export const useCloseCard = () => {
   let spaceID = useSpaceID();
   let { action } = useMutations();
   let openCard = useUIState((state) => state.openCard);
-  let closeCard = useUIState((state) => state.closeCard);
+
   return useCallback(() => {
     if (!spaceID) return;
-
     let room = useUIState.getState().spaces[spaceID]?.activeRoom;
-
     if (!room) return;
+
+    let closeCard = (spaceID: string, room: string) => {
+      useUIState.setState((state) => ({
+        spaces: {
+          ...state.spaces,
+          [spaceID]: {
+            ...state.spaces[spaceID],
+            rooms: {
+              [room]: state.spaces?.[spaceID]?.rooms?.[room]?.slice(1) || [],
+            },
+          },
+        },
+      }));
+    };
+
     let currentCard = useUIState.getState().spaces[spaceID]?.rooms?.[room]?.[0];
     if (!currentCard) return;
     closeCard(spaceID as string, room as string);
@@ -212,7 +266,7 @@ export const useCloseCard = () => {
         closeCard(spaceID as string, room as string);
       },
     });
-  }, [spaceID, action]);
+  }, [spaceID, action, openCard]);
 };
 
 export const useSetRoom = () => {

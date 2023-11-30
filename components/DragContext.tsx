@@ -89,8 +89,6 @@ export const SmallCardDragContext = (props: {
           <AnimatedPickup>
             {active.type === "card" || active.type === "search-card" ? (
               <div
-                className={`${active.type === "search-card" ? "w-[314px]" : ""}
-                }`}
                 style={{
                   transform: `rotate(${
                     active.type === "search-card" || !active.position?.rotation
@@ -132,7 +130,7 @@ export const SmallCardDragContext = (props: {
                 />
               </div>
             ) : active.type === "new-search-card" ? (
-              <div className="w-[314px]">
+              <div className="w-full">
                 <PlaceholderNewCard title={active.title} />
               </div>
             ) : null}
@@ -147,7 +145,7 @@ export const SmallCardDragContext = (props: {
                   <span>Add</span>
                 ) : (
                   <span>
-                    Add to {over.type === "linkCard" ? "Card" : "Room"}
+                    Place {over.type === "linkCard" ? "on Card" : "in Room"}
                   </span>
                 )}
               </div>
