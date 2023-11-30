@@ -140,16 +140,18 @@ export const SmallCardDragContext = (props: {
             ) : null}
 
             {/* depending on what the card is being dragged over, add an indicator to the card */}
-            {(over?.type === "linkCard" ||
+
+            {active.type !== "room" &&
+            (over?.type === "linkCard" ||
               over?.type === "card" ||
               over?.type === "room" ||
               over?.type === "dropzone") &&
             (active.type !== "card" || active.parent !== over.entityID) ? (
-              // if the object is being
-              // 1 - dragged over another card, the linked card section, or a room
-              // 2 - AND the object is NOT a card in a room (so its new or from search)
-              // 2 (cont) - OR the object is a card in a room, but its being draggged over something that is not the room it is from (another card or the sidebar)
-              // Add an indicator to it.
+              // Add an indcator to the oject if it is
+              // 1 - not a room
+              // 2 - dragged over another card, the linked card section, or a room
+              // 3 - AND the object is NOT a card in a room (so its new or from search)
+              // 3 (cont) - OR the object is a card in a room, but its being draggged over something that is not the room it is from (another card or the sidebar)
               <div className="absolute -bottom-0 right-2 flex flex-row items-center gap-2 rounded-md bg-accent-blue px-2 py-1 align-middle font-bold text-white">
                 <AddTiny width={12} height={12} className="shrink-0" />{" "}
                 {(active.type === "card" &&

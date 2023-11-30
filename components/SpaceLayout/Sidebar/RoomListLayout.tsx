@@ -170,6 +170,7 @@ export const RoomListItem = (props: {
   setEditting: (editing: boolean) => void;
   roomEntity: string;
   setRoomEditOpen?: () => void;
+  isOver?: boolean;
 }) => {
   let isActiveRoom = useIsActiveRoom(props.roomEntity);
   let setRoom = useSetRoom();
@@ -208,7 +209,7 @@ export const RoomListItem = (props: {
   return (
     <div
       className={`relative select-none rounded-md border  ${
-        isActiveRoom
+        isActiveRoom || props.isOver
           ? "rounded-md  border-accent-blue font-bold text-accent-blue"
           : " border-transparent text-grey-35 hover:border-grey-80"
       }`}
@@ -239,7 +240,11 @@ export const RoomListItem = (props: {
       >
         <div
           className={` roomListItemIcon mt-[4px] h-4 w-4 shrink-0 
-             ${isActiveRoom ? "text-accent-blue" : "text-grey-55"}`}
+             ${
+               isActiveRoom || props.isOver
+                 ? "text-accent-blue"
+                 : "text-grey-55"
+             }`}
         >
           {roomType?.value === "collection" ? (
             <RoomCollection />
@@ -448,6 +453,7 @@ export const DraggableRoomListItem = (props: {
       )}
       {isOverSomethingElse ? null : (
         <RoomListItem
+          isOver={!!over && over.type !== "room"}
           editting={editting}
           setEditting={setEditting}
           roomEntity={props.entityID}
