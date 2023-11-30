@@ -129,8 +129,8 @@ export const Desktop = (props: { entityID: string }) => {
                   data.position?.size === "small"
                     ? "small"
                     : data.hideContent
-                      ? "small"
-                      : "big",
+                    ? "small"
+                    : "big",
               },
             });
           } else {
@@ -156,19 +156,15 @@ export const Desktop = (props: { entityID: string }) => {
 
   return (
     <>
-      <AddCard
-        position={createCard}
-        onClose={() => setCreateCard(null)}
-        desktopEntity={props.entityID}
-      />
-      {/* Handles Double CLick to Create */}
       <div
         ref={setNodeRef}
         onClick={async (e) => {
           if (!authorized || !memberEntity) return;
           if (e.currentTarget !== e.target) return;
           let parentRect = e.currentTarget.getBoundingClientRect();
-          if (e.ctrlKey || e.metaKey) {
+
+          // Create a new card on cntl/cmd + click or double click
+          if (e.ctrlKey || e.metaKey || e.detail === 2) {
             action.start();
             let entity = ulid();
             await mutate("createCard", {
@@ -188,12 +184,6 @@ export const Desktop = (props: { entityID: string }) => {
               },
             });
             action.end();
-          }
-          if (e.detail === 2) {
-            setCreateCard({
-              x: e.clientX - parentRect.left,
-              y: e.clientY - parentRect.top,
-            });
           }
         }}
         onDragOver={(e) => e.preventDefault()}
@@ -244,7 +234,6 @@ export const Desktop = (props: { entityID: string }) => {
           />
         ))}
       </div>
-      {/* <HelpToast helpText={`double click/tap to create new`} /> */}
     </>
   );
 };
@@ -391,13 +380,14 @@ const DraggableCard = (props: {
           <div
             className={``}
             style={{
-              transform: `rotate(${!position
+              transform: `rotate(${
+                !position
                   ? 0
                   : (
-                    Math.floor(position.value.rotation / (Math.PI / 24)) *
-                    (Math.PI / 24)
-                  ).toFixed(2)
-                }rad)`,
+                      Math.floor(position.value.rotation / (Math.PI / 24)) *
+                      (Math.PI / 24)
+                    ).toFixed(2)
+              }rad)`,
             }}
           >
             {/* This is the actual card and its buttons. It also handles size */}
@@ -419,71 +409,6 @@ const DraggableCard = (props: {
   );
 };
 
-const AddCard = (props: {
-  onClose: () => void;
-  desktopEntity: string;
-  position: null | { x: number; y: number };
-}) => {
-  let items = useAllItems(!!props.position);
-  let name = db.useEntity(props.desktopEntity, "member/name");
-  let { open } = useCardViewer();
-  let { mutate, memberEntity, action } = useMutations();
-  return (
-    <FindOrCreate
-      items={items}
-      open={!!props.position}
-      allowBlank={true}
-      onClose={() => props.onClose()}
-      onSelect={async (cards) => {
-        if (!props.position || !memberEntity) return;
-        let entity;
-
-        action.start();
-        for (let d of cards) {
-          if (d.type === "create") {
-            entity = ulid();
-            await mutate("createCard", {
-              entityID: entity,
-              title: d.name,
-              memberEntity,
-            });
-          } else {
-            entity = d.entity;
-          }
-
-          await mutate("addCardToDesktop", {
-            entity,
-            factID: ulid(),
-            desktop: props.desktopEntity,
-            position: {
-              rotation: 0,
-              size: "small",
-              x: Math.max(props.position.x - 128, 0),
-              y: Math.max(props.position.y - 42, 0),
-            },
-          });
-          open({
-            entityID: entity,
-            focus:
-              d.type === "create" ? (d.name ? "content" : "title") : undefined,
-          });
-        }
-        action.end();
-      }}
-      selected={[]}
-    />
-  );
-};
-
-export const HelpToast = (props: { helpText: string }) => {
-  return (
-    <div className="fixed bottom-20 flex w-[320px] justify-center">
-      <div className="rounded-full px-2 py-1 text-center italic text-grey-80">
-        * {props.helpText} *
-      </div>
-    </div>
-  );
-};
 export function useCombinedRefs<T>(
   ...refs: Array<((node: T) => void) | MutableRefObject<T>>
 ): (node: T) => void {
