@@ -235,6 +235,9 @@ const DraggableCard = (props: {
     data: data,
     type: "search-card",
     entityID: props.entityID,
+    onDragEnd: (over) => {
+      props.onClick?.();
+    },
   });
   let ref = useRef<HTMLDivElement>(null);
   useEffect(() => {

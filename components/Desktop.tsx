@@ -29,6 +29,8 @@ const GRID_SIZE = 8;
 const snap = (x: number) => Math.round(x / GRID_SIZE) * GRID_SIZE;
 
 export const Desktop = (props: { entityID: string }) => {
+  let { open } = useCardViewer();
+
   let cards = db.useEntity(props.entityID, "desktop/contains");
   let height = useHeight(props.entityID) + 500;
   let { authToken } = useAuth();
@@ -69,6 +71,7 @@ export const Desktop = (props: { entityID: string }) => {
             title: "",
             memberEntity,
           });
+          open({ entityID: entityID, focus: "title" });
 
           await mutate("addCardToDesktop", {
             factID: ulid(),
@@ -90,6 +93,7 @@ export const Desktop = (props: { entityID: string }) => {
             title: data.title,
             memberEntity,
           });
+          open({ entityID: entityID, focus: "title" });
 
           await mutate("addCardToDesktop", {
             factID: ulid(),
@@ -114,6 +118,8 @@ export const Desktop = (props: { entityID: string }) => {
               size: "small",
             },
           });
+          open({ entityID: data.entityID, focus: "title" });
+
           break;
         }
         case "card": {
