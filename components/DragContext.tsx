@@ -88,6 +88,7 @@ export const SmallCardDragContext = (props: {
         {active ? (
           <AnimatedPickup>
             {active.type === "card" || active.type === "search-card" ? (
+              /* if the dragged object is a normal card, show the card and maintain size and rotation; if its a card from search, show a big card */
               <div
                 style={{
                   transform: `rotate(${
@@ -119,8 +120,10 @@ export const SmallCardDragContext = (props: {
                 />
               </div>
             ) : active.type === "room" ? (
+              // if its a room, show a room
               <RoomListPreview entityID={active.entityID} />
             ) : active.type === "new-card" ? (
+              // if its a new card from the add card button, show a small new card
               <div style={{ transform: "rotate(0rad)" }}>
                 <CardPreview
                   outerControls
@@ -130,18 +133,28 @@ export const SmallCardDragContext = (props: {
                 />
               </div>
             ) : active.type === "new-search-card" ? (
+              // if its a new card from the search, show a big card
               <div className="w-full">
                 <PlaceholderNewCard title={active.title} />
               </div>
             ) : null}
+
+            {/* depending on what the card is being dragged over, add an indicator to the card */}
             {(over?.type === "linkCard" ||
               over?.type === "card" ||
               over?.type === "dropzone") &&
             (active.type !== "card" || active.parent !== over.entityID) ? (
-              <div className="absolute -bottom-3 right-4 flex flex-row items-center gap-2 rounded-md bg-accent-blue px-2 py-1 align-middle font-bold text-white">
-                <AddTiny width={12} height={12} />{" "}
-                {active.type === "card" &&
-                (active.size === "small" || !active.size) ? (
+              // if the object is being
+              // 1 - dragged over another card, the linked card section, or any other dropzone
+              // 2 - AND the object is NOT a card in a room (so its new or from search)
+              // 2 (cont) - OR the object is a card in a room, but its being draggged over something that is not the room it is from (another card or the sidebar)
+              // Add an indicator to it.
+              <div className="absolute -bottom-0 right-2 flex flex-row items-center gap-2 rounded-md bg-accent-blue px-2 py-1 align-middle font-bold text-white">
+                <AddTiny width={12} height={12} className="shrink-0" />{" "}
+                {(active.type === "card" &&
+                  (active.size === "small" || !active.size)) ||
+                active.type === "new-card" ? (
+                  // if the card is in a room, and is small OR is a from the new card button, use a small indicator
                   <span>Add</span>
                 ) : (
                   <span>
@@ -157,10 +170,14 @@ export const SmallCardDragContext = (props: {
   );
 };
 
-const AnimatedPickup = (props: { children: React.ReactNode }) => {
+const AnimatedPickup = (props: { children: React.ReactNode; size: string }) => {
   let spring = useSpring({ from: { scale: 1 }, to: { scale: 1.02 } });
+
   return (
-    <animated.div className="relative text-sm drop-shadow" style={spring}>
+    <animated.div
+      className={`relative  min-w-[152px] text-sm drop-shadow`}
+      style={spring}
+    >
       {props.children}
     </animated.div>
   );
