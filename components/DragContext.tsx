@@ -174,7 +174,7 @@ export const SmallCardDragContext = (props: {
   );
 };
 
-const AnimatedPickup = (props: { children: React.ReactNode; size: string }) => {
+const AnimatedPickup = (props: { children: React.ReactNode }) => {
   let spring = useSpring({ from: { scale: 1 }, to: { scale: 1.02 } });
 
   return (
