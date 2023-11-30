@@ -235,24 +235,26 @@ const DraggableCard = (props: {
             </div>
           ) : null)}
         {isOverSomethingElse ? null : (
-          <CardPreview
-            data={data}
-            entityID={props.entityID}
-            size="big"
-            editable={props.editable}
-            dragHandleProps={{ listeners, attributes }}
-            hideContent={props.hideContent}
-            onDelete={() => {
-              mutate("removeCardFromDesktopOrCollection", {
-                factID: props.id,
-                entityID: props.entityID,
-              });
-              removeCardFromRoomHistory({
-                cardEntity: props.entityID,
-                room: props.parent,
-              });
-            }}
-          />
+          <div className="grow-0">
+            <CardPreview
+              data={data}
+              entityID={props.entityID}
+              size="big"
+              editable={props.editable}
+              dragHandleProps={{ listeners, attributes }}
+              hideContent={props.hideContent}
+              onDelete={() => {
+                mutate("removeCardFromDesktopOrCollection", {
+                  factID: props.id,
+                  entityID: props.entityID,
+                });
+                removeCardFromRoomHistory({
+                  cardEntity: props.entityID,
+                  room: props.parent,
+                });
+              }}
+            />
+          </div>
         )}
       </div>
     </>
@@ -260,7 +262,7 @@ const DraggableCard = (props: {
 };
 
 const NewCardPreview = () => (
-  <div className="mb-2 h-4 w-full rounded-md border border-dashed border-grey-80" />
+  <div className="mb-2 h-[62px] w-full rounded-md border border-dashed border-grey-80" />
 );
 
 let useOnDragEndCollection = (props: {

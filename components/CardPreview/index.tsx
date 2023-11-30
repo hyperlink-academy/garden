@@ -199,7 +199,7 @@ export const HoverControls = (
       style={{}}
       className={`
       cardPreviewWrapper
-      relative
+      relative 
       ${props.size === "small" ? "h-[6rem] w-[160px]" : "h-full w-full"}
       group grid  
       grid-cols-[auto_min-content]
