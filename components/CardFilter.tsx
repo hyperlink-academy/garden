@@ -133,8 +133,8 @@ export function FilterByReactions(props: {
       )}
     </div>
   ) : (
-    <div className="mt-1 italic text-grey-55">
-      filter cards by adding reactags!
+    <div className="lightBorder mt-1 w-full px-2 py-1 italic text-grey-55 ">
+      filter cards by reactag! <br /> add a reaction to a card to try it.
     </div>
   );
 }
