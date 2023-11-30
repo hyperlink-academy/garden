@@ -142,10 +142,11 @@ export const SmallCardDragContext = (props: {
             {/* depending on what the card is being dragged over, add an indicator to the card */}
             {(over?.type === "linkCard" ||
               over?.type === "card" ||
+              over?.type === "room" ||
               over?.type === "dropzone") &&
             (active.type !== "card" || active.parent !== over.entityID) ? (
               // if the object is being
-              // 1 - dragged over another card, the linked card section, or any other dropzone
+              // 1 - dragged over another card, the linked card section, or a room
               // 2 - AND the object is NOT a card in a room (so its new or from search)
               // 2 (cont) - OR the object is a card in a room, but its being draggged over something that is not the room it is from (another card or the sidebar)
               // Add an indicator to it.
