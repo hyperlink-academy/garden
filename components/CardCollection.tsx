@@ -21,7 +21,7 @@ import {
   useDraggableCard,
   useDroppableZone,
 } from "./DragContext";
-import { useUIState } from "hooks/useUIState";
+import { useRemoveCardFromRoomHistory, useUIState } from "hooks/useUIState";
 import { useDebouncedValue } from "hooks/useDebouncedValue";
 
 export const CardCollection = (props: {
@@ -204,6 +204,7 @@ const DraggableCard = (props: {
   let over = useDebouncedValue(_over, 20);
 
   let refs = useCombinedRefs(draggableRef, setNodeRef);
+  let removeCardFromRoomHistory = useRemoveCardFromRoomHistory();
 
   return (
     <>
@@ -245,6 +246,10 @@ const DraggableCard = (props: {
               mutate("removeCardFromDesktopOrCollection", {
                 factID: props.id,
                 entityID: props.entityID,
+              });
+              removeCardFromRoomHistory({
+                cardEntity: props.entityID,
+                room: props.parent,
               });
             }}
           />
