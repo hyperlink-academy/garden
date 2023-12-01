@@ -347,6 +347,7 @@ export const DraggableRoomListItem = (props: {
   setRoomEditOpen: () => void;
 }) => {
   let rep = useContext(ReplicacheContext);
+  let roomType = db.useEntity(props.entityID, "room/type");
 
   let [editting, setEditting] = useState(false);
   const { attributes, listeners, setNodeRef, isOverSomethingElse } =
@@ -360,6 +361,7 @@ export const DraggableRoomListItem = (props: {
   let { mutate } = useMutations();
   let { setNodeRef: droppableRef, over } = useDroppableZone({
     type: "room",
+    roomType: roomType?.value,
     entityID: props.entityID,
     id: props.factID,
     onDragEnd: async (data) => {
@@ -434,12 +436,13 @@ export const DraggableRoomListItem = (props: {
 
   let setRoom = useSetRoom();
   useEffect(() => {
+    if (roomType?.value === "chat") return;
     if (over?.type === "room" || !over) return;
     let timeout = window.setTimeout(() => {
       setRoom(props.entityID);
     }, 500);
     return () => window.clearTimeout(timeout);
-  }, [over, props.entityID, setRoom]);
+  }, [over, props.entityID, setRoom, roomType]);
 
   let refs = useCombinedRefs(setNodeRef, droppableRef);
 
@@ -453,7 +456,7 @@ export const DraggableRoomListItem = (props: {
       )}
       {isOverSomethingElse ? null : (
         <RoomListItem
-          isOver={!!over && over.type !== "room"}
+          isOver={!!over && over.type !== "room" && roomType?.value !== "chat"}
           editting={editting}
           setEditting={setEditting}
           roomEntity={props.entityID}
