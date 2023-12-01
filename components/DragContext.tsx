@@ -217,7 +217,7 @@ export type DroppableData = {
   id: string;
   disabled?: boolean;
   entityID: string;
-  type: "card" | "room" | "dropzone" | "linkCard" | "trigger";
+  type: "card" | "room" | "dropzone" | "linkCard" | "trigger" | "search";
   onDragEnter?: (data: DraggableData) => void | Promise<void>;
   onDragExit?: (data: DraggableData) => void | Promise<void>;
   onDragEnd?: (
