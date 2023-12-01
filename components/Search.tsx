@@ -51,7 +51,12 @@ export function Search() {
   useEffect(() => {
     setOpen(focused);
   }, [focused]);
-
+  let { setNodeRef: drawerDroppableRef } = useDroppableZone({
+    id: "search-popover",
+    entityID: "",
+    type: "search",
+  });
+  let combinedRefs = useCombinedRefs(ref, drawerDroppableRef);
   let { authorized, mutate, memberEntity } = useMutations();
   return (
     <Popover.Root open>
@@ -59,7 +64,7 @@ export function Search() {
         <Popover.Anchor />
         <Popover.Portal>
           <Popover.Content
-            ref={ref}
+            ref={combinedRefs}
             onOpenAutoFocus={(e) => e.preventDefault()}
             className={`no-scrollbar z-0 -mr-4 flex max-h-80 flex-col gap-1  overflow-x-scroll pb-1 text-sm ${
               open ? "-mt-2 rounded-md border-grey-90 bg-white shadow-drop" : ""
@@ -236,6 +241,7 @@ const DraggableCard = (props: {
     type: "search-card",
     entityID: props.entityID,
     onDragEnd: (over) => {
+      if (over.type === "search") return;
       props.onClick?.();
     },
   });
@@ -282,7 +288,7 @@ export const MobileSearch = () => {
     onDragEnter: () => {
       setState("normal");
     },
-    type: "dropzone",
+    type: "search",
   });
   let refCombined = useCombinedRefs(measure);
   let inputRef = useRef<HTMLInputElement>(null);
