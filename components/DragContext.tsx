@@ -141,36 +141,38 @@ export const SmallCardDragContext = (props: {
             ) : null}
 
             {/* depending on what the card is being dragged over, add an indicator to the card */}
-
-            {active.type !== "room" &&
-            (over?.type === "linkCard" ||
-              over?.type === "card" ||
-              over?.type === "room" ||
-              over?.type === "dropzone") &&
-            (active.type !== "card" || active.parent !== over.entityID) ? (
-              // Add an indcator to the oject if it is
-              // 1 - not a room
-              // 2 - dragged over another card, the linked card section, or a room
-              // 3 - AND the object is NOT a card in a room (so its new or from search)
-              // 3 (cont) - OR the object is a card in a room, but its being draggged over something that is not the room it is from (another card or the sidebar)
-              <div className="absolute -bottom-0 right-2 flex flex-row items-center gap-2 rounded-md bg-accent-blue px-2 py-1 align-middle font-bold text-white">
-                <AddTiny width={12} height={12} className="shrink-0" />{" "}
-                {(active.type === "card" &&
-                  (active.size === "small" || !active.size)) ||
-                active.type === "new-card" ? (
-                  // if the card is in a room, and is small OR is a from the new card button, use a small indicator
-                  <span>Add</span>
-                ) : (
-                  <span>
-                    Place {over.type === "linkCard" ? "on Card" : "in Room"}
-                  </span>
-                )}
-              </div>
-            ) : null}
+            <CardDropIndicator active={active} over={over} />
           </AnimatedPickup>
         ) : null}
       </DragOverlay>
     </DndContext>
+  );
+};
+
+const CardDropIndicator = ({
+  active,
+  over,
+}: {
+  active: DraggableData;
+  over: DroppableData | null;
+}) => {
+  if (!over) return null;
+  if (active.type === "room") return null;
+  if (over?.type === "search" || over?.type === "trigger") return null;
+  console.log(over.type, over.entityID);
+  if (active.type === "card" && active.parent === over?.entityID) return null;
+
+  return (
+    <div className="absolute -bottom-4 right-2 flex flex-row items-center gap-2 rounded-md bg-accent-blue px-2 py-1 align-middle font-bold text-white">
+      <AddTiny width={12} height={12} className="shrink-0" />{" "}
+      {(active.type === "card" && (active.size === "small" || !active.size)) ||
+      active.type === "new-card" ? (
+        // if the card is in a room, and is small OR is a from the new card button, use a small indicator
+        <span>{"Add"}</span>
+      ) : (
+        <span>Place {over.type === "linkCard" ? "on Card" : "in Room"}</span>
+      )}
+    </div>
   );
 };
 
@@ -264,5 +266,9 @@ export const useDroppableZone = (data: DroppableData) => {
       },
     },
   });
-  return { ...droppable, over };
+  return {
+    ...droppable,
+    active: droppable.active as { data: { current: DraggableData } } | null,
+    over,
+  };
 };
