@@ -298,7 +298,7 @@ export const AttachedCardSection = (props: { entityID: string }) => {
   return (
     <>
       {attachedCards && attachedCards.length > 0 && (
-        <div className="flex flex-col gap-3">
+        <div id="card-attached-card-section" className="flex flex-col gap-3">
           <div className="flex flex-row gap-1">
             {authorized && (
               <CollectionType
