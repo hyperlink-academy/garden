@@ -314,6 +314,7 @@ let useOnDragEndCollection = (props: {
                 eav: position,
               },
             });
+            open({ entityID: entityID, focus: "title" });
           }
           break;
         }
