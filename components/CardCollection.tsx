@@ -64,7 +64,7 @@ const CollectionList = (props: {
   let { setNodeRef, over } = useDroppableZone({
     type: "dropzone",
     entityID: props.entityID,
-    id: "add-card-dropzone",
+    id: props.entityID + "add-card-dropzone",
     onDragEnd,
   });
   const onAdd = (entity: string) => {
