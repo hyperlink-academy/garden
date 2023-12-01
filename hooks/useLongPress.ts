@@ -7,7 +7,6 @@ export const useLongPress = (cb: () => void, cancel?: boolean) => {
   let start = () => {
     isLongPress.current = false;
     longPressTimer.current = window.setTimeout(() => {
-      console.log("cb", cancel);
       isLongPress.current = true;
       cb();
     }, 500);
