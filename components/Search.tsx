@@ -199,6 +199,7 @@ const NewCard = (props: { title: string; onClick: () => void }) => {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggableCard({
     id: "new-search-card" + props.title,
     type: "new-search-card",
+    size: "big",
     title: props.title,
   });
   let { open } = useCardViewer();
@@ -239,6 +240,7 @@ const DraggableCard = (props: {
     id: props.entityID,
     data: data,
     type: "search-card",
+    size: "big",
     entityID: props.entityID,
     onDragEnd: (over) => {
       if (over.type === "search") return;

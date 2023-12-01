@@ -87,66 +87,76 @@ export const SmallCardDragContext = (props: {
 
       <DragOverlay dropAnimation={null} adjustScale={false}>
         {active ? (
-          <AnimatedPickup>
-            {active.type === "card" || active.type === "search-card" ? (
-              /* if the dragged object is a normal card, show the card and maintain size and rotation; if its a card from search, show a big card */
-              <div
-                style={{
-                  transform: `rotate(${
-                    active.type === "search-card" || !active.position?.rotation
-                      ? 0
-                      : (
-                          Math.floor(
-                            active.position?.rotation / (Math.PI / 24)
-                          ) *
-                          (Math.PI / 24)
-                        ).toFixed(2)
-                  }rad)`,
-                }}
-              >
-                <CardPreview
-                  data={active.data}
-                  outerControls={
-                    active.type === "search-card" ? false : active.outerControls
-                  }
-                  entityID={active.entityID}
-                  size={
-                    active.type === "search-card"
-                      ? "big"
-                      : active.position?.size || active.size || "small"
-                  }
-                  hideContent={
-                    active.type === "search-card" ? true : active.hideContent
-                  }
-                />
-              </div>
-            ) : active.type === "room" ? (
-              // if its a room, show a room
-              <RoomListPreview entityID={active.entityID} />
-            ) : active.type === "new-card" ? (
-              // if its a new card from the add card button, show a small new card
-              <div style={{ transform: "rotate(0rad)" }}>
-                <CardPreview
-                  outerControls
-                  entityID={""}
-                  size="small"
-                  data={EmptyCardData}
-                />
-              </div>
-            ) : active.type === "new-search-card" ? (
-              // if its a new card from the search, show a big card
-              <div className="w-full">
-                <PlaceholderNewCard title={active.title} />
-              </div>
-            ) : null}
-
-            {/* depending on what the card is being dragged over, add an indicator to the card */}
+          <AnimatedPickup
+            size={active.type === "new-card" ? active.size : "small"}
+          >
+            <CardDragPreview active={active} />
             <CardDropIndicator active={active} over={over} />
           </AnimatedPickup>
         ) : null}
       </DragOverlay>
     </DndContext>
   );
+};
+
+const CardDragPreview = ({ active }: { active: DraggableData }) => {
+  switch (active.type) {
+    case "card":
+      return (
+        <div
+          style={{
+            transform: `rotate(${(
+              Math.floor((active.position?.rotation || 0) / (Math.PI / 24)) *
+              (Math.PI / 24)
+            ).toFixed(2)}rad)`,
+          }}
+        >
+          <CardPreview
+            data={active.data}
+            outerControls={active.outerControls}
+            entityID={active.entityID}
+            size={active.position?.size || active.size || "small"}
+            hideContent={active.hideContent}
+          />
+        </div>
+      );
+    case "search-card":
+      return (
+        <div>
+          <CardPreview
+            data={active.data}
+            outerControls={false}
+            entityID={active.entityID}
+            size={"big"}
+            hideContent
+          />
+        </div>
+      );
+    case "room":
+      return <RoomListPreview entityID={active.entityID} />;
+    case "new-card":
+      return (
+        <div>
+          <div className={`${active.size === "big" ? "w-[302px]" : ""}`}>
+            <CardPreview
+              outerControls={false}
+              entityID={""}
+              size={active.size}
+              data={EmptyCardData}
+            />
+          </div>
+        </div>
+      );
+    case "new-search-card":
+      return (
+        <div className="w-full">
+          <PlaceholderNewCard title={active.title} />
+        </div>
+      );
+    default: {
+      active satisfies never;
+    }
+  }
 };
 
 const CardDropIndicator = ({
@@ -162,12 +172,17 @@ const CardDropIndicator = ({
   if (over?.type === "search" || over?.type === "trigger") return null;
   console.log(over.type, over.entityID);
   if (active.type === "card" && active.parent === over?.entityID) return null;
+  let size = active.size || "small";
 
   return (
-    <div className="absolute -bottom-4 right-2 flex flex-row items-center gap-2 rounded-md bg-accent-blue px-2 py-1 align-middle font-bold text-white">
-      <AddTiny width={12} height={12} className="shrink-0" />{" "}
+    <div
+      className={`absolute -bottom-4 ${
+        size === "small" ? "right-4" : "right-2"
+      } flex flex-row items-center gap-2 rounded-md bg-accent-blue px-2 py-1 align-middle font-bold text-white`}
+    >
+      <AddTiny width={12} height={12} className="shrink-0" />
       {(active.type === "card" && (active.size === "small" || !active.size)) ||
-      active.type === "new-card" ? (
+      (active.type === "new-card" && active.size === "small") ? (
         // if the card is in a room, and is small OR is a from the new card button, use a small indicator
         <span>{"Add"}</span>
       ) : (
@@ -177,12 +192,17 @@ const CardDropIndicator = ({
   );
 };
 
-const AnimatedPickup = (props: { children: React.ReactNode }) => {
+const AnimatedPickup = (props: {
+  children: React.ReactNode;
+  size: "small" | "big";
+}) => {
   let spring = useSpring({ from: { scale: 1 }, to: { scale: 1.02 } });
 
   return (
     <animated.div
-      className={`relative  min-w-[152px] text-sm drop-shadow`}
+      className={`relative  ${
+        props.size === "small" ? "min-w-[152px]" : "min-w-[302px]"
+      } text-sm drop-shadow`}
       style={spring}
     >
       {props.children}
@@ -211,9 +231,14 @@ export type DraggableData = {
       type: "room";
       entityID: string;
     }
-  | { type: "new-card" }
-  | { data: CardPreviewData; type: "search-card"; entityID: string }
-  | { type: "new-search-card"; title: string }
+  | { type: "new-card"; size: "big" | "small" }
+  | {
+      data: CardPreviewData;
+      type: "search-card";
+      size: "big";
+      entityID: string;
+    }
+  | { type: "new-search-card"; size: "big"; title: string }
 );
 
 export type DroppableData = {

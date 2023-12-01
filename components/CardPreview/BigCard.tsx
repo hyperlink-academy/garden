@@ -68,15 +68,12 @@ export const BigCardBody = (
         or if (theres a title) 
         or if (its a member card) 
         or if (you're in edit mode) */}
-        {(!props.outerControls && props.onDelete && authorized) ||
-        props.data.title?.value ||
-        props.data.member ||
-        editing ? (
+        {
           <div
             className={`cardPreviewHeader items-top flex justify-between gap-2 pb-1`}
           >
             <div className="cardPreviewTitle flex w-full justify-between gap-2">
-              {(props.data.title?.value || props.data.member || editing) && (
+              {
                 <SingleTextSection
                   style={{
                     whiteSpace: "pre-wrap",
@@ -107,7 +104,7 @@ export const BigCardBody = (
                   }}
                   id={props.editable ? `${props.entityID}-preview-title` : ""}
                 />
-              )}
+              }
               {props.data.isMember ? (
                 <div className="shrink-0 italic text-white">member</div>
               ) : (
@@ -131,7 +128,7 @@ export const BigCardBody = (
               </>
             ) : null}
           </div>
-        ) : null}
+        }
         {props.showRelated && <Backlinks entityID={props.entityID} />}
 
         {/* Big Card Preview Default Content (show if not you're in preview mode AND there is content/image or you're in edit mode)*/}
