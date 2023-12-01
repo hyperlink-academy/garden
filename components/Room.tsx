@@ -140,6 +140,7 @@ export const Room = () => {
 
       <AddCardButton
         total={total}
+        firstCard={cardsFiltered[0]?.value.value}
         roomEntity={room}
         getViewHeight={() =>
           ref.current ? ref?.current.clientHeight + ref.current.scrollTop : 0
@@ -150,11 +151,13 @@ export const Room = () => {
 };
 
 const AddCardButton = (props: {
+  firstCard?: string;
   total: number;
   roomEntity: string;
   getViewHeight: () => number | undefined;
 }) => {
   let { open } = useCardViewer();
+  let firstCardTitle = db.useEntity(props?.firstCard || null, "card/title");
   let roomType = db.useEntity(props.roomEntity, "room/type");
   const { attributes, listeners, setNodeRef } = useDraggableCard({
     id: "new-card",
@@ -163,9 +166,13 @@ const AddCardButton = (props: {
   });
   let { mutate, memberEntity, authorized, rep } = useMutations();
   if (!authorized || !roomType || roomType?.value === "chat") return null;
+  let showHelp =
+    props.total === 0 ||
+    (props.total === 1 &&
+      firstCardTitle?.value === "HYPERLINK README 📖✨📖 click here! 🌱");
   return (
     <div className="absolute bottom-0 left-[136px] z-[2] -mb-[1px] flex h-8 w-16 items-center justify-center rounded-t-full border border-b-0 border-grey-80 bg-background text-center">
-      {props.total === 0 && (
+      {showHelp && (
         <div className="absolute bottom-10 flex flex-col place-items-center">
           <div className=" w-max rounded-md bg-accent-blue px-2 py-1 text-center text-sm font-bold text-white">
             Drag to add a Card!
