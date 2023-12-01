@@ -21,7 +21,7 @@ import { ref } from "data/Facts";
 import { CardPreviewWithData } from "components/CardPreview";
 import { LogInModal } from "components/LoginModal";
 import { RoomHeader } from "components/Room";
-import { useRoom } from "hooks/useUIState";
+import { useRoom, useUIState } from "hooks/useUIState";
 import { useFilteredCards } from "../CardFilter";
 
 export const DiscussionRoom = (props: {
@@ -133,8 +133,12 @@ export const MessageInput = (props: {
   setReply: (reply: string | null) => void;
 }) => {
   let [unread, setUnread] = useState<boolean | null>(null);
-  let [value, setValue] = useState("");
-  let [attachedCards, setAttachedCards] = useState<string[]>([]);
+  let value = useUIState((s) => s.chatInputStates[props.entityID]?.value || "");
+  let attachedCards = useUIState(
+    (s) => s.chatInputStates[props.entityID]?.attachedCards || []
+  );
+  let setValue = useUIState((s) => s.setChatInputValue);
+  let setAttachedCards = useUIState((s) => s.setChatInputAttachedCards);
   let { mutate, memberEntity, authorized } = useMutations();
   let replyMessage = db.useMessageByID(props.reply);
   let replyToName = db.useEntity(replyMessage?.sender || null, "member/name");
@@ -166,8 +170,8 @@ export const MessageInput = (props: {
       discussion: props.entityID,
       message,
     });
-    setValue("");
-    setAttachedCards([]);
+    setValue(props.entityID, "");
+    setAttachedCards(props.entityID, []);
     props.setReply(null);
     setTimeout(() => {
       let el = document.getElementById("card-comments");
@@ -243,7 +247,7 @@ export const MessageInput = (props: {
                   }
                 }}
                 value={value}
-                onChange={(e) => setValue(e.target.value)}
+                onChange={(e) => setValue(props.entityID, e.target.value)}
                 placeholder=""
                 className="w-full"
                 id="messageInput"
@@ -251,7 +255,9 @@ export const MessageInput = (props: {
               <div className="place-self-end">
                 <AttachCard
                   attachedCards={attachedCards}
-                  setAttachedCards={setAttachedCards}
+                  setAttachedCards={(cards) =>
+                    setAttachedCards(props.entityID, cards)
+                  }
                 />
               </div>
             </div>
@@ -278,7 +284,7 @@ const AttachCard = ({
   setAttachedCards,
 }: {
   attachedCards: string[];
-  setAttachedCards: React.Dispatch<React.SetStateAction<string[]>>;
+  setAttachedCards: (cards: string[]) => void;
 }) => {
   let [open, setOpen] = useState(false);
   let items = useAllItems(open);
@@ -319,7 +325,9 @@ const AttachCard = ({
                       <button
                         className="pt-1 text-grey-55 hover:text-accent-blue"
                         onClick={() =>
-                          setAttachedCards((a) => a.filter((c) => c !== card))
+                          setAttachedCards(
+                            attachedCards.filter((c) => c !== card)
+                          )
                         }
                       >
                         <CloseLinedTiny />
@@ -361,7 +369,7 @@ const AttachCard = ({
                 memberEntity,
               });
             }
-            setAttachedCards((a) => [...a, entity]);
+            setAttachedCards([...attachedCards, entity]);
           }
 
           action.end();

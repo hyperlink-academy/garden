@@ -28,9 +28,40 @@ export let useUIState = create(
           drawerOpen: boolean;
         };
       },
+      chatInputStates: {} as {
+        [entityID: string]: {
+          value: string;
+          attachedCards: string[];
+        };
+      },
       focusedCard: undefined as string | undefined,
     },
     (set) => ({
+      setChatInputAttachedCards: (
+        entityID: string,
+        attachedCards: string[]
+      ) => {
+        set((state) => ({
+          chatInputStates: {
+            ...state.chatInputStates,
+            [entityID]: {
+              ...state.chatInputStates[entityID],
+              attachedCards,
+            },
+          },
+        }));
+      },
+      setChatInputValue: (entityID: string, value: string) => {
+        set((state) => ({
+          chatInputStates: {
+            ...state.chatInputStates,
+            [entityID]: {
+              ...state.chatInputStates[entityID],
+              value,
+            },
+          },
+        }));
+      },
       setMobileSidebarOpen: (open?: boolean) => {
         set((state) => ({
           mobileSidebarOpen:
