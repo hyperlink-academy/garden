@@ -118,6 +118,11 @@ export const CardView = (props: {
           eav: position,
         },
       });
+      setTimeout(() => {
+        document
+          .getElementById("card-attached-card-section")
+          ?.scrollIntoView({ block: "center", behavior: "smooth" });
+      }, 100);
     },
   });
 
