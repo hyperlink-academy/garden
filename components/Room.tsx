@@ -159,6 +159,7 @@ const AddCardButton = (props: {
   const { attributes, listeners, setNodeRef } = useDraggableCard({
     id: "new-card",
     type: "new-card",
+    size: roomType?.value === "canvas" ? "small" : "big",
   });
   let { mutate, memberEntity, authorized, rep } = useMutations();
   if (!authorized || !roomType || roomType?.value === "chat") return null;
