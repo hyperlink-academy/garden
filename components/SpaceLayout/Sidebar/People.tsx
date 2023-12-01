@@ -82,8 +82,8 @@ export const People = () => {
       </div>
       {offlineMembers.length === 0 ? null : (
         <>
-          <Divider />
-          <div className="peopleOffline mb-2 flex  flex-col ">
+          {/* <Divider /> */}
+          <div className="peopleOffline flex  flex-col ">
             <button
               onClick={() => setOfflineExpanded(!offlineExpanded)}
               className={`h-[28px]  gap-1 text-left text-sm font-bold  text-grey-55  hover:text-accent-blue`}
@@ -95,10 +95,10 @@ export const People = () => {
             {offlineExpanded ? (
               <MembersOffline offlineMembers={offlineMembers} />
             ) : null}
-            {authorized && <InviteMember />}
           </div>
         </>
       )}
+      <div className="mb-2">{authorized && <InviteMember />}</div>
       {!callOngoing && <JoinCall />}
     </div>
   );
