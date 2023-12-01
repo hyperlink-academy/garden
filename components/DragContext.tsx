@@ -158,6 +158,7 @@ const CardDropIndicator = ({
 }) => {
   if (!over) return null;
   if (active.type === "room") return null;
+  if (over.type === "room" && over.roomType === "chat") return null;
   if (over?.type === "search" || over?.type === "trigger") return null;
   console.log(over.type, over.entityID);
   if (active.type === "card" && active.parent === over?.entityID) return null;
@@ -219,7 +220,6 @@ export type DroppableData = {
   id: string;
   disabled?: boolean;
   entityID: string;
-  type: "card" | "room" | "dropzone" | "linkCard" | "trigger" | "search";
   onDragEnter?: (data: DraggableData) => void | Promise<void>;
   onDragExit?: (data: DraggableData) => void | Promise<void>;
   onDragEnd?: (
@@ -230,7 +230,13 @@ export type DroppableData = {
     data: DraggableData,
     rect: ClientRect | null
   ) => void | Promise<void>;
-};
+} & (
+  | {
+      type: "room";
+      roomType?: Fact<"room/type">["value"];
+    }
+  | { type: "card" | "dropzone" | "linkCard" | "trigger" | "search" }
+);
 
 export const useDraggableCard = (data: DraggableData) => {
   let draggable = useDraggable({ id: data.id, data, disabled: data.disabled });
