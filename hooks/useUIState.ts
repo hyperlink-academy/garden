@@ -173,7 +173,7 @@ export const useOpenCard = () => {
         },
       });
     },
-    [spaceID, action]
+    [spaceID, action, closeCard, openCard]
   );
 };
 
@@ -193,6 +193,7 @@ export const useRemoveCardFromRoomHistory = () => {
           [sID]: {
             ...state.spaces[sID],
             rooms: {
+              ...state.spaces[sID].rooms,
               [room]: history.filter((h) => h !== cardEntity),
             },
           },
