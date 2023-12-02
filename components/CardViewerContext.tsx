@@ -91,6 +91,8 @@ export function CardViewer() {
   );
   let viewheight = useViewportSize().height;
   let removeCardFromRoomHistory = useRemoveCardFromRoomHistory();
+  let isMobile = useIsMobile();
+  if (!history[0] && isMobile) return null;
 
   return (
     <div
