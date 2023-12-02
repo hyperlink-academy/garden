@@ -54,7 +54,7 @@ export const DiscussionRoom = (props: {
           isRoom={props.isRoom}
         />
       </MessageWindow>
-      <div className="absolute bottom-0 w-full">
+      <div className="absolute bottom-0 w-full px-3 sm:px-4">
         <MessageInput
           entityID={props.entityID}
           allowReact={props.allowReact}
@@ -204,7 +204,7 @@ export const MessageInput = (props: {
           />
         </>
       ) : (
-        <div className="messageInput flex w-full flex-col gap-2  px-2 pb-2 pt-1">
+        <div className="messageInput flex w-full flex-col gap-2  pb-2 pt-1">
           {unread && (
             <button
               className="messageUnreadsAvailable sticky bottom-0 mx-auto flex  w-fit flex-row items-center justify-between gap-2 rounded-full bg-accent-blue px-4 py-1.5 text-sm font-bold italic text-white"
