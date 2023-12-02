@@ -16,7 +16,9 @@ export const Title = (props: { entityID: string }) => {
   let matchingTitles = titles.filter(
     (t) =>
       titleFact &&
-      t.value.includes(titleFact?.value) &&
+      t.value
+        .toLocaleLowerCase()
+        .includes(titleFact?.value.toLocaleLowerCase()) &&
       t.entity !== props.entityID
   );
   let [focused, setFocused] = useState(false);
