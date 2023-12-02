@@ -32,8 +32,7 @@ export function getLinkAtCursor(text: string, cursor: number) {
   };
 }
 
-export function focusElement(element?: HTMLElement | null) {
-  if (!element) return;
+export function focusElement(element: () => HTMLElement | null) {
   let fakeInput: HTMLInputElement | null = null;
   if (isIOS()) {
     //Safari doesn't let you focus outside a user-triggered event loop, so we have to create a fake input to focus
@@ -48,7 +47,7 @@ export function focusElement(element?: HTMLElement | null) {
   }
 
   setTimeout(() => {
-    element?.focus();
+    element()?.focus();
     fakeInput?.remove();
-  }, 10);
+  }, 50);
 }
