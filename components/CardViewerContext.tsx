@@ -24,7 +24,7 @@ export const useCardViewer = () => {
       openCard(args.entityID);
       publishAppEvent("cardviewer.open-card", args);
       if (args.focus) {
-        focusElement(
+        focusElement(() =>
           document.getElementById(
             args.focus === "content" ? "default-text-section" : "card-title"
           )
