@@ -11,6 +11,7 @@ import { getLinkAtCursor } from "src/utils";
 import { modifyString, useKeyboardHandling } from "hooks/useKeyboardHandling";
 import { CollectionType } from "components/Room";
 import { sortByPosition } from "src/position_helpers";
+import { RoomCollection } from "components/Icons";
 
 export const SingleTextSection = (
   props: {
@@ -298,17 +299,17 @@ export const AttachedCardSection = (props: { entityID: string }) => {
   return (
     <>
       {attachedCards && attachedCards.length > 0 && (
-        <div id="card-attached-card-section" className="flex flex-col gap-3">
-          <div className="flex flex-row gap-1">
+        <div id="card-attached-card-section" className="flex flex-col gap-2">
+          <div className="flex flex-row justify-between">
+            <div className="flex items-center gap-1 text-sm font-bold text-grey-55">
+              <RoomCollection /> ({attachedCards.length})
+            </div>
             {authorized && (
               <CollectionType
                 collectionType={currentCollectionType?.value}
                 entityID={props.entityID}
               />
-            )}{" "}
-            <span className="text-sm text-grey-35">
-              ({attachedCards.length})
-            </span>
+            )}
           </div>
           <CardCollection
             editable
