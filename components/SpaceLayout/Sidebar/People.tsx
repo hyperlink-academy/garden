@@ -31,7 +31,6 @@ import useSWR from "swr";
 import { spaceAPI } from "backend/lib/api";
 import { ButtonPrimary, ButtonTertiary } from "components/Buttons";
 import { Modal } from "components/Modal";
-import { Divider } from "components/Layout";
 import { Truncate } from "components/Truncate";
 
 export const People = () => {
@@ -82,7 +81,6 @@ export const People = () => {
       </div>
       {offlineMembers.length === 0 ? null : (
         <>
-          {/* <Divider /> */}
           <div className="peopleOffline flex  flex-col ">
             <button
               onClick={() => setOfflineExpanded(!offlineExpanded)}

@@ -407,14 +407,6 @@ const RoomDescription = (props: {
 
   let [descriptionEditting, setDescriptionEditting] = useState(false);
 
-  // let [collectionType, setCollectionType] = useState(
-  //   currentCollectionType?.value
-  // );
-
-  // useEffect(() => {
-  //   setCollectionType(currentCollectionType?.value);
-  // }, [currentCollectionType?.value]);
-
   return (
     <>
       <div id="roomDescription" className="flex flex-col gap-1 ">
@@ -449,7 +441,7 @@ const RoomDescription = (props: {
                 className={`grow border-none bg-inherit p-0 font-normal italic text-inherit`}
               />
             ) : (
-              roomDescription?.value
+              <RenderedText text={roomDescription?.value} />
             )}
           </button>
         )}

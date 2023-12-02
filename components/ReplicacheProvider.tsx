@@ -17,6 +17,7 @@ export const SpaceProvider: React.FC<
         (e.key === "z" && e.ctrlKey) ||
         (e.key === "z" && e.metaKey && !e.shiftKey)
       ) {
+        e.preventDefault();
         undoManager.undo();
       }
       if (
@@ -24,6 +25,7 @@ export const SpaceProvider: React.FC<
         (e.key === "Z" && e.ctrlKey) ||
         (e.key === "z" && e.metaKey && e.shiftKey)
       ) {
+        e.preventDefault();
         undoManager.redo();
       }
     };
