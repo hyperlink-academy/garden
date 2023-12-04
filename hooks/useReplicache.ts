@@ -42,8 +42,9 @@ export const db = {
       async (tx) => {
         let results = await tx
           .scan({
-            prefix: match && start ? `${attribute}-${start}` : `${attribute}-`,
-            start: start ? { key: `${attribute}-${start}` } : undefined,
+            prefix:
+              match && start ? `${attribute}-${start}` : `at-${attribute}-`,
+            start: start ? { key: `at-${attribute}-${start}` } : undefined,
           })
           .values()
           .toArray();
@@ -92,7 +93,7 @@ export const db = {
         if (!attribute) return [];
         let results = await tx
           .scan({
-            prefix: `${attribute}-${entity || ""}`,
+            prefix: `aev-${attribute}-${entity || ""}`,
           })
           .values()
           .toArray();
@@ -112,7 +113,7 @@ export const db = {
         if (!entity) return [];
         let results = await tx
           .scan({
-            prefix: `${entity}-${attribute || ""}`,
+            prefix: `vae-${entity}-${attribute || ""}`,
           })
           .values()
           .toArray();
@@ -142,7 +143,7 @@ export const db = {
       async (tx) => {
         if (!entity) return null;
         let messages = await tx
-          .scan({ prefix: `messageBYEntity-${entity}` })
+          .scan({ prefix: `messageByEntity-${entity}` })
           .values()
           .toArray();
         return messages[0] as Message;
@@ -179,7 +180,7 @@ export const useMutations = () => {
         return null;
       let fact = (await tx
         .scan({
-          prefix: `space/member-${session.session.studio}`,
+          prefix: `ave-space/member-${session.session.studio}`,
         })
         .values()
         .toArray()) as Fact<"space/member">[];

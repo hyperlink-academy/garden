@@ -130,7 +130,7 @@ export const scanIndex = (
     eav: async (entity, attribute) => {
       let results = await tx
         .scan({
-          prefix: `${entity}-${attribute ? `${attribute}-` : ""}`,
+          prefix: `eav-${entity}-${attribute ? `${attribute}-` : ""}`,
         })
         .values()
         .toArray();
@@ -145,7 +145,7 @@ export const scanIndex = (
       if (!attribute) return [];
       let results = await tx
         .scan({
-          prefix: `${attribute}-${entity || ""}`,
+          prefix: `aev-${attribute}-${entity || ""}`,
         })
         .values()
         .toArray();
@@ -155,7 +155,7 @@ export const scanIndex = (
     vae: async (entity, attribute) => {
       let results = await tx
         .scan({
-          prefix: `${entity}-${attribute || ""}`,
+          prefix: `vae-${entity}-${attribute || ""}`,
         })
         .values()
         .toArray();
@@ -164,7 +164,7 @@ export const scanIndex = (
     ave: async (attribute, value) => {
       let results = await tx
         .scan({
-          prefix: `${attribute}-${value}`,
+          prefix: `ave-${attribute}-${value}`,
         })
         .values()
         .toArray();
@@ -221,7 +221,7 @@ export const makeMutationContext = (tx: WriteTransaction): MutationContext => ({
     if (schema.cardinality === "one") {
       let result = await tx
         .scan({
-          prefix: `${fact_input.entity}-${fact_input.attribute}`,
+          prefix: `eav-${fact_input.entity}-${fact_input.attribute}`,
         })
         .values()
         .toArray();
@@ -268,7 +268,7 @@ export const makeMutationContext = (tx: WriteTransaction): MutationContext => ({
     if (schema.cardinality === "one") {
       let result = await tx
         .scan({
-          prefix: `${fact_input.entity}-${fact_input.attribute}`,
+          prefix: `eav-${fact_input.entity}-${fact_input.attribute}`,
         })
         .values()
         .toArray();
@@ -316,16 +316,18 @@ export function FactIndexes<A extends keyof Attribute>(
     feed?: string;
   } = {
     id: `${f.id}`,
-    eav: `${f.entity}-${f.attribute}-${f.id}`,
-    aev: `${f.attribute}-${f.entity}-${f.id}`,
+    eav: `eav-${f.entity}-${f.attribute}-${f.id}`,
+    aev: `aev-${f.attribute}-${f.entity}-${f.id}`,
   };
   if (schema.type === "feed_post")
-    indexes.feed = `${f.attribute}-${f.value}-${f.id}`;
-  if (schema.unique) indexes.ave = `${f.attribute}-${f.value}`;
+    indexes.feed = `feed-${f.attribute}-${f.value}-${f.id}`;
+  if (schema.unique) indexes.ave = `ave-${f.attribute}-${f.value}`;
   if (schema.type === "reference")
-    indexes.vae = `${(f.value as ReferenceType).value}-${f.attribute}`;
+    indexes.vae = `vae-${(f.value as ReferenceType).value}-${f.attribute}`;
   if (schema.type === "timestamp")
-    indexes.at = `${f.attribute}-${(f.value as TimestampeType).value}-${f.id}`;
+    indexes.at = `at-${f.attribute}-${(f.value as TimestampeType).value}-${
+      f.id
+    }`;
   return indexes;
 }
 
