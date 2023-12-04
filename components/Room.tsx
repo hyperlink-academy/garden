@@ -30,6 +30,7 @@ import { generateKeyBetween } from "src/fractional-indexing";
 import { useRoom } from "hooks/useUIState";
 import { SingleTextSection } from "./CardView/Sections";
 import { useCardViewer } from "./CardViewerContext";
+import { Textarea } from "./Textarea";
 
 export const Room = () => {
   let room = useRoom();
@@ -266,7 +267,7 @@ export function RoomHeader(props: {
 }) {
   let [descriptionOpen, setDescriptionOpen] = useState(false);
   let [scrolledTop, setScrolledTop] = useState(true);
-  let [nameEditting, setNameEditting] = useState(false);
+  let [nameEditing, setNameEditing] = useState(false);
 
   let [titleRef, { height: titleHeight }] = useMeasure();
   let [descriptionRef, { height: descriptionHeight }] = useMeasure();
@@ -307,17 +308,17 @@ export function RoomHeader(props: {
             className={` text-left text-lg font-bold text-grey-35 `}
             onClick={(e) => {
               if (authorized) {
-                setNameEditting(true);
+                setNameEditing(true);
                 return;
               }
             }}
           >
-            {authorized && nameEditting ? (
+            {authorized && nameEditing ? (
               <SingleTextSection
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     e.preventDefault();
-                    setNameEditting(false);
+                    setNameEditing(false);
                   }
                 }}
                 onFocus={(e) => {
@@ -329,7 +330,7 @@ export function RoomHeader(props: {
                 entityID={props.entityID}
                 section="room/name"
                 focused
-                onBlur={() => setNameEditting(false)}
+                onBlur={() => setNameEditing(false)}
                 className={`grow border-none bg-inherit p-0 font-normal italic text-inherit`}
               />
             ) : (
@@ -405,29 +406,23 @@ const RoomDescription = (props: {
   let [filtersOpen, setFiltersOpen] = useState(false);
   let { authorized } = useMutations();
 
-  let [descriptionEditting, setDescriptionEditting] = useState(false);
+  let [descriptionEditing, setDescriptionEditing] = useState(false);
 
   return (
     <>
       <div id="roomDescription" className="flex flex-col gap-1 ">
         {roomDescription?.value && (
           <button
-            className={` pt-1 text-left text-base text-grey-35`}
+            className={`flex flex-col pt-1 text-left text-base text-grey-35`}
             onClick={(e) => {
               if (authorized) {
-                setDescriptionEditting(true);
+                setDescriptionEditing(true);
                 return;
               }
             }}
           >
-            {authorized && descriptionEditting ? (
+            {authorized && descriptionEditing ? (
               <SingleTextSection
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    setDescriptionEditting(false);
-                  }
-                }}
                 onFocus={(e) => {
                   e.currentTarget.setSelectionRange(
                     0,
@@ -437,11 +432,11 @@ const RoomDescription = (props: {
                 entityID={props.entityID}
                 section="room/description"
                 focused
-                onBlur={() => setDescriptionEditting(false)}
+                onBlur={() => setDescriptionEditing(false)}
                 className={`grow border-none bg-inherit p-0 font-normal italic text-inherit`}
               />
             ) : (
-              <RenderedText text={roomDescription?.value} />
+              <Textarea value={roomDescription?.value} />
             )}
           </button>
         )}
