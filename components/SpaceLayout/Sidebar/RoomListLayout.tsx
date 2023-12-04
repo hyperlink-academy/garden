@@ -166,8 +166,8 @@ const AreYouSureRoomDeletionModal = (props: {
 
 export const RoomListItem = (props: {
   children: React.ReactNode;
-  editting: boolean;
-  setEditting: (editing: boolean) => void;
+  editing: boolean;
+  setEditing: (editing: boolean) => void;
   roomEntity: string;
   setRoomEditOpen?: () => void;
   isOver?: boolean;
@@ -222,7 +222,7 @@ export const RoomListItem = (props: {
         }`}
         onClick={(e) => {
           if (e.detail === 2 && authorized) {
-            props.setEditting(true);
+            props.setEditing(true);
             return;
           }
           setTimeout(() => {
@@ -254,12 +254,12 @@ export const RoomListItem = (props: {
             <RoomChat />
           ) : null}
         </div>
-        {authorized && props.editting ? (
+        {authorized && props.editing ? (
           <SingleTextSection
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 e.preventDefault();
-                props.setEditting(false);
+                props.setEditing(false);
               }
             }}
             onFocus={(e) => {
@@ -271,7 +271,7 @@ export const RoomListItem = (props: {
             entityID={props.roomEntity}
             section="room/name"
             focused
-            onBlur={() => props.setEditting(false)}
+            onBlur={() => props.setEditing(false)}
             className={`grow border-none bg-inherit p-0 font-normal italic text-inherit`}
           />
         ) : (
@@ -349,10 +349,10 @@ export const DraggableRoomListItem = (props: {
   let rep = useContext(ReplicacheContext);
   let roomType = db.useEntity(props.entityID, "room/type");
 
-  let [editting, setEditting] = useState(false);
+  let [editing, setEditing] = useState(false);
   const { attributes, listeners, setNodeRef, isOverSomethingElse } =
     useDraggableCard({
-      disabled: !props.draggable || editting,
+      disabled: !props.draggable || editing,
       type: "room",
       entityID: props.entityID,
       id: props.factID,
@@ -457,8 +457,8 @@ export const DraggableRoomListItem = (props: {
       {isOverSomethingElse ? null : (
         <RoomListItem
           isOver={!!over && over.type !== "room" && roomType?.value !== "chat"}
-          editting={editting}
-          setEditting={setEditting}
+          editing={editing}
+          setEditing={setEditing}
           roomEntity={props.entityID}
           setRoomEditOpen={props.setRoomEditOpen}
         >
@@ -473,8 +473,8 @@ export const RoomListPreview = (props: { entityID: string }) => {
   let name = db.useEntity(props.entityID, "room/name");
   return (
     <RoomListItem
-      editting={false}
-      setEditting={() => {}}
+      editing={false}
+      setEditing={() => {}}
       roomEntity={props.entityID}
     >
       {name?.value}
