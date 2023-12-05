@@ -14,12 +14,14 @@ import { migrations } from "./migrations";
 import { initializeSpace } from "./initializeSpace";
 
 export { makeOptions as default };
-type Env = {
-  NEXT_API_URL: string;
-  RPC_SECRET: string;
-  SUPABASE_API_TOKEN: string;
-  SUPABASE_URL: string;
-};
+export type Env = z.infer<typeof EnvValidator>;
+
+const EnvValidator = z.object({
+  NEXT_API_URL: z.string(),
+  RPC_SECRET: z.string(),
+  SUPABASE_API_TOKEN: z.string(),
+  SUPABASE_URL: z.string(),
+});
 
 export type ReplicacheMutators = {
   [k in keyof typeof Mutations]: (
@@ -51,6 +53,8 @@ type Auth = {
 function makeOptions(): ReflectServerOptions<ReplicacheMutators> {
   return {
     roomStartHandler: async (tx, roomID) => {
+      let env = EnvValidator.safeParse(tx.env);
+      if (!env.success) throw new Error(JSON.stringify(env.error, null, 2));
       let lastAppliedMigration = await tx.get<string>(
         "meta-lastAppliedMigration"
       );
@@ -72,7 +76,7 @@ function makeOptions(): ReflectServerOptions<ReplicacheMutators> {
         "meta-lastAppliedMigration",
         pendingMigrations[pendingMigrations.length - 1].date
       );
-      await initializeSpace(tx);
+      await initializeSpace(tx, env.data);
     },
     mutators,
     authHandler: async (auth_string, roomID, env): Promise<Auth> => {
