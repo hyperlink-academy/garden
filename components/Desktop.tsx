@@ -298,13 +298,30 @@ const DraggableCard = (props: {
     onDragEnd: async (data) => {
       if (!rep) return;
       let entityID;
-      if (data.type === "room") return;
-      if (data.type === "card") {
-        entityID = data.entityID;
-        mutate("retractFact", { id: data.id });
+      switch (data.type) {
+        case "room":
+          return;
+        case "card": {
+          entityID = data.entityID;
+          mutate("retractFact", { id: data.id });
+          break;
+        }
+        case "search-card": {
+          entityID = data.entityID;
+          break;
+        }
+        case "new-card": {
+          entityID = ulid();
+          break;
+        }
+        case "new-search-card": {
+          entityID = ulid();
+          break;
+        }
+        default: {
+          data satisfies never;
+        }
       }
-      if (data.type === "search-card") entityID = data.entityID;
-      else entityID = ulid();
 
       let siblings =
         (await rep.query((tx) => {
@@ -317,7 +334,7 @@ const DraggableCard = (props: {
       let position = generateKeyBetween(null, firstPosition || null);
       await mutate("addCardToSection", {
         factID: ulid(),
-        cardEntity: entityID,
+        cardEntity: entityID as string,
         parent: props.entityID,
         section: "deck/contains",
         positions: {
