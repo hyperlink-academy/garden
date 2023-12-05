@@ -24,13 +24,19 @@ export const markUnread = async (
   }
 
   await ctx.runOnServer(async (id, env) => {
-    for (let i = 0; i < members.length; i++) {
-      let supabase = createClient(env);
-      let unreads = await calculateUnreads(members[i].entity, ctx);
-      await supabase
-        .from("user_space_unreads")
-        .upsert({ user: members[i].value, unreads, space: id });
-    }
+    let supabase = createClient(env);
+    await supabase.from("user_space_unreads").upsert(
+      await Promise.all(
+        members.map(async (m) => {
+          let unreads = await calculateUnreads(m.entity, ctx);
+          return {
+            user: m.value,
+            space: id,
+            unreads,
+          };
+        })
+      )
+    );
   });
 };
 
