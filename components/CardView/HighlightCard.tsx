@@ -1,22 +1,20 @@
-import { spaceAPI } from "backend/lib/api";
 import { ButtonLink } from "components/Buttons";
 import { CreateStudioPost } from "components/CreateStudioPost";
 import { Note } from "components/Icons";
 import { Modal } from "components/Modal";
+import { makeReflect } from "components/ReplicacheProvider";
 import { useAuth, useAuthIdentityData } from "hooks/useAuth";
 import { useSpaceID } from "hooks/useReplicache";
 import { useSpaceData } from "hooks/useSpaceData";
 import { useState } from "react";
 
-const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export function HighlightCard(props: { entityID: string }) {
   let spaceID = useSpaceID();
   let { data } = useSpaceData(spaceID);
   let { identityData } = useAuthIdentityData();
-  let { authToken } = useAuth();
+  let { authToken, session } = useAuth();
   let [open, setOpen] = useState(false);
 
-  let [state, setState] = useState<"normal" | "loading" | "success">("normal");
   let sharedStudios = data?.spaces_in_studios.filter((studio) =>
     identityData?.members_in_studios.find(
       (memberStudio) => memberStudio.studios?.id === studio.studio
@@ -76,23 +74,22 @@ export function HighlightCard(props: { entityID: string }) {
                   if (!authToken || !studio?.studios || !studio?.space) {
                     return;
                   }
-                  setState("loading");
-                  let data = await spaceAPI(
-                    `${WORKER_URL}/space/${studio.studios.do_id}`,
-                    "post_feed_route",
-                    {
-                      cardPosition,
-                      contentPosition,
-                      authToken: authToken,
-                      content: value,
-                      spaceID: studio.space,
-                      cardEntity: props.entityID,
-                    }
-                  );
-                  if (data.success) setState("success");
+                  if (!session.session?.studio) return;
+                  let reflect = makeReflect({
+                    id: studio.studios.do_id,
+                    authToken,
+                    studio: session.session?.studio,
+                  });
+                  reflect.mutate.postToFeed({
+                    cardPosition,
+                    contentPosition,
+                    content: value,
+                    memberStudioDO: session.session?.studio,
+                    spaceID: studio.space,
+                    cardEntity: props.entityID,
+                  });
                   setTimeout(() => {
                     setOpen(false);
-                    setState("normal");
                   }, 300);
                 }}
               />

@@ -11,10 +11,15 @@ import { createClient } from "@supabase/supabase-js";
 import { authTokenVerifier } from "backend/lib/auth";
 import { z } from "zod";
 import { migrations } from "./migrations";
-import { initialize } from "next/dist/server/lib/render-server";
 import { initializeSpace } from "./initializeSpace";
 
 export { makeOptions as default };
+type Env = {
+  NEXT_API_URL: string;
+  RPC_SECRET: string;
+  SUPABASE_API_TOKEN: string;
+  SUPABASE_URL: string;
+};
 
 export type ReplicacheMutators = {
   [k in keyof typeof Mutations]: (
@@ -31,7 +36,7 @@ export const mutators = {
         mu,
         (tx: WriteTransaction, args: any) => {
           let ctx = makeMutationContext(tx);
-          if (tx.auth?.userID) return Mutations[mu](args, ctx);
+          return Mutations[mu](args, ctx);
         },
       ];
     })
@@ -112,7 +117,6 @@ function makeOptions(): ReflectServerOptions<ReplicacheMutators> {
         .scan({ prefix: `ephemeral-${tx.clientID}` })
         .values()
         .toArray();
-      console.log(JSON.stringify(ephemeralFacts, null, 2));
       for (let fact of ephemeralFacts) {
         await store.retractEphemeralFact(
           tx.clientID,
@@ -174,7 +178,14 @@ export const scanIndex = (
 };
 export const makeMutationContext = (tx: WriteTransaction): MutationContext => ({
   scanIndex: scanIndex(tx),
-  runOnServer: async () => {},
+  runOnServer: async (cb) => {
+    if (tx.env && tx.auth?.userID) {
+      let id = await tx.get<string>("meta-room-id");
+      if (!id) return;
+      let result = await cb(id, tx.env as Env, tx.auth?.userID);
+      return result;
+    }
+  },
   postMessage: async (message) => {
     let indexes = MessageIndexes(message);
     for (let key of Object.values(indexes)) {

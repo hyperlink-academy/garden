@@ -9,12 +9,12 @@ import { SVGProps, useEffect, useState } from "react";
 import { LogInModal, SignupModal } from "components/LoginModal";
 import Head from "next/head";
 import { useSpaceData } from "hooks/useSpaceData";
-import Link from "next/link";
 import { SpaceCard, SpaceData } from "components/SpacesList";
 import { Divider } from "components/Layout";
 import { GetStaticPropsContext, InferGetStaticPropsType } from "next";
-import { SpaceProvider } from "components/ReplicacheProvider";
+import { SpaceProvider, makeReflect } from "components/ReplicacheProvider";
 import { SWRConfig } from "swr";
+import { ulid } from "src/ulid";
 
 export async function getStaticPaths() {
   return { paths: [], fallback: "blocking" };
@@ -63,6 +63,17 @@ export function JoinSpace() {
       code,
     });
     if (data.success) {
+      let reflect = makeReflect({
+        id,
+        authToken,
+        studio: session.session?.studio,
+      });
+      if (session.session)
+        await reflect.mutate.joinSpace({
+          memberEntity: ulid(),
+          username: session.session.username,
+          studio: session.session.studio,
+        });
       router.push(`/s/${router.query.studio}/s/${router.query.space}`);
     }
   };

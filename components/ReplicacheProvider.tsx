@@ -35,12 +35,10 @@ export const SpaceProvider: React.FC<
 
   let { session, authToken } = useAuth();
   useEffect(() => {
-    let newRep = new Reflect({
-      mutators: mutators,
-      auth: JSON.stringify({ authToken }),
-      userID: session.session?.studio || "unauthorized",
-      server: process.env.NEXT_PUBLIC_REFLECT_SERVER,
-      roomID: props.id,
+    let newRep = makeReflect({
+      id: props.id,
+      authToken,
+      studio: session.session?.studio,
     });
     setRep(newRep);
     return () => {
@@ -55,4 +53,22 @@ export const SpaceProvider: React.FC<
       {props.children}
     </ReplicacheContext.Provider>
   );
+};
+
+export const makeReflect = ({
+  id,
+  authToken,
+  studio,
+}: {
+  id: string;
+  authToken: { access_token: string; refresh_token: string } | null;
+  studio?: string;
+}) => {
+  return new Reflect({
+    mutators: mutators,
+    auth: JSON.stringify({ authToken }),
+    userID: studio || "unauthorized",
+    server: process.env.NEXT_PUBLIC_REFLECT_SERVER,
+    roomID: id,
+  });
 };

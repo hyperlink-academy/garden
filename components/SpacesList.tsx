@@ -79,9 +79,8 @@ export const BaseSpaceCard = (props: Parameters<typeof SpaceCard>[0]) => {
 
   let { data } = useSpaceData(props.do_id, props);
   let spaceEntity = db.useUniqueAttribute("space/id", props.do_id);
-  let unreads = db.useEntity(
-    spaceEntity?.entity || null,
-    "space/unread-notifications"
+  let unreads = data?.user_space_unreads.find(
+    (u) => u.user === session?.session?.studio
   );
 
   let duration_days = null;
@@ -163,7 +162,7 @@ export const BaseSpaceCard = (props: Parameters<typeof SpaceCard>[0]) => {
             display_name={data?.display_name}
             image={data?.image}
             default_space_image={data?.default_space_image}
-            glow={!!unreads && !!authorized && unreads.value > 0}
+            glow={!!unreads && !!authorized && unreads.unreads > 0}
           />
         </div>
       </div>
@@ -177,7 +176,7 @@ export const BaseSpaceCard = (props: Parameters<typeof SpaceCard>[0]) => {
           display_name={data?.display_name}
           image={data?.image}
           default_space_image={data?.default_space_image}
-          glow={!!unreads && !!authorized && unreads.value > 0}
+          glow={!!unreads && !!authorized && unreads.unreads > 0}
         />
       </div>
       <div className="ml-16 mt-10 w-full">

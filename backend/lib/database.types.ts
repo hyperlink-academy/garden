@@ -370,6 +370,37 @@ export interface Database {
           }
         ]
       }
+      user_space_unreads: {
+        Row: {
+          space: string
+          unreads: number
+          user: string
+        }
+        Insert: {
+          space: string
+          unreads: number
+          user: string
+        }
+        Update: {
+          space?: string
+          unreads?: number
+          user?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_space_unreads_space_fkey"
+            columns: ["space"]
+            referencedRelation: "space_data"
+            referencedColumns: ["do_id"]
+          },
+          {
+            foreignKeyName: "user_space_unreads_user_fkey"
+            columns: ["user"]
+            referencedRelation: "identity_data"
+            referencedColumns: ["studio"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -492,12 +523,6 @@ export interface Database {
             foreignKeyName: "objects_bucketId_fkey"
             columns: ["bucket_id"]
             referencedRelation: "buckets"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "objects_owner_fkey"
-            columns: ["owner"]
-            referencedRelation: "users"
             referencedColumns: ["id"]
           }
         ]

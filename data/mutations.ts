@@ -1,5 +1,3 @@
-import { privateSpaceAPI } from "backend/lib/api";
-import { Env } from "backend/SpaceDurableObject";
 import { calculateUnreads, markUnread } from "src/markUnread";
 import { Attribute, FilterAttributes, ReferenceAttributes } from "./Attributes";
 import { Fact, ref } from "./Facts";
@@ -8,11 +6,11 @@ import { z } from "zod";
 import { webPushPayloadParser } from "pages/api/web_push";
 import { sign } from "src/sign";
 import { ulid } from "src/ulid";
-import { README, README_Title, defaultReactions } from "src/content";
 import { WriteTransaction } from "@rocicorp/reflect";
 import { getMemberColor } from "backend/SpaceDurableObject/routes/join";
 import { generateKeyBetween } from "src/fractional-indexing";
 import { app_event } from "backend/lib/analytics";
+import { createClient } from "backend/lib/supabase";
 
 export type MutationContext = {
   tx: WriteTransaction;
@@ -36,7 +34,16 @@ export type MutationContext = {
     undoAction?: boolean
   ) => Promise<{ success: boolean }>;
   runOnServer: (
-    fn: (env: Env, userID: string) => Promise<void>
+    fn: (
+      id: string,
+      env: {
+        NEXT_API_URL: string;
+        RPC_SECRET: string;
+        SUPABASE_API_TOKEN: string;
+        SUPABASE_URL: string;
+      },
+      userID: string
+    ) => Promise<void>
   ) => Promise<void>;
   retractFact: (id: string, undoAction?: boolean) => Promise<void>;
   retractEphemeralFact: (clientID: string, id: string) => Promise<void>;
@@ -226,10 +233,10 @@ const createCard: Mutation<{
     },
     ctx
   );
-  await ctx.runOnServer(async (env, userID) => {
-    await app_event(env.env, {
+  await ctx.runOnServer(async (id, env, userID) => {
+    await app_event(env, {
       event: "created_card",
-      spaceID: env.id,
+      spaceID: id,
       user: userID,
     });
   });
@@ -278,38 +285,7 @@ const updateFact: Mutation<{
 const updateContentFact: Mutation<
   Pick<Fact<"card/content">, "attribute" | "entity" | "value" | "positions">
 > = async (args, ctx) => {
-  let existingLinks = await Promise.all(
-    (
-      await ctx.scanIndex.eav(args.entity, "card/inline-links-to")
-    ).map(async (l) => ({
-      id: l.id,
-      title: await ctx.scanIndex.eav(l.value.value, "card/title"),
-    }))
-  );
-  let newLinks = [...args.value.matchAll(/\[\[([^\[\n\]]*)\]\]/g)];
-
-  let linkstoremove = existingLinks.filter(
-    (l) => !newLinks.find((n) => n[1] === l.title?.value)
-  );
-
-  let linkstoadd = newLinks.filter(
-    (n) => !existingLinks.find((l) => n[1] === l.title?.value)
-  );
-
-  for (let link of linkstoremove) {
-    await ctx.retractFact(link.id);
-  }
-  for (let link of linkstoadd) {
-    let title = link[1];
-    let entity = await ctx.scanIndex.ave("card/title", title);
-    if (!entity || entity.value !== title) continue;
-    await ctx.assertFact({
-      entity: args.entity,
-      attribute: "card/inline-links-to",
-      value: ref(entity.entity),
-      positions: {},
-    });
-  }
+  console.log("????");
   await ctx.assertFact(args);
 };
 
@@ -372,16 +348,16 @@ const replyToDiscussion: Mutation<{
     args.message.sender,
     "space/member"
   );
-  await ctx.runOnServer(async (env, userID) => {
+  await ctx.runOnServer(async (id, env, userID) => {
     if (!senderStudio) return;
 
     let title: Fact<"room/name" | "card/title"> | null =
       await ctx.scanIndex.eav(args.discussion, "card/title");
     if (!title) title = await ctx.scanIndex.eav(args.discussion, "room/name");
 
-    await app_event(env.env, {
+    await app_event(env, {
       event: "sent_message",
-      spaceID: env.id,
+      spaceID: id,
       user: userID,
     });
 
@@ -391,17 +367,17 @@ const replyToDiscussion: Mutation<{
         title: title?.value || "Untitled",
         senderStudio: senderStudio.value,
         message: args.message,
-        spaceID: env.id,
+        spaceID: id,
       };
       let payloadString = JSON.stringify(payload);
-      fetch(`${env.env.NEXT_API_URL}/api/web_push`, {
+      fetch(`${env.NEXT_API_URL}/api/web_push`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           payload: payloadString,
-          sig: await sign(payloadString, env.env.RPC_SECRET),
+          sig: await sign(payloadString, env.RPC_SECRET),
         }),
       });
     } catch (e) {
@@ -427,10 +403,10 @@ const createRoom: Mutation<{
     value: args.type,
     positions: {},
   });
-  await ctx.runOnServer(async (env, userID) => {
-    await app_event(env.env, {
+  await ctx.runOnServer(async (id, env, userID) => {
+    await app_event(env, {
       event: "created_room",
-      spaceID: env.id,
+      spaceID: id,
       user: userID,
     });
   });
@@ -483,16 +459,14 @@ const markRead: Mutation<{
   let unread = unreads.find((u) => u.value.value === args.memberEntity);
   if (unread) await ctx.retractFact(unread.id);
 
-  await ctx.runOnServer(async (env) => {
+  await ctx.runOnServer(async (id, env) => {
     let space = await ctx.scanIndex.eav(args.memberEntity, "space/member");
     if (!space) return;
-    let spaceID = env.env.SPACES.idFromString(space.value);
+    let supabase = createClient(env);
     let unreads = await calculateUnreads(args.memberEntity, ctx);
-    let stub = env.env.SPACES.get(spaceID);
-    await privateSpaceAPI(stub)("http://internal", "sync_notifications", {
-      space: env.id,
-      unreads,
-    });
+    await supabase
+      .from("user_space_unreads")
+      .upsert({ user: space.value, unreads, space: id });
   });
 };
 
@@ -535,101 +509,16 @@ const setClientInCall: Mutation<{
   }
 };
 
-export const initializeSpace: Mutation<{}> = async (args, ctx) => {
-  let thisEntity = ulid();
-  let canvasRoom = ulid();
-  let collectionRoom = ulid();
-  let chatRoom = ulid();
-  let readmeEntity = ulid();
-  let readmeCardPositionFact = ulid();
-
-  await Promise.all([
-    ctx.assertFact({
-      entity: readmeEntity,
-      attribute: "card/title",
-      value: README_Title,
-      positions: {},
-    }),
-    ctx.assertFact({
-      entity: readmeEntity,
-      attribute: "card/content",
-      value: README.trim(),
-      positions: {},
-    }),
-    ctx.assertFact({
-      entity: canvasRoom,
-      factID: readmeCardPositionFact,
-      attribute: "desktop/contains",
-      value: ref(readmeEntity),
-      positions: {},
-    }),
-    ctx.assertFact({
-      entity: readmeCardPositionFact,
-      attribute: "card/position-in",
-      value: { x: 64, y: 32, rotation: 0.2, size: "small", type: "position" },
-      positions: {},
-    }),
-    ctx.assertFact({
-      entity: canvasRoom,
-      attribute: "home",
-      value: flag(),
-      positions: {},
-    }),
-
-    ctx.assertFact({
-      entity: canvasRoom,
-      attribute: "room/name",
-      value: "Canvas",
-      positions: { roomList: "a0" },
-    }),
-    ctx.assertFact({
-      entity: canvasRoom,
-      attribute: "room/type",
-      value: "canvas",
-      positions: {},
-    }),
-
-    ctx.assertFact({
-      entity: collectionRoom,
-      attribute: "room/name",
-      value: "Collection",
-      positions: { roomList: "c1" },
-    }),
-    ctx.assertFact({
-      entity: collectionRoom,
-      attribute: "room/type",
-      value: "collection",
-      positions: {},
-    }),
-    ctx.assertFact({
-      entity: chatRoom,
-      attribute: "room/name",
-      value: "Chat",
-      positions: { roomList: "t1" },
-    }),
-    ctx.assertFact({
-      entity: chatRoom,
-      attribute: "room/type",
-      value: "chat",
-      positions: {},
-    }),
-    ...defaultReactions.map((r) =>
-      ctx.assertFact({
-        entity: thisEntity,
-        attribute: "space/reaction",
-        value: r,
-        positions: {},
-      })
-    ),
-  ]);
-};
-
 const joinSpace: Mutation<{
   memberEntity: string;
   username: string;
   studio: string;
 }> = async ({ memberEntity, username, studio }, ctx) => {
   let color = await getMemberColor(ctx);
+
+  //TODO I should make this use the auth context to ensure that the user is
+  //joining legitimately
+
   await Promise.all([
     ctx.assertFact({
       entity: memberEntity,
@@ -663,12 +552,14 @@ const leaveSpace: Mutation<{ memberEntity: string }> = async (
 };
 
 const postToFeed: Mutation<{
-  cardPosition: { x: number; y: number };
-  contentPosition: { x: number; y: number };
+  cardPosition?: { x: number; y: number };
+  contentPosition?: { x: number; y: number };
   content: string;
   spaceID: string;
   cardEntity: string;
+  memberStudioDO: string;
 }> = async (msg, ctx) => {
+  //TODO verify that the authed member is the one creating
   let entity = ulid();
   await ctx.assertFact({
     entity,
@@ -711,18 +602,19 @@ const postToFeed: Mutation<{
       },
     });
 
+  let memberEntity = await ctx.scanIndex.ave(
+    "space/member",
+    msg.memberStudioDO
+  );
+  if (!memberEntity) return;
   await ctx.assertFact({
     entity,
     attribute: "card/created-by",
-    value: ref(creator.entity),
+    value: ref(memberEntity?.entity),
     positions: {},
   });
 
   //getClientID somehow
-  let creator = await env.factStore.scanIndex.ave(
-    "space/member",
-    session.studio
-  );
   let latestPosts = await ctx.scanIndex.aev("feed/post");
   await ctx.assertFact({
     entity,
@@ -768,13 +660,13 @@ export const Mutations = {
   assertEmphemeralFact,
   retractFact,
   updateFact,
+  postToFeed,
   updatePositionInDesktop,
   removeCardFromDesktopOrCollection,
   addCardToDesktop,
   addReaction,
   initializeClient,
   setClientInCall,
-  initializeSpace,
   joinSpace,
   leaveSpace,
   createRoom,

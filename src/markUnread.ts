@@ -1,6 +1,6 @@
-import { privateSpaceAPI } from "backend/lib/api";
 import { ref } from "data/Facts";
 import { MutationContext } from "data/mutations";
+import { createClient } from "backend/lib/supabase";
 
 export const markUnread = async (
   args: {
@@ -23,15 +23,13 @@ export const markUnread = async (
     });
   }
 
-  await ctx.runOnServer(async (env) => {
+  await ctx.runOnServer(async (id, env) => {
     for (let i = 0; i < members.length; i++) {
-      let spaceID = env.env.SPACES.idFromString(members[i].value);
+      let supabase = createClient(env);
       let unreads = await calculateUnreads(members[i].entity, ctx);
-      let stub = env.env.SPACES.get(spaceID);
-      await privateSpaceAPI(stub)("http://internal", "sync_notifications", {
-        space: env.id,
-        unreads,
-      });
+      await supabase
+        .from("user_space_unreads")
+        .upsert({ user: members[i].value, unreads, space: id });
     }
   });
 };

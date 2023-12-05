@@ -11,6 +11,8 @@ import { useSpaceData } from "hooks/useSpaceData";
 import { useIdentityData } from "hooks/useIdentityData";
 import { Form, SubmitButton } from "./Form";
 import { DotLoader } from "./DotLoader";
+import { makeReflect } from "./ReplicacheProvider";
+import { ulid } from "src/ulid";
 
 export type CreateSpaceFormState = {
   display_name: string;
@@ -76,6 +78,17 @@ export const CreateSpace = (props: {
                   owner: [...s.owner, d],
                 };
               });
+              let reflect = makeReflect({
+                id: result.data.do_id,
+                authToken,
+                studio: auth.session.session?.studio,
+              });
+              if (auth.session.session)
+                await reflect.mutate.joinSpace({
+                  memberEntity: ulid(),
+                  username: auth.session.session.username,
+                  studio: auth.session.session.studio,
+                });
             }
             setFormState({
               display_name: "",

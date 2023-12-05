@@ -1,7 +1,6 @@
 import { spaceAPI } from "backend/lib/api";
 import { WriteTransaction } from "@rocicorp/reflect";
 import { FactIndexes, MessageIndexes } from "./";
-import { WORKER_URL } from "src/constants";
 
 type Migration = {
   date: string;
@@ -12,13 +11,17 @@ export const migrations: Migration[] = [
   {
     date: "2023-11-01",
     run: async (tx, ctx) => {
-      let data = await spaceAPI(`${WORKER_URL}/space/${ctx.roomID}`, "pull", {
-        clientID: "",
-        cookie: undefined,
-        lastMutationID: 0,
-        pullVersion: 0,
-        schemaVersion: "",
-      });
+      let data = await spaceAPI(
+        `${tx.env?.WORKER_URL}/space/${ctx.roomID}`,
+        "pull",
+        {
+          clientID: "",
+          cookie: undefined,
+          lastMutationID: 0,
+          pullVersion: 0,
+          schemaVersion: "",
+        }
+      );
 
       for (let fact of data.data) {
         if (fact.retracted) continue;

@@ -1,4 +1,4 @@
-import { useSubscribe as useSubscribeRepl } from "replicache-react";
+import { useSubscribe as useSubscribeRepl } from "@rocicorp/reflect/react";
 import type { ReadonlyJSONValue, ReadTransaction } from "replicache";
 import { useContext } from "react";
 import { ReplicacheContext } from "./useReplicache";
