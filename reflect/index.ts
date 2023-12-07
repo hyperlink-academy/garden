@@ -310,6 +310,7 @@ export const makeMutationContext = (tx: WriteTransaction): MutationContext => ({
 });
 export function MessageIndexes(m: Message) {
   return {
+    messageByID: `${m.id}`,
     messageByEntity: m.entity ? `messageByEntity-${m.entity}` : undefined,
     messages: `messages-${m.topic || "general"}-${m.ts}-${m.id}`,
   };
