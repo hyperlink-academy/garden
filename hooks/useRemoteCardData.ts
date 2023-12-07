@@ -1,8 +1,9 @@
 import { Reflect } from "@rocicorp/reflect/client";
-import { ReplicacheMutators, mutators, scanIndex } from "reflect";
+import { ReplicacheMutators, scanIndex } from "reflect";
 import { useAuth } from "./useAuth";
 import { useEffect, useState } from "react";
 import { useSubscribe } from "replicache-react";
+import { makeReflect } from "components/ReplicacheProvider";
 
 export const useRemoteCardData = (do_id?: string, cardEntity?: string) => {
   let { session, authToken } = useAuth();
@@ -10,11 +11,10 @@ export const useRemoteCardData = (do_id?: string, cardEntity?: string) => {
 
   useEffect(() => {
     if (!do_id) return;
-    let newRep = new Reflect({
-      mutators: mutators,
-      userID: session.session?.studio || "unauthorized",
-      socketOrigin: "ws://127.0.0.1:8080",
-      roomID: do_id,
+    let newRep = makeReflect({
+      authToken,
+      studio: session.session?.studio || "unauthorized",
+      id: do_id,
     });
     setRep(newRep);
     return () => {

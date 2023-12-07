@@ -50,6 +50,11 @@ type Auth = {
   authorized: boolean;
 };
 
+export type AuthString = z.infer<typeof AuthStringVerifier>;
+const AuthStringVerifier = z.object({
+  authToken: z.union([authTokenVerifier, z.null()]),
+});
+
 function makeOptions(): ReflectServerOptions<ReplicacheMutators> {
   return {
     roomStartHandler: async (tx, roomID) => {
@@ -76,7 +81,7 @@ function makeOptions(): ReflectServerOptions<ReplicacheMutators> {
         "meta-lastAppliedMigration",
         pendingMigrations[pendingMigrations.length - 1].date
       );
-      await initializeSpace(tx, env.data);
+      await initializeSpace(tx);
     },
     mutators,
     authHandler: async (auth_string, roomID, env): Promise<Auth> => {
@@ -102,9 +107,9 @@ function makeOptions(): ReflectServerOptions<ReplicacheMutators> {
       let authorized = false;
       if (session.user?.id) {
         let { data } = await supabase
-          .from("members_in_spaces")
-          .select("member")
-          .eq("member", session.user.id)
+          .from("space_authorizations")
+          .select("user")
+          .eq("user", session.user.id)
           .eq("space_do_id", roomID)
           .single();
         if (data) authorized = true;
@@ -340,9 +345,8 @@ export function FactIndexes<A extends keyof Attribute>(
   if (schema.type === "reference")
     indexes.vae = `vae-${(f.value as ReferenceType).value}-${f.attribute}`;
   if (schema.type === "timestamp")
-    indexes.at = `at-${f.attribute}-${(f.value as TimestampeType).value}-${
-      f.id
-    }`;
+    indexes.at = `at-${f.attribute}-${(f.value as TimestampeType).value}-${f.id
+      }`;
   return indexes;
 }
 

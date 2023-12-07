@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Reflect } from "@rocicorp/reflect/client";
 import { useAuth } from "hooks/useAuth";
 import { UndoManager } from "@rocicorp/undo";
-import { mutators, ReplicacheMutators } from "reflect";
+import { AuthString, mutators, ReplicacheMutators } from "reflect";
 
 export const SpaceProvider: React.FC<
   React.PropsWithChildren<{ id: string }>
@@ -66,9 +66,12 @@ export const makeReflect = ({
   authToken: { access_token: string; refresh_token: string } | null;
   studio?: string;
 }) => {
+  let auth: AuthString = {
+    authToken,
+  };
   return new Reflect({
     mutators: mutators,
-    auth: JSON.stringify({ authToken }),
+    auth: JSON.stringify(auth),
     userID: studio || "unauthorized",
     server: process.env.NEXT_PUBLIC_REFLECT_SERVER,
     roomID: id,

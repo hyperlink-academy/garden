@@ -13,6 +13,8 @@ import useSWR from "swr";
 import { Modal } from "components/Modal";
 import { Divider } from "components/Layout";
 import LoginPage from "pages/login";
+import { makeReflect } from "components/ReplicacheProvider";
+import { ulid } from "src/ulid";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export default function SignupPage() {
@@ -80,9 +82,20 @@ export default function SignupPage() {
         else router.push(`/s/${data.username}`);
       }
     }
+
     if (res.success) {
       let { data } = await supabase.auth.refreshSession();
       if (data.session) {
+        let reflect = makeReflect({
+          id: data.user?.user_metadata.studio,
+          authToken: tokens,
+          studio: data.user?.user_metadata.studio,
+        });
+        reflect.mutate.joinSpace({
+          memberEntity: ulid(),
+          username: data.user?.user_metadata.username,
+          studio: data.user?.user_metadata.studio,
+        });
         await supabase.auth.setSession(data?.session);
         if (router.query.redirectTo)
           router.push(
@@ -152,7 +165,7 @@ export default function SignupPage() {
                   }
                 />
                 {data.username.match(/^[A-Za-z_0-9]+$/) === null &&
-                data.username !== "" ? (
+                  data.username !== "" ? (
                   <p className="text-sm  font-normal text-accent-red">
                     No special characters or spaces please!
                   </p>

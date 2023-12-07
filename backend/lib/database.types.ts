@@ -403,7 +403,13 @@ export interface Database {
       }
     }
     Views: {
-      [_ in never]: never
+      space_authorizations: {
+        Row: {
+          space_do_id: string | null
+          user: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never

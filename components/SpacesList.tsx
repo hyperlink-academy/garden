@@ -29,19 +29,17 @@ export const SpaceList = (props: {
         }
       `}</style>
       <div
-        className={`spacesList flex flex-wrap  ${
-          props?.small ? "gap-4" : "gap-6 py-2"
-        }`}
+        className={`spacesList flex flex-wrap  ${props?.small ? "gap-4" : "gap-6 py-2"
+          }`}
       >
         {props.spaces?.map((a) => {
           return (
             <div
               key={a.do_id}
-              className={`${
-                props.small
+              className={`${props.small
                   ? ""
                   : "min-w-80 flex-1 basis-80 sm:last:max-w-[calc(50%-12px)]"
-              }`}
+                }`}
             >
               <SpaceCard
                 onEdit={props.onEdit}
@@ -78,6 +76,7 @@ export const BaseSpaceCard = (props: Parameters<typeof SpaceCard>[0]) => {
   let now = getCurrentDate();
 
   let { data } = useSpaceData(props.do_id, props);
+  console.log(data);
   let spaceEntity = db.useUniqueAttribute("space/id", props.do_id);
   let unreads = data?.user_space_unreads.find(
     (u) => u.user === session?.session?.studio
@@ -126,9 +125,9 @@ export const BaseSpaceCard = (props: Parameters<typeof SpaceCard>[0]) => {
               </div>
             </div>
             {data?.start_date &&
-            data?.end_date &&
-            data?.start_date <= now &&
-            data?.end_date >= now ? (
+              data?.end_date &&
+              data?.start_date <= now &&
+              data?.end_date >= now ? (
               <div className="text-sm italic text-grey-35">
                 <div>
                   ends{" "}
@@ -209,9 +208,9 @@ export const BaseSpaceCard = (props: Parameters<typeof SpaceCard>[0]) => {
           </div>
 
           {data?.start_date &&
-          data?.end_date &&
-          data?.start_date <= now &&
-          data?.end_date >= now ? (
+            data?.end_date &&
+            data?.start_date <= now &&
+            data?.end_date >= now ? (
             <div className="mt-2 text-sm italic text-grey-35">
               ends{" "}
               {data?.end_date &&
