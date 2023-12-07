@@ -6,18 +6,18 @@ import { CardinalityResult, MutationContext, Mutations } from "data/mutations";
 import { ReadTransaction } from "replicache";
 import { WriteTransaction } from "@rocicorp/reflect";
 import { ulid } from "src/ulid";
-import { Database } from "backend/lib/database.types";
-import { createClient } from "@supabase/supabase-js";
 import { authTokenVerifier } from "backend/lib/auth";
 import { z } from "zod";
 import { migrations } from "./migrations";
 import { initializeSpace } from "./initializeSpace";
+import { createClient } from "backend/lib/supabase";
 
 export { makeOptions as default };
 export type Env = z.infer<typeof EnvValidator>;
 
 const EnvValidator = z.object({
   NEXT_API_URL: z.string(),
+  WORKER_URL: z.string(),
   RPC_SECRET: z.string(),
   SUPABASE_API_TOKEN: z.string(),
   SUPABASE_URL: z.string(),
@@ -84,7 +84,8 @@ function makeOptions(): ReflectServerOptions<ReplicacheMutators> {
       await initializeSpace(tx);
     },
     mutators,
-    authHandler: async (auth_string, roomID, env): Promise<Auth> => {
+    authHandler: async (auth_string, roomID, e): Promise<Auth> => {
+      let env = e as Env;
       let auth: { authToken: { access_token: string; refresh_token: string } };
       try {
         auth = z
@@ -94,15 +95,7 @@ function makeOptions(): ReflectServerOptions<ReplicacheMutators> {
         return { userID: "unauthorized", authorized: false };
       }
 
-      let supabase = createClient<Database>(
-        env.SUPABASE_URL,
-        env.SUPABASE_API_KEY,
-        {
-          auth: {
-            persistSession: false,
-          },
-        }
-      );
+      let supabase = createClient(env);
       let { data: session } = await supabase.auth.setSession(auth.authToken);
       let authorized = false;
       if (session.user?.id) {
