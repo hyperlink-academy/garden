@@ -78,7 +78,7 @@ export const BaseSpaceCard = (props: Parameters<typeof SpaceCard>[0]) => {
   let { data } = useSpaceData(props.do_id, props);
   console.log(data);
   let spaceEntity = db.useUniqueAttribute("space/id", props.do_id);
-  let unreads = data?.user_space_unreads.find(
+  let unreads = data?.user_space_unreads?.find(
     (u) => u.user === session?.session?.studio
   );
 
