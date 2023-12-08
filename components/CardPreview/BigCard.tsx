@@ -12,6 +12,7 @@ import { Divider } from "components/Layout";
 import { useMutations } from "hooks/useReplicache";
 import { useUIState } from "hooks/useUIState";
 import { Props } from "./index";
+import { focusElement } from "src/utils";
 
 export const BigCardBody = (
   props: {
@@ -29,17 +30,16 @@ export const BigCardBody = (
   let listenersAndAttributes =
     authorized && !editing
       ? {
-          ...props?.dragHandleProps?.attributes,
-          ...props?.dragHandleProps?.listeners,
-        }
+        ...props?.dragHandleProps?.attributes,
+        ...props?.dragHandleProps?.listeners,
+      }
       : {};
 
   return (
     <div
       {...listenersAndAttributes}
-      className={`CardPreview flex h-full grow flex-row !bg-cover !bg-center !bg-no-repeat pl-2 text-sm ${
-        props.data.isMember ? "py-2 pr-2" : "py-2 pr-2"
-      }`}
+      className={`CardPreview flex h-full grow flex-row !bg-cover !bg-center !bg-no-repeat pl-2 text-sm ${props.data.isMember ? "py-2 pr-2" : "py-2 pr-2"
+        }`}
       style={{
         wordBreak: "break-word",
         background:
@@ -58,9 +58,8 @@ export const BigCardBody = (
     >
       {/* Big Card Preview Content Wrapper */}
       <div
-        className={`cardPreviewContent flex w-full flex-col  ${
-          editing ? "" : "hover:cursor-pointer"
-        }`}
+        className={`cardPreviewContent flex w-full flex-col  ${editing ? "" : "hover:cursor-pointer"
+          }`}
       >
         {/* Big Card Preview Title*/}
         {/* show title and remove button
@@ -84,15 +83,13 @@ export const BigCardBody = (
                   section={props.data.member ? "member/name" : "card/title"}
                   placeholder="Untitled"
                   previewOnly={!editing || !!props.data.member}
-                  className={`cardPreviewTitle text-md font-bold ${
-                    props.data.isMember ? "w-fit text-white" : "text-grey-35"
-                  } ${
-                    props.data.imageUrl &&
-                    props.hideContent &&
-                    !props.data.isMember
+                  className={`cardPreviewTitle text-md font-bold ${props.data.isMember ? "w-fit text-white" : "text-grey-35"
+                    } ${props.data.imageUrl &&
+                      props.hideContent &&
+                      !props.data.isMember
                       ? "rounded-[3px] !bg-white px-1"
                       : ""
-                  }`}
+                    }`}
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
                       e.preventDefault();
@@ -135,13 +132,12 @@ export const BigCardBody = (
         {!props.hideContent &&
           (editing || !!props.data.content?.value || !!props.data.imageUrl) && (
             <div
-              className={`cardPreviewDefaultContent flex flex-col gap-2 pb-2 ${
-                props.data.isMember &&
-                !props.hideContent &&
-                props.data.content?.value
+              className={`cardPreviewDefaultContent flex flex-col gap-2 pb-2 ${props.data.isMember &&
+                  !props.hideContent &&
+                  props.data.content?.value
                   ? "rounded-md bg-white pt-2 text-accent-red"
                   : ""
-              }`}
+                }`}
             >
               {!props.hideContent && (
                 <SingleTextSection
@@ -150,9 +146,8 @@ export const BigCardBody = (
                   placeholder={editing ? "write something..." : ""}
                   entityID={props.entityID}
                   previewOnly={!editing}
-                  className={`cardPreviewDefaultTextContent truncate whitespace-pre-wrap leading-tight ${
-                    !props.data.imageUrl ? "" : ""
-                  } ${props.data.isMember ? "px-2 " : ""} `}
+                  className={`cardPreviewDefaultTextContent truncate whitespace-pre-wrap leading-tight ${!props.data.imageUrl ? "" : ""
+                    } ${props.data.isMember ? "px-2 " : ""} `}
                   section={"card/content"}
                   id={
                     props.editable
@@ -181,11 +176,10 @@ export const BigCardBody = (
               {/* three states: unread, existing, none */}
               {/* clicking = shortcut to focus input for a new message */}
               <button
-                className={`cardPreviewComments relative rounded-md border ${
-                  props.unreadDiscussions
+                className={`cardPreviewComments relative rounded-md border ${props.unreadDiscussions
                     ? "unreadCardGlow bg-background text-accent-blue hover:bg-accent-blue hover:text-background"
                     : "border-transparent bg-white text-grey-55 hover:border-accent-blue hover:bg-bg-blue hover:text-accent-blue"
-                } `}
+                  } `}
                 onClick={() => {
                   if (!props.entityID) return;
                   open({ entityID: props.entityID });
@@ -242,29 +236,17 @@ export const BigCardBody = (
             {/* edit toggle on cardPreview  */}
             {props.editable && authorized && (
               <button
-                className={`jusitfy-self-end flex shrink-0 items-center gap-2 text-xs italic   ${
-                  editing ? "text-accent-blue" : "text-grey-55"
-                }`}
+                className={`jusitfy-self-end flex shrink-0 items-center gap-2 text-xs italic   ${editing ? "text-accent-blue" : "text-grey-55"
+                  }`}
                 onClick={(e) => {
                   e.preventDefault();
                   if (editing) setFocusedCard(undefined);
                   else {
                     setFocusedCard(props.entityID);
                     requestAnimationFrame(() => {
-                      let element = document.getElementById(
-                        `${props.entityID}-preview-default-text-section`
-                      );
-                      console.log(element);
-
-                      element?.focus();
-                      requestAnimationFrame(() => {
-                        let element = document.getElementById(
-                          `${props.entityID}-preview-default-text-section`
-                        ) as HTMLTextAreaElement;
-                        console.log(element);
-                        element?.setSelectionRange(
-                          element?.value?.length || 0,
-                          element?.value?.length || 0
+                      focusElement(() => {
+                        return document.getElementById(
+                          `${props.entityID}-preview-title`
                         );
                       });
                     });
@@ -272,9 +254,9 @@ export const BigCardBody = (
                 }}
               >
                 {!editing ? (
-                  <div className="hidden group-hover:block">read mode</div>
+                  <div className="hidden group-hover:block">edit</div>
                 ) : (
-                  <div>edit mode</div>
+                  <div>done</div>
                 )}
                 <Edit editing={editing} width={20} height={20} />
               </button>

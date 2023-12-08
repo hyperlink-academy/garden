@@ -67,16 +67,7 @@ const CollectionList = (props: {
     id: props.entityID + "add-card-dropzone",
     onDragEnd,
   });
-  const onAdd = (entity: string) => {
-    if (props.editable) {
-      useUIState.getState().setFocusedCard(entity);
-      requestAnimationFrame(() => {
-        let element = document.getElementById(`${entity}-preview-title`);
-
-        element?.focus();
-      });
-    }
-  };
+  const onAdd = () => { };
   return (
     <div
       ref={setNodeRef}
@@ -211,9 +202,8 @@ const DraggableCard = (props: {
     <>
       <div
         ref={refs}
-        className={`flex flex-col pb-2 ${
-          isDragging ? `opacity-60 ${isOverSomethingElse ? "-mt-2" : ""}` : ""
-        }`}
+        className={`flex flex-col pb-2 ${isDragging ? `opacity-60 ${isOverSomethingElse ? "-mt-2" : ""}` : ""
+          }`}
       >
         {over &&
           (over.type === "card" || over.type === "search-card" ? (
