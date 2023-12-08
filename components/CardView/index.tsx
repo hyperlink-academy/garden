@@ -564,37 +564,24 @@ export const SectionAdder = (props: {
       </MakeImage>
       {/* END ADDER */}
       {/* LINKED CARD ADDER */}
-      {attachedCards && attachedCards.length !== 0 ? (
-        <button
-          className={`${toggledOnStyle}`}
-          onClick={() => {
-            document
-              .getElementById("card-attached-cards")
-              ?.scrollIntoView({ behavior: "smooth" });
-          }}
-        >
+      <AddExistingCard
+        parentID={props.entityID}
+        attribute="deck/contains"
+        positionKey="eav"
+        onAdd={() => {
+          setTimeout(
+            () =>
+              document
+                .getElementById("card-attached-cards")
+                ?.scrollIntoView({ behavior: "smooth" }),
+            50
+          );
+        }}
+      >
+        <div className={`${toggledOffStyle} `}>
           <CardSmallLined />
-        </button>
-      ) : (
-        <AddExistingCard
-          parentID={props.entityID}
-          attribute="deck/contains"
-          positionKey="eav"
-          onAdd={() => {
-            setTimeout(
-              () =>
-                document
-                  .getElementById("card-attached-cards")
-                  ?.scrollIntoView({ behavior: "smooth" }),
-              50
-            );
-          }}
-        >
-          <div className={`${toggledOffStyle} `}>
-            <CardSmallLined />
-          </div>
-        </AddExistingCard>
-      )}
+        </div>
+      </AddExistingCard>
       {/* END LINKED CARD ADDER */}
       {/* DATE ADDER */}
       <button
