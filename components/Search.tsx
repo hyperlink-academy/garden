@@ -1,4 +1,4 @@
-import { db, useMutations } from "hooks/useReplicache";
+import { db, scanIndex, useMutations } from "hooks/useReplicache";
 import { useEffect, useRef, useState } from "react";
 import { CardPreview, PlaceholderNewCard } from "./CardPreview";
 import * as Popover from "@radix-ui/react-popover";
@@ -15,6 +15,9 @@ import { useGesture } from "@use-gesture/react";
 import { useViewportSize } from "hooks/useViewportSize";
 import { HelpModal } from "./HelpCenter";
 import { Divider } from "./Layout";
+import { useCurrentOpenCard, useOpenCard, useRoom } from "hooks/useUIState";
+import { sortByPosition } from "src/position_helpers";
+import { generateKeyBetween } from "src/fractional-indexing";
 
 let useSearch = () => {
   let [input, setInput] = useState("");
@@ -57,7 +60,10 @@ export function Search() {
     type: "search",
   });
   let combinedRefs = useCombinedRefs(ref, drawerDroppableRef);
-  let { authorized, mutate, memberEntity } = useMutations();
+  let { authorized, mutate, memberEntity, rep } = useMutations();
+  let room = useRoom();
+  let currentOpenCard = useCurrentOpenCard();
+  let roomType = db.useEntity(room, "room/type");
   return (
     <Popover.Root open>
       <div style={{ width: 336 }}>
@@ -82,27 +88,112 @@ export function Search() {
               <input
                 ref={inputRef}
                 onKeyDown={async (e) => {
+                  let target = e.currentTarget;
                   if (e.key === "Escape") {
                     e.currentTarget.blur();
                   }
                   if (e.key === "Enter") {
                     //New Card
+                    e.preventDefault();
+                    let entityID: string;
                     if (suggestionIndex === results.length && !exactMatch) {
                       if (!authorized || !memberEntity) return;
-                      let entityID = ulid();
+                      entityID = ulid();
                       await mutate("createCard", {
                         entityID,
                         title: input,
                         memberEntity,
                       });
-                      openCard({ entityID, focus: "content" });
-                      setOpen(false);
                     } else {
-                      let entityID = results[suggestionIndex].entity;
-                      setOpen(false);
-                      e.currentTarget.blur();
+                      entityID = results[suggestionIndex].entity;
+                    }
+                    if (e.ctrlKey || e.metaKey) {
+                      if (e.shiftKey && currentOpenCard) {
+                        if (!rep) return;
+                        let siblings = (
+                          await rep.query((tx) => {
+                            return scanIndex(tx).eav(room, "deck/contains");
+                          })
+                        ).sort(sortByPosition("eav"));
+                        let newIndex = siblings.length - 1;
+                        let position = generateKeyBetween(
+                          siblings[newIndex]?.positions.eav || null,
+                          siblings[newIndex + 1]?.positions.eav || null
+                        );
+
+                        await mutate("addCardToSection", {
+                          factID: ulid(),
+                          cardEntity: entityID,
+                          parent: currentOpenCard,
+                          section: "deck/contains",
+                          positions: {
+                            eav: position,
+                          },
+                        });
+                        setOpen(false);
+                        target.blur();
+                        return;
+                      }
+                      if (!roomType || !rep) return;
+                      if (roomType.value === "chat") return;
+                      if (roomType.value === "collection") {
+                        let siblings = (
+                          await rep.query((tx) => {
+                            return scanIndex(tx).eav(room, "desktop/contains");
+                          })
+                        ).sort(sortByPosition("eav"));
+                        let newIndex = siblings.length - 1;
+                        let position = generateKeyBetween(
+                          siblings[newIndex]?.positions.eav || null,
+                          siblings[newIndex + 1]?.positions.eav || null
+                        );
+
+                        await mutate("addCardToSection", {
+                          factID: ulid(),
+                          cardEntity: entityID,
+                          parent: room,
+                          section: "desktop/contains",
+                          positions: {
+                            eav: position,
+                          },
+                        });
+                      }
+                      if (roomType.value === "canvas") {
+                        let positions = await rep.query(async (tx) => {
+                          return await Promise.all(
+                            (
+                              await scanIndex(tx).eav(room, "desktop/contains")
+                            ).map(async (c) =>
+                              scanIndex(tx).eav(c.id, "card/position-in")
+                            )
+                          );
+                        });
+                        let lowestCard = positions.reduce((acc, val) => {
+                          return val && val.value.y > acc ? val.value.y : acc;
+                        }, 0);
+                        await mutate("addCardToDesktop", {
+                          entity: entityID,
+                          factID: ulid(),
+                          desktop: room,
+                          position: {
+                            rotation: 1 - Math.random() * 2,
+                            size: "small",
+                            x: 64,
+                            y: lowestCard + 128,
+                          },
+                        });
+                        let roomElement =
+                          document.getElementById("room-wrapper");
+                        roomElement?.scrollTo({
+                          top: lowestCard + roomElement.clientHeight / 3,
+                          behavior: "smooth",
+                        });
+                      }
+                    } else {
                       openCard({ entityID, focus: "content" });
                     }
+                    target.blur();
+                    setOpen(false);
                   }
 
                   if (
