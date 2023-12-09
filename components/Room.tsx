@@ -227,6 +227,12 @@ const AddCardButton = (props: {
                 eav: position,
               },
             });
+
+            let roomElement = document.getElementById("room-wrapper");
+            roomElement?.scrollTo({
+              top: roomElement.scrollHeight,
+              behavior: "smooth",
+            });
           }
           if (roomType.value === "canvas") {
             let siblingPositions = await rep.query(async (tx) => {

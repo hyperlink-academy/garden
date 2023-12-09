@@ -25,7 +25,7 @@ let useSearch = () => {
   let results = cards.filter(
     (c) =>
       c.value &&
-      input.length > 2 &&
+      input.length > 0 &&
       (!input ||
         c.value.toLocaleLowerCase().includes(input.toLocaleLowerCase()))
   );
@@ -156,6 +156,12 @@ export function Search() {
                           positions: {
                             eav: position,
                           },
+                        });
+                        let roomElement =
+                          document.getElementById("room-wrapper");
+                        roomElement?.scrollTo({
+                          top: roomElement.scrollHeight,
+                          behavior: "smooth",
                         });
                       }
                       if (roomType.value === "canvas") {
