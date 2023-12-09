@@ -176,16 +176,16 @@ export function Search() {
                           factID: ulid(),
                           desktop: room,
                           position: {
-                            rotation: 1 - Math.random() * 2,
+                            rotation: 0,
                             size: "small",
                             x: 64,
-                            y: lowestCard + 128,
+                            y: lowestCard === 0 ? 32 : lowestCard + 124,
                           },
                         });
                         let roomElement =
                           document.getElementById("room-wrapper");
                         roomElement?.scrollTo({
-                          top: lowestCard + roomElement.clientHeight / 3,
+                          top: lowestCard,
                           behavior: "smooth",
                         });
                       }
