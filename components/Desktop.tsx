@@ -190,6 +190,9 @@ export const Desktop = (props: { entityID: string }) => {
                 y: Math.max(e.clientY - parentRect.top - 42, 0),
               },
             });
+
+            open({ entityID: entity, focus: "title" });
+
             action.end();
           }
         }}
