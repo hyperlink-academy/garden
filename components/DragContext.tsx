@@ -17,6 +17,8 @@ import { RoomListPreview } from "./SpaceLayout/Sidebar/RoomListLayout";
 import { animated, useSpring } from "@react-spring/web";
 import { CardPreviewData, EmptyCardData } from "hooks/CardPreviewData";
 import { Fact } from "data/Facts";
+import { create, useStore } from "zustand";
+import { useUIState } from "hooks/useUIState";
 
 export const SmallCardDragContext = (props: {
   children: React.ReactNode;
@@ -70,6 +72,7 @@ export const SmallCardDragContext = (props: {
             active,
             activeData.rect.current.translated
           );
+        else await overData?.onDragCancel?.();
         active?.onDragEnd?.(overData);
         setActiveCard(null);
         setOver(null);
@@ -245,6 +248,8 @@ export type DroppableData = {
   id: string;
   disabled?: boolean;
   entityID: string;
+
+  onDragCancel?: () => void | Promise<void>;
   onDragEnter?: (data: DraggableData) => void | Promise<void>;
   onDragExit?: (data: DraggableData) => void | Promise<void>;
   onDragEnd?: (
@@ -272,8 +277,22 @@ export const useDraggableCard = (data: DraggableData) => {
   return { ...draggable, isOverSomethingElse };
 };
 
+type OverState = {
+  state: { over: DraggableData; id: string; updatedAt: number } | null;
+};
+let useOverStore = create(() => ({ state: null } as OverState));
+let setState = (
+  s: OverState | ((state: OverState) => OverState),
+  reason: string
+) => {
+  console.log(reason);
+  useOverStore.setState(s);
+};
+
 export const useDroppableZone = (data: DroppableData) => {
-  let [over, setOver] = useState<DraggableData | null>(null);
+  let over = useOverStore(({ state: s }) =>
+    s ? (s.id === data.id ? s.over : null) : null
+  );
   let droppable = useDroppable({
     id: data.id,
     disabled: data.disabled,
@@ -285,15 +304,30 @@ export const useDroppableZone = (data: DroppableData) => {
       ...data,
       onDragExit: (d: DraggableData) => {
         data.onDragExit?.(d);
-        setOver(null);
+        let now = Date.now();
+        setTimeout(() => {
+          setState((state) => {
+            let s = state?.state;
+            if (s?.id === data.id && s.updatedAt < now) return { state: null };
+            return state;
+          }, "exit");
+        }, 100);
+      },
+      onDragCancel: () => {
+        data.onDragCancel?.();
+        setState({ state: null }, "cancel");
       },
       onDragEnter: (d: DraggableData) => {
         data.onDragEnter?.(d);
-        setOver(d);
+        setState(
+          { state: { over: d, id: data.id, updatedAt: Date.now() } },
+          "enter"
+        );
       },
       onDragEnd: (d: DraggableData, rect: ClientRect | null) => {
+        console.log("yo");
         data.onDragEnd?.(d, rect);
-        setOver(null);
+        setState({ state: null }, "end");
       },
     },
   });

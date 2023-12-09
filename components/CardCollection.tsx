@@ -67,7 +67,7 @@ const CollectionList = (props: {
     id: props.entityID + "add-card-dropzone",
     onDragEnd,
   });
-  const onAdd = () => { };
+  const onAdd = () => {};
   return (
     <div
       ref={setNodeRef}
@@ -186,24 +186,24 @@ const DraggableCard = (props: {
 
   let { mutate } = useMutations();
   let onDragEnd = useOnDragEndCollection(props);
-  let { setNodeRef: draggableRef, over: _over } = useDroppableZone({
+  let { setNodeRef: draggableRef, over } = useDroppableZone({
     type: "card",
     entityID: props.parent,
     id: props.id,
     onDragEnd,
   });
 
-  let over = useDebouncedValue(_over, 20);
-
   let refs = useCombinedRefs(draggableRef, setNodeRef);
   let removeCardFromRoomHistory = useRemoveCardFromRoomHistory();
+  if (isDragging) return null;
 
   return (
     <>
       <div
         ref={refs}
-        className={`flex flex-col pb-2 ${isDragging ? `opacity-60 ${isOverSomethingElse ? "-mt-2" : ""}` : ""
-          }`}
+        className={`flex flex-col pb-2 ${
+          isDragging ? `opacity-60 ${isOverSomethingElse ? "-mt-2" : ""}` : ""
+        }`}
       >
         {over &&
           (over.type === "card" || over.type === "search-card" ? (
