@@ -105,10 +105,10 @@ export const CardView = (props: {
           return scanIndex(tx).eav(props.entityID, "deck/contains");
         })) || [];
 
-      let firstPosition = siblings.sort(sortByPosition("eav"))[0]?.positions[
-        "eav"
-      ];
-      let position = generateKeyBetween(null, firstPosition || null);
+      let lastPosition = siblings.sort(sortByPosition("eav"))[
+        siblings.length - 1
+      ]?.positions["eav"];
+      let position = generateKeyBetween(lastPosition || null, null);
       await mutate("addCardToSection", {
         factID: ulid(),
         cardEntity: entityID as string,
@@ -121,7 +121,7 @@ export const CardView = (props: {
       setTimeout(() => {
         document
           .getElementById("card-attached-card-section")
-          ?.scrollIntoView({ block: "center", behavior: "smooth" });
+          ?.scrollIntoView({ block: "end", behavior: "smooth" });
       }, 100);
     },
   });
@@ -132,12 +132,11 @@ export const CardView = (props: {
         ref={setNodeRef}
         className={`
           card
-          relative
-          mx-auto       
-          flex
-          h-[42px] w-full
-          max-w-3xl grow
-          flex-col items-stretch
+          relative       
+          mx-auto
+          flex h-[42px]
+          w-full max-w-3xl
+          grow flex-col items-stretch
           ${borderStyles({
             member: !!memberName,
           })}
@@ -568,14 +567,13 @@ export const SectionAdder = (props: {
         parentID={props.entityID}
         attribute="deck/contains"
         positionKey="eav"
+        addToEnd
         onAdd={() => {
-          setTimeout(
-            () =>
-              document
-                .getElementById("card-attached-cards")
-                ?.scrollIntoView({ behavior: "smooth" }),
-            50
-          );
+          setTimeout(() => {
+            document
+              .getElementById("card-attached-card-section")
+              ?.scrollIntoView({ block: "end", behavior: "smooth" });
+          }, 100);
         }}
       >
         <div className={`${toggledOffStyle} `}>
