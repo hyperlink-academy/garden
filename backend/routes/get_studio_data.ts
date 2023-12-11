@@ -2,6 +2,7 @@ import { Bindings } from "backend";
 import { makeRoute } from "backend/lib/api";
 import { createClient } from "backend/lib/supabase";
 import { z } from "zod";
+import { space_data_query } from "./get_space_data";
 export const get_studio_data_route = makeRoute({
   route: "get_studio_data",
   input: z.object({ id: z.string() }),
@@ -13,8 +14,7 @@ export const get_studio_data_route = makeRoute({
         `*,
         members_in_studios(*, identity_data(username)),
         spaces_in_studios(*,
-                          space_data(*,
-                                     owner:identity_data!space_data_owner_fkey(*))
+                          space_data(${space_data_query})
                          )`
       )
       .eq("id", msg.id)
