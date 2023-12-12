@@ -4,22 +4,20 @@ import {
   DragOverlay,
   MouseSensor,
   TouchSensor,
-  closestCorners,
   useDraggable,
   useDroppable,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { AddSmall, AddTiny } from "components/Icons";
+import { AddTiny } from "components/Icons";
 import { useRef, useState } from "react";
 import { CardPreview, PlaceholderNewCard } from "./CardPreview";
-import { pointerWithinOrRectIntersection } from "src/customCollisionDetection";
+import { customCollisionDetection } from "src/customCollisionDetection";
 import { RoomListPreview } from "./SpaceLayout/Sidebar/RoomListLayout";
 import { animated, useSpring } from "@react-spring/web";
 import { CardPreviewData, EmptyCardData } from "hooks/CardPreviewData";
 import { Fact } from "data/Facts";
-import { create, useStore } from "zustand";
-import { useUIState } from "hooks/useUIState";
+import { create } from "zustand";
 
 export const SmallCardDragContext = (props: {
   children: React.ReactNode;
@@ -41,7 +39,7 @@ export const SmallCardDragContext = (props: {
   let previouslyOver = useRef<DroppableData | null>(null);
   return (
     <DndContext
-      collisionDetection={closestCorners}
+      collisionDetection={customCollisionDetection}
       sensors={sensors}
       onDragStart={({ active }) => {
         let activeData = active?.data.current as DraggableData;
@@ -266,7 +264,15 @@ export type DroppableData = {
       type: "room";
       roomType?: Fact<"room/type">["value"];
     }
-  | { type: "card" | "dropzone" | "linkCard" | "trigger" | "search" }
+  | {
+      type:
+        | "card"
+        | "dropzone"
+        | "linkCard"
+        | "trigger"
+        | "search"
+        | "collectionCard";
+    }
 );
 
 export const useDraggableCard = (data: DraggableData) => {

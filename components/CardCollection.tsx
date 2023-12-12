@@ -57,10 +57,6 @@ const CollectionList = (props: {
   let spaceID = useSpaceID();
   let { authToken } = useAuth();
   let { mutate } = useMutations();
-  let onDragEnd = useOnDragEndCollection({
-    parent: props.entityID,
-    attribute: props.attribute,
-  });
   const onAdd = () => {};
   return (
     <div
