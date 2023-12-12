@@ -4,6 +4,7 @@ import {
   DragOverlay,
   MouseSensor,
   TouchSensor,
+  closestCorners,
   useDraggable,
   useDroppable,
   useSensor,
@@ -40,7 +41,7 @@ export const SmallCardDragContext = (props: {
   let previouslyOver = useRef<DroppableData | null>(null);
   return (
     <DndContext
-      collisionDetection={pointerWithinOrRectIntersection}
+      collisionDetection={closestCorners}
       sensors={sensors}
       onDragStart={({ active }) => {
         let activeData = active?.data.current as DraggableData;

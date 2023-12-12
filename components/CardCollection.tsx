@@ -61,16 +61,9 @@ const CollectionList = (props: {
     parent: props.entityID,
     attribute: props.attribute,
   });
-  let { setNodeRef, over } = useDroppableZone({
-    type: "dropzone",
-    entityID: props.entityID,
-    id: props.entityID + "add-card-dropzone",
-    onDragEnd,
-  });
   const onAdd = () => {};
   return (
     <div
-      ref={setNodeRef}
       className="collectionCardList z-0 flex h-full flex-col"
       onDragOver={(e) => e.preventDefault()}
       onDrop={async (e) => {
@@ -135,23 +128,6 @@ const CollectionList = (props: {
           id={card.id}
         />
       ))}
-      {over ? (
-        over.type === "card" ? (
-          <div className="pb-2 opacity-60">
-            <CardPreview
-              data={over.data}
-              entityID={over.entityID}
-              size={"big"}
-              hideContent={props.collectionType !== "cardpreview"}
-              editable={props.editable}
-            />
-          </div>
-        ) : over.type === "new-card" ? (
-          <NewCardPreview />
-        ) : over.type === "new-search-card" ? (
-          <PlaceholderNewCard title={over.title} />
-        ) : null
-      ) : null}
       <CardAdder
         parentID={props.entityID}
         attribute={props.attribute}
@@ -195,7 +171,6 @@ const DraggableCard = (props: {
 
   let refs = useCombinedRefs(draggableRef, setNodeRef);
   let removeCardFromRoomHistory = useRemoveCardFromRoomHistory();
-  if (isDragging) return null;
 
   return (
     <>
@@ -252,11 +227,11 @@ const DraggableCard = (props: {
   );
 };
 
-const NewCardPreview = () => (
+export const NewCardPreview = () => (
   <div className="mb-2 h-[62px] w-full rounded-md border border-dashed border-grey-80" />
 );
 
-let useOnDragEndCollection = (props: {
+export const useOnDragEndCollection = (props: {
   parent: string;
   entityID?: string;
   attribute: "desktop/contains" | "deck/contains";
