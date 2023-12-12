@@ -36,7 +36,6 @@ export const Room = () => {
   let room = useRoom();
   let roomType = db.useEntity(room, "room/type");
   let { ref } = usePreserveScroll<HTMLDivElement>(room);
-
   let { reactions, filters, setFilters, cardsFiltered, total } =
     useFilteredCards(room, "desktop/contains");
 
@@ -57,6 +56,7 @@ export const Room = () => {
     <div
       id="room-wrapper"
       onPaste={async (e) => {
+        //handles creating a new image card if you paste in an image
         if (!authToken || !spaceID || !roomType || !rep || !memberEntity)
           return;
         if (roomType.value === "chat") return;
@@ -171,6 +171,7 @@ const AddCardButton = (props: {
     props.total === 0 ||
     (props.total === 1 &&
       firstCardTitle?.value === "HYPERLINK README 📖✨📖 click here! 🌱");
+
   return (
     <div className="absolute bottom-0 left-[136px] z-[2] -mb-[1px] flex h-8 w-16 items-center justify-center rounded-t-full border border-b-0 border-grey-80 bg-background text-center">
       {showHelp && (
@@ -226,21 +227,53 @@ const AddCardButton = (props: {
                 eav: position,
               },
             });
+
+            let roomElement = document.getElementById("room-wrapper");
+            roomElement?.scrollTo({
+              top: roomElement.scrollHeight,
+              behavior: "smooth",
+            });
           }
           if (roomType.value === "canvas") {
-            let viewHeight = props.getViewHeight() || 128;
+            let siblingPositions = await rep.query(async (tx) => {
+              let siblings = await scanIndex(tx).eav(
+                props.roomEntity,
+                "desktop/contains"
+              );
+
+              return Promise.all(
+                siblings.map(async (c) =>
+                  scanIndex(tx).eav(c.id, "card/position-in")
+                )
+              );
+            });
+
+            let siblingsSortedByPosition = siblingPositions.sort(
+              (a, b) => (a?.value.y || 0) - (b?.value.y || 0)
+            );
+
+            let lastSiblingPosition =
+              siblingsSortedByPosition[siblingsSortedByPosition.length - 1]
+                ?.value.y;
+
             mutate("addCardToDesktop", {
               entity: newEntity,
               factID: ulid(),
               desktop: props.roomEntity,
               position: {
-                rotation: 1 - Math.random() * 2,
+                rotation: 0,
                 size: "small",
                 x: 64,
-                y: viewHeight - 256,
+                y: lastSiblingPosition ? lastSiblingPosition + 124 : 32,
               },
             });
+            let roomElement = document.getElementById("room-wrapper");
+            roomElement?.scrollTo({
+              top: lastSiblingPosition ? lastSiblingPosition : 0,
+              behavior: "smooth",
+            });
           }
+
           open({ entityID: newEntity, focus: "title" });
 
           //open the card

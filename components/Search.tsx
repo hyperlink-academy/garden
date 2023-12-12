@@ -13,7 +13,6 @@ import { ulid } from "src/ulid";
 import { useCardViewer } from "./CardViewerContext";
 import { useGesture } from "@use-gesture/react";
 import { useViewportSize } from "hooks/useViewportSize";
-import { HelpModal } from "./HelpCenter";
 import { Divider } from "./Layout";
 import { useCurrentOpenCard, useOpenCard, useRoom } from "hooks/useUIState";
 import { sortByPosition } from "src/position_helpers";
@@ -25,7 +24,7 @@ let useSearch = () => {
   let results = cards.filter(
     (c) =>
       c.value &&
-      input.length > 2 &&
+      input.length > 0 &&
       (!input ||
         c.value.toLocaleLowerCase().includes(input.toLocaleLowerCase()))
   );
@@ -51,6 +50,8 @@ export function Search() {
     return () => document.removeEventListener("keydown", listener);
   }, []);
   let [suggestionIndex, setSuggestionIndex] = useState<number>(0);
+  let [shortcutHelpOpen, setShortcutHelpOpen] = useState(false);
+
   useEffect(() => {
     setOpen(focused);
   }, [focused]);
@@ -157,6 +158,12 @@ export function Search() {
                             eav: position,
                           },
                         });
+                        let roomElement =
+                          document.getElementById("room-wrapper");
+                        roomElement?.scrollTo({
+                          top: roomElement.scrollHeight,
+                          behavior: "smooth",
+                        });
                       }
                       if (roomType.value === "canvas") {
                         let positions = await rep.query(async (tx) => {
@@ -176,16 +183,16 @@ export function Search() {
                           factID: ulid(),
                           desktop: room,
                           position: {
-                            rotation: 1 - Math.random() * 2,
+                            rotation: 0,
                             size: "small",
                             x: 64,
-                            y: lowestCard + 128,
+                            y: lowestCard === 0 ? 32 : lowestCard + 124,
                           },
                         });
                         let roomElement =
                           document.getElementById("room-wrapper");
                         roomElement?.scrollTo({
-                          top: lowestCard + roomElement.clientHeight / 3,
+                          top: lowestCard,
                           behavior: "smooth",
                         });
                       }
@@ -228,9 +235,48 @@ export function Search() {
               />
               {open && (
                 <div className="flex flex-col gap-1 pt-2 text-grey-55">
-                  <p className="text-xs">
-                    <i>click to open, drag to add to room</i>
-                  </p>
+                  <div className="flex w-full items-start justify-between text-xs">
+                    {shortcutHelpOpen ? (
+                      <div className="flex flex-col gap-1 italic">
+                        <div className="flex gap-2">
+                          <div className="flex gap-0.5">
+                            <UnicodeKeyboardKey>↑</UnicodeKeyboardKey>
+                            <UnicodeKeyboardKey>↓</UnicodeKeyboardKey>
+                          </div>
+                          select, <UnicodeKeyboardKey>⏎</UnicodeKeyboardKey>
+                          open
+                        </div>
+                        <div className="flex gap-2">
+                          <div className="flex gap-0.5">
+                            <KeyboardKey>ctrl</KeyboardKey>
+                            <UnicodeKeyboardKey>⏎</UnicodeKeyboardKey>
+                          </div>
+                          place in current room
+                        </div>
+                        <div className="flex gap-2">
+                          <div className="flex gap-0.5">
+                            <UnicodeKeyboardKey>⇧</UnicodeKeyboardKey>
+                            <KeyboardKey>ctrl</KeyboardKey>
+                            <UnicodeKeyboardKey>⏎</UnicodeKeyboardKey>
+                          </div>
+                          place on current card
+                        </div>
+                      </div>
+                    ) : (
+                      <i>click to open, drag to place in space</i>
+                    )}
+                    <button
+                      className="text-accent-blue"
+                      onClick={(e) => {
+                        setShortcutHelpOpen(!shortcutHelpOpen);
+                      }}
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                      }}
+                    >
+                      {shortcutHelpOpen ? "close" : "shortcuts"}
+                    </button>
+                  </div>
                   {input && results.length > 0 && <Divider />}
                 </div>
               )}
@@ -282,6 +328,22 @@ let SearchResults = (props: {
         />
       ))}
     </>
+  );
+};
+
+const KeyboardKey = (props: { children: React.ReactNode }) => {
+  return (
+    <code className=" flex h-4 w-fit min-w-[16px] justify-center rounded-md border border-grey-80 bg-background px-1 text-center text-[10px] not-italic text-grey-55 ">
+      {props.children}
+    </code>
+  );
+};
+
+const UnicodeKeyboardKey = (props: { children: React.ReactNode }) => {
+  return (
+    <code className=" flex h-4 w-fit min-w-[16px] justify-center rounded-md border border-grey-80 bg-background text-center font-sans text-[10px] not-italic text-grey-55 ">
+      <div className="-mt-[1px]"> {props.children}</div>
+    </code>
   );
 };
 
