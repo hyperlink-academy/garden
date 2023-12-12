@@ -13,7 +13,7 @@ import { WORKER_URL, springConfig } from "src/constants";
 import { GetStaticPropsContext, InferGetStaticPropsType } from "next/types";
 import { SpaceProvider } from "components/ReplicacheProvider";
 import { SWRConfig } from "swr";
-import { useViewportSize } from "hooks/useViewportSize";
+import { useViewportDifference, useViewportSize } from "hooks/useViewportSize";
 import { usePreventResize } from "hooks/usePreventResize";
 import { Question, SidebarIcon, StudioFilled } from "components/Icons";
 import { SpaceName, SpaceOptions } from "components/SpaceLayout/Sidebar";
@@ -76,10 +76,10 @@ function Space() {
   }, []);
 
   let viewheight = useViewportSize().height;
+  let difference = useViewportDifference();
   let heightSpring = useSpring({
     height: viewheight,
   });
-  usePreventResize();
 
   return (
     <>
@@ -87,8 +87,8 @@ function Space() {
       <PresenceHandler />
 
       <animated.div
-        style={heightSpring}
-        className="spacecontent max-w-screen-xl relative mx-auto flex h-full w-full grow md:px-4 md:py-4 md:pb-2"
+        style={difference > 100 ? heightSpring : undefined}
+        className="spacecontent max-w-screen-xl relative mx-auto flex h-screen w-full grow md:px-4 md:py-4 md:pb-2"
       >
         <SmallCardDragContext>
           {width > 960 || width === 0 ? <DesktopLayout /> : <MobileLayout />}
@@ -193,9 +193,9 @@ const MobileLayout = () => {
   });
 
   return (
-    <div className="flex h-full w-full flex-col">
+    <div className="mobileLayout flex h-full w-full flex-col">
       <div
-        className="no-scrollbar pwa-padding my-2 flex h-full snap-x snap-mandatory flex-row overflow-y-hidden overflow-x-scroll overscroll-x-none scroll-smooth"
+        className="mobileRoomAndCard no-scrollbar pwa-padding my-2 flex h-full snap-x snap-mandatory flex-row overflow-y-hidden overflow-x-scroll overscroll-x-none scroll-smooth"
         {...bind()}
       >
         <div
@@ -210,13 +210,16 @@ const MobileLayout = () => {
           </div>
         </div>
 
-        <div className="snap-center snap-always ">
+        <div className="cardViewerWrapper snap-center snap-always ">
           <CardViewer />
         </div>
         <div className="w-2 shrink-0 snap-start" />
       </div>
-      <div className="flex flex-row justify-between px-2 pb-1">
-        <div className="flex flex-row gap-2 text-grey-55" ref={droppableRef}>
+      <div className="navFooter pwa-bottom-padding flex flex-row justify-between px-2">
+        <div
+          className="sidebarTrigger flex flex-row gap-2 text-grey-55"
+          ref={droppableRef}
+        >
           <button onClick={() => setSidebarOpen()}>
             <SidebarIcon />
           </button>
@@ -288,7 +291,7 @@ const MobileSidebar = () => {
       }
       <animated.div
         style={{ height: viewheight, left }}
-        className="fixed top-0 z-50 ml-2 p-1 pl-0"
+        className="pwa-padding pwa-bottom-padding fixed top-0 z-50 ml-2 p-1 pl-0"
       >
         <div
           className="h-full touch-none rounded-md border border-grey-90 bg-white"

@@ -430,7 +430,7 @@ export const MobileSearch = () => {
   let [state, setState] = useState<"normal" | "open">("normal");
   let [measure, { height }] = useMeasure();
   let style = useSpring({
-    y: state === "open" ? -1 * height + 39 : 38,
+    y: state === "open" ? -1 * height + 39 : 200,
   });
   let opacity = useSpring({
     opacity: state === "open" ? 0.2 : 0,
@@ -461,7 +461,7 @@ export const MobileSearch = () => {
   return (
     <>
       <button
-        className="flex h-8 w-8 items-center justify-center rounded-md border border-grey-55"
+        className="mobileSearchTrigger flex h-8 w-8 items-center justify-center rounded-md border border-grey-55"
         onClick={() => {
           setState("open");
           inputRef.current?.focus();
@@ -469,12 +469,13 @@ export const MobileSearch = () => {
       >
         <SearchSmall />
       </button>
+
       {state === "open" && (
         <>
           <animated.div
             {...bindOverlay()}
             onClick={() => setState("normal")}
-            className="fixed inset-0 z-50 bg-grey-15"
+            className="mobileSearchOverlay fixed inset-0 z-50 bg-grey-15"
             style={opacity}
           />
           <div
@@ -487,14 +488,14 @@ export const MobileSearch = () => {
       <animated.div className="fixed left-0 z-50 w-full px-2" style={style}>
         <div
           style={{ height: viewportHeight * 0.5 }}
-          className="no-scrollbar relative z-0 flex  w-full flex-col gap-2 overflow-y-scroll rounded-md border border-b-0 border-grey-90 bg-white pt-2"
+          className="mobileSearchDrawer no-scrollbar relative z-0 flex  w-full flex-col gap-2 overflow-y-scroll rounded-md border border-b-0 border-grey-90 bg-white pt-2"
           ref={refCombined}
         >
-          <div className="sticky top-0 z-10 flex flex-row justify-between gap-2 px-2">
+          <div className="mobileSearchInput sticky top-0 z-10 flex flex-row justify-between gap-2 px-2">
             <div className="relative w-full">
               <RoomSearch className="absolute right-2 top-2 text-grey-55" />
               <input
-                className={`w-full px-2 py-1 outline-none`}
+                className={`w-full py-1 pl-2 pr-7  outline-none`}
                 onKeyDown={(e) => {
                   if (e.key === "Escape") {
                     setState("normal");
@@ -511,7 +512,7 @@ export const MobileSearch = () => {
               <CloseLinedTiny />
             </button>
           </div>
-          <div className="flex flex-col">
+          <div className="mobileSearchResults flex flex-col">
             {input.length > 0 &&
               results.map((c) => (
                 <DraggableCard
@@ -525,7 +526,7 @@ export const MobileSearch = () => {
                 />
               ))}
             {input && !exactMatch && (
-              <div className="p-2">
+              <div className="mobileSearchNewCard p-2">
                 <NewCard title={input} onClick={() => setState("normal")} />
               </div>
             )}
