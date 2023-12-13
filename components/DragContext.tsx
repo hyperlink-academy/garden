@@ -188,7 +188,12 @@ const CardDropIndicator = ({
         // if the card is in a room, and is small OR is a from the new card button, use a small indicator
         <span>{"Add"}</span>
       ) : (
-        <span>Place {over.type === "linkCard" ? "on Card" : "in Room"}</span>
+        <span>
+          Place{" "}
+          {over.type === "desktopCard" || over.type === "cardView"
+            ? "on Card"
+            : "in Room"}
+        </span>
       )}
     </div>
   );
@@ -268,7 +273,8 @@ export type DroppableData = {
       type:
         | "card"
         | "dropzone"
-        | "linkCard"
+        | "cardView"
+        | "desktopCard"
         | "trigger"
         | "search"
         | "collectionCard";

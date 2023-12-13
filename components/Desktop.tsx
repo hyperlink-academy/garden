@@ -297,7 +297,7 @@ const DraggableCard = (props: {
   let { setNodeRef: setNodeRef2 } = useDroppableZone({
     id: props.relationshipID,
     entityID: props.entityID,
-    type: "linkCard",
+    type: "desktopCard",
     onDragEnd: async (data) => {
       if (!rep) return;
       let entityID;

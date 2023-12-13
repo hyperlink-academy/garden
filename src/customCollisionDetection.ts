@@ -12,7 +12,8 @@ export function customCollisionDetection(
   let sortedCollisions = args.droppableContainers.reduce(
     (acc, container) => {
       let data = container.data.current as DroppableData;
-      if (data.type === "collectionCard") acc.closestCorners.push(container);
+      if (data.type === "collectionCard" || data.type === "cardView")
+        acc.closestCorners.push(container);
       else acc.pointerWithin.push(container);
       return acc;
     },

@@ -159,7 +159,7 @@ const DraggableCard = (props: {
   let { mutate } = useMutations();
   let onDragEnd = useOnDragEndCollection(props);
   let { setNodeRef: draggableRef, over } = useDroppableZone({
-    type: "card",
+    type: "collectionCard",
     entityID: props.parent,
     id: props.id,
     onDragEnd,

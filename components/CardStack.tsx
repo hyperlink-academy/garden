@@ -42,7 +42,7 @@ export const CardAdder = (
   });
   let { setNodeRef: droppableRef, over } = useDroppableZone({
     disabled: !props.addToEnd,
-    type: "card",
+    type: "collectionCard",
     entityID: props.parentID,
     id: props.parentID + "cardAdder",
     onDragEnd,

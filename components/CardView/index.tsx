@@ -68,9 +68,9 @@ export const CardView = (props: {
 
   let { mutate, rep } = useMutations();
   let { setNodeRef } = useDroppableZone({
-    id: props.referenceFactID + "-dropzone",
+    id: props.entityID + "-cardview-dropzone",
     entityID: props.entityID,
-    type: "linkCard",
+    type: "cardView",
     onDragEnd: async (data) => {
       if (!rep) return;
 
