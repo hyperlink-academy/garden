@@ -33,6 +33,7 @@ import { useCardViewer } from "./CardViewerContext";
 import { Textarea } from "./Textarea";
 
 export const Room = () => {
+  let { open } = useCardViewer();
   let room = useRoom();
   let roomType = db.useEntity(room, "room/type");
   let { ref } = usePreserveScroll<HTMLDivElement>(room);
@@ -66,6 +67,10 @@ export const Room = () => {
           spaceID
         );
         if (!data.success) return;
+
+        //prevent image from opening in new tab
+        e.preventDefault();
+
         let newCard = ulid();
         action.start();
         let factID = ulid();
@@ -93,19 +98,45 @@ export const Room = () => {
           positions: {},
         });
         if (roomType.value === "canvas") {
+          let siblingPositions = await rep.query(async (tx) => {
+            let siblings = await scanIndex(tx).eav(room, "desktop/contains");
+
+            return Promise.all(
+              siblings.map(async (c) =>
+                scanIndex(tx).eav(c.id, "card/position-in")
+              )
+            );
+          });
+
+          let siblingsSortedByPosition = siblingPositions.sort(
+            (a, b) => (a?.value.y || 0) - (b?.value.y || 0)
+          );
+
+          let lastSiblingPosition =
+            siblingsSortedByPosition[siblingsSortedByPosition.length - 2]?.value
+              .y;
+
           await mutate("assertFact", {
             entity: factID,
             attribute: "card/position-in",
             value: {
               type: "position",
-              x: 0,
-              y: 0,
-              rotation: 1 - Math.random() * 2,
+              x: 64,
+              y: lastSiblingPosition ? lastSiblingPosition + 124 : 32,
+              rotation: 0,
               size: "small",
             },
             positions: {},
           });
+
+          let roomElement = document.getElementById("room-wrapper");
+          roomElement?.scrollTo({
+            top: lastSiblingPosition ? lastSiblingPosition : 0,
+            behavior: "smooth",
+          });
         }
+        open({ entityID: newCard, focus: "title" });
+
         action.end();
       }}
       ref={ref}

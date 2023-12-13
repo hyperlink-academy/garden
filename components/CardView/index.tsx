@@ -145,6 +145,7 @@ export const CardView = (props: {
           `}
         onDragOver={(e) => e.preventDefault()}
         onDrop={async (e) => {
+          e.preventDefault();
           if (!authToken || !spaceID) return;
           let data = await getAndUploadFile(
             e.dataTransfer.items,
@@ -152,7 +153,7 @@ export const CardView = (props: {
             spaceID
           );
           if (!data.success) return;
-
+          e.preventDefault();
           await mutate("assertFact", {
             entity: props.entityID,
             factID: ulid(),
