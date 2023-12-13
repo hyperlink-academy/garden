@@ -96,6 +96,7 @@ export const NotificationManager = () => {
             notificationPermissionState={notificationPermissionState}
             existingSubscription={existingSubscription}
             setExistingSubscription={setExistingSubscription}
+            setPushPermissionState={setPushPermissionState}
             setNotificationPermissionState={setNotificationPermissionState}
           />
           <hr className="border-grey-55" />
@@ -118,6 +119,7 @@ const NotificationModalContent = ({
   existingSubscription,
   setExistingSubscription,
   setNotificationPermissionState,
+  setPushPermissionState,
 }: {
   notificationPermissionState: string;
   pushPermissionState: string;
@@ -125,6 +127,8 @@ const NotificationModalContent = ({
   setExistingSubscription: React.Dispatch<
     React.SetStateAction<PushSubscription | null>
   >;
+
+  setPushPermissionState: React.Dispatch<React.SetStateAction<string>>;
   setNotificationPermissionState: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   let supabase = useSupabaseClient<Database>();
@@ -188,6 +192,7 @@ const NotificationModalContent = ({
 
                     setExistingSubscription(result);
                     setNotificationPermissionState("granted");
+                    setPushPermissionState("granted")
                     return;
                   }
                 });
