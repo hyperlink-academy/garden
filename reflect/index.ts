@@ -335,7 +335,9 @@ export function FactIndexes<A extends keyof Attribute>(
     indexes.feed = `feed-${f.attribute}-${f.value}-${f.id}`;
   if (schema.unique) indexes.ave = `ave-${f.attribute}-${f.value}`;
   if (schema.type === "reference")
-    indexes.vae = `vae-${(f.value as ReferenceType).value}-${f.attribute}`;
+    indexes.vae = `vae-${(f.value as ReferenceType).value}-${f.attribute}-${
+      f.id
+    }`;
   if (schema.type === "timestamp")
     indexes.at = `at-${f.attribute}-${(f.value as TimestampeType).value}-${f.id
       }`;
