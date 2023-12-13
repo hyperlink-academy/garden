@@ -61,6 +61,7 @@ export const SmallCardDragContext = (props: {
       }}
       onDragCancel={async ({ active }) => {
         let activeData = active?.data.current as DraggableData;
+        setState({ state: null }, "cancel");
         if (previouslyOver.current)
           await previouslyOver.current.onDragExit?.(activeData);
       }}
@@ -315,20 +316,8 @@ export const useDroppableZone = (data: DroppableData) => {
     },
     data: {
       ...data,
-      onDragExit: (d: DraggableData) => {
-        data.onDragExit?.(d);
-        let now = Date.now();
-        setTimeout(() => {
-          setState((state) => {
-            let s = state?.state;
-            if (s?.id === data.id && s.updatedAt < now) return { state: null };
-            return state;
-          }, "exit");
-        }, 100);
-      },
       onDragCancel: () => {
         data.onDragCancel?.();
-        setState({ state: null }, "cancel");
       },
       onDragEnter: (d: DraggableData) => {
         data.onDragEnter?.(d);
