@@ -135,6 +135,14 @@ export const Room = () => {
             behavior: "smooth",
           });
         }
+
+        if (roomType.value === "collection") {
+          let roomElement = document.getElementById("room-wrapper");
+          roomElement?.scrollTo({
+            top: roomElement.scrollHeight,
+            behavior: "smooth",
+          });
+        }
         open({ entityID: newCard, focus: "title" });
 
         action.end();
