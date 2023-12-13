@@ -58,8 +58,11 @@ export const Desktop = (props: { entityID: string }) => {
       if (!rect || !droppableRect.current || !rep || data.type === "room")
         return;
       let newPosition = {
-        y: snap(rect.top - droppableRect.current?.top),
-        x: snap(rect.left - droppableRect.current.left),
+        y: Math.max(snap(rect.top - droppableRect.current?.top), 0),
+        x: Math.min(
+          Math.max(0, snap(rect.left - droppableRect.current.left)),
+          320
+        ),
       };
 
       switch (data.type) {
