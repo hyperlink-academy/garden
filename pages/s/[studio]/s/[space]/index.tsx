@@ -101,8 +101,8 @@ function Space() {
 const DesktopLayout = () => {
   let { session } = useAuth();
   return (
-    <div className="mx-auto flex h-full w-full flex-col gap-2">
-      <div className="spaceHeader flex w-full flex-row gap-4 ">
+    <div className="mx-auto flex h-full w-full flex-col gap-2 overflow-hidden">
+      <div className="spaceHeader mx-auto flex w-full max-w-[1332px] flex-row gap-4">
         <div className="spaceHeaderInfo flex min-w-0 shrink grow  flex-row items-stretch gap-2 font-bold">
           {session.session && (
             <>
@@ -130,8 +130,8 @@ const DesktopLayout = () => {
           <Search />
         </div>
       </div>
-      <div className=" no-scrollbar spaceLargeSplitLayout overscroll-y-hidden flex h-[calc(100%-46px)] snap-x snap-mandatory flex-row items-stretch gap-4 overflow-x-scroll  sm:gap-4 md:w-full md:overflow-x-hidden">
-        <div className="spaceRoomAndSidebar flex w-[fit] shrink-0  snap-center snap-always flex-row overflow-x-scroll rounded-md border border-grey-90">
+      <div className=" no-scrollbar spaceLargeSplitLayout mx-auto flex h-full w-full max-w-[1332px] snap-x snap-mandatory flex-row items-stretch gap-4 overflow-y-hidden overflow-x-scroll scroll-smooth sm:gap-4 md:overflow-x-hidden">
+        <div className="spaceRoomAndSidebar flex shrink-0  snap-center snap-always flex-row  rounded-md border border-grey-90">
           <div className="shrink-0 rounded-l-md border border-transparent border-r-grey-90 bg-white">
             <Sidebar />
           </div>
