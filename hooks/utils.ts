@@ -91,5 +91,5 @@ export function useIsElementOrChildFocused() {
 
 export function useIsMobile() {
   const { width } = useWindowDimensions();
-  return width < 960 || width === 0;
+  return width < 640 || width === 0;
 }

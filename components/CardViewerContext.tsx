@@ -79,7 +79,7 @@ export function CardViewer() {
 
   useAppEventListener(
     "cardviewer.open-card",
-    (data) => {
+    () => {
       setTimeout(() => {
         cardViewerRef.current?.scrollIntoView({
           inline: "center",
@@ -89,7 +89,6 @@ export function CardViewer() {
     },
     []
   );
-  let viewheight = useViewportSize().height;
   let removeCardFromRoomHistory = useRemoveCardFromRoomHistory();
   let isMobile = useIsMobile();
   if (!history[0] && isMobile) return null;
@@ -99,11 +98,11 @@ export function CardViewer() {
       ref={cardViewerRef}
       id="cardViewerWrapper"
       className={`cardViewerWrapper 
-          flex  h-full w-[calc(100vw-16px)] 
-          max-w-3xl shrink-0        
-          touch-pan-x snap-center snap-always
-          flex-col 
-          items-stretch focus:outline-none sm:shrink`}
+          flex  h-full w-[calc(100vw-16px)] max-w-3xl
+          shrink-0 touch-pan-x        
+          snap-center snap-always flex-col
+          items-stretch 
+          focus:outline-none sm:w-[calc(100vw-32px)] md:shrink`}
     >
       {room && history[0] ? (
         <CardView
