@@ -58,6 +58,8 @@ const AuthStringVerifier = z.object({
 function makeOptions(): ReflectServerOptions<ReplicacheMutators> {
   return {
     roomStartHandler: async (tx, roomID) => {
+      let storedRoomID = await tx.get<string>("meta-room-id");
+      if (!storedRoomID) await tx.set("meta-room-id", roomID);
       let env = EnvValidator.safeParse(tx.env);
       if (!env.success) throw new Error(JSON.stringify(env.error, null, 2));
       let lastAppliedMigration = await tx.get<string>(
@@ -67,20 +69,16 @@ function makeOptions(): ReflectServerOptions<ReplicacheMutators> {
         (m) => !lastAppliedMigration || m.date > lastAppliedMigration
       );
 
-      if (pendingMigrations.length === 0) return;
       try {
         for (let i = 0; i < pendingMigrations.length; i++) {
           await pendingMigrations[i].run(tx, {
             roomID,
           });
+          await tx.set("meta-lastAppliedMigration", pendingMigrations[i].date);
         }
       } catch (e) {
         console.log("CONSTRUCTOR ERROR", e);
       }
-      await tx.set(
-        "meta-lastAppliedMigration",
-        pendingMigrations[pendingMigrations.length - 1].date
-      );
       await initializeSpace(tx);
     },
     mutators,
