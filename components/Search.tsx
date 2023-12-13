@@ -88,6 +88,7 @@ export function Search() {
               />
               <input
                 ref={inputRef}
+                tabIndex={-1}
                 onKeyDown={async (e) => {
                   let target = e.currentTarget;
                   if (e.key === "Escape") {
