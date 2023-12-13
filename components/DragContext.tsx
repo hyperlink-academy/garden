@@ -9,16 +9,17 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { AddSmall, AddTiny } from "components/Icons";
+import { AddTiny } from "components/Icons";
 import { useRef, useState } from "react";
 import { CardPreview, PlaceholderNewCard } from "./CardPreview";
-import { pointerWithinOrRectIntersection } from "src/customCollisionDetection";
+import { customCollisionDetection } from "src/customCollisionDetection";
 import { RoomListPreview } from "./SpaceLayout/Sidebar/RoomListLayout";
 import { animated, useSpring } from "@react-spring/web";
 import { CardPreviewData, EmptyCardData } from "hooks/CardPreviewData";
 import { Fact } from "data/Facts";
-import { create, useStore } from "zustand";
-import { useUIState } from "hooks/useUIState";
+import { create } from "zustand";
+import useMeasure from "react-use-measure";
+import { springConfig } from "src/constants";
 
 export const SmallCardDragContext = (props: {
   children: React.ReactNode;
@@ -40,7 +41,7 @@ export const SmallCardDragContext = (props: {
   let previouslyOver = useRef<DroppableData | null>(null);
   return (
     <DndContext
-      collisionDetection={pointerWithinOrRectIntersection}
+      collisionDetection={customCollisionDetection}
       sensors={sensors}
       onDragStart={({ active }) => {
         let activeData = active?.data.current as DraggableData;
@@ -62,6 +63,7 @@ export const SmallCardDragContext = (props: {
       }}
       onDragCancel={async ({ active }) => {
         let activeData = active?.data.current as DraggableData;
+        setState({ state: null }, "cancel");
         if (previouslyOver.current)
           await previouslyOver.current.onDragExit?.(activeData);
       }}
@@ -91,10 +93,12 @@ export const SmallCardDragContext = (props: {
       <DragOverlay dropAnimation={null} adjustScale={false}>
         {active ? (
           <AnimatedPickup
+            CardDropIndicator={
+              <CardDropIndicator active={active} over={over} />
+            }
             size={active.type === "new-card" ? active.size : "small"}
           >
             <CardDragPreview active={active} />
-            <CardDropIndicator active={active} over={over} />
           </AnimatedPickup>
         ) : null}
       </DragOverlay>
@@ -179,9 +183,7 @@ const CardDropIndicator = ({
 
   return (
     <div
-      className={`absolute -bottom-4 ${
-        size === "small" ? "right-4" : "right-2"
-      } flex flex-row items-center gap-2 rounded-md bg-accent-blue px-2 py-1 align-middle font-bold text-white`}
+      className={` flex flex-row items-center gap-2 rounded-md bg-accent-blue px-2 py-1 align-middle font-bold text-white`}
     >
       <AddTiny width={12} height={12} className="shrink-0" />
       {(active.type === "card" && (active.size === "small" || !active.size)) ||
@@ -189,26 +191,64 @@ const CardDropIndicator = ({
         // if the card is in a room, and is small OR is a from the new card button, use a small indicator
         <span>{"Add"}</span>
       ) : (
-        <span>Place {over.type === "linkCard" ? "on Card" : "in Room"}</span>
+        <span>
+          Place{" "}
+          {over.type === "desktopCard" || over.type === "cardView"
+            ? "on Card"
+            : "in Room"}
+        </span>
       )}
     </div>
   );
 };
 
 const AnimatedPickup = (props: {
+  CardDropIndicator: React.ReactNode;
   children: React.ReactNode;
   size: "small" | "big";
 }) => {
-  let spring = useSpring({ from: { scale: 1 }, to: { scale: 1.02 } });
+  let [measure, { height }] = useMeasure();
+  const [style, setStyle] = useState({
+    transformOrigin: undefined as undefined | string,
+  });
+  let spring = useSpring({
+    config: springConfig,
+    from: { scale: 1, opacity: 1 },
+    to: { scale: height < 256 ? 1.02 : 256 / height, opacity: 0.8 },
+  });
+  let inverseSpring = useSpring({
+    config: springConfig,
+    from: { scale: 1, opacity: 1 },
+    to: { scale: height < 256 ? 1.02 : height / 256 },
+  });
+  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
+    const { left, top, width, height } =
+      event.currentTarget.getBoundingClientRect();
+    const x = ((event.clientX - left) / width) * 100;
+    const y = ((event.clientY - top) / height) * 100;
+    setStyle((style) => ({
+      transformOrigin: style.transformOrigin || `${x}% ${y}%`,
+    }));
+  };
 
   return (
     <animated.div
+      onMouseMove={handleMouseMove}
+      ref={measure}
       className={`relative  ${
         props.size === "small" ? "min-w-[152px]" : "min-w-[302px]"
       } text-sm drop-shadow`}
-      style={spring}
+      style={{ ...spring, ...style }}
     >
       {props.children}
+      <animated.div
+        className={`absolute -bottom-4 ${
+          props.size === "small" ? "right-4" : "right-2"
+        }`}
+        style={{ ...inverseSpring, ...style }}
+      >
+        {props.CardDropIndicator}
+      </animated.div>
     </animated.div>
   );
 };
@@ -265,7 +305,16 @@ export type DroppableData = {
       type: "room";
       roomType?: Fact<"room/type">["value"];
     }
-  | { type: "card" | "dropzone" | "linkCard" | "trigger" | "search" }
+  | {
+      type:
+        | "card"
+        | "dropzone"
+        | "cardView"
+        | "desktopCard"
+        | "trigger"
+        | "search"
+        | "collectionCard";
+    }
 );
 
 export const useDraggableCard = (data: DraggableData) => {
@@ -302,20 +351,8 @@ export const useDroppableZone = (data: DroppableData) => {
     },
     data: {
       ...data,
-      onDragExit: (d: DraggableData) => {
-        data.onDragExit?.(d);
-        let now = Date.now();
-        setTimeout(() => {
-          setState((state) => {
-            let s = state?.state;
-            if (s?.id === data.id && s.updatedAt < now) return { state: null };
-            return state;
-          }, "exit");
-        }, 100);
-      },
       onDragCancel: () => {
         data.onDragCancel?.();
-        setState({ state: null }, "cancel");
       },
       onDragEnter: (d: DraggableData) => {
         data.onDragEnter?.(d);
@@ -325,7 +362,6 @@ export const useDroppableZone = (data: DroppableData) => {
         );
       },
       onDragEnd: (d: DraggableData, rect: ClientRect | null) => {
-        console.log("yo");
         data.onDragEnd?.(d, rect);
         setState({ state: null }, "end");
       },

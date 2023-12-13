@@ -15,10 +15,13 @@ import { useLongPress } from "hooks/useLongPress";
 import { Replicache } from "replicache";
 import { useCardViewer } from "./CardViewerContext";
 import { CardSearch } from "./Icons";
+import { NewCardPreview, useOnDragEndCollection } from "./CardCollection";
+import { useDroppableZone } from "./DragContext";
+import { CardPreview, PlaceholderNewCard } from "./CardPreview";
 
 export type StackData = {
   parentID: string;
-  attribute: keyof ReferenceAttributes;
+  attribute: "deck/contains" | "desktop/contains";
   positionKey: string;
   addToEnd?: boolean | undefined;
 };
@@ -33,64 +36,96 @@ export const CardAdder = (
   let { authorized, mutate, memberEntity, action } = useMutations();
   let rep = useContext(ReplicacheContext);
   let { open } = useCardViewer();
+  let onDragEnd = useOnDragEndCollection({
+    parent: props.parentID,
+    attribute: props.attribute,
+  });
+  let { setNodeRef: droppableRef, over } = useDroppableZone({
+    disabled: !props.addToEnd,
+    type: "collectionCard",
+    entityID: props.parentID,
+    id: props.parentID + "cardAdder",
+    onDragEnd,
+  });
 
   if (!authorized) {
     return null;
   } else
     return (
-      <div className="justify-left flex w-full shrink-0 items-center gap-2 rounded-lg border border-dashed border-grey-80 px-2 py-1 text-sm text-grey-55 group-hover:border-accent-blue">
-        <button
-          className="group grow text-left font-bold hover:text-accent-blue"
-          onClick={async () => {
-            if (!memberEntity) return;
-            action.start();
-            let entity = ulid();
-            await mutate("createCard", {
-              entityID: entity,
-              title: "",
-              memberEntity,
-            });
-            if (props.openOnAdd) {
-              open({ entityID: entity, focus: "title" });
-            } else null;
-            if (rep === null) {
-              return;
-            } else {
-              create(entity, props, rep.rep, mutate);
-            }
-            props.onAdd?.(entity);
-
-            action.end();
-          }}
+      <>
+        {over &&
+          (over.type === "card" || over.type === "search-card" ? (
+            <div className="pb-2 opacity-60">
+              <CardPreview
+                data={over.data}
+                entityID={over.entityID}
+                size={"big"}
+              />
+            </div>
+          ) : over.type === "new-card" ? (
+            <NewCardPreview />
+          ) : over.type === "new-search-card" ? (
+            <div className="pb-2 opacity-60">
+              <PlaceholderNewCard title={over.title} />
+            </div>
+          ) : null)}
+        <div
+          ref={droppableRef}
+          className="justify-left flex w-full shrink-0 items-center gap-2 rounded-lg border border-dashed border-grey-80 px-2 py-1 text-sm text-grey-55 group-hover:border-accent-blue"
         >
-          <p>create new</p>
-        </button>
-        <div className="h-4 w-[1px] border-l border-dashed text-grey-80" />
-        <AddExistingCard
-          onAdd={(entity, d) => {
-            if (props.openOnAdd) {
-              open({
+          <button
+            className="group grow text-left font-bold hover:text-accent-blue"
+            onClick={async () => {
+              if (!memberEntity) return;
+              action.start();
+              let entity = ulid();
+              await mutate("createCard", {
                 entityID: entity,
-                focus:
-                  d.type === "create"
-                    ? d.name
-                      ? "content"
-                      : "title"
-                    : undefined,
+                title: "",
+                memberEntity,
               });
-            } else null;
-            props.onAdd?.(entity);
-          }}
-          addToEnd={props.addToEnd}
-          parentID={props.parentID}
-          positionKey="eav"
-          attribute={props.attribute}
-        >
-          <div className={`text-grey-55 hover:text-accent-blue`}>
-            <CardSearch />
-          </div>
-        </AddExistingCard>
-      </div>
+              if (props.openOnAdd) {
+                open({ entityID: entity, focus: "title" });
+              } else null;
+              if (rep === null) {
+                return;
+              } else {
+                create(entity, props, rep.rep, mutate);
+              }
+              props.onAdd?.(entity);
+
+              action.end();
+            }}
+          >
+            <p>create new</p>
+          </button>
+          <div className="h-4 w-[1px] border-l border-dashed text-grey-80" />
+          <AddExistingCard
+            onAdd={(entity, d) => {
+              if (props.openOnAdd) {
+                open({
+                  entityID: entity,
+                  focus:
+                    d.type === "create"
+                      ? d.name
+                        ? "content"
+                        : "title"
+                      : undefined,
+                });
+              } else null;
+              props.onAdd?.(entity);
+            }}
+            addToEnd={props.addToEnd}
+            parentID={props.parentID}
+            positionKey="eav"
+            attribute={props.attribute}
+          >
+            <div className={`text-grey-55 hover:text-accent-blue`}>
+              <CardSearch />
+            </div>
+          </AddExistingCard>
+        </div>
+      </>
     );
 };
 
