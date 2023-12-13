@@ -18,6 +18,8 @@ import { animated, useSpring } from "@react-spring/web";
 import { CardPreviewData, EmptyCardData } from "hooks/CardPreviewData";
 import { Fact } from "data/Facts";
 import { create } from "zustand";
+import useMeasure from "react-use-measure";
+import { springConfig } from "src/constants";
 
 export const SmallCardDragContext = (props: {
   children: React.ReactNode;
@@ -91,10 +93,12 @@ export const SmallCardDragContext = (props: {
       <DragOverlay dropAnimation={null} adjustScale={false}>
         {active ? (
           <AnimatedPickup
+            CardDropIndicator={
+              <CardDropIndicator active={active} over={over} />
+            }
             size={active.type === "new-card" ? active.size : "small"}
           >
             <CardDragPreview active={active} />
-            <CardDropIndicator active={active} over={over} />
           </AnimatedPickup>
         ) : null}
       </DragOverlay>
@@ -179,9 +183,7 @@ const CardDropIndicator = ({
 
   return (
     <div
-      className={`absolute -bottom-4 ${
-        size === "small" ? "right-4" : "right-2"
-      } flex flex-row items-center gap-2 rounded-md bg-accent-blue px-2 py-1 align-middle font-bold text-white`}
+      className={` flex flex-row items-center gap-2 rounded-md bg-accent-blue px-2 py-1 align-middle font-bold text-white`}
     >
       <AddTiny width={12} height={12} className="shrink-0" />
       {(active.type === "card" && (active.size === "small" || !active.size)) ||
@@ -201,19 +203,52 @@ const CardDropIndicator = ({
 };
 
 const AnimatedPickup = (props: {
+  CardDropIndicator: React.ReactNode;
   children: React.ReactNode;
   size: "small" | "big";
 }) => {
-  let spring = useSpring({ from: { scale: 1 }, to: { scale: 1.02 } });
+  let [measure, { height }] = useMeasure();
+  const [style, setStyle] = useState({
+    transformOrigin: undefined as undefined | string,
+  });
+  let spring = useSpring({
+    config: springConfig,
+    from: { scale: 1, opacity: 1 },
+    to: { scale: height < 256 ? 1.02 : 256 / height, opacity: 0.8 },
+  });
+  let inverseSpring = useSpring({
+    config: springConfig,
+    from: { scale: 1, opacity: 1 },
+    to: { scale: height < 256 ? 1.02 : height / 256 },
+  });
+  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
+    const { left, top, width, height } =
+      event.currentTarget.getBoundingClientRect();
+    const x = ((event.clientX - left) / width) * 100;
+    const y = ((event.clientY - top) / height) * 100;
+    setStyle((style) => ({
+      transformOrigin: style.transformOrigin || `${x}% ${y}%`,
+    }));
+  };
 
   return (
     <animated.div
+      onMouseMove={handleMouseMove}
+      ref={measure}
       className={`relative  ${
         props.size === "small" ? "min-w-[152px]" : "min-w-[302px]"
       } text-sm drop-shadow`}
-      style={spring}
+      style={{ ...spring, ...style }}
     >
       {props.children}
+      <animated.div
+        className={`absolute -bottom-4 ${
+          props.size === "small" ? "right-4" : "right-2"
+        }`}
+        style={{ ...inverseSpring, ...style }}
+      >
+        {props.CardDropIndicator}
+      </animated.div>
     </animated.div>
   );
 };
@@ -327,7 +362,6 @@ export const useDroppableZone = (data: DroppableData) => {
         );
       },
       onDragEnd: (d: DraggableData, rect: ClientRect | null) => {
-        console.log("yo");
         data.onDragEnd?.(d, rect);
         setState({ state: null }, "end");
       },
