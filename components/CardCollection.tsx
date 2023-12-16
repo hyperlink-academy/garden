@@ -105,6 +105,7 @@ const CollectionList = (props: {
       {props.cards.length > 5 && (
         <div className="pb-2">
           <CardAdder
+          hideContent={props.collectionType !== "cardpreview"}
             parentID={props.entityID}
             attribute={props.attribute}
             positionKey="eav"
@@ -125,6 +126,7 @@ const CollectionList = (props: {
         />
       ))}
       <CardAdder
+          hideContent={props.collectionType !== "cardpreview"}
         parentID={props.entityID}
         attribute={props.attribute}
         positionKey="eav"

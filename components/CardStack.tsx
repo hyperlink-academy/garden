@@ -28,6 +28,7 @@ export type StackData = {
 
 export const CardAdder = (
   props: {
+    hideContent: boolean;
     openOnAdd?: boolean | undefined;
     addToEnd?: boolean;
     onAdd?: (entityID: string) => void;
@@ -44,7 +45,7 @@ export const CardAdder = (
     disabled: !props.addToEnd,
     type: "collectionCard",
     entityID: props.parentID,
-    id: props.parentID + "cardAdder",
+    id: props.parentID + "cardAdder" + props.addToEnd,
     onDragEnd,
   });
 
@@ -52,13 +53,17 @@ export const CardAdder = (
     return null;
   } else
     return (
-      <>
+      <div
+
+          ref={droppableRef}
+      >
         {over &&
           (over.type === "card" || over.type === "search-card" ? (
             <div className="pb-2 opacity-60">
               <CardPreview
                 data={over.data}
                 entityID={over.entityID}
+                hideContent={props.hideContent}
                 size={"big"}
               />
             </div>
@@ -70,7 +75,6 @@ export const CardAdder = (
             </div>
           ) : null)}
         <div
-          ref={droppableRef}
           className="justify-left flex w-full shrink-0 items-center gap-2 rounded-lg border border-dashed border-grey-80 px-2 py-1 text-sm text-grey-55 group-hover:border-accent-blue"
         >
           <button
@@ -125,7 +129,7 @@ export const CardAdder = (
             </div>
           </AddExistingCard>
         </div>
-      </>
+      </div>
     );
 };
 
