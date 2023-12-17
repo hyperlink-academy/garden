@@ -285,7 +285,38 @@ const updateFact: Mutation<{
 const updateContentFact: Mutation<
   Pick<Fact<"card/content">, "attribute" | "entity" | "value" | "positions">
 > = async (args, ctx) => {
-  console.log("????");
+  let existingLinks = await Promise.all(
+    (
+      await ctx.scanIndex.eav(args.entity, "card/inline-links-to")
+    ).map(async (l) => ({
+      id: l.id,
+      title: await ctx.scanIndex.eav(l.value.value, "card/title"),
+    }))
+  );
+  let newLinks = [...args.value.matchAll(/\[\[([^\[\n\]]*)\]\]/g)];
+
+  let linkstoremove = existingLinks.filter(
+    (l) => !newLinks.find((n) => n[1] === l.title?.value)
+  );
+
+  let linkstoadd = newLinks.filter(
+    (n) => !existingLinks.find((l) => n[1] === l.title?.value)
+  );
+
+  for (let link of linkstoremove) {
+    await ctx.retractFact(link.id);
+  }
+  for (let link of linkstoadd) {
+    let title = link[1];
+    let entity = await ctx.scanIndex.ave("card/title", title);
+    if (!entity || entity.value !== title) continue;
+    await ctx.assertFact({
+      entity: args.entity,
+      attribute: "card/inline-links-to",
+      value: ref(entity.entity),
+      positions: {},
+    });
+  }
   await ctx.assertFact(args);
 };
 
