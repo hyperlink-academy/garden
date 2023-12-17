@@ -34,16 +34,16 @@ export type MutationContext = {
     undoAction?: boolean
   ) => Promise<{ success: boolean }>;
   runOnServer: (
-    fn: (
-      id: string,
+    fn: (args: {
+      id: string;
       env: {
         NEXT_API_URL: string;
         RPC_SECRET: string;
         SUPABASE_API_TOKEN: string;
         SUPABASE_URL: string;
-      },
-      userID: string
-    ) => Promise<void>
+      };
+      user_studio: string;
+    }) => Promise<void>
   ) => Promise<void>;
   retractFact: (id: string, undoAction?: boolean) => Promise<void>;
   retractEphemeralFact: (clientID: string, id: string) => Promise<void>;
@@ -233,11 +233,11 @@ const createCard: Mutation<{
     },
     ctx
   );
-  await ctx.runOnServer(async (id, env, userID) => {
+  await ctx.runOnServer(async ({ id, env, user_studio }) => {
     await app_event(env, {
       event: "created_card",
       spaceID: id,
-      user: userID,
+      user: user_studio,
     });
   });
 };
@@ -379,7 +379,7 @@ const replyToDiscussion: Mutation<{
     args.message.sender,
     "space/member"
   );
-  await ctx.runOnServer(async (id, env, userID) => {
+  await ctx.runOnServer(async ({ id, env, user_studio }) => {
     if (!senderStudio) return;
 
     let title: Fact<"room/name" | "card/title"> | null =
@@ -389,7 +389,7 @@ const replyToDiscussion: Mutation<{
     await app_event(env, {
       event: "sent_message",
       spaceID: id,
-      user: userID,
+      user: user_studio,
     });
 
     try {
@@ -434,11 +434,11 @@ const createRoom: Mutation<{
     value: args.type,
     positions: {},
   });
-  await ctx.runOnServer(async (id, env, userID) => {
+  await ctx.runOnServer(async ({ id, env, user_studio }) => {
     await app_event(env, {
       event: "created_room",
       spaceID: id,
-      user: userID,
+      user: user_studio,
     });
   });
 };
@@ -490,7 +490,7 @@ const markRead: Mutation<{
   let unread = unreads.find((u) => u.value.value === args.memberEntity);
   if (unread) await ctx.retractFact(unread.id);
 
-  await ctx.runOnServer(async (id, env) => {
+  await ctx.runOnServer(async ({ id, env }) => {
     let space = await ctx.scanIndex.eav(args.memberEntity, "space/member");
     if (!space) return;
     let supabase = createClient(env);
@@ -549,37 +549,46 @@ const joinSpace: Mutation<{
 
   //TODO I should make this use the auth context to ensure that the user is
   //joining legitimately
+  return ctx.runOnServer(async ({ user_studio }) => {
+    let existingMember = await ctx.scanIndex.ave("space/member", user_studio);
+    if (existingMember) return;
 
-  await Promise.all([
-    ctx.assertFact({
-      entity: memberEntity,
-      attribute: "member/color",
-      value: color,
-      positions: {},
-    }),
-    ctx.assertFact({
-      entity: memberEntity,
-      attribute: "space/member",
-      value: studio,
-      positions: {},
-    }),
-    ctx.assertFact({
-      entity: memberEntity,
-      attribute: "member/name",
-      value: username,
-      positions: {},
-    }),
-  ]);
+    await Promise.all([
+      ctx.assertFact({
+        entity: memberEntity,
+        attribute: "member/color",
+        value: color,
+        positions: {},
+      }),
+      ctx.assertFact({
+        entity: memberEntity,
+        attribute: "space/member",
+        value: studio,
+        positions: {},
+      }),
+      ctx.assertFact({
+        entity: memberEntity,
+        attribute: "member/name",
+        value: username,
+        positions: {},
+      }),
+    ]);
+  });
 };
 
 const leaveSpace: Mutation<{ memberEntity: string }> = async (
   { memberEntity },
   ctx
 ) => {
-  //TODO use auth data to make sure users can only leave themselves
-  let references = await ctx.scanIndex.vae(memberEntity);
-  let facts = await ctx.scanIndex.eav(memberEntity, null);
-  await Promise.all(facts.concat(references).map((f) => ctx.retractFact(f.id)));
+  return ctx.runOnServer(async ({ user_studio }) => {
+    let studio = await ctx.scanIndex.eav(memberEntity, "space/member");
+    if (!studio || studio.value !== user_studio) return;
+    let references = await ctx.scanIndex.vae(memberEntity);
+    let facts = await ctx.scanIndex.eav(memberEntity, null);
+    await Promise.all(
+      facts.concat(references).map((f) => ctx.retractFact(f.id))
+    );
+  });
 };
 
 const postToFeed: Mutation<{

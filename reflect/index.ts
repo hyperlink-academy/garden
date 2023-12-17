@@ -182,7 +182,11 @@ export const makeMutationContext = (tx: WriteTransaction): MutationContext => ({
     if (tx.env && tx.auth?.userID) {
       let id = await tx.get<string>("meta-room-id");
       if (!id) return;
-      let result = await cb(id, tx.env as Env, tx.auth?.userID);
+      let result = await cb({
+        id,
+        env: tx.env as Env,
+        user_studio: tx.auth?.userID,
+      });
       return result;
     }
   },
@@ -339,8 +343,9 @@ export function FactIndexes<A extends keyof Attribute>(
       f.id
     }`;
   if (schema.type === "timestamp")
-    indexes.at = `at-${f.attribute}-${(f.value as TimestampeType).value}-${f.id
-      }`;
+    indexes.at = `at-${f.attribute}-${(f.value as TimestampeType).value}-${
+      f.id
+    }`;
   return indexes;
 }
 

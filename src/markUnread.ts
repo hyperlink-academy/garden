@@ -23,7 +23,7 @@ export const markUnread = async (
     });
   }
 
-  await ctx.runOnServer(async (id, env) => {
+  await ctx.runOnServer(async ({ id, env }) => {
     let supabase = createClient(env);
     await supabase.from("user_space_unreads").upsert(
       await Promise.all(
