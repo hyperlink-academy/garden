@@ -68,9 +68,9 @@ export const CardView = (props: {
 
   let { mutate, rep } = useMutations();
   let { setNodeRef } = useDroppableZone({
-    id: props.referenceFactID + "-dropzone",
+    id: props.entityID + "-cardview-dropzone",
     entityID: props.entityID,
-    type: "linkCard",
+    type: "cardView",
     onDragEnd: async (data) => {
       if (!rep) return;
 
@@ -105,10 +105,10 @@ export const CardView = (props: {
           return scanIndex(tx).eav(props.entityID, "deck/contains");
         })) || [];
 
-      let firstPosition = siblings.sort(sortByPosition("eav"))[0]?.positions[
-        "eav"
-      ];
-      let position = generateKeyBetween(null, firstPosition || null);
+      let lastPosition = siblings.sort(sortByPosition("eav"))[
+        siblings.length - 1
+      ]?.positions["eav"];
+      let position = generateKeyBetween(lastPosition || null, null);
       await mutate("addCardToSection", {
         factID: ulid(),
         cardEntity: entityID as string,
@@ -121,7 +121,7 @@ export const CardView = (props: {
       setTimeout(() => {
         document
           .getElementById("card-attached-card-section")
-          ?.scrollIntoView({ block: "center", behavior: "smooth" });
+          ?.scrollIntoView({ block: "end", behavior: "smooth" });
       }, 100);
     },
   });
@@ -132,12 +132,11 @@ export const CardView = (props: {
         ref={setNodeRef}
         className={`
           card
-          relative
-          mx-auto       
-          flex
-          h-[42px] w-full
-          max-w-3xl grow
-          flex-col items-stretch
+          relative       
+          mx-auto
+          flex h-[42px]
+          w-full max-w-3xl
+          grow flex-col items-stretch
           ${borderStyles({
             member: !!memberName,
           })}
@@ -146,6 +145,7 @@ export const CardView = (props: {
           `}
         onDragOver={(e) => e.preventDefault()}
         onDrop={async (e) => {
+          e.preventDefault();
           if (!authToken || !spaceID) return;
           let data = await getAndUploadFile(
             e.dataTransfer.items,
@@ -153,7 +153,7 @@ export const CardView = (props: {
             spaceID
           );
           if (!data.success) return;
-
+          e.preventDefault();
           await mutate("assertFact", {
             entity: props.entityID,
             factID: ulid(),
@@ -215,7 +215,7 @@ export const CardContent = (props: {
       {/* START CARD CONTENT */}
       <div
         ref={ref}
-        className={`cardContentWrapper no-scrollbar relative z-0 flex grow flex-col items-stretch overflow-y-scroll overscroll-y-auto pb-3 sm:pb-4 ${
+        className={`cardContentWrapper no-scrollbar relative z-0 flex grow flex-col items-stretch overflow-y-scroll overscroll-y-none pb-3 sm:pb-4 ${
           !memberName ? "pt-3 sm:pt-4" : ""
         }`}
         onClick={() => {
@@ -563,37 +563,23 @@ export const SectionAdder = (props: {
       </MakeImage>
       {/* END ADDER */}
       {/* LINKED CARD ADDER */}
-      {attachedCards && attachedCards.length !== 0 ? (
-        <button
-          className={`${toggledOnStyle}`}
-          onClick={() => {
+      <AddExistingCard
+        parentID={props.entityID}
+        attribute="deck/contains"
+        positionKey="eav"
+        addToEnd
+        onAdd={() => {
+          setTimeout(() => {
             document
-              .getElementById("card-attached-cards")
-              ?.scrollIntoView({ behavior: "smooth" });
-          }}
-        >
+              .getElementById("card-attached-card-section")
+              ?.scrollIntoView({ block: "end", behavior: "smooth" });
+          }, 100);
+        }}
+      >
+        <div className={`${toggledOffStyle} `}>
           <CardSmallLined />
-        </button>
-      ) : (
-        <AddExistingCard
-          parentID={props.entityID}
-          attribute="deck/contains"
-          positionKey="eav"
-          onAdd={() => {
-            setTimeout(
-              () =>
-                document
-                  .getElementById("card-attached-cards")
-                  ?.scrollIntoView({ behavior: "smooth" }),
-              50
-            );
-          }}
-        >
-          <div className={`${toggledOffStyle} `}>
-            <CardSmallLined />
-          </div>
-        </AddExistingCard>
-      )}
+        </div>
+      </AddExistingCard>
       {/* END LINKED CARD ADDER */}
       {/* DATE ADDER */}
       <button

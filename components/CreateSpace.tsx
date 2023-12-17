@@ -395,6 +395,15 @@ export const CreateSpaceForm = ({
           })
         }
       />
+      {/* space visibility */}
+      {/* TODO: add actual public vs. private setting here */}
+      <div className="flex flex-col gap-1">
+        <p className="font-bold">Visibility</p>
+        <div className="flex flex-col gap-2 rounded-md bg-bg-gold p-4 text-sm italic">
+          <p className="font-bold">Note: Spaces are publicly viewable.</p>
+          <p>Private Spaces are coming soon 🔐🌱</p>
+        </div>
+      </div>
     </div>
   );
 };

@@ -397,15 +397,36 @@ export const DraggableRoomListItem = (props: {
           });
         }
         if (roomType.value === "canvas") {
+          let siblingPositions = await rep.rep.query(async (tx) => {
+            let siblings = await scanIndex(tx).eav(
+              props.entityID,
+              "desktop/contains"
+            );
+
+            return Promise.all(
+              siblings.map(async (c) =>
+                scanIndex(tx).eav(c.id, "card/position-in")
+              )
+            );
+          });
+
+          let siblingsSortedByPosition = siblingPositions.sort(
+            (a, b) => (a?.value.y || 0) - (b?.value.y || 0)
+          );
+
+          let lastSiblingPosition =
+            siblingsSortedByPosition[siblingsSortedByPosition.length - 1]?.value
+              .y;
+
           await mutate("retractFact", { id: data.id });
           await mutate("addCardToDesktop", {
             factID: ulid(),
             entity: data.entityID,
             desktop: props.entityID,
             position: {
-              y: 64,
-              x: 128,
-              rotation: ((Math.random() * 10000) % 60) / 100 - 0.3,
+              y: lastSiblingPosition ? lastSiblingPosition + 124 : 32,
+              x: 64,
+              rotation: 0,
               size:
                 data.position?.size === "small"
                   ? "small"

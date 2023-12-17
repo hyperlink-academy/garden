@@ -178,7 +178,6 @@ export const MessageInput = (props: {
       if (!el) return;
       el.scrollTop = el.scrollHeight;
     }, 50);
-    document.getElementById("messageInput")?.focus({ preventScroll: true });
   };
   return (
     <>
@@ -265,6 +264,9 @@ export const MessageInput = (props: {
             <div className="flex h-min justify-end text-grey-55">
               <ButtonPrimary
                 disabled={!value}
+                onPointerDown={(e)=> {
+                  e.preventDefault()
+                }}
                 onClick={(e) => {
                   e.preventDefault();
                   send();

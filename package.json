@@ -37,7 +37,7 @@
     "@radix-ui/react-popover": "^1.0.5",
     "@radix-ui/react-slider": "^1.0.0",
     "@react-aria/overlays": "^3.17.0",
-    "@react-aria/utils": "^3.21.0",
+    "@react-aria/utils": "^3.22.0",
     "@react-spring/web": "^9.7.3",
     "@rocicorp/reflect": "^0.38.202311200859",
     "@rocicorp/undo": "^0.2.0",

@@ -1,126 +1,43 @@
-import { pointerWithin, rectIntersection } from "@dnd-kit/core";
 import {
-  ClientRect,
-  CollisionDetection,
-  CollisionDescriptor,
+  DroppableContainer,
+  closestCorners,
+  pointerWithin,
 } from "@dnd-kit/core";
-/**
- * Returns the intersecting rectangle area between two rectangles
- */
-export function getIntersectionRatio(
-  entry: ClientRect,
-  target: ClientRect
-): [number, number] {
-  const top = Math.max(target.top, entry.top);
-  const left = Math.max(target.left, entry.left);
-  const right = Math.min(target.left + target.width, entry.left + entry.width);
-  const bottom = Math.min(target.top + target.height, entry.top + entry.height);
-  const width = right - left;
-  const height = bottom - top;
+import { CollisionDetection } from "@dnd-kit/core";
+import { DroppableData } from "components/DragContext";
 
-  if (left < right && top < bottom) {
-    const targetArea = target.width * target.height;
-    const entryArea = entry.width * entry.height;
-    const intersectionArea = width * height;
-    const intersectionRatio =
-      intersectionArea / (targetArea + entryArea - intersectionArea);
-
-    return [
-      Number(intersectionRatio.toFixed(4)),
-      Number((intersectionArea / targetArea).toFixed(4)),
-    ];
-  }
-
-  // Rectangles do not overlap, or overlap has an area of zero (edge/corner overlap)
-  return [0, 0];
-}
-
-/**
- * Returns the rectangles that has the greatest intersection area with a given
- * rectangle in an array of rectangles.
- */
-export const customCollisionDetection: CollisionDetection = ({
-  collisionRect,
-  droppableRects,
-  droppableContainers,
-}) => {
-  const collisions: CollisionDescriptor[] = [];
-
-  for (const droppableContainer of droppableContainers) {
-    const { id } = droppableContainer;
-    const rect = droppableRects.get(id);
-
-    if (rect) {
-      const [intersectionRatio, targetRatio] = getIntersectionRatio(
-        rect,
-        collisionRect
-      );
-
-      if (intersectionRatio > 0.5 || targetRatio > 0.5) {
-        collisions.push({
-          id,
-          data: { droppableContainer, value: intersectionRatio, targetRatio },
-        });
-      }
-    }
-  }
-
-  return collisions.sort(sortCollisionsDesc);
-};
-
-function sortCollisionsDesc(
-  { data: { value: a } }: CollisionDescriptor,
-  { data: { value: b } }: CollisionDescriptor
-) {
-  return b - a;
-}
-
-export const cardStackCollisionDetection: CollisionDetection = ({
-  collisionRect,
-  droppableRects,
-  droppableContainers,
-}) => {
-  const collisions: CollisionDescriptor[] = [];
-  for (const droppableContainer of droppableContainers) {
-    const { id } = droppableContainer;
-    const rect = droppableRects.get(id);
-
-    let draggingRect = { ...collisionRect, height: -1 };
-    if (rect) {
-      const [intersectionRatio, targetRatio] = getIntersectionRatio(
-        rect,
-        draggingRect
-      );
-
-      if (intersectionRatio > 0) {
-        collisions.push({
-          id,
-          data: {
-            droppableContainer,
-            value: intersectionRatio,
-            targetRatio,
-            top: rect.top,
-          },
-        });
-      }
-    }
-  }
-
-  return collisions.sort((a, b) => b.data.top - a.data.top);
-};
-
-export function pointerWithinOrRectIntersection(
+export function customCollisionDetection(
   args: Parameters<CollisionDetection>[0]
 ) {
+  let sortedCollisions = args.droppableContainers.reduce(
+    (acc, container) => {
+      let data = container.data.current as DroppableData;
+      if (data.type === "collectionCard" || data.type === "cardView")
+        acc.closestCorners.push(container);
+      else acc.pointerWithin.push(container);
+      return acc;
+    },
+    { closestCorners: [], pointerWithin: [] } as {
+      closestCorners: DroppableContainer[];
+      pointerWithin: DroppableContainer[];
+    }
+  );
+  let pointerWithinCollisions = pointerWithin({
+    ...args,
+    droppableContainers: sortedCollisions.pointerWithin,
+  });
+
   // First, let's see if there are any collisions with the pointer
-  const pointerCollisions = pointerWithin(args);
-  if (pointerCollisions.length > 0) {
-    return pointerCollisions.sort((a, b) =>
+  if (pointerWithinCollisions.length > 0) {
+    return pointerWithinCollisions.sort((a, b) =>
       b.id === "mobile-sidebar-overlay" ? 1 : 0
     );
   }
 
-  return pointerCollisions;
+  return closestCorners({
+    ...args,
+    droppableContainers: sortedCollisions.closestCorners,
+  });
   // Collision detection algorithms return an array of collisions
   //if (pointerCollisions.length > 0) {
   //    return pointerCollisions;

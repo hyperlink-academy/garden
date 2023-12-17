@@ -39,6 +39,11 @@ export default function JoinSpacePage(props: Props) {
 
   return (
     <SWRConfig value={{ fallback: { [props.data.do_id]: props.data } }}>
+      <Head>
+        <title key="title">
+          {`${props.data.display_name}: you're invited!`}
+        </title>
+      </Head>
       <SpaceProvider id={props.data.do_id}>
         <JoinSpace />
       </SpaceProvider>
@@ -84,10 +89,6 @@ export function JoinSpace() {
 
   return (
     <>
-      <Head>
-        <title key="title">{data?.display_name}: you&apos;re invited!</title>
-      </Head>
-
       <div className="mx-auto flex max-w-3xl flex-col place-items-center gap-6 px-4 py-8">
         <h2>Welcome!</h2>
         <p className="text-center text-lg">

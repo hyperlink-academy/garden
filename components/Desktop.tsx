@@ -58,8 +58,11 @@ export const Desktop = (props: { entityID: string }) => {
       if (!rect || !droppableRect.current || !rep || data.type === "room")
         return;
       let newPosition = {
-        y: snap(rect.top - droppableRect.current?.top),
-        x: snap(rect.left - droppableRect.current.left),
+        y: Math.max(snap(rect.top - droppableRect.current?.top), 0),
+        x: Math.min(
+          Math.max(0, snap(rect.left - droppableRect.current.left)),
+          320
+        ),
       };
 
       switch (data.type) {
@@ -190,6 +193,9 @@ export const Desktop = (props: { entityID: string }) => {
                 y: Math.max(e.clientY - parentRect.top - 42, 0),
               },
             });
+
+            open({ entityID: entity, focus: "title" });
+
             action.end();
           }
         }}
@@ -294,7 +300,7 @@ const DraggableCard = (props: {
   let { setNodeRef: setNodeRef2 } = useDroppableZone({
     id: props.relationshipID,
     entityID: props.entityID,
-    type: "linkCard",
+    type: "desktopCard",
     onDragEnd: async (data) => {
       if (!rep) return;
       let entityID;

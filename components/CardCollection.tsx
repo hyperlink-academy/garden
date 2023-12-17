@@ -57,29 +57,9 @@ const CollectionList = (props: {
   let spaceID = useSpaceID();
   let { authToken } = useAuth();
   let { mutate } = useMutations();
-  let onDragEnd = useOnDragEndCollection({
-    parent: props.entityID,
-    attribute: props.attribute,
-  });
-  let { setNodeRef, over } = useDroppableZone({
-    type: "dropzone",
-    entityID: props.entityID,
-    id: props.entityID + "add-card-dropzone",
-    onDragEnd,
-  });
-  const onAdd = (entity: string) => {
-    if (props.editable) {
-      useUIState.getState().setFocusedCard(entity);
-      requestAnimationFrame(() => {
-        let element = document.getElementById(`${entity}-preview-title`);
-
-        element?.focus();
-      });
-    }
-  };
+  const onAdd = () => {};
   return (
     <div
-      ref={setNodeRef}
       className="collectionCardList z-0 flex h-full flex-col"
       onDragOver={(e) => e.preventDefault()}
       onDrop={async (e) => {
@@ -125,6 +105,7 @@ const CollectionList = (props: {
       {props.cards.length > 5 && (
         <div className="pb-2">
           <CardAdder
+            hideContent={props.collectionType !== "cardpreview"}
             parentID={props.entityID}
             attribute={props.attribute}
             positionKey="eav"
@@ -144,24 +125,8 @@ const CollectionList = (props: {
           id={card.id}
         />
       ))}
-      {over ? (
-        over.type === "card" ? (
-          <div className="pb-2 opacity-60">
-            <CardPreview
-              data={over.data}
-              entityID={over.entityID}
-              size={"big"}
-              hideContent={props.collectionType !== "cardpreview"}
-              editable={props.editable}
-            />
-          </div>
-        ) : over.type === "new-card" ? (
-          <NewCardPreview />
-        ) : over.type === "new-search-card" ? (
-          <PlaceholderNewCard title={over.title} />
-        ) : null
-      ) : null}
       <CardAdder
+        hideContent={props.collectionType !== "cardpreview"}
         parentID={props.entityID}
         attribute={props.attribute}
         positionKey="eav"
@@ -195,14 +160,12 @@ const DraggableCard = (props: {
 
   let { mutate } = useMutations();
   let onDragEnd = useOnDragEndCollection(props);
-  let { setNodeRef: draggableRef, over: _over } = useDroppableZone({
-    type: "card",
+  let { setNodeRef: draggableRef, over } = useDroppableZone({
+    type: "collectionCard",
     entityID: props.parent,
     id: props.id,
     onDragEnd,
   });
-
-  let over = useDebouncedValue(_over, 20);
 
   let refs = useCombinedRefs(draggableRef, setNodeRef);
   let removeCardFromRoomHistory = useRemoveCardFromRoomHistory();
@@ -262,11 +225,11 @@ const DraggableCard = (props: {
   );
 };
 
-const NewCardPreview = () => (
+export const NewCardPreview = () => (
   <div className="mb-2 h-[62px] w-full rounded-md border border-dashed border-grey-80" />
 );
 
-let useOnDragEndCollection = (props: {
+export const useOnDragEndCollection = (props: {
   parent: string;
   entityID?: string;
   attribute: "desktop/contains" | "deck/contains";

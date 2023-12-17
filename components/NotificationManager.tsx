@@ -96,6 +96,7 @@ export const NotificationManager = () => {
             notificationPermissionState={notificationPermissionState}
             existingSubscription={existingSubscription}
             setExistingSubscription={setExistingSubscription}
+            setPushPermissionState={setPushPermissionState}
             setNotificationPermissionState={setNotificationPermissionState}
           />
           <hr className="border-grey-55" />
@@ -118,6 +119,7 @@ const NotificationModalContent = ({
   existingSubscription,
   setExistingSubscription,
   setNotificationPermissionState,
+  setPushPermissionState,
 }: {
   notificationPermissionState: string;
   pushPermissionState: string;
@@ -125,13 +127,10 @@ const NotificationModalContent = ({
   setExistingSubscription: React.Dispatch<
     React.SetStateAction<PushSubscription | null>
   >;
+  setPushPermissionState: React.Dispatch<React.SetStateAction<string>>;
   setNotificationPermissionState: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   let supabase = useSupabaseClient<Database>();
-  let isIos =
-    typeof navigator !== "undefined" &&
-    (/iPad|iPhone|iPod/.test(navigator.userAgent || "") ||
-      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)); // iPad iOS 13
 
   if (
     notificationPermissionState === "unavailable" ||
@@ -178,6 +177,9 @@ const NotificationModalContent = ({
                         process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
                       userVisibleOnly: true,
                     });
+                    setExistingSubscription(result);
+                    setNotificationPermissionState("granted");
+                    setPushPermissionState("granted")
                     let { data: session } = await supabase.auth.getSession();
                     if (!session.session) return;
                     await supabase.from("push_subscriptions").insert({
@@ -186,8 +188,6 @@ const NotificationModalContent = ({
                       push_subscription: result as any,
                     });
 
-                    setExistingSubscription(result);
-                    setNotificationPermissionState("granted");
                     return;
                   }
                 });

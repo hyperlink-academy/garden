@@ -301,6 +301,17 @@ export const useCloseCard = () => {
   }, [spaceID, action, openCard]);
 };
 
+export const useCurrentOpenCard = () => {
+  let room = useRoom();
+  let spaceID = useSpaceID();
+
+  let history = useUIState((s) => {
+    if (!spaceID || !room) return [];
+    return s.spaces[spaceID]?.rooms?.[room] || [];
+  });
+  return history[0];
+};
+
 export const useSetRoom = () => {
   let spaceID = useSpaceID();
   let { action } = useMutations();

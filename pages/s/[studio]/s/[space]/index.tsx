@@ -13,7 +13,7 @@ import { WORKER_URL, springConfig } from "src/constants";
 import { GetStaticPropsContext, InferGetStaticPropsType } from "next/types";
 import { SpaceProvider } from "components/ReplicacheProvider";
 import { SWRConfig } from "swr";
-import { useViewportSize } from "hooks/useViewportSize";
+import { useViewportDifference, useViewportSize } from "hooks/useViewportSize";
 import { usePreventResize } from "hooks/usePreventResize";
 import { Question, SidebarIcon, StudioFilled } from "components/Icons";
 import { SpaceName, SpaceOptions } from "components/SpaceLayout/Sidebar";
@@ -76,10 +76,10 @@ function Space() {
   }, []);
 
   let viewheight = useViewportSize().height;
+  let difference = useViewportDifference();
   let heightSpring = useSpring({
     height: viewheight,
   });
-  usePreventResize();
 
   return (
     <>
@@ -87,11 +87,11 @@ function Space() {
       <PresenceHandler />
 
       <animated.div
-        style={heightSpring}
-        className="spacecontent max-w-screen-xl relative mx-auto flex h-full w-full grow md:px-4 md:py-4 md:pb-2"
+        style={difference > 100 ? heightSpring : undefined}
+        className="spacecontent max-w-screen-xl relative mx-auto flex h-screen w-full grow pb-2 sm:px-4 sm:py-4"
       >
         <SmallCardDragContext>
-          {width > 960 || width === 0 ? <DesktopLayout /> : <MobileLayout />}
+          {width > 640 || width === 0 ? <DesktopLayout /> : <MobileLayout />}
         </SmallCardDragContext>
       </animated.div>
     </>
@@ -101,8 +101,8 @@ function Space() {
 const DesktopLayout = () => {
   let { session } = useAuth();
   return (
-    <div className="no-scrollbar mx-auto flex h-full flex-col gap-2 overflow-x-scroll">
-      <div className="spaceHeader flex w-full flex-row  justify-stretch gap-4 ">
+    <div className="mx-auto flex h-full w-full flex-col gap-2 overflow-hidden">
+      <div className="spaceHeader mx-auto flex w-full max-w-[1332px] flex-row gap-4">
         <div className="spaceHeaderInfo flex min-w-0 shrink grow  flex-row items-stretch gap-2 font-bold">
           {session.session && (
             <>
@@ -130,9 +130,9 @@ const DesktopLayout = () => {
           <Search />
         </div>
       </div>
-      <div className="spaceLargeSplitLayout flex h-[calc(100%-46px)] w-full flex-row items-stretch gap-4 sm:justify-center sm:gap-4">
-        <div className="spaceRoomAndSidebar flex flex-row rounded-md border border-grey-90">
-          <div className="rounded-l-md border border-transparent border-r-grey-90 bg-white">
+      <div className=" no-scrollbar spaceLargeSplitLayout mx-auto flex h-full w-full max-w-[1332px] snap-x snap-mandatory flex-row items-stretch gap-4 overflow-y-hidden overflow-x-scroll scroll-smooth sm:gap-4 md:overflow-x-hidden">
+        <div className="spaceRoomAndSidebar flex shrink-0  snap-center snap-always flex-row  rounded-md border border-grey-90">
+          <div className="shrink-0 rounded-l-md border border-transparent border-r-grey-90 bg-white">
             <Sidebar />
           </div>
 
@@ -193,9 +193,9 @@ const MobileLayout = () => {
   });
 
   return (
-    <div className="flex h-full w-full flex-col">
+    <div className="mobileLayout flex h-full w-full flex-col">
       <div
-        className="no-scrollbar pwa-padding my-2 flex h-full snap-x snap-mandatory flex-row overflow-y-hidden overflow-x-scroll overscroll-x-none scroll-smooth"
+        className="mobileRoomAndCard no-scrollbar pwa-padding my-2 flex h-full snap-x snap-mandatory flex-row overflow-y-hidden overflow-x-scroll overscroll-x-none scroll-smooth"
         {...bind()}
       >
         <div
@@ -210,13 +210,16 @@ const MobileLayout = () => {
           </div>
         </div>
 
-        <div className="snap-center snap-always ">
+        <div className="cardViewerWrapper snap-center snap-always ">
           <CardViewer />
         </div>
         <div className="w-2 shrink-0 snap-start" />
       </div>
-      <div className="flex flex-row justify-between px-2 pb-1">
-        <div className="flex flex-row gap-2 text-grey-55" ref={droppableRef}>
+      <div className="navFooter pwa-bottom-padding flex flex-row justify-between px-2">
+        <div
+          className="sidebarTrigger flex flex-row gap-2 text-grey-55"
+          ref={droppableRef}
+        >
           <button onClick={() => setSidebarOpen()}>
             <SidebarIcon />
           </button>
@@ -288,7 +291,7 @@ const MobileSidebar = () => {
       }
       <animated.div
         style={{ height: viewheight, left }}
-        className="fixed top-0 z-50 ml-2 p-1 pl-0"
+        className="pwa-padding pwa-bottom-padding fixed top-0 z-50 ml-2 p-1 pl-0"
       >
         <div
           className="h-full touch-none rounded-md border border-grey-90 bg-white"
