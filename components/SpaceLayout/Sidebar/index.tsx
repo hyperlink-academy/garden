@@ -5,28 +5,22 @@ import { db, useMutations, useSpaceID } from "hooks/useReplicache";
 import * as Popover from "@radix-ui/react-popover";
 import { useState } from "react";
 import {
-  BackToHome,
   BellSmall,
-  Information,
   MoreOptionsSmall,
   RoomCalendar,
-  RoomSearch,
   SidebarIcon,
   StudioFilled,
   UnreadDot,
 } from "../../Icons";
 import { EditSpaceModal } from "components/CreateSpace";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { EditRoomModal } from "./RoomListLayout";
 import { SharedRoomList } from "./SharedRoomList";
 import { ButtonPrimary, ButtonTertiary } from "components/Buttons";
 import { LogInModal } from "components/LoginModal";
 import { useSpaceData } from "hooks/useSpaceData";
-import { HelpModal } from "components/HelpCenter";
 import { People } from "./People";
-import { spaceAPI } from "backend/lib/api";
 import { DotLoader } from "components/DotLoader";
-import { Feedback } from "components/Feedback";
 import { useIsActiveRoom, useRoom, useSetRoom } from "hooks/useUIState";
 import { prefetchIdentityData } from "hooks/useIdentityData";
 import { ModalSubmitButton, Modal } from "components/Modal";
@@ -201,10 +195,8 @@ const MemberOptions = () => {
   return (
     <>
       <Popover.Root>
-        <Popover.Trigger>
-          <button className="shrink-0 rounded-md border border-transparent pt-[1px] hover:border-accent-blue hover:text-accent-blue">
-            <MoreOptionsSmall className="pt-2" />
-          </button>
+        <Popover.Trigger className="shrink-0 rounded-md border border-transparent pt-[1px] hover:border-accent-blue hover:text-accent-blue">
+          <MoreOptionsSmall className="pt-2" />
         </Popover.Trigger>
         <Popover.Portal>
           <Popover.Content

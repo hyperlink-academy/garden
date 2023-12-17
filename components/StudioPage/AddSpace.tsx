@@ -24,11 +24,13 @@ export function AddSpace(props: { id: string }) {
   }, [open]);
   return (
     <>
-      <ButtonTertiary
-        content={"Add a Space"}
+      <button
+        className="flex w-full flex-row items-center justify-center gap-2 rounded-md border border-grey-55 bg-white text-lg text-grey-35 outline-none hover:bg-bg-blue hover:text-accent-blue"
         onClick={() => setOpen(true)}
-        icon={<SpaceCreate />}
-      />
+      >
+        <SpaceCreate />
+        Add a Space
+      </button>
       <Modal header="Add a Space" open={open} onClose={() => setOpen(false)}>
         {state === "normal" ? (
           <>

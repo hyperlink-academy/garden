@@ -1,11 +1,11 @@
-import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { sortByPosition } from "src/position_helpers";
 import { db, scanIndex, useMutations, useSpaceID } from "./useReplicache";
 import { useRoom, useSetRoom, useUIState } from "./useUIState";
+import { useSearchParams, useRouter } from "next/navigation";
 
 export const useSpaceSyncState = () => {
-  let { query, replace } = useRouter();
+  let query = useSearchParams();
   let { rep } = useMutations();
   let room = useRoom();
   let spaceID = useSpaceID();
@@ -24,15 +24,17 @@ export const useSpaceSyncState = () => {
     if (!r && firstRoom) setRoom(firstRoom);
   }, [r, firstRoom]);
 
+  let openCard = query?.get("openCard");
   useEffect(() => {
-    if (query.openCard) {
+    if (openCard) {
       (async () => {
-        let entityID = query.openCard as string;
+        let entityID = openCard as string;
         if (!room || !spaceID || !rep) return;
 
         let url = new URL(window.location.href);
         url.searchParams.delete("openCard");
-        replace(url, undefined, { shallow: true });
+
+        history.replaceState(null, "", url);
 
         let isRoom = await rep.query((tx) =>
           scanIndex(tx).eav(entityID, "room/type")
@@ -46,7 +48,7 @@ export const useSpaceSyncState = () => {
         openCardWithoutHistory(spaceID, parent[0]?.entity || room, entityID);
       })();
     }
-  }, [rep, query.openCard, room, spaceID]);
+  }, [rep, openCard, room, spaceID]);
 
   useEffect(() => {
     if (!spaceID) return;

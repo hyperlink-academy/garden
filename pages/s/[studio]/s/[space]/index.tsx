@@ -1,3 +1,4 @@
+"use client";
 import { CardViewer } from "components/CardViewerContext";
 import { SmallCardDragContext, useDroppableZone } from "components/DragContext";
 import { Sidebar } from "components/SpaceLayout";
@@ -28,6 +29,7 @@ import { HelpModal } from "components/HelpCenter";
 import { useGesture } from "@use-gesture/react";
 import { useDndContext } from "@dnd-kit/core";
 import { useSpaceShortcuts } from "hooks/useSpaceShortcuts";
+import { PageHeightContainer } from "components/PageHeightContainer";
 
 export async function getStaticPaths() {
   return { paths: [], fallback: "blocking" };
@@ -58,15 +60,18 @@ export default function SpacePage(props: Props) {
   return (
     <SWRConfig value={{ fallback: { [props.data.do_id]: props.data } }}>
       <SpaceProvider id={props.data.do_id}>
-        <Space />
+        <PageHeightContainer>
+          <Space />
+        </PageHeightContainer>
       </SpaceProvider>
     </SWRConfig>
   );
 }
-function Space() {
+
+export const Space = () => {
+  const { width } = useWindowDimensions();
   useSpaceSyncState();
   useSpaceShortcuts();
-  const { width } = useWindowDimensions();
 
   useEffect(() => {
     window.requestAnimationFrame(() => {
@@ -74,29 +79,16 @@ function Space() {
       roomPane?.scrollIntoView();
     });
   }, []);
-
-  let viewheight = useViewportSize().height;
-  let difference = useViewportDifference();
-  let heightSpring = useSpring({
-    height: viewheight,
-  });
-
   return (
     <>
       <SpaceMetaTitle />
       <PresenceHandler />
-
-      <animated.div
-        style={difference > 100 ? heightSpring : undefined}
-        className="spacecontent max-w-screen-xl relative mx-auto flex h-screen w-full grow pb-2 sm:px-4 sm:py-4"
-      >
-        <SmallCardDragContext>
-          {width > 640 || width === 0 ? <DesktopLayout /> : <MobileLayout />}
-        </SmallCardDragContext>
-      </animated.div>
+      <SmallCardDragContext>
+        {width > 640 || width === 0 ? <DesktopLayout /> : <MobileLayout />}
+      </SmallCardDragContext>
     </>
   );
-}
+};
 
 const DesktopLayout = () => {
   let { session } = useAuth();
