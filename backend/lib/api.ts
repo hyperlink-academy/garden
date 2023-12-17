@@ -1,6 +1,6 @@
 import { WorkerRoutes } from "backend";
-import { PrivateSpaceRoutes, SpaceRoutes } from "backend/SpaceDurableObject";
-import { ZodObject, ZodRawShape, ZodUnion, z } from "zod";
+import { SpaceRoutes } from "backend/SpaceDurableObject";
+import { ZodObject, ZodRawShape, z } from "zod";
 
 type UnwrapPromise<T> = T extends Promise<infer U> ? U : T;
 
@@ -9,8 +9,6 @@ export const spaceAPI = makeAPIClient<SpaceRoutes>("api");
 //Rename these,
 export const internalSpaceAPI = (stub: DurableObjectStub) =>
   makeAPIClient<SpaceRoutes>("api", stub.fetch.bind(stub));
-export const privateSpaceAPI = (stub: DurableObjectStub) =>
-  makeAPIClient<PrivateSpaceRoutes>("internal_api", stub.fetch.bind(stub));
 
 export type ExtractResponse<
   T extends { handler: (...d: any[]) => Promise<{ data: any }> }
