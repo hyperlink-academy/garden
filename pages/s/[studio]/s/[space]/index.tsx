@@ -61,14 +61,42 @@ export default function SpacePage(props: Props) {
     <SWRConfig value={{ fallback: { [props.data.do_id]: props.data } }}>
       <SpaceProvider id={props.data.do_id}>
         <PageHeightContainer>
-          <Space />
+          <Space header={<Header />} />
         </PageHeightContainer>
       </SpaceProvider>
     </SWRConfig>
   );
 }
 
-export const Space = () => {
+const Header = () => {
+  let { session } = useAuth();
+  return (
+    <div className="spaceHeaderInfo flex min-w-0 shrink grow  flex-row items-stretch gap-2 font-bold">
+      {session.session && (
+        <>
+          <Link
+            href={`/s/${session.session.username}`}
+            className="flex flex-row items-center gap-1 text-grey-55 "
+          >
+            <StudioFilled className="hover:text-accent-blue" />
+            <span className="text-lg"> /</span>
+          </Link>
+        </>
+      )}
+      <div
+        className={`spaceName flex w-full min-w-0 grow bg-background text-grey-35`}
+      >
+        <div className="flex w-full flex-row items-start gap-2 bg-inherit ">
+          <SpaceName truncate />
+          <SpaceOptions />
+        </div>
+      </div>
+      {!session.loggedIn && <LoginButton />}
+    </div>
+  );
+};
+
+export const Space = (props: { header: React.ReactNode }) => {
   const { width } = useWindowDimensions();
   useSpaceSyncState();
   useSpaceShortcuts();
@@ -84,39 +112,21 @@ export const Space = () => {
       <SpaceMetaTitle />
       <PresenceHandler />
       <SmallCardDragContext>
-        {width > 640 || width === 0 ? <DesktopLayout /> : <MobileLayout />}
+        {width > 640 || width === 0 ? (
+          <DesktopLayout {...props} />
+        ) : (
+          <MobileLayout />
+        )}
       </SmallCardDragContext>
     </>
   );
 };
 
-const DesktopLayout = () => {
-  let { session } = useAuth();
+const DesktopLayout = (props: { header: React.ReactNode }) => {
   return (
     <div className="mx-auto flex h-full w-full flex-col gap-2 overflow-hidden">
-      <div className="spaceHeader mx-auto flex w-full max-w-[1332px] flex-row gap-4">
-        <div className="spaceHeaderInfo flex min-w-0 shrink grow  flex-row items-stretch gap-2 font-bold">
-          {session.session && (
-            <>
-              <Link
-                href={`/s/${session.session.username}`}
-                className="flex flex-row items-center gap-1 text-grey-55 "
-              >
-                <StudioFilled className="hover:text-accent-blue" />
-                <span className="text-lg"> /</span>
-              </Link>
-            </>
-          )}
-          <div
-            className={`spaceName flex w-full min-w-0 grow bg-background text-grey-35`}
-          >
-            <div className="flex w-full flex-row items-start gap-2 bg-inherit ">
-              <SpaceName truncate />
-              <SpaceOptions />
-            </div>
-          </div>
-          {!session.loggedIn && <LoginButton />}
-        </div>
+      <div className="spaceHeader mx-auto flex w-full max-w-[1332px] flex-row justify-between gap-4">
+        {props.header}
         <div className="spaceHeaderSearch flex w-[360px] shrink-0 flex-row gap-0">
           <HelpButton />
           <Search />
