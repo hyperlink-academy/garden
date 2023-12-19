@@ -13,14 +13,5 @@ export function SpaceViewer(props: {
   let params = useParams<{ space_id: string; studio_id: string }>();
   let activeSpace =
     props.spaces.find((x) => x.id === params?.space_id) || props.spaces[0];
-  return (
-    <div className="flex h-full w-full flex-col justify-between">
-      <div className="flex flex-row gap-2">
-        <Link href={`/studio/${params?.studio_id}`}>
-          <h3>{props.studioName}</h3>
-        </Link>
-      </div>
-      <SpaceProvider id={activeSpace.do_id}>{props.children}</SpaceProvider>
-    </div>
-  );
+  return <SpaceProvider id={activeSpace.do_id}>{props.children}</SpaceProvider>;
 }

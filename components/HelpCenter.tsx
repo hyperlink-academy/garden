@@ -1,5 +1,5 @@
 import { Tab } from "@headlessui/react";
-import { useRouter } from "next/router";
+import { useSearchParams } from "next/navigation";
 import { Fragment, useEffect, useState } from "react";
 import { CloseLinedTiny, Settings } from "./Icons";
 import { ModalFixedHeight } from "./Layout";
@@ -24,18 +24,17 @@ export const HelpModal = (props: { open: boolean; onClose: () => void }) => {
 };
 
 export const HelpDocs = () => {
-  let router = useRouter();
+  let query = useSearchParams();
+  let tab = query?.get("tab") || "handbook";
   let [selectedIndex, setSelectedIndex] = useState(0);
 
   useEffect(() => {
     setSelectedIndex(() => {
-      return router.query.tab
-        ? ["handbook", "shortcuts", "examples", "app"].indexOf(
-            router.query.tab as string
-          )
+      return tab
+        ? ["handbook", "shortcuts", "examples", "app"].indexOf(tab as string)
         : 0;
     });
-  }, [router.query.tab]);
+  }, [tab]);
 
   return (
     <>

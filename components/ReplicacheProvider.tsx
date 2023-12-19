@@ -1,3 +1,4 @@
+"use client";
 import { spaceAPI } from "backend/lib/api";
 import { z } from "zod";
 import { pullRoute } from "backend/SpaceDurableObject/routes/pull";

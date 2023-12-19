@@ -21,7 +21,11 @@ export default async function StudioSpaceLayout(props: {
   return (
     <PageHeightContainer>
       <SpaceViewer studioName={data.data.name} spaces={spaces}>
-        <Space header={<SpaceViewerHeader spaces={spaces} />} />
+        <Space
+          header={
+            <SpaceViewerHeader spaces={spaces} studioName={data.data.name} />
+          }
+        />
       </SpaceViewer>
     </PageHeightContainer>
   );

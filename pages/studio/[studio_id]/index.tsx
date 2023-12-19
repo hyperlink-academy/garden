@@ -3,23 +3,20 @@ import { workerAPI } from "backend/lib/api";
 import { SpaceProvider } from "components/ReplicacheProvider";
 import { BaseSpaceCard, SpaceData } from "components/SpacesList";
 import { AddSpace } from "components/StudioPage/AddSpace";
-import { StudioMembers } from "components/StudioPage/Members";
-import { StudioSpaces } from "components/StudioPage/Spaces";
-import { StudioPosts } from "components/StudioPosts";
 import { Textarea } from "components/Textarea";
-import { RenderedText } from "components/Textarea/RenderedText";
 import { useStudioData } from "hooks/useStudioData";
-import { useViewportDifference, useViewportSize } from "hooks/useViewportSize";
 import { GetStaticPropsContext, InferGetStaticPropsType } from "next";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import Router from "next/router";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { base62ToUuid, uuidToBase62 } from "src/uuidHelpers";
 
+import { Tab } from "@headlessui/react";
+import { useSearchParams } from "next/navigation";
+
 type Props = InferGetStaticPropsType<typeof getStaticProps>;
-export type View = "posts" | "spaces" | "members";
 export default function StudioPage(props: Props) {
   let id = props.id;
   let { data } = useStudioData(id, props.data);
@@ -27,7 +24,6 @@ export default function StudioPage(props: Props) {
     if (id) Router.replace(`/studio/${uuidToBase62(id)}`);
   }, [id]);
   if (!data || !id) return null;
-  console.log(data);
   return (
     <>
       <Head>
@@ -39,17 +35,67 @@ export default function StudioPage(props: Props) {
     </>
   );
 }
+const Tabs = { About: About, Spaces: SpaceList, Members: Members };
 
-const StudioPageContent = ({
+function StudioPageContent({
   data,
 }: {
   data: ReturnType<typeof useStudioData>["data"];
-}) => {
-  let viewheight = useViewportSize().height;
-  let difference = useViewportDifference();
-  let heightSpring = useSpring({
-    height: viewheight,
-  });
+}) {
+  let tab = "About";
+  let [selectedIndex, setSelectedIndex] = useState(0);
+
+  useEffect(() => {
+    setSelectedIndex(() => {
+      return tab ? Object.keys(Tabs).indexOf(tab as string) : 0;
+    });
+  }, [tab]);
+
+  return (
+    <div className="m-auto flex h-full w-full max-w-6xl flex-col items-stretch gap-2 px-4 pt-2">
+      <div className="w-full text-center">
+        <h1>{data?.name}</h1>
+      </div>
+
+      <Tab.Group
+        manual
+        selectedIndex={selectedIndex}
+        onChange={setSelectedIndex}
+      >
+        <Tab.List className="flex w-full flex-row justify-center gap-2">
+          {Object.keys(Tabs).map((tab) => (
+            <TabItem name={tab} key={tab} />
+          ))}
+        </Tab.List>
+        <Tab.Panels>
+          {Object.values(Tabs).map((T, index) => (
+            <Tab.Panel key={index}>
+              <T data={data} />
+            </Tab.Panel>
+          ))}
+        </Tab.Panels>
+      </Tab.Group>
+    </div>
+  );
+}
+
+const TabItem = (props: { name: string }) => (
+  <Tab as={Fragment}>
+    {({ selected }) => (
+      <button
+        className={`outline-none ${
+          selected
+            ? "font-bold text-accent-blue"
+            : "text-grey-35 hover:text-accent-blue"
+        }`}
+      >
+        {props.name}
+      </button>
+    )}
+  </Tab>
+);
+
+function SpaceList({ data }: Pick<Props, "data">) {
   let [search, setSearch] = useState("");
 
   let spaces = data?.spaces_in_studios.filter(
@@ -59,65 +105,35 @@ const StudioPageContent = ({
 
   if (!data) return;
   return (
-    <animated.div
-      style={difference > 100 ? heightSpring : undefined}
-      className="spacecontent max-w-screen-xl relative mx-auto flex h-screen w-full grow pb-2 sm:px-4 sm:py-4"
-    >
-      <div className="flex h-full w-full flex-col items-stretch gap-2">
-        <div className="flex w-full flex-row justify-between ">
-          <h2>{data.name}</h2>
+    <div className="m-auto flex h-full w-full max-w-6xl flex-col items-stretch gap-2">
+      <div className="flex w-full flex-row justify-between ">
+        <h1>{data.name}</h1>
 
-          <div className="flex flex-row ">
-            <input
-              className="w-64"
-              value={search}
-              onChange={(e) => setSearch(e.currentTarget.value)}
-            />
-          </div>
-        </div>
-        <div className="no-scrollbar relative flex h-full w-full flex-row gap-2 overflow-y-scroll ">
-          <Sidebar data={data} />
-          <List
-            id={data.id}
-            spaces={spaces?.map((s) => s.space_data as SpaceData) || []}
+        <div className="flex flex-row ">
+          <input
+            className="w-64"
+            value={search}
+            onChange={(e) => setSearch(e.currentTarget.value)}
           />
         </div>
       </div>
-    </animated.div>
-  );
-};
-
-const Sidebar = ({
-  data,
-}: {
-  data: ReturnType<typeof useStudioData>["data"];
-}) => {
-  let [state, setState] = useState<"readme" | "members">("readme");
-
-  return (
-    <div className="flex h-full min-w-[302px] flex-col justify-between rounded-lg border border-grey-80 bg-white p-3">
-      <div className="h-full">
-        {state === "readme" ? (
-          <Textarea className="h-full" placeholder="write a readme..." />
-        ) : (
-          <>
-            <div>members</div>
-
-            {data?.members_in_studios.map((m) => (
-              <div key={m.member}>{m.identity_data?.username}</div>
-            ))}
-          </>
-        )}
+      <div className="no-scrollbar relative flex h-full w-full flex-row gap-2 overflow-y-scroll ">
+        <List
+          id={data.id}
+          spaces={spaces?.map((s) => s.space_data as SpaceData) || []}
+        />
       </div>
-      <button
-        className="w-full border"
-        onClick={() => setState(state === "readme" ? "members" : "readme")}
-      >
-        {state === "readme" ? "members" : "readme"}
-      </button>
     </div>
   );
-};
+}
+
+function About() {
+  return (
+    <div className="h-full rounded-lg border border-grey-80 bg-white p-4">
+      {<Textarea className="h-full" placeholder="write a readme..." />}
+    </div>
+  );
+}
 
 const List = (props: { spaces: Array<SpaceData>; id: string }) => {
   let { query } = useRouter();
@@ -143,15 +159,16 @@ const List = (props: { spaces: Array<SpaceData>; id: string }) => {
   );
 };
 
-function View(props: { view: View; id: string }) {
-  switch (props.view) {
-    case "posts":
-      return <StudioPosts id={props.id} />;
-    case "members":
-      return <StudioMembers id={props.id} />;
-    case "spaces":
-      return <StudioSpaces id={props.id} />;
-  }
+function Members({ data }: Pick<Props, "data">) {
+  return (
+    <>
+      <div>members</div>
+
+      {data?.members_in_studios.map((m) => (
+        <div key={m.member}>{m.identity_data?.username}</div>
+      ))}
+    </>
+  );
 }
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;

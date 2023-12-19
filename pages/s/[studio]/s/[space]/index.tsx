@@ -125,14 +125,14 @@ export const Space = (props: { header: React.ReactNode }) => {
 const DesktopLayout = (props: { header: React.ReactNode }) => {
   return (
     <div className="mx-auto flex h-full w-full flex-col gap-2 overflow-hidden">
-      <div className="spaceHeader mx-auto flex w-full max-w-[1332px] flex-row justify-between gap-4">
+      <div className="spaceHeader mx-auto flex w-full max-w-[1332px] flex-row items-end justify-between gap-4 px-2">
         {props.header}
         <div className="spaceHeaderSearch flex w-[360px] shrink-0 flex-row gap-0">
           <HelpButton />
           <Search />
         </div>
       </div>
-      <div className=" no-scrollbar spaceLargeSplitLayout mx-auto flex h-full w-full max-w-[1332px] snap-x snap-mandatory flex-row items-stretch gap-4 overflow-y-hidden overflow-x-scroll scroll-smooth sm:gap-4 md:overflow-x-hidden">
+      <div className=" no-scrollbar spaceLargeSplitLayout mx-auto flex h-full w-full max-w-[1332px] snap-x snap-mandatory flex-row items-stretch gap-4 overflow-y-hidden overflow-x-scroll scroll-smooth px-4 sm:gap-4  md:overflow-x-hidden">
         <div className="spaceRoomAndSidebar flex shrink-0  snap-center snap-always flex-row  rounded-md border border-grey-90">
           <div className="shrink-0 rounded-l-md border border-transparent border-r-grey-90 bg-white">
             <Sidebar />
