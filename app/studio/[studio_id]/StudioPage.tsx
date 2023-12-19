@@ -1,49 +1,28 @@
-import { animated, useSpring } from "@react-spring/web";
-import { workerAPI } from "backend/lib/api";
-import { SpaceProvider } from "components/ReplicacheProvider";
+"use client";
+
+import { Tab } from "@headlessui/react";
+import { ButtonPrimary } from "components/Buttons";
+import { MemberAdd } from "components/Icons";
 import { BaseSpaceCard, SpaceData } from "components/SpacesList";
 import { AddSpace } from "components/StudioPage/AddSpace";
 import { Textarea } from "components/Textarea";
+import { db, useMutations } from "hooks/useReplicache";
 import { useStudioData } from "hooks/useStudioData";
-import { GetStaticPropsContext, InferGetStaticPropsType } from "next";
-import Head from "next/head";
 import Link from "next/link";
-import { useRouter } from "next/router";
-import Router from "next/router";
+import { useParams } from "next/navigation";
 import { Fragment, useEffect, useState } from "react";
-import { base62ToUuid, uuidToBase62 } from "src/uuidHelpers";
 
-import { Tab } from "@headlessui/react";
-import { useSearchParams } from "next/navigation";
-
-type Props = InferGetStaticPropsType<typeof getStaticProps>;
-export default function StudioPage(props: Props) {
-  let id = props.id;
-  let { data } = useStudioData(id, props.data);
-  useEffect(() => {
-    if (id) Router.replace(`/studio/${uuidToBase62(id)}`);
-  }, [id]);
-  if (!data || !id) return null;
-  return (
-    <>
-      <Head>
-        <title key="title">{data?.name}</title>
-      </Head>
-      <SpaceProvider id={data?.do_id}>
-        <StudioPageContent data={data} />
-      </SpaceProvider>
-    </>
-  );
-}
-const Tabs = { About: About, Spaces: SpaceList, Members: Members };
-
-function StudioPageContent({
-  data,
-}: {
+type Props = {
   data: ReturnType<typeof useStudioData>["data"];
-}) {
+  isAdmin: boolean;
+};
+
+export function StudioPageContent({ data, isAdmin }: Props) {
   let tab = "About";
   let [selectedIndex, setSelectedIndex] = useState(0);
+
+  const Tabs = { About: About, Spaces: SpaceList, Members: Members };
+  if (isAdmin) Tabs["Settings"] = Settings;
 
   useEffect(() => {
     setSelectedIndex(() => {
@@ -56,21 +35,27 @@ function StudioPageContent({
       <div className="w-full text-center">
         <h1>{data?.name}</h1>
       </div>
-
       <Tab.Group
         manual
         selectedIndex={selectedIndex}
         onChange={setSelectedIndex}
       >
-        <Tab.List className="flex w-full flex-row justify-center gap-2">
+        <Tab.List className="flex w-full flex-row justify-center gap-4">
           {Object.keys(Tabs).map((tab) => (
-            <TabItem name={tab} key={tab} />
+            <TabItem
+              name={
+                tab === "Members"
+                  ? `Members (${data?.members_in_studios.length})`
+                  : tab
+              }
+              key={tab}
+            />
           ))}
         </Tab.List>
         <Tab.Panels>
           {Object.values(Tabs).map((T, index) => (
             <Tab.Panel key={index}>
-              <T data={data} />
+              <T data={data} isAdmin={isAdmin} />
             </Tab.Panel>
           ))}
         </Tab.Panels>
@@ -95,7 +80,7 @@ const TabItem = (props: { name: string }) => (
   </Tab>
 );
 
-function SpaceList({ data }: Pick<Props, "data">) {
+function SpaceList({ data }: Props) {
   let [search, setSearch] = useState("");
 
   let spaces = data?.spaces_in_studios.filter(
@@ -107,8 +92,7 @@ function SpaceList({ data }: Pick<Props, "data">) {
   return (
     <div className="m-auto flex h-full w-full max-w-6xl flex-col items-stretch gap-2">
       <div className="flex w-full flex-row justify-between ">
-        <h1>{data.name}</h1>
-
+        <AddSpace id={data.id} />
         <div className="flex flex-row ">
           <input
             className="w-64"
@@ -118,35 +102,49 @@ function SpaceList({ data }: Pick<Props, "data">) {
         </div>
       </div>
       <div className="no-scrollbar relative flex h-full w-full flex-row gap-2 overflow-y-scroll ">
-        <List
-          id={data.id}
-          spaces={spaces?.map((s) => s.space_data as SpaceData) || []}
-        />
+        <List spaces={spaces?.map((s) => s.space_data as SpaceData) || []} />
       </div>
     </div>
   );
 }
 
 function About() {
+  let home = db.useAttribute("home")[0];
+  let homeContent = db.useEntity(home?.entity, "card/content");
+  let { mutate } = useMutations();
   return (
     <div className="h-full rounded-lg border border-grey-80 bg-white p-4">
-      {<Textarea className="h-full" placeholder="write a readme..." />}
+      {
+        <Textarea
+          className="h-full"
+          placeholder="write a readme..."
+          value={homeContent?.value}
+          onChange={(e) => {
+            if (!home) return;
+            mutate("assertFact", {
+              positions: {},
+              attribute: "card/content",
+              value: e.currentTarget.value,
+              entity: home?.entity,
+            });
+          }}
+        />
+      }
     </div>
   );
 }
 
-const List = (props: { spaces: Array<SpaceData>; id: string }) => {
-  let { query } = useRouter();
+const List = (props: { spaces: Array<SpaceData> }) => {
+  let params = useParams<{ studio_id: string }>();
 
   return (
     <div className="flex w-full flex-col gap-2">
       <div className="grid grid-cols-3 gap-2">
-        <AddSpace id={props.id} />
         {props.spaces.map((space) => {
           return (
             <div className="" key={space.id}>
               <Link
-                href={`/studio/${query.studio_id}/space/${space.id}`}
+                href={`/studio/${params?.studio_id}/space/${space.id}`}
                 className="flex flex-col gap-2 text-left"
               >
                 <BaseSpaceCard {...space} />
@@ -159,10 +157,15 @@ const List = (props: { spaces: Array<SpaceData>; id: string }) => {
   );
 };
 
-function Members({ data }: Pick<Props, "data">) {
+function Members({ data, isAdmin }: Props) {
   return (
     <>
-      <div>members</div>
+      {isAdmin && (
+        <div className="lightBorder m-auto flex max-w-2xl flex-row items-center justify-between bg-bg-blue p-2 text-grey-55">
+          Add a new member!{" "}
+          <ButtonPrimary icon={<MemberAdd />} content="Invite" />
+        </div>
+      )}
 
       {data?.members_in_studios.map((m) => (
         <div key={m.member}>{m.identity_data?.username}</div>
@@ -171,22 +174,10 @@ function Members({ data }: Pick<Props, "data">) {
   );
 }
 
-const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
-export async function getStaticProps(ctx: GetStaticPropsContext) {
-  if (!ctx.params?.studio_id)
-    return { props: { notFound: true }, revalidate: 10 } as const;
-
-  let id = ctx.params.studio_id as string;
-  if (id.length !== 36) id = base62ToUuid(id);
-  let data = await workerAPI(WORKER_URL, "get_studio_data", {
-    id,
-  });
-
-  if (!data.success)
-    return { props: { notFound: true }, revalidate: 10 } as const;
-  return { props: { notFound: false, data: data.data, id } };
-}
-
-export async function getStaticPaths() {
-  return { paths: [], fallback: "blocking" };
+function Settings({ data }: Props) {
+  return (
+    <>
+      <div>settings yo</div>
+    </>
+  );
 }

@@ -5,15 +5,15 @@ import {
   useSession,
   useSupabaseClient,
 } from "@supabase/auth-helpers-react";
-import { createPagesBrowserClient } from "@supabase/auth-helpers-nextjs";
 import { useIdentityData } from "./useIdentityData";
+import { supabaseBrowserClient } from "supabase/clients";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 
 export const AuthProvider: React.FC<React.PropsWithChildren<unknown>> = (
   props
 ) => {
-  const [supabaseClient] = useState(() => createPagesBrowserClient());
+  const [supabaseClient] = useState(() => supabaseBrowserClient());
   return (
     <SessionContextProvider supabaseClient={supabaseClient}>
       {props.children}
