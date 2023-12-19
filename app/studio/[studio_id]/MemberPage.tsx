@@ -11,16 +11,29 @@ import { Props } from "./StudioPage";
 import { useState } from "react";
 import { BaseSmallCard } from "components/CardPreview/SmallCard";
 import { Textarea } from "components/Textarea";
+import { SpaceData } from "components/SpacesList";
+import { DoorImage } from "components/Doors";
+import Link from "next/link";
+import { useParams } from "next/navigation";
 
 export function Members({ data, isAdmin }: Props) {
   return (
     <div className="flex flex-col gap-2">
       {isAdmin && <InviteModal />}
 
-      <div>
+      <div className="flex flex-col gap-2">
         {data?.members_in_studios.map((m) =>
           !m.identity_data ? null : (
             <Memberc
+              spaces={data.spaces_in_studios
+                .filter(
+                  (space) =>
+                    !space.space_data.archived &&
+                    space.space_data.members_in_spaces.find(
+                      (member) => member.member === m.member
+                    )
+                )
+                .map((space) => space.space_data)}
               key={m.member}
               memberName={m.identity_data?.username || ""}
               memberStudio={m.identity_data.studio}
@@ -32,10 +45,15 @@ export function Members({ data, isAdmin }: Props) {
   );
 }
 
-const Memberc = (props: { memberName: string; memberStudio: string }) => {
+const Memberc = (props: {
+  memberName: string;
+  memberStudio: string;
+  spaces: SpaceData[];
+}) => {
   let memberEntity = db.useUniqueAttribute("space/member", props.memberStudio);
   let bio = db.useEntity(memberEntity?.entity || null, "card/content");
 
+  let params = useParams<{ studio_id: string }>();
   let { mutate } = useMutations();
   let { session } = useAuth();
   return (
@@ -48,7 +66,7 @@ const Memberc = (props: { memberName: string; memberStudio: string }) => {
           <div className="text-cs font-normal">member</div>
         </div>
         <div className="p-2">
-          <div className="h-full rounded-lg bg-white p-2">
+          <div className="flex h-full flex-col gap-2 rounded-lg bg-white p-2">
             <Textarea
               previewOnly={session.session?.studio !== props.memberStudio}
               spellCheck={false}
@@ -69,6 +87,19 @@ const Memberc = (props: { memberName: string; memberStudio: string }) => {
                 });
               }}
             />
+            <div>
+              <h4 className="font-bold text-grey-55">
+                Spaces ({props.spaces.length})
+              </h4>
+              {props.spaces.map((space) => (
+                <Link href={`/studio/${params?.studio_id}/space/${space.id}`}>
+                  <div className="flex flex-row gap-2 text-sm hover:text-accent-blue">
+                    <DoorImage small {...space} width="18" />
+                    {space.display_name}
+                  </div>
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       </div>
