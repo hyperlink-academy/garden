@@ -37,6 +37,7 @@ export const Modal: React.FC<
           transform: `translate(-50%, -50% )`,
         }}
         className={`
+        no-scrollbar
         pwa-margin
         fixed
         left-1/2    
