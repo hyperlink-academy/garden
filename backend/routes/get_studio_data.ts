@@ -12,7 +12,7 @@ export const get_studio_data_route = makeRoute({
       .from("studios")
       .select(
         `*,
-        members_in_studios(*, identity_data(username)),
+        members_in_studios(*, identity_data(*)),
         spaces_in_studios(*,
                           space_data(${space_data_query})
                          )`
