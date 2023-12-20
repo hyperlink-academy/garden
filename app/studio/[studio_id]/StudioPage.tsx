@@ -11,9 +11,11 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Fragment, useEffect, useState } from "react";
 import { Members } from "./MemberPage";
+import { StudioSettings } from "./Settings";
+import { NonUndefined } from "@use-gesture/react";
 
 export type Props = {
-  data: ReturnType<typeof useStudioData>["data"];
+  data: NonUndefined<ReturnType<typeof useStudioData>["data"]>;
   isAdmin: boolean;
 };
 
@@ -56,7 +58,7 @@ export function StudioPageContent(props: Props) {
         <Tab.Panels>
           {Object.values(Tabs).map((T, index) => (
             <Tab.Panel key={index}>
-              <T data={data} isAdmin={props.isAdmin} />
+              <T data={data || props.data} isAdmin={props.isAdmin} />
             </Tab.Panel>
           ))}
         </Tab.Panels>
@@ -160,7 +162,7 @@ const List = (props: { spaces: Array<SpaceData> }) => {
 function Settings({ data }: Props) {
   return (
     <>
-      <div>settings yo</div>
+      <StudioSettings id={data.id} />
     </>
   );
 }
