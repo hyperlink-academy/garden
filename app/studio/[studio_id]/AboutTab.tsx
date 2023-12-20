@@ -1,11 +1,5 @@
-import { NonUndefined } from "@use-gesture/react";
 import { Textarea } from "components/Textarea";
 import { db, useMutations } from "hooks/useReplicache";
-import { useStudioData } from "hooks/useStudioData";
-
-export type Props = {
-  data: NonUndefined<ReturnType<typeof useStudioData>["data"]>;
-};
 
 export function About() {
   let home = db.useAttribute("home")[0];

@@ -1,15 +1,8 @@
 "use client";
 
 import { Tab } from "@headlessui/react";
-import { BaseSpaceCard, SpaceData } from "components/SpacesList";
-import { AddSpace } from "components/StudioPage/AddSpace";
-import { Textarea } from "components/Textarea";
-import { useAuth } from "hooks/useAuth";
 import { NonUndefined } from "@use-gesture/react";
-import { db, useMutations, useSpaceID } from "hooks/useReplicache";
 import { useStudioData } from "hooks/useStudioData";
-import Link from "next/link";
-import { useParams } from "next/navigation";
 import { Fragment, useEffect, useState } from "react";
 import { Members } from "./MemberTab";
 import { StudioSettings } from "./SettingsTab";
@@ -86,29 +79,6 @@ const TabItem = (props: { name: string }) => (
     )}
   </Tab>
 );
-
-const List = (props: { spaces: Array<SpaceData> }) => {
-  let params = useParams<{ studio_id: string }>();
-
-  return (
-    <div className="flex w-full flex-col gap-2">
-      <div className="grid grid-cols-3 gap-2">
-        {props.spaces.map((space) => {
-          return (
-            <div className="" key={space.id}>
-              <Link
-                href={`/studio/${params?.studio_id}/space/${space.id}`}
-                className="flex flex-col gap-2 text-left"
-              >
-                <BaseSpaceCard {...space} />
-              </Link>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-};
 
 function Settings({ data }: Props) {
   return (
