@@ -17,12 +17,13 @@ export type Props = {
   isAdmin: boolean;
 };
 
-export function StudioPageContent({ data, isAdmin }: Props) {
+const Tabs = { About: About, Spaces: SpaceList, Members: Members } as { [key: string]: (props: Props) => React.ReactNode };
+export function StudioPageContent(props: Props) {
   let tab = "About";
+  let { data } = useStudioData(props.data?.id, props.data)
   let [selectedIndex, setSelectedIndex] = useState(0);
 
-  const Tabs = { About: About, Spaces: SpaceList, Members: Members };
-  if (isAdmin) Tabs["Settings"] = Settings;
+  if (props.isAdmin) Tabs["Settings"] = Settings;
 
   useEffect(() => {
     setSelectedIndex(() => {
@@ -55,7 +56,7 @@ export function StudioPageContent({ data, isAdmin }: Props) {
         <Tab.Panels>
           {Object.values(Tabs).map((T, index) => (
             <Tab.Panel key={index}>
-              <T data={data} isAdmin={isAdmin} />
+              <T data={data} isAdmin={props.isAdmin} />
             </Tab.Panel>
           ))}
         </Tab.Panels>
@@ -68,11 +69,10 @@ const TabItem = (props: { name: string }) => (
   <Tab as={Fragment}>
     {({ selected }) => (
       <button
-        className={`outline-none ${
-          selected
-            ? "font-bold text-accent-blue"
-            : "text-grey-35 hover:text-accent-blue"
-        }`}
+        className={`outline-none ${selected
+          ? "font-bold text-accent-blue"
+          : "text-grey-35 hover:text-accent-blue"
+          }`}
       >
         {props.name}
       </button>

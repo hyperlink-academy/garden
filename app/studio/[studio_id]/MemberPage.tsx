@@ -92,7 +92,10 @@ const Memberc = (props: {
                 Spaces ({props.spaces.length})
               </h4>
               {props.spaces.map((space) => (
-                <Link href={`/studio/${params?.studio_id}/space/${space.id}`}>
+                <Link
+                  href={`/studio/${params?.studio_id}/space/${space.id}`}
+                  key={space.id}
+                >
                   <div className="flex flex-row gap-2 text-sm hover:text-accent-blue">
                     <DoorImage small {...space} width="18" />
                     {space.display_name}

@@ -15,7 +15,6 @@ import { ulid } from "src/ulid";
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export function AddSpace(props: { id: string }) {
   let [open, setOpen] = useState(false);
-  let { data } = useStudioData(props.id);
   let [state, setState] = useState<"normal" | "add-new" | "add-existing">(
     "normal"
   );
@@ -201,11 +200,10 @@ const AddExistingSpace = (props: { onClose: () => void; studioID: string }) => {
                   );
                 else setAddedSpaces((spaces) => [...spaces, space_data.do_id]);
               }}
-              className={`w-full rounded-lg border ${
-                addedSpaces.includes(space_data.do_id)
+              className={`w-full rounded-lg border ${addedSpaces.includes(space_data.do_id)
                   ? "border-accent-blue bg-accent-blue text-white"
                   : "border-grey-80 hover:border-accent-blue hover:bg-bg-blue"
-              } px-3 py-2 text-left `}
+                } px-3 py-2 text-left `}
             >
               <h3>{space_data.display_name}</h3>
             </button>
