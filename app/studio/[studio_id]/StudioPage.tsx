@@ -5,24 +5,28 @@ import { BaseSpaceCard, SpaceData } from "components/SpacesList";
 import { AddSpace } from "components/StudioPage/AddSpace";
 import { Textarea } from "components/Textarea";
 import { useAuth } from "hooks/useAuth";
+import { NonUndefined } from "@use-gesture/react";
 import { db, useMutations, useSpaceID } from "hooks/useReplicache";
 import { useStudioData } from "hooks/useStudioData";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Fragment, useEffect, useState } from "react";
-import { Members } from "./MemberPage";
-import { StudioSettings } from "./Settings";
-import { NonUndefined } from "@use-gesture/react";
+import { Members } from "./MemberTab";
+import { StudioSettings } from "./SettingsTab";
+import { SpaceList } from "./SpacesTab";
+import { About } from "./AboutTab";
 
 export type Props = {
   data: NonUndefined<ReturnType<typeof useStudioData>["data"]>;
   isAdmin: boolean;
 };
 
-const Tabs = { About: About, Spaces: SpaceList, Members: Members } as { [key: string]: (props: Props) => React.ReactNode };
+const Tabs = { About: About, Spaces: SpaceList, Members: Members } as {
+  [key: string]: (props: Props) => React.ReactNode;
+};
 export function StudioPageContent(props: Props) {
   let tab = "About";
-  let { data } = useStudioData(props.data?.id, props.data)
+  let { data } = useStudioData(props.data?.id, props.data);
   let [selectedIndex, setSelectedIndex] = useState(0);
 
   if (props.isAdmin) Tabs["Settings"] = Settings;
@@ -71,70 +75,17 @@ const TabItem = (props: { name: string }) => (
   <Tab as={Fragment}>
     {({ selected }) => (
       <button
-        className={`outline-none ${selected
-          ? "font-bold text-accent-blue"
-          : "text-grey-35 hover:text-accent-blue"
-          }`}
+        className={`outline-none ${
+          selected
+            ? "font-bold text-accent-blue"
+            : "text-grey-35 hover:text-accent-blue"
+        }`}
       >
         {props.name}
       </button>
     )}
   </Tab>
 );
-
-function SpaceList({ data }: Props) {
-  let [search, setSearch] = useState("");
-
-  let spaces = data?.spaces_in_studios.filter(
-    ({ space_data: s }) =>
-      s && !s.archived && s.display_name?.toLocaleLowerCase().includes(search)
-  );
-
-  if (!data) return;
-  return (
-    <div className="m-auto flex h-full w-full max-w-6xl flex-col items-stretch gap-2">
-      <div className="flex w-full flex-row justify-between ">
-        <AddSpace id={data.id} />
-        <div className="flex flex-row ">
-          <input
-            className="w-64"
-            value={search}
-            onChange={(e) => setSearch(e.currentTarget.value)}
-          />
-        </div>
-      </div>
-      <div className="no-scrollbar relative flex h-full w-full flex-row gap-2 overflow-y-scroll ">
-        <List spaces={spaces?.map((s) => s.space_data as SpaceData) || []} />
-      </div>
-    </div>
-  );
-}
-
-function About() {
-  let home = db.useAttribute("home")[0];
-  let homeContent = db.useEntity(home?.entity, "card/content");
-  let { mutate } = useMutations();
-  return (
-    <div className="h-full rounded-lg border border-grey-80 bg-white p-4">
-      {
-        <Textarea
-          className="h-full"
-          placeholder="write a readme..."
-          value={homeContent?.value}
-          onChange={(e) => {
-            if (!home) return;
-            mutate("assertFact", {
-              positions: {},
-              attribute: "card/content",
-              value: e.currentTarget.value,
-              entity: home?.entity,
-            });
-          }}
-        />
-      }
-    </div>
-  );
-}
 
 const List = (props: { spaces: Array<SpaceData> }) => {
   let params = useParams<{ studio_id: string }>();
