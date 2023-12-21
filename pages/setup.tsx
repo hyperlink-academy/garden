@@ -97,7 +97,7 @@ export default function SignupPage() {
   if (router.query.error_description)
     return (
       <div className="lightBorder flex flex-col gap-2 bg-white p-2">
-        <h1>Sorry, an error occurred</h1>
+        <h3>Sorry, an error occurred</h3>
         <div>{router.query.error_description}</div>
         <div>
           Please try to{" "}
@@ -125,7 +125,7 @@ export default function SignupPage() {
           src="/img/spotIllustration/welcome.png"
         />
         <div className="grid-auto-rows m-auto grid gap-2">
-          <h2>Hi, welcome to Hyperlink!</h2>
+          <h3>Hi, welcome to Hyperlink!</h3>
         </div>
 
         <form onSubmit={onSubmit} className="grid w-full gap-4 text-grey-35">

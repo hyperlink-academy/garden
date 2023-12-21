@@ -50,7 +50,7 @@ function PostBigView(props: { space_do_id: string; cardEntity: string }) {
   let { data } = useRemoteCardData(props.space_do_id, props.cardEntity);
   return (
     <div className="mt-5 flex w-[calc(100vw-32px)] max-w-screen-md flex-shrink-0 snap-center flex-col gap-6 bg-white p-4">
-      <h2>{data?.title}</h2>
+      <h3>{data?.title}</h3>
       <RenderedText text={data?.content || ""} />
     </div>
   );
@@ -73,7 +73,7 @@ export function CardBigView(props: {
       <div className="fixed top-1/2 max-h-[calc(100%-32px)] w-full -translate-y-1/2">
         <div className="mx-auto mt-4 flex w-[calc(100vw-32px)] max-w-screen-md flex-col gap-6 rounded-md bg-white p-4">
           <div className="flex flex-col gap-2">
-            <h2>{data?.title}</h2>
+            <h3>{data?.title}</h3>
             <p className="text-sm italic">by {data?.creator}</p>
           </div>
           <RenderedText

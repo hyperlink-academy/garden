@@ -67,7 +67,7 @@ export default function UserHomePage(props: Props) {
         <div className="mb-12 flex flex-col gap-2">
           <div className="flex flex-col gap-2 sm:flex-row sm:justify-between">
             <div className="flex flex-row justify-between gap-2">
-              <h1 className="grow">{currentStudioName}</h1>
+              <h2 className="grow">{currentStudioName}</h2>
               {!session?.loggedIn ||
                 (session.session?.username === currentStudioName && (
                   <NotificationManager />

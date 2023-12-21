@@ -106,9 +106,9 @@ export const BaseSpaceCard = (props: Parameters<typeof SpaceCard>[0]) => {
           >
             <div className="flex justify-between gap-2">
               {/* this may never show 'space deleted' but here same as big space card in case */}
-              <h3 className={!data?.display_name ? "italic text-grey-55" : ""}>
+              <h4 className={!data?.display_name ? "italic text-grey-55" : ""}>
                 {data?.display_name || "space deleted"}
-              </h3>
+              </h4>
               <div className="">
                 {props.editable &&
                   (data?.owner?.username == session.session?.username ? (

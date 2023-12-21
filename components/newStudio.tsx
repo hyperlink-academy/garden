@@ -10,7 +10,7 @@ export const NewStudio = (props: {
     <div className="flex flex-col gap-6 pt-4 text-grey-35">
       <div className=" lightBorder flex flex-col-reverse items-center gap-4 bg-white p-4 text-center sm:flex-row ">
         <div className="flex grow  flex-col place-items-center gap-3">
-          <h1>Welcome to Hyperlink!</h1>
+          <h2>Welcome to Hyperlink!</h2>
           <p className="text-lg">
             <span className="font-bold">Here, you make and join Spaces.</span>
             <br />

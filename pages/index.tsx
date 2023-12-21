@@ -38,7 +38,7 @@ export default function IndexPage() {
                 </div>
               </div>
               <div className="w-11/12 self-center rounded-md border-x-[24px] border-y-[24px] border-accent-gold p-4 sm:border-x-[96px] sm:border-y-[48px] sm:p-8">
-                <h1 className="plexSerifBoldItalic text-3xl sm:text-5xl md:text-7xl">
+                <h1 className="plexSerifBoldItalic md:text-7xl text-2xl sm:text-[3rem]">
                   Hyperlink Academy
                 </h1>
               </div>
@@ -110,8 +110,8 @@ export default function IndexPage() {
           </div>
           {/* what is hyperlink */}
           <div className={`landingWhatIsHyperlink text-center ${textFormat}`}>
-            <h2 className="text-2xl sm:text-3xl">What is Hyperlink?</h2>
-            <p className="text-xl">
+            <h2 className="sm:text-3xl text-xl">What is Hyperlink?</h2>
+            <p className="text-lg">
               It&apos;s where we make <strong>Spaces</strong> to make things
               happen — places to do meaningful work with close collaborators.
             </p>
@@ -164,7 +164,7 @@ export default function IndexPage() {
           {/* hyperlink in action */}
           <div className={`hyperlinkInAction ${textFormat} text-center`}>
             <div className="mb-4 flex flex-col gap-4">
-              <h2 className="text-2xl sm:text-3xl">What does it look like?</h2>
+              <h2 className="text-xl sm:text-2xl">What does it look like?</h2>
               <span>
                 <em>click each item for a preview!</em>
               </span>
@@ -240,8 +240,8 @@ export default function IndexPage() {
           <DividerSmall />
           {/* get started CTA! */}
           <div className={`getStarted text-center ${textFormat}`}>
-            <h2 className="pb-4 text-2xl leading-loose sm:text-3xl sm:leading-[3rem]">
-              <span className="text-xl sm:text-2xl">Set up your new</span>
+            <h2 className="sm:text-3xl pb-4 text-xl leading-loose sm:leading-[3rem]">
+              <span className="text-lg sm:text-xl">Set up your new</span>
               <br />
               <span className="rounded-md border-b-4 border-accent-blue px-2 py-1">
                 Studio
@@ -263,7 +263,7 @@ export default function IndexPage() {
               />
             </div>
 
-            <p className="text-xl">
+            <p className="text-lg">
               We&apos;d love to answer any questions & hear more about how you
               imagine using Hyperlink —{" "}
               <a
@@ -280,7 +280,7 @@ export default function IndexPage() {
         <div className="-mx-4 -mb-4 bg-bg-blue px-4 py-8 sm:-mx-8 sm:-mb-8 sm:px-8">
           {/* who and why */}
           <div className={`whoAndWhy1 text-center ${textFormat}`}>
-            <h2 className="text-2xl sm:text-3xl">About Hyperlink</h2>
+            <h2 className="text-xl sm:text-2xl">About Hyperlink</h2>
             <p>
               We&apos;re a small team —{" "}
               <a className="text-accent-blue" href="https://awarm.space/">

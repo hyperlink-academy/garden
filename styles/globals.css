@@ -67,14 +67,13 @@ h2 {
 }
 
 h3 {
-  @apply text-lg;
+  @apply text-[20px];
   @apply font-bold;
 }
 
 h4 {
-  @apply text-[.95rem];
+  @apply text-lg;
   @apply font-bold;
-  @apply text-grey-35;
 }
 
 a {

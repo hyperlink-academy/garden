@@ -11,13 +11,13 @@ export default function LoginPage() {
   let router = useRouter();
   return (
     <div className=" -my-4 mx-auto flex h-screen  max-w-md flex-col items-center justify-center gap-4">
-      <h1 className="w-full">
+      <h2 className="w-full">
         Welcome Back to{" "}
         <Link className="text-accent-blue hover:underline" href="/">
           Hyperlink
         </Link>
         !
-      </h1>
+      </h2>
       <div className="lightBorder w-full bg-white p-4">
         <LoginForm
           onLogin={(s) => {

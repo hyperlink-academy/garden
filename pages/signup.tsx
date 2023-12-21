@@ -12,13 +12,13 @@ type Status = "normal" | "invalidEmail" | "confirm" | "loading";
 export default function SignupPage() {
   return (
     <div className=" -my-4 mx-auto flex h-screen  max-w-md flex-col items-center justify-center gap-4">
-      <h1 className="w-full">
+      <h2 className="w-full">
         Welcome to{" "}
         <Link className="text-accent-blue hover:underline" href="/">
           Hyperlink Academy
         </Link>
         !
-      </h1>
+      </h2>
       <div className="lightBorder w-full bg-white p-4">
         <SignupForm />
       </div>
@@ -66,9 +66,8 @@ export function SignupForm(props: {
           alt="an overgrown USPS collection box"
           src="/img/spotIllustration/checkMail.png"
         />
-        <h2>Confirm your email! </h2>{" "}
+        <h3>Confirm your email! </h3>
         <p>
-          {" "}
           We sent a confirmation link to{" "}
           <span className="font-bold">{input.email}</span>{" "}
         </p>

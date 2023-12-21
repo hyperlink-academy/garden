@@ -55,15 +55,14 @@ module.exports = {
         drop: "0px 2px 3px rgba(0, 0, 0, 0.25), 0px 0.25px 6px rgba(0, 0, 0, 0.15);",
       },
     },
-  },
-
-  fontSize: {
-    xs: ".75rem",
-    sm: ".875rem",
-    base: "1rem",
-    lg: "1.25rem",
-    xl: "1.625rem",
-    "2xl": "2rem",
+    fontSize: {
+      xs: ".75rem",
+      sm: ".875rem",
+      base: "1rem",
+      lg: "1.125rem",
+      xl: "1.625rem",
+      "2xl": "2rem",
+    },
   },
 
   variants: {
