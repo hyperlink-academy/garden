@@ -204,7 +204,7 @@ const HelpShortcuts = () => {
         An evolving list of shortcuts you may find helpful in using Hyperlink!
       </p>
 
-      <h3>text editing</h3>
+      <h4>text editing</h4>
       <ul className="flex list-disc flex-col gap-1 pl-4 sm:pl-8">
         <li>
           start a line with <TextString>#</TextString> or{" "}
@@ -237,7 +237,7 @@ const HelpShortcuts = () => {
         </li>
       </ul>
 
-      <h3>chat & comments</h3>
+      <h4>chat & comments</h4>
       <ul className="flex list-disc flex-col gap-1 pl-4 sm:pl-8">
         <li>
           <KeyboardKey>enter</KeyboardKey> to send a message
@@ -248,7 +248,7 @@ const HelpShortcuts = () => {
         </li>
       </ul>
 
-      <h3>rooms & cards</h3>
+      <h4>rooms & cards</h4>
       <ul className="flex list-disc flex-col gap-1 pl-4 sm:pl-8">
         <li>
           <KeyboardKey>alt</KeyboardKey> + <KeyboardKey>↑</KeyboardKey> and{" "}
@@ -269,7 +269,7 @@ const HelpShortcuts = () => {
         <li>drag a card onto another to add it as a linked card</li>
       </ul>
 
-      <h3>general</h3>
+      <h4>general</h4>
       <ul className="flex list-disc flex-col gap-1 pl-4 sm:pl-8">
         <li>
           <KeyboardKey>ctrl/cmd</KeyboardKey> + <KeyboardKey>z</KeyboardKey> to
@@ -295,37 +295,37 @@ const HelpChangelog = () => {
 // also used in homepage empty state
 export const HelpExampleSpaces = () => {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-3">
       <p className="">Here are a few of our Spaces for inspiration ✨🌱</p>
 
-      <div className="my-4 flex flex-col gap-4">
+      <div className="my-4 flex flex-col gap-2">
         <a
-          className="flex w-full flex-col gap-2 self-center rounded-md border bg-white p-2 hover:bg-bg-blue sm:gap-4 sm:p-4"
+          className="flex w-full flex-col gap-0 self-center rounded-md border bg-white p-2 hover:bg-bg-blue sm:gap-0 sm:p-3"
           href="https://hyperlink.academy/s/brendan/s/Website%20Jam:%20pattern.kitchen/website-jam-patternkitchen"
           target="_blank"
           rel="noopener noreferrer"
         >
-          <h2>side project</h2>
+          <h3>side project</h3>
           <p className="text-sm italic">
             example: website on pattern languages 🌐
           </p>
         </a>
         <a
-          className="flex w-full flex-col gap-2 self-center rounded-md border bg-white p-2 hover:bg-bg-blue sm:gap-4 sm:p-4"
+          className="flex w-full flex-col gap-0 self-center rounded-md border bg-white p-2 hover:bg-bg-blue sm:gap-0 sm:p-3"
           href="https://hyperlink.academy/s/celine/s/Stuffy%20Stuff/stuffy-stuff"
           target="_blank"
           rel="noopener noreferrer"
         >
-          <h2>creative project with a friend</h2>
+          <h3>creative project with a friend</h3>
           <p className="text-sm italic">example: stuffed animal crafting 🐰</p>
         </a>
         <a
-          className="flex w-full flex-col gap-2 self-center rounded-md border bg-white p-2 hover:bg-bg-blue sm:gap-4 sm:p-4"
+          className="flex w-full flex-col gap-0 self-center rounded-md border bg-white p-2 hover:bg-bg-blue sm:gap-0 sm:p-3"
           href="https://hyperlink.academy/s/brendan/s/23/hyperlink-writing-room-2023"
           target="_blank"
           rel="noopener noreferrer"
         >
-          <h2>small group collab</h2>
+          <h3>small group collab</h3>
           <p className="text-sm italic">
             example: Hyperlink team writing room ✍️
           </p>
@@ -343,7 +343,7 @@ export const HelpAppInfo = () => {
         Get Hyperlink on your home screen — and get push notifications for
         activity in your Spaces.
       </p>
-      <h3>first, grab your phone 📱</h3>
+      <h4>First, grab your phone 📱</h4>
       <ol className="flex list-decimal flex-col gap-1 pl-8">
         <li>Open hyperlink.academy in your browser</li>
         <li>
@@ -351,7 +351,7 @@ export const HelpAppInfo = () => {
         </li>
         <li>Select &quot;Add to Home Screen&quot;</li>
       </ol>
-      <h3>then, turn on notifications 🔔</h3>
+      <h4>Then, turn on notifications 🔔</h4>
       <p>Open the app, log in, and from your homepage: </p>
       <p className="flex gap-2">
         <span className="inline-block justify-center">

@@ -483,17 +483,20 @@ const InviteMember = () => {
           <AddTiny className="text-grey-80" /> invite
         </button>
       )}
-      <Modal open={open} onClose={() => setInviteOpen(false)}>
-        <div className="inviteMemberModal flex flex-col place-items-center gap-4 p-0 text-center">
+      <Modal
+        open={open}
+        header="Send a friend this invite link…"
+        onClose={() => setInviteOpen(false)}
+      >
+        <div className="inviteMemberModal flex flex-col  gap-2 p-0 ">
           <div className="flex flex-col gap-2">
-            <h3>Send a friend this invite link…</h3>
             <p>So they can join as a member of this Space!</p>
             <p>
               Members have full access — they can create and edit cards, and
               invite other members.
             </p>
           </div>
-          <div className="inviteMemberModalLink flex w-full gap-2">
+          <div className="inviteMemberModalLink flex w-full gap-2 pt-4">
             <input
               className="grow bg-grey-90 text-grey-35"
               readOnly

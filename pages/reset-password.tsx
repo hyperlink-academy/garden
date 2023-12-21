@@ -78,7 +78,7 @@ export function ResetPasswordForm() {
       onSubmit={onSubmit}
     >
       <div className="flex flex-col gap-1">
-        <h2>Reset Password</h2>
+        <h3>Reset Password</h3>
         <p>We&apos;ll email you a link to reset your password!</p>
       </div>
       <label className="grid-flow-rows grid gap-2 font-bold">

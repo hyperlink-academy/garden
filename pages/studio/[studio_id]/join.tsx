@@ -67,7 +67,7 @@ export default function StudioPage(props: Props) {
           href={`/studio/${uuidToBase62(props.id || "")}`}
           className="lightBorder flex shrink-0 flex-col gap-0 bg-white p-4"
         >
-          <h2>{data?.name}</h2>
+          <h3>{data?.name}</h3>
           <p>{data?.description}</p>
         </Link>
 
@@ -86,7 +86,7 @@ export default function StudioPage(props: Props) {
                   />
                 </div>
               </div>
-              <div className="absolute top-0 -left-2">
+              <div className="absolute -left-2 top-0">
                 <WelcomeSparkle />
               </div>
             </div>

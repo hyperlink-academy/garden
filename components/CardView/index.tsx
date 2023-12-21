@@ -373,7 +373,7 @@ const AreYouSureCardDeletionModal = (props: {
     <Modal open={props.open} onClose={props.onClose}>
       <div className="flex flex-col gap-3 text-grey-35">
         <div className="modal flex flex-col gap-3">
-          <p className="text-lg font-bold">Are you sure?</p>
+          <h4>Are you sure?</h4>
           <p className="text-sm">
             This will permanently delete the card and its contents.
           </p>

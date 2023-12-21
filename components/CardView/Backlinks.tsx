@@ -45,7 +45,7 @@ export const Backlinks = (props: { entityID: string }) => {
     <div className="flex flex-col gap-2">
       {rooms.length + roomMessages.length > 0 && (
         <div>
-          <h4>Rooms</h4>
+          <div className="font-bold">Rooms</div>
           <hr className="border-grey-80" />
         </div>
       )}
@@ -76,7 +76,7 @@ export const Backlinks = (props: { entityID: string }) => {
       ))}
       {cards.length + cardMessages.length + inlineBacklinks.length > 0 && (
         <div>
-          <h4>Cards</h4>
+          <div className="font-bold">Cards</div>
           <hr className="border-grey-80" />
         </div>
       )}

@@ -32,17 +32,21 @@ export function AddSpace(props: { id: string }) {
         {state === "normal" ? (
           <>
             <p>
-              Studio members will be able to <b>post</b> about the Space and{" "}
-              <b>highlight cards</b> they appreciate!
+              Studio members can{" "}
+              <span className="font-bold">chat and comment</span> in any spaces
+              in the studio!
             </p>
-            <p>They&apos;ll still need an invite to join a Space.</p>
+            <p>
+              They still need an invite to a specific Space to add, remove, and
+              otherwise change it.
+            </p>
             <button
               className="rounded-md border-2 border-grey-80 px-4 py-3 hover:border-accent-blue hover:bg-bg-blue"
               onClick={() => {
                 setState("add-new");
               }}
             >
-              <h3>New Space</h3>
+              <h4>New Space</h4>
               <p className="italic text-grey-35">
                 Create a brand new Space; it will also appear in your Homepage
               </p>
@@ -54,7 +58,7 @@ export function AddSpace(props: { id: string }) {
                 setState("add-existing");
               }}
             >
-              <h3>Existing Space</h3>
+              <h4>Existing Space</h4>
               <p className="italic text-grey-35">
                 Spaces can be linked to multiple Studios
               </p>
@@ -183,7 +187,7 @@ const AddExistingSpace = (props: { onClose: () => void; studioID: string }) => {
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <h3> Select Space(s) to Add </h3>
+        <h4> Select Space(s) to Add </h4>
         <p className="text-grey-55">
           You can only add Spaces that are upcoming, active, or unscheduled
         </p>
@@ -205,7 +209,7 @@ const AddExistingSpace = (props: { onClose: () => void; studioID: string }) => {
                   : "border-grey-80 hover:border-accent-blue hover:bg-bg-blue"
                 } px-3 py-2 text-left `}
             >
-              <h3>{space_data.display_name}</h3>
+              <p className="font-bold">{space_data.display_name}</p>
             </button>
           ) : null
         )}

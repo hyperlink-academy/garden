@@ -330,7 +330,7 @@ export const CreateSpaceForm = ({
       <div className="flex flex-col gap-1">
         <p className="font-bold">Name this Space</p>
         {disableName ? (
-          <h3>{formState.display_name}</h3>
+          <h4>{formState.display_name}</h4>
         ) : (
           <input
             className="w-full"

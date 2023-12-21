@@ -79,7 +79,7 @@ export function JoinSpace() {
   return (
     <>
       <div className="mx-auto flex max-w-3xl flex-col place-items-center gap-6 px-4 py-8">
-        <h2>Welcome!</h2>
+        <h3>Welcome!</h3>
         <p className="text-center text-lg">
           You&apos;ve been invited to join a{" "}
           <strong>

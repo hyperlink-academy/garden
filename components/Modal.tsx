@@ -52,7 +52,7 @@ export const Modal: React.FC<
       >
         {!props.header && props.noCloseButton ? null : (
           <div className="flex w-full items-center">
-            <h2 className="grow">{props.header && props.header}</h2>
+            <h3 className="grow">{props.header && props.header}</h3>
             {!props.noCloseButton && (
               <button
                 className="shrink0 grow-0 text-grey-55 hover:text-accent-blue"

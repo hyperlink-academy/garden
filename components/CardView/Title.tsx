@@ -53,7 +53,7 @@ export const Title = (props: { entityID: string }) => {
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         id="card-title"
-        className="bg-inherit text-xl font-bold"
+        className="bg-inherit text-lg font-bold"
         onKeyDown={async (e) => {
           if (e.key === "Enter") {
             e.preventDefault();
