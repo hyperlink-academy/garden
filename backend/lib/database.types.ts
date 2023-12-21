@@ -346,6 +346,7 @@ export interface Database {
           do_id: string
           id: string
           name: string
+          welcome_message: string
         }
         Insert: {
           creator: string
@@ -353,6 +354,7 @@ export interface Database {
           do_id: string
           id?: string
           name: string
+          welcome_message?: string
         }
         Update: {
           creator?: string
@@ -360,6 +362,7 @@ export interface Database {
           do_id?: string
           id?: string
           name?: string
+          welcome_message?: string
         }
         Relationships: [
           {
@@ -492,12 +495,6 @@ export interface Database {
             foreignKeyName: "objects_bucketId_fkey"
             columns: ["bucket_id"]
             referencedRelation: "buckets"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "objects_owner_fkey"
-            columns: ["owner"]
-            referencedRelation: "users"
             referencedColumns: ["id"]
           }
         ]
