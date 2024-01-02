@@ -1,7 +1,7 @@
 import { spaceAPI, workerAPI } from "backend/lib/api";
 import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
 import { BaseSmallCard } from "components/CardPreview/SmallCard";
-import { Member } from "components/Icons";
+import { Member, StudioFilled } from "components/Icons";
 import { Divider } from "components/Layout";
 import { LogInModal, SignupModal } from "components/LoginModal";
 import { useAuth } from "hooks/useAuth";
@@ -55,21 +55,22 @@ export default function StudioPage(props: Props) {
 
       {/* NB: spacing adjusted b/c we have HomeLayout with header wrapper here */}
       <div className="mx-auto flex max-w-3xl flex-col place-items-center gap-6 px-0 py-4">
-        <h2>Welcome!</h2>
         <p className="text-center text-lg">
           You&apos;ve been invited to join a{" "}
           <strong>
             Studio<sup className="text-grey-55">†</sup>
           </strong>
-          :{" "}
         </p>
+        <StudioFilled />
         <Link
           href={`/studio/${uuidToBase62(props.id || "")}`}
-          className="lightBorder flex shrink-0 flex-col gap-0 bg-white p-4"
+          className="flex flex-col gap-0 p-4"
         >
           <h3>{data?.name}</h3>
-          <p>{data?.description}</p>
         </Link>
+        <div className="p-2 border border-grey-80 rounded-md bg-white">
+          {data?.welcome_message}
+        </div>
 
         {session.loggedIn ? (
           <>

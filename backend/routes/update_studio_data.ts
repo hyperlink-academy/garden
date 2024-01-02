@@ -9,8 +9,11 @@ export const update_studio_data = makeRoute({
   input: z.object({
     authToken: authTokenVerifier,
     studio_id: z.string(),
-    name: z.string(),
-    description: z.string(),
+    data: z.object({
+      welcome_message: z.string(),
+      name: z.string(),
+      description: z.string(),
+    }).partial()
   }),
   handler: async (msg, env: Bindings) => {
     const supabase = createClient(env);
@@ -23,10 +26,7 @@ export const update_studio_data = makeRoute({
 
     let { data } = await supabase
       .from("studios")
-      .update({
-        name: msg.name,
-        description: msg.description,
-      })
+      .update(msg.data)
       .eq("id", msg.studio_id)
       .eq("creator", session.id)
       .select("*");

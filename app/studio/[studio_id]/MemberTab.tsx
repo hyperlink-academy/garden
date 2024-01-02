@@ -1,4 +1,4 @@
-import { spaceAPI } from "backend/lib/api";
+import { spaceAPI, workerAPI } from "backend/lib/api";
 import { ButtonPrimary } from "components/Buttons";
 import { Member, MemberAdd } from "components/Icons";
 import { Modal } from "components/Modal";
@@ -15,11 +15,12 @@ import { SpaceData } from "components/SpacesList";
 import { DoorImage } from "components/Doors";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useStudioData } from "hooks/useStudioData";
 
 export function Members({ data, isAdmin }: Props) {
   return (
     <div className="flex flex-col gap-2">
-      {isAdmin && <InviteModal />}
+      {isAdmin && <InviteModal welcomeMessage={data.welcome_message} id={data.id} />}
 
       <div className="flex flex-col gap-2">
         {data?.members_in_studios.map((m) =>
@@ -110,7 +111,9 @@ const Memberc = (props: {
   );
 };
 
-function InviteModal() {
+function InviteModal(props: { welcomeMessage: string, id: string }) {
+  let [welcomeMessage, setWelcomeMessage] = useState(props.welcomeMessage)
+  let { mutate } = useStudioData(props.id);
   let [open, setOpen] = useState(false);
   const spaceID = useSpaceID();
   let { authToken } = useAuth();
@@ -174,6 +177,28 @@ function InviteModal() {
                 onClick={(e) => getShareLink(e)}
                 content={"Copy"}
               />
+            </div>
+          </div>
+          <div>
+            <h4>Customize the welcome message</h4>
+            <p>Prospective studio members will see this before accepting the invite to join your space! Say hello :D</p>
+            <div className="flex flex-col gap-2">
+              <Textarea value={welcomeMessage} onChange={e => setWelcomeMessage(e.currentTarget.value)} className="w-full border p-2 rounded-md border-grey-55" placeholder="Add a Welcome Message..." />
+              <ButtonPrimary disabled={props.welcomeMessage === welcomeMessage} content="Save" className="justify-self-end" onClick={async () => {
+
+                if (!authToken) return
+                mutate((s) => {
+                  if (!s) return;
+                  return { ...s, welcome_message: welcomeMessage };
+                }, false);
+                await workerAPI(WORKER_URL, "update_studio_data", {
+                  authToken,
+                  studio_id: props.id,
+                  data: {
+                    welcome_message: welcomeMessage
+                  }
+                });
+              }} />
             </div>
           </div>
         </div>
