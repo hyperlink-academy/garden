@@ -69,8 +69,10 @@ function StudioSettings(props: {
             await workerAPI(WORKER_URL, "update_studio_data", {
               authToken,
               studio_id: props.id,
-              name: formState.name,
-              description: formState.description,
+              data: {
+                name: formState.name,
+                description: formState.description,
+              },
             });
             setLoading(false);
             mutate();
