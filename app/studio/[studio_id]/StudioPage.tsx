@@ -35,45 +35,47 @@ export function StudioPageContent(props: Props) {
   }, [tab]);
 
   return (
-    <div className="m-auto flex w-full max-w-6xl flex-col gap-1 px-4 pb-6 pt-8">
-      <div className="relative w-full text-center ">
-        <h2>{data?.name}</h2>
-        {session.session && (
-          <Link
-            href={`/s/${session.session.username}`}
-            className="absolute left-0 top-[6px] flex items-center gap-2 text-grey-55 hover:text-accent-blue"
-          >
-            <ArrowDown className="rotate-90" height={16} width={16} /> home
-          </Link>
-        )}
-      </div>
-      <Tab.Group
-        manual
-        selectedIndex={selectedIndex}
-        onChange={setSelectedIndex}
-      >
-        <div className="flex flex-col gap-6">
-          <Tab.List className="flex w-full flex-row justify-center gap-4">
-            {Object.keys(Tabs).map((tab) => (
-              <TabItem
-                name={
-                  tab === "Members"
-                    ? `Members (${data?.members_in_studios.length})`
-                    : tab
-                }
-                key={tab}
-              />
-            ))}
-          </Tab.List>
-          <Tab.Panels>
-            {Object.values(Tabs).map((T, index) => (
-              <Tab.Panel key={index}>
-                <T data={data || props.data} isAdmin={props.isAdmin} />
-              </Tab.Panel>
-            ))}
-          </Tab.Panels>
+    <div className="flex h-screen w-full items-stretch">
+      <div className="m-auto flex h-full w-full max-w-6xl flex-col gap-1 px-4 pb-6 pt-8">
+        <div className="relative w-full text-center ">
+          <h2>{data?.name}</h2>
+          {session.session && (
+            <Link
+              href={`/s/${session.session.username}`}
+              className="absolute left-0 top-[6px] flex h-full items-center gap-2 text-grey-55 hover:text-accent-blue"
+            >
+              <ArrowDown className="rotate-90" height={16} width={16} /> home
+            </Link>
+          )}
         </div>
-      </Tab.Group>
+        <Tab.Group
+          manual
+          selectedIndex={selectedIndex}
+          onChange={setSelectedIndex}
+        >
+          <div className="flex h-full flex-col gap-4 overflow-hidden">
+            <Tab.List className="flex w-full shrink-0 flex-row justify-center gap-4">
+              {Object.keys(Tabs).map((tab) => (
+                <TabItem
+                  name={
+                    tab === "Members"
+                      ? `Members (${data?.members_in_studios.length})`
+                      : tab
+                  }
+                  key={tab}
+                />
+              ))}
+            </Tab.List>
+            <Tab.Panels className="h-full min-h-0">
+              {Object.values(Tabs).map((T, index) => (
+                <Tab.Panel key={index} className="h-full">
+                  <T data={data || props.data} isAdmin={props.isAdmin} />
+                </Tab.Panel>
+              ))}
+            </Tab.Panels>
+          </div>
+        </Tab.Group>
+      </div>
     </div>
   );
 }
