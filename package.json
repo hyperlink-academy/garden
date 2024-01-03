@@ -34,7 +34,7 @@
     "@mdx-js/loader": "^3.0.0",
     "@mdx-js/react": "^3.0.0",
     "@next/mdx": "^14.0.1",
-    "@radix-ui/react-popover": "^1.0.5",
+    "@radix-ui/react-popover": "^1.0.7",
     "@radix-ui/react-slider": "^1.0.0",
     "@react-aria/overlays": "^3.17.0",
     "@react-aria/utils": "^3.22.0",
