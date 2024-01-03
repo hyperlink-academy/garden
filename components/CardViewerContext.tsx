@@ -7,7 +7,7 @@ import {
   useRoom,
   useUIState,
 } from "hooks/useUIState";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { CardView } from "./CardView";
 import { useViewportSize } from "hooks/useViewportSize";
 import { isIOS } from "@react-aria/utils";
@@ -89,8 +89,13 @@ export function CardViewer() {
     },
     []
   );
+  let [render, setRender] = useState(false);
+  useEffect(() => {
+    setRender(true);
+  }, []);
   let removeCardFromRoomHistory = useRemoveCardFromRoomHistory();
   let isMobile = useIsMobile();
+  if (!render) return null;
   if (!history[0] && isMobile) return null;
 
   return (

@@ -38,6 +38,10 @@ export function Search() {
   let [open, setOpen] = useState(false);
   let [focused, ref] = useIsElementOrChildFocused();
   let inputRef = useRef<HTMLInputElement>(null);
+  let [render, setRender] = useState(false);
+  useEffect(() => {
+    setRender(true);
+  }, []);
   useEffect(() => {
     let listener = (e: KeyboardEvent) => {
       if (e.key == "k" && (e.metaKey || e.ctrlKey)) {
@@ -65,6 +69,8 @@ export function Search() {
   let room = useRoom();
   let currentOpenCard = useCurrentOpenCard();
   let roomType = db.useEntity(room, "room/type");
+  if (!render) return null;
+
   return (
     <Popover.Root open>
       <div style={{ width: 336 }}>
