@@ -174,6 +174,7 @@ const useWebSocket = (id: string, rep?: Replicache) => {
       });
       socket.current.addEventListener("open", () => {
         rep?.clientID.then((clientID) => {
+          if (socket.current?.readyState !== WebSocket.OPEN) return;
           setSocketState("connected");
           socket.current?.send(
             JSON.stringify({
