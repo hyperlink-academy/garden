@@ -1,3 +1,3 @@
 export default function StudioSpacePage() {
-  return <></>;
+  return null;
 }
