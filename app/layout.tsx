@@ -3,6 +3,8 @@ import React from "react";
 import { SharedProviders } from "./SharedProviders";
 import { Metadata, Viewport } from "next/types";
 
+export const fetchCache = "force-no-store";
+
 export const viewport: Viewport = {
   minimumScale: 1,
   initialScale: 1,
