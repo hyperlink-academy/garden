@@ -157,46 +157,55 @@ const MemberCard = (props: {
                 <Textarea
                   value={bio?.value}
                   readOnly
+                  placeholder={
+                    session.session?.studio !== props.memberStudio
+                      ? " "
+                      : "write a bio..."
+                  }
                   className="min-h-0 grow overflow-hidden"
                 />
               )}
             </button>
-            <Divider />
-            <div
-              className={`flex shrink-0  gap-1 text-grey-55 ${
-                expanded ? "flex-col" : "justify-between"
-              }`}
-            >
-              {expanded ? (
-                props.spaces.map((space) => (
-                  <Link
-                    href={`/studio/${params?.studio_id}/space/${space.id}`}
-                    className="w-fit"
-                    key={space.id}
-                  >
-                    <div className="flex flex-row gap-1 text-sm hover:font-bold hover:text-accent-blue">
-                      <DoorImage small {...space} width="16" />
-                      {space.display_name}
-                    </div>
-                  </Link>
-                ))
-              ) : (
-                <>
-                  <Link
-                    href={`/studio/${params?.studio_id}/space/${props.spaces[0].id}`}
-                    className="w-fit"
-                  >
-                    <div className="flex flex-row gap-1 text-sm hover:font-bold hover:text-accent-blue">
-                      <DoorImage small {...props.spaces[0]} width="16" />
-                      {props.spaces[0].display_name}
-                    </div>
-                  </Link>
-                  {props.spaces.length > 1 && (
-                    <div>+{props.spaces.length - 1}</div>
+            {props.spaces.length > 0 && (
+              <>
+                <Divider />
+                <div
+                  className={`flex shrink-0  gap-1 text-grey-55 ${
+                    expanded ? "flex-col" : "justify-between"
+                  }`}
+                >
+                  {expanded ? (
+                    props.spaces.map((space) => (
+                      <Link
+                        href={`/studio/${params?.studio_id}/space/${space.id}`}
+                        className="w-fit"
+                        key={space.id}
+                      >
+                        <div className="flex flex-row gap-1 text-sm hover:font-bold hover:text-accent-blue">
+                          <DoorImage small {...space} width="16" />
+                          {space.display_name}
+                        </div>
+                      </Link>
+                    ))
+                  ) : (
+                    <>
+                      <Link
+                        href={`/studio/${params?.studio_id}/space/${props.spaces[0].id}`}
+                        className="w-fit"
+                      >
+                        <div className="flex flex-row gap-1 text-sm hover:font-bold hover:text-accent-blue">
+                          <DoorImage small {...props.spaces[0]} width="16" />
+                          {props.spaces[0].display_name}
+                        </div>
+                      </Link>
+                      {props.spaces.length > 1 && (
+                        <div>+{props.spaces.length - 1}</div>
+                      )}
+                    </>
                   )}
-                </>
-              )}
-            </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
