@@ -28,17 +28,21 @@ export function AddSpace(props: { id: string }) {
         content={"Create a space"}
         icon={<SpaceCreate />}
       />
-      <Modal header="Add a Space" open={open} onClose={() => setOpen(false)}>
+      <Modal
+        header="Add a Space To This Studio"
+        open={open}
+        onClose={() => setOpen(false)}
+      >
         {state === "normal" ? (
           <>
             <p>
-              Studio members can{" "}
+              Your Studiomates can{" "}
               <span className="font-bold">chat and comment</span> in any spaces
               in the studio!
             </p>
             <p>
-              They still need an invite to a specific Space to add, remove, and
-              otherwise change it.
+              But they still need an invite to a specific Space to add, remove,
+              and otherwise change it.
             </p>
             <button
               className="rounded-md border-2 border-grey-80 px-4 py-3 hover:border-accent-blue hover:bg-bg-blue"
@@ -60,7 +64,7 @@ export function AddSpace(props: { id: string }) {
             >
               <h4>Existing Space</h4>
               <p className="italic text-grey-35">
-                Spaces can be linked to multiple Studios
+                Bring any space that you&apos;re a member of into this studio.
               </p>
             </button>
           </>
@@ -204,10 +208,11 @@ const AddExistingSpace = (props: { onClose: () => void; studioID: string }) => {
                   );
                 else setAddedSpaces((spaces) => [...spaces, space_data.do_id]);
               }}
-              className={`w-full rounded-lg border ${addedSpaces.includes(space_data.do_id)
+              className={`w-full rounded-lg border ${
+                addedSpaces.includes(space_data.do_id)
                   ? "border-accent-blue bg-accent-blue text-white"
                   : "border-grey-80 hover:border-accent-blue hover:bg-bg-blue"
-                } px-3 py-2 text-left `}
+              } px-3 py-2 text-left `}
             >
               <p className="font-bold">{space_data.display_name}</p>
             </button>

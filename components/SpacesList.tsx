@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { ButtonLink } from "./Buttons";
 import { DoorImage } from "./Doors";
-import { Information, Settings } from "./Icons";
+import { Information, RoomMember, Settings } from "./Icons";
 import { useAuth } from "hooks/useAuth";
 import { spacePath } from "hooks/utils";
 import { EditSpaceModal } from "./CreateSpace";
@@ -126,34 +126,6 @@ export const BaseSpaceCard = (props: Parameters<typeof SpaceCard>[0]) => {
                   ))}
               </div>
             </div>
-            {data?.start_date &&
-            data?.end_date &&
-            data?.start_date <= now &&
-            data?.end_date >= now ? (
-              <div className="text-sm italic text-grey-35">
-                <div>
-                  ends{" "}
-                  {new Date(data.end_date).toLocaleDateString(undefined, {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                    timeZone: "UTC",
-                  })}
-                </div>
-              </div>
-            ) : data?.start_date && data?.start_date > now ? (
-              <div className="text-sm italic text-grey-35">
-                <div>
-                  starts{" "}
-                  {new Date(data.start_date).toLocaleDateString(undefined, {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                    timeZone: "UTC",
-                  })}
-                </div>
-              </div>
-            ) : null}
           </div>
         </div>
         <div className="smallSpaceCardIcon absolute left-0 top-0">
@@ -173,55 +145,36 @@ export const BaseSpaceCard = (props: Parameters<typeof SpaceCard>[0]) => {
     <div className="largeSpaceCard group relative flex w-full">
       <div className="largeSpaceCardIcon absolute left-0 top-0">
         <DoorImage
-          width="96"
+          width="64"
           display_name={data?.display_name}
           image={data?.image}
           default_space_image={data?.default_space_image}
           glow={!!unreads && !!authorized && unreads.value > 0}
         />
       </div>
-      <div className="ml-16 mt-10 w-full">
-        <div className="largeSpaceCardContent lightBorder flex min-h-[160px] w-full shrink-0 flex-col gap-0 bg-white py-4 pl-12 pr-4">
+      <div className="ml-6 mt-7 w-full">
+        <div className="largeSpaceCardContent lightBorder flex min-h-[124px] w-full shrink-0 flex-col bg-white  py-3 pl-[52px] pr-4">
           <div className="largeSpaceCardDetails flex grow flex-col gap-1">
             <div
               className="flex justify-between gap-4"
               style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
             >
-              <h3 className={!data?.display_name ? "italic text-grey-55" : ""}>
+              <div
+                className={
+                  !data?.display_name ? "italic text-grey-55" : " font-bold"
+                }
+              >
                 {data?.display_name || "space deleted"}
-              </h3>
-              <div className="">
-                {data?.owner?.username == session.session?.username ? (
-                  <EditSpaceButton
-                    onEdit={props.onEdit}
-                    spaceID={props.do_id}
-                    owner={data?.owner?.username}
-                  />
-                ) : (
-                  <SpaceInfoButton
-                    studio={data?.owner?.username}
-                    name={data?.display_name}
-                    description={data?.description}
-                  />
-                )}
               </div>
             </div>
-            <p>{data?.description}</p>
           </div>
-
-          {data?.start_date &&
-          data?.end_date &&
-          data?.start_date <= now &&
-          data?.end_date >= now ? (
-            <div className="mt-2 text-sm italic text-grey-35">
-              ends{" "}
-              {data?.end_date &&
-                new Date(data?.end_date).toLocaleDateString(undefined, {
-                  month: "short",
-                  day: "numeric",
-                  year: "numeric",
-                  timeZone: "UTC",
-                })}
+          {data && data.owner ? (
+            <div className=" flex items-center gap-1 place-self-end text-sm italic text-grey-55">
+              <RoomMember />
+              {data.owner.username}{" "}
+              {data.members_in_spaces?.length > 1 && (
+                <div>+ {data.members_in_spaces?.length - 1}</div>
+              )}
             </div>
           ) : null}
         </div>

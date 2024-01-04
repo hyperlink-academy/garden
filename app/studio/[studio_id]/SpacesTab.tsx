@@ -1,4 +1,5 @@
 import { NonUndefined } from "@use-gesture/react";
+import { RoomSearch } from "components/Icons";
 import { BaseSpaceCard, SpaceData } from "components/SpacesList";
 import { AddSpace } from "components/StudioPage/AddSpace";
 import { useStudioData } from "hooks/useStudioData";
@@ -20,14 +21,19 @@ export function SpaceList({ data }: Props) {
 
   if (!data) return;
   return (
-    <div className="m-auto flex h-full w-full max-w-6xl flex-col items-stretch gap-2">
-      <div className="flex w-full flex-row justify-between ">
+    <div className="studioSpaces m-auto flex h-full w-full max-w-4xl flex-col items-stretch gap-2">
+      <div className="studioSpacesOptions flex w-full flex-row justify-between ">
         <AddSpace id={data.id} />
-        <div className="flex flex-row ">
+        <div className="studioSpacesSearch relative flex flex-row text-sm">
+          <RoomSearch className="absolute right-2 top-2  text-grey-55" />
           <input
-            className="w-64"
+            className="h-fit w-64 bg-white py-1 pl-2 pr-6 outline-none"
             value={search}
             onChange={(e) => setSearch(e.currentTarget.value)}
+            placeholder="search spaces..."
+            onFocus={(e) =>
+              e.currentTarget.setSelectionRange(0, e.currentTarget.value.length)
+            }
           />
         </div>
       </div>
