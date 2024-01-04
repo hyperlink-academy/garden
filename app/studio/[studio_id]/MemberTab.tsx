@@ -19,31 +19,61 @@ import { useStudioData } from "hooks/useStudioData";
 import { Divider } from "components/Layout";
 
 export function Members({ data, isAdmin }: Props) {
+  let { session } = useAuth();
+
   return (
     <div className="mx-auto flex max-w-md flex-col gap-2 overflow-scroll">
       {isAdmin && (
         <InviteModal welcomeMessage={data.welcome_message} id={data.id} />
       )}
+      {session.session && (
+        <div className="flex flex-col gap-1">
+          <div className="text-sm italic text-grey-55">
+            click your bio to edit it!
+          </div>
 
+          <MemberCard
+            spaces={data.spaces_in_studios
+              .filter(
+                (space) =>
+                  !space.space_data.archived &&
+                  space.space_data.members_in_spaces.find(
+                    (member) => member.member === session.user?.id
+                  )
+              )
+              .map((space) => space.space_data)}
+            memberName={session.session?.username}
+            memberStudio={session.session?.studio}
+          />
+        </div>
+      )}
+      <div className="py-4">
+        <Divider />
+      </div>
       <div className="flex flex-col gap-2 overflow-scroll">
-        {data?.members_in_studios.map((m) =>
-          !m.identity_data ? null : (
-            <MemberCard
-              spaces={data.spaces_in_studios
-                .filter(
-                  (space) =>
-                    !space.space_data.archived &&
-                    space.space_data.members_in_spaces.find(
-                      (member) => member.member === m.member
-                    )
-                )
-                .map((space) => space.space_data)}
-              key={m.member}
-              memberName={m.identity_data?.username || ""}
-              memberStudio={m.identity_data.studio}
-            />
+        {data?.members_in_studios
+          .filter(
+            (member) =>
+              member.identity_data?.username !== session.session?.username
           )
-        )}
+          .map((m) =>
+            !m.identity_data ? null : (
+              <MemberCard
+                spaces={data.spaces_in_studios
+                  .filter(
+                    (space) =>
+                      !space.space_data.archived &&
+                      space.space_data.members_in_spaces.find(
+                        (member) => member.member === m.member
+                      )
+                  )
+                  .map((space) => space.space_data)}
+                key={m.member}
+                memberName={m.identity_data?.username || ""}
+                memberStudio={m.identity_data.studio}
+              />
+            )
+          )}
       </div>
     </div>
   );
@@ -62,7 +92,7 @@ const MemberCard = (props: {
   let { session } = useAuth();
 
   let [expanded, setExpanded] = useState(false);
-
+  let [editing, setEditing] = useState(false);
   props.spaces.sort((a, b) => {
     if (!a.lastUpdated || !b.lastUpdated) return 0;
     return (
@@ -71,13 +101,19 @@ const MemberCard = (props: {
   });
 
   return (
-    <div className="relative" onClick={() => setExpanded(!expanded)}>
+    <div
+      className="relative"
+      onClick={() => {
+        if (!editing) setExpanded(!expanded);
+        else return;
+      }}
+    >
       <div className={`memberCardBorder relative grow`}>
         <div className="flex items-end justify-between p-2 pb-0 text-white">
           <div className="flex h-fit flex-row gap-2 font-bold">
             <Member /> {props.memberName}
           </div>
-          <div className="text-xs ">member</div>
+          <div className="text-sm ">member</div>
         </div>
         <div className="p-1 pt-1">
           <div
@@ -85,26 +121,46 @@ const MemberCard = (props: {
               !expanded && "max-h-[200px]"
             }`}
           >
-            <Textarea
-              previewOnly={session.session?.studio !== props.memberStudio}
-              spellCheck={false}
-              className="studioMemberBio min-h-0 grow overflow-hidden"
-              placeholder={
-                session.session?.studio !== props.memberStudio
-                  ? " "
-                  : "write a bio..."
-              }
-              value={bio?.value}
-              onChange={(e) => {
-                if (!memberEntity) return;
-                mutate("assertFact", {
-                  positions: {},
-                  attribute: "card/content",
-                  value: e.currentTarget.value,
-                  entity: memberEntity?.entity,
-                });
+            <button
+              className="min-h-0 grow overflow-hidden text-left"
+              onClick={() => {
+                if (session.session?.studio === props.memberStudio)
+                  setEditing(true);
+                return;
               }}
-            />
+            >
+              {editing ? (
+                <Textarea
+                  spellCheck={false}
+                  className="italic"
+                  placeholder={
+                    session.session?.studio !== props.memberStudio
+                      ? " "
+                      : "write a bio..."
+                  }
+                  value={bio?.value}
+                  onChange={(e) => {
+                    if (!memberEntity) return;
+                    mutate("assertFact", {
+                      positions: {},
+                      attribute: "card/content",
+                      value: e.currentTarget.value,
+                      entity: memberEntity?.entity,
+                    });
+                  }}
+                  onBlur={() => {
+                    setEditing(false);
+                  }}
+                  onFocus={() => setExpanded(true)}
+                />
+              ) : (
+                <Textarea
+                  value={bio?.value}
+                  readOnly
+                  className="min-h-0 grow overflow-hidden"
+                />
+              )}
+            </button>
             <Divider />
             <div
               className={`flex shrink-0  gap-1 text-grey-55 ${
@@ -115,6 +171,7 @@ const MemberCard = (props: {
                 props.spaces.map((space) => (
                   <Link
                     href={`/studio/${params?.studio_id}/space/${space.id}`}
+                    className="w-fit"
                     key={space.id}
                   >
                     <div className="flex flex-row gap-1 text-sm hover:font-bold hover:text-accent-blue">
