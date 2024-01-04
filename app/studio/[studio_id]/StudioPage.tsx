@@ -35,8 +35,8 @@ export function StudioPageContent(props: Props) {
   }, [tab]);
 
   return (
-    <div className="flex h-screen w-full items-stretch">
-      <div className="m-auto flex h-full w-full max-w-6xl flex-col gap-1 px-4 pb-6 pt-8">
+    <div className="Studio flex h-screen w-full items-stretch">
+      <div className="StudioHeader m-auto flex h-full w-full max-w-6xl flex-col gap-1 px-4 pb-6 pt-8">
         <div className="relative w-full text-center ">
           <h2>{data?.name}</h2>
           {session.session && (
@@ -53,8 +53,8 @@ export function StudioPageContent(props: Props) {
           selectedIndex={selectedIndex}
           onChange={setSelectedIndex}
         >
-          <div className="flex h-full flex-col gap-4 overflow-hidden">
-            <Tab.List className="flex w-full shrink-0 flex-row justify-center gap-4">
+          <div className="StudioContent flex h-full flex-col gap-4 overflow-hidden">
+            <Tab.List className="StudioTabs flex w-full shrink-0 flex-row justify-center gap-4">
               {Object.keys(Tabs).map((tab) => (
                 <TabItem
                   name={
@@ -66,7 +66,7 @@ export function StudioPageContent(props: Props) {
                 />
               ))}
             </Tab.List>
-            <Tab.Panels className="h-full min-h-0">
+            <Tab.Panels className="StudioTabContent h-full min-h-0 ">
               {Object.values(Tabs).map((T, index) => (
                 <Tab.Panel key={index} className="h-full">
                   <T data={data || props.data} isAdmin={props.isAdmin} />

@@ -16,16 +16,19 @@ import { DoorImage } from "components/Doors";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useStudioData } from "hooks/useStudioData";
+import { Divider } from "components/Layout";
 
 export function Members({ data, isAdmin }: Props) {
   return (
-    <div className="flex flex-col gap-2">
-      {isAdmin && <InviteModal welcomeMessage={data.welcome_message} id={data.id} />}
+    <div className="mx-auto flex max-w-md flex-col gap-2 overflow-scroll">
+      {isAdmin && (
+        <InviteModal welcomeMessage={data.welcome_message} id={data.id} />
+      )}
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 overflow-scroll">
         {data?.members_in_studios.map((m) =>
           !m.identity_data ? null : (
-            <Memberc
+            <MemberCard
               spaces={data.spaces_in_studios
                 .filter(
                   (space) =>
@@ -46,7 +49,7 @@ export function Members({ data, isAdmin }: Props) {
   );
 }
 
-const Memberc = (props: {
+const MemberCard = (props: {
   memberName: string;
   memberStudio: string;
   spaces: SpaceData[];
@@ -57,21 +60,35 @@ const Memberc = (props: {
   let params = useParams<{ studio_id: string }>();
   let { mutate } = useMutations();
   let { session } = useAuth();
+
+  let [expanded, setExpanded] = useState(false);
+
+  props.spaces.sort((a, b) => {
+    if (!a.lastUpdated || !b.lastUpdated) return 0;
+    return (
+      new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime()
+    );
+  });
+
   return (
-    <div className="relative">
+    <div className="relative" onClick={() => setExpanded(!expanded)}>
       <div className={`memberCardBorder relative grow`}>
-        <div className="flex justify-between p-2 text-white">
-          <div className="flex flex-row gap-2 font-bold ">
+        <div className="flex items-end justify-between p-2 pb-0 text-white">
+          <div className="flex h-fit flex-row gap-2 font-bold">
             <Member /> {props.memberName}
           </div>
-          <div className="text-cs font-normal">member</div>
+          <div className="text-xs ">member</div>
         </div>
-        <div className="p-2">
-          <div className="flex h-full flex-col gap-2 rounded-lg bg-white p-2">
+        <div className="p-1 pt-1">
+          <div
+            className={`studioMemberContent flex h-full  flex-col gap-2 overflow-hidden rounded-md bg-white p-2 text-sm text-grey-35 ${
+              !expanded && "max-h-[200px]"
+            }`}
+          >
             <Textarea
               previewOnly={session.session?.studio !== props.memberStudio}
               spellCheck={false}
-              className="h-full"
+              className="studioMemberBio min-h-0 grow overflow-hidden"
               placeholder={
                 session.session?.studio !== props.memberStudio
                   ? " "
@@ -88,21 +105,40 @@ const Memberc = (props: {
                 });
               }}
             />
-            <div>
-              <h4 className="font-bold text-grey-55">
-                Spaces ({props.spaces.length})
-              </h4>
-              {props.spaces.map((space) => (
-                <Link
-                  href={`/studio/${params?.studio_id}/space/${space.id}`}
-                  key={space.id}
-                >
-                  <div className="flex flex-row gap-2 text-sm hover:text-accent-blue">
-                    <DoorImage small {...space} width="18" />
-                    {space.display_name}
-                  </div>
-                </Link>
-              ))}
+            <Divider />
+            <div
+              className={`flex shrink-0  gap-1 text-grey-55 ${
+                expanded ? "flex-col" : "justify-between"
+              }`}
+            >
+              {expanded ? (
+                props.spaces.map((space) => (
+                  <Link
+                    href={`/studio/${params?.studio_id}/space/${space.id}`}
+                    key={space.id}
+                  >
+                    <div className="flex flex-row gap-1 text-sm hover:font-bold hover:text-accent-blue">
+                      <DoorImage small {...space} width="16" />
+                      {space.display_name}
+                    </div>
+                  </Link>
+                ))
+              ) : (
+                <>
+                  <Link
+                    href={`/studio/${params?.studio_id}/space/${props.spaces[0].id}`}
+                    className="w-fit"
+                  >
+                    <div className="flex flex-row gap-1 text-sm hover:font-bold hover:text-accent-blue">
+                      <DoorImage small {...props.spaces[0]} width="16" />
+                      {props.spaces[0].display_name}
+                    </div>
+                  </Link>
+                  {props.spaces.length > 1 && (
+                    <div>+{props.spaces.length - 1}</div>
+                  )}
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -111,8 +147,8 @@ const Memberc = (props: {
   );
 };
 
-function InviteModal(props: { welcomeMessage: string, id: string }) {
-  let [welcomeMessage, setWelcomeMessage] = useState(props.welcomeMessage)
+function InviteModal(props: { welcomeMessage: string; id: string }) {
+  let [welcomeMessage, setWelcomeMessage] = useState(props.welcomeMessage);
   let { mutate } = useStudioData(props.id);
   let [open, setOpen] = useState(false);
   const spaceID = useSpaceID();
@@ -181,24 +217,36 @@ function InviteModal(props: { welcomeMessage: string, id: string }) {
           </div>
           <div>
             <h4>Customize the welcome message</h4>
-            <p>Prospective studio members will see this before accepting the invite to join your space! Say hello :D</p>
+            <p>
+              Prospective studio members will see this before accepting the
+              invite to join your space! Say hello :D
+            </p>
             <div className="flex flex-col gap-2">
-              <Textarea value={welcomeMessage} onChange={e => setWelcomeMessage(e.currentTarget.value)} className="w-full border p-2 rounded-md border-grey-55" placeholder="Add a Welcome Message..." />
-              <ButtonPrimary disabled={props.welcomeMessage === welcomeMessage} content="Save" className="justify-self-end" onClick={async () => {
-
-                if (!authToken) return
-                mutate((s) => {
-                  if (!s) return;
-                  return { ...s, welcome_message: welcomeMessage };
-                }, false);
-                await workerAPI(WORKER_URL, "update_studio_data", {
-                  authToken,
-                  studio_id: props.id,
-                  data: {
-                    welcome_message: welcomeMessage
-                  }
-                });
-              }} />
+              <Textarea
+                value={welcomeMessage}
+                onChange={(e) => setWelcomeMessage(e.currentTarget.value)}
+                className="w-full rounded-md border border-grey-55 p-2"
+                placeholder="Add a Welcome Message..."
+              />
+              <ButtonPrimary
+                disabled={props.welcomeMessage === welcomeMessage}
+                content="Save"
+                className="justify-self-end"
+                onClick={async () => {
+                  if (!authToken) return;
+                  mutate((s) => {
+                    if (!s) return;
+                    return { ...s, welcome_message: welcomeMessage };
+                  }, false);
+                  await workerAPI(WORKER_URL, "update_studio_data", {
+                    authToken,
+                    studio_id: props.id,
+                    data: {
+                      welcome_message: welcomeMessage,
+                    },
+                  });
+                }}
+              />
             </div>
           </div>
         </div>
