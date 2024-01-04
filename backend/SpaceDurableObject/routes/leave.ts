@@ -68,9 +68,9 @@ export const leave_route = makeRoute({
     }
 
     env.poke();
-    app_event(env.env, {
-      event: "joined_space",
-      user: session.username,
+    await app_event(env.env, {
+      event: "left_space",
+      user: session.id,
       spaceID: env.id,
     });
     return { data: { success: true } } as const;
