@@ -10,9 +10,9 @@ export function About() {
   let { mutate } = useMutations();
   let [aboutFocus, setAboutFocus] = useState(false);
   return (
-    <div className="mx-auto flex h-full max-w-2xl flex-col gap-3 rounded-lg border border-grey-80 bg-white p-4 text-lg">
+    <div className="mx-auto h-full max-w-2xl  py-6">
       {
-        <div className="no-scrollbar flex h-full flex-col gap-2 overflow-scroll">
+        <div className="no-scrollbar flex h-full flex-col gap-2 overflow-scroll rounded-lg border border-grey-80 bg-white p-4 text-lg">
           <Textarea
             id="studio-about"
             placeholder="write a readme..."

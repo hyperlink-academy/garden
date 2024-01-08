@@ -22,58 +22,60 @@ export function Members({ data, isAdmin }: Props) {
   let { session } = useAuth();
 
   return (
-    <div className="mx-auto flex max-w-md flex-col gap-2 overflow-scroll">
-      {isAdmin && (
-        <InviteModal welcomeMessage={data.welcome_message} id={data.id} />
-      )}
-      {session.session && (
-        <div className="flex flex-col gap-1">
-          <div className="text-sm italic text-grey-55">
-            click your bio to edit it!
-          </div>
+    <div className="no-scrollbar mx-auto  h-full max-w-md  overflow-y-scroll  ">
+      <div className="flex flex-col gap-2 py-6">
+        {isAdmin && (
+          <InviteModal welcomeMessage={data.welcome_message} id={data.id} />
+        )}
+        {session.session && (
+          <div className="flex flex-col gap-1">
+            <div className="text-sm italic text-grey-55">
+              click your bio to edit it!
+            </div>
 
-          <MemberCard
-            spaces={data.spaces_in_studios
-              .filter(
-                (space) =>
-                  !space.space_data.archived &&
-                  space.space_data.members_in_spaces.find(
-                    (member) => member.member === session.user?.id
-                  )
-              )
-              .map((space) => space.space_data)}
-            memberName={session.session?.username}
-            memberStudio={session.session?.studio}
-          />
+            <MemberCard
+              spaces={data.spaces_in_studios
+                .filter(
+                  (space) =>
+                    !space.space_data.archived &&
+                    space.space_data.members_in_spaces.find(
+                      (member) => member.member === session.user?.id
+                    )
+                )
+                .map((space) => space.space_data)}
+              memberName={session.session?.username}
+              memberStudio={session.session?.studio}
+            />
+          </div>
+        )}
+        <div className="py-4">
+          <Divider />
         </div>
-      )}
-      <div className="py-4">
-        <Divider />
-      </div>
-      <div className="flex flex-col gap-2 overflow-scroll">
-        {data?.members_in_studios
-          .filter(
-            (member) =>
-              member.identity_data?.username !== session.session?.username
-          )
-          .map((m) =>
-            !m.identity_data ? null : (
-              <MemberCard
-                spaces={data.spaces_in_studios
-                  .filter(
-                    (space) =>
-                      !space.space_data.archived &&
-                      space.space_data.members_in_spaces.find(
-                        (member) => member.member === m.member
-                      )
-                  )
-                  .map((space) => space.space_data)}
-                key={m.member}
-                memberName={m.identity_data?.username || ""}
-                memberStudio={m.identity_data.studio}
-              />
+        <div className="flex flex-col gap-2">
+          {data?.members_in_studios
+            .filter(
+              (member) =>
+                member.identity_data?.username !== session.session?.username
             )
-          )}
+            .map((m) =>
+              !m.identity_data ? null : (
+                <MemberCard
+                  spaces={data.spaces_in_studios
+                    .filter(
+                      (space) =>
+                        !space.space_data.archived &&
+                        space.space_data.members_in_spaces.find(
+                          (member) => member.member === m.member
+                        )
+                    )
+                    .map((space) => space.space_data)}
+                  key={m.member}
+                  memberName={m.identity_data?.username || ""}
+                  memberStudio={m.identity_data.studio}
+                />
+              )
+            )}
+        </div>
       </div>
     </div>
   );
