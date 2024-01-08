@@ -14,7 +14,7 @@ import { RenderedText } from "components/Textarea/RenderedText";
 import { db, useMutations } from "hooks/useReplicache";
 import { HTMLAttributes, useEffect, useRef, useState } from "react";
 import { ulid } from "src/ulid";
-import { Message } from "data/Messages";
+import type { Message } from "data/Messages";
 import AutosizeTextarea from "components/Textarea/AutosizeTextarea";
 import { FindOrCreate, useAllItems } from "components/FindOrCreateEntity";
 import { ref } from "data/Facts";
@@ -23,6 +23,7 @@ import { LogInModal } from "components/LoginModal";
 import { RoomHeader } from "components/Room";
 import { useRoom, useUIState } from "hooks/useUIState";
 import { useFilteredCards } from "../CardFilter";
+import { useAuth } from "hooks/useAuth";
 
 export const DiscussionRoom = (props: {
   entityID: string;
@@ -132,27 +133,29 @@ export const MessageInput = (props: {
   reply: string | null;
   setReply: (reply: string | null) => void;
 }) => {
-  let [unread, setUnread] = useState<boolean | null>(null);
   let value = useUIState((s) => s.chatInputStates[props.entityID]?.value || "");
   let attachedCards = useUIState(
     (s) => s.chatInputStates[props.entityID]?.attachedCards || []
   );
   let setValue = useUIState((s) => s.setChatInputValue);
   let setAttachedCards = useUIState((s) => s.setChatInputAttachedCards);
-  let { mutate, memberEntity, authorized } = useMutations();
+  let { mutate, permissions } = useMutations();
+  let { session } = useAuth();
+
+  let authorized = permissions.commentAndReact;
+
   let replyMessage = db.useMessageByID(props.reply);
   let replyToName = db.useEntity(replyMessage?.sender || null, "member/name");
   let [loginIsOpen, setLoginOpen] = useState(false);
   const send = async () => {
-    if (!memberEntity || !value) return;
-    let message: Message = {
+    if (!session.session || !value) return;
+    let message: Omit<Message, "sender"> = {
       id: ulid(),
       topic: props.entityID,
       ts: Date.now().toString(),
-      sender: memberEntity,
+      replyTo: props.reply,
       content: value || "",
     };
-    if (props.reply) message.replyTo = props.reply;
     if (attachedCards.length > 0) {
       let entity = ulid();
       message.entity = entity;
@@ -167,6 +170,7 @@ export const MessageInput = (props: {
       );
     }
     await mutate("replyToDiscussion", {
+      session: session.session,
       discussion: props.entityID,
       message,
     });
@@ -264,8 +268,8 @@ export const MessageInput = (props: {
             <div className="flex h-min justify-end text-grey-55">
               <ButtonPrimary
                 disabled={!value}
-                onPointerDown={(e)=> {
-                  e.preventDefault()
+                onPointerDown={(e) => {
+                  e.preventDefault();
                 }}
                 onClick={(e) => {
                   e.preventDefault();
@@ -447,7 +451,7 @@ const Message = (props: {
   author: string;
   date: string;
   id: string;
-  reply?: string;
+  reply?: string | null;
   entity?: string;
   setReply: (reply: string) => void;
 }) => {

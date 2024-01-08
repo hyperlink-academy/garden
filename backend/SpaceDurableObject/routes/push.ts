@@ -1,11 +1,13 @@
 import { z } from "zod";
 import { makeRoute } from "backend/lib/api";
 import { Env } from "..";
-import { Mutations } from "data/mutations";
+import { Mutations, StudioMatePermissions } from "data/mutations";
 import { store } from "../fact_store";
 import { CachedStorage } from "../storage_cache";
 import { app_event } from "backend/lib/analytics";
 import { authTokenVerifier, verifyIdentity } from "backend/lib/auth";
+import { createClient } from "backend/lib/supabase";
+import { isUserMember } from "../lib/isMember";
 
 export const push_route = makeRoute({
   route: "push",
@@ -26,6 +28,7 @@ export const push_route = makeRoute({
   handler: async (msg, env: Env) => {
     let lastMutationID =
       (await env.storage.get<number>(`lastMutationID-${msg.clientID}`)) || 0;
+    let supabase = createClient(env.env);
 
     let session = await verifyIdentity(env.env, msg.authToken);
     if (!session)
@@ -35,18 +38,28 @@ export const push_route = makeRoute({
     let cachedStore = new CachedStorage(env.storage);
     let fact_store = store(cachedStore, { id: env.id });
 
-    let isMember = await env.factStore.scanIndex.ave(
-      "space/member",
-      session.studio
-    );
+    let isMember = isUserMember(env, session.id);
+
+    let isStudioMember = false;
     if (!isMember) {
-      env.storage.put<number>(
-        `lastMutationID-${msg.clientID}`,
-        msg.mutations[msg.mutations.length - 1].id
-      );
-      return {
-        data: { success: false, error: "user is not a member" },
-      } as const;
+      let { data } = await supabase
+        .from("space_data")
+        .select(
+          "do_id, spaces_in_studios!inner(studios!inner(members_in_studios!inner(member)))"
+        )
+        .eq("do_id", env.id)
+        .eq("spaces_in_studios.studios.members_in_studios.member", session.id)
+        .single();
+      isStudioMember = !!data;
+      if (!isStudioMember) {
+        env.storage.put<number>(
+          `lastMutationID-${msg.clientID}`,
+          msg.mutations[msg.mutations.length - 1].id
+        );
+        return {
+          data: { success: false, error: "user is not a member" },
+        } as const;
+      }
     }
 
     let release = await env.pushLock.lock();
@@ -63,9 +76,12 @@ export const push_route = makeRoute({
           user: session.username,
         });
       }
+
       if (!Mutations[name]) {
         continue;
       }
+      if (!isMember && isStudioMember && !StudioMatePermissions.includes(name))
+        continue;
       try {
         await Mutations[name](mutation.args, {
           ...fact_store,

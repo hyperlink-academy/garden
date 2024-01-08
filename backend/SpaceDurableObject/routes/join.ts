@@ -9,6 +9,7 @@ import { Env } from "..";
 import { store } from "../fact_store";
 import { webPushPayloadParser } from "pages/api/web_push";
 import { sign } from "src/sign";
+import { MutationContext } from "data/mutations";
 
 export const join_route = makeRoute({
   route: "join",
@@ -119,7 +120,7 @@ export const join_route = makeRoute({
   },
 });
 
-export const getMemberColor = async (fact_store: ReturnType<typeof store>) => {
+export const getMemberColor = async (fact_store: MutationContext) => {
   let existingMemberColors = await fact_store.scanIndex.aev("member/color");
   let color;
   let unassignedColors = memberColors.filter(

@@ -4,7 +4,7 @@ export type Message = {
   sender: string;
   content: string;
   entity?: string;
-  replyTo?: string;
+  replyTo?: string | null;
   ts: string;
   server_ts?: string;
 };

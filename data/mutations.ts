@@ -8,6 +8,7 @@ import { z } from "zod";
 import { webPushPayloadParser } from "pages/api/web_push";
 import { sign } from "src/sign";
 import { app_event } from "backend/lib/analytics";
+import { getOrCreateMemberEntity } from "src/getOrCreateMemberEntity";
 
 export type MutationContext = {
   assertEmphemeralFact: <A extends keyof FilterAttributes<{ ephemeral: true }>>(
@@ -338,7 +339,8 @@ const updateTitleFact: Mutation<{
 
 const replyToDiscussion: Mutation<{
   discussion: string;
-  message: Message;
+  session: { username: string; studio: string };
+  message: Omit<Message, "sender">;
 }> = async (args, ctx) => {
   let messageCount = await ctx.scanIndex.eav(
     args.discussion,
@@ -350,21 +352,19 @@ const replyToDiscussion: Mutation<{
     value: messageCount ? messageCount.value + 1 : 1,
     positions: {},
   });
+  let sender = await getOrCreateMemberEntity(args.session, ctx);
 
   await markUnread(
     {
       entityID: args.discussion,
-      memberEntity: args.message.sender,
+      memberEntity: sender,
       attribute: "discussion/unread-by",
     },
     ctx
   );
 
-  await ctx.postMessage(args.message);
-  let senderStudio = await ctx.scanIndex.eav(
-    args.message.sender,
-    "space/member"
-  );
+  await ctx.postMessage({ ...args.message, sender });
+  let senderStudio = await ctx.scanIndex.eav(sender, "space/member");
   await ctx.runOnServer(async (env, userID) => {
     if (!senderStudio) return;
 
@@ -564,3 +564,8 @@ export const Mutations = {
   setClientInCall,
   createRoom,
 };
+
+export const StudioMatePermissions: Array<keyof typeof Mutations> = [
+  "replyToDiscussion",
+  "addReaction",
+];

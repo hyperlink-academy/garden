@@ -25,6 +25,7 @@ import { useSubscribe } from "hooks/useSubscribe";
 import { ulid } from "src/ulid";
 import { useAuth } from "./useAuth";
 import { UndoManager } from "@rocicorp/undo";
+import { useSpaceData } from "./useSpaceData";
 
 export type ReplicacheMutators = {
   [k in keyof typeof Mutations]: (
@@ -524,6 +525,7 @@ export const useSpaceID = () => {
 export const useMutations = () => {
   let { session } = useAuth();
   let rep = useContext(ReplicacheContext);
+  let { data: spaceData } = useSpaceData(rep?.id);
   let auth = useSubscribe(
     async (tx) => {
       if (!session || !session.loggedIn || !session.session?.studio)
@@ -541,6 +543,19 @@ export const useMutations = () => {
     null,
     [session.session?.studio],
     "auth"
+  );
+  let permissions = useMemo(
+    () => ({
+      commentAndReact:
+        !!auth ||
+        (session &&
+          spaceData?.spaces_in_studios.find((s) =>
+            s.studios?.members_in_studios.find(
+              (m) => m.member === session.user?.id
+            )
+          )),
+    }),
+    [spaceData, session, auth]
   );
   let client = useSubscribe(
     async (tx) => {
@@ -561,7 +576,7 @@ export const useMutations = () => {
       mutation: T,
       args: Parameters<(typeof Mutations)[T]>[0]
     ) {
-      if (!session || !auth) return;
+      if (!session) return;
       return rep?.rep.mutate[mutation](args);
     },
     [session, auth, rep]
@@ -593,5 +608,6 @@ export const useMutations = () => {
     client,
     mutate,
     action,
+    permissions,
   };
 };
