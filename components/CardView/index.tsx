@@ -32,7 +32,6 @@ import { useUndoableState } from "hooks/useUndoableState";
 import { Fact } from "data/Facts";
 import { getAndUploadFile } from "src/getAndUploadFile";
 import { useReactions } from "hooks/useReactions";
-import { HighlightCard } from "./HighlightCard";
 import { CardViewDrawer } from "./CardViewDrawer";
 import { useCloseCard, useRoomHistory, useUIState } from "hooks/useUIState";
 import { Modal } from "components/Modal";
@@ -247,7 +246,6 @@ export const CardContent = (props: {
             {/* NB: keep wrapper for spacing with CardMoreOptionsMenu even if no cardCreatorName */}
 
             <div className="flex flex-row gap-2 text-grey-55">
-              <HighlightCard entityID={props.entityID} />
               <CardMoreOptionsMenu
                 onDelete={props.onDelete}
                 entityID={props.entityID}
