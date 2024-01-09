@@ -23,7 +23,7 @@ export function Members({ data, isAdmin }: Props) {
 
   return (
     <div className="no-scrollbar mx-auto  h-full max-w-md  overflow-y-scroll  ">
-      <div className="flex flex-col gap-2 py-6">
+      <div className="flex flex-col gap-2 pb-6 sm:pt-6">
         {isAdmin && (
           <InviteModal welcomeMessage={data.welcome_message} id={data.id} />
         )}

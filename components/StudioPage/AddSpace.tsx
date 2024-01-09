@@ -8,6 +8,7 @@ import { useAuth } from "hooks/useAuth";
 import { useIdentityData } from "hooks/useIdentityData";
 import { scanIndex, useMutations } from "hooks/useReplicache";
 import { useStudioData } from "hooks/useStudioData";
+import useWindowDimensions from "hooks/useWindowDimensions";
 import { useEffect, useState } from "react";
 import { generateKeyBetween } from "src/fractional-indexing";
 import { ulid } from "src/ulid";
@@ -18,6 +19,8 @@ export function AddSpace(props: { id: string }) {
   let [state, setState] = useState<"normal" | "add-new" | "add-existing">(
     "normal"
   );
+  let { width } = useWindowDimensions();
+
   useEffect(() => {
     if (!open) setState("normal");
   }, [open]);
@@ -25,7 +28,7 @@ export function AddSpace(props: { id: string }) {
     <>
       <ButtonPrimary
         onClick={() => setOpen(true)}
-        content={"Create a space"}
+        content={width > 640 ? `Create a space` : `Create`}
         icon={<SpaceCreate />}
       />
       <Modal
