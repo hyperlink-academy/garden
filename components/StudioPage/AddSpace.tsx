@@ -28,7 +28,7 @@ export function AddSpace(props: { id: string }) {
     <>
       <ButtonPrimary
         onClick={() => setOpen(true)}
-        content={width > 640 ? `Create a space` : `Create`}
+        content={width > 640 ? `Add a space` : `Add`}
         icon={<SpaceCreate />}
       />
       <Modal
