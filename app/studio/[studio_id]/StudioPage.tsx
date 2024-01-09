@@ -23,7 +23,7 @@ const Tabs = { About: About, Spaces: SpaceList, Members: Members } as {
 };
 export function StudioPageContent(props: Props) {
   let { data } = useStudioData(props.data?.id, props.data);
-  let [selectedIndex, setSelectedIndex] = useState(0);
+  let [selectedIndex, setSelectedIndex] = useState(1);
   let { session } = useAuth();
   let { width } = useWindowDimensions();
 
