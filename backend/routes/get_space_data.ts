@@ -60,7 +60,7 @@ export const get_space_data_by_id_route = makeRoute({
 
 export const space_data_query = `*,
   owner:identity_data!space_data_owner_fkey!inner(*),
-  spaces_in_studios(*, studios(do_id, name)),
+  spaces_in_studios(*, studios(do_id, name, members_in_studios(member))),
   members_in_spaces(*),
   user_space_unreads(*)
 ` as const;
