@@ -47,24 +47,6 @@ export const StudioForm = ({
         />
         <div className="text-xs italic">{formState.name.length}/64</div>
       </div>
-
-      <div className="flex flex-col gap-2">
-        <p className="font-bold">Write a short description</p>
-        <textarea
-          className="min-h-[128px] w-full rounded-md border border-grey-55"
-          value={formState.description}
-          maxLength={256}
-          placeholder="write something..."
-          onChange={(e) => {
-            let value = e.currentTarget.value;
-            setFormState((form) => ({
-              ...form,
-              description: value,
-            }));
-          }}
-        />
-        <div className="text-xs italic">{formState.description.length}/256</div>
-      </div>
     </>
   );
 };
