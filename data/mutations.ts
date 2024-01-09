@@ -1,4 +1,3 @@
-import { privateSpaceAPI } from "backend/lib/api";
 import { Env } from "backend/SpaceDurableObject";
 import { calculateUnreads, markUnread } from "src/markUnread";
 import { Attribute, FilterAttributes, ReferenceAttributes } from "./Attributes";
@@ -9,6 +8,7 @@ import { webPushPayloadParser } from "pages/api/web_push";
 import { sign } from "src/sign";
 import { app_event } from "backend/lib/analytics";
 import { getOrCreateMemberEntity } from "src/getOrCreateMemberEntity";
+import { createClient } from "backend/lib/supabase";
 
 export type MutationContext = {
   assertEmphemeralFact: <A extends keyof FilterAttributes<{ ephemeral: true }>>(
@@ -470,6 +470,7 @@ const addReaction: Mutation<{
 const markRead: Mutation<{
   entityID: string;
   memberEntity: string;
+  userID: string;
   attribute: "discussion/unread-by" | "card/unread-by";
 }> = async (args, ctx) => {
   let unreads = await ctx.scanIndex.eav(args.entityID, args.attribute);
@@ -477,12 +478,10 @@ const markRead: Mutation<{
   if (unread) await ctx.retractFact(unread.id);
 
   await ctx.runOnServer(async (env) => {
-    let space = await ctx.scanIndex.eav(args.memberEntity, "space/member");
-    if (!space) return;
-    let spaceID = env.env.SPACES.idFromString(space.value);
+    let supabase = createClient(env.env);
     let unreads = await calculateUnreads(args.memberEntity, ctx);
-    let stub = env.env.SPACES.get(spaceID);
-    await privateSpaceAPI(stub)("http://internal", "sync_notifications", {
+    await supabase.from("user_space_unreads").upsert({
+      user: args.userID,
       space: env.id,
       unreads,
     });

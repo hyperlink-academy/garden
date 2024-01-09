@@ -1,7 +1,6 @@
 import { ButtonPrimary } from "components/Buttons";
 import * as Popover from "@radix-ui/react-popover";
 import {
-  ArrowDown,
   CardAdd,
   CardSmall,
   CloseLinedTiny,
@@ -72,6 +71,7 @@ export const useMarkRead = (entityID: string, focused: boolean) => {
   let unreadBy = db.useEntity(entityID, "discussion/unread-by");
   let [windowFocus, setWindowFocus] = useState(true);
   let { mutate, memberEntity } = useMutations();
+  let { session } = useAuth();
   useEffect(() => {
     let callback = () => setWindowFocus(true);
     window.addEventListener("focus", callback);
@@ -80,17 +80,26 @@ export const useMarkRead = (entityID: string, focused: boolean) => {
     };
   }, []);
   useEffect(() => {
-    if (entityID && memberEntity) {
+    if (entityID && memberEntity && session.user) {
       if (!windowFocus || !focused) return;
       let unread = unreadBy?.find((f) => f.value.value === memberEntity);
       if (unread)
         mutate("markRead", {
           memberEntity,
+          userID: session.user.id,
           entityID: entityID,
           attribute: "discussion/unread-by",
         });
     }
-  }, [entityID, unreadBy, memberEntity, mutate, windowFocus, focused]);
+  }, [
+    entityID,
+    unreadBy,
+    memberEntity,
+    mutate,
+    windowFocus,
+    focused,
+    session.user,
+  ]);
 };
 
 export const MessageWindow = (props: {
@@ -208,19 +217,6 @@ export const MessageInput = (props: {
         </>
       ) : (
         <div className="messageInput flex w-full flex-col gap-2  pb-2 pt-1">
-          {unread && (
-            <button
-              className="messageUnreadsAvailable sticky bottom-0 mx-auto flex  w-fit flex-row items-center justify-between gap-2 rounded-full bg-accent-blue px-4 py-1.5 text-sm font-bold italic text-white"
-              onClick={() => {
-                document
-                  .getElementById("card-comments")
-                  ?.scrollIntoView({ behavior: "smooth", block: "end" });
-              }}
-            >
-              <div>unread messages</div>
-              <GoToBottom />
-            </button>
-          )}
           {/* IF MESSAGE IS IN REPLY */}
           {props.reply && (
             <div className="messageInputReply -mb-2">

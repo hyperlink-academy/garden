@@ -1,6 +1,7 @@
-import { privateSpaceAPI } from "backend/lib/api";
+import { createClient } from "backend/lib/supabase";
 import { ref } from "data/Facts";
 import { MutationContext } from "data/mutations";
+import { getOrCreateMemberEntity } from "./getOrCreateMemberEntity";
 
 export const markUnread = async (
   args: {
@@ -24,11 +25,24 @@ export const markUnread = async (
   }
 
   await ctx.runOnServer(async (env) => {
+    let supabase = createClient(env.env);
+    let { data } = await supabase
+      .from("space_data")
+      .select(
+        "members_in_spaces(identity_data(*)), spaces_in_studios(members_in_studios(identity_data(*)))"
+      )
+      .eq("do_id", env.id)
+      .single();
+    if (!data) return;
+    let members = [
+      ...data.members_in_spaces,
+      ...data.spaces_in_studios.flatMap((m) => m.members_in_studios),
+    ].map((m) => m.identity_data as NonNullable<typeof m.identity_data>);
     for (let i = 0; i < members.length; i++) {
-      let spaceID = env.env.SPACES.idFromString(members[i].value);
-      let unreads = await calculateUnreads(members[i].entity, ctx);
-      let stub = env.env.SPACES.get(spaceID);
-      await privateSpaceAPI(stub)("http://internal", "sync_notifications", {
+      let memberEntity = await getOrCreateMemberEntity(members[i], ctx);
+      let unreads = await calculateUnreads(memberEntity, ctx);
+      await supabase.from("user_space_unreads").upsert({
+        user: members[i].id,
         space: env.id,
         unreads,
       });

@@ -14,7 +14,6 @@ import { handleFileUpload } from "./upload_file";
 import { migrations } from "./migrations";
 import { update_self_route } from "./routes/update_self";
 import { delete_self_route } from "./routes/delete_self";
-import { sync_notifications_route } from "./internal_routes/sync_notifications";
 import { get_daily_token_route } from "./routes/get_daily_token";
 import { post_feed_route } from "./routes/post_feed";
 import { get_card_data_route } from "./routes/get_card_data";
@@ -48,11 +47,8 @@ let routes = [
   post_feed_route,
   leave_route,
 ];
-let private_routes = [sync_notifications_route];
-export type PrivateSpaceRoutes = typeof private_routes;
 export type SpaceRoutes = typeof routes;
 let router = makeRouter(routes);
-let internalRouter = makeRouter(private_routes);
 
 export class SpaceDurableObject implements DurableObject {
   pushLock = new Lock();
@@ -147,9 +143,6 @@ export class SpaceDurableObject implements DurableObject {
         }
         case "api": {
           return router(path[2], request, ctx);
-        }
-        case "internal_api": {
-          return internalRouter(path[2], request, ctx);
         }
         default:
           return new Response("", { status: 404 });

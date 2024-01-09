@@ -120,7 +120,9 @@ export const join_route = makeRoute({
   },
 });
 
-export const getMemberColor = async (fact_store: MutationContext) => {
+export const getMemberColor = async (
+  fact_store: Pick<MutationContext, "scanIndex">
+) => {
   let existingMemberColors = await fact_store.scanIndex.aev("member/color");
   let color;
   let unassignedColors = memberColors.filter(
