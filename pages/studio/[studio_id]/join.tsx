@@ -4,6 +4,7 @@ import { BaseSmallCard } from "components/CardPreview/SmallCard";
 import { Member, StudioFilled } from "components/Icons";
 import { Divider } from "components/Layout";
 import { LoginOrSignupModal } from "components/LoginModal";
+import { Textarea } from "components/Textarea";
 import { useAuth } from "hooks/useAuth";
 import { useStudioData } from "hooks/useStudioData";
 import { GetStaticPropsContext, InferGetStaticPropsType } from "next";
@@ -69,7 +70,7 @@ export default function StudioPage(props: Props) {
           <h3>{data?.name}</h3>
         </Link>
         <div className="rounded-md border border-grey-80 bg-white p-2">
-          {data?.welcome_message}
+          <Textarea previewOnly value={data?.welcome_message} />
         </div>
 
         {session.loggedIn ? (
