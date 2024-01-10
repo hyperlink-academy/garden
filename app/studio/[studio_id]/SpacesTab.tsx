@@ -15,7 +15,9 @@ export type Props = {
 export function SpaceList({ data }: Props) {
   let [search, setSearch] = useState("");
 
-  let spaces = data?.spaces_in_studios.filter(
+  let allSpaces = data?.spaces_in_studios;
+
+  let filteredSpaces = allSpaces.filter(
     ({ space_data: s }) =>
       s && !s.archived && s.display_name?.toLocaleLowerCase().includes(search)
   );
@@ -32,9 +34,9 @@ export function SpaceList({ data }: Props) {
         <div className="studioSpacesOptions flex w-full items-center justify-between gap-3  ">
           {authorized && <AddSpace id={data.id} />}
 
-          {spaces.length > 0 && (
-            <div className="studioSpacesSearch relative flex flex-row text-sm">
-              <RoomSearch className="absolute right-2 top-2  text-grey-55" />
+          {allSpaces.length > 0 && (
+            <div className="studioSpacesSearch relative flex flex-row">
+              <RoomSearch className="absolute right-2 top-[10px] text-grey-55" />
               <input
                 className="h-fit w-full max-w-sm bg-white py-1 pl-2 pr-6 outline-none sm:w-64"
                 value={search}
@@ -51,9 +53,11 @@ export function SpaceList({ data }: Props) {
           )}
         </div>
         <div className=" studioSpaceListWrapper no-scrollbar relative flex h-full w-full flex-row gap-2 overflow-y-scroll ">
-          {spaces.length > 0 ? (
+          {allSpaces.length > 0 ? (
             <List
-              spaces={spaces?.map((s) => s.space_data as SpaceData) || []}
+              spaces={
+                filteredSpaces?.map((s) => s.space_data as SpaceData) || []
+              }
             />
           ) : (
             <EmptyStudio />
