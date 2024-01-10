@@ -32,6 +32,7 @@ import { spaceAPI } from "backend/lib/api";
 import { ButtonPrimary, ButtonTertiary } from "components/Buttons";
 import { Modal } from "components/Modal";
 import { Truncate } from "components/Truncate";
+import { useSpaceData } from "hooks/useSpaceData";
 
 export const People = () => {
   let members = db.useAttribute("member/name");
@@ -447,9 +448,9 @@ const InviteMember = () => {
   let [open, setInviteOpen] = useState(false);
   let isMember = db.useUniqueAttribute("space/member", session.session?.studio);
   let { authorized } = useMutations();
-
   let smoker = useSmoker();
   const spaceID = useSpaceID();
+  let { data } = useSpaceData(spaceID);
   let { data: inviteLink } = useSWR(
     !isMember ? null : `${WORKER_URL}/space/${spaceID}/get_share_code`,
     async () => {
@@ -460,7 +461,7 @@ const InviteMember = () => {
         { authToken }
       );
       if (code.success) {
-        return `${document.location.protocol}//${document.location.host}${document.location.pathname}/join?code=${code.code}`;
+        return `${document.location.protocol}//${document.location.host}/s/${data?.owner.username}/s/${data?.name}/${data?.display_name}/join?code=${code.code}`;
       }
     }
   );
