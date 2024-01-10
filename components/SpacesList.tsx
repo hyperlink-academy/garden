@@ -64,18 +64,6 @@ export const BaseSpaceCard = (props: Parameters<typeof SpaceCard>[0]) => {
     (f) => f.user === session.user?.id
   )?.unreads;
 
-  let duration_days = null;
-  // calculate duration, in days
-  // add extra +1 day to account for start and end dates
-  if (data?.start_date && data?.end_date) {
-    let start = new Date(data.start_date);
-    let end = new Date(data.end_date);
-    let start_timestamp = start.getTime();
-    let end_timestamp = end.getTime();
-    let delta = Math.abs(end_timestamp - start_timestamp) / 1000;
-    duration_days = Math.floor(delta / 86400) + 1;
-  }
-
   return (
     <div className="largeSpaceCard group relative flex w-full">
       <div className="largeSpaceCardIcon absolute left-0 top-0">
