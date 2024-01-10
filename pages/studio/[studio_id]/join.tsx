@@ -54,22 +54,23 @@ export default function StudioPage(props: Props) {
         <title key="title">{data?.name}: you&apos;re invited!</title>
       </Head>
 
-      {/* NB: spacing adjusted b/c we have HomeLayout with header wrapper here */}
-      <div className="mx-auto flex max-w-3xl flex-col place-items-center gap-6 px-0 py-4">
+      <div className="mx-auto flex max-w-3xl flex-col place-items-center gap-6 px-4 py-8">
+        <h3>Welcome!</h3>
         <p className="text-center text-lg">
           You&apos;ve been invited to join a{" "}
           <strong>
             Studio<sup className="text-grey-55">†</sup>
           </strong>
         </p>
-        <StudioFilled />
         <Link
           href={`/studio/${uuidToBase62(props.id || "")}`}
-          className="flex flex-col gap-0 p-4"
+          className="lightBorder flex flex-row items-center gap-4 bg-white p-4"
         >
+          <StudioFilled />
+          {/* TODO: add image from studio 'about' if one is set? */}
           <h3>{data?.name}</h3>
         </Link>
-        <div className="rounded-md border border-grey-80 bg-white p-2">
+        <div className="max-w-md rounded-md border border-grey-80 bg-white p-2">
           <Textarea previewOnly value={data?.welcome_message} />
         </div>
 
