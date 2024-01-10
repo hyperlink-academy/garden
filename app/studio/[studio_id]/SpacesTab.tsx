@@ -20,14 +20,17 @@ export function SpaceList({ data }: Props) {
       s && !s.archived && s.display_name?.toLocaleLowerCase().includes(search)
   );
 
-  let auth = useAuth();
+  let { session } = useAuth();
+  let authorized = data.members_in_studios.find(
+    (m) => m.member === session.user?.id
+  );
 
   if (!data) return;
   return (
     <div className="studioSpacesWrapper mx-auto h-full overflow-y-scroll pb-6 sm:pt-6">
       <div className="studioSpaces flex h-full w-full flex-col gap-4">
         <div className="studioSpacesOptions flex w-full items-center justify-between gap-3  ">
-          {auth.authToken && <AddSpace id={data.id} />}
+          {authorized && <AddSpace id={data.id} />}
 
           {spaces.length > 0 && (
             <div className="studioSpacesSearch relative flex flex-row text-sm">
