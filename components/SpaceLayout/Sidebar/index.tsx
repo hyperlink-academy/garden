@@ -5,11 +5,12 @@ import { db, useMutations, useSpaceID } from "hooks/useReplicache";
 import * as Popover from "@radix-ui/react-popover";
 import { useState } from "react";
 import {
+  ArrowUp,
   BellSmall,
   MoreOptionsSmall,
   RoomCalendar,
+  Settings,
   SidebarIcon,
-  StudioFilled,
   UnreadDot,
 } from "../../Icons";
 import { EditSpaceModal } from "components/CreateSpace";
@@ -26,6 +27,8 @@ import { prefetchIdentityData } from "hooks/useIdentityData";
 import { ModalSubmitButton, Modal } from "components/Modal";
 import { useUIState } from "hooks/useUIState";
 import { Truncate } from "components/Truncate";
+import router from "next/router";
+import { HelpButton } from "pages/s/[studio]/s/[space]";
 
 export const Sidebar = (props: { mobile?: boolean }) => {
   let [roomEditOpen, setRoomEditOpen] = useState(false);
@@ -36,12 +39,41 @@ export const Sidebar = (props: { mobile?: boolean }) => {
       <div className="no-scrollbar flex h-full w-full flex-col gap-2 overflow-y-scroll px-3 pt-3">
         {props.mobile && (
           <>
-            <div className={`spaceName flex w-full bg-white text-grey-35`}>
+            <div
+              className={`spaceName flex w-full flex-col bg-white text-grey-35`}
+            >
+              <div className="flex justify-between">
+                <div className="-mb-0.5  text-sm font-bold text-grey-55">
+                  studio name
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    className="flex items-center gap-0 text-grey-55 hover:text-accent-blue "
+                    onClick={() => {}}
+                  >
+                    <ArrowUp
+                      style={{ transform: "rotate(-90deg)" }}
+                      height={16}
+                      width={16}
+                    />
+                  </button>
+                  <button
+                    className="flex items-center gap-0 text-grey-55 hover:text-accent-blue"
+                    onClick={() => {}}
+                  >
+                    <ArrowUp
+                      style={{ transform: "rotate(90deg)" }}
+                      height={16}
+                      width={16}
+                    />
+                  </button>
+                </div>
+              </div>
+
               <div className="flex w-full flex-row items-start gap-2 ">
                 <div className="grow">
                   <SpaceName />
                 </div>
-                <SpaceOptions />
               </div>
             </div>
             <Divider />
@@ -68,11 +100,14 @@ export const Sidebar = (props: { mobile?: boolean }) => {
       </div>
       <People />
       {props.mobile && (
-        <div className="flex flex-row justify-between p-2 pt-0 text-grey-55">
+        <div className="flex flex-row items-center justify-between p-2 pt-0 text-grey-55">
           <button onClick={() => setMobileSidebarOpen()}>
             <SidebarIcon />
           </button>
-          <LoginOrHome />
+          <div className="flex gap-2">
+            <HelpButton />
+            <LoginOrHome />
+          </div>
         </div>
       )}
     </div>
@@ -135,10 +170,10 @@ export const SpaceName = (props: { truncate?: boolean }) => {
     <div className={`spaceName flex min-w-0 bg-inherit text-grey-35`}>
       {props.truncate ? (
         <Truncate className="w-full max-w-none overflow-hidden bg-inherit">
-          <h4 className="SpaceName whitespace-nowrap">{data?.display_name}</h4>
+          <h3 className="SpaceName whitespace-nowrap">{data?.display_name}</h3>
         </Truncate>
       ) : (
-        <h3 className="SpaceName whitespace-normal">{data?.display_name}</h3>
+        <h4 className="SpaceName whitespace-normal">{data?.display_name}</h4>
       )}
     </div>
   );
@@ -164,9 +199,9 @@ export const SpaceOptions = () => {
             setEditModal(true);
             setMobileSidebarOpen(false);
           }}
-          className="shrink-0 rounded-md border border-transparent pt-[1px] hover:border-accent-blue hover:text-accent-blue"
+          className="shrink-0 rounded-md border border-transparent pt-[1px]  hover:text-accent-blue"
         >
-          <MoreOptionsSmall className="" />
+          <Settings />
         </button>
       ) : (
         <MemberOptions />
@@ -195,15 +230,14 @@ const MemberOptions = () => {
   return (
     <>
       <Popover.Root>
-        <Popover.Trigger className="shrink-0 rounded-md border border-transparent pt-[1px] hover:border-accent-blue hover:text-accent-blue">
-          <MoreOptionsSmall className="pt-2" />
+        <Popover.Trigger className="shrink-0 rounded-md border border-transparent pt-[1px]  hover:text-accent-blue">
+          <Settings />
         </Popover.Trigger>
         <Popover.Portal>
           <Popover.Content
-            className="z-20 flex max-w-xs flex-col gap-2 rounded-md border-2 border-grey-80 bg-white py-2 drop-shadow-md"
-            sideOffset={-4}
+            className="z-20 flex max-w-xs flex-col gap-2 rounded-md border border-grey-80 bg-white py-2 drop-shadow-md"
+            sideOffset={4}
           >
-            <Popover.Arrow className="fill-grey-80 stroke-grey-80" />
             <button
               className="px-2 font-bold text-accent-red hover:bg-bg-blue"
               onClick={() => setLeaveModalOpen(true)}
@@ -253,21 +287,22 @@ const LoginOrHome = () => {
       <LogInModal isOpen={logInOpen} onClose={() => setLogInOpen(false)} />
     </div>
   ) : (
-    <Link
-      className="hover:text-accent-blue"
-      href={`/s/${session.session.username}`}
-      onPointerDown={() => {
-        if (session.session?.username)
-          prefetchIdentityData(session.session.username);
-      }}
-    >
-      <ButtonTertiary
-        content={
-          <div className="flex flex-row gap-2">
-            Back Home <StudioFilled />
-          </div>
-        }
-      />
-    </Link>
+    <SpaceOptions />
+    // <Link
+    //   className="hover:text-accent-blue"
+    //   href={`/s/${session.session.username}`}
+    //   onPointerDown={() => {
+    //     if (session.session?.username)
+    //       prefetchIdentityData(session.session.username);
+    //   }}
+    // >
+    //   <ButtonTertiary
+    //     content={
+    //       <div className="flex flex-row gap-2">
+    //         Back Home <StudioFilled />
+    //       </div>
+    //     }
+    //   />
+    // </Link>
   );
 };

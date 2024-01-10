@@ -34,7 +34,6 @@ export const SpaceViewerHeader = (props: {
           </div>
           <div className="flex w-full flex-row items-center justify-between gap-2 bg-inherit ">
             <SpaceName truncate />
-            <SpaceOptions />
           </div>
         </div>
       </div>
@@ -117,14 +116,10 @@ const SpaceName = (props: { truncate?: boolean }) => {
   let { data } = useSpaceData(spaceID);
 
   return (
-    <div
-      className={`spaceName flex min-w-0 bg-inherit font-normal text-grey-35`}
-    >
+    <div className={`spaceName flex min-w-0 bg-inherit text-grey-35`}>
       {props.truncate ? (
         <Truncate className="w-full max-w-none overflow-hidden bg-inherit">
-          <h3 className="SpaceName whitespace-nowrap font-normal">
-            {data?.display_name}
-          </h3>
+          <h3 className="SpaceName whitespace-nowrap">{data?.display_name}</h3>
         </Truncate>
       ) : (
         <h3 className="SpaceName whitespace-normal">{data?.display_name}</h3>

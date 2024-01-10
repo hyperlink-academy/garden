@@ -71,27 +71,25 @@ export default function SpacePage(props: Props) {
 const Header = () => {
   let { session } = useAuth();
   return (
-    <div className="spaceHeaderInfo flex min-w-0 shrink grow  flex-row items-stretch gap-2 font-bold">
-      {session.session && (
-        <>
-          <Link
-            href={`/s/${session.session.username}`}
-            className="flex flex-row items-center gap-1 text-grey-55 "
-          >
-            <StudioFilled className="hover:text-accent-blue" />
-            <span className="text-lg"> /</span>
-          </Link>
-        </>
-      )}
+    <div className="spaceHeaderInfo group group -mb-1 ml-2 flex min-w-0 shrink grow flex-row items-stretch gap-2 rounded-md border border-transparent px-3 py-1 font-bold ">
       <div
-        className={`spaceName flex w-full min-w-0 grow bg-background text-grey-35`}
+        className={`spaceName flex w-full min-w-0 grow justify-between bg-background text-grey-35`}
       >
-        <div className="flex w-full flex-row items-start gap-2 bg-inherit ">
-          <SpaceName truncate />
-          <SpaceOptions />
+        <div className="flex w-full flex-col gap-0">
+          <div className="flex flex-row items-center gap-2">
+            {session.session && (
+              <Link href={`/s/${session.session.username}`}>
+                <h4 className="text-sm text-grey-55 hover:text-accent-blue ">
+                  home
+                </h4>
+              </Link>
+            )}
+          </div>
+          <div className="flex w-full flex-row items-center justify-between gap-2 bg-inherit ">
+            <SpaceName truncate />
+          </div>
         </div>
       </div>
-      {!session.loggedIn && <LoginButton />}
     </div>
   );
 };
@@ -123,12 +121,17 @@ export const Space = (props: { header: React.ReactNode }) => {
 };
 
 const DesktopLayout = (props: { header: React.ReactNode }) => {
+  let { session } = useAuth();
+
   return (
     <div className="mx-auto flex h-full w-full flex-col gap-2 overflow-hidden">
       <div className="spaceHeader mx-auto flex w-full max-w-[1332px] flex-row items-end justify-between gap-4 px-2">
         {props.header}
-        <div className="spaceHeaderSearch flex w-[360px] shrink-0 flex-row items-center gap-0">
+        <div className="spaceHeaderSearch flex w-[440px] shrink-0 flex-row items-center gap-2 text-grey-55">
           <HelpButton />
+
+          {!session.loggedIn ? <LoginButton /> : <SpaceOptions />}
+
           <Search />
         </div>
       </div>
@@ -307,11 +310,14 @@ const MobileSidebar = () => {
   );
 };
 
-const HelpButton = () => {
+export const HelpButton = () => {
   let [open, setOpen] = useState(false);
   return (
     <>
-      <button onClick={() => setOpen(true)} className="   text-grey-55 ">
+      <button
+        onClick={() => setOpen(true)}
+        className="  text-grey-55 hover:text-accent-blue "
+      >
         <Question />
       </button>
       <HelpModal open={open} onClose={() => setOpen(false)} />

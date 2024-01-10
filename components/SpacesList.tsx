@@ -107,22 +107,6 @@ export const BaseSpaceCard = (props: Parameters<typeof SpaceCard>[0]) => {
               <h4 className={!data?.display_name ? "italic text-grey-55" : ""}>
                 {data?.display_name || "space deleted"}
               </h4>
-              <div className="">
-                {props.editable &&
-                  (data?.owner?.username == session.session?.username ? (
-                    <EditSpaceButton
-                      onEdit={props.onEdit}
-                      spaceID={props.do_id}
-                      owner={data?.owner?.username}
-                    />
-                  ) : (
-                    <SpaceInfoButton
-                      studio={data?.owner?.username}
-                      name={data?.display_name}
-                      description={data?.description}
-                    />
-                  ))}
-              </div>
             </div>
           </div>
         </div>
@@ -178,95 +162,5 @@ export const BaseSpaceCard = (props: Parameters<typeof SpaceCard>[0]) => {
         </div>
       </div>
     </div>
-  );
-};
-
-export const EditSpaceButton = (props: {
-  spaceID: string;
-  owner?: string;
-  onEdit?: () => void;
-}) => {
-  let [open, setOpen] = useState(false);
-  let { authorized } = useMutations();
-  let { session } = useAuth();
-  if (
-    !props.owner ||
-    authorized === false ||
-    session.session?.username !== props.owner
-  ) {
-    return null;
-  } else
-    return (
-      <>
-        <button
-          onClick={(e) => {
-            setOpen(true);
-            e.preventDefault();
-          }}
-          className="text-grey-55 hover:text-accent-blue"
-        >
-          <Settings />
-        </button>
-
-        <div className="text-grey-55 hover:text-accent-blue">
-          <EditSpaceModal
-            onSubmit={props.onEdit}
-            spaceID={props.spaceID}
-            open={open}
-            onClose={() => setOpen(false)}
-            onDelete={() => setOpen(false)}
-          />
-        </div>
-      </>
-    );
-};
-
-const SpaceInfoButton = (props: {
-  studio?: string;
-  name?: string | null;
-  description?: string | null;
-}) => {
-  let [open, setOpen] = useState(false);
-
-  let studio = props.studio;
-  let name = props.name;
-  let description = props.description;
-
-  if (!studio || !name) return null;
-
-  return (
-    <>
-      <button
-        onClick={(e) => {
-          setOpen(true);
-          e.preventDefault();
-        }}
-        className="text-grey-55 hover:text-accent-blue"
-      >
-        <Information />
-      </button>
-
-      <Modal header={name} open={open} onClose={() => setOpen(false)}>
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col gap-1">
-            {description ? (
-              <div>{description}</div>
-            ) : (
-              <div>
-                <p>
-                  <em className="text-grey-55">no description</em>
-                </p>
-              </div>
-            )}
-          </div>
-          <div className="flex gap-2 italic text-grey-55">
-            <span>created by</span>
-            <Link href={`/s/${studio}`} className="">
-              <ButtonLink content={studio} />
-            </Link>
-          </div>
-        </div>
-      </Modal>
-    </>
   );
 };
