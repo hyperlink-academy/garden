@@ -32,20 +32,24 @@ export const StudioForm = ({
     <>
       <div className="flex flex-col gap-1">
         <p className="font-bold">Name this Studio</p>
-        <input
-          placeholder={example_studio + "..."}
-          className="w-full"
-          maxLength={64}
-          value={formState.name}
-          onChange={(e) => {
-            let value = e.currentTarget.value;
-            setFormState((form) => ({
-              ...form,
-              name: value,
-            }));
-          }}
-        />
-        <div className="text-xs italic">{formState.name.length}/64</div>
+        <div className="flex flex-col gap-0.5">
+          <input
+            placeholder={example_studio + "..."}
+            className="w-full"
+            maxLength={64}
+            value={formState.name}
+            onChange={(e) => {
+              let value = e.currentTarget.value;
+              setFormState((form) => ({
+                ...form,
+                name: value,
+              }));
+            }}
+          />
+          <div className="text-xs italic text-grey-55">
+            {formState.name.length}/64
+          </div>
+        </div>
       </div>
     </>
   );

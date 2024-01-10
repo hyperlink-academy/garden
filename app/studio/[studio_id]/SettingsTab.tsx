@@ -9,10 +9,7 @@ import Router from "next/router";
 import { ModalSubmitButton, Modal } from "components/Modal";
 import { WORKER_URL } from "src/constants";
 
-
-export function StudioSettings(props: {
-  id: string;
-}) {
+export function StudioSettings(props: { id: string }) {
   let { session, authToken } = useAuth();
   let { data, mutate } = useStudioData(props.id);
   let [loading, setLoading] = useState(false);
@@ -30,7 +27,7 @@ export function StudioSettings(props: {
     });
   }, [data?.description, data?.name]);
   return (
-    <div className="flex flex-col gap-3">
+    <div className="mx-auto flex max-w-2xl flex-col gap-3 pb-6 sm:pt-6">
       <form
         className="flex flex-col gap-3"
         onSubmit={async (e) => {
@@ -48,7 +45,7 @@ export function StudioSettings(props: {
             data: {
               name: formState.name,
               description: formState.description,
-            }
+            },
           });
           setLoading(false);
           mutate();
@@ -56,9 +53,13 @@ export function StudioSettings(props: {
       >
         <StudioForm setFormState={setFormState} formState={formState} />
         <ButtonPrimary
+          className="place-self-end"
           content={loading ? "" : "Update Studio"}
           icon={loading ? <DotLoader /> : undefined}
-          disabled={formState.name === data?.name && formState.description === data?.description}
+          disabled={
+            formState.name === data?.name &&
+            formState.description === data?.description
+          }
         />
       </form>
 
@@ -68,8 +69,8 @@ export function StudioSettings(props: {
         <div className="flex flex-col items-center justify-between gap-2">
           <h3>Delete Studio</h3>
           <p className="text-sm ">
-            Spaces linked here will NOT be deleted; they will be
-            available from their members&apos; homepages.
+            Spaces linked here will NOT be deleted; they will be available from
+            their members&apos; homepages.
             <br />
             <span className="font-bold">
               You WILL lose all Studio posts / highlights.
@@ -82,11 +83,9 @@ export function StudioSettings(props: {
   );
 }
 
-const DeleteStudioForm = (props: {
-  studioID: string;
-}) => {
+const DeleteStudioForm = (props: { studioID: string }) => {
   let [state, setState] = useState({ studioName: "" });
-  let [open, setOpen] = useState(false)
+  let [open, setOpen] = useState(false);
   let [status, setStatus] = useState<"normal" | "loading">("normal");
   let { authToken } = useAuth();
   let { data } = useStudioData(props.studioID);
@@ -120,16 +119,20 @@ const DeleteStudioForm = (props: {
               if (data?.name !== state.studioName) return;
               if (!props.studioID || !authToken) return;
               setStatus("loading");
-              await spaceAPI(`${WORKER_URL}/space/${data.do_id}`, "delete_self", {
-                authToken,
-              });
+              await spaceAPI(
+                `${WORKER_URL}/space/${data.do_id}`,
+                "delete_self",
+                {
+                  authToken,
+                }
+              );
               setStatus("normal");
               Router.push("/s/" + session.session?.username);
             }}
             disabled={data?.name !== state.studioName}
             destructive
             onClose={async () => {
-              setOpen(false)
+              setOpen(false);
             }}
           />
         </div>
