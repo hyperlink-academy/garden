@@ -235,7 +235,7 @@ const MemberOptions = () => {
         </Popover.Trigger>
         <Popover.Portal>
           <Popover.Content
-            className="z-20 flex max-w-xs flex-col gap-2 rounded-md border border-grey-80 bg-white py-2 drop-shadow-md"
+            className="z-50 flex max-w-xs flex-col gap-2 rounded-md border border-grey-80 bg-white py-2 drop-shadow-md"
             sideOffset={4}
           >
             <button
