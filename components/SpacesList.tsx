@@ -94,7 +94,7 @@ export const BaseSpaceCard = (props: Parameters<typeof SpaceCard>[0]) => {
             <div className="flex justify-between gap-2">
               {/* this may never show 'space deleted' but here same as big space card in case */}
               <div
-                className={`font-bold text-grey-55 ${
+                className={`font-bold ${
                   !data?.display_name ? "italic text-grey-55" : ""
                 }`}
               >
