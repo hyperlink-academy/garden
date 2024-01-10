@@ -73,25 +73,28 @@ export function Search() {
 
   return (
     <Popover.Root open>
-      <div style={{ width: 336 }}>
-        <Popover.Anchor />
+      <div className="w-full">
+        {/* this transparent anchor is a hack, but you need some content in the div to ensure that the popover positions itself correctly on page load */}
+        <Popover.Anchor className="h-8 text-transparent">.</Popover.Anchor>
         <Popover.Portal>
           <Popover.Content
+            side="bottom"
+            sideOffset={-40}
             ref={combinedRefs}
             onOpenAutoFocus={(e) => e.preventDefault()}
-            className={`no-scrollbar z-0 -mr-4 flex max-h-80 flex-col gap-1  overflow-x-scroll pb-1 text-sm ${
-              open ? "-mt-2 rounded-md border-grey-90 bg-white shadow-drop" : ""
+            className={`no-scrollbar relative z-0 flex max-h-80 flex-col gap-1 overflow-x-scroll rounded-md border pb-1 text-sm ${
+              open
+                ? " border-grey-90 bg-white shadow-drop"
+                : "border-transparent"
             }`}
             style={{ width: "var(--radix-popper-anchor-width)" }}
           >
             <div
-              className={`sticky top-0 z-20 px-2 ${open && "bg-white pt-2"} `}
+              className={`sticky top-0 z-20  px-2 pt-2  ${
+                open && " bg-white"
+              } `}
             >
-              <RoomSearch
-                className={`absolute right-4  text-grey-55 ${
-                  open ? "top-4" : "top-2"
-                }`}
-              />
+              <RoomSearch className={`absolute right-4 top-4 text-grey-55`} />
               <input
                 ref={inputRef}
                 tabIndex={-1}

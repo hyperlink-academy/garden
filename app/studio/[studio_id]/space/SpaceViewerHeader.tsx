@@ -19,18 +19,20 @@ export const SpaceViewerHeader = (props: {
   let { session } = useAuth();
   let params = useParams<{ space_id: string; studio_id: string }>();
   return (
-    <div className="spaceHeaderInfo group flex min-w-0 shrink  grow flex-row items-stretch gap-2 rounded-md border border-transparent p-2 pb-0 font-bold hover:border-grey-80">
+    <div className="spaceHeaderInfo group group -mb-1 ml-2 flex min-w-0 shrink grow flex-row items-stretch gap-2 rounded-md border border-transparent px-3 py-1 font-bold hover:border-grey-80 ">
       <div
         className={`spaceName flex w-full min-w-0 grow justify-between bg-background text-grey-35`}
       >
-        <div className="flex flex-col gap-0">
-          <div className="flex flex-row gap-2">
+        <div className="flex w-full flex-col gap-0">
+          <div className="flex flex-row items-center gap-2">
             <Link href={`/studio/${params?.studio_id}`}>
-              <h3 className="text-base">{props.studioName}</h3>
+              <h4 className="text-sm text-grey-55 hover:text-accent-blue ">
+                {props.studioName}
+              </h4>
             </Link>
             <SpaceSwitcher spaces={props.spaces} />
           </div>
-          <div className="flex w-full flex-row items-start gap-2 bg-inherit ">
+          <div className="flex w-full flex-row items-center justify-between gap-2 bg-inherit ">
             <SpaceName truncate />
             <SpaceOptions />
           </div>
@@ -49,43 +51,50 @@ const SpaceSwitcher = (props: { spaces: SpaceData[] }) => {
   let spaces = props.spaces.filter((s) => s.archived === activeSpace.archived);
   let index = spaces.findIndex((s) => s.id === params?.space_id);
   return (
-    <div className="flex flex-row items-center gap-0.5 text-sm font-normal">
-      <button
-        onClick={() => {
-          if (!params) return;
-          router.push(
-            `/studio/${params.studio_id}/space/${
-              //wrap around index - 1
-              spaces[(index - 1 + spaces.length) % spaces.length].id
-            }`
-          );
-        }}
-      >
-        <ArrowUp
-          style={{ transform: "rotate(-90deg)" }}
-          height={16}
-          width={16}
-        />
-      </button>
-      <span>
-        <sup>{index + 1}</sup>/<sub>{spaces.length}</sub>
-      </span>
-      <button
-        onClick={() => {
-          if (!params) return;
-          router.push(
-            `/studio/${params.studio_id}/space/${
-              spaces[(index + 1) % spaces.length].id
-            }`
-          );
-        }}
-      >
-        <ArrowUp
-          style={{ transform: "rotate(90deg)" }}
-          height={16}
-          width={16}
-        />
-      </button>
+    <div className="hidden group-hover:block">
+      <div className="flex flex-row items-center gap-2 text-sm font-normal">
+        <button
+          className="flex items-center gap-0 text-grey-55 hover:text-accent-blue "
+          onClick={() => {
+            if (!params) return;
+            router.push(
+              `/studio/${params.studio_id}/space/${
+                //wrap around index - 1
+                spaces[(index - 1 + spaces.length) % spaces.length].id
+              }`
+            );
+          }}
+        >
+          <ArrowUp
+            style={{ transform: "rotate(-90deg)" }}
+            height={16}
+            width={16}
+          />
+          prev
+        </button>
+        {/* <span>
+           
+          <sup>{index + 1}</sup>/<sub>{spaces.length}</sub>
+        </span> */}
+        <button
+          className="flex items-center gap-0 text-grey-55 hover:text-accent-blue"
+          onClick={() => {
+            if (!params) return;
+            router.push(
+              `/studio/${params.studio_id}/space/${
+                spaces[(index + 1) % spaces.length].id
+              }`
+            );
+          }}
+        >
+          next
+          <ArrowUp
+            style={{ transform: "rotate(90deg)" }}
+            height={16}
+            width={16}
+          />
+        </button>
+      </div>
     </div>
   );
 };
@@ -113,9 +122,9 @@ const SpaceName = (props: { truncate?: boolean }) => {
     >
       {props.truncate ? (
         <Truncate className="w-full max-w-none overflow-hidden bg-inherit">
-          <h2 className="SpaceName whitespace-nowrap font-normal">
+          <h3 className="SpaceName whitespace-nowrap font-normal">
             {data?.display_name}
-          </h2>
+          </h3>
         </Truncate>
       ) : (
         <h3 className="SpaceName whitespace-normal">{data?.display_name}</h3>

@@ -127,7 +127,7 @@ const DesktopLayout = (props: { header: React.ReactNode }) => {
     <div className="mx-auto flex h-full w-full flex-col gap-2 overflow-hidden">
       <div className="spaceHeader mx-auto flex w-full max-w-[1332px] flex-row items-end justify-between gap-4 px-2">
         {props.header}
-        <div className="spaceHeaderSearch flex w-[360px] shrink-0 flex-row gap-0">
+        <div className="spaceHeaderSearch flex w-[360px] shrink-0 flex-row items-center gap-0">
           <HelpButton />
           <Search />
         </div>
@@ -311,10 +311,7 @@ const HelpButton = () => {
   let [open, setOpen] = useState(false);
   return (
     <>
-      <button
-        onClick={() => setOpen(true)}
-        className=" -mr-[6px] ml-[6px] text-grey-55 "
-      >
+      <button onClick={() => setOpen(true)} className="   text-grey-55 ">
         <Question />
       </button>
       <HelpModal open={open} onClose={() => setOpen(false)} />
