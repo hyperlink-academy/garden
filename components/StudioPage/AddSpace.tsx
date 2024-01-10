@@ -28,11 +28,11 @@ export function AddSpace(props: { id: string }) {
     <>
       <ButtonPrimary
         onClick={() => setOpen(true)}
-        content={width > 640 ? `Add a space` : `Add`}
+        content={width > 640 ? `Add a Space` : `Add`}
         icon={<SpaceCreate />}
       />
       <Modal
-        header="Add a Space To This Studio"
+        header="Add a Space to this Studio"
         open={open}
         onClose={() => setOpen(false)}
       >
@@ -40,8 +40,8 @@ export function AddSpace(props: { id: string }) {
           <>
             <p>
               Your Studiomates can{" "}
-              <span className="font-bold">chat and comment</span> in any spaces
-              in the studio!
+              <span className="font-bold">chat and comment</span> in any Spaces
+              in the Studio!
             </p>
             <p>
               But they still need an invite to a specific Space to add, remove,
@@ -67,7 +67,7 @@ export function AddSpace(props: { id: string }) {
             >
               <h4>Existing Space</h4>
               <p className="italic text-grey-35">
-                Bring any space that you&apos;re a member of into this studio.
+                Bring any space that you&apos;re a member of into this Studio
               </p>
             </button>
           </>
@@ -193,11 +193,9 @@ const AddExistingSpace = (props: { onClose: () => void; studioID: string }) => {
 
   return (
     <div className="flex flex-col gap-4">
-      <div>
+      <div className="flex flex-col gap-2">
         <h4> Select Space(s) to Add </h4>
-        <p className="text-grey-55">
-          You can only add Spaces that are upcoming, active, or unscheduled
-        </p>
+        <p className="text-grey-55">You can only add active Spaces</p>
       </div>
       <div className="flex flex-col gap-2">
         {spaces?.map(({ space_data }) =>
