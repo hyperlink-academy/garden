@@ -8,6 +8,7 @@ import { spaceAPI, workerAPI } from "backend/lib/api";
 import Router from "next/router";
 import { ModalSubmitButton, Modal } from "components/Modal";
 import { WORKER_URL } from "src/constants";
+import { Delete } from "components/Icons";
 
 export function StudioSettings(props: { id: string }) {
   let { session, authToken } = useAuth();
@@ -27,7 +28,7 @@ export function StudioSettings(props: { id: string }) {
     });
   }, [data?.description, data?.name]);
   return (
-    <div className="mx-auto flex max-w-2xl flex-col gap-3 pb-6 sm:pt-6">
+    <div className="mx-auto flex max-w-2xl flex-col gap-8 pb-6 sm:pt-6">
       <form
         className="flex flex-col gap-3"
         onSubmit={async (e) => {
@@ -65,17 +66,13 @@ export function StudioSettings(props: { id: string }) {
 
       <hr className="border-grey-80" />
 
-      <div className="lightBorder flex flex-col justify-center gap-4 p-2 text-center">
-        <div className="flex flex-col items-center justify-between gap-2">
-          <h3>Delete Studio</h3>
-          <p className="text-sm ">
-            Spaces linked here will NOT be deleted; they will be available from
-            their members&apos; homepages.
-            <br />
-            <span className="font-bold">
-              You WILL lose all Studio posts / highlights.
-            </span>
-          </p>
+      <div className="lightBorder flex flex-col items-center gap-2 p-4 text-center">
+        <h3>Delete Studio</h3>
+        <p className="text-sm">
+          Spaces will <strong>not</strong> be deleted; they will be available
+          from their members&apos; homepages.
+        </p>
+        <div className="items-right my-1 justify-end">
           <DeleteStudioForm studioID={props.id} />
         </div>
       </div>
@@ -96,13 +93,14 @@ const DeleteStudioForm = (props: { studioID: string }) => {
       <ButtonPrimary
         type="button"
         content="Delete Studio"
+        icon={status === "normal" ? <Delete /> : <DotLoader />}
         destructive
         onClick={() => setOpen(true)}
         className="mx-auto"
       />
       <Modal open={open} onClose={() => setOpen(false)}>
         <div className="flex flex-col gap-3">
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-2">
             <p className="font-bold">Type the name of this Studio</p>
             <input
               className="w-full"
@@ -114,7 +112,7 @@ const DeleteStudioForm = (props: { studioID: string }) => {
 
           <ModalSubmitButton
             content={status === "normal" ? "Delete Studio" : ""}
-            icon={status === "normal" ? undefined : <DotLoader />}
+            icon={status === "normal" ? <Delete /> : <DotLoader />}
             onSubmit={async () => {
               if (data?.name !== state.studioName) return;
               if (!props.studioID || !authToken) return;

@@ -30,7 +30,7 @@ export const StudioForm = ({
   let example_studio = useRandomValue(weird_studios);
   return (
     <>
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-2">
         <p className="font-bold">Name this Studio</p>
         <div className="flex flex-col gap-0.5">
           <input
