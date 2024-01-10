@@ -20,7 +20,7 @@ export function About() {
         <div className="no-scrollbar flex h-full flex-col gap-2 overflow-scroll rounded-lg border border-grey-80 bg-white p-4 text-lg">
           <Textarea
             id="studio-about"
-            placeholder="write a readme..."
+            placeholder="write a readme…"
             value={homeContent?.value}
             onFocus={() => {
               setAboutFocus(true);

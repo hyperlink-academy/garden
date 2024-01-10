@@ -32,7 +32,7 @@ export function StudioPageContent(props: Props) {
   if (props.isAdmin) Tabs["Settings"] = Settings;
 
   return (
-    <div className="studioWrapper flex w-full items-stretch px-3 sm:h-screen sm:px-4">
+    <div className="studioWrapper pwa-padding flex w-full items-stretch px-3 sm:h-screen sm:px-4">
       <div className="studio relative m-auto flex h-full w-full max-w-6xl flex-col sm:flex-row">
         <Tab.Group
           manual
