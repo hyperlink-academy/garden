@@ -13,7 +13,7 @@ import Link from "next/link";
 import { useAuth } from "hooks/useAuth";
 import useWindowDimensions from "hooks/useWindowDimensions";
 import { ButtonPrimary } from "components/Buttons";
-import { LogInModal } from "components/LoginModal";
+import { LoginOrSignupModal } from "components/LoginModal";
 
 export type Props = {
   data: NonUndefined<ReturnType<typeof useStudioData>["data"]>;
@@ -149,14 +149,11 @@ const StudioMobileNav = (props: Props) => {
 };
 
 const LoginButton = () => {
-  let [logInOpen, setLogInOpen] = useState(false);
+  let [state, setState] = LoginOrSignupModal.useState("closed");
   return (
     <>
-      <ButtonPrimary
-        content="Log In"
-        onClick={() => setLogInOpen(!logInOpen)}
-      />
-      <LogInModal isOpen={logInOpen} onClose={() => setLogInOpen(false)} />
+      <ButtonPrimary content="Log In" onClick={() => setState("login")} />
+      <LoginOrSignupModal state={state} setState={setState} />
     </>
   );
 };

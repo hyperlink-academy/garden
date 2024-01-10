@@ -8,7 +8,7 @@ import { CreateStudio } from "./CreateStudio";
 import { useIdentityData } from "hooks/useIdentityData";
 import { uuidToBase62 } from "src/uuidHelpers";
 import Head from "next/head";
-import { LogInModal } from "./LoginModal";
+import { LoginOrSignupModal } from "./LoginModal";
 
 export const HomeLayout = (props: {
   id: string;
@@ -91,25 +91,11 @@ const StudiosList = (props: { username: string }) => {
 };
 
 const Login = () => {
-  let [isOpen, setIsOpen] = useState(false);
-  let router = useRouter();
-
+  let [state, setState] = LoginOrSignupModal.useState("closed");
   return (
     <>
-      <ButtonLink content="log in" onClick={() => setIsOpen(true)} />
-
-      <LogInModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
+      <ButtonLink content="log in" onClick={() => setState("login")} />
+      <LoginOrSignupModal state={state} setState={setState} />
     </>
   );
-};
-
-// NB: currently unused!
-const Logout = () => {
-  let { session, logout } = useAuth();
-  let router = useRouter();
-  return session.session?.username === router.query.studio ? (
-    <div className="self-center">
-      <ButtonLink content="logout" onClick={() => logout()} />
-    </div>
-  ) : null;
 };

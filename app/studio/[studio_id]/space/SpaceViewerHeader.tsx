@@ -1,8 +1,7 @@
 "use client";
 import { ButtonPrimary } from "components/Buttons";
 import { ArrowUp } from "components/Icons";
-import { LogInModal } from "components/LoginModal";
-import { SpaceOptions } from "components/SpaceLayout/Sidebar";
+import { LoginOrSignupModal } from "components/LoginModal";
 import { SpaceData } from "components/SpacesList";
 import { Truncate } from "components/Truncate";
 import { useAuth } from "hooks/useAuth";
@@ -99,14 +98,11 @@ const SpaceSwitcher = (props: { spaces: SpaceData[] }) => {
 };
 
 export const LoginButton = () => {
-  let [logInOpen, setLogInOpen] = useState(false);
+  let [state, setState] = LoginOrSignupModal.useState("closed");
   return (
     <>
-      <ButtonPrimary
-        content="Log In"
-        onClick={() => setLogInOpen(!logInOpen)}
-      />
-      <LogInModal isOpen={logInOpen} onClose={() => setLogInOpen(false)} />
+      <ButtonPrimary content="Log In" onClick={() => setState("login")} />
+      <LoginOrSignupModal state={state} setState={setState} />
     </>
   );
 };

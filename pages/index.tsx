@@ -7,12 +7,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "hooks/useAuth";
 import { useRouter } from "next/router";
-import { LogInModal, SignupModal } from "components/LoginModal";
+import { LoginOrSignupModal } from "components/LoginModal";
 
 export default function IndexPage() {
   let textFormat = "mx-auto w-full flex max-w-2xl flex-col gap-4";
-  let [logInOpen, setLogInOpen] = useState(false);
-  let [signupOpen, setSignupOpen] = useState(false);
+  let [loginOrSignupState, setLoginOrSignupState] =
+    LoginOrSignupModal.useState("closed");
 
   let { session } = useAuth();
   let router = useRouter();
@@ -49,33 +49,18 @@ export default function IndexPage() {
                     <>
                       <ButtonLink
                         content="sign up"
-                        onClick={() => setSignupOpen(true)}
+                        onClick={() => setLoginOrSignupState("signup")}
                       />
                       <span>
                         <em>or</em>
                       </span>
                       <ButtonLink
                         content="log in"
-                        onClick={() => setLogInOpen(true)}
+                        onClick={() => setLoginOrSignupState("signup")}
                       />
-                      {/* signup modal */}
-                      <SignupModal
-                        isOpen={signupOpen}
-                        onClose={() => setSignupOpen(false)}
-                        onSwitchToLogIn={() => {
-                          setLogInOpen(true);
-                          setSignupOpen(false);
-                        }}
-                      />
-
-                      {/* login modal */}
-                      <LogInModal
-                        isOpen={logInOpen}
-                        onClose={() => setLogInOpen(false)}
-                        onSwitchToSignUp={() => {
-                          setLogInOpen(false);
-                          setSignupOpen(true);
-                        }}
+                      <LoginOrSignupModal
+                        state={loginOrSignupState}
+                        setState={setLoginOrSignupState}
                         redirectOnLogin={(s) =>
                           s.username
                             ? router.push(`/s/${s.username}`)
@@ -259,7 +244,7 @@ export default function IndexPage() {
               {/* NB: opens same modal as above - just an extra button here! */}
               <ButtonPrimary
                 content="create your account!"
-                onClick={() => setSignupOpen(true)}
+                onClick={() => setLoginOrSignupState("signup")}
               />
             </div>
 
@@ -372,7 +357,7 @@ export default function IndexPage() {
                 {/* NB: opens same modal as above - just an extra button here! */}
                 <ButtonPrimary
                   content="create your account!"
-                  onClick={() => setSignupOpen(true)}
+                  onClick={() => setLoginOrSignupState("signup")}
                 />
               </div>
             </div>

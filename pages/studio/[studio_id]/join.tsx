@@ -3,7 +3,7 @@ import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
 import { BaseSmallCard } from "components/CardPreview/SmallCard";
 import { Member, StudioFilled } from "components/Icons";
 import { Divider } from "components/Layout";
-import { LogInModal, SignupModal } from "components/LoginModal";
+import { LoginOrSignupModal } from "components/LoginModal";
 import { useAuth } from "hooks/useAuth";
 import { useStudioData } from "hooks/useStudioData";
 import { GetStaticPropsContext, InferGetStaticPropsType } from "next";
@@ -68,7 +68,7 @@ export default function StudioPage(props: Props) {
         >
           <h3>{data?.name}</h3>
         </Link>
-        <div className="p-2 border border-grey-80 rounded-md bg-white">
+        <div className="rounded-md border border-grey-80 bg-white p-2">
           {data?.welcome_message}
         </div>
 
@@ -98,32 +98,7 @@ export default function StudioPage(props: Props) {
             />
           </>
         ) : (
-          <>
-            <div className="display flex flex-row gap-2">
-              <ButtonPrimary
-                content="Log In"
-                onClick={() => setState("login")}
-                className="justify-self-center"
-              />
-              <p className="self-center text-sm italic">or</p>
-              <ButtonSecondary
-                content="Sign Up"
-                onClick={() => setState("signup")}
-                className="justify-self-center"
-              />
-            </div>
-            <LogInModal
-              isOpen={state === "login"}
-              onClose={() => setState("normal")}
-            />
-            <SignupModal
-              redirectTo={`/studio/${uuidToBase62(
-                props.id || ""
-              )}/join?code=${code}`}
-              isOpen={state === "signup"}
-              onClose={() => setState("normal")}
-            />
-          </>
+          <LoginOrSignup code={code} id={props.id} />
         )}
         <div className="flex max-w-sm flex-col gap-4 pt-4 text-center italic">
           <Divider />
@@ -146,6 +121,37 @@ export default function StudioPage(props: Props) {
     </>
   );
 }
+
+const LoginOrSignup = (props: {
+  id: string | undefined;
+  code: string | undefined;
+}) => {
+  let [state, setState] = LoginOrSignupModal.useState("closed");
+  return (
+    <>
+      <div className="display flex flex-row gap-2">
+        <ButtonPrimary
+          content="Log In"
+          onClick={() => setState("login")}
+          className="justify-self-center"
+        />
+        <p className="self-center text-sm italic">or</p>
+        <ButtonSecondary
+          content="Sign Up"
+          onClick={() => setState("signup")}
+          className="justify-self-center"
+        />
+      </div>
+      <LoginOrSignupModal
+        state={state}
+        setState={setState}
+        redirectTo={`/studio/${uuidToBase62(props.id || "")}/join?code=${
+          props.code
+        }`}
+      />
+    </>
+  );
+};
 
 export const WelcomeSparkle = (props: SVGProps<SVGSVGElement>) => {
   return (

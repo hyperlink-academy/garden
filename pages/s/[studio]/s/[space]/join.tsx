@@ -6,7 +6,7 @@ import { useAuth } from "hooks/useAuth";
 import { db, useSpaceID } from "hooks/useReplicache";
 import { useRouter } from "next/router";
 import { SVGProps, useEffect, useState } from "react";
-import { LogInModal, SignupModal } from "components/LoginModal";
+import { LoginOrSignupModal } from "components/LoginModal";
 import Head from "next/head";
 import { useSpaceData } from "hooks/useSpaceData";
 import Link from "next/link";
@@ -58,8 +58,6 @@ export function JoinSpace() {
   let code = router.query.code as string | undefined;
   let isMember = db.useUniqueAttribute("space/member", session.session?.studio);
   let { data } = useSpaceData(id);
-
-  let [state, setState] = useState<"normal" | "signup" | "login">("normal");
 
   const onClick = async () => {
     if (!authToken || !code || isMember || !id) return;
@@ -116,30 +114,7 @@ export function JoinSpace() {
             />
           </>
         ) : (
-          <>
-            <div className="display flex flex-row gap-2">
-              <ButtonPrimary
-                content="Log In"
-                onClick={() => setState("login")}
-                className="justify-self-center"
-              />
-              <p className="self-center text-sm italic">or</p>
-              <ButtonSecondary
-                content="Sign Up"
-                onClick={() => setState("signup")}
-                className="justify-self-center"
-              />
-            </div>
-            <LogInModal
-              isOpen={state === "login"}
-              onClose={() => setState("normal")}
-            />
-            <SignupModal
-              redirectTo={`/s/${router.query.studio}/s/${router.query.space}/${data?.display_name}/join?code=${router.query.code}`}
-              isOpen={state === "signup"}
-              onClose={() => setState("normal")}
-            />
-          </>
+          <LoginOrSignup display_name={data?.display_name} />
         )}
         <div className="flex max-w-sm flex-col gap-4 pt-4 text-center italic">
           <Divider />
@@ -162,6 +137,33 @@ export function JoinSpace() {
     </>
   );
 }
+
+const LoginOrSignup = (props: { display_name?: string | null }) => {
+  let [state, setState] = LoginOrSignupModal.useState("closed");
+  let router = useRouter();
+  return (
+    <>
+      <div className="display flex flex-row gap-2">
+        <ButtonPrimary
+          content="Log In"
+          onClick={() => setState("login")}
+          className="justify-self-center"
+        />
+        <p className="self-center text-sm italic">or</p>
+        <ButtonSecondary
+          content="Sign Up"
+          onClick={() => setState("signup")}
+          className="justify-self-center"
+        />
+      </div>
+      <LoginOrSignupModal
+        state={state}
+        setState={setState}
+        redirectTo={`/s/${router.query.studio}/s/${router.query.space}/${props.display_name}/join?code=${router.query.code}`}
+      />
+    </>
+  );
+};
 
 export const WelcomeSparkle = (props: SVGProps<SVGSVGElement>) => {
   return (

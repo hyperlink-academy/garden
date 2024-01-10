@@ -22,7 +22,7 @@ import { useSpring, animated } from "@react-spring/web";
 import { createPortal } from "react-dom";
 import { useAuth } from "hooks/useAuth";
 import { ButtonPrimary } from "components/Buttons";
-import { LogInModal } from "components/LoginModal";
+import { LoginOrSignupModal } from "components/LoginModal";
 import Link from "next/link";
 import { Search, MobileSearch } from "components/Search";
 import { HelpModal } from "components/HelpCenter";
@@ -153,14 +153,11 @@ const DesktopLayout = (props: { header: React.ReactNode }) => {
 };
 
 const LoginButton = () => {
-  let [logInOpen, setLogInOpen] = useState(false);
+  let [state, setState] = LoginOrSignupModal.useState("closed");
   return (
     <>
-      <ButtonPrimary
-        content="Log In"
-        onClick={() => setLogInOpen(!logInOpen)}
-      />
-      <LogInModal isOpen={logInOpen} onClose={() => setLogInOpen(false)} />
+      <ButtonPrimary content="Log In" onClick={() => setState("login")} />
+      <LoginOrSignupModal state={state} setState={setState} />
     </>
   );
 };

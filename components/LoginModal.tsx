@@ -2,43 +2,43 @@ import { LoginForm } from "pages/login";
 import { SignupForm } from "pages/signup";
 import { Modal } from "./Modal";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useState } from "react";
 
-export const LogInModal = (props: {
-  isOpen: boolean;
-  onClose: () => void;
+export const LoginOrSignupModal = (props: {
+  state: "login" | "signup" | "closed";
+  setState: (s: "login" | "signup" | "closed") => void;
   redirectOnLogin?: (s: { username?: string }) => void;
-  onSwitchToSignUp?: () => void;
+  redirectTo?: string;
 }) => {
   return (
-    <Modal open={props.isOpen} onClose={props.onClose} noCloseButton>
-      <LoginForm
-        onLogin={(s) => {
-          if (props.redirectOnLogin) {
-            props.redirectOnLogin(s);
-          }
-        }}
-        onClose={props.onClose}
-        onSwitchToSignUp={props.onSwitchToSignUp}
-      />
+    <Modal
+      open={props.state !== "closed"}
+      onClose={() => props.setState("closed")}
+      noCloseButton
+    >
+      {props.state === "login" ? (
+        <LoginForm
+          onLogin={(s) => {
+            if (props.redirectOnLogin) {
+              props.redirectOnLogin(s);
+            }
+          }}
+          onClose={() => props.setState("closed")}
+          onSwitchToSignUp={() => props.setState("signup")}
+        />
+      ) : (
+        <SignupForm
+          redirectTo={props.redirectTo}
+          onClose={() => props.setState("closed")}
+          onSwitchToLogIn={() => props.setState("login")}
+        />
+      )}
     </Modal>
   );
 };
 
-export const SignupModal = (props: {
-  isOpen: boolean;
-  onClose: () => void;
-  redirectTo?: string;
-  onSwitchToLogIn?: () => void;
-}) => {
-  return (
-    <Modal open={props.isOpen} onClose={props.onClose} noCloseButton>
-      <SignupForm
-        redirectTo={props.redirectTo}
-        onClose={props.onClose}
-        onSwitchToLogIn={props.onSwitchToLogIn}
-      />
-    </Modal>
-  );
+LoginOrSignupModal.useState = (initialState: "login" | "signup" | "closed") => {
+  return useState(initialState);
 };
 
 const buttonClass =

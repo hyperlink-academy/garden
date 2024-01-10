@@ -18,7 +18,7 @@ import { useRouter } from "next/navigation";
 import { EditRoomModal } from "./RoomListLayout";
 import { SharedRoomList } from "./SharedRoomList";
 import { ButtonPrimary, ButtonTertiary } from "components/Buttons";
-import { LogInModal } from "components/LoginModal";
+import { LoginOrSignupModal } from "components/LoginModal";
 import { useSpaceData } from "hooks/useSpaceData";
 import { People } from "./People";
 import { DotLoader } from "components/DotLoader";
@@ -276,15 +276,19 @@ const LoginOrHome = () => {
   let { session } = useAuth();
 
   let [infoOpen, setInfoOpen] = useState(false);
-  let [logInOpen, setLogInOpen] = useState(false);
+  let [loginOrSignupState, setLoginOrSignupState] =
+    LoginOrSignupModal.useState("closed");
 
   return !session.session?.username ? (
     <div>
       <ButtonPrimary
         content="Log In"
-        onClick={() => setLogInOpen(!logInOpen)}
+        onClick={() => setLoginOrSignupState("login")}
       />
-      <LogInModal isOpen={logInOpen} onClose={() => setLogInOpen(false)} />
+      <LoginOrSignupModal
+        setState={setLoginOrSignupState}
+        state={loginOrSignupState}
+      />
     </div>
   ) : (
     <SpaceOptions />

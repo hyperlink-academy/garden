@@ -18,7 +18,7 @@ import AutosizeTextarea from "components/Textarea/AutosizeTextarea";
 import { FindOrCreate, useAllItems } from "components/FindOrCreateEntity";
 import { ref } from "data/Facts";
 import { CardPreviewWithData } from "components/CardPreview";
-import { LogInModal } from "components/LoginModal";
+import { LoginOrSignupModal } from "components/LoginModal";
 import { RoomHeader } from "components/Room";
 import { useRoom, useUIState } from "hooks/useUIState";
 import { useFilteredCards } from "../CardFilter";
@@ -155,7 +155,6 @@ export const MessageInput = (props: {
 
   let replyMessage = db.useMessageByID(props.reply);
   let replyToName = db.useEntity(replyMessage?.sender || null, "member/name");
-  let [loginIsOpen, setLoginOpen] = useState(false);
   const send = async () => {
     if (!session.session || !value) return;
     let message: Omit<Message, "sender"> = {
@@ -195,26 +194,7 @@ export const MessageInput = (props: {
   return (
     <>
       {!authorized ? (
-        <>
-          <div className="messageLogIn mx-2 mb-2 flex h-[38px] place-items-center gap-2 rounded-md bg-grey-90">
-            <p className=" w-full text-center text-sm italic text-grey-55">
-              <span
-                role="button"
-                className="font-bold text-accent-blue"
-                onClick={() => {
-                  setLoginOpen(true);
-                }}
-              >
-                Log In
-              </span>{" "}
-              to join the discussion!
-            </p>
-          </div>
-          <LogInModal
-            isOpen={loginIsOpen}
-            onClose={() => setLoginOpen(false)}
-          />
-        </>
+        <Login />
       ) : (
         <div className="messageInput flex w-full flex-col gap-2  pb-2 pt-1">
           {/* IF MESSAGE IS IN REPLY */}
@@ -277,6 +257,29 @@ export const MessageInput = (props: {
           </div>
         </div>
       )}
+    </>
+  );
+};
+
+const Login = () => {
+  let [state, setState] = LoginOrSignupModal.useState("closed");
+  return (
+    <>
+      <div className="messageLogIn mx-2 mb-2 flex h-[38px] place-items-center gap-2 rounded-md bg-grey-90">
+        <p className=" w-full text-center text-sm italic text-grey-55">
+          <span
+            role="button"
+            className="font-bold text-accent-blue"
+            onClick={() => {
+              setState("login");
+            }}
+          >
+            Log In
+          </span>{" "}
+          to join the discussion!
+        </p>
+      </div>
+      <LoginOrSignupModal state={state} setState={setState} />
     </>
   );
 };
