@@ -16,7 +16,6 @@ import { Modal } from "./Modal";
 export const SpaceList = (props: {
   spaces: Array<SpaceData>;
   onEdit?: () => void;
-  small?: boolean;
 }) => {
   return (
     <div>
@@ -32,12 +31,7 @@ export const SpaceList = (props: {
         {props.spaces?.map((a) => {
           return (
             <div key={a.do_id}>
-              <SpaceCard
-                onEdit={props.onEdit}
-                small={props.small}
-                {...a}
-                editable={true}
-              />
+              <SpaceCard onEdit={props.onEdit} {...a} editable={true} />
             </div>
           );
         })}
@@ -48,7 +42,6 @@ export const SpaceList = (props: {
 
 export const SpaceCard = (
   props: {
-    small?: boolean;
     editable?: boolean;
     onEdit?: () => void;
   } & SpaceData
@@ -82,39 +75,6 @@ export const BaseSpaceCard = (props: Parameters<typeof SpaceCard>[0]) => {
     let delta = Math.abs(end_timestamp - start_timestamp) / 1000;
     duration_days = Math.floor(delta / 86400) + 1;
   }
-
-  if (props.small)
-    return (
-      <div className="smallSpaceCard relative flex min-h-[82px] w-full">
-        <div className="ml-8 mt-6 w-full">
-          <div
-            className="smallSpaceCardContent lightBorder flex w-full shrink-0 grow flex-col gap-0 bg-white py-2 pl-10 pr-3"
-            style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
-          >
-            <div className="flex justify-between gap-2">
-              {/* this may never show 'space deleted' but here same as big space card in case */}
-              <div
-                className={`font-bold ${
-                  !data?.display_name ? "italic text-grey-55" : ""
-                }`}
-              >
-                {data?.display_name || "space deleted"}
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="smallSpaceCardIcon absolute left-0 top-0">
-          <DoorImage
-            small
-            width="64"
-            display_name={data?.display_name}
-            image={data?.image}
-            default_space_image={data?.default_space_image}
-            glow={!!unreads && !!authorized && unreads > 0}
-          />
-        </div>
-      </div>
-    );
 
   return (
     <div className="largeSpaceCard group relative flex w-full">

@@ -86,7 +86,7 @@ export function JoinSpace() {
           :{" "}
         </p>
         <div className="-mt-4">
-          <SpaceCard small {...(data as SpaceData)} />
+          <SpaceCard {...(data as SpaceData)} />
         </div>
         {session.loggedIn && authToken ? (
           <>

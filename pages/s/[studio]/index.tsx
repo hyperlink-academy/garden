@@ -141,7 +141,6 @@ const HistoryList = (props: { spaces: Array<SpaceData> }) => {
           </button>
           <div className={`${showHistory ? "" : "hidden"}`}>
             <SpaceList
-              small
               spaces={spacesHistory}
               onEdit={() => {
                 mutate();
