@@ -2,6 +2,7 @@ import { NonUndefined } from "@use-gesture/react";
 import { RoomSearch } from "components/Icons";
 import { BaseSpaceCard, SpaceData } from "components/SpacesList";
 import { AddSpace } from "components/StudioPage/AddSpace";
+import { useAuth } from "hooks/useAuth";
 import { useStudioData } from "hooks/useStudioData";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -19,31 +20,41 @@ export function SpaceList({ data }: Props) {
       s && !s.archived && s.display_name?.toLocaleLowerCase().includes(search)
   );
 
+  let auth = useAuth();
+
   if (!data) return;
   return (
     <div className="studioSpacesWrapper mx-auto h-full overflow-y-scroll pb-6 sm:pt-6">
       <div className="studioSpaces flex h-full w-full flex-col gap-4">
-        <div className="studioSpacesOptions flex w-full  items-center justify-between gap-3  ">
-          <AddSpace id={data.id} />
+        <div className="studioSpacesOptions flex w-full items-center justify-between gap-3  ">
+          {auth.authToken && <AddSpace id={data.id} />}
 
-          <div className="studioSpacesSearch relative flex flex-row text-sm">
-            <RoomSearch className="absolute right-2 top-2  text-grey-55" />
-            <input
-              className="h-fit w-full max-w-sm bg-white py-1 pl-2 pr-6 outline-none sm:w-64"
-              value={search}
-              onChange={(e) => setSearch(e.currentTarget.value)}
-              placeholder="search spaces..."
-              onFocus={(e) =>
-                e.currentTarget.setSelectionRange(
-                  0,
-                  e.currentTarget.value.length
-                )
-              }
-            />
-          </div>
+          {spaces.length > 0 && (
+            <div className="studioSpacesSearch relative flex flex-row text-sm">
+              <RoomSearch className="absolute right-2 top-2  text-grey-55" />
+              <input
+                className="h-fit w-full max-w-sm bg-white py-1 pl-2 pr-6 outline-none sm:w-64"
+                value={search}
+                onChange={(e) => setSearch(e.currentTarget.value)}
+                placeholder="search spaces..."
+                onFocus={(e) =>
+                  e.currentTarget.setSelectionRange(
+                    0,
+                    e.currentTarget.value.length
+                  )
+                }
+              />
+            </div>
+          )}
         </div>
         <div className=" studioSpaceListWrapper no-scrollbar relative flex h-full w-full flex-row gap-2 overflow-y-scroll ">
-          <List spaces={spaces?.map((s) => s.space_data as SpaceData) || []} />
+          {spaces.length > 0 ? (
+            <List
+              spaces={spaces?.map((s) => s.space_data as SpaceData) || []}
+            />
+          ) : (
+            <EmptyStudio />
+          )}
         </div>
       </div>
     </div>
@@ -69,6 +80,15 @@ const List = (props: { spaces: Array<SpaceData> }) => {
           );
         })}
       </div>
+    </div>
+  );
+};
+
+const EmptyStudio = () => {
+  return (
+    <div className="lightBorder flex h-fit flex-col gap-4 bg-bg-blue p-4">
+      <h3>⚠️ under construction ⚠️</h3>
+      <p>This Studio does not yet contain any Spaces!</p>
     </div>
   );
 };
