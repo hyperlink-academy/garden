@@ -23,12 +23,12 @@ export function Members({ data, isAdmin }: Props) {
 
   return (
     <div className="no-scrollbar mx-auto  h-full max-w-md  overflow-y-scroll  ">
-      <div className="flex flex-col gap-2 pb-6 sm:pt-6">
+      <div className="flex flex-col gap-4 pb-6 sm:pt-6">
         {isAdmin && (
           <InviteModal welcomeMessage={data.welcome_message} id={data.id} />
         )}
         {session.session && (
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-2">
             <div className="text-sm italic text-grey-55">
               click your bio to edit it!
             </div>
@@ -48,9 +48,11 @@ export function Members({ data, isAdmin }: Props) {
             />
           </div>
         )}
-        <div className="py-4">
-          <Divider />
-        </div>
+        {session.session && data?.members_in_studios.length > 1 && (
+          <div className="py-4">
+            <Divider />
+          </div>
+        )}
         <div className="flex flex-col gap-2">
           {data?.members_in_studios
             .filter(
@@ -138,7 +140,7 @@ const MemberCard = (props: {
                   placeholder={
                     session.session?.studio !== props.memberStudio
                       ? " "
-                      : "write a bio..."
+                      : "write a bio…"
                   }
                   value={bio?.value}
                   onChange={(e) => {
@@ -162,7 +164,7 @@ const MemberCard = (props: {
                   placeholder={
                     session.session?.studio !== props.memberStudio
                       ? " "
-                      : "write a bio..."
+                      : "write a bio…"
                   }
                   className="min-h-0 grow overflow-hidden"
                 />
