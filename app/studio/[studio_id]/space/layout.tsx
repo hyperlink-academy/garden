@@ -6,6 +6,8 @@ import { PageHeightContainer } from "components/PageHeightContainer";
 import { Space } from "pages/s/[studio]/s/[space]";
 import { SpaceViewerHeader } from "./SpaceViewerHeader";
 
+export const fetchCache = "force-no-store";
+
 export default async function StudioSpaceLayout(props: {
   params: { studio_id: string };
   children: React.ReactNode;

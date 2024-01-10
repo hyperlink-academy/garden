@@ -5,6 +5,8 @@ import { SpaceData } from "components/SpacesList";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 
+export const fetchCache = "force-no-store";
+
 export function SpaceViewer(props: {
   studioName: string;
   children: React.ReactNode;
