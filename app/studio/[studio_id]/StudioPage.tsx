@@ -94,14 +94,7 @@ const StudioDesktopNav = (props: Props) => {
         <h3>{data?.name}</h3>
         <Tab.List className="StudioTabs flex flex-col gap-2 ">
           {Object.keys(Tabs).map((tab) => (
-            <TabItem
-              name={
-                tab === "Members"
-                  ? `Members (${data?.members_in_studios.length})`
-                  : tab
-              }
-              key={tab}
-            />
+            <TabItem name={tab} key={tab} />
           ))}
         </Tab.List>
         {session.session && (
@@ -136,14 +129,7 @@ const StudioMobileNav = (props: Props) => {
         <div className=" flex gap-2 ">
           <Tab.List className="StudioTabs  flex gap-4">
             {Object.keys(Tabs).map((tab) => (
-              <TabItem
-                name={
-                  tab === "Members"
-                    ? `Members (${data?.members_in_studios.length})`
-                    : tab
-                }
-                key={tab}
-              />
+              <TabItem name={tab} key={tab} />
             ))}
           </Tab.List>
         </div>
