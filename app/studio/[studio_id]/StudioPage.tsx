@@ -12,6 +12,8 @@ import { ArrowDown, ArrowUp } from "components/Icons";
 import Link from "next/link";
 import { useAuth } from "hooks/useAuth";
 import useWindowDimensions from "hooks/useWindowDimensions";
+import { ButtonPrimary } from "components/Buttons";
+import { LogInModal } from "components/LoginModal";
 
 export type Props = {
   data: NonUndefined<ReturnType<typeof useStudioData>["data"]>;
@@ -97,13 +99,17 @@ const StudioDesktopNav = (props: Props) => {
             <TabItem name={tab} key={tab} />
           ))}
         </Tab.List>
-        {session.session && (
+        {session.session ? (
           <Link
             href={`/s/${session.session.username}`}
             className="flex items-center justify-end gap-2 text-grey-55 hover:text-accent-blue"
           >
             <ArrowDown className="rotate-90" height={16} width={16} /> home
           </Link>
+        ) : (
+          <div className="self-end">
+            <LoginButton />
+          </div>
         )}
       </div>
     </div>
@@ -116,24 +122,41 @@ const StudioMobileNav = (props: Props) => {
 
   return (
     <>
-      {session.session && (
+      {session.session ? (
         <Link
           href={`/s/${session.session.username}`}
           className="mt-3 flex items-center gap-2 text-sm text-grey-55 hover:text-accent-blue"
         >
           <ArrowDown className="rotate-90" height={16} width={16} /> home
         </Link>
+      ) : (
+        <div className="my-4">
+          <LoginButton />
+        </div>
       )}
       <h3 className="z-20 -mb-3 mt-2">{data?.name}</h3>
       <div className="sticky top-0 z-10 -mx-3 mb-4 border-b border-grey-80 bg-background px-3  pb-1 pt-4">
         <div className=" flex gap-2 ">
-          <Tab.List className="StudioTabs  flex gap-4">
+          <Tab.List className="StudioTabs flex gap-4">
             {Object.keys(Tabs).map((tab) => (
               <TabItem name={tab} key={tab} />
             ))}
           </Tab.List>
         </div>
       </div>
+    </>
+  );
+};
+
+const LoginButton = () => {
+  let [logInOpen, setLogInOpen] = useState(false);
+  return (
+    <>
+      <ButtonPrimary
+        content="Log In"
+        onClick={() => setLogInOpen(!logInOpen)}
+      />
+      <LogInModal isOpen={logInOpen} onClose={() => setLogInOpen(false)} />
     </>
   );
 };
