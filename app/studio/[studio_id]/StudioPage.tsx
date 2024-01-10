@@ -122,6 +122,7 @@ const StudioMobileNav = (props: Props) => {
 
   return (
     <>
+      <div className="pwa-padding sticky"></div>
       {session.session ? (
         <Link
           href={`/s/${session.session.username}`}
@@ -135,7 +136,7 @@ const StudioMobileNav = (props: Props) => {
         </div>
       )}
       <h3 className="z-20 -mb-3 mt-2">{data?.name}</h3>
-      <div className="pwa-padding sticky top-0 z-10 -mx-3 mb-4 border-b border-grey-80 bg-background px-3 pb-1 pt-4">
+      <div className="sticky top-0 z-10 -mx-3 mb-4 border-b border-grey-80 bg-background px-3 pb-1 pt-4">
         <div className=" flex gap-2 ">
           <Tab.List className="StudioTabs flex gap-4">
             {Object.keys(Tabs).map((tab) => (
