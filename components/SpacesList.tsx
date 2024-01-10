@@ -67,7 +67,7 @@ export const BaseSpaceCard = (props: Parameters<typeof SpaceCard>[0]) => {
   let now = getCurrentDate();
 
   let { data } = useSpaceData(props.do_id, props);
-  let unreads = data?.user_space_unreads.find(
+  let unreads = data?.user_space_unreads?.find(
     (f) => f.user === session.user?.id
   )?.unreads;
 
