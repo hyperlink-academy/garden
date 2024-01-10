@@ -28,21 +28,10 @@ export const SpaceList = (props: {
           }
         }
       `}</style>
-      <div
-        className={`spacesList flex flex-wrap  ${
-          props?.small ? "gap-4" : "gap-6 py-2"
-        }`}
-      >
+      <div className=" homeSpaceList grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3">
         {props.spaces?.map((a) => {
           return (
-            <div
-              key={a.do_id}
-              className={`${
-                props.small
-                  ? ""
-                  : "min-w-80 flex-1 basis-80 sm:last:max-w-[calc(50%-12px)]"
-              }`}
-            >
+            <div key={a.do_id}>
               <SpaceCard
                 onEdit={props.onEdit}
                 small={props.small}
@@ -96,17 +85,21 @@ export const BaseSpaceCard = (props: Parameters<typeof SpaceCard>[0]) => {
 
   if (props.small)
     return (
-      <div className="smallSpaceCard group relative flex min-h-[82px]">
-        <div className="ml-8 mt-6">
+      <div className="smallSpaceCard relative flex min-h-[82px] w-full">
+        <div className="ml-8 mt-6 w-full">
           <div
-            className="smallSpaceCardContent lightBorder flex w-80 shrink-0 flex-col gap-0 bg-white py-2 pl-10 pr-3"
+            className="smallSpaceCardContent lightBorder flex w-full shrink-0 grow flex-col gap-0 bg-white py-2 pl-10 pr-3"
             style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
           >
             <div className="flex justify-between gap-2">
               {/* this may never show 'space deleted' but here same as big space card in case */}
-              <h4 className={!data?.display_name ? "italic text-grey-55" : ""}>
+              <div
+                className={`font-bold text-grey-55 ${
+                  !data?.display_name ? "italic text-grey-55" : ""
+                }`}
+              >
                 {data?.display_name || "space deleted"}
-              </h4>
+              </div>
             </div>
           </div>
         </div>
