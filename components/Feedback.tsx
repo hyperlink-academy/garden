@@ -61,7 +61,7 @@ export const Feedback = () => {
               </p>
             </div>
             <AutosizeTextarea
-              placeholder="Your feedback..."
+              placeholder="Your feedback…"
               className="min-h-[128px] rounded-md border border-grey-55 p-2"
               value={input}
               onChange={(e) => setInput(e.currentTarget.value)}

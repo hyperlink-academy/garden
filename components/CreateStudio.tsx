@@ -34,7 +34,7 @@ export const StudioForm = ({
         <p className="font-bold">Name this Studio</p>
         <div className="flex flex-col gap-0.5">
           <input
-            placeholder={example_studio + "..."}
+            placeholder={example_studio + "…"}
             className="w-full"
             maxLength={64}
             value={formState.name}

@@ -94,7 +94,7 @@ export const EditRoomModal = (props: {
               value={descriptionState}
               maxLength={500}
               placeholder={
-                currentRoomDescription?.value || "Add a description..."
+                currentRoomDescription?.value || "Add a description…"
               }
               onChange={(e) => {
                 let value = e.currentTarget.value;

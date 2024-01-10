@@ -39,7 +39,7 @@ export function SpaceList({ data }: Props) {
                 className="h-fit w-full max-w-sm bg-white py-1 pl-2 pr-6 outline-none sm:w-64"
                 value={search}
                 onChange={(e) => setSearch(e.currentTarget.value)}
-                placeholder="search spaces..."
+                placeholder="search spaces…"
                 onFocus={(e) =>
                   e.currentTarget.setSelectionRange(
                     0,

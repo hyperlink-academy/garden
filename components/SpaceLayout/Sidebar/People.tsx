@@ -187,7 +187,7 @@ const CallPanel = (props: {
             className="w-full pt-2 text-left"
             onClick={() => props.toggleCallExpanded()}
           >
-            {inCall ? "in call..." : "call ongoing..."}
+            {inCall ? "in call…" : "call ongoing…"}
           </button>
           {inCall ? <CallSettings /> : <JoinCall />}
         </div>

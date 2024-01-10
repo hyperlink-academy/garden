@@ -515,7 +515,7 @@ export const MobileSearch = () => {
                 ref={inputRef}
                 value={input}
                 onChange={(e) => setInput(e.currentTarget.value)}
-                placeholder="search cards..."
+                placeholder="search cards…"
               />
             </div>
             <button onClick={() => setState("normal")} className="text-grey-15">

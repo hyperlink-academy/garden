@@ -527,7 +527,7 @@ const DefaultTextSection = (props: { entityID: string }) => {
       }}
       entityID={props.entityID}
       section={"card/content"}
-      placeholder={authorized ? "write something..." : ""}
+      placeholder={authorized ? "write something…" : ""}
     />
   );
 };
