@@ -262,16 +262,16 @@ function InviteModal(props: { welcomeMessage: string; id: string }) {
       >
         <div className="flex flex-col gap-4">
           <p>
-            Studio members can add spaces to the studio, and see and
-            comment/chat in each others’ spaces!
+            Members can add Spaces to the Studio, and chat / comment in each
+            other&apos;s Spaces.
           </p>
 
           <p>
-            However they won’t be able to change or delete spaces that they are
-            not explicitly invited to.
+            They won&apos;t be able to otherwise edit Spaces unless explicitly
+            invited.
           </p>
           <div className="flex flex-col gap-3 rounded-md border border-grey-80 bg-bg-blue p-2">
-            <h4>Send this Invite Link</h4>
+            <h4>Send this invite link</h4>
             <div className="inviteMemberModalLink flex w-full gap-2">
               <input
                 className="grow bg-grey-90 text-grey-35"
@@ -285,18 +285,21 @@ function InviteModal(props: { welcomeMessage: string; id: string }) {
               />
             </div>
           </div>
-          <div>
-            <h4>Customize the welcome message</h4>
+          <div className="flex flex-col gap-2">
+            <h4>Customize your welcome message</h4>
             <p>
-              Prospective studio members will see this before accepting the
-              invite to join your space! Say hello :D
+              Prospective Studio members will see this on the invite page just
+              before joining!
+            </p>
+            <p className="text-sm italic">
+              You can include links & Markdown for styling ✨
             </p>
             <div className="flex flex-col gap-2">
               <Textarea
                 value={welcomeMessage}
                 onChange={(e) => setWelcomeMessage(e.currentTarget.value)}
                 className="w-full rounded-md border border-grey-55 p-2"
-                placeholder="Add a Welcome Message..."
+                placeholder="Add a welcome message…"
               />
               <ButtonPrimary
                 disabled={props.welcomeMessage === welcomeMessage}
