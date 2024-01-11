@@ -15,8 +15,8 @@ export const get_identity_data_route = makeRoute({
         members_in_spaces(
           space_data(${space_data_query})
         ),
-        studios!studios_creator_fkey(*),
-        members_in_studios(studios(*)),
+        studios!studios_creator_fkey(${studio_query}),
+        members_in_studios(studios(${studio_query})),
         owner:space_data!space_data_owner_fkey(*, owner:identity_data!space_data_owner_fkey(*))`
       )
       .eq("username", msg.name.toLowerCase())
@@ -29,3 +29,8 @@ export const get_identity_data_route = makeRoute({
     return { data: { success: false } } as const;
   },
 });
+
+const studio_query = `*,
+        members_in_studios(*, identity_data(*)),
+        spaces_in_studios(*)
+  `;
