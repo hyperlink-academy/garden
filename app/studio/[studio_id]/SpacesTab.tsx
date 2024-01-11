@@ -19,7 +19,7 @@ export function SpaceList({ data }: Props) {
 
   let filteredSpaces = allSpaces.filter(
     ({ space_data: s }) =>
-      s && !s.archived && s.display_name?.toLocaleLowerCase().includes(search)
+      s && !s.archived && s.display_name?.toLocaleLowerCase().includes(search.toLocaleLowerCase())
   );
 
   let { session } = useAuth();
