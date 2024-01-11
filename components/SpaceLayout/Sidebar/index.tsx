@@ -14,7 +14,7 @@ import {
   UnreadDot,
 } from "../../Icons";
 import { EditSpaceModal } from "components/CreateSpace";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { EditRoomModal } from "./RoomListLayout";
 import { SharedRoomList } from "./SharedRoomList";
 import { ButtonPrimary, ButtonTertiary } from "components/Buttons";
@@ -29,8 +29,12 @@ import { useUIState } from "hooks/useUIState";
 import { Truncate } from "components/Truncate";
 import router from "next/router";
 import { HelpButton } from "pages/s/[studio]/s/[space]";
+import { SpaceData } from "components/SpacesList";
 
-export const Sidebar = (props: { mobile?: boolean }) => {
+export const Sidebar = (props: {
+  mobile?: boolean;
+  studio?: { spaces: SpaceData[]; studioName: string };
+}) => {
   let [roomEditOpen, setRoomEditOpen] = useState(false);
   let setMobileSidebarOpen = useUIState((s) => s.setMobileSidebarOpen);
 
@@ -42,33 +46,14 @@ export const Sidebar = (props: { mobile?: boolean }) => {
             <div
               className={`spaceName flex w-full flex-col bg-white text-grey-35`}
             >
-              <div className="flex justify-between">
-                <div className="-mb-0.5  text-sm font-bold text-grey-55">
-                  studio name
+              {props.studio && (
+                <div className="flex justify-between">
+                  <div className="-mb-0.5  text-sm font-bold text-grey-55">
+                    {props.studio.studioName}
+                  </div>
+                  <SpaceSwitcher spaces={props.studio?.spaces} />
                 </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    className="flex items-center gap-0 text-grey-55 hover:text-accent-blue "
-                    onClick={() => {}}
-                  >
-                    <ArrowUp
-                      style={{ transform: "rotate(-90deg)" }}
-                      height={16}
-                      width={16}
-                    />
-                  </button>
-                  <button
-                    className="flex items-center gap-0 text-grey-55 hover:text-accent-blue"
-                    onClick={() => {}}
-                  >
-                    <ArrowUp
-                      style={{ transform: "rotate(90deg)" }}
-                      height={16}
-                      width={16}
-                    />
-                  </button>
-                </div>
-              </div>
+              )}
 
               <div className="flex w-full flex-row items-start gap-2 ">
                 <div className="grow">
@@ -110,6 +95,54 @@ export const Sidebar = (props: { mobile?: boolean }) => {
           </div>
         </div>
       )}
+    </div>
+  );
+};
+
+const SpaceSwitcher = (props: { spaces: SpaceData[] }) => {
+  let router = useRouter();
+  let params = useParams<{ space_id: string; studio_id: string }>();
+  let activeSpace =
+    props.spaces.find((x) => x.id === params?.space_id) || props.spaces[0];
+  let spaces = props.spaces.filter((s) => s.archived === activeSpace.archived);
+  let index = spaces.findIndex((s) => s.id === params?.space_id);
+  return (
+    <div className="flex items-center gap-2">
+      <button
+        className="flex items-center gap-0 text-grey-55 hover:text-accent-blue "
+        onClick={() => {
+          if (!params) return;
+          router.push(
+            `/studio/${params.studio_id}/space/${
+              //wrap around index - 1
+              spaces[(index - 1 + spaces.length) % spaces.length].id
+            }`
+          );
+        }}
+      >
+        <ArrowUp
+          style={{ transform: "rotate(-90deg)" }}
+          height={16}
+          width={16}
+        />
+      </button>
+      <button
+        className="flex items-center gap-0 text-grey-55 hover:text-accent-blue"
+        onClick={() => {
+          if (!params) return;
+          router.push(
+            `/studio/${params.studio_id}/space/${
+              spaces[(index + 1) % spaces.length].id
+            }`
+          );
+        }}
+      >
+        <ArrowUp
+          style={{ transform: "rotate(90deg)" }}
+          height={16}
+          width={16}
+        />
+      </button>
     </div>
   );
 };

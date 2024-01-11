@@ -4,8 +4,6 @@ import { base62ToUuid } from "src/uuidHelpers";
 import { SpaceViewer } from "./SpaceViewer";
 import { PageHeightContainer } from "components/PageHeightContainer";
 import { Space } from "pages/s/[studio]/s/[space]";
-import { SpaceViewerHeader } from "./SpaceViewerHeader";
-
 export const fetchCache = "force-no-store";
 
 export default async function StudioSpaceLayout(props: {
@@ -24,9 +22,10 @@ export default async function StudioSpaceLayout(props: {
     <PageHeightContainer>
       <SpaceViewer studioName={data.data.name} spaces={spaces}>
         <Space
-          header={
-            <SpaceViewerHeader spaces={spaces} studioName={data.data.name} />
-          }
+          studio={{
+            spaces,
+            studioName: data.data.name,
+          }}
         />
       </SpaceViewer>
     </PageHeightContainer>

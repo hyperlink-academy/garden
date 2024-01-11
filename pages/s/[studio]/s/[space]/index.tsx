@@ -30,6 +30,8 @@ import { useGesture } from "@use-gesture/react";
 import { useDndContext } from "@dnd-kit/core";
 import { useSpaceShortcuts } from "hooks/useSpaceShortcuts";
 import { PageHeightContainer } from "components/PageHeightContainer";
+import { SpaceData } from "components/SpacesList";
+import { SpaceViewerHeader } from "app/studio/[studio_id]/space/SpaceViewerHeader";
 
 export async function getStaticPaths() {
   return { paths: [], fallback: "blocking" };
@@ -48,8 +50,9 @@ export async function getStaticProps(ctx: GetStaticPropsContext) {
   return { props: { notFound: false, data: data.data } };
 }
 
-type Props = InferGetStaticPropsType<typeof getStaticProps>;
-export default function SpacePage(props: Props) {
+export default function SpacePage(
+  props: InferGetStaticPropsType<typeof getStaticProps>
+) {
   const [isClient, setIsClient] = useState(false);
   useEffect(() => {
     setIsClient(true);
@@ -61,12 +64,71 @@ export default function SpacePage(props: Props) {
     <SWRConfig value={{ fallback: { [props.data.do_id]: props.data } }}>
       <SpaceProvider id={props.data.do_id}>
         <PageHeightContainer>
-          <Space header={<Header />} />
+          <Space />
         </PageHeightContainer>
       </SpaceProvider>
     </SWRConfig>
   );
 }
+
+type Props = { studio?: { spaces: SpaceData[]; studioName: string } };
+export const Space = (props: Props) => {
+  const { width } = useWindowDimensions();
+  useSpaceSyncState();
+  useSpaceShortcuts();
+
+  useEffect(() => {
+    window.requestAnimationFrame(() => {
+      let roomPane = document.getElementById("roomInnerWrapper");
+      roomPane?.scrollIntoView();
+    });
+  }, []);
+  return (
+    <>
+      <SpaceMetaTitle />
+      <PresenceHandler />
+      <SmallCardDragContext>
+        {width > 640 || width === 0 ? (
+          <DesktopLayout {...props} />
+        ) : (
+          <MobileLayout {...props} />
+        )}
+      </SmallCardDragContext>
+    </>
+  );
+};
+
+const DesktopLayout = (props: Props) => {
+  let { session } = useAuth();
+
+  return (
+    <div className="mx-auto flex h-full w-full flex-col gap-2 overflow-hidden">
+      <div className="spaceHeader mx-auto flex w-full max-w-[1332px] flex-row items-end justify-between gap-4 px-2">
+        {props.studio ? <SpaceViewerHeader {...props.studio} /> : <Header />}
+        <div className="spaceHeaderSearch flex w-[440px] shrink-0 flex-row items-center gap-2 text-grey-55">
+          <HelpButton />
+
+          {!session.loggedIn ? <LoginButton /> : <SpaceOptions />}
+
+          <Search />
+        </div>
+      </div>
+      <div className=" no-scrollbar spaceLargeSplitLayout mx-auto flex h-full w-full max-w-[1332px] snap-x snap-mandatory flex-row items-stretch gap-4 overflow-y-hidden overflow-x-scroll scroll-smooth px-4 sm:gap-4  md:overflow-x-hidden">
+        <div className="spaceRoomAndSidebar flex shrink-0  snap-center snap-always flex-row  rounded-md border border-grey-90">
+          <div className="shrink-0 rounded-l-md border border-transparent border-r-grey-90 bg-white">
+            <Sidebar />
+          </div>
+
+          <div className="spaceRoomWrapper no-scrollbar relative flex h-full flex-shrink-0 flex-col gap-0">
+            <Room />
+          </div>
+        </div>
+
+        <CardViewer />
+      </div>
+    </div>
+  );
+};
 
 const Header = () => {
   let { session } = useAuth();
@@ -94,64 +156,6 @@ const Header = () => {
   );
 };
 
-export const Space = (props: { header: React.ReactNode }) => {
-  const { width } = useWindowDimensions();
-  useSpaceSyncState();
-  useSpaceShortcuts();
-
-  useEffect(() => {
-    window.requestAnimationFrame(() => {
-      let roomPane = document.getElementById("roomInnerWrapper");
-      roomPane?.scrollIntoView();
-    });
-  }, []);
-  return (
-    <>
-      <SpaceMetaTitle />
-      <PresenceHandler />
-      <SmallCardDragContext>
-        {width > 640 || width === 0 ? (
-          <DesktopLayout {...props} />
-        ) : (
-          <MobileLayout />
-        )}
-      </SmallCardDragContext>
-    </>
-  );
-};
-
-const DesktopLayout = (props: { header: React.ReactNode }) => {
-  let { session } = useAuth();
-
-  return (
-    <div className="mx-auto flex h-full w-full flex-col gap-2 overflow-hidden">
-      <div className="spaceHeader mx-auto flex w-full max-w-[1332px] flex-row items-end justify-between gap-4 px-2">
-        {props.header}
-        <div className="spaceHeaderSearch flex w-[440px] shrink-0 flex-row items-center gap-2 text-grey-55">
-          <HelpButton />
-
-          {!session.loggedIn ? <LoginButton /> : <SpaceOptions />}
-
-          <Search />
-        </div>
-      </div>
-      <div className=" no-scrollbar spaceLargeSplitLayout mx-auto flex h-full w-full max-w-[1332px] snap-x snap-mandatory flex-row items-stretch gap-4 overflow-y-hidden overflow-x-scroll scroll-smooth px-4 sm:gap-4  md:overflow-x-hidden">
-        <div className="spaceRoomAndSidebar flex shrink-0  snap-center snap-always flex-row  rounded-md border border-grey-90">
-          <div className="shrink-0 rounded-l-md border border-transparent border-r-grey-90 bg-white">
-            <Sidebar />
-          </div>
-
-          <div className="spaceRoomWrapper no-scrollbar relative flex h-full flex-shrink-0 flex-col gap-0">
-            <Room />
-          </div>
-        </div>
-
-        <CardViewer />
-      </div>
-    </div>
-  );
-};
-
 const LoginButton = () => {
   let [state, setState] = LoginOrSignupModal.useState("closed");
   return (
@@ -162,7 +166,7 @@ const LoginButton = () => {
   );
 };
 
-const MobileLayout = () => {
+const MobileLayout = (props: Props) => {
   let setSidebarOpen = useUIState((s) => s.setMobileSidebarOpen);
   let ref = useRef<HTMLDivElement>(null);
   let { setNodeRef: droppableRef, over } = useDroppableZone({
@@ -229,12 +233,12 @@ const MobileLayout = () => {
         <MobileSearch />
       </div>
 
-      <MobileSidebar />
+      <MobileSidebar {...props} />
     </div>
   );
 };
 
-const MobileSidebar = () => {
+const MobileSidebar = (props: Props) => {
   let open = useUIState((s) => s.mobileSidebarOpen);
   let setSidebarOpen = useUIState((s) => s.setMobileSidebarOpen);
   let { left } = useSpring({
@@ -299,7 +303,7 @@ const MobileSidebar = () => {
           className="h-full touch-none rounded-md border border-grey-90 bg-white"
           {...bindSidebar()}
         >
-          <Sidebar mobile />
+          <Sidebar mobile studio={props.studio} />
         </div>
       </animated.div>
     </>,
