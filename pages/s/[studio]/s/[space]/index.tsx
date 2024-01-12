@@ -71,7 +71,9 @@ export default function SpacePage(
   );
 }
 
-type Props = { studio?: { spaces: SpaceData[]; studioName: string } };
+type Props = {
+  studio?: { spaces: SpaceData[]; studioName: string; studioID: string };
+};
 export const Space = (props: Props) => {
   const { width } = useWindowDimensions();
   useSpaceSyncState();

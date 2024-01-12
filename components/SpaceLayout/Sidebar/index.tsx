@@ -23,17 +23,17 @@ import { useSpaceData } from "hooks/useSpaceData";
 import { People } from "./People";
 import { DotLoader } from "components/DotLoader";
 import { useIsActiveRoom, useRoom, useSetRoom } from "hooks/useUIState";
-import { prefetchIdentityData } from "hooks/useIdentityData";
 import { ModalSubmitButton, Modal } from "components/Modal";
 import { useUIState } from "hooks/useUIState";
 import { Truncate } from "components/Truncate";
 import router from "next/router";
 import { HelpButton } from "pages/s/[studio]/s/[space]";
 import { SpaceData } from "components/SpacesList";
+import { uuidToBase62 } from "src/uuidHelpers";
 
 export const Sidebar = (props: {
   mobile?: boolean;
-  studio?: { spaces: SpaceData[]; studioName: string };
+  studio?: { spaces: SpaceData[]; studioName: string; studioID: string };
 }) => {
   let [roomEditOpen, setRoomEditOpen] = useState(false);
   let setMobileSidebarOpen = useUIState((s) => s.setMobileSidebarOpen);
@@ -48,9 +48,14 @@ export const Sidebar = (props: {
             >
               {props.studio && (
                 <div className="flex justify-between">
-                  <div className="-mb-0.5  text-sm font-bold text-grey-55">
-                    {props.studio.studioName}
-                  </div>
+                  <Link
+                    prefetch
+                    href={`/studio/${uuidToBase62(props.studio.studioID)}`}
+                  >
+                    <div className="-mb-0.5  text-sm font-bold text-grey-55">
+                      {props.studio.studioName}
+                    </div>
+                  </Link>
                   <SpaceSwitcher spaces={props.studio?.spaces} />
                 </div>
               )}

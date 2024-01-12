@@ -25,6 +25,7 @@ export default async function StudioSpaceLayout(props: {
           studio={{
             spaces,
             studioName: data.data.name,
+            studioID: data.data.id,
           }}
         />
       </SpaceViewer>
