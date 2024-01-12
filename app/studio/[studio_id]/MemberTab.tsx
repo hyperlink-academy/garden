@@ -53,11 +53,13 @@ export function Members({ data, isAdmin }: Props) {
           </div>
         )}
         {/* divider, only if you + others are studio members */}
-        {session.session && data?.members_in_studios.length > 1 && (
-          <div className="py-4">
-            <Divider />
-          </div>
-        )}
+        {session.session &&
+          authorized &&
+          data?.members_in_studios.length > 1 && (
+            <div className="py-4">
+              <Divider />
+            </div>
+          )}
         {/* other studio members */}
         <div className="flex flex-col gap-2">
           {data?.members_in_studios
