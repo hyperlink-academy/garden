@@ -36,7 +36,7 @@ export function StudioPageContent(props: Props) {
   if (props.isAdmin) Tabs["Settings"] = Settings;
   if (!isClient) return null;
   return (
-    <div className="studioWrapper flex w-full items-stretch px-3 sm:h-screen sm:px-4">
+    <div className="pwa-padding studioWrapper flex w-full items-stretch px-3 sm:h-screen sm:px-4">
       <div className="studio relative mx-auto flex w-full max-w-6xl flex-col sm:flex-row">
         <Tab.Group
           manual
@@ -134,7 +134,7 @@ const StudioMobileNav = (props: Props) => {
           <ArrowDown className="rotate-90" height={16} width={16} /> home
         </Link>
       ) : (
-        <div className="my-4">
+        <div className="z-20 my-4">
           <LoginButton />
         </div>
       )}
