@@ -1,11 +1,8 @@
-import { workerAPI } from "backend/lib/api";
+"use client";
 import { SpaceProvider } from "components/ReplicacheProvider";
 import { SpaceData, SpaceList } from "components/SpacesList";
 import { CreateSpace } from "components/CreateSpace";
-import { GetStaticPropsContext, InferGetStaticPropsType } from "next";
 import { useAuth } from "hooks/useAuth";
-import { useRouter } from "next/router";
-import { getCurrentDate } from "src/utils";
 import { useIdentityData } from "hooks/useIdentityData";
 import { useEffect, useState } from "react";
 import { DisclosureCollapseTiny, DisclosureExpandTiny } from "components/Icons";
@@ -15,28 +12,28 @@ import { Divider } from "components/Layout";
 import { HelpExampleSpaces } from "components/HelpCenter";
 import { uuidToBase62 } from "src/uuidHelpers";
 import Link from "next/link";
+import { IdentityData } from "backend/routes/get_identity_data";
+import { useParams } from "next/dist/client/components/navigation";
 
-type Props = InferGetStaticPropsType<typeof getStaticProps>;
-export default function UserHomePage(props: Props) {
+export default function UserHomePage(props: { data: IdentityData }) {
   let { session } = useAuth();
-  let { query } = useRouter();
-  let { data } = useIdentityData(query.studio as string, props.data);
+  let query = useParams<{ studio: string }>();
+  let { data } = useIdentityData(query?.studio as string, props.data);
   let [sortOrder, _setSortOrder] = useState<"lastUpdated" | "name">(
     "lastUpdated"
   );
 
   const setSortOrder = (sortOrder: "lastUpdated" | "name") => {
     _setSortOrder(sortOrder);
-    localStorage.setItem(`${query.studio}/sortOrder`, sortOrder);
+    localStorage.setItem(`${query?.studio}/sortOrder`, sortOrder);
   };
   useEffect(() => {
-    let savedSortOrder = localStorage.getItem(`${query.studio}/sortOrder`);
+    let savedSortOrder = localStorage.getItem(`${query?.studio}/sortOrder`);
     if (savedSortOrder) _setSortOrder(savedSortOrder as "lastUpdated" | "name");
-  }, [query.studio, _setSortOrder]);
-  if (props.notFound) return <div>404 - page not found!</div>;
+  }, [query?.studio, _setSortOrder]);
   if (!data) return <div>loading </div>;
 
-  let currentStudioName = query.studio;
+  let currentStudioName = query?.studio;
   let studios = data?.members_in_studios.map(
     (s) => s.studios as Exclude<typeof s.studios, null>
   );
@@ -84,6 +81,7 @@ export default function UserHomePage(props: Props) {
               <div className="grid  w-full grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3">
                 {studios.map((studio) => (
                   <Link
+                    prefetch
                     href={`/studio/${uuidToBase62(studio.id)}`}
                     className="grid h-[120px] w-full flex-col place-items-center rounded-md border border-accent-blue bg-bg-blue text-center hover:border-2"
                     key={studio.id}
@@ -142,7 +140,7 @@ export default function UserHomePage(props: Props) {
           <List
             spaces={spaces}
             id={data.studio}
-            name={query.studio as string}
+            name={query?.studio as string}
           />
         </div>
       </SpaceProvider>
@@ -151,11 +149,10 @@ export default function UserHomePage(props: Props) {
 }
 
 const HistoryList = (props: { spaces: Array<SpaceData> }) => {
-  let now = getCurrentDate();
   let spacesHistory = props.spaces.filter((s) => s.archived);
   let [showHistory, setShowHistory] = useState(false);
-  let { query } = useRouter();
-  let { mutate } = useIdentityData(query.studio as string);
+  let query = useParams<{ studio: string }>();
+  let { mutate } = useIdentityData(query?.studio as string);
   return (
     <>
       {spacesHistory.length > 0 ? (
@@ -204,14 +201,12 @@ const List = (props: {
   name: string;
 }) => {
   let { session } = useAuth();
-  let { query } = useRouter();
 
   let myStudioName = session.session?.username;
-  let currentStudioName = query.studio;
 
   let spaces = props.spaces.filter((s) => !s.archived);
 
-  let { mutate } = useIdentityData(query.studio as string);
+  let { mutate } = useIdentityData(props.name);
 
   return (
     <div className="flex flex-col gap-8">
@@ -227,7 +222,7 @@ const List = (props: {
       {/* empty state - if user homepage has NO ACTIVE SPACES */}
       {/* different messages for logged in user vs. viewing someone else's home */}
       {spaces.length == 0 ? (
-        session?.loggedIn && myStudioName == currentStudioName ? (
+        session?.loggedIn && myStudioName == props.name ? (
           // <NewStudio
           //   studioSpaceID={props.id}
           //   studioName={myStudioName as string}
@@ -238,7 +233,7 @@ const List = (props: {
           /> /* me as in the logged in user who can make spaces here */
         ) : (
           <YourHomeEmpty
-            username={currentStudioName as string}
+            username={props.name}
           /> /* you as in I'm viewing a homepage that's not mine-the-authed-user's */
         )
       ) : null}
@@ -247,23 +242,6 @@ const List = (props: {
     </div>
   );
 };
-
-export async function getStaticPaths() {
-  return { paths: [], fallback: "blocking" };
-}
-
-const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
-export async function getStaticProps(ctx: GetStaticPropsContext) {
-  if (!ctx.params?.studio)
-    return { props: { notFound: true }, revalidate: 10 } as const;
-  let data = await workerAPI(WORKER_URL, "get_identity_data", {
-    name: ctx.params?.studio as string,
-  });
-
-  if (!data.success)
-    return { props: { notFound: true }, revalidate: 10 } as const;
-  return { props: { notFound: false, data: data.data } };
-}
 
 const YourHomeEmpty = (props: { username: string }) => {
   return (

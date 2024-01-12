@@ -34,3 +34,8 @@ const studio_query = `*,
         members_in_studios(*, identity_data(*)),
         spaces_in_studios(*)
   `;
+
+export type IdentityData = Extract<
+  Awaited<ReturnType<typeof get_identity_data_route.handler>>,
+  { data: { success: true } }
+>["data"]["data"];
