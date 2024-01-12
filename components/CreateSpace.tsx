@@ -26,7 +26,6 @@ export const CreateSpace = (props: {
   let { mutate } = useIdentityData(props.studioName);
   let [open, setOpen] = useState(false);
 
-  let { authorized } = useMutations();
   let [formState, setFormState] = useState<CreateSpaceFormState>({
     display_name: "",
     description: "",
@@ -35,7 +34,6 @@ export const CreateSpace = (props: {
   });
   let auth = useAuth();
   let rep = useContext(ReplicacheContext);
-  if (!authorized) return null;
   return (
     <>
       <a className="flex w-fit">
