@@ -59,7 +59,7 @@ export const BaseSpaceCard = (props: Parameters<typeof SpaceCard>[0]) => {
   let { authorized } = useMutations();
   let now = getCurrentDate();
 
-  let { data } = useSpaceData(props.do_id, props);
+  let data = props;
   let unreads = data?.user_space_unreads?.find(
     (f) => f.user === session.user?.id
   )?.unreads;
