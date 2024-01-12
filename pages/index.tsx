@@ -56,7 +56,7 @@ export default function IndexPage() {
                       </span>
                       <ButtonLink
                         content="log in"
-                        onClick={() => setLoginOrSignupState("signup")}
+                        onClick={() => setLoginOrSignupState("login")}
                       />
                       <LoginOrSignupModal
                         state={loginOrSignupState}
