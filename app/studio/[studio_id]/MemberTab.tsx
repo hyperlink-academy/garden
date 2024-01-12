@@ -20,6 +20,9 @@ import { Divider } from "components/Layout";
 
 export function Members({ data, isAdmin }: Props) {
   let { session } = useAuth();
+  let authorized = data.members_in_studios.find(
+    (m) => m.member === session.user?.id
+  );
 
   return (
     <div className="no-scrollbar mx-auto  h-full max-w-md  overflow-y-scroll  ">
@@ -27,7 +30,8 @@ export function Members({ data, isAdmin }: Props) {
         {isAdmin && (
           <InviteModal welcomeMessage={data.welcome_message} id={data.id} />
         )}
-        {session.session && (
+        {/* your studio member card */}
+        {session.session && authorized && (
           <div className="flex flex-col gap-2">
             <div className="text-sm italic text-grey-55">
               click your bio to edit it!
@@ -48,11 +52,13 @@ export function Members({ data, isAdmin }: Props) {
             />
           </div>
         )}
+        {/* divider, only if you + others are studio members */}
         {session.session && data?.members_in_studios.length > 1 && (
           <div className="py-4">
             <Divider />
           </div>
         )}
+        {/* other studio members */}
         <div className="flex flex-col gap-2">
           {data?.members_in_studios
             .filter(
