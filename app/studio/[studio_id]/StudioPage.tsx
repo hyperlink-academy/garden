@@ -32,8 +32,8 @@ export function StudioPageContent(props: Props) {
   if (props.isAdmin) Tabs["Settings"] = Settings;
 
   return (
-    <div className="studioWrapper pwa-padding flex w-full items-stretch px-3 sm:h-screen sm:px-4">
-      <div className="studio relative m-auto flex h-full w-full max-w-6xl flex-col sm:flex-row">
+    <div className="studioWrapper flex w-full items-stretch px-3 sm:h-screen sm:px-4">
+      <div className="studio relative m-auto flex w-full max-w-6xl flex-col sm:flex-row">
         <Tab.Group
           manual
           selectedIndex={selectedIndex}
@@ -135,8 +135,9 @@ const StudioMobileNav = (props: Props) => {
         </div>
       )}
       <h3 className="z-20 -mb-3 mt-2">{data?.name}</h3>
-      <div className="pwa-padding sticky top-0 z-10 -mx-3 mb-4 border-b border-grey-80 bg-background px-3 pb-1 pt-4">
-        <div className=" flex gap-2 ">
+
+      <div className="pwa-padding pwa-negative-margin sticky top-0 z-10 -mx-3  mb-4 border-b border-grey-80 bg-background px-3 pb-1">
+        <div className=" flex gap-2 pt-4">
           <Tab.List className="StudioTabs flex gap-4">
             {Object.keys(Tabs).map((tab) => (
               <TabItem name={tab} key={tab} />

@@ -1,5 +1,5 @@
 import { AddImage } from "components/CardView/ImageSection";
-import { SectionImageAdd } from "components/Icons";
+import { CloseLinedTiny, SectionImageAdd } from "components/Icons";
 import { Divider } from "components/Layout";
 import { Textarea } from "components/Textarea";
 import { db, useMutations } from "hooks/useReplicache";
@@ -14,8 +14,8 @@ export function About() {
   return (
     <div className="mx-auto h-full max-w-2xl  pb-6 sm:pt-6">
       <div className="relative h-full">
-        {
-          <div className="absolute -top-3 right-3 z-10 flex items-center gap-2 rounded-md border border-accent-blue bg-white p-1 text-accent-blue">
+        {!image && (
+          <div className="absolute right-3 top-3 z-10 flex items-center gap-2 rounded-md border border-grey-80 bg-white p-1 text-accent-blue sm:-top-4">
             <AddImage
               onUpload={(imageID) => {
                 if (!home) return;
@@ -30,18 +30,26 @@ export function About() {
               <SectionImageAdd />
             </AddImage>
           </div>
-        }
+        )}
         <div className="no-scrollbar flex h-full flex-col gap-2 overflow-scroll rounded-lg border border-grey-80 bg-white p-4 text-lg">
           {image && (
-            <img
-              alt=""
-              className="max-w-full rounded-md hover:cursor-pointer"
-              src={
-                image.value.filetype === "image"
-                  ? `${WORKER_URL}/static/${image.value.id}`
-                  : image.value.url
-              }
-            />
+            <div className="relative">
+              <img
+                alt=""
+                className="max-w-full rounded-md hover:cursor-pointer"
+                src={
+                  image.value.filetype === "image"
+                    ? `${WORKER_URL}/static/${image.value.id}`
+                    : image.value.url
+                }
+              />
+              <button
+                className=" absolute right-3 top-3 w-fit rounded-full border border-grey-80 bg-white p-1 text-grey-55 hover:border-accent-blue hover:bg-bg-blue hover:text-accent-blue"
+                onClick={() => {}}
+              >
+                <CloseLinedTiny />
+              </button>
+            </div>
           )}
           <Textarea
             id="studio-about"

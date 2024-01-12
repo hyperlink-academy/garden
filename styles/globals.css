@@ -250,6 +250,10 @@ textarea {
     margin-top: env(safe-area-inset-top) !important;
   }
 
+  .pwa-negative-margin {
+    margin-top: -env(safe-area-inset-top) !important;
+  }
+
   .safari-pwa-height {
     height: 100lvh !important;
   }
