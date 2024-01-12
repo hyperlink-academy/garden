@@ -247,6 +247,11 @@ const MobileSidebar = (props: Props) => {
     left: open ? 0 : -222,
     config: springConfig,
   });
+  useEffect(() => {
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute("content", open ? "#d4d0c8" : "#ffaf0");
+  }, [open]);
   let opacity = useSpring({
     opacity: open ? 0.2 : 0,
   });
