@@ -1,9 +1,10 @@
+import { spaceAPI } from "backend/lib/api";
 import { AddImage } from "components/CardView/ImageSection";
 import { CloseLinedTiny, SectionImageAdd } from "components/Icons";
 import { Divider } from "components/Layout";
 import { Textarea } from "components/Textarea";
-import { db, useMutations } from "hooks/useReplicache";
-import { useState } from "react";
+import { useAuth } from "hooks/useAuth";
+import { db, useMutations, useSpaceID } from "hooks/useReplicache";
 import { WORKER_URL } from "src/constants";
 
 export function About() {
@@ -11,6 +12,8 @@ export function About() {
   let homeContent = db.useEntity(home?.entity, "card/content");
   let image = db.useEntity(home?.entity, "card/image");
   let { mutate } = useMutations();
+  let { authToken } = useAuth();
+  let spaceID = useSpaceID();
   return (
     <div className="mx-auto h-full max-w-2xl  pb-6 sm:pt-6">
       <div className="relative h-full">
@@ -45,7 +48,19 @@ export function About() {
               />
               <button
                 className=" absolute right-3 top-3 w-fit rounded-full border border-grey-80 bg-white p-1 text-grey-55 hover:border-accent-blue hover:bg-bg-blue hover:text-accent-blue"
-                onClick={() => {}}
+                onClick={() => {
+                  if (!image || !authToken) return;
+                  mutate("retractFact", { id: image.id });
+                  if (image.value.filetype === "external_image") return;
+                  spaceAPI(
+                    `${WORKER_URL}/space/${spaceID}`,
+                    "delete_file_upload",
+                    {
+                      authToken,
+                      fileID: image.value.id,
+                    }
+                  );
+                }}
               >
                 <CloseLinedTiny />
               </button>
