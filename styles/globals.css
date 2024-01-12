@@ -237,24 +237,22 @@ textarea {
   scrollbar-width: none; /* Firefox */
 }
 
-@media (display-mode: standalone),
-  (display-mode: fullscreen) and (max-width: 640px) {
-  .pwa-padding {
-    padding-top: env(safe-area-inset-top) !important;
-  }
-  .pwa-bottom-padding {
-    padding-bottom: env(safe-area-inset-bottom) !important;
-  }
+.pwa-padding {
+  padding-top: env(safe-area-inset-top) !important;
+}
 
-  .pwa-margin {
-    margin-top: env(safe-area-inset-top) !important;
-  }
+.pwa-bottom-padding {
+  padding-bottom: env(safe-area-inset-bottom) !important;
+}
 
-  .pwa-negative-margin {
-    margin-top: -env(safe-area-inset-top) !important;
-  }
+.pwa-margin {
+  margin-top: env(safe-area-inset-top) !important;
+}
 
-  .safari-pwa-height {
-    height: 100lvh !important;
-  }
+.pwa-negative-margin {
+  margin-top: -env(safe-area-inset-top) !important;
+}
+
+.safari-pwa-height {
+  height: 100lvh !important;
 }
