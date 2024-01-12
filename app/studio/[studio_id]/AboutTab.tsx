@@ -36,7 +36,7 @@ export function About() {
         )}
         <div className="no-scrollbar flex h-full flex-col gap-2 overflow-scroll rounded-lg border border-grey-80 bg-white p-4 text-lg">
           {image && (
-            <div className="relative">
+            <div className="relative pb-2">
               <img
                 alt=""
                 className="max-w-full rounded-md hover:cursor-pointer"
@@ -46,29 +46,32 @@ export function About() {
                     : image.value.url
                 }
               />
-              <button
-                className=" absolute right-3 top-3 w-fit rounded-full border border-grey-80 bg-white p-1 text-grey-55 hover:border-accent-blue hover:bg-bg-blue hover:text-accent-blue"
-                onClick={() => {
-                  if (!image || !authToken) return;
-                  mutate("retractFact", { id: image.id });
-                  if (image.value.filetype === "external_image") return;
-                  spaceAPI(
-                    `${WORKER_URL}/space/${spaceID}`,
-                    "delete_file_upload",
-                    {
-                      authToken,
-                      fileID: image.value.id,
-                    }
-                  );
-                }}
-              >
-                <CloseLinedTiny />
-              </button>
+              {authToken && (
+                <button
+                  className=" absolute right-3 top-3 w-fit rounded-full border border-grey-80 bg-white p-1 text-grey-55 hover:border-accent-blue hover:bg-bg-blue hover:text-accent-blue"
+                  onClick={() => {
+                    if (!image || !authToken) return;
+                    mutate("retractFact", { id: image.id });
+                    if (image.value.filetype === "external_image") return;
+                    spaceAPI(
+                      `${WORKER_URL}/space/${spaceID}`,
+                      "delete_file_upload",
+                      {
+                        authToken,
+                        fileID: image.value.id,
+                      }
+                    );
+                  }}
+                >
+                  <CloseLinedTiny />
+                </button>
+              )}
             </div>
           )}
           <Textarea
             id="studio-about"
             placeholder="write a readme…"
+            previewOnly={!authToken}
             value={homeContent?.value}
             onChange={(e) => {
               if (!home) return;
