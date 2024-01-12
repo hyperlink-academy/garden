@@ -36,7 +36,6 @@ export const SpaceViewerHeader = (props: {
           </div>
         </div>
       </div>
-      {!session.loggedIn && <LoginButton />}
     </div>
   );
 };
