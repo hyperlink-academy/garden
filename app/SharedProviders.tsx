@@ -1,5 +1,4 @@
 "use client";
-import { Analytics } from "@vercel/analytics/react";
 import { AuthProvider } from "hooks/useAuth";
 import { SmokeProvider } from "components/Smoke";
 import { SWRConfig } from "swr";
@@ -10,13 +9,11 @@ export const SharedProviders: React.FC<React.PropsWithChildren<unknown>> = (
 ) => {
   useServiceWorkerMessageChannel();
   return (
-
     <SWRCache>
-        <CallProvider>
-      <SmokeProvider>
-        <AuthProvider>{props.children}</AuthProvider>
-        <Analytics />
-      </SmokeProvider>
+      <CallProvider>
+        <SmokeProvider>
+          <AuthProvider>{props.children}</AuthProvider>
+        </SmokeProvider>
       </CallProvider>
     </SWRCache>
   );
