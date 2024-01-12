@@ -29,8 +29,12 @@ export function StudioPageContent(props: Props) {
   let { session } = useAuth();
   let { width } = useWindowDimensions();
 
+  const [isClient, setIsClient] = useState(false);
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
   if (props.isAdmin) Tabs["Settings"] = Settings;
-
+  if (!isClient) return null;
   return (
     <div className="studioWrapper flex w-full items-stretch px-3 sm:h-screen sm:px-4">
       <div className="studio relative m-auto flex w-full max-w-6xl flex-col sm:flex-row">
