@@ -9,7 +9,7 @@ import { cache } from "react";
 const getData = cache((studio_id: string) => {
   let id = studio_id;
   if (id.length !== 36) id = base62ToUuid(id);
-  return workerAPI(WORKER_URL, "get_studio_data", { id: studio_id });
+  return workerAPI(WORKER_URL, "get_studio_data", { id });
 });
 
 export async function generateMetadata(props: {
