@@ -46,7 +46,7 @@ export const SpaceCard = (
     onEdit?: () => void;
   } & SpaceData
 ) => {
-  let { data } = useSpaceData(props.do_id, props);
+  let data = props;
   return (
     <Link href={`${spacePath(data?.owner?.username, data?.name || "")}`}>
       <BaseSpaceCard {...props} />
