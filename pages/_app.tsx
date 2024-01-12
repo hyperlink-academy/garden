@@ -1,7 +1,6 @@
 import "styles/globals.css";
 import type { AppProps } from "next/app";
 import React from "react";
-import { Analytics } from "@vercel/analytics/react";
 import { AuthProvider } from "hooks/useAuth";
 import { useRouter } from "next/router";
 import Head from "next/head";
@@ -86,7 +85,6 @@ const SharedProviders: React.FC<React.PropsWithChildren<unknown>> = (props) => {
           />
         </Head>
         <AuthProvider>{props.children}</AuthProvider>
-        <Analytics />
       </SmokeProvider>
     </SWRCache>
   );
