@@ -13,6 +13,8 @@ import Head from "next/head";
 import { NotificationManager } from "components/NotificationManager";
 import { Divider } from "components/Layout";
 import { HelpExampleSpaces } from "components/HelpCenter";
+import { uuidToBase62 } from "src/uuidHelpers";
+import Link from "next/link";
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>;
 export default function UserHomePage(props: Props) {
@@ -35,6 +37,9 @@ export default function UserHomePage(props: Props) {
   if (!data) return <div>loading </div>;
 
   let currentStudioName = query.studio;
+  let studios = data?.members_in_studios.map(
+    (s) => s.studios as Exclude<typeof s.studios, null>
+  );
   let spaces = [
     ...data.members_in_spaces
       ?.filter((s) => !!s.space_data)
@@ -63,7 +68,7 @@ export default function UserHomePage(props: Props) {
         <title key="title">{currentStudioName}</title>
       </Head>
       <SpaceProvider id={data.studio}>
-        <div className="mb-12 flex flex-col gap-2">
+        <div className="mb-0 flex flex-col gap-2">
           <div className="flex flex-col gap-2 sm:flex-row sm:justify-between">
             <div className="flex flex-row justify-between gap-2">
               <h2 className="grow">{currentStudioName}</h2>
@@ -72,7 +77,36 @@ export default function UserHomePage(props: Props) {
                   <NotificationManager />
                 ))}
             </div>
-
+          </div>
+          {studios && (
+            <>
+              <h4>Studios</h4>
+              <div className="grid  w-full grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3">
+                {studios.map((studio) => (
+                  <Link
+                    href={`/studio/${uuidToBase62(studio.id)}`}
+                    className="grid h-[120px] w-full flex-col place-items-center rounded-md border border-accent-blue bg-bg-blue text-center hover:border-2"
+                    key={studio.id}
+                  >
+                    <div className="flex h-fit flex-col">
+                      <h4 className="text-accent-blue">{studio.name}</h4>
+                      <p className="text-sm italic text-grey-55">
+                        {studio.spaces_in_studios.length} spaces
+                      </p>
+                      <p className="text-sm italic text-grey-55">
+                        {studio.members_in_studios.length} members
+                      </p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </>
+          )}
+          <div className="pb-2 pt-6">
+            <Divider />
+          </div>
+          <div className="flex justify-between gap-2">
+            <h4 className="">Spaces</h4>
             {!session?.loggedIn ||
               (session.session?.username === currentStudioName && (
                 <CreateSpace
@@ -81,23 +115,25 @@ export default function UserHomePage(props: Props) {
                 />
               ))}
           </div>
-          <Divider />
           {spaces.length === 0 ? null : (
             <div className="flex flex-row gap-2 text-sm">
-              sort by:{" "}
               <button
                 onClick={() => setSortOrder("lastUpdated")}
-                className={`${
-                  sortOrder === "lastUpdated" ? "underline" : ""
-                } hover:underline`}
+                className={` border  px-1 py-0.5 ${
+                  sortOrder === "lastUpdated"
+                    ? "rounded-md border-grey-80 text-grey-35"
+                    : "border-transparent text-grey-55"
+                } hover:border-grey-80`}
               >
                 last updated
               </button>
               <button
                 onClick={() => setSortOrder("name")}
-                className={`${
-                  sortOrder === "name" ? "underline" : ""
-                } hover:underline`}
+                className={` border  px-1 py-0.5 ${
+                  sortOrder === "name"
+                    ? "rounded-md border-grey-80 text-grey-35"
+                    : "border-transparent text-grey-55"
+                } hover:border-grey-80`}
               >
                 name
               </button>
@@ -132,7 +168,7 @@ const HistoryList = (props: { spaces: Array<SpaceData> }) => {
               setShowHistory(!showHistory);
             }}
           >
-            <h3>Completed ({spacesHistory.length})</h3>
+            <h4>Archived ({spacesHistory.length})</h4>
             {!showHistory ? (
               <DisclosureCollapseTiny />
             ) : (

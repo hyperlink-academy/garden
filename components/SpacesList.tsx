@@ -63,6 +63,15 @@ export const BaseSpaceCard = (props: Parameters<typeof SpaceCard>[0]) => {
   let unreads = data?.user_space_unreads?.find(
     (f) => f.user === session.user?.id
   )?.unreads;
+  let isMember = data?.members_in_spaces.find(
+    (f) => f.member === session.user?.id
+  );
+  let isStudioMate = data?.spaces_in_studios.find(
+    (studio) =>
+      !!studio.studios?.members_in_studios.find(
+        (m) => m.member === session.user?.id
+      )
+  );
 
   return (
     <div className="largeSpaceCard group relative flex w-full">

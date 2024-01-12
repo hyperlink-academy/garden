@@ -37,8 +37,8 @@ export const CreateSpace = (props: {
   let rep = useContext(ReplicacheContext);
   if (!authorized) return null;
   return (
-    <div className="">
-      <a className="flex w-full place-items-center">
+    <>
+      <a className="flex w-fit">
         <ButtonSecondary
           className="mx-auto"
           icon={<SpaceCreate />}
@@ -94,7 +94,7 @@ export const CreateSpace = (props: {
           <SubmitButton content="Create!" onClose={() => setOpen(false)} />
         </Form>
       </Modal>
-    </div>
+    </>
   );
 };
 
