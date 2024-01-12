@@ -5,6 +5,7 @@ import { db, useMutations, useSpaceID } from "hooks/useReplicache";
 import * as Popover from "@radix-ui/react-popover";
 import { useState } from "react";
 import {
+  ArrowDown,
   ArrowUp,
   BellSmall,
   MoreOptionsSmall,
@@ -36,6 +37,7 @@ export const Sidebar = (props: {
   studio?: { spaces: SpaceData[]; studioName: string; studioID: string };
 }) => {
   let [roomEditOpen, setRoomEditOpen] = useState(false);
+  let { session } = useAuth();
   let setMobileSidebarOpen = useUIState((s) => s.setMobileSidebarOpen);
 
   return (
@@ -46,7 +48,7 @@ export const Sidebar = (props: {
             <div
               className={`spaceName flex w-full flex-col bg-white text-grey-35`}
             >
-              {props.studio && (
+              {props.studio ? (
                 <div className="flex justify-between">
                   <Link
                     prefetch
@@ -58,6 +60,16 @@ export const Sidebar = (props: {
                   </Link>
                   <SpaceSwitcher spaces={props.studio?.spaces} />
                 </div>
+              ) : (
+                <Link
+                  href={
+                    session.session ? `/s/${session.session.username}` : "/"
+                  }
+                  className="-mb-0.5  text-sm font-bold text-grey-55"
+                >
+                  <ArrowDown className="rotate-90" height={16} width={16} />{" "}
+                  home
+                </Link>
               )}
 
               <div className="flex w-full flex-row items-start gap-2 ">
