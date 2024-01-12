@@ -14,6 +14,7 @@ import { uuidToBase62 } from "src/uuidHelpers";
 import Link from "next/link";
 import { IdentityData } from "backend/routes/get_identity_data";
 import { useParams } from "next/dist/client/components/navigation";
+import { LoginButton } from "app/studio/[studio_id]/space/SpaceViewerHeader";
 
 export default function UserHomePage(props: { data: IdentityData }) {
   let { session } = useAuth();
@@ -66,14 +67,16 @@ export default function UserHomePage(props: { data: IdentityData }) {
       </Head>
       <SpaceProvider id={data.studio}>
         <div className="mb-0 flex flex-col gap-2">
-          <div className="flex flex-col gap-2 sm:flex-row sm:justify-between">
-            <div className="flex flex-row justify-between gap-2">
-              <h2 className="grow">{currentStudioName}</h2>
-              {!session?.loggedIn ||
-                (session.session?.username === currentStudioName && (
-                  <NotificationManager />
-                ))}
-            </div>
+          <div className="flex w-full flex-row items-center justify-between gap-2">
+            <h2 className="grow">{currentStudioName}</h2>
+
+            {session?.loggedIn ? (
+              session.session?.username === currentStudioName && (
+                <NotificationManager />
+              )
+            ) : (
+              <LoginButton />
+            )}
           </div>
           {studios && (
             <>
