@@ -103,6 +103,11 @@ export const DefaultAttributes = {
     unique: false,
     cardinality: "one",
   },
+  "image/rotation": {
+    type: "number",
+    cardinality: "one",
+    unique: false,
+  },
   "card/image": {
     type: "file",
     unique: false,
