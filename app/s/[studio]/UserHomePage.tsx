@@ -2,6 +2,7 @@
 import { SpaceProvider } from "components/ReplicacheProvider";
 import { SpaceData, SpaceList } from "components/SpacesList";
 import { CreateSpace } from "components/CreateSpace";
+import { CreateStudio } from "components/CreateStudio";
 import { useAuth } from "hooks/useAuth";
 import { useIdentityData } from "hooks/useIdentityData";
 import { useEffect, useState } from "react";
@@ -80,7 +81,13 @@ export default function UserHomePage(props: { data: IdentityData }) {
           </div>
           {studios && (
             <>
-              <h4>Studios</h4>
+              <div className="flex flex-row justify-between">
+                <h4>Studios</h4>
+                {session.session &&
+                  session.session?.username === currentStudioName && (
+                    <CreateStudio username={session.session.username} />
+                  )}
+              </div>
               <div className="grid  w-full grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3">
                 {studios.map((studio) => (
                   <Link
@@ -108,13 +115,12 @@ export default function UserHomePage(props: { data: IdentityData }) {
           </div>
           <div className="flex justify-between gap-2">
             <h4 className="">Spaces</h4>
-            {!session?.loggedIn ||
-              (session.session?.username === currentStudioName && (
-                <CreateSpace
-                  studioSpaceID={data.studio}
-                  studioName={currentStudioName as string}
-                />
-              ))}
+            {session.session?.username === currentStudioName && (
+              <CreateSpace
+                studioSpaceID={data.studio}
+                studioName={currentStudioName as string}
+              />
+            )}
           </div>
           {spaces.length === 0 ? null : (
             <div className="flex flex-row gap-2 text-sm">
