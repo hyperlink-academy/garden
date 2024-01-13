@@ -5,6 +5,7 @@ import { CloseLinedTiny, SectionImageAdd } from "components/Icons";
 import { useEffect, useState } from "react";
 import { DotLoader } from "components/DotLoader";
 import { LightBoxModal } from "../Layout";
+import useMeasure from "react-use-measure";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 
@@ -61,17 +62,24 @@ export const ImageSection = (props: { entityID: string }) => {
   let { mutate, authorized } = useMutations();
   let spaceID = useSpaceID();
   let image = db.useEntity(props.entityID, "card/image");
+  let rotation = db.useEntity(image?.id || null, "image/rotation");
   let [lightBoxOpen, setLightBoxOpen] = useState(false);
+  let [measure, { width, height }] = useMeasure();
   return (
     // FOCUS ON DIV AND PASTE AN IMAGE
     image ? (
       <div
+        ref={measure}
         id="card-image"
-        className="grid auto-rows-max justify-items-center gap-1 pb-2"
+        className="group relative grid w-full auto-rows-max justify-items-center gap-1 pb-2"
       >
         <img
           alt=""
-          className="max-w-full rounded-md hover:cursor-pointer"
+          className="rounded-md hover:cursor-pointer"
+          style={{
+            transform: `rotate(${90 * (rotation?.value || 0)}deg)`,
+            height: rotation && rotation?.value % 2 === 1 ? width : undefined,
+          }}
           src={
             image.value.filetype === "image"
               ? `${WORKER_URL}/static/${image.value.id}`
@@ -82,20 +90,40 @@ export const ImageSection = (props: { entityID: string }) => {
           }}
         />
         {!authorized ? null : (
-          <button
-            className="justify-self-center text-sm text-grey-55 hover:text-accent-blue"
-            onClick={() => {
-              if (!image || !authToken) return;
-              mutate("retractFact", { id: image.id });
-              if (image.value.filetype === "external_image") return;
-              spaceAPI(`${WORKER_URL}/space/${spaceID}`, "delete_file_upload", {
-                authToken,
-                fileID: image.value.id,
-              });
-            }}
-          >
-            remove
-          </button>
+          <div className="flex gap-2 justify-self-center">
+            <button
+              className="text-sm text-grey-55 hover:text-accent-blue"
+              onClick={() => {
+                if (!image || !authToken) return;
+                mutate("retractFact", { id: image.id });
+                if (image.value.filetype === "external_image") return;
+                spaceAPI(
+                  `${WORKER_URL}/space/${spaceID}`,
+                  "delete_file_upload",
+                  {
+                    authToken,
+                    fileID: image.value.id,
+                  }
+                );
+              }}
+            >
+              remove
+            </button>
+            <button
+              className="text-sm text-grey-55 hover:text-accent-blue"
+              onClick={() => {
+                if (!image) return;
+                mutate("assertFact", {
+                  entity: image.id,
+                  attribute: "image/rotation",
+                  value: ((rotation?.value || 0) + 1) % 4,
+                  positions: {},
+                });
+              }}
+            >
+              rotate
+            </button>
+          </div>
         )}
         {lightBoxOpen && (
           <LightBoxModal
@@ -104,7 +132,7 @@ export const ImageSection = (props: { entityID: string }) => {
           >
             <div className="relative">
               <button
-                className="bg-white/ absolute top-4 right-4 rounded-full bg-white/90 p-1 text-grey-55 hover:text-accent-blue"
+                className="bg-white/ absolute right-4 top-4 rounded-full bg-white/90 p-1 text-grey-55 hover:text-accent-blue"
                 onClick={() => {
                   setLightBoxOpen(false);
                 }}
