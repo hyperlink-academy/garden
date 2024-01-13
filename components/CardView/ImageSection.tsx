@@ -142,6 +142,9 @@ export const ImageSection = (props: { entityID: string }) => {
               <img
                 alt=""
                 className="m-auto"
+                style={{
+                  transform: `rotate(${90 * (rotation?.value || 0)}deg)`,
+                }}
                 src={
                   image.value.filetype === "image"
                     ? `${WORKER_URL}/static/${image.value.id}`
