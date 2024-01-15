@@ -41,8 +41,8 @@ export const Sidebar = (props: {
   let setMobileSidebarOpen = useUIState((s) => s.setMobileSidebarOpen);
 
   return (
-    <div className="Sidebar flex h-full w-52 flex-col items-stretch gap-4 overflow-x-visible   text-grey-35">
-      <div className="no-scrollbar flex h-full w-full flex-col gap-2 overflow-y-scroll px-3 pt-3">
+    <div className="Sidebar flex h-full w-52 flex-col items-stretch justify-between gap-2 overflow-x-visible   text-grey-35">
+      <div className="roomList no-scrollbar flex h-fit w-full flex-col gap-2 overflow-y-scroll px-3 pt-3">
         {props.mobile && (
           <>
             <div

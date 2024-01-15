@@ -52,7 +52,7 @@ export const People = () => {
   let offlineMembers = members.filter((f) => !uniqueSessions.has(f.entity));
 
   return (
-    <div className="people flex flex-col border-t border-grey-80 px-3 pb-2 text-sm">
+    <div className="peopleList no-scrollbar flex h-fit flex-col overflow-y-scroll border-t border-grey-80 px-3 pb-2 text-sm">
       <div className="peopleOnline  mt-1 flex  flex-col ">
         <button
           onClick={() => {
@@ -97,7 +97,11 @@ export const People = () => {
           </div>
         </>
       )}
-      <div className="mb-2">{authorized && <InviteMember />}</div>
+      {authorized && (
+        <div className="mb-2">
+          <InviteMember />
+        </div>
+      )}
       {!callOngoing && <JoinCall />}
     </div>
   );
@@ -384,52 +388,50 @@ const Member = (props: { entityID: string; showInCall?: boolean }) => {
   if (participant && !props.showInCall) return null;
 
   return (
-    <div>
-      <div
-        className="flex w-full flex-row items-start gap-1 overflow-hidden bg-white"
-        style={{
-          color:
-            activeSessions.length > 0
-              ? color?.value
-              : tailwind.theme.colors["grey-55"],
-        }}
-      >
-        <div className="mt-0.5 shrink-0 ">
-          {!participant ? (
-            <RoomMember />
-          ) : participant.tracks.audio.state === "playable" ? (
-            <CallUnMutedTiny />
-          ) : (
-            <div className="text-grey-55">
-              <CallMutedTiny />
-            </div>
-          )}
-        </div>
-        <div className="w-full min-w-0 grow bg-inherit">
-          <div
-            className={`break-all text-sm ${
-              activeSessions.length > 0 ? "font-bold" : ""
-            }`}
-          >
-            {memberEntity === props.entityID ? "You" : name?.value}
+    <div
+      className="flex w-full flex-row items-start gap-1 overflow-hidden bg-white"
+      style={{
+        color:
+          activeSessions.length > 0
+            ? color?.value
+            : tailwind.theme.colors["grey-55"],
+      }}
+    >
+      <div className="mt-0.5 shrink-0 ">
+        {!participant ? (
+          <RoomMember />
+        ) : participant.tracks.audio.state === "playable" ? (
+          <CallUnMutedTiny />
+        ) : (
+          <div className="text-grey-55">
+            <CallMutedTiny />
           </div>
-          {cardTitle && memberEntity !== props.entityID && (
-            <div className="flex w-full min-w-0  gap-[5px] overflow-hidden bg-inherit text-xs italic text-grey-55">
-              in{" "}
-              <Truncate className="w-full min-w-0 grow overflow-hidden bg-inherit ">
-                <div
-                  role="button"
-                  className="over:cursor-pointer whitespace-nowrap underline"
-                  onClick={() => {
-                    if (onCard) open(onCard.value.value);
-                  }}
-                >
-                  {cardTitle?.value || "Untitled Card"}
-                </div>
-              </Truncate>
-            </div>
-          )}
+        )}
+      </div>
+      <div className="w-full min-w-0 grow bg-inherit">
+        <div
+          className={`break-all text-sm ${
+            activeSessions.length > 0 ? "font-bold" : ""
+          }`}
+        >
+          {memberEntity === props.entityID ? "You" : name?.value}
         </div>
+        {cardTitle && memberEntity !== props.entityID && (
+          <div className="flex w-full min-w-0  gap-[5px] overflow-hidden bg-inherit text-xs italic text-grey-55">
+            in{" "}
+            <Truncate className="w-full min-w-0 grow overflow-hidden bg-inherit ">
+              <div
+                role="button"
+                className="over:cursor-pointer whitespace-nowrap underline"
+                onClick={() => {
+                  if (onCard) open(onCard.value.value);
+                }}
+              >
+                {cardTitle?.value || "Untitled Card"}
+              </div>
+            </Truncate>
+          </div>
+        )}
       </div>
     </div>
   );
