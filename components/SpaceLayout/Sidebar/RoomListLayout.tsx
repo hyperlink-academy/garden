@@ -102,21 +102,26 @@ export const EditRoomModal = (props: {
               }}
             />
           </div>
-          <ModalSubmitButton content="Edit Room" onClose={props.onClose} />
+          <ModalSubmitButton content="Save Changes" onClose={props.onClose} />
 
           <Divider />
-
-          <ButtonPrimary
-            destructive
-            type="button"
-            onClick={() => {
-              setAreYouSureRoomDeletionModalOpen(true);
-              console.log("yo");
-            }}
-            content="Delete Room"
-            icon={<Delete />}
-            className="place-self-end"
-          />
+          <div className="lightBorder flex flex-col gap-2 p-3 text-center ">
+            <p className="text-sm text-grey-55">
+              Don&apos;t worry, deleting this room won&apos;t delete the cards
+              inside of it!
+            </p>
+            <ButtonPrimary
+              destructive
+              type="button"
+              onClick={() => {
+                setAreYouSureRoomDeletionModalOpen(true);
+                console.log("yo");
+              }}
+              content="Delete Room"
+              icon={<Delete />}
+              className="place-self-center"
+            />
+          </div>
         </>
       </form>
       {areYouSureRoomDeletionModalOpen && (
