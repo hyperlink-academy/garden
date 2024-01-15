@@ -21,7 +21,7 @@ export default async function UserStudio(props: {
   if (!data.success) return <div>404 - page not found!</div>;
   return (
     <div className="pwa-padding mx-auto mt-3 max-w-4xl px-3 pb-6 sm:px-4 sm:pb-8">
-      <UserHomePage data={data.data} />;
+      <UserHomePage data={data.data} />
     </div>
   );
 }
