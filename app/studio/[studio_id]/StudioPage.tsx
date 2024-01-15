@@ -129,7 +129,7 @@ const StudioMobileNav = (props: Props) => {
       {session.session ? (
         <Link
           href={`/s/${session.session.username}`}
-          className="mt-3 flex items-center gap-2 text-sm text-grey-55 hover:text-accent-blue"
+          className="z-30 mt-3 flex items-center gap-2 text-sm text-grey-55 hover:text-accent-blue"
         >
           <ArrowDown className="rotate-90" height={16} width={16} /> home
         </Link>
