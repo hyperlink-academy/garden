@@ -70,9 +70,11 @@ export default function StudioPage(props: Props) {
           {/* TODO: add image from studio 'about' if one is set? */}
           <h3>{data?.name}</h3>
         </Link>
-        <div className="max-w-md rounded-md border border-grey-80 bg-white p-2">
-          <Textarea previewOnly value={data?.welcome_message} />
-        </div>
+        {data?.welcome_message && (
+          <div className="max-w-md rounded-md border border-grey-80 bg-white p-2">
+            <Textarea previewOnly value={data?.welcome_message} />
+          </div>
+        )}
 
         {session.loggedIn ? (
           <>
