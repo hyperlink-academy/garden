@@ -65,7 +65,7 @@ export const Sidebar = (props: {
                   href={
                     session.session ? `/s/${session.session.username}` : "/"
                   }
-                  className="-mb-0.5  text-sm font-bold text-grey-55"
+                  className="-mb-0.5 flex items-center gap-1 text-sm font-bold text-grey-55"
                 >
                   <ArrowDown className="rotate-90" height={16} width={16} />{" "}
                   home
