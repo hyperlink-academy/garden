@@ -100,18 +100,22 @@ export const Sidebar = (props: {
 
         {/* shared; operates on current room */}
       </div>
-      <People />
-      {props.mobile && (
-        <div className="flex flex-row items-center justify-between p-2 pt-0 text-grey-55">
-          <button onClick={() => setMobileSidebarOpen()}>
-            <SidebarIcon />
-          </button>
-          <div className="flex gap-2">
-            <HelpButton />
-            <LoginOrHome />
+
+      {/* wrapper so both items (people + nav) display at end on mobile */}
+      <div className="flex max-h-[50%] flex-col gap-2">
+        <People />
+        {props.mobile && (
+          <div className="flex flex-row items-center justify-between p-2 pt-0 text-grey-55">
+            <button onClick={() => setMobileSidebarOpen()}>
+              <SidebarIcon />
+            </button>
+            <div className="flex gap-2">
+              <HelpButton />
+              <LoginOrHome />
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };
