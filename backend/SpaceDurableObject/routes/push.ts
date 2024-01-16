@@ -4,7 +4,6 @@ import { Env } from "..";
 import { Mutations, StudioMatePermissions } from "data/mutations";
 import { store } from "../fact_store";
 import { CachedStorage } from "../storage_cache";
-import { app_event } from "backend/lib/analytics";
 import { authTokenVerifier, verifyIdentity } from "backend/lib/auth";
 import { createClient } from "backend/lib/supabase";
 import { isUserMember } from "../lib/isMember";
@@ -69,14 +68,6 @@ export const push_route = makeRoute({
       if (mutation.id <= lastMutationID) continue;
       lastMutationID = mutation.id;
       let name = mutation.name as keyof typeof Mutations;
-      if (name === "createCard") {
-        app_event(env.env, {
-          event: "created_card",
-          spaceID: env.id,
-          user: session.username,
-        });
-      }
-
       if (!Mutations[name]) {
         continue;
       }
