@@ -40,6 +40,14 @@ export const markUnread = async (
     ].map((m) => m.identity_data as NonNullable<typeof m.identity_data>);
     for (let i = 0; i < members.length; i++) {
       let memberEntity = await getOrCreateMemberEntity(members[i], ctx);
+
+      await ctx.assertFact({
+        entity: args.entityID,
+        attribute: args.attribute,
+        value: ref(memberEntity),
+        positions: {},
+      });
+
       let unreads = await calculateUnreads(memberEntity, ctx);
       await supabase.from("user_space_unreads").upsert({
         user: members[i].id,
