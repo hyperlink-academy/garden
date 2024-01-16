@@ -126,21 +126,21 @@ export default function UserHomePage(props: { data: IdentityData }) {
             <div className="flex flex-row gap-2 text-sm">
               <button
                 onClick={() => setSortOrder("lastUpdated")}
-                className={` border  px-1 py-0.5 ${
+                className={`rounded-md border px-1 py-0.5 hover:border-grey-80 ${
                   sortOrder === "lastUpdated"
-                    ? "rounded-md border-grey-80 text-grey-35"
+                    ? " border-grey-80 text-grey-35"
                     : "border-transparent text-grey-55"
-                } hover:border-grey-80`}
+                }`}
               >
                 last updated
               </button>
               <button
                 onClick={() => setSortOrder("name")}
-                className={` border  px-1 py-0.5 ${
+                className={`rounded-md border px-1 py-0.5 hover:border-grey-80 ${
                   sortOrder === "name"
-                    ? "rounded-md border-grey-80 text-grey-35"
+                    ? " border-grey-80 text-grey-35"
                     : "border-transparent text-grey-55"
-                } hover:border-grey-80`}
+                } `}
               >
                 name
               </button>
