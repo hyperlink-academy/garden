@@ -69,34 +69,29 @@ export const Desktop = (props: { entityID: string }) => {
         case "new-card": {
           if (!memberEntity) return;
           let entityID = ulid();
+
+          await mutate("addCardToDesktop", {
+            factID: ulid(),
+            entity: entityID,
+            desktop: props.entityID,
+            position: {
+              ...newPosition,
+              rotation: 0,
+              size: "small",
+            },
+          });
+
           await mutate("createCard", {
             entityID,
             title: "",
             memberEntity,
           });
           open({ entityID: entityID, focus: "title" });
-
-          await mutate("addCardToDesktop", {
-            factID: ulid(),
-            entity: entityID,
-            desktop: props.entityID,
-            position: {
-              ...newPosition,
-              rotation: 0,
-              size: "small",
-            },
-          });
           break;
         }
         case "new-search-card": {
           if (!memberEntity) return;
           let entityID = ulid();
-          await mutate("createCard", {
-            entityID,
-            title: data.title,
-            memberEntity,
-          });
-          open({ entityID: entityID, focus: "title" });
 
           await mutate("addCardToDesktop", {
             factID: ulid(),
@@ -108,6 +103,14 @@ export const Desktop = (props: { entityID: string }) => {
               size: "small",
             },
           });
+
+          await mutate("createCard", {
+            entityID,
+            title: data.title,
+            memberEntity,
+          });
+
+          open({ entityID: entityID, focus: "title" });
           break;
         }
         case "search-card": {
@@ -177,11 +180,6 @@ export const Desktop = (props: { entityID: string }) => {
           if (e.ctrlKey || e.metaKey || e.detail === 2) {
             action.start();
             let entity = ulid();
-            await mutate("createCard", {
-              title: "",
-              entityID: entity,
-              memberEntity,
-            });
             mutate("addCardToDesktop", {
               entity,
               factID: ulid(),
@@ -192,6 +190,11 @@ export const Desktop = (props: { entityID: string }) => {
                 x: Math.max(e.clientX - parentRect.left - 128, 0),
                 y: Math.max(e.clientY - parentRect.top - 42, 0),
               },
+            });
+            await mutate("createCard", {
+              title: "",
+              entityID: entity,
+              memberEntity,
             });
 
             open({ entityID: entity, focus: "title" });

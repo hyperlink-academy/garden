@@ -74,11 +74,6 @@ export const Room = () => {
         let newCard = ulid();
         action.start();
         let factID = ulid();
-        await mutate("createCard", {
-          memberEntity,
-          entityID: newCard,
-          title: "",
-        });
         await create(
           newCard,
           {
@@ -91,6 +86,11 @@ export const Room = () => {
           mutate,
           factID
         );
+        await mutate("createCard", {
+          memberEntity,
+          entityID: newCard,
+          title: "",
+        });
         await mutate("assertFact", {
           entity: newCard,
           attribute: "card/image",
@@ -239,11 +239,6 @@ const AddCardButton = (props: {
           if (!roomType || !memberEntity || !authorized || !rep) return;
           if (roomType.value === "chat") return;
           let newEntity = ulid();
-          await mutate("createCard", {
-            entityID: newEntity,
-            title: "",
-            memberEntity,
-          });
 
           if (roomType.value === "collection") {
             let siblings = (
@@ -313,6 +308,11 @@ const AddCardButton = (props: {
             });
           }
 
+          await mutate("createCard", {
+            entityID: newEntity,
+            title: "",
+            memberEntity,
+          });
           open({ entityID: newEntity, focus: "title" });
 
           //open the card

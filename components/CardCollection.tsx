@@ -105,7 +105,7 @@ const CollectionList = (props: {
       {props.cards.length > 5 && (
         <div className="pb-2">
           <CardAdder
-          hideContent={props.collectionType !== "cardpreview"}
+            hideContent={props.collectionType !== "cardpreview"}
             parentID={props.entityID}
             attribute={props.attribute}
             positionKey="eav"
@@ -126,7 +126,7 @@ const CollectionList = (props: {
         />
       ))}
       <CardAdder
-          hideContent={props.collectionType !== "cardpreview"}
+        hideContent={props.collectionType !== "cardpreview"}
         parentID={props.entityID}
         attribute={props.attribute}
         positionKey="eav"
@@ -262,12 +262,6 @@ export const useOnDragEndCollection = (props: {
         case "new-card": {
           let entityID = ulid();
           if (memberEntity) {
-            await mutate("createCard", {
-              entityID,
-              title: "",
-              memberEntity,
-            });
-
             await mutate("addCardToSection", {
               factID: ulid(),
               cardEntity: entityID,
@@ -276,6 +270,12 @@ export const useOnDragEndCollection = (props: {
               positions: {
                 eav: position,
               },
+            });
+
+            await mutate("createCard", {
+              entityID,
+              title: "",
+              memberEntity,
             });
             open({ entityID: entityID, focus: "title" });
           }
@@ -284,12 +284,6 @@ export const useOnDragEndCollection = (props: {
         case "new-search-card": {
           let entityID = ulid();
           if (memberEntity) {
-            await mutate("createCard", {
-              entityID,
-              title: data.title,
-              memberEntity,
-            });
-
             await mutate("addCardToSection", {
               factID: ulid(),
               cardEntity: entityID,
@@ -298,6 +292,12 @@ export const useOnDragEndCollection = (props: {
               positions: {
                 eav: position,
               },
+            });
+
+            await mutate("createCard", {
+              entityID,
+              title: data.title,
+              memberEntity,
             });
           }
           open({ entityID: entityID, focus: "title" });
