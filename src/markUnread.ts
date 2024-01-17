@@ -29,14 +29,16 @@ export const markUnread = async (
     let { data } = await supabase
       .from("space_data")
       .select(
-        "members_in_spaces(identity_data(*)), spaces_in_studios(members_in_studios(identity_data(*)))"
+        "members_in_spaces(identity_data(*)), spaces_in_studios(studios(members_in_studios(identity_data(*))))"
       )
       .eq("do_id", env.id)
       .single();
     if (!data) return;
     let members = [
       ...data.members_in_spaces,
-      ...data.spaces_in_studios.flatMap((m) => m.members_in_studios),
+      ...data.spaces_in_studios.flatMap(
+        (m) => (m.studios as NonNullable<typeof m.studios>).members_in_studios
+      ),
     ].map((m) => m.identity_data as NonNullable<typeof m.identity_data>);
     for (let i = 0; i < members.length; i++) {
       let memberEntity = await getOrCreateMemberEntity(members[i], ctx);
