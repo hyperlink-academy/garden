@@ -456,7 +456,10 @@ const Message = (props: {
 }) => {
   let { authorized } = useMutations();
 
+  let { session } = useAuth();
+
   let memberName = db.useEntity(props.author, "member/name");
+  let isMe = session.session?.username == memberName?.value ? true : false;
   let time = new Date(parseInt(props.date));
   let replyMessage = db.useMessageByID(props.reply || null);
   let replyToName = db.useEntity(replyMessage?.sender || null, "member/name");
@@ -467,9 +470,9 @@ const Message = (props: {
   return (
     <div
       id={props.id}
-      className={`message flex flex-col text-sm first:mt-auto ${
+      className={`message lightBorder mt-2 flex w-[90%] flex-col p-2 text-sm first:mt-auto ${
         !props.multipleFromSameAuthor ? "pt-4" : "pt-1"
-      }`}
+      } ${isMe ? "self-end bg-bg-blue" : "self-start bg-grey-90"}`}
     >
       {/* MESSAGE HEADER */}
       {!props.multipleFromSameAuthor && (
@@ -493,7 +496,7 @@ const Message = (props: {
       {/* IF THE MESSAGE IS IN REPLY TO SOMEONE */}
       {replyMessage && (
         <>
-          <div className="mt-1 flex flex-col gap-[1px] rounded-md border border-grey-80 p-2 text-xs">
+          <div className="mt-1 flex flex-col gap-[1px] rounded-md border border-grey-80 bg-white p-2 text-xs">
             <div className="font-bold italic text-grey-55">
               {replyToName?.value}
             </div>
@@ -502,7 +505,7 @@ const Message = (props: {
           <div className="ml-2 h-2 w-0 border border-grey-80" />
         </>
       )}
-      <div className="group -mx-4 flex items-end gap-1 px-4 py-1 hover:bg-bg-blue">
+      <div className="group flex items-end gap-1 py-1">
         <RenderedText
           className="messageContent grow text-sm text-grey-35"
           text={props.content}
