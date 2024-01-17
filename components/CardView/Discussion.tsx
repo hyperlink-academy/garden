@@ -36,25 +36,33 @@ export const DiscussionRoom = (props: {
     useFilteredCards(room, "desktop/contains");
 
   return (
-    <div className="relative h-full w-full">
-      <div className="absolute w-full px-3 sm:px-4">
-        <RoomHeader
-          totalCount={total}
-          filteredCount={cardsFiltered.length}
-          entityID={room}
-          reactions={reactions}
-          filters={filters}
-          setFilters={setFilters}
-        />
-      </div>
-      <MessageWindow className="no-scrollbar relative flex h-full flex-col overflow-x-hidden overflow-y-scroll p-3 pb-12 sm:p-4 sm:pb-12">
+    // <div className="relative h-full w-full">
+    // trying this w/ ~same wrapper as other rooms
+    <div
+      className="no-scrollbar flex h-full w-[336px] flex-col items-stretch overflow-x-hidden overflow-y-scroll p-3 pb-0 pt-0 text-sm sm:p-4 sm:pb-0 sm:pt-0"
+      id="room-wrapper"
+    >
+      {/* <div className="absolute w-full px-3 sm:px-4"> */}
+      <RoomHeader
+        totalCount={total}
+        filteredCount={cardsFiltered.length}
+        entityID={room}
+        reactions={reactions}
+        filters={filters}
+        setFilters={setFilters}
+      />
+      {/* </div> */}
+      <MessageWindow className="no-scrollbar relative flex h-full flex-col overflow-x-hidden overflow-y-scroll pb-[3.2rem]">
+        {/* disabled styles: p-3 sm:p-4 */}
+        {/* replaced pb-12 sm:pb-12, also 10 lol */}
         <Messages
           entityID={props.entityID}
           setReply={setReply}
           isRoom={props.isRoom}
         />
       </MessageWindow>
-      <div className="absolute bottom-0 w-full px-3 sm:px-4">
+      {/* <div className="absolute bottom-0 w-full px-3 sm:px-4"> */}
+      <div className="absolute bottom-2 right-0 w-fit px-3 sm:px-4">
         <MessageInput
           entityID={props.entityID}
           allowReact={props.allowReact}
@@ -196,7 +204,7 @@ export const MessageInput = (props: {
       {!authorized ? (
         <Login />
       ) : (
-        <div className="messageInput flex w-full flex-col gap-2  pb-2 pt-1">
+        <div className="messageInput flex w-full flex-col gap-2">
           {/* IF MESSAGE IS IN REPLY */}
           {props.reply && (
             <div className="messageInputReply -mb-2">

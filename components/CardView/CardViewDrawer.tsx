@@ -31,8 +31,9 @@ export const CardViewDrawer = (props: {
             ? `min(60vh, ${viewportHeight - 128}px)`
             : "",
         }}
-        className={`cardDrawerContent no-scrollbar relative shrink overflow-x-hidden overflow-y-scroll ${props.drawerOpen ? " mb-2 mt-4  h-fit" : "mb-2 h-0 "
-          }`}
+        className={`cardDrawerContent no-scrollbar relative flex shrink flex-col gap-2 overflow-x-hidden overflow-y-scroll ${
+          props.drawerOpen ? "mt-4 h-fit" : "h-0 "
+        }`}
       >
         {drawer === "comments" ? (
           <DiscussionContent
@@ -42,7 +43,7 @@ export const CardViewDrawer = (props: {
         ) : (
           <Backlinks entityID={props.entityID} />
         )}
-        <div className="scroll-m-8 bg-white" />
+        {/* <div className="scroll-m-8 bg-white" /> */}
       </MessageWindow>
     </div>
   );
@@ -125,10 +126,11 @@ const Tab = (props: {
           useUIState.getState().closeDrawer(props.entityID);
         }
       }}
-      className={`${currentTab === props.id
+      className={`${
+        currentTab === props.id
           ? "border-b-white bg-white font-bold"
           : "bg-grey-90"
-        } -mb-[1px] w-fit shrink-0 rounded-t-md border border-grey-80  px-2  pt-0.5 text-sm text-grey-35`}
+      } -mb-[1px] w-fit shrink-0 rounded-t-md border border-grey-80  px-2  pt-0.5 text-sm text-grey-35`}
     >
       {props.text}
     </button>
