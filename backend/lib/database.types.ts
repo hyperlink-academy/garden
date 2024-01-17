@@ -52,6 +52,24 @@ export interface Database {
         }
         Relationships: []
       }
+      debug_logs: {
+        Row: {
+          data: Json | null
+          id: number
+          time: string | null
+        }
+        Insert: {
+          data?: Json | null
+          id?: number
+          time?: string | null
+        }
+        Update: {
+          data?: Json | null
+          id?: number
+          time?: string | null
+        }
+        Relationships: []
+      }
       file_uploads: {
         Row: {
           created_at: string
@@ -381,7 +399,7 @@ export interface Database {
         }
         Insert: {
           space: string
-          unreads: number
+          unreads?: number
           user: string
         }
         Update: {
@@ -400,7 +418,7 @@ export interface Database {
             foreignKeyName: "user_space_unreads_user_fkey"
             columns: ["user"]
             referencedRelation: "identity_data"
-            referencedColumns: ["studio"]
+            referencedColumns: ["id"]
           }
         ]
       }
