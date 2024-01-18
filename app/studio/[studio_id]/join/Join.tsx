@@ -1,4 +1,6 @@
-import { spaceAPI, workerAPI } from "backend/lib/api";
+"use client";
+import { spaceAPI } from "backend/lib/api";
+import { StudioData } from "backend/routes/get_studio_data";
 import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
 import { BaseSmallCard } from "components/CardPreview/SmallCard";
 import { Member, StudioFilled } from "components/Icons";
@@ -6,21 +8,17 @@ import { Divider } from "components/Layout";
 import { LoginOrSignupModal } from "components/LoginModal";
 import { Textarea } from "components/Textarea";
 import { useAuth } from "hooks/useAuth";
-import { useStudioData } from "hooks/useStudioData";
-import { GetStaticPropsContext, InferGetStaticPropsType } from "next";
 import Head from "next/head";
 import Link from "next/link";
-import Router, { useRouter } from "next/router";
-import { SVGProps, useEffect, useState } from "react";
-import { base62ToUuid, uuidToBase62 } from "src/uuidHelpers";
+import { useParams, useRouter } from "next/navigation";
+import { WORKER_URL } from "src/constants";
+import { uuidToBase62 } from "src/uuidHelpers";
 
-type Props = InferGetStaticPropsType<typeof getStaticProps>;
-export default function StudioPage(props: Props) {
-  let { query, push } = useRouter();
-  let code = query.code as string | undefined;
-  let { data } = useStudioData(props.id, props.data);
+export function JoinStudio(props: { data: StudioData }) {
+  let { push } = useRouter();
+  let query = useParams();
+  let code = query?.code as string | undefined;
   let { session, authToken } = useAuth();
-  let [state, setState] = useState<"normal" | "signup" | "login">("normal");
 
   const onClick = async () => {
     if (!props.data || !authToken || !code) return;
@@ -33,20 +31,11 @@ export default function StudioPage(props: Props) {
       }
     );
     if (data.success) {
-      push(`/studio/${uuidToBase62(props.id)}`);
+      push(`/studio/${uuidToBase62(props.data.id)}`);
     }
   };
 
-  useEffect(() => {
-    if (
-      session.user &&
-      data?.members_in_studios?.find(
-        ({ member }) => session.user && session.user.id === member
-      )
-    ) {
-      if (props.id) Router.push(`/studio/${uuidToBase62(props.id)}`);
-    }
-  }, [data, session.user, props.id]);
+  let data = props.data;
 
   return (
     <>
@@ -63,18 +52,16 @@ export default function StudioPage(props: Props) {
           </strong>
         </p>
         <Link
-          href={`/studio/${uuidToBase62(props.id || "")}`}
+          href={`/studio/${uuidToBase62(props.data.id || "")}`}
           className="lightBorder flex flex-row items-center gap-4 bg-white p-4"
         >
           <StudioFilled />
           {/* TODO: add image from studio 'about' if one is set? */}
           <h3>{data?.name}</h3>
         </Link>
-        {data?.welcome_message && (
-          <div className="max-w-md rounded-md border border-grey-80 bg-white p-2">
-            <Textarea previewOnly value={data?.welcome_message} />
-          </div>
-        )}
+        <div className="max-w-md rounded-md border border-grey-80 bg-white p-2">
+          <Textarea previewOnly value={data?.welcome_message} />
+        </div>
 
         {session.loggedIn ? (
           <>
@@ -102,7 +89,7 @@ export default function StudioPage(props: Props) {
             />
           </>
         ) : (
-          <LoginOrSignup code={code} id={props.id} />
+          <LoginOrSignup code={code} id={props.data.id} />
         )}
         <div className="flex max-w-sm flex-col gap-4 pt-4 text-center italic">
           <Divider />
@@ -157,7 +144,7 @@ const LoginOrSignup = (props: {
   );
 };
 
-export const WelcomeSparkle = (props: SVGProps<SVGSVGElement>) => {
+export const WelcomeSparkle = () => {
   return (
     <svg
       width="214"
@@ -175,22 +162,3 @@ export const WelcomeSparkle = (props: SVGProps<SVGSVGElement>) => {
     </svg>
   );
 };
-
-const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
-export async function getStaticProps(ctx: GetStaticPropsContext) {
-  if (!ctx.params?.studio_id)
-    return { props: { notFound: true }, revalidate: 10 } as const;
-  let id = ctx.params.studio_id as string;
-  if (id.length !== 36) id = base62ToUuid(id);
-  let data = await workerAPI(WORKER_URL, "get_studio_data", {
-    id,
-  });
-
-  if (!data.success)
-    return { props: { notFound: true }, revalidate: 10 } as const;
-  return { props: { notFound: false, data: data.data, id } };
-}
-
-export async function getStaticPaths() {
-  return { paths: [], fallback: "blocking" };
-}

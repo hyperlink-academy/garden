@@ -44,3 +44,8 @@ export const get_studio_data_route = makeRoute({
 type NonNull<T> = {
   [K in keyof T]: NonNullable<T[K]>;
 };
+
+export type StudioData = Extract<
+  Awaited<ReturnType<typeof get_studio_data_route.handler>>,
+  { data: { success: true } }
+>["data"]["data"];

@@ -3,7 +3,7 @@ import { WORKER_URL } from "src/constants";
 import { base62ToUuid } from "src/uuidHelpers";
 import { SpaceViewer } from "./SpaceViewer";
 import { PageHeightContainer } from "components/PageHeightContainer";
-import { Space } from "pages/s/[studio]/s/[space]";
+import { Space } from "components/Space";
 export const fetchCache = "force-no-store";
 
 export default async function StudioSpaceLayout(props: {

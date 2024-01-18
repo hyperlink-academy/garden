@@ -28,9 +28,9 @@ import { ModalSubmitButton, Modal } from "components/Modal";
 import { useUIState } from "hooks/useUIState";
 import { Truncate } from "components/Truncate";
 import router from "next/router";
-import { HelpButton } from "pages/s/[studio]/s/[space]";
 import { SpaceData } from "components/SpacesList";
 import { uuidToBase62 } from "src/uuidHelpers";
+import { HelpButton } from "components/Space";
 
 export const Sidebar = (props: {
   mobile?: boolean;

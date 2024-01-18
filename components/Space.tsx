@@ -9,14 +9,9 @@ import { SpaceMetaTitle } from "components/SpaceMetaTitle";
 import { useUIState } from "hooks/useUIState";
 import { PresenceHandler } from "components/PresenceHandler";
 import { useSpaceSyncState } from "hooks/useSpaceSyncState";
-import { workerAPI } from "backend/lib/api";
-import { WORKER_URL, springConfig } from "src/constants";
-import { GetStaticPropsContext, InferGetStaticPropsType } from "next/types";
-import { SpaceProvider } from "components/ReplicacheProvider";
-import { SWRConfig } from "swr";
-import { useViewportDifference, useViewportSize } from "hooks/useViewportSize";
-import { usePreventResize } from "hooks/usePreventResize";
-import { Question, SidebarIcon, StudioFilled } from "components/Icons";
+import { springConfig } from "src/constants";
+import { useViewportSize } from "hooks/useViewportSize";
+import { Question, SidebarIcon } from "components/Icons";
 import { SpaceName, SpaceOptions } from "components/SpaceLayout/Sidebar";
 import { useSpring, animated } from "@react-spring/web";
 import { createPortal } from "react-dom";
@@ -29,51 +24,13 @@ import { HelpModal } from "components/HelpCenter";
 import { useGesture } from "@use-gesture/react";
 import { useDndContext } from "@dnd-kit/core";
 import { useSpaceShortcuts } from "hooks/useSpaceShortcuts";
-import { PageHeightContainer } from "components/PageHeightContainer";
 import { SpaceData } from "components/SpacesList";
 import { SpaceViewerHeader } from "app/studio/[studio_id]/space/SpaceViewerHeader";
-
-export async function getStaticPaths() {
-  return { paths: [], fallback: "blocking" };
-}
-
-export async function getStaticProps(ctx: GetStaticPropsContext) {
-  if (!ctx.params?.space || !ctx.params?.studio)
-    return { props: { notFound: true }, revalidate: 10 } as const;
-  let data = await workerAPI(WORKER_URL, "get_space_data_by_name", {
-    spaceName: ctx.params?.space as string,
-    username: ctx.params?.studio as string,
-  });
-
-  if (!data.success)
-    return { props: { notFound: true }, revalidate: 10 } as const;
-  return { props: { notFound: false, data: data.data } };
-}
-
-export default function SpacePage(
-  props: InferGetStaticPropsType<typeof getStaticProps>
-) {
-  const [isClient, setIsClient] = useState(false);
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-  if (props.notFound) return <div>404 - page not found!</div>;
-  if (!isClient) return null;
-
-  return (
-    <SWRConfig value={{ fallback: { [props.data.do_id]: props.data } }}>
-      <SpaceProvider id={props.data.do_id}>
-        <PageHeightContainer>
-          <Space />
-        </PageHeightContainer>
-      </SpaceProvider>
-    </SWRConfig>
-  );
-}
 
 type Props = {
   studio?: { spaces: SpaceData[]; studioName: string; studioID: string };
 };
+
 export const Space = (props: Props) => {
   const { width } = useWindowDimensions();
   useSpaceSyncState();
@@ -250,7 +207,7 @@ const MobileSidebar = (props: Props) => {
   useEffect(() => {
     document
       .querySelector('meta[name="theme-color"]')
-      ?.setAttribute("content", open ? "#d4d0c8" : "#ffaf0");
+      ?.setAttribute("content", open ? "#D4D0C8" : "#FFAF0");
   }, [open]);
   let opacity = useSpring({
     opacity: open ? 0.2 : 0,
