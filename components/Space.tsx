@@ -26,12 +26,14 @@ import { useDndContext } from "@dnd-kit/core";
 import { useSpaceShortcuts } from "hooks/useSpaceShortcuts";
 import { SpaceData } from "components/SpacesList";
 import { SpaceViewerHeader } from "app/studio/[studio_id]/space/SpaceViewerHeader";
+import { useIsClient } from "hooks/utils";
 
 type Props = {
   studio?: { spaces: SpaceData[]; studioName: string; studioID: string };
 };
 
 export const Space = (props: Props) => {
+  let isClient = useIsClient();
   const { width } = useWindowDimensions();
   useSpaceSyncState();
   useSpaceShortcuts();
@@ -42,6 +44,8 @@ export const Space = (props: Props) => {
       roomPane?.scrollIntoView();
     });
   }, []);
+
+  if (!isClient) return null;
   return (
     <>
       <SpaceMetaTitle />

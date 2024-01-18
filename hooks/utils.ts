@@ -93,3 +93,10 @@ export function useIsMobile() {
   const { width } = useWindowDimensions();
   return width < 640 || width === 0;
 }
+export const useIsClient = () => {
+  const [isClient, setIsClient] = useState(false);
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+  return isClient;
+};
