@@ -463,7 +463,11 @@ const InviteMember = () => {
         { authToken }
       );
       if (code.success) {
-        return `${document.location.protocol}//${document.location.host}/s/${data?.owner.username}/s/${data?.name}/${data?.display_name}/join?code=${code.code}`;
+        return `${document.location.protocol}//${document.location.host}/s/${
+          data?.owner.username
+        }/s/${data?.name}/${encodeURIComponent(
+          data?.display_name || ""
+        )}/join?code=${code.code}`;
       }
     }
   );
