@@ -46,6 +46,7 @@ export type Bindings = {
   SUPABASE_API_TOKEN: string;
   SUPABASE_URL: string;
   DAILY_API_KEY: string;
+  MICROLINK_API_KEY: string;
   NEXT_API_URL: string;
   POSTMARK_API_TOKEN: string;
   RPC_SECRET: string;
