@@ -43,12 +43,13 @@ export const markUnread = async (
     for (let i = 0; i < members.length; i++) {
       let memberEntity = await getOrCreateMemberEntity(members[i], ctx);
 
-      await ctx.assertFact({
-        entity: args.entityID,
-        attribute: args.attribute,
-        value: ref(memberEntity),
-        positions: {},
-      });
+      if (memberEntity !== args.memberEntity)
+        await ctx.assertFact({
+          entity: args.entityID,
+          attribute: args.attribute,
+          value: ref(memberEntity),
+          positions: {},
+        });
 
       let unreads = await calculateUnreads(memberEntity, ctx);
       await supabase.from("user_space_unreads").upsert({
