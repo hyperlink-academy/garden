@@ -1,4 +1,4 @@
-"use client;";
+"use client";
 import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
 import { spaceAPI } from "backend/lib/api";
 import { Member } from "components/Icons";
