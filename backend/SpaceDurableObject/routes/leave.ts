@@ -46,13 +46,6 @@ export const leave_route = makeRoute({
     if (!memberEntity)
       return { data: { success: false, error: "no member entity found" } };
 
-    //Delete all facts
-    let references = await env.factStore.scanIndex.vae(memberEntity.entity);
-    let facts = await env.factStore.scanIndex.eav(memberEntity.entity, null);
-    await Promise.all(
-      facts.concat(references).map((f) => env.factStore.retractFact(f.id))
-    );
-
     if (space_type === "studio") {
       await supabase
         .from("members_in_studios")
