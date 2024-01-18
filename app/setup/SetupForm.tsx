@@ -1,33 +1,24 @@
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
+"use client";
 import { workerAPI } from "backend/lib/api";
-import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
+import { ButtonPrimary } from "components/Buttons";
 import { DotLoader } from "components/DotLoader";
-import { HelpAppInfo } from "components/HelpCenter";
-import { AddTiny } from "components/Icons";
 import { useAuth } from "hooks/useAuth";
 import { useDebouncedEffect } from "hooks/utils";
+import { useSearchParams } from "next/dist/client/components/navigation";
 import Link from "next/link";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import useSWR from "swr";
-import { Modal } from "components/Modal";
-import { Divider } from "components/Layout";
-import LoginPage from "pages/login";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { WORKER_URL } from "src/constants";
+import { supabaseBrowserClient } from "supabase/clients";
 
-const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
-export default function SignupPage() {
+export function SignupPageForm() {
   let router = useRouter();
-  let supabase = useSupabaseClient();
+  let supabase = supabaseBrowserClient();
   let [status, setStatus] = useState<
     "valid" | "invalidUsername" | "complete" | "loading"
   >("valid");
   let [data, setData] = useState({
     username: "",
-  });
-  let [open, setOpen] = useState(false);
-  let { data: session } = useSWR("session", async () => {
-    let { data } = await supabase.auth.refreshSession();
-    return data;
   });
 
   useDebouncedEffect(
@@ -47,19 +38,10 @@ export default function SignupPage() {
     300,
     [data.username]
   );
-
+  let query = useSearchParams();
+  let redirectTo = query?.get("redirectTo");
+  let error_description = query?.get("error_description");
   let { authToken: tokens } = useAuth();
-  useEffect(() => {
-    let username = session?.user?.user_metadata.username;
-    if (username) {
-      if (router.query.redirectTo)
-        router.push(
-          router.query.redirectTo as string,
-          router.query.redirectTo as string
-        );
-      else router.push(`/s/${username}`);
-    }
-  }, [session, router]);
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!tokens) return;
@@ -68,15 +50,10 @@ export default function SignupPage() {
       username: data.username,
       tokens,
     });
-    console.log(res, router.query.redirectTo);
     if (!res.success) {
       if (res.error === "username already exists") setStatus("invalidUsername");
       if (res.error === "user already initialized") {
-        if (router.query.redirectTo)
-          router.push(
-            router.query.redirectTo as string,
-            router.query.redirectTo as string
-          );
+        if (redirectTo) router.push(redirectTo);
         else router.push(`/s/${data.username}`);
       }
     }
@@ -84,21 +61,17 @@ export default function SignupPage() {
       let { data } = await supabase.auth.refreshSession();
       if (data.session) {
         await supabase.auth.setSession(data?.session);
-        if (router.query.redirectTo)
-          router.push(
-            router.query.redirectTo as string,
-            router.query.redirectTo as string
-          );
+        if (redirectTo) router.push(redirectTo);
         else router.push(`/s/${data.user?.user_metadata.username}`);
       }
       setStatus("complete");
     }
   };
-  if (router.query.error_description)
+  if (error_description)
     return (
       <div className="lightBorder flex flex-col gap-2 bg-white p-2">
         <h3>Sorry, an error occurred</h3>
-        <div>{router.query.error_description}</div>
+        <div>{error_description}</div>
         <div>
           Please try to{" "}
           <Link className="text-accent-blue" href="/signup">
@@ -112,8 +85,6 @@ export default function SignupPage() {
         </div>
       </div>
     );
-
-  if (!tokens) return <LoginPage />;
 
   return (
     <div className=" -my-4 mx-auto flex h-screen  max-w-md flex-col items-center justify-center gap-4 ">

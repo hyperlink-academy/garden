@@ -41,7 +41,6 @@
     "@react-spring/web": "^9.7.3",
     "@rocicorp/undo": "^0.2.0",
     "@supabase/auth-helpers-nextjs": "^0.8.7",
-    "@supabase/auth-helpers-react": "^0.4.2",
     "@supabase/ssr": "^0.0.10",
     "@supabase/supabase-js": "^2.38.4",
     "@types/mdx": "^2.0.9",

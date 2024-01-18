@@ -2,6 +2,7 @@ import "styles/globals.css";
 import React from "react";
 import { SharedProviders } from "./SharedProviders";
 import { Metadata, Viewport } from "next/types";
+import { supabaseServerClient } from "supabase/server";
 
 export const fetchCache = "force-no-store";
 
@@ -20,15 +21,17 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  let supabase = supabaseServerClient();
+  let { data: session } = await supabase.auth.getSession();
   return (
     <html lang="en">
       <body>
-        <SharedProviders>{children}</SharedProviders>
+        <SharedProviders session={session.session}>{children}</SharedProviders>
       </body>
     </html>
   );

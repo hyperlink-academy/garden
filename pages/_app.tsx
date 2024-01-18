@@ -84,7 +84,7 @@ const SharedProviders: React.FC<React.PropsWithChildren<unknown>> = (props) => {
             content="black-translucent"
           />
         </Head>
-        <AuthProvider>{props.children}</AuthProvider>
+        <AuthProvider session={null}>{props.children}</AuthProvider>
       </SmokeProvider>
     </SWRCache>
   );

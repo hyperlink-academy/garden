@@ -4,15 +4,17 @@ import { SmokeProvider } from "components/Smoke";
 import { SWRConfig } from "swr";
 import { useServiceWorkerMessageChannel } from "hooks/useServiceWorkerMessageChannel";
 import { CallProvider } from "components/Calls/CallProvider";
-export const SharedProviders: React.FC<React.PropsWithChildren<unknown>> = (
-  props
-) => {
+import { Session } from "@supabase/supabase-js";
+export const SharedProviders = (props: {
+  children: React.ReactNode;
+  session: Session | null;
+}) => {
   useServiceWorkerMessageChannel();
   return (
     <SWRCache>
       <CallProvider>
         <SmokeProvider>
-          <AuthProvider>{props.children}</AuthProvider>
+          <AuthProvider session={props.session}>{props.children}</AuthProvider>
         </SmokeProvider>
       </CallProvider>
     </SWRCache>

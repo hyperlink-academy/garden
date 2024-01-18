@@ -1,14 +1,14 @@
 import { ButtonPrimary } from "components/Buttons";
 import { useEffect, useState } from "react";
 import { DotLoader } from "components/DotLoader";
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useRouter } from "next/router";
+import { supabaseBrowserClient } from "supabase/clients";
 
 export default function LoginPage() {
   let [state, setState] = useState<"normal" | "new-password" | "signed-in">(
     "normal"
   );
-  let supabase = useSupabaseClient();
+  let supabase = supabaseBrowserClient();
   useEffect(() => {
     supabase.auth.onAuthStateChange(async (event) => {
       if (event == "PASSWORD_RECOVERY") {
@@ -40,7 +40,7 @@ export function ResetPasswordForm() {
   let [status, setStatus] = useState<
     "normal" | "loading" | "sent" | "new-password"
   >("normal");
-  let supabase = useSupabaseClient();
+  let supabase = supabaseBrowserClient();
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -103,7 +103,7 @@ export function ResetPasswordForm() {
 }
 
 function NewPasswordForm() {
-  let supabase = useSupabaseClient();
+  let supabase = supabaseBrowserClient();
   let [status, setStatus] = useState<"normal" | "loading">("normal");
   let [newPassword, setNewPassword] = useState("");
   let router = useRouter();
