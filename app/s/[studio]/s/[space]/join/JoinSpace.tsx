@@ -1,66 +1,25 @@
-import { spaceAPI, workerAPI } from "backend/lib/api";
 import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
+import { spaceAPI } from "backend/lib/api";
 import { Member } from "components/Icons";
 import { BaseSmallCard } from "components/CardPreview/SmallCard";
 import { useAuth } from "hooks/useAuth";
-import { db, useSpaceID } from "hooks/useReplicache";
+import { useSpaceID } from "hooks/useReplicache";
 import { useRouter } from "next/router";
-import { SVGProps, useEffect, useState } from "react";
+import { SVGProps } from "react";
 import { LoginOrSignupModal } from "components/LoginModal";
-import Head from "next/head";
 import { useSpaceData } from "hooks/useSpaceData";
-import Link from "next/link";
 import { SpaceCard, SpaceData } from "components/SpacesList";
 import { Divider } from "components/Layout";
-import { GetStaticPropsContext, InferGetStaticPropsType } from "next";
-import { SpaceProvider } from "components/ReplicacheProvider";
-import { SWRConfig } from "swr";
-
-export async function getStaticPaths() {
-  return { paths: [], fallback: "blocking" };
-}
-
-export async function getStaticProps(ctx: GetStaticPropsContext) {
-  if (!ctx.params?.space || !ctx.params?.studio)
-    return { props: { notFound: true }, revalidate: 10 } as const;
-  let data = await workerAPI(WORKER_URL, "get_space_data_by_name", {
-    spaceName: ctx.params?.space as string,
-    username: ctx.params?.studio as string,
-  });
-
-  if (!data.success)
-    return { props: { notFound: true }, revalidate: 10 } as const;
-  return { props: { notFound: false, data: data.data } };
-}
-
-type Props = InferGetStaticPropsType<typeof getStaticProps>;
-export default function JoinSpacePage(props: Props) {
-  if (props.notFound) return <div>404 - page not found!</div>;
-
-  return (
-    <SWRConfig value={{ fallback: { [props.data.do_id]: props.data } }}>
-      <Head>
-        <title key="title">
-          {`${props.data.display_name}: you're invited!`}
-        </title>
-      </Head>
-      <SpaceProvider id={props.data.do_id}>
-        <JoinSpace />
-      </SpaceProvider>
-    </SWRConfig>
-  );
-}
-const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
+import { WORKER_URL } from "src/constants";
 export function JoinSpace() {
   let id = useSpaceID();
   let { session, authToken } = useAuth();
   let router = useRouter();
   let code = router.query.code as string | undefined;
-  let isMember = db.useUniqueAttribute("space/member", session.session?.studio);
   let { data } = useSpaceData(id);
 
   const onClick = async () => {
-    if (!authToken || !code || isMember || !id) return;
+    if (!authToken || !code || !id) return;
     let data = await spaceAPI(`${WORKER_URL}/space/${id}`, "join", {
       authToken,
       code,
@@ -69,10 +28,6 @@ export function JoinSpace() {
       router.push(`/s/${router.query.studio}/s/${router.query.space}`);
     }
   };
-  useEffect(() => {
-    if (!!isMember)
-      router.push(`/s/${router.query.studio}/s/${router.query.space}`);
-  }, [!!isMember]);
 
   return (
     <>
