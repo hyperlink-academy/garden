@@ -3,7 +3,6 @@ import { useSearchParams } from "next/navigation";
 import { Fragment, useEffect, useState } from "react";
 import { CloseLinedTiny, Settings } from "./Icons";
 import { ModalFixedHeight } from "./Layout";
-import { DividerSmall, DividerTiny } from "pages";
 
 export const HelpModal = (props: { open: boolean; onClose: () => void }) => {
   return (
@@ -22,6 +21,14 @@ export const HelpModal = (props: { open: boolean; onClose: () => void }) => {
     </ModalFixedHeight>
   );
 };
+
+const DividerTiny = () => (
+  <div className="m-auto my-1 rounded-md bg-accent-gold p-1 sm:my-2 sm:p-2">
+    <div className="rounded-md bg-accent-red p-1 sm:p-2">
+      <div className="rounded-md bg-accent-blue p-0.5 sm:p-1"></div>
+    </div>
+  </div>
+);
 
 export const HelpDocs = () => {
   let query = useSearchParams();

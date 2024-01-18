@@ -1,3 +1,4 @@
+"use client";
 import styles from "styles/Landing.module.css";
 import Head from "next/head";
 import { ButtonLink, ButtonPrimary } from "components/Buttons";
@@ -6,10 +7,10 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "hooks/useAuth";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { LoginOrSignupModal } from "components/LoginModal";
 
-export default function IndexPage() {
+export function HomePage() {
   let textFormat = "mx-auto w-full flex max-w-2xl flex-col gap-4";
   let [loginOrSignupState, setLoginOrSignupState] =
     LoginOrSignupModal.useState("closed");
@@ -19,10 +20,6 @@ export default function IndexPage() {
 
   return (
     <>
-      <Head>
-        <title key="title">Hyperlink Academy</title>
-      </Head>
-      {/* LANDING WRAPPER */}
       <div className="landing px-4 py-4 md:px-8 md:py-8">
         {/* main content - inner wrapper */}
         <div className="m-auto mb-8 flex max-w-6xl flex-col gap-8">
@@ -387,30 +384,6 @@ export default function IndexPage() {
   );
 }
 
-export const Divider = () => (
-  <div className="m-auto my-4 rounded-md bg-accent-gold p-4 sm:my-8 sm:p-8">
-    <div className="rounded-md bg-accent-red p-4 sm:p-8">
-      <div className="rounded-md bg-accent-blue p-2 sm:p-4"></div>
-    </div>
-  </div>
-);
-
-export const DividerSmall = () => (
-  <div className="m-auto my-2 rounded-md bg-accent-gold p-2 sm:my-4 sm:p-4">
-    <div className="rounded-md bg-accent-red p-2 sm:p-4">
-      <div className="rounded-md bg-accent-blue p-1 sm:p-2"></div>
-    </div>
-  </div>
-);
-
-export const DividerTiny = () => (
-  <div className="m-auto my-1 rounded-md bg-accent-gold p-1 sm:my-2 sm:p-2">
-    <div className="rounded-md bg-accent-red p-1 sm:p-2">
-      <div className="rounded-md bg-accent-blue p-0.5 sm:p-1"></div>
-    </div>
-  </div>
-);
-
 const Features = () => {
   let [activeVideo, setActiveVideo] = useState("");
   return (
@@ -478,6 +451,14 @@ const Features = () => {
     </div>
   );
 };
+
+const DividerSmall = () => (
+  <div className="m-auto my-2 rounded-md bg-accent-gold p-2 sm:my-4 sm:p-4">
+    <div className="rounded-md bg-accent-red p-2 sm:p-4">
+      <div className="rounded-md bg-accent-blue p-1 sm:p-2"></div>
+    </div>
+  </div>
+);
 
 const Feature = (props: {
   name: string;

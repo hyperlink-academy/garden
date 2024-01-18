@@ -5,7 +5,6 @@ import { ModalSubmitButton } from "components/Modal";
 import { useAuth } from "hooks/useAuth";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { Divider } from "pages";
 import { useEffect, useState } from "react";
 
 type Status = "normal" | "invalidEmail" | "confirm" | "loading";
