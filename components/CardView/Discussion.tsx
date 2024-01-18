@@ -158,6 +158,13 @@ export const MessageInput = (props: {
 
   let replyMessage = db.useMessageByID(props.reply);
   let replyToName = db.useEntity(replyMessage?.sender || null, "member/name");
+  let replyToColor = db.useEntity(replyMessage?.sender || null, "member/color");
+  let replyToColorLight = "";
+  if (replyToColor?.value) {
+    replyToColorLight =
+      memberColorsLight[memberColors.indexOf(replyToColor?.value)];
+  }
+
   const send = async () => {
     if (!session.session || !value) return;
     let message: Omit<Message, "sender"> = {
@@ -203,10 +210,13 @@ export const MessageInput = (props: {
           {/* IF MESSAGE IS IN REPLY */}
           {props.reply && (
             <div className="messageInputReply -mb-2">
-              <div className="flex items-start justify-between gap-2 rounded-md border border-grey-80 bg-white p-2 text-xs italic text-grey-55">
+              <div
+                className="flex items-start justify-between gap-2 rounded-md border border-grey-80 bg-white p-2 text-xs italic text-grey-55"
+                style={{ backgroundColor: replyToColorLight }}
+              >
                 <div className="flex flex-col gap-[1px]">
                   <div className="font-bold"> {replyToName?.value}</div>
-                  <div>{replyMessage?.content}</div>
+                  <div className="text-grey-35">{replyMessage?.content}</div>
                 </div>
                 <button className="" onClick={() => props.setReply(null)}>
                   <CloseLinedTiny />
@@ -475,6 +485,12 @@ const Message = (props: {
   let time = new Date(parseInt(props.date));
   let replyMessage = db.useMessageByID(props.reply || null);
   let replyToName = db.useEntity(replyMessage?.sender || null, "member/name");
+  let replyToColor = db.useEntity(replyMessage?.sender || null, "member/color");
+  let replyToColorLight = "";
+  if (replyToColor?.value) {
+    replyToColorLight =
+      memberColorsLight[memberColors.indexOf(replyToColor?.value)];
+  }
   let attachedCards = db.useEntity(
     props.entity || null,
     "message/attached-card"
@@ -515,11 +531,14 @@ const Message = (props: {
       {/* IF THE MESSAGE IS IN REPLY TO SOMEONE */}
       {replyMessage && (
         <>
-          <div className="mt-1 flex flex-col gap-[1px] rounded-md border border-grey-80 bg-white p-2 text-xs">
+          <div
+            className="mt-1 flex flex-col gap-[1px] rounded-md border border-grey-80 bg-white p-2 text-xs"
+            style={{ backgroundColor: replyToColorLight }}
+          >
             <div className="font-bold italic text-grey-55">
               {replyToName?.value}
             </div>
-            <div className="italic text-grey-55">{replyMessage?.content}</div>
+            <div className="italic text-grey-35">{replyMessage?.content}</div>
           </div>
           <div className="-mt-1 ml-2 h-2 w-0 border border-grey-80 pt-2" />
         </>
