@@ -1,5 +1,9 @@
 import { NonUndefined } from "@use-gesture/react";
-import { RoomSearch } from "components/Icons";
+import {
+  DisclosureCollapseTiny,
+  DisclosureExpandTiny,
+  RoomSearch,
+} from "components/Icons";
 import { BaseSpaceCard, SpaceData } from "components/SpacesList";
 import { AddSpace } from "components/StudioPage/AddSpace";
 import { useAuth } from "hooks/useAuth";
@@ -7,6 +11,7 @@ import { useStudioData } from "hooks/useStudioData";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
+import { mutate } from "swr";
 
 export type Props = {
   data: NonUndefined<ReturnType<typeof useStudioData>["data"]>;
@@ -17,9 +22,18 @@ export function SpaceList({ data }: Props) {
 
   let allSpaces = data?.spaces_in_studios;
 
-  let filteredSpaces = allSpaces.filter(
+  let activeSpaces = allSpaces.filter(
     ({ space_data: s }) =>
-      s && !s.archived && s.display_name?.toLocaleLowerCase().includes(search.toLocaleLowerCase())
+      s &&
+      !s.archived &&
+      s.display_name?.toLocaleLowerCase().includes(search.toLocaleLowerCase())
+  );
+
+  let archivedSpaces = allSpaces.filter(
+    ({ space_data: s }) =>
+      s &&
+      !!s.archived &&
+      s.display_name?.toLocaleLowerCase().includes(search.toLocaleLowerCase())
   );
 
   let { session } = useAuth();
@@ -52,13 +66,22 @@ export function SpaceList({ data }: Props) {
             </div>
           )}
         </div>
-        <div className=" studioSpaceListWrapper no-scrollbar relative flex h-full w-full flex-row gap-2 overflow-y-scroll ">
+        <div className=" studioSpaceListWrapper no-scrollbar relative flex h-full w-full flex-col gap-8 overflow-y-scroll ">
           {allSpaces.length > 0 ? (
-            <List
-              spaces={
-                filteredSpaces?.map((s) => s.space_data as SpaceData) || []
-              }
-            />
+            <>
+              <List
+                spaces={
+                  activeSpaces?.map((s) => s.space_data as SpaceData) || []
+                }
+              />
+              {archivedSpaces.length > 0 && (
+                <HistoryList
+                  spaces={
+                    archivedSpaces?.map((s) => s.space_data as SpaceData) || []
+                  }
+                />
+              )}
+            </>
           ) : (
             <EmptyStudio />
           )}
@@ -88,6 +111,55 @@ const List = (props: { spaces: Array<SpaceData> }) => {
         })}
       </div>
     </div>
+  );
+};
+
+const HistoryList = (props: { spaces: Array<SpaceData> }) => {
+  let spacesHistory = props.spaces.filter((s) => s.archived);
+  let [showHistory, setShowHistory] = useState(false);
+  let params = useParams<{ studio_id: string }>();
+
+  let query = useParams<{ studio: string }>();
+  return (
+    <>
+      {spacesHistory.length > 0 ? (
+        <div className="myStudioCompleted">
+          <button
+            className={`flex items-center gap-2 hover:text-accent-blue ${
+              showHistory ? "text-grey-15" : "text-grey-55"
+            }`}
+            onClick={() => {
+              setShowHistory(!showHistory);
+            }}
+          >
+            <h4>Archived ({spacesHistory.length})</h4>
+            {!showHistory ? (
+              <DisclosureCollapseTiny />
+            ) : (
+              <DisclosureExpandTiny />
+            )}
+          </button>
+          <div className={`${showHistory ? "" : "hidden"}`}>
+            <div className="studioSpaceList w-full ">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3">
+                {props.spaces.map((space) => {
+                  return (
+                    <div className="" key={space.id}>
+                      <Link
+                        href={`/studio/${params?.studio_id}/space/${space.id}`}
+                        className="flex flex-col gap-2 text-left"
+                      >
+                        <BaseSpaceCard {...space} />
+                      </Link>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </>
   );
 };
 
