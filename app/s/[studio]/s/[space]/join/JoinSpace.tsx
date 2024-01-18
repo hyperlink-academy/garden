@@ -4,18 +4,20 @@ import { Member } from "components/Icons";
 import { BaseSmallCard } from "components/CardPreview/SmallCard";
 import { useAuth } from "hooks/useAuth";
 import { useSpaceID } from "hooks/useReplicache";
-import { useRouter } from "next/router";
+import { useParams, useRouter } from "next/navigation";
 import { SVGProps } from "react";
 import { LoginOrSignupModal } from "components/LoginModal";
 import { useSpaceData } from "hooks/useSpaceData";
 import { SpaceCard, SpaceData } from "components/SpacesList";
 import { Divider } from "components/Layout";
 import { WORKER_URL } from "src/constants";
+import { useSearchParams } from "next/dist/client/components/navigation";
 export function JoinSpace() {
   let id = useSpaceID();
   let { session, authToken } = useAuth();
   let router = useRouter();
-  let code = router.query.code as string | undefined;
+  let code = useSearchParams()?.get("code");
+  let query = useParams();
   let { data } = useSpaceData(id);
 
   const onClick = async () => {
@@ -25,7 +27,7 @@ export function JoinSpace() {
       code,
     });
     if (data.success) {
-      router.push(`/s/${router.query.studio}/s/${router.query.space}`);
+      router.push(`/s/${query?.studio}/s/${query?.space}`);
     }
   };
 
@@ -95,7 +97,9 @@ export function JoinSpace() {
 
 const LoginOrSignup = (props: { display_name?: string | null }) => {
   let [state, setState] = LoginOrSignupModal.useState("closed");
-  let router = useRouter();
+
+  let query = useParams();
+  let code = useSearchParams()?.get("code");
   return (
     <>
       <div className="display flex flex-row gap-2">
@@ -114,7 +118,7 @@ const LoginOrSignup = (props: { display_name?: string | null }) => {
       <LoginOrSignupModal
         state={state}
         setState={setState}
-        redirectTo={`/s/${router.query.studio}/s/${router.query.space}/${props.display_name}/join?code=${router.query.code}`}
+        redirectTo={`/s/${query?.studio}/s/${query?.space}/${props.display_name}/join?code=${code}`}
       />
     </>
   );
