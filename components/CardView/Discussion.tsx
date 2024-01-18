@@ -23,6 +23,7 @@ import { RoomHeader } from "components/Room";
 import { useRoom, useUIState } from "hooks/useUIState";
 import { useFilteredCards } from "../CardFilter";
 import { useAuth } from "hooks/useAuth";
+import { memberColors, memberColorsLight } from "src/colors";
 
 export const DiscussionRoom = (props: {
   entityID: string;
@@ -62,7 +63,8 @@ export const DiscussionRoom = (props: {
         />
       </MessageWindow>
       {/* <div className="absolute bottom-0 w-full px-3 sm:px-4"> */}
-      <div className="absolute bottom-2 right-0 w-fit px-3 sm:px-4">
+      {/* <div className="absolute bottom-2 right-0 w-fit px-3 sm:px-4"> */}
+      <div className="absolute bottom-2 right-0 w-full px-3 sm:px-4">
         <MessageInput
           entityID={props.entityID}
           allowReact={props.allowReact}
@@ -273,7 +275,7 @@ const Login = () => {
   let [state, setState] = LoginOrSignupModal.useState("closed");
   return (
     <>
-      <div className="messageLogIn mx-2 mb-2 flex h-[38px] place-items-center gap-2 rounded-md bg-grey-90">
+      <div className="messageLogIn flex place-items-center gap-2 rounded-md bg-grey-90 p-2">
         <p className=" w-full text-center text-sm italic text-grey-55">
           <span
             role="button"
@@ -467,7 +469,16 @@ const Message = (props: {
   let { session } = useAuth();
 
   let memberName = db.useEntity(props.author, "member/name");
-  let isMe = session.session?.username == memberName?.value ? true : false;
+  let memberColor = db.useEntity(props.author, "member/color");
+  let memberColorLight = "";
+  if (memberColor?.value) {
+    memberColorLight =
+      memberColorsLight[memberColors.indexOf(memberColor?.value)];
+  }
+  let isMe = session.session?.username == memberName?.value;
+  let isSomeoneElse =
+    session.session?.username &&
+    session.session?.username !== memberName?.value;
   let time = new Date(parseInt(props.date));
   let replyMessage = db.useMessageByID(props.reply || null);
   let replyToName = db.useEntity(replyMessage?.sender || null, "member/name");
@@ -478,9 +489,19 @@ const Message = (props: {
   return (
     <div
       id={props.id}
-      className={`message lightBorder mt-2 flex w-[90%] flex-col p-2 text-sm first:mt-auto ${
-        !props.multipleFromSameAuthor ? "pt-4" : "pt-1"
-      } ${isMe ? "self-end bg-bg-blue" : "self-start bg-grey-90"}`}
+      className={`message lightBorder mt-2 flex flex-col gap-1 p-2 text-sm first:mt-auto ${
+        // !props.multipleFromSameAuthor ? "pt-4" : "pt-1"
+        !props.multipleFromSameAuthor ? "pt-2" : "pt-2"
+      } ${
+        isMe
+          ? // ? "w-[90%] self-end bg-bg-blue"
+            "w-[90%] self-end"
+          : isSomeoneElse
+          ? // ? "w-[90%] self-start bg-grey-90"
+            "w-[90%] self-start"
+          : "w-full"
+      }`}
+      style={{ backgroundColor: memberColorLight }}
     >
       {/* MESSAGE HEADER */}
       {!props.multipleFromSameAuthor && (
@@ -510,10 +531,11 @@ const Message = (props: {
             </div>
             <div className="italic text-grey-55">{replyMessage?.content}</div>
           </div>
-          <div className="ml-2 h-2 w-0 border border-grey-80" />
+          <div className="-mt-1 ml-2 h-2 w-0 border border-grey-80 pt-2" />
         </>
       )}
-      <div className="group flex items-end gap-1 py-1">
+      {/* <div className="group flex items-end gap-1 py-1"> */}
+      <div className="group flex items-end gap-1">
         <RenderedText
           className="messageContent grow text-sm text-grey-35"
           text={props.content}
