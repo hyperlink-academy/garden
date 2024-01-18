@@ -31,6 +31,8 @@ import router from "next/router";
 import { SpaceData } from "components/SpacesList";
 import { uuidToBase62 } from "src/uuidHelpers";
 import { HelpButton } from "components/Space";
+import { spaceAPI } from "backend/lib/api";
+import { WORKER_URL } from "src/constants";
 
 export const Sidebar = (props: {
   mobile?: boolean;
@@ -315,8 +317,10 @@ const MemberOptions = () => {
           onClose={() => setLeaveModalOpen(false)}
           onSubmit={async () => {
             if (!spaceID || !authToken || !session) return;
-
             setLoading(true);
+            await spaceAPI(`${WORKER_URL}/space/${spaceID}`, "leave", {
+              authToken,
+            });
             router.push("/s/" + session.session?.username);
             setLoading(false);
           }}
