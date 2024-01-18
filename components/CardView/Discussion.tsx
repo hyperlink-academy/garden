@@ -37,13 +37,11 @@ export const DiscussionRoom = (props: {
     useFilteredCards(room, "desktop/contains");
 
   return (
-    // <div className="relative h-full w-full">
     // trying this w/ ~same wrapper as other rooms
     <div
       className="no-scrollbar flex h-full w-[336px] flex-col items-stretch overflow-x-hidden overflow-y-scroll p-3 pb-0 pt-0 text-sm sm:p-4 sm:pb-0 sm:pt-0"
       id="room-wrapper"
     >
-      {/* <div className="absolute w-full px-3 sm:px-4"> */}
       <RoomHeader
         totalCount={total}
         filteredCount={cardsFiltered.length}
@@ -52,18 +50,13 @@ export const DiscussionRoom = (props: {
         filters={filters}
         setFilters={setFilters}
       />
-      {/* </div> */}
       <MessageWindow className="no-scrollbar relative flex h-full flex-col overflow-x-hidden overflow-y-scroll pb-[3.2rem]">
-        {/* disabled styles: p-3 sm:p-4 */}
-        {/* replaced pb-12 sm:pb-12, also 10 lol */}
         <Messages
           entityID={props.entityID}
           setReply={setReply}
           isRoom={props.isRoom}
         />
       </MessageWindow>
-      {/* <div className="absolute bottom-0 w-full px-3 sm:px-4"> */}
-      {/* <div className="absolute bottom-2 right-0 w-fit px-3 sm:px-4"> */}
       <div className="absolute bottom-2 right-0 w-full px-3 sm:px-4">
         <MessageInput
           entityID={props.entityID}
@@ -224,7 +217,7 @@ export const MessageInput = (props: {
           )}
           {/* ACTUAL MESSAGE INPUT */}
           <div className="flex w-full items-end gap-2">
-            <div className="flex w-full items-center gap-1 rounded-md border border-grey-55 bg-white px-2 py-1 text-sm text-grey-15">
+            <div className="flex w-full items-center gap-1 rounded-md border border-grey-55 bg-white px-2 py-1 text-base text-grey-15">
               <AutosizeTextarea
                 onKeyDown={(e) => {
                   if (e.key === "Escape") {
@@ -490,15 +483,12 @@ const Message = (props: {
     <div
       id={props.id}
       className={`message lightBorder mt-2 flex flex-col gap-1 p-2 text-sm first:mt-auto ${
-        // !props.multipleFromSameAuthor ? "pt-4" : "pt-1"
         !props.multipleFromSameAuthor ? "pt-2" : "pt-2"
       } ${
         isMe
-          ? // ? "w-[90%] self-end bg-bg-blue"
-            "w-[90%] self-end"
+          ? "w-[90%] self-end"
           : isSomeoneElse
-          ? // ? "w-[90%] self-start bg-grey-90"
-            "w-[90%] self-start"
+          ? "w-[90%] self-start"
           : "w-full"
       }`}
       style={{ backgroundColor: memberColorLight }}
@@ -534,7 +524,6 @@ const Message = (props: {
           <div className="-mt-1 ml-2 h-2 w-0 border border-grey-80 pt-2" />
         </>
       )}
-      {/* <div className="group flex items-end gap-1 py-1"> */}
       <div className="group flex items-end gap-1">
         <RenderedText
           className="messageContent grow text-sm text-grey-35"
