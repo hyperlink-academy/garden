@@ -113,6 +113,11 @@ export const DefaultAttributes = {
     unique: false,
     cardinality: "one",
   },
+  "card/link-preview": {
+    type: "reference",
+    unique: false,
+    cardinality: "one",
+  },
   "card/date": {
     type: "timestamp",
     unique: false,
@@ -157,6 +162,31 @@ export const DefaultAttributes = {
     type: "string",
     unique: false,
     cardinality: "many",
+  },
+  "card/blocks": {
+    type: "reference",
+    unique: false,
+    cardinality: "many",
+  },
+  "link-preview/url": {
+    type: "string",
+    unique: false,
+    cardinality: "one",
+  },
+  "link-preview/author": {
+    type: "string",
+    unique: false,
+    cardinality: "one",
+  },
+  "link-preview/title": {
+    type: "string",
+    unique: false,
+    cardinality: "one",
+  },
+  "link-preview/description": {
+    type: "string",
+    unique: false,
+    cardinality: "one",
   },
   "reaction/author": {
     type: "reference",

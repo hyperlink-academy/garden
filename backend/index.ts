@@ -11,6 +11,7 @@ import {
   get_space_data_route,
 } from "./routes/get_space_data";
 import { get_studio_data_route } from "./routes/get_studio_data";
+import { get_url_preview_data_route } from "./routes/get_url_preview_data";
 import { LoginRoute } from "./routes/login";
 import { SignupRoute } from "./routes/signup";
 import { update_studio_data } from "./routes/update_studio_data";
@@ -29,6 +30,7 @@ const Routes = [
   get_space_data_by_name_route,
   get_space_data_by_id_route,
   get_studio_data_route,
+  get_url_preview_data_route,
   add_space_to_studio,
   update_studio_data,
   create_studio_route,
