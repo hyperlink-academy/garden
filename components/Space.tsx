@@ -184,7 +184,7 @@ const MobileLayout = (props: Props) => {
         </div>
         <div className="w-2 shrink-0 snap-start" />
       </div>
-      <div className="navFooter pwa-bottom-padding flex flex-row justify-between px-2">
+      <div className="navFooter pwa-padding-bottom flex flex-row justify-between px-2">
         <div
           className="sidebarTrigger flex flex-row gap-2 text-grey-55"
           ref={droppableRef}
@@ -265,7 +265,7 @@ const MobileSidebar = (props: Props) => {
       }
       <animated.div
         style={{ height: viewheight, left }}
-        className="pwa-padding pwa-bottom-padding fixed top-0 z-50 ml-2 p-1 pl-0"
+        className="pwa-padding pwa-padding-bottom fixed top-0 z-50 ml-2 p-1 pl-0"
       >
         <div
           className="h-full touch-none rounded-md border border-grey-90 bg-white"

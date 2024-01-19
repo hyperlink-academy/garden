@@ -37,7 +37,7 @@ export function StudioPageContent(props: Props) {
   if (!isClient) return null;
   return (
     <div className="pwa-padding studioWrapper flex w-full items-stretch px-3 sm:h-screen sm:px-4">
-      <div className="studio relative mx-auto flex w-full max-w-6xl flex-col sm:flex-row">
+      <div className="studio relative z-10 mx-auto flex w-full max-w-6xl flex-col sm:flex-row">
         <Tab.Group
           manual
           selectedIndex={selectedIndex}
