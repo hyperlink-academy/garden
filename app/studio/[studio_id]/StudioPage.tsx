@@ -147,7 +147,7 @@ const StudioMobileNav = (props: Props) => {
         {data?.name}
       </h3>
 
-      <div className="pwa-padding pwa-negative-margin sticky top-0 z-10 -mx-3  mb-4 border-b border-grey-80  px-3 pb-1">
+      <div className="pwa-padding pwa-negative-margin sticky top-0 z-10 -mx-3  mb-4 border-b border-grey-80 bg-background px-3 pb-1">
         <div className=" flex gap-2 pt-4">
           <Tab.List className="StudioTabs flex gap-4">
             {Object.keys(Tabs).map((tab) => (
