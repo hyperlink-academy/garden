@@ -33,17 +33,11 @@ export const get_url_preview_data_route = makeRoute({
     url: z.string(),
   }),
   handler: async (msg, env: Bindings) => {
-    let supabase = createClient(env);
     let response = await fetch(`https://pro.microlink.io/?url=${msg.url}`, {
       headers: {
         "x-api-key": env.MICROLINK_API_KEY,
       },
     });
-
-    let responseJSON = await response.json();
-    await supabase
-      .from("debug_logs")
-      .insert({ spaceID: env.id, data: responseJSON });
 
     let result = expectedAPIResponse.safeParse(responseJSON);
     if (!result.success)
