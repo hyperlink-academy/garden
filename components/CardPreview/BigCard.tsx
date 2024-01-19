@@ -97,8 +97,10 @@ export const BigCardBody = (
           <div
             className={`cardPreviewHeader items-top flex justify-between gap-2 pb-1`}
           >
-            <div className="cardPreviewTitle flex w-full justify-between gap-2">
-              {
+            {!(
+              linkPreview && linkPreview.value.url === props.data.title?.value
+            ) && (
+              <div className="cardPreviewTitle flex w-full justify-between gap-2">
                 <SingleTextSection
                   style={{
                     whiteSpace: "pre-wrap",
@@ -129,13 +131,13 @@ export const BigCardBody = (
                   }}
                   id={props.editable ? `${props.entityID}-preview-title` : ""}
                 />
-              }
-              {props.data.isMember ? (
-                <div className="shrink-0 italic text-white">member</div>
-              ) : (
-                ""
-              )}
-            </div>
+                {props.data.isMember ? (
+                  <div className="shrink-0 italic text-white">member</div>
+                ) : (
+                  ""
+                )}
+              </div>
+            )}
 
             {/* Card "X" to remove button */}
             {/* NB: this is for inner control in Collection only! */}
