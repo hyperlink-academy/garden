@@ -278,8 +278,9 @@ export const CardContent = (props: {
 
           <Reactions entityID={props.entityID} />
 
-          <CardLinkPreview entityID={props.entityID} />
           <DefaultTextSection entityID={props.entityID} />
+
+          <CardLinkPreview entityID={props.entityID} />
 
           <ImageSection entityID={props.entityID} />
 

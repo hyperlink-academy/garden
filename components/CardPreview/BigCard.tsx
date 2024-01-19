@@ -15,6 +15,7 @@ import { Props } from "./index";
 import { focusElement } from "src/utils";
 import { isUrl } from "src/isUrl";
 import { ListLinkCard } from "./LinkPreviewCard";
+import { LinkPreview, LinkPreviewCondensed } from "components/LinkPreview";
 
 export const BigCardBody = (
   props: {
@@ -39,24 +40,24 @@ export const BigCardBody = (
         }
       : {};
 
-  if (linkPreview)
-    return (
-      <div
-        {...listenersAndAttributes}
-        className={`CardPreview flex h-full grow flex-row !bg-cover !bg-center !bg-no-repeat pl-2 text-sm`}
-        style={{
-          wordBreak: "break-word",
-        }} //no tailwind equiv - need for long titles to wrap
-        onClick={(e) => {
-          if (e.defaultPrevented) return;
-          let cardView = document.getElementById("cardViewerWrapper");
-          open({ entityID: props.entityID });
-          cardView ? cardView.scrollIntoView({ behavior: "smooth" }) : null;
-        }}
-      >
-        <ListLinkCard entityID={linkPreview.value.value} />
-      </div>
-    );
+  // if (linkPreview)
+  //   return (
+  //     <div
+  //       {...listenersAndAttributes}
+  //       className={`CardPreview flex h-full grow flex-row !bg-cover !bg-center !bg-no-repeat pl-2 text-sm`}
+  //       style={{
+  //         wordBreak: "break-word",
+  //       }} //no tailwind equiv - need for long titles to wrap
+  //       onClick={(e) => {
+  //         if (e.defaultPrevented) return;
+  //         let cardView = document.getElementById("cardViewerWrapper");
+  //         open({ entityID: props.entityID });
+  //         cardView ? cardView.scrollIntoView({ behavior: "smooth" }) : null;
+  //       }}
+  //     >
+  //       <ListLinkCard entityID={linkPreview.value.value} />
+  //     </div>
+  //   );
 
   return (
     <div
@@ -188,7 +189,10 @@ export const BigCardBody = (
                   }
                 />
               )}
-              {(props.data.imageUrl || !props.hideContent) && (
+              {externalUrl && !props.hideContent && (
+                <LinkPreviewCondensed entityID={props.entityID} />
+              )}
+              {props.data.imageUrl && !props.hideContent && (
                 <img
                   alt=""
                   src={`${props.data.imageUrl}`}

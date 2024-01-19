@@ -30,3 +30,33 @@ export const LinkPreview = (props: { entityID: string }) => {
     </a>
   );
 };
+
+export const LinkPreviewCondensed = (props: { entityID: string }) => {
+  let data = db.useEntity(props.entityID, "link-preview/data");
+
+  return (
+    <a href={data?.value.url}>
+      <div className=" flex h-[64px] w-full gap-3 overflow-hidden rounded-md border border-accent-blue hover:bg-bg-blue ">
+        {/* 
+        {data?.value.image && (
+          <img src={data.value.image.url} className="w-full" />
+        )} */}
+
+        {data?.value.logo && (
+          <img
+            src={data.value.logo.url}
+            height={64}
+            width={64}
+            alt="a website logo"
+            className="shrink-0"
+          />
+        )}
+        <div className="h-full py-1 pr-1 sm:py-2 sm:pr-2">
+          <p className="h-full overflow-hidden font-bold text-accent-blue">
+            {data?.value.title}
+          </p>
+        </div>
+      </div>
+    </a>
+  );
+};
