@@ -39,10 +39,10 @@ export const get_url_preview_data_route = makeRoute({
       },
     });
 
-    let result = expectedAPIResponse.safeParse(responseJSON);
+    let result = expectedAPIResponse.safeParse(await response.json());
     if (!result.success)
       return {
-        data: { success: false, responseJSON } as const,
+        data: { success: false } as const,
       };
     let data = result.data.data;
     return {
