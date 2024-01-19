@@ -37,7 +37,7 @@ export function StudioPageContent(props: Props) {
   if (!isClient) return null;
   return (
     <div className="pwa-padding studioWrapper flex w-full items-stretch px-3 sm:h-screen sm:px-4">
-      <div className="studio relative z-10 mx-auto flex w-full max-w-6xl flex-col sm:flex-row">
+      <div className="studio relative mx-auto flex w-full max-w-6xl flex-col sm:flex-row">
         <Tab.Group
           manual
           selectedIndex={selectedIndex}
@@ -126,21 +126,28 @@ const StudioMobileNav = (props: Props) => {
 
   return (
     <>
+      {/* translate3d is necessary to fix a bug in safari where sticky z-index is reordered on scroll */}
       {session.session ? (
         <Link
           href={`/s/${session.session.username}`}
           className="z-30 mt-3 flex items-center gap-2 text-sm text-grey-55 hover:text-accent-blue"
+          style={{ transform: "translate3D(0,0,0)" }}
         >
           <ArrowDown className="rotate-90" height={16} width={16} /> home
         </Link>
       ) : (
-        <div className="z-20 my-4">
+        <div style={{ transform: "translate3D(0,0,0)" }} className="z-20 my-4">
           <LoginButton />
         </div>
       )}
-      <h3 className="z-20 -mb-3 mt-2">{data?.name}</h3>
+      <h3
+        style={{ transform: "translate3D(0,0,0)" }}
+        className="z-20 -mb-3 mt-2"
+      >
+        {data?.name}
+      </h3>
 
-      <div className="pwa-padding pwa-negative-margin sticky top-0 z-10 -mx-3  mb-4 border-b border-grey-80 bg-background px-3 pb-1">
+      <div className="pwa-padding pwa-negative-margin sticky top-0 z-10 -mx-3  mb-4 border-b border-grey-80  px-3 pb-1">
         <div className=" flex gap-2 pt-4">
           <Tab.List className="StudioTabs flex gap-4">
             {Object.keys(Tabs).map((tab) => (
