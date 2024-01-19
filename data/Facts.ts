@@ -27,6 +27,22 @@ type Value<A extends AttributeName> = Attribute[A] extends {
 }
   ? Attribute[A]["union/value"][number]
   : {
+      "link-preview": {
+        url: string;
+        title?: string | null;
+        description?: string | null;
+        image?: {
+          url: string;
+          width: number;
+          height: number;
+        } | null;
+        logo?: {
+          url: string;
+          width: number;
+          height: number;
+        } | null;
+        author?: string | null;
+      };
       feed_post: string;
       "post/attached-card": { space_do_id: string; cardEntity: string };
       union: never;

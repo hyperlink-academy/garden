@@ -168,23 +168,8 @@ export const DefaultAttributes = {
     unique: false,
     cardinality: "many",
   },
-  "link-preview/url": {
-    type: "string",
-    unique: false,
-    cardinality: "one",
-  },
-  "link-preview/author": {
-    type: "string",
-    unique: false,
-    cardinality: "one",
-  },
-  "link-preview/title": {
-    type: "string",
-    unique: false,
-    cardinality: "one",
-  },
-  "link-preview/description": {
-    type: "string",
+  "link-preview/data": {
+    type: "link-preview",
     unique: false,
     cardinality: "one",
   },
