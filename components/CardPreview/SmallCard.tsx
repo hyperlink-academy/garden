@@ -63,7 +63,7 @@ export const BaseSmallCard = (
       }
     : {};
 
-  if (linkPreview)
+  if (linkPreview && props.entityID)
     return (
       <div
         {...listenersAndAttributes}
@@ -72,7 +72,7 @@ export const BaseSmallCard = (
         }}
         className={`h-full w-full !bg-cover !bg-center !bg-no-repeat hover:cursor-pointer`}
       >
-        <SmallLinkCard entityID={linkPreview.value.value} />
+        <SmallLinkCard entityID={props.entityID} />
       </div>
     );
 

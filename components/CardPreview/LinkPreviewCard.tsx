@@ -6,7 +6,7 @@ type Props = {
   entityID: string;
 };
 export function SmallLinkCard(props: Props) {
-  let data = db.useEntity(props.entityID, "link-preview/data");
+  let data = db.useEntity(props.entityID, "card/link-preview");
   let isMobile = useIsMobile();
 
   return (
@@ -36,7 +36,7 @@ export function SmallLinkCard(props: Props) {
 }
 
 export function ListLinkCard(props: Props) {
-  let data = db.useEntity(props.entityID, "link-preview/data");
+  let data = db.useEntity(props.entityID, "card/link-preview");
   let isMobile = useIsMobile();
 
   return (

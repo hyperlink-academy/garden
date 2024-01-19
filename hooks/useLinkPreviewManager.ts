@@ -21,46 +21,26 @@ export const useLinkPreviewManager = (
       let isTitleUrl = isUrl(value);
       if (!isTitleUrl) {
         if (linkPreview) {
-          console.log("yooo");
           await mutate("retractFact", { id: linkPreview.id });
-          await mutate("deleteEntity", { entity: linkPreview.value.value });
         }
         return;
       }
+
+      if (linkPreview && linkPreview.value.url === value) return;
       if (isTitleUrl) {
-        let linkPreviewEntity: string;
-        if (linkPreview) {
-          linkPreviewEntity = linkPreview.entity;
-          let linkPreviewData = await rep.query((tx) =>
-            scanIndex(tx).eav(linkPreviewEntity, "link-preview/data")
-          );
-          if (linkPreviewData && linkPreviewData?.value.url === value) return;
-        } else {
-          linkPreviewEntity = ulid();
-          await mutate("assertFact", {
-            entity: entityID,
-            value: ref(linkPreviewEntity),
-            positions: {},
-            attribute: "card/link-preview",
-          });
-        }
         let data = await workerAPI(WORKER_URL, "get_url_preview_data", {
           url: value,
         });
         if (!data.success) {
-          let linkPreview = await rep.query((tx) =>
-            scanIndex(tx).eav(entityID, "card/link-preview")
-          );
           if (linkPreview) {
             await mutate("retractFact", { id: linkPreview.id });
-            await mutate("deleteEntity", { entity: linkPreview.value.value });
           }
           return;
         }
         await mutate("assertFact", [
           {
-            entity: linkPreviewEntity,
-            attribute: "link-preview/data",
+            entity: entityID,
+            attribute: "card/link-preview",
             value: {
               url: value,
               description: data.description,

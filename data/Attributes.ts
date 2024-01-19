@@ -115,7 +115,7 @@ export const DefaultAttributes = {
     cardinality: "one",
   },
   "card/link-preview": {
-    type: "reference",
+    type: "link-preview",
     unique: false,
     cardinality: "one",
   },
@@ -168,11 +168,6 @@ export const DefaultAttributes = {
     type: "reference",
     unique: false,
     cardinality: "many",
-  },
-  "link-preview/data": {
-    type: "link-preview",
-    unique: false,
-    cardinality: "one",
   },
   "reaction/author": {
     type: "reference",

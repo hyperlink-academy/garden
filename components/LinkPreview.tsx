@@ -2,7 +2,7 @@ import { db } from "hooks/useReplicache";
 import { useIsMobile } from "hooks/utils";
 
 export const LinkPreview = (props: { entityID: string }) => {
-  let data = db.useEntity(props.entityID, "link-preview/data");
+  let data = db.useEntity(props.entityID, "card/link-preview");
   let isMobile = useIsMobile();
 
   return (
@@ -32,7 +32,7 @@ export const LinkPreview = (props: { entityID: string }) => {
 };
 
 export const LinkPreviewCondensed = (props: { entityID: string }) => {
-  let data = db.useEntity(props.entityID, "link-preview/data");
+  let data = db.useEntity(props.entityID, "card/link-preview");
 
   return (
     <a href={data?.value.url}>
