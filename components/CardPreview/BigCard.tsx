@@ -9,11 +9,12 @@ import {
   RoomChat,
 } from "components/Icons";
 import { Divider } from "components/Layout";
-import { useMutations } from "hooks/useReplicache";
+import { db, useMutations } from "hooks/useReplicache";
 import { useUIState } from "hooks/useUIState";
 import { Props } from "./index";
 import { focusElement } from "src/utils";
 import { isUrl } from "src/isUrl";
+import { ListLinkCard } from "./LinkPreviewCard";
 
 export const BigCardBody = (
   props: {
@@ -28,6 +29,7 @@ export const BigCardBody = (
   let editing = useUIState((s) => s.focusedCard === props.entityID);
   let setFocusedCard = useUIState((s) => s.setFocusedCard);
   let externalUrl = props.data.title ? isUrl(props.data.title.value) : false;
+  let linkPreview = db.useEntity(props.entityID, "card/link-preview");
 
   let listenersAndAttributes =
     authorized && !editing
@@ -36,6 +38,25 @@ export const BigCardBody = (
           ...props?.dragHandleProps?.listeners,
         }
       : {};
+
+  if (linkPreview)
+    return (
+      <div
+        {...listenersAndAttributes}
+        className={`CardPreview flex h-full grow flex-row !bg-cover !bg-center !bg-no-repeat pl-2 text-sm`}
+        style={{
+          wordBreak: "break-word",
+        }} //no tailwind equiv - need for long titles to wrap
+        onClick={(e) => {
+          if (e.defaultPrevented) return;
+          let cardView = document.getElementById("cardViewerWrapper");
+          open({ entityID: props.entityID });
+          cardView ? cardView.scrollIntoView({ behavior: "smooth" }) : null;
+        }}
+      >
+        <ListLinkCard entityID={linkPreview.value.value} />
+      </div>
+    );
 
   return (
     <div

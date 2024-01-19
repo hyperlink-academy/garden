@@ -9,10 +9,11 @@ import {
   RoomChat,
 } from "components/Icons";
 import { useReactions } from "hooks/useReactions";
-import { useMutations } from "hooks/useReplicache";
+import { db, useMutations } from "hooks/useReplicache";
 import { isUrl } from "src/isUrl";
 import { Props } from "./index";
 import { useUIState } from "hooks/useUIState";
+import { SmallLinkCard } from "./LinkPreviewCard";
 
 export const SmallCardBody = (
   props: {
@@ -52,16 +53,29 @@ export const BaseSmallCard = (
     messagesCount?: number;
   } & Omit<Props, "size" | "href" | "data">
 ) => {
-  let externalUrl = props.title ? isUrl(props.title) : false;
-
   let { authorized } = useMutations();
   let { open } = useCardViewer();
+  let linkPreview = db.useEntity(props.entityID || null, "card/link-preview");
   let listenersAndAttributes = authorized
     ? {
         ...props?.dragHandleProps?.attributes,
         ...props?.dragHandleProps?.listeners,
       }
     : {};
+
+  if (linkPreview)
+    return (
+      <div
+        {...listenersAndAttributes}
+        onClick={() => {
+          props.entityID && open({ entityID: props.entityID });
+        }}
+        className={`h-full w-full !bg-cover !bg-center !bg-no-repeat hover:cursor-pointer`}
+      >
+        <SmallLinkCard entityID={linkPreview.value.value} />
+      </div>
+    );
+
   return (
     <div
       {...listenersAndAttributes}

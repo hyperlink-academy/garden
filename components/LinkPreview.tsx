@@ -1,7 +1,5 @@
-import { workerAPI } from "backend/lib/api";
 import { db } from "hooks/useReplicache";
 import { useIsMobile } from "hooks/utils";
-import useSWR from "swr";
 
 export const LinkPreview = (props: { entityID: string }) => {
   let data = db.useEntity(props.entityID, "link-preview/data");
