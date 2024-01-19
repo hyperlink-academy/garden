@@ -39,6 +39,7 @@ export const Modal: React.FC<
         className={`
         no-scrollbar
         pwa-margin
+        pwa-margin-bottom
         fixed
         left-1/2    
         z-40 h-max 

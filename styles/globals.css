@@ -248,6 +248,9 @@ textarea {
 .pwa-margin {
   margin-top: env(safe-area-inset-top) !important;
 }
+.pwa-margin-bottom {
+  margin-bottom: env(safe-area-inset-top) !important;
+}
 
 .pwa-negative-margin {
   margin-top: calc(env(safe-area-inset-top) * -1) !important;

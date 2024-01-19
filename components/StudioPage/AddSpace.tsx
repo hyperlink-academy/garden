@@ -194,8 +194,7 @@ const AddExistingSpace = (props: { onClose: () => void; studioID: string }) => {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-2">
-        <h4> Select Space(s) to Add </h4>
-        <p className="text-grey-55">You can only add active Spaces</p>
+        <h4> Select Spaces to Add </h4>
       </div>
       <div className="flex flex-col gap-2">
         {spaces?.map(({ space_data }) =>
@@ -209,18 +208,21 @@ const AddExistingSpace = (props: { onClose: () => void; studioID: string }) => {
                   );
                 else setAddedSpaces((spaces) => [...spaces, space_data.do_id]);
               }}
-              className={`w-full rounded-lg border ${
+              className={`flex w-full items-center justify-between rounded-md border ${
                 addedSpaces.includes(space_data.do_id)
                   ? "border-accent-blue bg-accent-blue text-white"
                   : "border-grey-80 hover:border-accent-blue hover:bg-bg-blue"
-              } px-3 py-2 text-left `}
+              } px-3 py-2 text-left`}
             >
               <p className="font-bold">{space_data.display_name}</p>
+              {space_data.archived && (
+                <p className="text-sm italic text-grey-55">archived</p>
+              )}
             </button>
           ) : null
         )}
       </div>
-      <div className="flex flex-row justify-end gap-2">
+      <div className="sticky -bottom-4 -mx-4 -mb-4 flex  flex-row justify-end gap-2 border-t border-grey-80 bg-white px-4 pb-4 pt-2 sm:-bottom-4 ">
         <ButtonLink
           content="nevermind"
           className="font-normal"
