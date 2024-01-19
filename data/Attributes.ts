@@ -18,6 +18,7 @@ export const BaseAttributes = {
       "last-read-message",
       "timestamp",
       "feed_post",
+      "link-preview",
       "post/attached-card",
       "string",
       "union",
