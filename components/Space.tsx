@@ -164,7 +164,7 @@ const MobileLayout = (props: Props) => {
   return (
     <div className="mobileLayout flex h-full w-full flex-col">
       <div
-        className="mobileRoomAndCard no-scrollbar pwa-padding my-2 flex h-full snap-x snap-mandatory flex-row overflow-y-hidden overflow-x-scroll overscroll-x-none scroll-smooth"
+        className="mobileRoomAndCard no-scrollbar pwa-padding my-2 flex h-full touch-none snap-x snap-mandatory flex-row overflow-y-hidden overflow-x-scroll overscroll-x-none scroll-smooth"
         {...bind()}
       >
         <div
