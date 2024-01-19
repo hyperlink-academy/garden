@@ -13,6 +13,7 @@ import { useMutations } from "hooks/useReplicache";
 import { useUIState } from "hooks/useUIState";
 import { Props } from "./index";
 import { focusElement } from "src/utils";
+import { isUrl } from "src/isUrl";
 
 export const BigCardBody = (
   props: {
@@ -26,6 +27,7 @@ export const BigCardBody = (
   let { open } = useCardViewer();
   let editing = useUIState((s) => s.focusedCard === props.entityID);
   let setFocusedCard = useUIState((s) => s.setFocusedCard);
+  let externalUrl = props.data.title ? isUrl(props.data.title.value) : false;
 
   let listenersAndAttributes =
     authorized && !editing
@@ -132,9 +134,12 @@ export const BigCardBody = (
         }
         {props.showRelated && <Backlinks entityID={props.entityID} />}
 
-        {/* Big Card Preview Default Content (show if not you're in preview mode AND there is content/image or you're in edit mode)*/}
+        {/* Big Card Preview Default Content (show if not you're in preview mode OR there is content/image OR you're in edit mode)*/}
         {!props.hideContent &&
-          (editing || !!props.data.content?.value || !!props.data.imageUrl) && (
+          (editing ||
+            !!props.data.content?.value ||
+            !!props.data.imageUrl ||
+            externalUrl) && (
             <div
               className={`cardPreviewDefaultContent flex flex-col gap-2 pb-2 ${
                 props.data.isMember &&
@@ -162,8 +167,7 @@ export const BigCardBody = (
                   }
                 />
               )}
-
-              {!props.data.imageUrl || props.hideContent ? null : (
+              {(props.data.imageUrl || !props.hideContent) && (
                 <img
                   alt=""
                   src={`${props.data.imageUrl}`}
