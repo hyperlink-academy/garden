@@ -36,6 +36,8 @@ import { CardViewDrawer } from "./CardViewDrawer";
 import { useCloseCard, useRoomHistory, useUIState } from "hooks/useUIState";
 import { Modal } from "components/Modal";
 import { Title } from "./Title";
+import { isUrl } from "src/isUrl";
+import { LinkPreview } from "components/LinkPreview";
 
 const borderStyles = (args: { member: boolean }) => {
   switch (true) {
@@ -205,6 +207,7 @@ export const CardContent = (props: {
   let { authorized } = useMutations();
   let drawerOpen = useUIState((s) => s.cardStates[props.entityID]?.drawerOpen);
   let cardCreator = db.useEntity(props.entityID, "card/created-by");
+  let title = db.useEntity(props.entityID, "card/title");
   let cardCreatorName = db.useEntity(
     cardCreator?.value.value as string,
     "member/name"
@@ -275,6 +278,7 @@ export const CardContent = (props: {
 
           <Reactions entityID={props.entityID} />
 
+          <CardLinkPreview entityID={props.entityID} />
           <DefaultTextSection entityID={props.entityID} />
 
           <ImageSection entityID={props.entityID} />
@@ -291,6 +295,12 @@ export const CardContent = (props: {
       <CardViewDrawer entityID={props.entityID} drawerOpen={drawerOpen} />
     </>
   );
+};
+
+const CardLinkPreview = (props: { entityID: string }) => {
+  let linkPreview = db.useEntity(props.entityID, "card/link-preview");
+  if (linkPreview) return <LinkPreview entityID={linkPreview.value.value} />;
+  return null;
 };
 
 const BackButton = () => {
