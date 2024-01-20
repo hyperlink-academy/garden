@@ -567,7 +567,7 @@ export const SectionAdder = (props: {
     <div className="pointer-events-auto flex w-fit items-center gap-1 rounded-full border border-grey-90 bg-white px-4 py-2 text-grey-55 shadow">
       {/* IMAGE ADDER */}
       <MakeImage entity={props.entityID}>
-        <div className={`${image ? toggledOnStyle : toggledOffStyle} `}>
+        <div className={`${toggledOffStyle} `}>
           <SectionImageAdd />
         </div>
       </MakeImage>

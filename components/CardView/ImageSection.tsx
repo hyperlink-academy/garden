@@ -30,7 +30,7 @@ export const MakeImage = (props: {
     }
   }, [imageID, mutate, props.entity]);
 
-  return !authorized ? null : !image ? (
+  return !authorized ? null : (
     <AddImage
       onUpload={async (imageID) => {
         setState(imageID);
@@ -45,17 +45,6 @@ export const MakeImage = (props: {
     >
       {props.children}
     </AddImage>
-  ) : (
-    <button
-      onClick={() =>
-        document
-          .getElementById("card-image")
-          ?.scrollIntoView({ behavior: "smooth", block: "center" })
-      }
-    >
-      {" "}
-      {props.children}{" "}
-    </button>
   );
 };
 
