@@ -6,23 +6,30 @@ export const getAndUploadFile = async (
   spaceID: string
 ) => {
   let results = [];
-  for (let item of items) {
+  for (let i = 0; i < items.length; i++) {
+    console.log(i);
+    const item = items[i];
     if (!item.type.includes("image")) continue;
     let image = item.getAsFile();
-    if (!image) results.push({ success: false } as const);
-    let res = await fetch(`${WORKER_URL}/space/${spaceID}/upload_file`, {
-      headers: {
-        "X-Authorization-Access-Token": authToken.access_token,
-        "X-Authorization-Refresh-Token": authToken.refresh_token,
-      },
-      method: "POST",
-      body: image,
-    });
-    let data = (await res.json()) as
-      | { success: false }
-      | { success: true; data: { id: string } };
-
-    results.push(data);
+    if (!image) {
+      results.push({ success: false } as const);
+      continue;
+    }
+    results.push(
+      fetch(`${WORKER_URL}/space/${spaceID}/upload_file`, {
+        headers: {
+          "X-Authorization-Access-Token": authToken.access_token,
+          "X-Authorization-Refresh-Token": authToken.refresh_token,
+        },
+        method: "POST",
+        body: image,
+      }).then(
+        (result) =>
+          result.json() as unknown as
+            | { success: false }
+            | { success: true; data: { id: string } }
+      )
+    );
   }
-  return results;
+  return Promise.all(results);
 };
