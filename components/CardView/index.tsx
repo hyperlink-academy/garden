@@ -531,6 +531,8 @@ const DefaultTextSection = (props: { entityID: string }) => {
           authToken,
           spaceID
         );
+        if (data.length === 0) return;
+        e.preventDefault();
 
         for (let image of data) {
           if (!image.success) continue;
