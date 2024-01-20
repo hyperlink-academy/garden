@@ -93,14 +93,14 @@ export const Image = (props: {
       : image.value.url;
   return (
     // FOCUS ON DIV AND PASTE AN IMAGE
-    <div className="flex w-fit flex-col">
+    <div className="flex w-fit flex-col rounded-md border border-grey-80 p-1">
       <div
         id="card-image"
         style={{
           height: 256,
           width: 256,
         }}
-        className="group relative flex grid w-full auto-rows-max items-center justify-center justify-items-center gap-1 border pb-2"
+        className="group relative flex grid w-full auto-rows-max items-center justify-center justify-items-center gap-1 "
       >
         <img
           alt=""
