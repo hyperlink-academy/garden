@@ -69,7 +69,9 @@ export const ImageSection = (props: { entityID: string }) => {
       } gap-2`}
     >
       {images?.map((image) => {
-        return <Image entityID={props.entityID} fact={image} />;
+        return (
+          <Image entityID={props.entityID} fact={image} key={props.entityID} />
+        );
       })}
     </div>
   );
