@@ -10,7 +10,7 @@ import { WORKER_URL } from "src/constants";
 export function About() {
   let home = db.useAttribute("home")[0];
   let homeContent = db.useEntity(home?.entity, "card/content");
-  let image = db.useEntity(home?.entity, "card/image");
+  let image = db.useEntity(home?.entity, "card/image")?.[0];
   let { mutate } = useMutations();
   let { authToken } = useAuth();
   let spaceID = useSpaceID();
