@@ -112,7 +112,7 @@ export const DefaultAttributes = {
   "card/image": {
     type: "file",
     unique: false,
-    cardinality: "one",
+    cardinality: "many",
   },
   "card/link-preview": {
     type: "link-preview",

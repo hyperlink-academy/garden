@@ -1,11 +1,13 @@
 import { db, useMutations, useSpaceID } from "hooks/useReplicache";
 import { useAuth } from "hooks/useAuth";
 import { spaceAPI } from "backend/lib/api";
-import { CloseLinedTiny, SectionImageAdd } from "components/Icons";
+import { CloseLinedTiny } from "components/Icons";
 import { useEffect, useState } from "react";
 import { DotLoader } from "components/DotLoader";
 import { LightBoxModal } from "../Layout";
 import useMeasure from "react-use-measure";
+import { Fact } from "data/Facts";
+import { useIsMobile } from "hooks/utils";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 
@@ -58,73 +60,65 @@ export const MakeImage = (props: {
 };
 
 export const ImageSection = (props: { entityID: string }) => {
-  let { session, authToken } = useAuth();
+  let images = db.useEntity(props.entityID, "card/image");
+  let isMobile = useIsMobile();
+  return (
+    <div
+      className={`grid w-full ${
+        isMobile ? "grid-cols-1" : "grid-cols-[min-content_auto] "
+      } gap-2`}
+    >
+      {images?.map((image) => {
+        return <Image entityID={props.entityID} fact={image} />;
+      })}
+    </div>
+  );
+};
+
+export const Image = (props: {
+  entityID: string;
+  fact: Fact<"card/image">;
+}) => {
+  let { authToken } = useAuth();
   let { mutate, authorized } = useMutations();
   let spaceID = useSpaceID();
-  let image = db.useEntity(props.entityID, "card/image");
-  let rotation = db.useEntity(image?.id || null, "image/rotation");
+  let rotation = db.useEntity(props.fact.id || null, "image/rotation");
   let [lightBoxOpen, setLightBoxOpen] = useState(false);
-  let [measure, { width, height }] = useMeasure();
+  let image = props.fact;
+  let src =
+    image.value.filetype === "image"
+      ? `${WORKER_URL}/static/${image.value.id}`
+      : image.value.url;
   return (
     // FOCUS ON DIV AND PASTE AN IMAGE
-    image ? (
+    <div className="flex w-fit flex-col">
       <div
-        ref={measure}
         id="card-image"
-        className="group relative grid w-full auto-rows-max justify-items-center gap-1 pb-2"
+        style={{
+          height: 256,
+          width: 256,
+        }}
+        className="group relative flex grid w-full auto-rows-max items-center justify-center justify-items-center gap-1 border pb-2"
       >
         <img
           alt=""
-          className="rounded-md hover:cursor-pointer"
-          style={{
-            transform: `rotate(${90 * (rotation?.value || 0)}deg)`,
-            height: rotation && rotation?.value % 2 === 1 ? width : undefined,
-          }}
+          className="h-full w-full rounded-md hover:cursor-pointer"
           src={
             image.value.filetype === "image"
               ? `${WORKER_URL}/static/${image.value.id}`
               : image.value.url
           }
+          style={{
+            position: "absolute",
+            objectFit: "contain",
+            transformOrigin: "center",
+            transform: `rotate(${90 * (rotation?.value || 0)}deg)`,
+          }}
           onClick={() => {
             setLightBoxOpen(true);
           }}
         />
-        {!authorized ? null : (
-          <div className="flex gap-2 justify-self-center">
-            <button
-              className="text-sm text-grey-55 hover:text-accent-blue"
-              onClick={() => {
-                if (!image || !authToken) return;
-                mutate("retractFact", { id: image.id });
-                if (image.value.filetype === "external_image") return;
-                spaceAPI(
-                  `${WORKER_URL}/space/${spaceID}`,
-                  "delete_file_upload",
-                  {
-                    authToken,
-                    fileID: image.value.id,
-                  }
-                );
-              }}
-            >
-              remove
-            </button>
-            <button
-              className="text-sm text-grey-55 hover:text-accent-blue"
-              onClick={() => {
-                if (!image) return;
-                mutate("assertFact", {
-                  entity: image.id,
-                  attribute: "image/rotation",
-                  value: ((rotation?.value || 0) + 1) % 4,
-                  positions: {},
-                });
-              }}
-            >
-              rotate
-            </button>
-          </div>
-        )}
+
         {lightBoxOpen && (
           <LightBoxModal
             open={lightBoxOpen}
@@ -145,19 +139,44 @@ export const ImageSection = (props: { entityID: string }) => {
                 style={{
                   transform: `rotate(${90 * (rotation?.value || 0)}deg)`,
                 }}
-                src={
-                  image.value.filetype === "image"
-                    ? `${WORKER_URL}/static/${image.value.id}`
-                    : image.value.url
-                }
+                src={src}
               />
             </div>
           </LightBoxModal>
         )}
       </div>
-    ) : (
-      <div id="card-image" />
-    )
+      {!authorized ? null : (
+        <div className="flex w-full justify-center justify-items-center gap-2">
+          <button
+            className="text-sm text-grey-55 hover:text-accent-blue"
+            onClick={() => {
+              if (!authToken) return;
+              mutate("retractFact", { id: image.id });
+              if (image.value.filetype === "external_image") return;
+              spaceAPI(`${WORKER_URL}/space/${spaceID}`, "delete_file_upload", {
+                authToken,
+                fileID: image.value.id,
+              });
+            }}
+          >
+            remove
+          </button>
+          <button
+            className="text-sm text-grey-55 hover:text-accent-blue"
+            onClick={() => {
+              mutate("assertFact", {
+                entity: image.id,
+                attribute: "image/rotation",
+                value: ((rotation?.value || 0) + 1) % 4,
+                positions: {},
+              });
+            }}
+          >
+            rotate
+          </button>
+        </div>
+      )}
+    </div>
   );
 };
 
@@ -181,6 +200,9 @@ export const AddImage: React.FC<
         type="file"
         accept="image/*"
         className="hidden"
+        onClick={() => {
+          console.log("what");
+        }}
         onChange={async (e) => {
           let files = e.currentTarget.files;
           if (!files || !authToken || !spaceID) return;
