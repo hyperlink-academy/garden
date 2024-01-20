@@ -14,7 +14,8 @@ export async function isUserMember(env: Env, userID: string) {
     .single();
 
   return (
-    !!isMember?.members_in_spaces.length > 0 ||
-    !!isMember?.members_in_studios.length > 0
+    isMember &&
+    (isMember.members_in_spaces.length > 0 ||
+      isMember.members_in_studios.length > 0)
   );
 }
