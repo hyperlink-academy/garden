@@ -1,35 +1,39 @@
 import { ulid } from "src/ulid";
-import { scanIndex, useMutations } from "./useReplicache";
+import { db, scanIndex, useMutations } from "./useReplicache";
 import { isUrl } from "src/isUrl";
 import { ref } from "data/Facts";
 import { workerAPI } from "backend/lib/api";
 import { WORKER_URL } from "src/constants";
 import { useDebouncedEffect } from "./utils";
 
-export const useLinkPreviewManager = (
-  entityID: string,
-  value: string | undefined
-) => {
+export const useLinkPreviewManager = (entityID: string) => {
   let { authorized, mutate, rep } = useMutations();
+  let title = db.useEntity(entityID, "card/title");
+  let content = db.useEntity(entityID, "card/content");
   useDebouncedEffect(
     async () => {
       if (!authorized || !rep) return;
-      if (value === undefined) return;
       let linkPreview = await rep.query((tx) =>
         scanIndex(tx).eav(entityID, "card/link-preview")
       );
-      let isTitleUrl = isUrl(value);
-      if (!isTitleUrl) {
+      let isTitleUrl = isUrl(title?.value || "");
+      let isContentUrl = isUrl(content?.value || "");
+      let url = isTitleUrl
+        ? title?.value
+        : isContentUrl
+        ? content?.value
+        : null;
+      if (!url) {
         if (linkPreview) {
           await mutate("retractFact", { id: linkPreview.id });
         }
         return;
       }
 
-      if (linkPreview && linkPreview.value.url === value) return;
-      if (isTitleUrl) {
+      if (linkPreview && linkPreview.value.url === url) return;
+      if (url) {
         let data = await workerAPI(WORKER_URL, "get_url_preview_data", {
-          url: value,
+          url,
         });
         if (!data.success) {
           if (linkPreview) {
@@ -42,7 +46,7 @@ export const useLinkPreviewManager = (
             entity: entityID,
             attribute: "card/link-preview",
             value: {
-              url: value,
+              url,
               description: data.description,
               image: data.image,
               logo: data.logo,
@@ -55,6 +59,6 @@ export const useLinkPreviewManager = (
       }
     },
     1000,
-    [value, rep, entityID]
+    [title?.value, content?.value, rep, entityID]
   );
 };

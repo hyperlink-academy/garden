@@ -14,8 +14,7 @@ import { useUIState } from "hooks/useUIState";
 import { Props } from "./index";
 import { focusElement } from "src/utils";
 import { isUrl } from "src/isUrl";
-import { ListLinkCard } from "./LinkPreviewCard";
-import { LinkPreview, LinkPreviewCondensed } from "components/LinkPreview";
+import { LinkPreviewCondensed } from "components/LinkPreview";
 
 export const BigCardBody = (
   props: {
@@ -29,7 +28,6 @@ export const BigCardBody = (
   let { open } = useCardViewer();
   let editing = useUIState((s) => s.focusedCard === props.entityID);
   let setFocusedCard = useUIState((s) => s.setFocusedCard);
-  let externalUrl = props.data.title ? isUrl(props.data.title.value) : false;
   let linkPreview = db.useEntity(props.entityID, "card/link-preview");
 
   let listenersAndAttributes =
@@ -94,7 +92,9 @@ export const BigCardBody = (
         or if (its a member card) 
         or if (you're in edit mode) */}
         {!(
-          linkPreview && linkPreview.value.url === props.data.title?.value
+          linkPreview &&
+          (linkPreview.value.url === props.data.title?.value ||
+            !props.data.title)
         ) && (
           <div className="cardPreviewTitle flex w-full justify-between gap-2">
             <SingleTextSection
@@ -134,13 +134,13 @@ export const BigCardBody = (
         )}
         {props.showRelated && <Backlinks entityID={props.entityID} />}
 
-        {externalUrl && <LinkPreviewCondensed entityID={props.entityID} />}
+        {linkPreview && <LinkPreviewCondensed entityID={props.entityID} />}
         {/* Big Card Preview Default Content (show if not you're in preview mode OR there is content/image OR you're in edit mode)*/}
         {!props.hideContent &&
           (editing ||
             !!props.data.content?.value ||
             !!props.data.imageUrl ||
-            externalUrl) && (
+            linkPreview) && (
             <div
               className={`cardPreviewDefaultContent flex flex-col gap-2 pb-2 ${
                 props.data.isMember &&

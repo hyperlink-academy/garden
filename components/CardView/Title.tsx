@@ -4,7 +4,6 @@ import { useCallback, useState } from "react";
 import { useOpenCard } from "hooks/useUIState";
 import * as Popover from "@radix-ui/react-popover";
 import { CardSmall } from "components/Icons";
-import { useLinkPreviewManager } from "hooks/useLinkPreviewManager";
 
 export const Title = (props: { entityID: string }) => {
   let { authorized, mutate, action } = useMutations();
@@ -47,7 +46,6 @@ export const Title = (props: { entityID: string }) => {
     },
     [props.entityID, action, mutate, openCard]
   );
-  useLinkPreviewManager(props.entityID, titleFact?.value);
 
   return (
     <div>
