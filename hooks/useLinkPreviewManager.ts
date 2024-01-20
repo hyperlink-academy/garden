@@ -58,7 +58,7 @@ export const useLinkPreviewManager = (entityID: string) => {
         ]);
       }
     },
-    1000,
+    600,
     [title?.value, content?.value, rep, entityID]
   );
 };
