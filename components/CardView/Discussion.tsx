@@ -325,7 +325,7 @@ const AttachCard = ({
           </Popover.Trigger>
           <Popover.Portal>
             <Popover.Content
-              className="PopoverContent"
+              className="PopoverContent relative z-20"
               sideOffset={12}
               collisionPadding={{ left: 24, right: 24 }}
               side="top"
@@ -376,6 +376,7 @@ const AttachCard = ({
 
           action.start();
 
+          let newAttachedCards = [...attachedCards];
           for (let d of cards) {
             let entity: string;
             if (d.type === "existing") entity = d.entity;
@@ -387,8 +388,9 @@ const AttachCard = ({
                 memberEntity,
               });
             }
-            setAttachedCards([...attachedCards, entity]);
+            newAttachedCards.push(entity);
           }
+          setAttachedCards(newAttachedCards);
 
           action.end();
         }}
