@@ -37,7 +37,7 @@ export function Members({ data, isAdmin }: Props) {
               click your bio to edit it!
             </div>
 
-            <MemberCard
+            <MemberCardWithBio
               spaces={data.spaces_in_studios
                 .filter(
                   (space) =>
@@ -69,7 +69,7 @@ export function Members({ data, isAdmin }: Props) {
             )
             .map((m) =>
               !m.identity_data ? null : (
-                <MemberCard
+                <MemberCardWithBio
                   spaces={data.spaces_in_studios
                     .filter(
                       (space) =>
@@ -91,16 +91,39 @@ export function Members({ data, isAdmin }: Props) {
   );
 }
 
-const MemberCard = (props: {
+const MemberCardWithBio = (props: {
   memberName: string;
   memberStudio: string;
   spaces: SpaceData[];
 }) => {
+  let { mutate } = useMutations();
   let memberEntity = db.useUniqueAttribute("space/member", props.memberStudio);
   let bio = db.useEntity(memberEntity?.entity || null, "card/content");
+  return (
+    <MemberCard
+      {...props}
+      bio={bio?.value || ""}
+      onBioChange={(newBio) => {
+        if (!memberEntity) return;
+        mutate("assertFact", {
+          positions: {},
+          attribute: "card/content",
+          value: newBio,
+          entity: memberEntity?.entity,
+        });
+      }}
+    />
+  );
+};
 
+export const MemberCard = (props: {
+  memberName: string;
+  bio: string;
+  onBioChange: (newBio: string) => void;
+  memberStudio: string;
+  spaces: SpaceData[];
+}) => {
   let params = useParams<{ studio_id: string }>();
-  let { mutate } = useMutations();
   let { session } = useAuth();
 
   let [expanded, setExpanded] = useState(false);
@@ -150,15 +173,9 @@ const MemberCard = (props: {
                       ? " "
                       : "write a bio…"
                   }
-                  value={bio?.value}
+                  value={props.bio}
                   onChange={(e) => {
-                    if (!memberEntity) return;
-                    mutate("assertFact", {
-                      positions: {},
-                      attribute: "card/content",
-                      value: e.currentTarget.value,
-                      entity: memberEntity?.entity,
-                    });
+                    props.onBioChange(e.currentTarget.value);
                   }}
                   onBlur={() => {
                     setEditing(false);
@@ -167,7 +184,7 @@ const MemberCard = (props: {
                 />
               ) : (
                 <Textarea
-                  value={bio?.value}
+                  value={props.bio}
                   readOnly
                   placeholder={
                     session.session?.studio !== props.memberStudio

@@ -16,6 +16,7 @@ export const join_route = makeRoute({
   input: z.object({
     code: z.string(),
     authToken: authTokenVerifier,
+    bio: z.string().optional(),
   }),
   handler: async (msg, env: Env) => {
     let supabase = createClient(env.env);
@@ -68,6 +69,14 @@ export const join_route = makeRoute({
           value: session.studio,
           positions: {},
         }),
+        msg.bio
+          ? env.factStore.assertFact({
+              entity: memberEntity,
+              attribute: "card/content",
+              value: msg.bio,
+              positions: {},
+            })
+          : null,
         env.factStore.assertFact({
           entity: memberEntity,
           attribute: "member/name",

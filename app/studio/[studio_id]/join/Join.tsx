@@ -10,29 +10,39 @@ import { Textarea } from "components/Textarea";
 import { useAuth } from "hooks/useAuth";
 import Head from "next/head";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
 import { WORKER_URL } from "src/constants";
 import { uuidToBase62 } from "src/uuidHelpers";
+import { MemberCard } from "../MemberTab";
+import { DotLoader } from "components/DotLoader";
 
 export function JoinStudio(props: { data: StudioData }) {
   let { push } = useRouter();
-  let query = useParams();
-  let code = query?.code as string | undefined;
+  let query = useSearchParams();
+  let code = query?.get("code");
   let { session, authToken } = useAuth();
+  let [bio, setBio] = useState("");
+  let [state, setState] = useState<"loading" | "normal">("normal");
 
   const onClick = async () => {
+    console.log(!props.data, !authToken, !code);
     if (!props.data || !authToken || !code) return;
+    setState("loading");
     let data = await spaceAPI(
       `${WORKER_URL}/space/${props.data?.do_id}`,
       "join",
       {
         authToken,
         code,
+        bio,
       }
     );
+
     if (data.success) {
       push(`/studio/${uuidToBase62(props.data.id)}`);
     }
+    setState("normal");
   };
 
   let data = props.data;
@@ -59,31 +69,33 @@ export function JoinStudio(props: { data: StudioData }) {
           {/* TODO: add image from studio 'about' if one is set? */}
           <h3>{data?.name}</h3>
         </Link>
-        <div className="max-w-md rounded-md border border-grey-80 bg-white p-2">
-          <Textarea previewOnly value={data?.welcome_message} />
-        </div>
+        {data?.welcome_message && (
+          <div className="max-w-md rounded-md border border-grey-80 bg-white p-2">
+            <Textarea previewOnly value={data?.welcome_message} />
+          </div>
+        )}
 
-        {session.loggedIn ? (
+        {session.session ? (
           <>
             <p className="text-center">A membership card is waiting for you!</p>
             <div className="relative">
-              <div className="mb-2 p-4">
-                <div
-                  className={`memberCardBorder relative h-[94px] w-[160px] grow`}
-                >
-                  <BaseSmallCard
-                    isMember
-                    memberName={session.session?.username}
-                    content=""
+              <div className="mb-2 w-[302px] p-4">
+                <div className={`memberCardBorder relative grow`}>
+                  <MemberCard
+                    spaces={[]}
+                    bio={bio}
+                    onBioChange={setBio}
+                    memberStudio={session.session?.studio || ""}
+                    memberName={session.session.username}
                   />
                 </div>
               </div>
-              <div className="absolute -left-2 top-0">
+              <div className="pointer-events-none absolute -left-2 top-0">
                 <WelcomeSparkle />
               </div>
             </div>
             <ButtonPrimary
-              content="Join the Studio"
+              content={state === "loading" ? <DotLoader /> : "Join the Studio"}
               icon={<Member />}
               onClick={onClick}
             />
@@ -115,7 +127,7 @@ export function JoinStudio(props: { data: StudioData }) {
 
 const LoginOrSignup = (props: {
   id: string | undefined;
-  code: string | undefined;
+  code: string | null | undefined;
 }) => {
   let [state, setState] = LoginOrSignupModal.useState("closed");
   return (
@@ -151,6 +163,7 @@ export const WelcomeSparkle = () => {
       height="131"
       viewBox="0 0 214 131"
       fill="none"
+      className="pointer-events-none"
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
