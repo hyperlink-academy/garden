@@ -72,7 +72,7 @@ export const BaseSpaceCard = (props: Parameters<typeof SpaceCard>[0]) => {
           display_name={data?.display_name}
           image={data?.image}
           default_space_image={data?.default_space_image}
-          glow={!!unreads && !!authorized && unreads > 0}
+          glow={!!unreads && unreads > 0}
         />
       </div>
       <div className="ml-6 mt-7 w-full">
