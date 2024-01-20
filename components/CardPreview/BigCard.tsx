@@ -93,69 +93,48 @@ export const BigCardBody = (
         or if (theres a title) 
         or if (its a member card) 
         or if (you're in edit mode) */}
-        {
-          <div
-            className={`cardPreviewHeader items-top flex justify-between gap-2 pb-1`}
-          >
-            {
-              <div className="cardPreviewTitle flex w-full justify-between gap-2">
-                <SingleTextSection
-                  style={{
-                    whiteSpace: "pre-wrap",
-                    fontFamily: "inherit",
-                    width: "100%",
-                  }}
-                  entityID={props.entityID}
-                  section={props.data.member ? "member/name" : "card/title"}
-                  placeholder="Untitled"
-                  previewOnly={!editing || !!props.data.member}
-                  className={`cardPreviewTitle text-md font-bold ${
-                    props.data.isMember ? "w-fit text-white" : "text-grey-35"
-                  } ${
-                    props.data.imageUrl &&
-                    props.hideContent &&
-                    !props.data.isMember
-                      ? "rounded-[3px] !bg-white px-1"
-                      : ""
-                  }`}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      let element = document.getElementById(
-                        `${props.entityID}-preview-default-text-section`
-                      );
-                      element?.focus();
-                    }
-                  }}
-                  id={props.editable ? `${props.entityID}-preview-title` : ""}
-                />
-                {props.data.isMember ? (
-                  <div className="shrink-0 italic text-white">member</div>
-                ) : (
-                  ""
-                )}
-              </div>
-            }
-
-            {/* Card "X" to remove button */}
-            {/* NB: this is for inner control in Collection only! */}
-            {!props.outerControls && props.onDelete && authorized ? (
-              <>
-                <button
-                  className="cardPreviewRemove h-fit pt-1 text-grey-80 hover:text-grey-15"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    props.onDelete?.();
-                  }}
-                >
-                  <CloseLinedTiny width={12} height={12} />
-                </button>
-              </>
-            ) : null}
+        {!(
+          linkPreview && linkPreview.value.url === props.data.title?.value
+        ) && (
+          <div className="cardPreviewTitle flex w-full justify-between gap-2">
+            <SingleTextSection
+              style={{
+                whiteSpace: "pre-wrap",
+                fontFamily: "inherit",
+                width: "100%",
+              }}
+              entityID={props.entityID}
+              section={props.data.member ? "member/name" : "card/title"}
+              placeholder="Untitled"
+              previewOnly={!editing || !!props.data.member}
+              className={`cardPreviewTitle text-md font-bold ${
+                props.data.isMember ? "w-fit text-white" : "text-grey-35"
+              } ${
+                props.data.imageUrl && props.hideContent && !props.data.isMember
+                  ? "rounded-[3px] !bg-white px-1"
+                  : ""
+              }`}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  let element = document.getElementById(
+                    `${props.entityID}-preview-default-text-section`
+                  );
+                  element?.focus();
+                }
+              }}
+              id={props.editable ? `${props.entityID}-preview-title` : ""}
+            />
+            {props.data.isMember ? (
+              <div className="shrink-0 italic text-white">member</div>
+            ) : (
+              ""
+            )}
           </div>
-        }
+        )}
         {props.showRelated && <Backlinks entityID={props.entityID} />}
 
+        {externalUrl && <LinkPreviewCondensed entityID={props.entityID} />}
         {/* Big Card Preview Default Content (show if not you're in preview mode OR there is content/image OR you're in edit mode)*/}
         {!props.hideContent &&
           (editing ||
@@ -188,9 +167,6 @@ export const BigCardBody = (
                       : ""
                   }
                 />
-              )}
-              {externalUrl && !props.hideContent && (
-                <LinkPreviewCondensed entityID={props.entityID} />
               )}
               {props.data.imageUrl && !props.hideContent && (
                 <img
@@ -298,6 +274,21 @@ export const BigCardBody = (
                 <Edit editing={editing} width={20} height={20} />
               </button>
             )}
+            {/* Card "X" to remove button */}
+            {/* NB: this is for inner control in Collection only! */}
+            {!props.outerControls && props.onDelete && authorized ? (
+              <>
+                <button
+                  className="cardPreviewRemove h-fit pt-1 text-grey-80 hover:text-grey-15"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    props.onDelete?.();
+                  }}
+                >
+                  <CloseLinedTiny width={12} height={12} />
+                </button>
+              </>
+            ) : null}
           </div>
         )}
       </div>
