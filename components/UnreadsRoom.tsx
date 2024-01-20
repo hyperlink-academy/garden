@@ -7,7 +7,8 @@ import { Divider } from "./Layout";
 import { CollectionListTiny, CollectionPreviewTiny, GoToTop } from "./Icons";
 
 export const UnreadsRoom = () => {
-  let { authorized, memberEntity } = useMutations();
+  let { memberEntity, permissions } = useMutations();
+  let authorized = permissions.commentAndReact;
   let unreadCards = db.useReference(memberEntity, "card/unread-by");
   let chatRooms = db
     .useAttribute("room/type")

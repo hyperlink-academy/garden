@@ -180,7 +180,8 @@ const EditRoomModalWithRoom = (props: {
 };
 
 const UnreadsRoomButton = () => {
-  let { authorized, memberEntity } = useMutations();
+  let { memberEntity, permissions } = useMutations();
+  let authorized = permissions.commentAndReact;
   let unreadCards = db.useReference(memberEntity, "card/unread-by");
   let unreadDiscussions = db.useReference(memberEntity, "discussion/unread-by");
   if (!authorized) return null;
