@@ -1,18 +1,16 @@
 import { SingleReactionPreview } from "components/CardView/Reactions";
 import { useCardViewer } from "components/CardViewerContext";
 import {
-  ChatEmptySmall,
   ChatEmptyTiny,
-  ChatSmall,
   ExternalLink,
   Member,
   RoomChat,
 } from "components/Icons";
 import { useReactions } from "hooks/useReactions";
-import { useMutations } from "hooks/useReplicache";
-import { isUrl } from "src/isUrl";
+import { db, useMutations } from "hooks/useReplicache";
 import { Props } from "./index";
 import { useUIState } from "hooks/useUIState";
+import { SmallLinkCard } from "./LinkPreviewCard";
 
 export const SmallCardBody = (
   props: {
@@ -52,24 +50,25 @@ export const BaseSmallCard = (
     messagesCount?: number;
   } & Omit<Props, "size" | "href" | "data">
 ) => {
-  let url = props.content ? isUrl(props.content) : false;
-
   let { authorized } = useMutations();
   let { open } = useCardViewer();
+  let linkPreview = db.useEntity(props.entityID || null, "card/link-preview");
   let listenersAndAttributes = authorized
     ? {
-      ...props?.dragHandleProps?.attributes,
-      ...props?.dragHandleProps?.listeners,
-    }
+        ...props?.dragHandleProps?.attributes,
+        ...props?.dragHandleProps?.listeners,
+      }
     : {};
+
   return (
     <div
       {...listenersAndAttributes}
       onClick={() => {
         props.entityID && open({ entityID: props.entityID });
       }}
-      className={`h-full w-full !bg-cover !bg-center !bg-no-repeat hover:cursor-pointer ${props.isMember ? "pb-1 pl-2 pr-1 pt-2" : "px-2 py-2"
-        }`}
+      className={`h-full w-full !bg-cover !bg-center !bg-no-repeat hover:cursor-pointer ${
+        props.isMember ? "pb-1 pl-2 pr-1 pt-2" : "px-2 py-2"
+      }`}
       style={{
         background: props.imageUrl ? `url(${props.imageUrl})` : "",
       }}
@@ -151,12 +150,13 @@ export const BaseSmallCard = (
           {/* three states: unread, existing, none */}
           {/* clicking = shortcut to focus input for a new message */}
           <button
-            className={`unreadCount fixed -bottom-[10px] right-[24px]  rounded-md border p-[2px] ${props.unreadDiscussions
+            className={`unreadCount fixed -bottom-[10px] right-[24px]  rounded-md border p-[2px] ${
+              props.unreadDiscussions
                 ? "unreadCardGlow bg-background text-accent-blue hover:bg-accent-blue hover:text-background"
                 : props.messagesCount && props.messagesCount > 0
-                  ? "border-grey-80 bg-background text-grey-55 hover:border-accent-blue hover:bg-bg-blue hover:text-accent-blue"
-                  : "border-grey-80 bg-white text-grey-55 hover:border-accent-blue hover:bg-bg-blue hover:text-accent-blue"
-              } `}
+                ? "border-grey-80 bg-background text-grey-55 hover:border-accent-blue hover:bg-bg-blue hover:text-accent-blue"
+                : "border-grey-80 bg-white text-grey-55 hover:border-accent-blue hover:bg-bg-blue hover:text-accent-blue"
+            } `}
             onClick={() => {
               if (!props.entityID) return;
               open({ entityID: props.entityID });

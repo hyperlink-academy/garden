@@ -36,6 +36,8 @@ import { CardViewDrawer } from "./CardViewDrawer";
 import { useCloseCard, useRoomHistory, useUIState } from "hooks/useUIState";
 import { Modal } from "components/Modal";
 import { Title } from "./Title";
+import { LinkPreview } from "components/LinkPreview";
+import { useLinkPreviewManager } from "hooks/useLinkPreviewManager";
 
 const borderStyles = (args: { member: boolean }) => {
   switch (true) {
@@ -198,6 +200,7 @@ export const CardContent = (props: {
   onDelete?: () => void;
   referenceFactID?: string;
 }) => {
+  useLinkPreviewManager(props.entityID);
   let { ref } = usePreserveScroll<HTMLDivElement>(props.entityID);
   let date = db.useEntity(props.entityID, "card/date");
   let [dateEditing, setDateEditing] = useUndoableState(false);
@@ -277,6 +280,8 @@ export const CardContent = (props: {
 
           <DefaultTextSection entityID={props.entityID} />
 
+          <CardLinkPreview entityID={props.entityID} />
+
           <ImageSection entityID={props.entityID} />
 
           <AttachedCardSection entityID={props.entityID} />
@@ -291,6 +296,12 @@ export const CardContent = (props: {
       <CardViewDrawer entityID={props.entityID} drawerOpen={drawerOpen} />
     </>
   );
+};
+
+const CardLinkPreview = (props: { entityID: string }) => {
+  let linkPreview = db.useEntity(props.entityID, "card/link-preview");
+  if (linkPreview) return <LinkPreview entityID={props.entityID} />;
+  return null;
 };
 
 const BackButton = () => {

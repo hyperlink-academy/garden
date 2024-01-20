@@ -33,13 +33,7 @@ export const get_url_preview_data_route = makeRoute({
     url: z.string(),
   }),
   handler: async (msg, env: Bindings) => {
-    let response = await fetch(`https://pro.microlink.io/?url=${msg.url}`, {
-      headers: {
-        "x-api-key": env.MICROLINK_API_KEY,
-      },
-    });
-
-    let result = expectedAPIResponse.safeParse(await response.json());
+    let result = await get_url_preview_data(msg.url, env);
     if (!result.success)
       return {
         data: { success: false } as const,
@@ -57,3 +51,14 @@ export const get_url_preview_data_route = makeRoute({
     } as const;
   },
 });
+
+export const get_url_preview_data = async (url: string, env: Bindings) => {
+  let response = await fetch(`https://pro.microlink.io/?url=${url}`, {
+    headers: {
+      "x-api-key": env.MICROLINK_API_KEY,
+    },
+  });
+
+  let result = expectedAPIResponse.safeParse(await response.json());
+  return result;
+};
