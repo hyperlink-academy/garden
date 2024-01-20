@@ -35,7 +35,7 @@ export const LinkPreviewCondensed = (props: { entityID: string }) => {
   let data = db.useEntity(props.entityID, "card/link-preview");
 
   return (
-    <a href={data?.value.url}>
+    <a href={data?.value.url} className="w-full">
       <div className=" flex h-[64px] w-full gap-3 overflow-hidden rounded-md border border-accent-blue hover:bg-bg-blue ">
         {/* 
         {data?.value.image && (

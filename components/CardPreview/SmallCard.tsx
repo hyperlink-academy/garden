@@ -1,16 +1,13 @@
 import { SingleReactionPreview } from "components/CardView/Reactions";
 import { useCardViewer } from "components/CardViewerContext";
 import {
-  ChatEmptySmall,
   ChatEmptyTiny,
-  ChatSmall,
   ExternalLink,
   Member,
   RoomChat,
 } from "components/Icons";
 import { useReactions } from "hooks/useReactions";
 import { db, useMutations } from "hooks/useReplicache";
-import { isUrl } from "src/isUrl";
 import { Props } from "./index";
 import { useUIState } from "hooks/useUIState";
 import { SmallLinkCard } from "./LinkPreviewCard";
@@ -62,19 +59,6 @@ export const BaseSmallCard = (
         ...props?.dragHandleProps?.listeners,
       }
     : {};
-
-  if (linkPreview && props.entityID)
-    return (
-      <div
-        {...listenersAndAttributes}
-        onClick={() => {
-          props.entityID && open({ entityID: props.entityID });
-        }}
-        className={`h-full w-full !bg-cover !bg-center !bg-no-repeat hover:cursor-pointer`}
-      >
-        <SmallLinkCard entityID={props.entityID} />
-      </div>
-    );
 
   return (
     <div
