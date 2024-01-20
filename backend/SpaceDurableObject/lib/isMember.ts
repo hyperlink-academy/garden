@@ -7,6 +7,7 @@ export async function isUserMember(env: Env, userID: string) {
     .from("members_in_spaces")
     .select("*")
     .eq("space_do_id", env.id)
-    .eq("member", userID);
+    .eq("member", userID)
+    .single();
   return !!isMember;
 }

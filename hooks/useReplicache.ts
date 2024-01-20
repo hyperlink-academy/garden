@@ -526,7 +526,7 @@ export const useMutations = () => {
   let { session } = useAuth();
   let rep = useContext(ReplicacheContext);
   let { data: spaceData } = useSpaceData(rep?.id);
-  let auth = useSubscribe(
+  let memberEntity = useSubscribe(
     async (tx) => {
       if (!session || !session.loggedIn || !session.session?.studio)
         return null;
@@ -544,10 +544,13 @@ export const useMutations = () => {
     [session.session?.studio],
     "auth"
   );
+  let auth =
+    session.user &&
+    spaceData?.members_in_spaces.find((m) => m.member === session.user?.id);
   let permissions = useMemo(
     () => ({
       commentAndReact:
-        !!auth ||
+        !!memberEntity ||
         (session &&
           spaceData?.spaces_in_studios.find((s) =>
             s.studios?.members_in_studios.find(
@@ -555,7 +558,7 @@ export const useMutations = () => {
             )
           )),
     }),
-    [spaceData, session, auth]
+    [spaceData, session, memberEntity]
   );
   let client = useSubscribe(
     async (tx) => {
@@ -579,7 +582,7 @@ export const useMutations = () => {
       if (!session) return;
       return rep?.rep.mutate[mutation](args);
     },
-    [session, auth, rep]
+    [session, memberEntity, rep]
   );
   let action = useMemo(
     () => ({
@@ -604,7 +607,7 @@ export const useMutations = () => {
   return {
     rep: rep?.rep,
     authorized: !!auth,
-    memberEntity: auth?.entity || null,
+    memberEntity: memberEntity?.entity || null,
     client,
     mutate,
     action,

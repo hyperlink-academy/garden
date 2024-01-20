@@ -37,7 +37,7 @@ export const push_route = makeRoute({
     let cachedStore = new CachedStorage(env.storage);
     let fact_store = store(cachedStore, { id: env.id });
 
-    let isMember = isUserMember(env, session.id);
+    let isMember = await isUserMember(env, session.id);
 
     let isStudioMember = false;
     if (!isMember) {
@@ -71,8 +71,13 @@ export const push_route = makeRoute({
       if (!Mutations[name]) {
         continue;
       }
-      if (!isMember && isStudioMember && !StudioMatePermissions.includes(name))
+      if (
+        !isMember &&
+        isStudioMember &&
+        !StudioMatePermissions.includes(name)
+      ) {
         continue;
+      }
       try {
         await Mutations[name](mutation.args, {
           ...fact_store,

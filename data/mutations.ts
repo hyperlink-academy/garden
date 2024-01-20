@@ -566,5 +566,6 @@ export const Mutations = {
 
 export const StudioMatePermissions: Array<keyof typeof Mutations> = [
   "replyToDiscussion",
+  "markRead",
   "addReaction",
 ];
