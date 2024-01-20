@@ -212,28 +212,31 @@ export const Desktop = (props: { entityID: string }) => {
             authToken,
             spaceID
           );
-          if (!data.success) return;
+          if (data.length === 0) return;
+          for (let i = 0; i < data.length; i++) {
+            let image = data[i];
+            if (image.success === false) continue;
+            let entity = ulid();
+            await mutate("assertFact", {
+              entity,
+              factID: ulid(),
+              attribute: "card/image",
+              value: { type: "file", id: image.data.id, filetype: "image" },
+              positions: {},
+            });
 
-          let entity = ulid();
-          await mutate("assertFact", {
-            entity,
-            factID: ulid(),
-            attribute: "card/image",
-            value: { type: "file", id: data.data.id, filetype: "image" },
-            positions: {},
-          });
-
-          await mutate("addCardToDesktop", {
-            entity,
-            factID: ulid(),
-            desktop: props.entityID,
-            position: {
-              rotation: 0,
-              size: "small",
-              x: Math.max(e.clientX - parentRect.left - 128, 0),
-              y: Math.max(e.clientY - parentRect.top - 42, 0),
-            },
-          });
+            await mutate("addCardToDesktop", {
+              entity,
+              factID: ulid(),
+              desktop: props.entityID,
+              position: {
+                rotation: 0,
+                size: "small",
+                x: Math.max(e.clientX - parentRect.left - 128, 0),
+                y: Math.max(e.clientY - parentRect.top - 42 + i * 128, 0),
+              },
+            });
+          }
         }}
         style={{
           zIndex: 1,

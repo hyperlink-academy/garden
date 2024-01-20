@@ -71,35 +71,36 @@ const CollectionList = (props: {
           authToken,
           spaceID
         );
-        if (!data.success) return;
+        for (let image of data) {
+          if (image.success === false) continue;
+          let entity = ulid();
+          await mutate("assertFact", {
+            entity,
+            factID: ulid(),
+            attribute: "card/image",
+            value: { type: "file", id: image.data.id, filetype: "image" },
+            positions: {},
+          });
 
-        let entity = ulid();
-        await mutate("assertFact", {
-          entity,
-          factID: ulid(),
-          attribute: "card/image",
-          value: { type: "file", id: data.data.id, filetype: "image" },
-          positions: {},
-        });
+          let siblings =
+            (await rep.rep.query((tx) => {
+              return scanIndex(tx).eav(props.entityID, props.attribute);
+            })) || [];
 
-        let siblings =
-          (await rep.rep.query((tx) => {
-            return scanIndex(tx).eav(props.entityID, props.attribute);
-          })) || [];
-
-        let lastPosition = siblings.sort(sortByPosition("eav"))[
-          siblings.length - 1
-        ]?.positions["eav"];
-        let position = generateKeyBetween(lastPosition || null, null);
-        await mutate("addCardToSection", {
-          factID: ulid(),
-          cardEntity: entity,
-          parent: props.entityID,
-          section: props.attribute,
-          positions: {
-            eav: position,
-          },
-        });
+          let lastPosition = siblings.sort(sortByPosition("eav"))[
+            siblings.length - 1
+          ]?.positions["eav"];
+          let position = generateKeyBetween(lastPosition || null, null);
+          await mutate("addCardToSection", {
+            factID: ulid(),
+            cardEntity: entity,
+            parent: props.entityID,
+            section: props.attribute,
+            positions: {
+              eav: position,
+            },
+          });
+        }
       }}
     >
       {props.cards.length > 5 && (

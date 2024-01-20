@@ -153,15 +153,18 @@ export const CardView = (props: {
             authToken,
             spaceID
           );
-          if (!data.success) return;
+          if (data.length === 0) return;
           e.preventDefault();
-          await mutate("assertFact", {
-            entity: props.entityID,
-            factID: ulid(),
-            attribute: "card/image",
-            value: { type: "file", id: data.data.id, filetype: "image" },
-            positions: {},
-          });
+          for (let image of data) {
+            if (!image.success) continue;
+            await mutate("assertFact", {
+              entity: props.entityID,
+              factID: ulid(),
+              attribute: "card/image",
+              value: { type: "file", id: image.data.id, filetype: "image" },
+              positions: {},
+            });
+          }
         }}
       >
         {/* IF MEMBER CARD, INCLUDE LINK TO STUDIO  */}
@@ -528,13 +531,16 @@ const DefaultTextSection = (props: { entityID: string }) => {
           authToken,
           spaceID
         );
-        if (!data.success) return;
-        await mutate("assertFact", {
-          entity: props.entityID,
-          attribute: "card/image",
-          value: { type: "file", id: data.data.id, filetype: "image" },
-          positions: {},
-        });
+
+        for (let image of data) {
+          if (!image.success) continue;
+          await mutate("assertFact", {
+            entity: props.entityID,
+            attribute: "card/image",
+            value: { type: "file", id: image.data.id, filetype: "image" },
+            positions: {},
+          });
+        }
       }}
       entityID={props.entityID}
       section={"card/content"}

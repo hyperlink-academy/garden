@@ -191,6 +191,7 @@ export const AddImage: React.FC<
         type="file"
         accept="image/*"
         className="hidden"
+        multiple
         onClick={() => {
           console.log("what");
         }}
@@ -198,20 +199,26 @@ export const AddImage: React.FC<
           let files = e.currentTarget.files;
           if (!files || !authToken || !spaceID) return;
           setState("uploading");
-          let res = await fetch(`${WORKER_URL}/space/${spaceID}/upload_file`, {
-            headers: {
-              "X-Authorization-Access-Token": authToken.access_token,
-              "X-Authorization-Refresh-Token": authToken.refresh_token,
-            },
-            method: "POST",
-            body: files[0],
-          });
+          for (let file of files) {
+            let res = await fetch(
+              `${WORKER_URL}/space/${spaceID}/upload_file`,
+              {
+                headers: {
+                  "X-Authorization-Access-Token": authToken.access_token,
+                  "X-Authorization-Refresh-Token": authToken.refresh_token,
+                },
+                method: "POST",
+                body: file,
+              }
+            );
+            let data = (await res.json()) as
+              | { success: false }
+              | { success: true; data: { id: string } };
+            if (!data.success) return;
+            props.onUpload(data.data.id);
+          }
+
           setState("normal");
-          let data = (await res.json()) as
-            | { success: false }
-            | { success: true; data: { id: string } };
-          if (!data.success) return;
-          props.onUpload(data.data.id);
         }}
       />
     </label>

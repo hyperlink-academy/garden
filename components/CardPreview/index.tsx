@@ -118,15 +118,16 @@ export const CardPreview = (
             authToken,
             spaceID
           );
-          if (!data.success) return;
-
-          await mutate("assertFact", {
-            entity: props.entityID,
-            factID: ulid(),
-            attribute: "card/image",
-            value: { type: "file", id: data.data.id, filetype: "image" },
-            positions: {},
-          });
+          for (let image of data) {
+            if (!image.success) continue;
+            await mutate("assertFact", {
+              entity: props.entityID,
+              factID: ulid(),
+              attribute: "card/image",
+              value: { type: "file", id: image.data.id, filetype: "image" },
+              positions: {},
+            });
+          }
         }}
         className={`cardPreviewBorder select-none ${
           isUnread ? "unreadCardGlow" : ""

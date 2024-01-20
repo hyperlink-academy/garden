@@ -5,10 +5,11 @@ export const getAndUploadFile = async (
   authToken: authToken,
   spaceID: string
 ) => {
+  let results = [];
   for (let item of items) {
     if (!item.type.includes("image")) continue;
     let image = item.getAsFile();
-    if (!image) return { success: false } as const;
+    if (!image) results.push({ success: false } as const);
     let res = await fetch(`${WORKER_URL}/space/${spaceID}/upload_file`, {
       headers: {
         "X-Authorization-Access-Token": authToken.access_token,
@@ -21,7 +22,7 @@ export const getAndUploadFile = async (
       | { success: false }
       | { success: true; data: { id: string } };
 
-    return data;
+    results.push(data);
   }
-  return { success: false } as const;
+  return results;
 };
