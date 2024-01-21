@@ -288,6 +288,8 @@ const MyHomeEmpty = (props: { studioSpaceID: string; studioName: string }) => {
         <img
           src="/img/spotIllustration/sandbox.png"
           alt="a door overgrown with moss"
+          width={300}
+          height={600}
         />
       )}
 
