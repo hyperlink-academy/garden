@@ -8,8 +8,8 @@ export async function generateMetadata(props: {
   params: { space: string; studio: string };
 }) {
   let data = await workerAPI(WORKER_URL, "get_space_data_by_name", {
-    spaceName: props.params.space,
-    username: props.params.studio,
+    spaceName: decodeURIComponent(props.params.space),
+    username: decodeURIComponent(props.params.studio),
   });
   return { title: data.data?.display_name || "404 Space Not Found" };
 }
@@ -18,10 +18,10 @@ export default async function SpacePage(props: {
   params: { space: string; studio: string };
 }) {
   let result = await workerAPI(WORKER_URL, "get_space_data_by_name", {
-    spaceName: props.params.space,
-    username: props.params.studio,
+    spaceName: decodeURIComponent(props.params.space),
+    username: decodeURIComponent(props.params.studio),
   });
-  if (!result.success) return <div>Not found</div>;
+  if (!result.success) return <pre>{JSON.stringify(result, null, 2)}</pre>;
 
   return (
     <SpaceProvider id={result.data.do_id}>
