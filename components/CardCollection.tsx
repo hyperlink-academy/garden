@@ -56,7 +56,7 @@ const CollectionList = (props: {
   let rep = useContext(ReplicacheContext);
   let spaceID = useSpaceID();
   let { authToken } = useAuth();
-  let { mutate } = useMutations();
+  let { mutate, memberEntity } = useMutations();
   const onAdd = () => {};
   return (
     <div
@@ -65,7 +65,7 @@ const CollectionList = (props: {
       onDrop={async (e) => {
         e.preventDefault();
         e.stopPropagation();
-        if (!rep || !authToken || !spaceID) return;
+        if (!rep || !authToken || !spaceID || !memberEntity) return;
         let data = await getAndUploadFile(
           e.dataTransfer.items,
           authToken,
@@ -74,6 +74,11 @@ const CollectionList = (props: {
         for (let image of data) {
           if (image.success === false) continue;
           let entity = ulid();
+          await mutate("createCard", {
+            entityID: entity,
+            title: "",
+            memberEntity,
+          });
           await mutate("assertFact", {
             entity,
             factID: ulid(),

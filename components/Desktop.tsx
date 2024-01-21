@@ -24,6 +24,7 @@ import { useAuth } from "hooks/useAuth";
 import { getAndUploadFile } from "src/getAndUploadFile";
 import { useCardPreviewData } from "hooks/CardPreviewData";
 import { useRemoveCardFromRoomHistory } from "hooks/useUIState";
+import { create } from "components/CardStack";
 
 const GRID_SIZE = 8;
 const snap = (x: number) => Math.round(x / GRID_SIZE) * GRID_SIZE;
@@ -205,7 +206,7 @@ export const Desktop = (props: { entityID: string }) => {
         onDragOver={(e) => e.preventDefault()}
         onDrop={async (e) => {
           e.preventDefault();
-          if (!authToken || !spaceID) return;
+          if (!authToken || !spaceID || !memberEntity) return;
           let parentRect = e.currentTarget.getBoundingClientRect();
           let data = await getAndUploadFile(
             e.dataTransfer.items,
@@ -217,6 +218,12 @@ export const Desktop = (props: { entityID: string }) => {
             let image = data[i];
             if (image.success === false) continue;
             let entity = ulid();
+
+            await mutate("createCard", {
+              entityID: entity,
+              title: "",
+              memberEntity,
+            });
             await mutate("assertFact", {
               entity,
               factID: ulid(),
