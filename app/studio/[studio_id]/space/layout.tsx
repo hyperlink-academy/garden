@@ -4,6 +4,8 @@ import { base62ToUuid } from "src/uuidHelpers";
 import { SpaceViewer } from "./SpaceViewer";
 import { PageHeightContainer } from "components/PageHeightContainer";
 import { Space } from "components/Space";
+import { StudioPresenceHandler } from "./StudioPresenceHandler";
+import { useParams } from "next/navigation";
 export const fetchCache = "force-no-store";
 
 export default async function StudioSpaceLayout(props: {
@@ -18,8 +20,10 @@ export default async function StudioSpaceLayout(props: {
   });
   if (!data.success) return <>404</>;
   let spaces = data.data.spaces_in_studios.map((x) => x.space_data);
+
   return (
     <PageHeightContainer>
+      <StudioPresenceHandler spaces={spaces} studio_do_id={data.data.do_id} />
       <SpaceViewer studioName={data.data.name} spaces={spaces}>
         <Space
           studio={{

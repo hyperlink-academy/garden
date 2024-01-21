@@ -2,11 +2,13 @@ import { NonUndefined } from "@use-gesture/react";
 import {
   DisclosureCollapseTiny,
   DisclosureExpandTiny,
+  RoomMember,
   RoomSearch,
 } from "components/Icons";
 import { BaseSpaceCard, SpaceData } from "components/SpacesList";
 import { AddSpace } from "components/StudioPage/AddSpace";
 import { useAuth } from "hooks/useAuth";
+import { db } from "hooks/useReplicache";
 import { useStudioData } from "hooks/useStudioData";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -43,7 +45,7 @@ export function SpaceList({ data }: Props) {
 
   if (!data) return;
   return (
-    <div className="studioSpacesWrapper mx-auto h-full overflow-y-scroll pb-6 sm:pt-6">
+    <div className="no-scrollbar studioSpacesWrapper mx-auto h-full overflow-y-scroll pb-6 sm:pt-6">
       <div className="studioSpaces flex h-full w-full flex-col gap-4">
         <div className="studioSpacesOptions flex w-full items-center justify-between gap-3  ">
           {authorized && <AddSpace id={data.id} />}
@@ -66,7 +68,7 @@ export function SpaceList({ data }: Props) {
             </div>
           )}
         </div>
-        <div className=" studioSpaceListWrapper no-scrollbar relative flex h-full w-full flex-col gap-8 overflow-y-scroll ">
+        <div className=" studioSpaceListWrapper no-scrollbar relative flex h-full w-full flex-col gap-8 overflow-y-scroll pt-4">
           {allSpaces.length > 0 ? (
             <>
               <List
@@ -93,13 +95,28 @@ export function SpaceList({ data }: Props) {
 
 const List = (props: { spaces: Array<SpaceData> }) => {
   let params = useParams<{ studio_id: string }>();
+  let peopleInSpaces = db.useAttribute("presence/in-space");
 
   return (
     <div className="studioSpaceList w-full ">
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3">
         {props.spaces.map((space) => {
+          let presences = peopleInSpaces.filter((p) => p.value === space.do_id);
           return (
-            <div className="" key={space.id}>
+            <div className="relative" key={space.id}>
+              <div className="absolute right-0">
+                {presences.slice(0, 4).map((p) => (
+                  <SpacePresence entityID={p.entity} />
+                ))}
+                {presences.length < 5 ? null : (
+                  <div className=" mt-1 flex items-center gap-0.5 rounded-t-md bg-accent-blue px-[6px]  pb-2 pt-0.5 text-xs font-bold text-white">
+                    + {presences.length - 4}
+                    <span>
+                      <RoomMember />
+                    </span>
+                  </div>
+                )}
+              </div>
               <Link
                 href={`/studio/${params?.studio_id}/space/${space.id}`}
                 className="flex flex-col gap-2 text-left"
@@ -111,6 +128,20 @@ const List = (props: { spaces: Array<SpaceData> }) => {
         })}
       </div>
     </div>
+  );
+};
+
+const SpacePresence = (props: { entityID: string }) => {
+  let member = db.useEntity(props.entityID, "presence/client-member");
+  let name = db.useEntity(member?.value.value || null, "member/name");
+  let color = db.useEntity(member?.value.value || null, "member/color");
+  return (
+    <span
+      className="relative ml-1 rounded-t-md px-1 pb-2 pt-0.5  text-xs font-bold text-white"
+      style={{ backgroundColor: color?.value }}
+    >
+      {name?.value}
+    </span>
   );
 };
 

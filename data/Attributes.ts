@@ -302,6 +302,12 @@ export const DefaultAttributes = {
     unique: true,
     ephemeral: true,
   },
+  "presence/in-space": {
+    type: "string",
+    cardinality: "one",
+    unique: false,
+    ephemeral: true,
+  },
   "presence/in-room": {
     type: "reference",
     cardinality: "one",
