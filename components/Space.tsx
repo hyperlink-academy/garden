@@ -265,7 +265,7 @@ const MobileSidebar = (props: Props) => {
       }
       <animated.div
         style={{ height: viewheight, left }}
-        className="pwa-padding pwa-padding-bottom fixed top-0 z-50 ml-2 p-1 pl-0"
+        className="pwa-padding pwa-padding-bottom fixed top-0 z-50 ml-2 p-1 py-[2px] pl-0"
       >
         <div
           className="h-full touch-none rounded-md border border-grey-90 bg-white"
