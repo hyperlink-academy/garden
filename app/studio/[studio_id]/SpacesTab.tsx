@@ -106,7 +106,7 @@ const List = (props: { spaces: Array<SpaceData> }) => {
             <div className="relative" key={space.id}>
               <div className="absolute right-0">
                 {presences.slice(0, 4).map((p) => (
-                  <SpacePresence entityID={p.entity} />
+                  <SpacePresence entityID={p.entity} key={p.entity} />
                 ))}
                 {presences.length < 5 ? null : (
                   <div className=" mt-1 flex items-center gap-0.5 rounded-t-md bg-accent-blue px-[6px]  pb-2 pt-0.5 text-xs font-bold text-white">
