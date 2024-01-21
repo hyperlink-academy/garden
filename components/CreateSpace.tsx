@@ -12,6 +12,7 @@ import { useSpaceData } from "hooks/useSpaceData";
 import { useIdentityData } from "hooks/useIdentityData";
 import { Form, SubmitButton } from "./Form";
 import { DotLoader } from "./DotLoader";
+import { useIsMobile } from "hooks/utils";
 
 export type CreateSpaceFormState = {
   display_name: string;
@@ -36,13 +37,14 @@ export const CreateSpace = (props: {
   let auth = useAuth();
   let rep = useContext(ReplicacheContext);
   let router = useRouter();
+  let isMobile = useIsMobile();
   return (
     <>
       <a className="flex w-fit">
         <ButtonSecondary
           className="mx-auto"
           icon={<SpaceCreate />}
-          content="Create New Space!"
+          content={isMobile ? "Create" : "Create New Space!"}
           onClick={() => setOpen(true)}
         />
       </a>

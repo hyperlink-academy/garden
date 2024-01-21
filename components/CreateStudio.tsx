@@ -8,6 +8,7 @@ import Router from "next/router";
 import { useIdentityData } from "hooks/useIdentityData";
 import { uuidToBase62 } from "src/uuidHelpers";
 import { Modal } from "./Modal";
+import { useIsMobile } from "hooks/utils";
 
 let weird_studios = [
   "Bauhaus",
@@ -65,16 +66,17 @@ export function CreateStudio(props: { username: string }) {
     description: "",
   });
   let { authToken } = useAuth();
+  let isMobile = useIsMobile();
   return (
     <>
-      <ButtonTertiary
-        content={"Create a Studio"}
+      <ButtonLink
+        content={isMobile ? "Create" : "Create a Studio"}
         onClick={() => setOpen(true)}
       />
       <Modal
         open={open}
         onClose={() => setOpen(false)}
-        header="Create A New Studio"
+        header="Create New Studio"
       >
         <form
           className="flex flex-col gap-4"
