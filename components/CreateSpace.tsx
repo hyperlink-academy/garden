@@ -6,6 +6,7 @@ import { ButtonPrimary, ButtonSecondary } from "./Buttons";
 import { DoorSelector } from "./DoorSelector";
 import { SpaceCreate } from "./Icons";
 import { Modal } from "./Modal";
+import { useRouter } from "next/navigation";
 
 import { useSpaceData } from "hooks/useSpaceData";
 import { useIdentityData } from "hooks/useIdentityData";
@@ -34,6 +35,7 @@ export const CreateSpace = (props: {
   });
   let auth = useAuth();
   let rep = useContext(ReplicacheContext);
+  let router = useRouter();
   return (
     <>
       <a className="flex w-fit">
@@ -75,6 +77,7 @@ export const CreateSpace = (props: {
                   owner: [...s.owner, d],
                 };
               });
+              router.push(`${d.owner.username}/s/${d.name}/${d.display_name}`);
             }
             setFormState({
               display_name: "",
@@ -83,7 +86,7 @@ export const CreateSpace = (props: {
               default_space_image: null,
             });
             rep?.rep.pull();
-            setOpen(false);
+            // setOpen(false);
           }}
         >
           <CreateSpaceForm formState={formState} setFormState={setFormState} />
