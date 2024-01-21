@@ -80,15 +80,16 @@ export default function UserHomePage(props: { data: IdentityData }) {
               <LoginButton />
             )}
           </div>
-          <div className="flex flex-row items-center justify-between">
-            <h4>Studios</h4>
-            {session.session &&
-              session.session?.username === currentStudioName && (
-                <CreateStudio username={session.session.username} />
-              )}
-          </div>
+
           {studios.length > 0 ? (
             <>
+              <div className="flex flex-row items-center justify-between">
+                <h4>Studios</h4>
+                {session.session &&
+                  session.session?.username === currentStudioName && (
+                    <CreateStudio username={session.session.username} />
+                  )}
+              </div>
               <div className="grid  w-full grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3">
                 {studios.map((studio) => (
                   <Link
@@ -109,19 +110,31 @@ export default function UserHomePage(props: { data: IdentityData }) {
                   </Link>
                 ))}
               </div>
+              <div className="pb-2 pt-4">
+                <Divider />
+              </div>
             </>
           ) : (
             spaces.length > 0 && (
-              <div className="text-sm text-grey-55 ">
-                Studios are places to collect related spaces. <br />
-                Invite friends and work alongside each other as a creative
-                collective!
-              </div>
+              <>
+                <div className="flex flex-row items-center justify-between">
+                  <h4>Studios</h4>
+                  {session.session &&
+                    session.session?.username === currentStudioName && (
+                      <CreateStudio username={session.session.username} />
+                    )}
+                </div>
+                <div className="text-sm text-grey-55 ">
+                  Studios are places to collect related spaces. <br />
+                  Invite friends and work alongside each other as a creative
+                  collective!
+                </div>
+                <div className="pb-2 pt-4">
+                  <Divider />
+                </div>
+              </>
             )
           )}
-          <div className="pb-2 pt-4">
-            <Divider />
-          </div>
 
           {spaces.length === 0 ? null : (
             <>
