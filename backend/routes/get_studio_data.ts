@@ -3,22 +3,33 @@ import { makeRoute } from "backend/lib/api";
 import { createClient } from "backend/lib/supabase";
 import { z } from "zod";
 import { space_data_query } from "./get_space_data";
+let idk = z.union([
+  z.object({ id: z.string() }),
+  z.object({
+    do_id: z.string(),
+  }),
+]);
 export const get_studio_data_route = makeRoute({
   route: "get_studio_data",
-  input: z.object({ id: z.string() }),
+  input: z.union([
+    z.object({ id: z.string() }),
+    z.object({
+      do_id: z.string(),
+    }),
+  ]),
   handler: async (msg, env: Bindings) => {
     const supabase = createClient(env);
-    let { data } = await supabase
-      .from("studios")
-      .select(
-        `*,
+    let query = supabase.from("studios").select(
+      `*,
         members_in_studios(*, identity_data(*)),
         spaces_in_studios(*,
                           space_data(${space_data_query})
                          )`
-      )
-      .eq("id", msg.id)
-      .single();
+    );
+    if (msg.id) query = query.eq("id", msg.id);
+    else query = query.eq("do_id", msg.do_id);
+    let { data } = await query.single();
+    console.log(data);
     if (data) {
       return {
         data: {

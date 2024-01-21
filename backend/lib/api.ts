@@ -1,6 +1,6 @@
 import { WorkerRoutes } from "backend";
 import { SpaceRoutes } from "backend/SpaceDurableObject";
-import { ZodObject, ZodRawShape, z } from "zod";
+import { ZodObject, ZodRawShape, ZodUnion, z } from "zod";
 
 type UnwrapPromise<T> = T extends Promise<infer U> ? U : T;
 
@@ -103,7 +103,7 @@ export const makeRouter = <Env extends {}>(routes: Routes<Env>) => {
 
 type POSTRoute<
   Cmd extends string,
-  Input extends ZodObject<ZodRawShape>,
+  Input extends ZodObject<ZodRawShape> | ZodUnion<any>,
   Result extends {
     data: object;
     headers?: readonly (readonly [string, string])[];
@@ -116,7 +116,7 @@ type POSTRoute<
 };
 export function makeRoute<
   Cmd extends string,
-  Input extends ZodObject<ZodRawShape>,
+  Input extends ZodObject<ZodRawShape> | ZodUnion<any>,
   Result extends {
     data: object;
     headers?: readonly (readonly [string, string])[];
