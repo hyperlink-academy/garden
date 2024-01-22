@@ -310,58 +310,62 @@ const MyHomeEmpty = (props: { studioSpaceID: string; studioName: string }) => {
         <h3 className="text-grey-15">Welcome to Hyperlink!</h3>
 
         <p>
-          Hyperlink is all about making and sharing{" "}
-          <em className="font-bold">spaces</em>.
+          Hyperlink is a place to make <em className="font-bold">Spaces</em> —
+          collaborative environments for creative projects and gatherings.
         </p>
         <p>
-          A Space is for keeping notes, progress logs, and plans for a specific
-          project you&apos;re working on, especially a collaborative one!
+          You can use Spaces to share notes and chats, plans and progress logs,
+          collections, to do lists, and more.
         </p>
-        <div className="flex flex-col gap-1">
-          <p className="font-bold">For example</p>
-          <ul className="list-inside list-disc ">
-            <li>
-              coordinate{" "}
-              <Link
-                className="text-accent-blue hover:underline"
-                href="/s/brendan/s/23/hyperlink-writing-room"
-              >
-                a writing group
-              </Link>
-            </li>
-            <li>
-              track and share{" "}
-              <Link
-                className="text-accent-blue hover:underline"
-                href="/s/brendan/s/Website%20Jam%3A%20pattern.kitchen/patternkitchen"
-              >
-                a creative craft
-              </Link>
-            </li>
-            <li>
-              organize{" "}
-              <Link
-                className="text-accent-blue hover:underline"
-                href="/s/celine/s/Stuffy%20Stuff/stuffy-stuff"
-              >
-                a side project
-              </Link>
-            </li>
-            <li>
-              collect{" "}
-              <Link
-                className="text-accent-blue hover:underline"
-                href="/s/celine/s/What%20Should%20I%20Eat%20For%20Dinner/what-should-i-eat-for-dinner"
-              >
-                your favorite recipes
-              </Link>
-            </li>
-          </ul>
-          <p className="text-sm italic text-grey-55">
-            * these are all real, actually used spaces! they might be a litte
-            messy, but they&apos;re ~authentic~!
-          </p>
-        </div>
+        {/* <div className="flex flex-col gap-1"> */}
+        <p className="font-bold">For example:</p>
+        <ul className="list-inside list-disc ">
+          <li>
+            coordinate{" "}
+            <Link
+              className="text-accent-blue hover:underline"
+              href="/s/brendan/s/23/hyperlink-writing-room"
+            >
+              a writing group
+            </Link>
+          </li>
+          <li>
+            track and share{" "}
+            <Link
+              className="text-accent-blue hover:underline"
+              href="/s/celine/s/Stuffy%20Stuff/stuffy-stuff"
+            >
+              a creative craft
+            </Link>
+          </li>
+          <li>
+            organize{" "}
+            <Link
+              className="text-accent-blue hover:underline"
+              href="/s/brendan/s/Website%20Jam%3A%20pattern.kitchen/patternkitchen"
+            >
+              a side project
+            </Link>
+          </li>
+          <li>
+            collect{" "}
+            <Link
+              className="text-accent-blue hover:underline"
+              href="/s/celine/s/What%20Should%20I%20Eat%20For%20Dinner/what-should-i-eat-for-dinner"
+            >
+              your favorite recipes
+            </Link>
+          </li>
+        </ul>
+        {/* <p className="mx-auto max-w-sm rounded-md border border-dashed border-grey-55 p-2 text-sm italic text-grey-55">
+          ^these are all real spaces; they may be a bit messy, but they&apos;re
+          authentic!
+        </p> */}
+        {/* <p>
+          Like any place that&apos;s both a cozy spot to hang and a focused zone
+          to get things done…Spaces are even better with friends :)
+        </p> */}
+        {/* </div> */}
         <div className="lightBorder mt-4 flex flex-col gap-2 bg-bg-blue p-4 text-center">
           <h4>Let&apos;s get started!</h4>
           <div className="m-auto">
