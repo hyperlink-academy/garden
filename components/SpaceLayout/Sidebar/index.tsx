@@ -184,11 +184,17 @@ const UnreadsRoomButton = () => {
   let authorized = permissions.commentAndReact;
   let unreadCards = db.useReference(memberEntity, "card/unread-by");
   let unreadDiscussions = db.useReference(memberEntity, "discussion/unread-by");
+  let chatRooms = db
+    .useAttribute("room/type")
+    .filter((room) => room.value === "chat");
   if (!authorized) return null;
 
   return (
     <RoomButton roomID="unreads">
-      {unreadCards?.length > 0 || unreadDiscussions?.length > 0 ? (
+      {unreadCards?.length > 0 ||
+      unreadDiscussions?.filter(
+        (unread) => !chatRooms.find((room) => room.entity === unread.entity)
+      ).length > 0 ? (
         <div className="absolute left-0 top-1">
           <UnreadDot />
         </div>

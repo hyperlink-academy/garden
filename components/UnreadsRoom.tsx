@@ -26,9 +26,11 @@ export const UnreadsRoom = () => {
         if (!newUnreads.find((u) => u.entity === unread.entity))
           newUnreads.push(unread);
       }
-      return newUnreads;
+      return newUnreads.filter(
+        (unread) => !chatRooms.find((room) => room.entity === unread.entity)
+      );
     });
-  }, [unreadCards]);
+  }, [unreadCards, chatRooms]);
 
   useEffect(() => {
     setCachedUnreads((existingUnreads) => {
