@@ -54,13 +54,13 @@ export function JoinStudio(props: { data: StudioData }) {
       </Head>
 
       <div className="mx-auto flex max-w-3xl flex-col place-items-center gap-6 px-4 py-8">
-        <h3>Welcome!</h3>
-        <p className="text-center text-lg">
-          You&apos;ve been invited to join a{" "}
-          <strong>
+        <h2>
+          You&apos;ve Been Invited to a{" "}
+          <em>
             Studio<sup className="text-grey-55">†</sup>
-          </strong>
-        </p>
+          </em>
+        </h2>
+
         <Link
           href={`/studio/${uuidToBase62(props.data.id || "")}`}
           className="lightBorder flex flex-row items-center gap-4 bg-white p-4"
@@ -78,9 +78,9 @@ export function JoinStudio(props: { data: StudioData }) {
         {session.session ? (
           <>
             <div className="flex flex-col gap-2">
-              <p className="text-center text-lg font-bold">
-                Take a moment to introduce yourself! Let other&apos;s know what
-                you&apos;re up to.
+              <p className="text-center text-lg font-bold ">
+                Take a moment to introduce yourself! <br />
+                Let other&apos;s know what you&apos;re up to.
               </p>
               <div className="relative">
                 <div className="mx-auto mb-2  w-[448px] max-w-full">

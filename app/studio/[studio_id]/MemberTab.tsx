@@ -173,7 +173,7 @@ export const MemberCard = (props: {
                   placeholder={
                     session.session?.studio !== props.memberStudio
                       ? " "
-                      : "write a bio…"
+                      : "introduce yourself…"
                   }
                   value={props.bio}
                   onChange={(e) => {
@@ -191,7 +191,7 @@ export const MemberCard = (props: {
                   placeholder={
                     session.session?.studio !== props.memberStudio
                       ? " "
-                      : "write a bio…"
+                      : "introduce yourself…"
                   }
                   className="min-h-0 grow overflow-hidden"
                 />
