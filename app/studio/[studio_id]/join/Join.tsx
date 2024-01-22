@@ -77,21 +77,22 @@ export function JoinStudio(props: { data: StudioData }) {
 
         {session.session ? (
           <>
-            <p className="text-center">A membership card is waiting for you!</p>
-            <div className="relative">
-              <div className="mb-2 w-[302px] p-4">
-                <div className={`memberCardBorder relative grow`}>
-                  <MemberCard
-                    spaces={[]}
-                    bio={bio}
-                    onBioChange={setBio}
-                    memberStudio={session.session?.studio || ""}
-                    memberName={session.session.username}
-                  />
+            <div className="flex flex-col gap-2">
+              <p className="text-center text-lg font-bold">
+                Take a moment to introduce yourself!
+              </p>
+              <div className="relative">
+                <div className="mb-2 w-[448px]  max-w-full">
+                  <div className={`memberCardBorder relative grow`}>
+                    <MemberCard
+                      spaces={[]}
+                      bio={bio}
+                      onBioChange={setBio}
+                      memberStudio={session.session?.studio || ""}
+                      memberName={session.session.username}
+                    />
+                  </div>
                 </div>
-              </div>
-              <div className="pointer-events-none absolute -left-2 top-0">
-                <WelcomeSparkle />
               </div>
             </div>
             <ButtonPrimary

@@ -137,27 +137,29 @@ export const MemberCard = (props: {
 
   return (
     <div
-      className="relative"
+      className="relative flex h-full "
       onClick={() => {
         if (!editing) setExpanded(!expanded);
         else return;
       }}
     >
-      <div className={`memberCardBorder relative grow`}>
-        <div className="flex items-end justify-between p-2 pb-0 text-white">
+      <div
+        className={`memberCard relative flex  h-full grow flex-col items-stretch`}
+      >
+        <div className="memberCardHeader flex  items-end justify-between p-2 pb-0 text-white">
           <div className="flex h-fit flex-row gap-2 font-bold">
             <Member /> {props.memberName}
           </div>
           <div className="text-sm ">member</div>
         </div>
-        <div className="p-1 pt-1">
+        <div className="grow p-1 pt-1">
           <div
-            className={`studioMemberContent flex h-full  flex-col gap-2 overflow-hidden rounded-md bg-white p-2 text-sm text-grey-35 ${
+            className={`studioMemberContent mt-0 flex h-full flex-col items-start gap-2 overflow-hidden rounded-md bg-white p-2 text-sm text-grey-35 ${
               !expanded && "max-h-[200px]"
             }`}
           >
             <button
-              className="min-h-0 grow overflow-hidden text-left"
+              className="flex h-full min-h-0 w-full grow items-start overflow-hidden text-left"
               onClick={() => {
                 if (session.session?.studio === props.memberStudio)
                   setEditing(true);
@@ -167,7 +169,7 @@ export const MemberCard = (props: {
               {editing ? (
                 <Textarea
                   spellCheck={false}
-                  className="italic"
+                  className="h-full w-full italic"
                   placeholder={
                     session.session?.studio !== props.memberStudio
                       ? " "
