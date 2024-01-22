@@ -124,10 +124,9 @@ export default function UserHomePage(props: { data: IdentityData }) {
                       <CreateStudio username={session.session.username} />
                     )}
                 </div>
-                <div className="text-sm text-grey-55 ">
-                  Studios are places to collect related spaces. <br />
-                  Invite friends and work alongside each other as a creative
-                  collective!
+                <div className="max-w-lg text-sm italic text-grey-55">
+                  Studios are places for groups to work together and share
+                  related Spaces — like a collection of projects or gatherings.
                 </div>
                 <div className="pb-2 pt-4">
                   <Divider />
