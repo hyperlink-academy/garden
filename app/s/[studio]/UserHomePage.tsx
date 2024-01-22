@@ -68,7 +68,7 @@ export default function UserHomePage(props: { data: IdentityData }) {
         <title key="title">{currentStudioName}</title>
       </Head>
       <SpaceProvider id={data.studio}>
-        <div className="mb-0 flex flex-col gap-2">
+        <div className="mb-0 flex flex-col gap-2 pt-4">
           <div className="flex w-full flex-row items-center justify-between gap-2">
             <h2 className="grow">{currentStudioName}</h2>
 
