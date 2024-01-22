@@ -144,7 +144,7 @@ export const MemberCard = (props: {
       }}
     >
       <div
-        className={`memberCard relative flex  h-full grow flex-col items-stretch`}
+        className={`memberCard memberCardBorder relative flex  h-full grow flex-col items-stretch`}
       >
         <div className="memberCardHeader flex  items-end justify-between p-2 pb-0 text-white">
           <div className="flex h-fit flex-row gap-2 font-bold">

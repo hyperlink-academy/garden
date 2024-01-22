@@ -79,11 +79,12 @@ export function JoinStudio(props: { data: StudioData }) {
           <>
             <div className="flex flex-col gap-2">
               <p className="text-center text-lg font-bold">
-                Take a moment to introduce yourself!
+                Take a moment to introduce yourself! Let other's know what
+                you&apos;re up to.
               </p>
               <div className="relative">
-                <div className="mb-2 w-[448px]  max-w-full">
-                  <div className={`memberCardBorder relative grow`}>
+                <div className="mx-auto mb-2  w-[448px] max-w-full">
+                  <div className={`relative grow`}>
                     <MemberCard
                       spaces={[]}
                       bio={bio}

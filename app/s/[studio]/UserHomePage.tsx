@@ -324,33 +324,42 @@ const MyHomeEmpty = (props: { studioSpaceID: string; studioName: string }) => {
               coordinate{" "}
               <Link
                 className="text-accent-blue hover:underline"
-                href="s/brendan/s/23/hyperlink-writing-room"
+                href="/s/brendan/s/23/hyperlink-writing-room"
               >
                 a writing group
               </Link>
             </li>
             <li>
               track and share{" "}
-              <Link className="text-accent-blue hover:underline" href="">
+              <Link
+                className="text-accent-blue hover:underline"
+                href="/s/brendan/s/Website%20Jam%3A%20pattern.kitchen/patternkitchen"
+              >
                 a creative craft
               </Link>
             </li>
             <li>
               organize{" "}
-              <Link className="text-accent-blue hover:underline" href="">
+              <Link
+                className="text-accent-blue hover:underline"
+                href="/s/celine/s/Stuffy%20Stuff/stuffy-stuff"
+              >
                 a side project
               </Link>
             </li>
             <li>
               collect{" "}
-              <Link className="text-accent-blue hover:underline" href="">
+              <Link
+                className="text-accent-blue hover:underline"
+                href="/s/celine/s/What%20Should%20I%20Eat%20For%20Dinner/what-should-i-eat-for-dinner"
+              >
                 your favorite recipes
               </Link>
             </li>
           </ul>
           <p className="text-sm italic text-grey-55">
             * these are all real, actually used spaces! they might be a litte
-            messy, but they&apos;re authentic!
+            messy, but they&apos;re ~authentic~!
           </p>
         </div>
         <div className="lightBorder mt-4 flex flex-col gap-2 bg-bg-blue p-4 text-center">
