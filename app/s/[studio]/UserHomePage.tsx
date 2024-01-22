@@ -16,6 +16,7 @@ import Link from "next/link";
 import { IdentityData } from "backend/routes/get_identity_data";
 import { useParams } from "next/dist/client/components/navigation";
 import { LoginButton } from "app/studio/[studio_id]/space/SpaceViewerHeader";
+import { useIsMobile } from "hooks/utils";
 
 export default function UserHomePage(props: { data: IdentityData }) {
   let { session } = useAuth();
@@ -79,9 +80,10 @@ export default function UserHomePage(props: { data: IdentityData }) {
               <LoginButton />
             )}
           </div>
-          {studios && (
+
+          {studios.length > 0 ? (
             <>
-              <div className="flex flex-row justify-between">
+              <div className="flex flex-row items-center justify-between">
                 <h4>Studios</h4>
                 {session.session &&
                   session.session?.username === currentStudioName && (
@@ -108,43 +110,69 @@ export default function UserHomePage(props: { data: IdentityData }) {
                   </Link>
                 ))}
               </div>
+              <div className="pb-2 pt-4">
+                <Divider />
+              </div>
             </>
+          ) : (
+            spaces.length > 0 && (
+              <>
+                <div className="flex flex-row items-center justify-between">
+                  <h4>Studios</h4>
+                  {session.session &&
+                    session.session?.username === currentStudioName && (
+                      <CreateStudio username={session.session.username} />
+                    )}
+                </div>
+                <div className="text-sm text-grey-55 ">
+                  Studios are places to collect related spaces. <br />
+                  Invite friends and work alongside each other as a creative
+                  collective!
+                </div>
+                <div className="pb-2 pt-4">
+                  <Divider />
+                </div>
+              </>
+            )
           )}
-          <div className="pb-2 pt-6">
-            <Divider />
-          </div>
-          <div className="flex justify-between gap-2">
-            <h4 className="">Spaces</h4>
-            {session.session?.username === currentStudioName && (
-              <CreateSpace
-                studioSpaceID={data.studio}
-                studioName={currentStudioName as string}
-              />
-            )}
-          </div>
+
           {spaces.length === 0 ? null : (
-            <div className="flex flex-row gap-2 text-sm">
-              <button
-                onClick={() => setSortOrder("lastUpdated")}
-                className={`rounded-md border px-1 py-0.5 hover:border-grey-80 ${
-                  sortOrder === "lastUpdated"
-                    ? " border-grey-80 text-grey-35"
-                    : "border-transparent text-grey-55"
-                }`}
-              >
-                last updated
-              </button>
-              <button
-                onClick={() => setSortOrder("name")}
-                className={`rounded-md border px-1 py-0.5 hover:border-grey-80 ${
-                  sortOrder === "name"
-                    ? " border-grey-80 text-grey-35"
-                    : "border-transparent text-grey-55"
-                } `}
-              >
-                name
-              </button>
-            </div>
+            <>
+              <div className="flex justify-between gap-2">
+                <h4 className="">Spaces</h4>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex flex-row gap-2 text-sm">
+                  <button
+                    onClick={() => setSortOrder("lastUpdated")}
+                    className={`h-fit rounded-md border px-1 py-0.5 hover:border-grey-80 ${
+                      sortOrder === "lastUpdated"
+                        ? " border-grey-80 text-grey-35"
+                        : "border-transparent text-grey-55"
+                    }`}
+                  >
+                    last updated
+                  </button>
+                  <button
+                    onClick={() => setSortOrder("name")}
+                    className={`h-fit rounded-md border px-1 py-0.5 hover:border-grey-80 ${
+                      sortOrder === "name"
+                        ? " border-grey-80 text-grey-35"
+                        : "border-transparent text-grey-55"
+                    } `}
+                  >
+                    name
+                  </button>
+                </div>{" "}
+                {session.session?.username === currentStudioName &&
+                  spaces.length !== 0 && (
+                    <CreateSpace
+                      studioSpaceID={data.studio}
+                      studioName={currentStudioName as string}
+                    />
+                  )}
+              </div>
+            </>
           )}
           <List
             spaces={spaces}
@@ -261,24 +289,93 @@ const YourHomeEmpty = (props: { username: string }) => {
   );
 };
 const MyHomeEmpty = (props: { studioSpaceID: string; studioName: string }) => {
+  let isMobile = useIsMobile();
   return (
-    <div className="lightBorder my-4 flex flex-col gap-4 border border-dashed p-8 text-center">
-      <p>
-        Spaces are containers for doing things together: projects, experiments,
-        collaboration. Each Space has its own cards, calendar, and members.
-      </p>
-      <p>To get started, make a new Space & invite a friend to join!</p>
-
-      <div className="m-auto">
-        <CreateSpace
-          studioSpaceID={props.studioSpaceID}
-          studioName={props.studioName}
+    <div className="lightBorder flex flex-col bg-white sm:flex-row">
+      {isMobile ? (
+        <img
+          src="/img/spotIllustration/sandboxMobile.png"
+          alt="a door overgrown with moss"
         />
+      ) : (
+        <img
+          src="/img/spotIllustration/sandbox.png"
+          alt="a door overgrown with moss"
+          width={300}
+          height={600}
+        />
+      )}
+
+      <div className=" flex h-full flex-col gap-3 p-4 text-grey-35 sm:p-8 sm:py-4 ">
+        <h3 className="text-grey-15">Welcome to Hyperlink!</h3>
+
+        <p>
+          Hyperlink is all about making and sharing{" "}
+          <em className="font-bold">spaces</em>.
+        </p>
+        <p>
+          A Space is for keeping notes, progress logs, and plans for a specific
+          project you&apos;re working on, especially a collaborative one!
+        </p>
+        <div className="flex flex-col gap-1">
+          <p className="font-bold">For example</p>
+          <ul className="list-inside list-disc ">
+            <li>
+              coordinate{" "}
+              <Link
+                className="text-accent-blue hover:underline"
+                href="/s/brendan/s/23/hyperlink-writing-room"
+              >
+                a writing group
+              </Link>
+            </li>
+            <li>
+              track and share{" "}
+              <Link
+                className="text-accent-blue hover:underline"
+                href="/s/brendan/s/Website%20Jam%3A%20pattern.kitchen/patternkitchen"
+              >
+                a creative craft
+              </Link>
+            </li>
+            <li>
+              organize{" "}
+              <Link
+                className="text-accent-blue hover:underline"
+                href="/s/celine/s/Stuffy%20Stuff/stuffy-stuff"
+              >
+                a side project
+              </Link>
+            </li>
+            <li>
+              collect{" "}
+              <Link
+                className="text-accent-blue hover:underline"
+                href="/s/celine/s/What%20Should%20I%20Eat%20For%20Dinner/what-should-i-eat-for-dinner"
+              >
+                your favorite recipes
+              </Link>
+            </li>
+          </ul>
+          <p className="text-sm italic text-grey-55">
+            * these are all real, actually used spaces! they might be a litte
+            messy, but they&apos;re ~authentic~!
+          </p>
+        </div>
+        <div className="lightBorder mt-4 flex flex-col gap-2 bg-bg-blue p-4 text-center">
+          <h4>Let&apos;s get started!</h4>
+          <div className="m-auto">
+            <CreateSpace
+              studioSpaceID={props.studioSpaceID}
+              studioName={props.studioName}
+            />
+          </div>
+        </div>
+
+        {/* <hr className="m-auto my-4 w-16 border-dashed border-grey-80" />
+
+      <HelpExampleSpaces /> */}
       </div>
-
-      <hr className="m-auto my-4 w-16 border-dashed border-grey-80" />
-
-      <HelpExampleSpaces />
     </div>
   );
 };
