@@ -79,7 +79,7 @@ export function JoinStudio(props: { data: StudioData }) {
           <>
             <div className="flex flex-col gap-2">
               <p className="text-center text-lg font-bold">
-                Take a moment to introduce yourself! Let other's know what
+                Take a moment to introduce yourself! Let other&apos;s know what
                 you&apos;re up to.
               </p>
               <div className="relative">
