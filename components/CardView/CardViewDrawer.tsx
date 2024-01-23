@@ -17,10 +17,12 @@ export const CardViewDrawer = (props: {
 }) => {
   let drawer = useUIState((s) => s.cardStates[props.entityID]?.drawer);
   let viewportHeight = useViewportSize().height;
+  let [reply, setReply] = useState<string | null>(null);
+
   return (
     <div className="z-10 ">
       <div className="cardDrawerHeader -mx-3 -mt-6  md:-mx-4">
-        <div className="cardDrawerTabs flex items-end gap-2 border-b border-b-grey-80 pl-4">
+        <div className="cardDrawerTabs mb-3 flex items-end gap-2 border-b border-b-grey-80 pl-4">
           <CommentsTab entityID={props.entityID} />
           <BacklinkTab entityID={props.entityID} />
         </div>
@@ -32,25 +34,43 @@ export const CardViewDrawer = (props: {
             : "",
         }}
         className={`cardDrawerContent no-scrollbar relative flex shrink flex-col gap-2 overflow-x-hidden overflow-y-scroll ${
-          props.drawerOpen ? "mt-4 h-fit" : "h-0 "
+          props.drawerOpen ? "mb-2 h-fit" : "h-0 "
         }`}
       >
         {drawer === "comments" ? (
           <DiscussionContent
             entityID={props.entityID}
             open={props.drawerOpen}
+            setReply={setReply}
           />
         ) : (
           <Backlinks entityID={props.entityID} />
         )}
         {/* <div className="scroll-m-8 bg-white" /> */}
       </MessageWindow>
+      {drawer === "comments" && (
+        <div className="sticky bottom-0">
+          <MessageInput
+            entityID={props.entityID}
+            allowReact={true}
+            isRoom={false}
+            reply={reply}
+            setReply={setReply}
+            onSend={() =>
+              useUIState.getState().openDrawer(props.entityID, "comments")
+            }
+          />
+        </div>
+      )}
     </div>
   );
 };
 
-const DiscussionContent = (props: { entityID: string; open: boolean }) => {
-  let [reply, setReply] = useState<string | null>(null);
+const DiscussionContent = (props: {
+  entityID: string;
+  open: boolean;
+  setReply: (reply: string) => void;
+}) => {
   useMarkRead(props.entityID, props.open);
   return (
     <>
@@ -58,17 +78,7 @@ const DiscussionContent = (props: { entityID: string; open: boolean }) => {
         <Messages
           entityID={props.entityID}
           isRoom={false}
-          setReply={setReply}
-        />
-      </div>
-
-      <div className="sticky bottom-0">
-        <MessageInput
-          entityID={props.entityID}
-          allowReact={true}
-          isRoom={false}
-          reply={reply}
-          setReply={setReply}
+          setReply={props.setReply}
         />
       </div>
     </>

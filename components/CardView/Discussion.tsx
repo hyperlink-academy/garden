@@ -67,7 +67,7 @@ export const DiscussionRoom = (props: {
           isRoom={props.isRoom}
         />
       </MessageWindow>
-      <div className="discussionInputWrapper absolute bottom-0 right-0 w-full ">
+      <div className="discussionInputWrapper absolute bottom-3 right-0 w-full ">
         <MessageInput
           entityID={props.entityID}
           allowReact={props.allowReact}
@@ -154,6 +154,7 @@ export const MessageInput = (props: {
   isRoom: boolean;
   reply: string | null;
   setReply: (reply: string | null) => void;
+  onSend?: () => void;
 }) => {
   let value = useUIState((s) => s.chatInputStates[props.entityID]?.value || "");
   let attachedCards = useUIState(
@@ -199,6 +200,9 @@ export const MessageInput = (props: {
     setValue(props.entityID, "");
     setAttachedCards(props.entityID, []);
     props.setReply(null);
+    if (props.onSend) {
+      props.onSend();
+    }
     setTimeout(() => {
       let el = document.getElementById("card-comments");
       if (!el) return;
@@ -215,7 +219,7 @@ export const MessageInput = (props: {
         </div>
       ) : (
         <div
-          className={`flex items-end gap-2  pb-2 pt-2 ${
+          className={`flex items-end gap-1 ${
             props.isRoom ? "bg-background px-3 sm:px-4" : "bg-white"
           } `}
         >
@@ -231,7 +235,7 @@ export const MessageInput = (props: {
             {/* IF MESSAGE IS IN REPLY */}
             {props.reply && (
               <div className="messageInputReply -mb-2">
-                <div className="flex items-start justify-between gap-2 rounded-lg border border-grey-80 bg-background px-[6px] py-[5px] text-xs italic text-grey-55">
+                <div className="flex items-start justify-between gap-2 rounded-lg border border-grey-80  px-[6px] py-[5px] text-xs italic text-grey-55">
                   <div className="flex flex-col gap-[1px]">
                     <div className="font-bold"> {replyToName?.value}</div>
                     <div className="text-grey-55">{replyMessage?.content}</div>
@@ -240,7 +244,7 @@ export const MessageInput = (props: {
                     <CloseLinedTiny />
                   </button>
                 </div>
-                <div className="ml-auto mr-2 h-3 w-0 border border-grey-80" />
+                <div className="ml-auto mr-2 h-2 w-0 border border-grey-80" />
               </div>
             )}
             {attachedCards.length > 0 && (
@@ -299,17 +303,6 @@ export const MessageInput = (props: {
                   icon={<Send />}
                 />
               </div>
-
-              {/* <div className="flex h-min w-full gap-2 text-grey-55">
-              <div className="grow">
-                <AttachCard
-                  attachedCards={attachedCards}
-                  setAttachedCards={(cards) =>
-                    setAttachedCards(props.entityID, cards)
-                  }
-                />
-              </div>
-            </div> */}
             </div>
           </div>
         </div>
@@ -414,9 +407,9 @@ export const Messages = (props: {
   return (
     <>
       {messages.length == 0 && authorized ? (
-        <div className="messagesEmpty mt-auto flex flex-col gap-4 py-1  text-sm italic text-grey-35">
-          <p>Welcome to the chat!</p>
-          <p>Go ahead, start the conversation 🌱</p>
+        <div className="messagesEmpty mt-auto flex flex-col gap-2 px-3 py-1  text-sm italic text-grey-55 sm:px-4">
+          <p>Welcome to the chat room!</p>
+          <p>Start a conversation 🌱</p>
         </div>
       ) : null}
       {[...messages].map((m, index, reversedMessages) => (
@@ -514,7 +507,7 @@ const Message = (props: {
               </div>
             </div>
             <div
-              className={` mt-0 h-3 w-0 border border-grey-80 ${
+              className={` mt-0 h-2 w-0 border border-grey-80 ${
                 isMe ? "ml-auto mr-2" : "ml-2"
               } `}
             />
