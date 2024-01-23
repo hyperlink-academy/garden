@@ -515,8 +515,8 @@ const Message = (props: {
           </div>
         )}
         {replyMessage && (
-          <div className="-mb-1 w-fit">
-            <div className="mt-0.5 flex max-h-[118px] flex-col overflow-hidden rounded-lg border border-grey-80 px-[6px] py-1 text-xs">
+          <div className={`-mb-1 w-fit ${isMe ? "ml-6" : "mr-6"}`}>
+            <div className="mt-0.5 flex max-h-[118px] flex-col overflow-hidden rounded-lg border border-grey-80 px-2 py-1 text-xs">
               <div className={`font-bold italic text-grey-55`}>
                 {replyToName?.value}
               </div>
@@ -531,61 +531,65 @@ const Message = (props: {
             />
           </div>
         )}
-        <div
-          className={`messageContent  rounded-lg border border-grey-80 px-2 py-[5px] text-white group-hover:bg-bg-blue ${
-            attachedCards ? "w-full " : "w-fit"
-          }`}
-          style={{
-            backgroundColor: isMe ? memberColor?.value : "#FDFCFA",
-          }}
-        >
-          {/* if comment is in reply, show reply content  */}
-
-          {attachedCards && (
-            <div className="mb-1 mt-[3px] flex w-full flex-col gap-1">
-              {attachedCards?.map((c) => (
-                <div key={c.id} className="w-full">
-                  <CardPreviewWithData
-                    entityID={c.value.value}
-                    size="big"
-                    hideContent={true}
-                    key={c.id}
-                  />
-                </div>
-              ))}
-            </div>
-          )}
-          <div className="flex items-end gap-1 ">
-            <RenderedText
-              className={`messageTextContent text-sm ${
-                isMe ? "text-white" : "text-grey-35"
-              }`}
-              text={props.content}
-              tabIndex={0}
-              style={{
-                whiteSpace: "pre-wrap",
-              }}
-            />
-          </div>
-        </div>
-      </div>
-      {authorized ? (
-        <span className="messageReplyButton mb-[1px] h-4 w-4 shrink-0 text-xs">
-          <button
-            className={`hidden text-grey-55 hover:text-accent-blue group-hover:block ${
-              isMe && "-scale-x-100"
+        <div className={`flex items-end gap-2 ${isMe && "flex-row-reverse"}`}>
+          <div
+            className={`messageContent  rounded-lg border border-grey-80 px-2 py-[5px] text-white group-hover:bg-bg-blue ${
+              attachedCards ? "w-full " : "w-fit"
             }`}
-            onClick={() => {
-              props.setReply(props.id);
-              document.getElementById("messageInput")?.focus();
+            style={{
+              backgroundColor: isMe ? memberColor?.value : "#FDFCFA",
             }}
           >
-            <Reply />
-          </button>
-        </span>
-      ) : (
-        <div className="h-4 w-4 " />
-      )}
+            {/* if comment is in reply, show reply content  */}
+
+            {attachedCards && (
+              <div className="mb-1 mt-[3px] flex w-full flex-col gap-1">
+                {attachedCards?.map((c) => (
+                  <div key={c.id} className="w-full">
+                    <CardPreviewWithData
+                      entityID={c.value.value}
+                      size="big"
+                      hideContent={true}
+                      key={c.id}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+            <div>
+              <div className="flex items-end gap-1 ">
+                <RenderedText
+                  className={`messageTextContent text-sm ${
+                    isMe ? "text-white" : "text-grey-35"
+                  }`}
+                  text={props.content}
+                  tabIndex={0}
+                  style={{
+                    whiteSpace: "pre-wrap",
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+          {authorized ? (
+            <span className="messageReplyButton mb-[1px] h-4 w-4 shrink-0 text-xs">
+              <button
+                className={`hidden text-grey-55 hover:text-accent-blue group-hover:block ${
+                  isMe && "-scale-x-100"
+                }`}
+                onClick={() => {
+                  props.setReply(props.id);
+                  document.getElementById("messageInput")?.focus();
+                }}
+              >
+                <Reply />
+              </button>
+            </span>
+          ) : (
+            <div className="h-4 w-4 " />
+          )}
+        </div>
+      </div>
     </div>
   );
 };
