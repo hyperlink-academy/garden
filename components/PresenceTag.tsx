@@ -30,7 +30,11 @@ export const PresenceTag = (props: { entityID: string; size: string }) => {
 
   return (
     <>
-      <div className={`absolute -top-5 right-4 flex flex-row-reverse`}>
+      <div
+        className={`absolute -top-5  ${
+          props.size === "small" ? "right-4" : "right-2"
+        } flex flex-row-reverse`}
+      >
         {present.length > 1 && props.size === "small" ? (
           <div className="relative flex items-center gap-0.5 rounded-t-md bg-accent-blue px-[6px] pb-2 pt-0.5  text-xs font-bold text-white">
             <span>{present.length}</span>
@@ -46,7 +50,7 @@ export const PresenceTag = (props: { entityID: string; size: string }) => {
         )}
 
         {props.size === "big" && present.length > 4 ? (
-          <div className=" mt-1 flex items-center gap-0.5 rounded-t-md bg-accent-blue px-[6px]  pb-2 pt-0.5 text-xs font-bold text-white">
+          <div className=" mt-1 flex items-center gap-0.5 rounded-t-md  bg-accent-blue px-[6px] pb-2 pt-0.5 text-xs font-bold text-white">
             + {present.length - 4}
             <span>
               <RoomMember />
@@ -64,7 +68,7 @@ const Identity = (props: { entityID: string }) => {
 
   return (
     <span
-      className="relative ml-1 rounded-t-md px-1 pb-2 pt-0.5  text-xs font-bold text-white"
+      className=" relative rounded-t-md border-2 border-white px-1 pb-2 text-xs font-bold text-white"
       style={{ backgroundColor: color?.value }}
     >
       {name?.value}
