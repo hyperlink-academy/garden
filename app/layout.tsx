@@ -9,6 +9,7 @@ export const fetchCache = "force-no-store";
 export const viewport: Viewport = {
   minimumScale: 1,
   initialScale: 1,
+  maximumScale: 1,
   width: "device-width",
   viewportFit: "cover",
   interactiveWidget: "resizes-content",

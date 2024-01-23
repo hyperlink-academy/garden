@@ -37,6 +37,9 @@ export const DiscussionRoom = (props: {
   let { reactions, filters, setFilters, cardsFiltered, total } =
     useFilteredCards(room, "desktop/contains");
 
+  let { permissions } = useMutations();
+
+  let authorized = permissions.commentAndReact;
   return (
     // trying this w/ ~same wrapper as other rooms
     <div
@@ -54,7 +57,9 @@ export const DiscussionRoom = (props: {
         />
       </div>
       <MessageWindow
-        className={`discussionWindow no-scrollbar relative flex h-full flex-col overflow-x-hidden overflow-y-scroll pb-[104px]`}
+        className={`discussionWindow no-scrollbar relative flex h-full flex-col overflow-x-hidden overflow-y-scroll ${
+          authorized ? "pb-[64px]" : "pb-[88px]"
+        }`}
       >
         <Messages
           entityID={props.entityID}
