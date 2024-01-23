@@ -217,9 +217,7 @@ export const BigCardBody = (
               {/* Reactions */}
               {props.data.reactions.length > 0 ? (
                 <>
-                  <div className="h-full w-0">
-                    <Divider vertical />
-                  </div>
+                  <Divider vertical my={2} />
                   <div className="cardPreviewReactions flex flex-row items-center gap-1">
                     {props.data.reactions
                       .slice(0, 3)
@@ -244,51 +242,52 @@ export const BigCardBody = (
                 </>
               ) : null}
             </div>
-
-            {/* edit toggle on cardPreview  */}
-            {props.editable && authorized && (
-              <button
-                className={`jusitfy-self-end flex shrink-0 items-center gap-2 text-xs italic   ${
-                  editing ? "text-accent-blue" : "text-grey-55"
-                }`}
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (editing) setFocusedCard(undefined);
-                  else {
-                    setFocusedCard(props.entityID);
-                    requestAnimationFrame(() => {
-                      focusElement(() => {
-                        return document.getElementById(
-                          `${props.entityID}-preview-title`
-                        );
-                      });
-                    });
-                  }
-                }}
-              >
-                {!editing ? (
-                  <div className="hidden group-hover:block">edit</div>
-                ) : (
-                  <div>done</div>
-                )}
-                <Edit editing={editing} width={20} height={20} />
-              </button>
-            )}
-            {/* Card "X" to remove button */}
-            {/* NB: this is for inner control in Collection only! */}
-            {!props.outerControls && props.onDelete && authorized ? (
-              <>
+            <div className="flex items-center gap-1">
+              {/* edit toggle on cardPreview  */}
+              {props.editable && authorized && (
                 <button
-                  className="cardPreviewRemove h-fit rounded-md bg-white p-0.5 text-grey-80 hover:text-accent-blue"
+                  className={`jusitfy-self-end flex shrink-0 items-center gap-2 text-xs italic   ${
+                    editing ? "text-accent-blue" : "text-grey-55"
+                  }`}
                   onClick={(e) => {
-                    e.stopPropagation();
-                    props.onDelete?.();
+                    e.preventDefault();
+                    if (editing) setFocusedCard(undefined);
+                    else {
+                      setFocusedCard(props.entityID);
+                      requestAnimationFrame(() => {
+                        focusElement(() => {
+                          return document.getElementById(
+                            `${props.entityID}-preview-title`
+                          );
+                        });
+                      });
+                    }
                   }}
                 >
-                  <CloseLinedTiny width={14} height={14} />
+                  {!editing ? (
+                    <div className="hidden group-hover:block">edit</div>
+                  ) : (
+                    <div>done</div>
+                  )}
+                  <Edit editing={editing} width={20} height={20} />
                 </button>
-              </>
-            ) : null}
+              )}
+              {/* Card "X" to remove button */}
+              {/* NB: this is for inner control in Collection only! */}
+              {!props.outerControls && props.onDelete && authorized ? (
+                <>
+                  <button
+                    className="cardPreviewRemove h-fit rounded-md bg-white p-0.5 text-grey-80 hover:text-accent-blue"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      props.onDelete?.();
+                    }}
+                  >
+                    <CloseLinedTiny width={14} height={14} />
+                  </button>
+                </>
+              ) : null}
+            </div>
           </div>
         )}
       </div>
