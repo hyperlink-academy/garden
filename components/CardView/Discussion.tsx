@@ -475,7 +475,9 @@ const Message = (props: {
     >
       <div
         id={props.id}
-        className={`message mt-2 flex flex-col gap-1 text-sm first:mt-auto `}
+        className={`message mt-2 flex grow flex-col  gap-1 text-sm  first:mt-auto ${
+          isMe && "place-items-end"
+        }`}
       >
         {/* MESSAGE HEADER */}
         {!props.multipleFromSameAuthor && (
@@ -502,40 +504,35 @@ const Message = (props: {
             </div>
           </div>
         )}
+        {replyMessage && (
+          <div className="-mb-1 w-fit">
+            <div className="mt-0.5 flex max-h-[118px] flex-col overflow-hidden rounded-lg border border-grey-90 px-[6px] py-1 text-xs">
+              <div className={`font-bold italic text-grey-55`}>
+                {replyToName?.value}
+              </div>
+              <div className=" italic text-grey-55">
+                {replyMessage?.content}
+              </div>
+            </div>
+            <div
+              className={` mt-0 h-3 w-0 border border-grey-80 ${
+                isMe ? "ml-auto mr-2" : "ml-2"
+              } `}
+            />
+          </div>
+        )}
         <div
-          className={`messageContent rounded-lg border border-grey-80 px-2 py-[5px] text-white group-hover:bg-bg-blue`}
+          className={`messageContent  rounded-lg border border-grey-80 px-2 py-[5px] text-white group-hover:bg-bg-blue ${
+            attachedCards ? "w-full " : "w-fit"
+          }`}
           style={{
-            backgroundColor: isMe ? memberColor?.value : "bg-grey-90",
+            backgroundColor: isMe ? memberColor?.value : "",
           }}
         >
           {/* if comment is in reply, show reply content  */}
-          {replyMessage && (
-            <>
-              <div className="lightBorder mt-0.5 flex max-h-[120px] flex-col overflow-hidden bg-white  px-[6px] py-1 text-xs">
-                <div className={`font-bold italic text-grey-55`}>
-                  {replyToName?.value}
-                </div>
-                <div className=" italic text-grey-55">
-                  {replyMessage?.content}
-                </div>
-              </div>
-              <div className="ml-2 mt-0 h-3 w-0 border border-grey-80 " />
-            </>
-          )}
-          <div className="flex items-end gap-1 ">
-            <RenderedText
-              className={`messageContent grow text-sm  ${
-                isMe ? "text-white" : "text-grey-35"
-              }`}
-              text={props.content}
-              tabIndex={0}
-              style={{
-                whiteSpace: "pre-wrap",
-              }}
-            />
-          </div>
+
           {attachedCards && (
-            <div className="mt-2 flex flex-col gap-1">
+            <div className="mb-1 mt-[3px] flex w-full flex-col gap-1">
               {attachedCards?.map((c) => (
                 <div key={c.id} className="w-full">
                   <CardPreviewWithData
@@ -548,6 +545,18 @@ const Message = (props: {
               ))}
             </div>
           )}
+          <div className="flex items-end gap-1 ">
+            <RenderedText
+              className={`messageTextContent text-sm ${
+                isMe ? "text-white" : "text-grey-35"
+              }`}
+              text={props.content}
+              tabIndex={0}
+              style={{
+                whiteSpace: "pre-wrap",
+              }}
+            />
+          </div>
         </div>
       </div>
       {authorized ? (
