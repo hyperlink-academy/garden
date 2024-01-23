@@ -61,7 +61,7 @@ export const BigCardBody = (
     <div
       {...listenersAndAttributes}
       className={`CardPreview flex h-full grow flex-row !bg-cover !bg-center !bg-no-repeat pl-2 text-sm ${
-        props.data.isMember ? "py-2 pr-2" : "py-2 pr-2"
+        props.data.isMember ? "py-2 pr-2" : "pb-1 pr-2 pt-2"
       }`}
       style={{
         wordBreak: "break-word",
@@ -181,8 +181,8 @@ export const BigCardBody = (
         {/* Reactions + Discussions WRAPPER */}
         {/* NB: show ONLY for non-member cards for now */}
         {!props.data.isMember && (
-          <div className="cardPreviewActionsWrapper flex w-full justify-between gap-2 pt-1">
-            <div className="cardPreviewActions flex gap-2">
+          <div className="cardPreviewActionsWrapper flex w-full items-center justify-between gap-2 pt-1">
+            <div className="cardPreviewActions flex  gap-2">
               {/* Discussions */}
               {/* three states: unread, existing, none */}
               {/* clicking = shortcut to focus input for a new message */}
@@ -279,13 +279,13 @@ export const BigCardBody = (
             {!props.outerControls && props.onDelete && authorized ? (
               <>
                 <button
-                  className="cardPreviewRemove h-fit pt-1 text-grey-80 hover:text-grey-15"
+                  className="cardPreviewRemove h-fit  text-grey-80 hover:text-accent-blue"
                   onClick={(e) => {
                     e.stopPropagation();
                     props.onDelete?.();
                   }}
                 >
-                  <CloseLinedTiny width={12} height={12} />
+                  <CloseLinedTiny width={14} height={14} />
                 </button>
               </>
             ) : null}

@@ -3,6 +3,7 @@ import * as Popover from "@radix-ui/react-popover";
 import {
   CardAdd,
   CardSmall,
+  CardSmallLined,
   CloseLinedTiny,
   GoToBottom,
   Member,
@@ -39,25 +40,27 @@ export const DiscussionRoom = (props: {
   return (
     // trying this w/ ~same wrapper as other rooms
     <div
-      className="no-scrollbar flex h-full w-[336px] flex-col items-stretch overflow-x-hidden overflow-y-scroll p-3 pb-0 pt-0 text-sm sm:p-4 sm:pb-0 sm:pt-0"
+      className="no-scrollbar flex h-full w-[336px] flex-col items-stretch overflow-x-hidden overflow-y-scroll text-sm "
       id="room-wrapper"
     >
-      <RoomHeader
-        totalCount={total}
-        filteredCount={cardsFiltered.length}
-        entityID={room}
-        reactions={reactions}
-        filters={filters}
-        setFilters={setFilters}
-      />
-      <MessageWindow className="no-scrollbar relative flex h-full flex-col overflow-x-hidden overflow-y-scroll pb-[3.2rem]">
+      <div className="-mb-3 px-3 sm:px-4">
+        <RoomHeader
+          totalCount={total}
+          filteredCount={cardsFiltered.length}
+          entityID={room}
+          reactions={reactions}
+          filters={filters}
+          setFilters={setFilters}
+        />
+      </div>
+      <MessageWindow className="no-scrollbar relative flex h-full flex-col overflow-x-hidden overflow-y-scroll pb-[104px]">
         <Messages
           entityID={props.entityID}
           setReply={setReply}
           isRoom={props.isRoom}
         />
       </MessageWindow>
-      <div className="absolute bottom-2 right-0 w-full px-3 sm:px-4">
+      <div className="absolute bottom-0 right-0 w-full ">
         <MessageInput
           entityID={props.entityID}
           allowReact={props.allowReact}
@@ -158,12 +161,6 @@ export const MessageInput = (props: {
 
   let replyMessage = db.useMessageByID(props.reply);
   let replyToName = db.useEntity(replyMessage?.sender || null, "member/name");
-  let replyToColor = db.useEntity(replyMessage?.sender || null, "member/color");
-  let replyToColorLight = "";
-  if (replyToColor?.value) {
-    replyToColorLight =
-      memberColorsLight[memberColors.indexOf(replyToColor?.value)];
-  }
 
   const send = async () => {
     if (!session.session || !value) return;
@@ -206,28 +203,46 @@ export const MessageInput = (props: {
       {!authorized ? (
         <Login />
       ) : (
-        <div className="messageInput flex w-full flex-col gap-2">
+        <div className="messageInput flex w-full flex-col gap-2  bg-background px-3 pb-2 pt-2 sm:px-4 ">
           {/* IF MESSAGE IS IN REPLY */}
           {props.reply && (
             <div className="messageInputReply -mb-2">
-              <div
-                className="flex items-start justify-between gap-2 rounded-md border border-grey-80 bg-white p-2 text-xs italic text-grey-55"
-                style={{ backgroundColor: replyToColorLight }}
-              >
+              <div className="flex items-start justify-between gap-2 rounded-lg border border-grey-80 bg-white px-[6px] py-[5px] text-xs italic text-grey-55">
                 <div className="flex flex-col gap-[1px]">
                   <div className="font-bold"> {replyToName?.value}</div>
-                  <div className="text-grey-35">{replyMessage?.content}</div>
+                  <div className="text-grey-55">{replyMessage?.content}</div>
                 </div>
                 <button className="" onClick={() => props.setReply(null)}>
                   <CloseLinedTiny />
                 </button>
               </div>
-              <div className="ml-2 h-2 w-0 border border-grey-80" />
+              <div className="ml-2 h-3 w-0 border border-grey-80" />
+            </div>
+          )}
+          {attachedCards.length > 0 && (
+            <div className="flex flex-col gap-1 ">
+              {attachedCards?.map((c) => {
+                return (
+                  <div key={c} className="w-full">
+                    <CardPreviewWithData
+                      entityID={c}
+                      size="big"
+                      hideContent={true}
+                      key={c.id}
+                      onDelete={() =>
+                        setAttachedCards(
+                          attachedCards.filter((c) => c !== card)
+                        )
+                      }
+                    />
+                  </div>
+                );
+              })}
             </div>
           )}
           {/* ACTUAL MESSAGE INPUT */}
-          <div className="flex w-full items-end gap-2">
-            <div className="flex w-full items-center gap-1 rounded-md border border-grey-55 bg-white px-2 py-1 text-base text-grey-15">
+          <div className="flex w-full flex-col items-end gap-1">
+            <div className="flex w-full items-center gap-1 rounded-lg border border-grey-55 bg-white px-2 py-1 text-base text-grey-15">
               <AutosizeTextarea
                 onKeyDown={(e) => {
                   if (e.key === "Escape") {
@@ -241,10 +256,13 @@ export const MessageInput = (props: {
                 value={value}
                 onChange={(e) => setValue(props.entityID, e.target.value)}
                 placeholder=""
-                className="w-full"
+                className="w-full text-sm"
                 id="messageInput"
               />
-              <div className="place-self-end">
+            </div>
+
+            <div className="flex h-min w-full gap-2 text-grey-55">
+              <div className="grow">
                 <AttachCard
                   attachedCards={attachedCards}
                   setAttachedCards={(cards) =>
@@ -252,10 +270,8 @@ export const MessageInput = (props: {
                   }
                 />
               </div>
-            </div>
-
-            <div className="flex h-min justify-end text-grey-55">
               <ButtonPrimary
+                className="!px-1 !py-0"
                 disabled={!value}
                 onPointerDown={(e) => {
                   e.preventDefault();
@@ -311,60 +327,13 @@ const AttachCard = ({
   return (
     <>
       {/* decide styling of button via children */}
-      {attachedCards.length === 0 ? (
-        <button onClick={() => setOpen(true)} className="flex text-grey-55">
-          {/* {props.expanded ? "Attach Card" : ""} */}
-          <CardAdd />
-        </button>
-      ) : (
-        <Popover.Root>
-          <Popover.Trigger asChild>
-            <button className="flex items-center gap-[1px] text-sm text-grey-55">
-              {attachedCards.length} <CardAdd />
-            </button>
-          </Popover.Trigger>
-          <Popover.Portal>
-            <Popover.Content
-              className="PopoverContent relative z-20"
-              sideOffset={12}
-              collisionPadding={{ left: 24, right: 24 }}
-              side="top"
-              align="end"
-              alignOffset={-6}
-            >
-              <div className="flex w-72 flex-col gap-0 rounded-md border border-grey-80 bg-white py-1 shadow-sm">
-                {attachedCards.map((card) => {
-                  return (
-                    <div
-                      className="flex w-full items-start justify-between gap-2 px-2 py-1 text-sm hover:bg-bg-blue"
-                      key={card}
-                    >
-                      <AttachedCard entityID={card} />
-                      <button
-                        className="pt-1 text-grey-55 hover:text-accent-blue"
-                        onClick={() =>
-                          setAttachedCards(
-                            attachedCards.filter((c) => c !== card)
-                          )
-                        }
-                      >
-                        <CloseLinedTiny />
-                      </button>
-                    </div>
-                  );
-                })}
-                <button
-                  onClick={() => setOpen(true)}
-                  className="flex gap-2 px-2 py-1 text-sm text-grey-55 hover:text-accent-blue"
-                >
-                  <CardAdd />
-                  attach another card
-                </button>
-              </div>
-            </Popover.Content>
-          </Popover.Portal>
-        </Popover.Root>
-      )}
+      <button
+        onClick={() => setOpen(true)}
+        className="flex text-grey-55 hover:text-accent-blue"
+      >
+        <CardSmallLined />
+      </button>
+
       <FindOrCreate
         allowBlank={true}
         onClose={() => setOpen(false)}
@@ -432,7 +401,7 @@ export const Messages = (props: {
   return (
     <>
       {messages.length == 0 && authorized ? (
-        <div className="messagesEmpty mt-auto flex flex-col gap-4 py-1 text-sm italic text-grey-35">
+        <div className="messagesEmpty mt-auto flex flex-col gap-4 py-1  text-sm italic text-grey-35">
           <p>Welcome to the chat!</p>
           <p>Go ahead, start the conversation 🌱</p>
         </div>
@@ -499,88 +468,103 @@ const Message = (props: {
   );
   return (
     <div
-      id={props.id}
-      className={`message lightBorder mt-2 flex flex-col gap-1 p-2 text-sm first:mt-auto ${
-        !props.multipleFromSameAuthor ? "pt-2" : "pt-2"
-      } ${
-        isMe
-          ? "w-[90%] self-end"
-          : isSomeoneElse
-          ? "w-[90%] self-start"
-          : "w-full"
-      }`}
-      style={{ backgroundColor: memberColorLight }}
+      className={`group mx-3 flex items-end gap-1 sm:mx-4 ${
+        !props.multipleFromSameAuthor ? "pt-4" : "pt-1"
+      } ${isMe && "flex-row-reverse"}`}
     >
-      {/* MESSAGE HEADER */}
-      {!props.multipleFromSameAuthor && (
-        <div className="flex justify-between gap-2 text-grey-55">
-          <div className="messageInfo flex gap-2">
-            <span className="messageAuthor text-sm font-bold italic">
-              {memberName?.value}
-            </span>
-            <span className="messageTimeStamp self-center text-xs">
-              {time.toLocaleDateString(undefined, {
-                month: "short",
-                day: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </span>
-          </div>
-        </div>
-      )}
-
-      {/* IF THE MESSAGE IS IN REPLY TO SOMEONE */}
-      {replyMessage && (
-        <>
+      <div
+        id={props.id}
+        className={`message mt-2 flex flex-col gap-1 text-sm first:mt-auto `}
+      >
+        {/* MESSAGE HEADER */}
+        {!props.multipleFromSameAuthor && (
           <div
-            className="mt-1 flex flex-col gap-[1px] rounded-md border border-grey-80 bg-white p-2 text-xs"
-            style={{ backgroundColor: replyToColorLight }}
+            className={`messageHeader flex w-full gap-2 text-grey-55 ${
+              isMe && "flex-row-reverse"
+            } `}
+            style={{ color: memberColor?.value }}
           >
-            <div className="font-bold italic text-grey-55">
-              {replyToName?.value}
-            </div>
-            <div className="italic text-grey-35">{replyMessage?.content}</div>
-          </div>
-          <div className="-mt-1 ml-2 h-2 w-0 border border-grey-80 pt-2" />
-        </>
-      )}
-      <div className="group flex items-end gap-1">
-        <RenderedText
-          className="messageContent grow text-sm text-grey-35"
-          text={props.content}
-          tabIndex={0}
-          style={{
-            whiteSpace: "pre-wrap",
-          }}
-        />
-        {authorized ? (
-          <span className="messageReplyButton mb-[1px] h-4 w-4 shrink-0 text-xs">
-            <button
-              className="hidden text-grey-55 hover:text-accent-blue group-hover:block"
-              onClick={() => {
-                props.setReply(props.id);
-                document.getElementById("messageInput")?.focus();
-              }}
+            <div
+              className={`messageInfo flex gap-2 ${isMe && "flex-row-reverse"}`}
             >
-              <Reply />
-            </button>
-          </span>
-        ) : null}
-      </div>
-      {attachedCards && (
-        <div className="mt-2 flex flex-col gap-1">
-          {attachedCards?.map((c) => (
-            <div key={c.id} className="w-full">
-              <CardPreviewWithData
-                entityID={c.value.value}
-                size="big"
-                hideContent={true}
-                key={c.id}
-              />
+              <span className="messageAuthor text-sm font-bold italic">
+                {isMe ? null : memberName?.value}
+              </span>
+              <span className="messageTimeStamp self-center text-xs">
+                {time.toLocaleDateString(undefined, {
+                  month: "short",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </span>
             </div>
-          ))}
+          </div>
+        )}
+        <div
+          className={`messageContent rounded-lg border border-grey-80 px-2 py-[5px] text-white group-hover:bg-bg-blue`}
+          style={{
+            backgroundColor: isMe ? memberColor?.value : "bg-grey-90",
+          }}
+        >
+          {/* if comment is in reply, show reply content  */}
+          {replyMessage && (
+            <>
+              <div className="lightBorder mt-0.5 flex max-h-[120px] flex-col overflow-hidden bg-white  px-[6px] py-1 text-xs">
+                <div className={`font-bold italic text-grey-55`}>
+                  {replyToName?.value}
+                </div>
+                <div className=" italic text-grey-55">
+                  {replyMessage?.content}
+                </div>
+              </div>
+              <div className="ml-2 mt-0 h-3 w-0 border border-grey-80 " />
+            </>
+          )}
+          <div className="flex items-end gap-1 ">
+            <RenderedText
+              className={`messageContent grow text-sm  ${
+                isMe ? "text-white" : "text-grey-35"
+              }`}
+              text={props.content}
+              tabIndex={0}
+              style={{
+                whiteSpace: "pre-wrap",
+              }}
+            />
+          </div>
+          {attachedCards && (
+            <div className="mt-2 flex flex-col gap-1">
+              {attachedCards?.map((c) => (
+                <div key={c.id} className="w-full">
+                  <CardPreviewWithData
+                    entityID={c.value.value}
+                    size="big"
+                    hideContent={true}
+                    key={c.id}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
+      </div>
+      {authorized ? (
+        <span className="messageReplyButton mb-[1px] h-4 w-4 shrink-0 text-xs">
+          <button
+            className={`hidden text-grey-55 hover:text-accent-blue group-hover:block ${
+              isMe && "-scale-x-100"
+            }`}
+            onClick={() => {
+              props.setReply(props.id);
+              document.getElementById("messageInput")?.focus();
+            }}
+          >
+            <Reply />
+          </button>
+        </span>
+      ) : (
+        <div className="h-4 w-4 " />
       )}
     </div>
   );
