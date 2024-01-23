@@ -35,7 +35,15 @@ import { Truncate } from "components/Truncate";
 import { useSpaceData } from "hooks/useSpaceData";
 
 export const People = () => {
-  let members = db.useAttribute("member/name");
+  let spaceID = useSpaceID();
+  let spaceData = useSpaceData(spaceID);
+  let members = db
+    .useAttribute("member/name")
+    .filter((m) =>
+      spaceData?.data?.members_in_spaces.find(
+        (f) => f.identity_data?.username === m.value
+      )
+    );
   let membersInCall = db.useAttribute("presence/in-call");
   let callOngoing = membersInCall.length > 0;
 
