@@ -202,8 +202,12 @@ export const MessageInput = (props: {
   };
   return (
     <>
-      {!authorized ? (
+      {!session?.loggedIn ? (
         <Login />
+      ) : !authorized ? (
+        <div className="messageLogIn  mx-3 mb-3 flex place-items-center gap-2 rounded-md bg-grey-90 p-2 text-center  text-sm italic text-grey-55 sm:mx-4 sm:mb-4">
+          Only members and studio mates can add to this chat!
+        </div>
       ) : (
         <div
           className={`messageInput flex w-full flex-col gap-2  pb-2 pt-2 ${
@@ -213,7 +217,7 @@ export const MessageInput = (props: {
           {/* IF MESSAGE IS IN REPLY */}
           {props.reply && (
             <div className="messageInputReply -mb-2">
-              <div className="flex items-start justify-between gap-2 rounded-lg border border-grey-80 bg-white px-[6px] py-[5px] text-xs italic text-grey-55">
+              <div className="flex items-start justify-between gap-2 rounded-lg border border-grey-80 bg-background px-[6px] py-[5px] text-xs italic text-grey-55">
                 <div className="flex flex-col gap-[1px]">
                   <div className="font-bold"> {replyToName?.value}</div>
                   <div className="text-grey-55">{replyMessage?.content}</div>
@@ -301,7 +305,7 @@ const Login = () => {
   let [state, setState] = LoginOrSignupModal.useState("closed");
   return (
     <>
-      <div className="messageLogIn flex place-items-center gap-2 rounded-md bg-grey-90 p-2">
+      <div className="messageLogIn mx-3 mb-3 flex place-items-center gap-2 rounded-md bg-grey-90 p-2 sm:mx-4 sm:mb-4">
         <p className=" w-full text-center text-sm italic text-grey-55">
           <span
             role="button"
@@ -512,7 +516,7 @@ const Message = (props: {
         )}
         {replyMessage && (
           <div className="-mb-1 w-fit">
-            <div className="mt-0.5 flex max-h-[118px] flex-col overflow-hidden rounded-lg border border-grey-90 px-[6px] py-1 text-xs">
+            <div className="mt-0.5 flex max-h-[118px] flex-col overflow-hidden rounded-lg border border-grey-80 px-[6px] py-1 text-xs">
               <div className={`font-bold italic text-grey-55`}>
                 {replyToName?.value}
               </div>
@@ -532,7 +536,7 @@ const Message = (props: {
             attachedCards ? "w-full " : "w-fit"
           }`}
           style={{
-            backgroundColor: isMe ? memberColor?.value : "",
+            backgroundColor: isMe ? memberColor?.value : "#FDFCFA",
           }}
         >
           {/* if comment is in reply, show reply content  */}
