@@ -43,7 +43,7 @@ export const DiscussionRoom = (props: {
       className="no-scrollbar flex h-full w-[336px] flex-col items-stretch overflow-x-hidden overflow-y-scroll text-sm "
       id="room-wrapper"
     >
-      <div className="-mb-3 px-3 sm:px-4">
+      <div className="discussionRoomHeaderWrapper-mb-3 px-3 sm:px-4">
         <RoomHeader
           totalCount={total}
           filteredCount={cardsFiltered.length}
@@ -53,14 +53,16 @@ export const DiscussionRoom = (props: {
           setFilters={setFilters}
         />
       </div>
-      <MessageWindow className="no-scrollbar relative flex h-full flex-col overflow-x-hidden overflow-y-scroll pb-[104px]">
+      <MessageWindow
+        className={`discussionWindow no-scrollbar relative flex h-full flex-col overflow-x-hidden overflow-y-scroll pb-[104px]`}
+      >
         <Messages
           entityID={props.entityID}
           setReply={setReply}
           isRoom={props.isRoom}
         />
       </MessageWindow>
-      <div className="absolute bottom-0 right-0 w-full ">
+      <div className="discussionInputWrapper absolute bottom-0 right-0 w-full ">
         <MessageInput
           entityID={props.entityID}
           allowReact={props.allowReact}
@@ -203,7 +205,11 @@ export const MessageInput = (props: {
       {!authorized ? (
         <Login />
       ) : (
-        <div className="messageInput flex w-full flex-col gap-2  bg-background px-3 pb-2 pt-2 sm:px-4 ">
+        <div
+          className={`messageInput flex w-full flex-col gap-2  pb-2 pt-2 ${
+            props.isRoom ? "bg-background px-3 sm:px-4" : "bg-white"
+          }`}
+        >
           {/* IF MESSAGE IS IN REPLY */}
           {props.reply && (
             <div className="messageInputReply -mb-2">
