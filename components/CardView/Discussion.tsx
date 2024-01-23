@@ -46,7 +46,7 @@ export const DiscussionRoom = (props: {
       className="no-scrollbar flex h-full w-[336px] flex-col items-stretch overflow-x-hidden overflow-y-scroll text-sm "
       id="room-wrapper"
     >
-      <div className="discussionRoomHeaderWrapper-mb-3 px-3 sm:px-4">
+      <div className="discussionRoomHeaderWrapper -mb-3 px-3 sm:px-4">
         <RoomHeader
           totalCount={total}
           filteredCount={cardsFiltered.length}
