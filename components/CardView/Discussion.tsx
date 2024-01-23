@@ -210,69 +210,92 @@ export const MessageInput = (props: {
         </div>
       ) : (
         <div
-          className={`messageInput flex w-full flex-col gap-2  pb-2 pt-2 ${
+          className={`flex items-end gap-2  pb-2 pt-2 ${
             props.isRoom ? "bg-background px-3 sm:px-4" : "bg-white"
-          }`}
+          } `}
         >
-          {/* IF MESSAGE IS IN REPLY */}
-          {props.reply && (
-            <div className="messageInputReply -mb-2">
-              <div className="flex items-start justify-between gap-2 rounded-lg border border-grey-80 bg-background px-[6px] py-[5px] text-xs italic text-grey-55">
-                <div className="flex flex-col gap-[1px]">
-                  <div className="font-bold"> {replyToName?.value}</div>
-                  <div className="text-grey-55">{replyMessage?.content}</div>
-                </div>
-                <button className="" onClick={() => props.setReply(null)}>
-                  <CloseLinedTiny />
-                </button>
-              </div>
-              <div className="ml-2 h-3 w-0 border border-grey-80" />
-            </div>
-          )}
-          {attachedCards.length > 0 && (
-            <div className="flex flex-col gap-1 ">
-              {attachedCards?.map((card) => {
-                return (
-                  <div key={card} className="w-full">
-                    <CardPreviewWithData
-                      entityID={card}
-                      size="big"
-                      hideContent={true}
-                      key={card}
-                      onDelete={() =>
-                        setAttachedCards(
-                          props.entityID,
-                          attachedCards.filter((c) => c !== card)
-                        )
-                      }
-                    />
+          <div className="shrink-0 pb-1">
+            <AttachCard
+              attachedCards={attachedCards}
+              setAttachedCards={(cards) =>
+                setAttachedCards(props.entityID, cards)
+              }
+            />
+          </div>
+          <div className={`messageInput flex w-full flex-col gap-2`}>
+            {/* IF MESSAGE IS IN REPLY */}
+            {props.reply && (
+              <div className="messageInputReply -mb-2">
+                <div className="flex items-start justify-between gap-2 rounded-lg border border-grey-80 bg-background px-[6px] py-[5px] text-xs italic text-grey-55">
+                  <div className="flex flex-col gap-[1px]">
+                    <div className="font-bold"> {replyToName?.value}</div>
+                    <div className="text-grey-55">{replyMessage?.content}</div>
                   </div>
-                );
-              })}
-            </div>
-          )}
-          {/* ACTUAL MESSAGE INPUT */}
-          <div className="flex w-full flex-col items-end gap-1">
-            <div className="flex w-full items-center gap-1 rounded-lg border border-grey-55 bg-white px-2 py-1 text-base text-grey-15">
-              <AutosizeTextarea
-                onKeyDown={(e) => {
-                  if (e.key === "Escape") {
-                    e.currentTarget.blur();
-                  }
-                  if (!e.shiftKey && e.key === "Enter") {
+                  <button className="" onClick={() => props.setReply(null)}>
+                    <CloseLinedTiny />
+                  </button>
+                </div>
+                <div className="ml-auto mr-2 h-3 w-0 border border-grey-80" />
+              </div>
+            )}
+            {attachedCards.length > 0 && (
+              <div className="flex flex-col gap-1 ">
+                {attachedCards?.map((card) => {
+                  return (
+                    <div key={card} className="w-full">
+                      <CardPreviewWithData
+                        entityID={card}
+                        size="big"
+                        hideContent={true}
+                        key={card}
+                        onDelete={() =>
+                          setAttachedCards(
+                            props.entityID,
+                            attachedCards.filter((c) => c !== card)
+                          )
+                        }
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+            {/* ACTUAL MESSAGE INPUT */}
+
+            <div className="flex w-full flex-col items-end gap-1">
+              <div className="flex w-full items-end gap-2 rounded-lg border border-grey-55 bg-white py-1 pl-2 pr-1 text-base text-grey-15">
+                <AutosizeTextarea
+                  onKeyDown={(e) => {
+                    if (e.key === "Escape") {
+                      e.currentTarget.blur();
+                    }
+                    if (!e.shiftKey && e.key === "Enter") {
+                      e.preventDefault();
+                      send();
+                    }
+                  }}
+                  value={value}
+                  onChange={(e) => setValue(props.entityID, e.target.value)}
+                  placeholder=""
+                  className="w-full grow text-sm"
+                  id="messageInput"
+                />
+
+                <ButtonPrimary
+                  className="shrink-0 !px-0 !py-0"
+                  disabled={!value}
+                  onPointerDown={(e) => {
+                    e.preventDefault();
+                  }}
+                  onClick={(e) => {
                     e.preventDefault();
                     send();
-                  }
-                }}
-                value={value}
-                onChange={(e) => setValue(props.entityID, e.target.value)}
-                placeholder=""
-                className="w-full text-sm"
-                id="messageInput"
-              />
-            </div>
+                  }}
+                  icon={<Send />}
+                />
+              </div>
 
-            <div className="flex h-min w-full gap-2 text-grey-55">
+              {/* <div className="flex h-min w-full gap-2 text-grey-55">
               <div className="grow">
                 <AttachCard
                   attachedCards={attachedCards}
@@ -281,18 +304,7 @@ export const MessageInput = (props: {
                   }
                 />
               </div>
-              <ButtonPrimary
-                className="!px-1 !py-0"
-                disabled={!value}
-                onPointerDown={(e) => {
-                  e.preventDefault();
-                }}
-                onClick={(e) => {
-                  e.preventDefault();
-                  send();
-                }}
-                icon={<Send />}
-              />
+            </div> */}
             </div>
           </div>
         </div>
@@ -333,7 +345,9 @@ const AttachCard = ({
 }) => {
   let [open, setOpen] = useState(false);
   let items = useAllItems(open);
-  let { authorized, mutate, memberEntity, action } = useMutations();
+  let { mutate, memberEntity, action, permissions } = useMutations();
+  let authorized = permissions.commentAndReact;
+
   if (!authorized) return null;
   return (
     <>
@@ -380,23 +394,6 @@ const AttachCard = ({
         items={items}
       />
     </>
-  );
-};
-
-const AttachedCard = (props: { entityID: string }) => {
-  let name = db.useEntity(props.entityID, "card/title");
-  let memberName = db.useEntity(props.entityID, "member/name");
-  return (
-    <div className="flex w-full items-start gap-2">
-      <div className="shrink-0 text-grey-35">
-        {memberName ? <Member /> : <CardSmall />}
-      </div>
-      <div className="grow pt-[2px]">
-        {memberName?.value || name?.value || (
-          <span className="italic text-grey-55">untitled</span>
-        )}
-      </div>
-    </div>
   );
 };
 
@@ -455,24 +452,11 @@ const Message = (props: {
 
   let memberName = db.useEntity(props.author, "member/name");
   let memberColor = db.useEntity(props.author, "member/color");
-  let memberColorLight = "";
-  if (memberColor?.value) {
-    memberColorLight =
-      memberColorsLight[memberColors.indexOf(memberColor?.value)];
-  }
+
   let isMe = session.session?.username == memberName?.value;
-  let isSomeoneElse =
-    session.session?.username &&
-    session.session?.username !== memberName?.value;
   let time = new Date(parseInt(props.date));
   let replyMessage = db.useMessageByID(props.reply || null);
   let replyToName = db.useEntity(replyMessage?.sender || null, "member/name");
-  let replyToColor = db.useEntity(replyMessage?.sender || null, "member/color");
-  let replyToColorLight = "";
-  if (replyToColor?.value) {
-    replyToColorLight =
-      memberColorsLight[memberColors.indexOf(replyToColor?.value)];
-  }
   let attachedCards = db.useEntity(
     props.entity || null,
     "message/attached-card"
@@ -533,9 +517,9 @@ const Message = (props: {
         )}
         <div className={`flex items-end gap-2 ${isMe && "flex-row-reverse"}`}>
           <div
-            className={`messageContent  rounded-lg border border-grey-80 px-2 py-[5px] text-white group-hover:bg-bg-blue ${
+            className={`messageContent  rounded-lg border border-grey-80 px-2 py-[5px] text-white  ${
               attachedCards ? "w-full " : "w-fit"
-            }`}
+            } ${!isMe && "group-hover:!bg-bg-blue"}`}
             style={{
               backgroundColor: isMe ? memberColor?.value : "#FDFCFA",
             }}
