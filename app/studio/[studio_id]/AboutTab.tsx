@@ -11,7 +11,7 @@ export function About() {
   let home = db.useAttribute("home")[0];
   let homeContent = db.useEntity(home?.entity, "card/content");
   let image = db.useEntity(home?.entity, "card/image")?.[0];
-  let { mutate } = useMutations();
+  let { mutate, authorized } = useMutations();
   let { authToken } = useAuth();
   let spaceID = useSpaceID();
   return (
@@ -71,7 +71,7 @@ export function About() {
           <Textarea
             id="studio-about"
             placeholder="write a readme…"
-            previewOnly={!authToken}
+            previewOnly={!authorized}
             value={homeContent?.value}
             onChange={(e) => {
               if (!home) return;
