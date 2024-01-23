@@ -5,7 +5,7 @@ import {
   Delete,
   Member,
   CalendarMedium,
-  CardSmallLined,
+  CardAddLined,
   SectionImageAdd,
   ReactionAdd,
   CloseLinedTiny,
@@ -595,7 +595,7 @@ export const SectionAdder = (props: {
         }}
       >
         <div className={`${toggledOffStyle} `}>
-          <CardSmallLined />
+          <CardAddLined />
         </div>
       </AddExistingCard>
       {/* END LINKED CARD ADDER */}

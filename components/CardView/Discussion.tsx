@@ -3,7 +3,7 @@ import * as Popover from "@radix-ui/react-popover";
 import {
   CardAdd,
   CardSmall,
-  CardSmallLined,
+  CardAddLined,
   CloseLinedTiny,
   GoToBottom,
   Member,
@@ -331,7 +331,7 @@ const AttachCard = ({
         onClick={() => setOpen(true)}
         className="flex text-grey-55 hover:text-accent-blue"
       >
-        <CardSmallLined />
+        <CardAddLined />
       </button>
 
       <FindOrCreate
