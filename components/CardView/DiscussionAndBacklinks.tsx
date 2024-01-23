@@ -1,77 +1,24 @@
 import { db } from "hooks/useReplicache";
-import { useRef, useState } from "react";
-import { Backlinks } from "./Backlinks";
-import {
-  DiscussionRoom,
-  MessageInput,
-  MessageWindow,
-  Messages,
-  useMarkRead,
-} from "./Discussion";
-import { useViewportSize } from "@react-aria/utils";
 import { useUIState } from "hooks/useUIState";
+import { useState } from "react";
+import { useMarkRead, Messages, MessageInput } from "./Discussion";
+import { Backlinks } from "./Backlinks";
 
-export const CardViewDrawer = (props: {
-  entityID: string;
-  drawerOpen: boolean;
-}) => {
+export const DiscussionAndBacklinks = (props: { entityID: string }) => {
   let drawer = useUIState((s) => s.cardStates[props.entityID]?.drawer);
-  let viewportHeight = useViewportSize().height;
+
   return (
-    <div className="z-10 ">
-      <div className="cardDrawerHeader -mx-3 -mt-6  md:-mx-4">
-        <div className="cardDrawerTabs flex items-end gap-2 border-b border-b-grey-80 pl-4">
-          <CommentsTab entityID={props.entityID} />
-          <BacklinkTab entityID={props.entityID} />
-        </div>
+    <div className="">
+      <div className="cardDrawerTabs flex items-end gap-2 border-b border-b-grey-80 ">
+        <CommentsTab entityID={props.entityID} />
+        <BacklinkTab entityID={props.entityID} />
       </div>
-      <MessageWindow
-        style={{
-          maxHeight: props.drawerOpen
-            ? `min(60vh, ${viewportHeight - 128}px)`
-            : "",
-        }}
-        className={`cardDrawerContent no-scrollbar relative flex shrink flex-col gap-2 overflow-x-hidden overflow-y-scroll ${
-          props.drawerOpen ? "mt-4 h-fit" : "h-0 "
-        }`}
-      >
-        {drawer === "comments" ? (
-          <DiscussionContent
-            entityID={props.entityID}
-            open={props.drawerOpen}
-          />
-        ) : (
-          <Backlinks entityID={props.entityID} />
-        )}
-        {/* <div className="scroll-m-8 bg-white" /> */}
-      </MessageWindow>
+      {drawer === "comments" ? (
+        <DiscussionContent entityID={props.entityID} open={true} />
+      ) : (
+        <Backlinks entityID={props.entityID} />
+      )}
     </div>
-  );
-};
-
-const DiscussionContent = (props: { entityID: string; open: boolean }) => {
-  let [reply, setReply] = useState<string | null>(null);
-  useMarkRead(props.entityID, props.open);
-  return (
-    <>
-      <div className="flex flex-col">
-        <Messages
-          entityID={props.entityID}
-          isRoom={false}
-          setReply={setReply}
-        />
-      </div>
-
-      <div className="sticky bottom-0">
-        <MessageInput
-          entityID={props.entityID}
-          allowReact={true}
-          isRoom={false}
-          reply={reply}
-          setReply={setReply}
-        />
-      </div>
-    </>
   );
 };
 
@@ -83,6 +30,32 @@ const CommentsTab = (props: { entityID: string }) => {
       text={`comments (${messages.length})`}
       id="comments"
     />
+  );
+};
+
+const DiscussionContent = (props: { entityID: string; open: boolean }) => {
+  let [reply, setReply] = useState<string | null>(null);
+  useMarkRead(props.entityID, props.open);
+  return (
+    <>
+      <div className="-mx-3 flex flex-col sm:-mx-4">
+        <Messages
+          entityID={props.entityID}
+          isRoom={false}
+          setReply={setReply}
+        />
+      </div>
+
+      <div className="sticky -bottom-[0px]">
+        <MessageInput
+          entityID={props.entityID}
+          allowReact={true}
+          isRoom={false}
+          reply={reply}
+          setReply={setReply}
+        />
+      </div>
+    </>
   );
 };
 

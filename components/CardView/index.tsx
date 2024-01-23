@@ -38,6 +38,7 @@ import { Modal } from "components/Modal";
 import { Title } from "./Title";
 import { LinkPreview } from "components/LinkPreview";
 import { useLinkPreviewManager } from "hooks/useLinkPreviewManager";
+import { DiscussionAndBacklinks } from "./DiscussionAndBacklinks";
 
 const borderStyles = (args: { member: boolean }) => {
   switch (true) {
@@ -179,13 +180,12 @@ export const CardView = (props: {
         <div
           id="card-container"
           className={`
-            no-scrollbar flex 
-            h-full  grow   
-            flex-col       
+            no-scrollbar flex
+            h-full  grow       
+            flex-col
             items-stretch
-            overflow-x-hidden overflow-y-hidden
-            pb-3
-            sm:pb-4
+            overflow-x-hidden
+            overflow-y-hidden pb-4
             ${contentStyles({
               member: !!memberName,
             })}
@@ -221,11 +221,29 @@ export const CardContent = (props: {
       {/* START CARD CONTENT */}
       <div
         ref={ref}
-        className={`cardContentWrapper no-scrollbar relative z-0 flex grow flex-col items-stretch overflow-y-scroll overscroll-y-none pb-3 sm:pb-4 ${
+        id="card-content"
+        className={`cardContentWrapper no-scrollbar relative z-0 flex grow flex-col items-stretch overflow-y-scroll overscroll-y-contain  ${
           !memberName ? "pt-3 sm:pt-4" : ""
         }`}
         onClick={() => {
           useUIState.getState().closeDrawer(props.entityID);
+        }}
+        onScroll={() => {
+          let cardContent = document.getElementById("card-content");
+          cardContent &&
+            console.log(
+              cardContent.scrollTop +
+                " | " +
+                (cardContent?.scrollHeight - cardContent?.offsetHeight)
+            );
+          if (
+            cardContent &&
+            cardContent?.scrollTop ===
+              cardContent?.scrollHeight - cardContent?.offsetHeight
+          ) {
+            // useUIState.getState().openDrawer(props.entityID, "comments");
+            console.log("bottomed!");
+          }
         }}
       >
         <div className="cardSectionAdder pointer-events-none sticky top-0 z-10 flex w-full  justify-between">
@@ -292,10 +310,11 @@ export const CardContent = (props: {
             created by {cardCreatorName}
           </div>
         </div>
+        {/* START CARD DISCUSSION */}
+        {/* <DiscussionAndBacklinks entityID={props.entityID} /> */}
       </div>
       {/* END CARD CONTENT */}
 
-      {/* START CARD DISCUSSION */}
       <CardViewDrawer entityID={props.entityID} drawerOpen={drawerOpen} />
     </>
   );
