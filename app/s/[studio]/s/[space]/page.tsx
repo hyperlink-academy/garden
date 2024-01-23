@@ -3,6 +3,7 @@ import { WORKER_URL } from "src/constants";
 import { SpaceProvider } from "components/ReplicacheProvider";
 import { PageHeightContainer } from "components/PageHeightContainer";
 import { Space } from "components/Space";
+import { SpacePageStudioPresenceHandler } from "app/studio/[studio_id]/space/StudioPresenceHandler";
 
 export async function generateMetadata(props: {
   params: { space: string; studio: string };
@@ -24,10 +25,13 @@ export default async function SpacePage(props: {
   if (!result.success) return <pre>{JSON.stringify(result, null, 2)}</pre>;
 
   return (
-    <SpaceProvider id={result.data.do_id}>
-      <PageHeightContainer>
-        <Space />
-      </PageHeightContainer>
-    </SpaceProvider>
+    <>
+      <SpaceProvider id={result.data.do_id}>
+        <PageHeightContainer>
+          <Space />
+        </PageHeightContainer>
+      </SpaceProvider>
+      <SpacePageStudioPresenceHandler space={result.data} />
+    </>
   );
 }

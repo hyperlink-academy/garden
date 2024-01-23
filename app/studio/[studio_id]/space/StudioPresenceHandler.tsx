@@ -23,6 +23,20 @@ export const StudioPresenceHandler = (props: {
     </SpaceProvider>
   );
 };
+
+export const SpacePageStudioPresenceHandler = (props: { space: SpaceData }) => {
+  return (
+    <>
+      {props.space.spaces_in_studios.map((studio) =>
+        studio.studios ? (
+          <SpaceProvider id={studio.studios.do_id} key={studio.studio}>
+            <PresenceHandler space_do_id={props.space.do_id} />
+          </SpaceProvider>
+        ) : null
+      )}
+    </>
+  );
+};
 export const PresenceHandler = (props: { space_do_id: string }) => {
   let { rep, mutate, authorized, memberEntity, client, permissions } =
     useMutations();
