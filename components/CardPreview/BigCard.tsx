@@ -279,7 +279,7 @@ export const BigCardBody = (
             {!props.outerControls && props.onDelete && authorized ? (
               <>
                 <button
-                  className="cardPreviewRemove h-fit  text-grey-80 hover:text-accent-blue"
+                  className="cardPreviewRemove h-fit rounded-md bg-white p-0.5 text-grey-80 hover:text-accent-blue"
                   onClick={(e) => {
                     e.stopPropagation();
                     props.onDelete?.();

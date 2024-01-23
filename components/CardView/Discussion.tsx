@@ -221,16 +221,17 @@ export const MessageInput = (props: {
           )}
           {attachedCards.length > 0 && (
             <div className="flex flex-col gap-1 ">
-              {attachedCards?.map((c) => {
+              {attachedCards?.map((card) => {
                 return (
-                  <div key={c} className="w-full">
+                  <div key={card} className="w-full">
                     <CardPreviewWithData
-                      entityID={c}
+                      entityID={card}
                       size="big"
                       hideContent={true}
-                      key={c.id}
+                      key={card}
                       onDelete={() =>
                         setAttachedCards(
+                          props.entityID,
                           attachedCards.filter((c) => c !== card)
                         )
                       }
