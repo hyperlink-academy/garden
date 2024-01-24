@@ -61,7 +61,7 @@ export const CardViewDrawer = (props: {
         </div>
       </animated.div>
       <div className={`sticky bottom-0  mt-2 bg-white pb-2`}>
-        {(drawer === "comments" || drawer === null) && (
+        {(drawer === "comments" || !drawer) && (
           <MessageInput
             entityID={props.entityID}
             allowReact={true}
