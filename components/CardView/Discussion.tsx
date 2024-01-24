@@ -272,7 +272,7 @@ export const MessageInput = (props: {
             {/* ACTUAL MESSAGE INPUT */}
 
             <div className="flex w-full flex-col items-end gap-1">
-              <div className="flex w-full items-end gap-2 rounded-lg border border-grey-55 bg-white py-1 pl-2 pr-1 text-base text-grey-15">
+              <div className="flex w-full items-center gap-2 rounded-lg border border-grey-55 bg-white py-1 pl-2 pr-1 text-base text-grey-15">
                 <AutosizeTextarea
                   onKeyDown={(e) => {
                     if (e.key === "Escape") {
@@ -291,7 +291,7 @@ export const MessageInput = (props: {
                 />
 
                 <ButtonPrimary
-                  className="shrink-0 !px-0 !py-0"
+                  className="shrink-0 self-end !px-0 !py-0"
                   disabled={!value}
                   onPointerDown={(e) => {
                     e.preventDefault();
