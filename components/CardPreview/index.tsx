@@ -102,7 +102,7 @@ export const CardPreview = (
       <PresenceTag
         entityID={props.entityID}
         size={props.size}
-        outerControls={props.outerControls}
+        outerControls={!!!props.outerControls}
       />
       <div
         {...handlers}
