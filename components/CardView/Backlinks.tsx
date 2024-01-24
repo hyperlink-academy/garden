@@ -42,84 +42,90 @@ export const Backlinks = (props: { entityID: string }) => {
   let cards = cardBacklinks.sort(sortByPosition("vae"));
   let { mutate } = useMutations();
   return (
-    <div className="flex flex-col gap-2">
-      {rooms.length + roomMessages.length > 0 && (
-        <div>
-          <div className="font-bold">Rooms</div>
-          <hr className="border-grey-80" />
-        </div>
-      )}
-      {rooms.map((c) => {
-        return (
-          <Room
-            entityID={c.entity}
-            key={c.id}
-            onClick={() => {
-              setTimeout(() => {
-                document.getElementById("room-wrapper")?.scrollIntoView();
-              }, 300);
-            }}
-          />
-        );
-      })}
-      {roomMessages.map((m) => (
-        <MessageBacklink key={m.id} id={m.id}>
-          <Room
-            entityID={m.topic}
-            onClick={() => {
-              setTimeout(() => {
-                document.getElementById(m.id)?.scrollIntoView();
-              }, 400);
-            }}
-          />
-        </MessageBacklink>
-      ))}
-      {cards.length + cardMessages.length + inlineBacklinks.length > 0 && (
-        <div>
-          <div className="font-bold">Cards</div>
-          <hr className="border-grey-80" />
-        </div>
-      )}
-      {cards.map((c) => {
-        return (
-          <div key={c.id}>
-            <CardPreviewWithData
+    <div className="mt-4 flex flex-col gap-4">
+      <div className="flex flex-col gap-1">
+        {rooms.length + roomMessages.length > 0 &&
+          cards.length + cardMessages.length + inlineBacklinks.length > 0 && (
+            <div>
+              <div className="font-bold">Rooms</div>
+            </div>
+          )}
+        {rooms.map((c) => {
+          return (
+            <Room
+              entityID={c.entity}
               key={c.id}
-              hideContent
-              factID={c.id}
-              onDelete={() => {
-                mutate("retractFact", { id: c.id });
+              onClick={() => {
+                setTimeout(() => {
+                  document.getElementById("room-wrapper")?.scrollIntoView();
+                }, 300);
               }}
+            />
+          );
+        })}
+        {roomMessages.map((m) => (
+          <MessageBacklink key={m.id} id={m.id}>
+            <Room
+              entityID={m.topic}
+              onClick={() => {
+                setTimeout(() => {
+                  document.getElementById(m.id)?.scrollIntoView();
+                }, 400);
+              }}
+            />
+          </MessageBacklink>
+        ))}
+      </div>
+      <div className="flex flex-col gap-1">
+        {cards.length + cardMessages.length + inlineBacklinks.length > 0 &&
+          rooms.length + roomMessages.length > 0 && (
+            <div className="font-bold">Cards</div>
+          )}
+        {cards.map((c) => {
+          return (
+            <div key={c.id}>
+              <CardPreviewWithData
+                key={c.id}
+                hideContent
+                factID={c.id}
+                onDelete={() => {
+                  mutate("retractFact", { id: c.id });
+                }}
+                entityID={c.entity}
+                size={"big"}
+              />
+            </div>
+          );
+        })}
+        {inlineBacklinks.map((c) => {
+          return (
+            <CardPreviewWithData
+              focusText={title ? `[[${title.value}]]` : undefined}
+              key={c.id}
+              factID={c.id}
               entityID={c.entity}
               size={"big"}
             />
-          </div>
-        );
-      })}
-      {inlineBacklinks.map((c) => {
-        return (
-          <CardPreviewWithData
-            focusText={title ? `[[${title.value}]]` : undefined}
-            key={c.id}
-            factID={c.id}
-            entityID={c.entity}
-            size={"big"}
-          />
-        );
-      })}
-      {cardMessages.map((c) => {
-        return (
-          <MessageBacklink
-            key={c.id}
-            id={c.id}
-            onClick={() => {
-              open({ entityID: c.topic });
-            }}
-          >
-            <CardPreviewWithData entityID={c.topic} size={"big"} hideContent />
-          </MessageBacklink>
-        );
-      })}
+          );
+        })}
+        {cardMessages.map((c) => {
+          return (
+            <MessageBacklink
+              key={c.id}
+              id={c.id}
+              onClick={() => {
+                open({ entityID: c.topic });
+              }}
+            >
+              <CardPreviewWithData
+                entityID={c.topic}
+                size={"big"}
+                hideContent
+              />
+            </MessageBacklink>
+          );
+        })}
+      </div>
     </div>
   );
 };

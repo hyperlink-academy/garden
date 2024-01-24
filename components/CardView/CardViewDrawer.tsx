@@ -22,7 +22,7 @@ export const CardViewDrawer = (props: {
   return (
     <div className="z-10 ">
       <div className="cardDrawerHeader -mx-3 -mt-6  md:-mx-4">
-        <div className="cardDrawerTabs mb-3 flex items-end gap-2 border-b border-b-grey-80 pl-4">
+        <div className="cardDrawerTabs flex items-end gap-2 border-b border-b-grey-80 pl-4">
           <CommentsTab entityID={props.entityID} />
           <BacklinkTab entityID={props.entityID} />
         </div>
@@ -34,7 +34,7 @@ export const CardViewDrawer = (props: {
             : "",
         }}
         className={`cardDrawerContent no-scrollbar relative flex shrink flex-col gap-2 overflow-x-hidden overflow-y-scroll ${
-          props.drawerOpen ? "mb-2 h-fit" : "h-0 "
+          props.drawerOpen ? " h-fit" : "h-0 "
         }`}
       >
         {drawer === "comments" ? (
@@ -48,8 +48,8 @@ export const CardViewDrawer = (props: {
         )}
         {/* <div className="scroll-m-8 bg-white" /> */}
       </MessageWindow>
-      {drawer === "comments" && (
-        <div className="sticky bottom-0">
+      {(drawer === "comments" || drawer === null) && (
+        <div className="sticky bottom-0  mt-2 ">
           <MessageInput
             entityID={props.entityID}
             allowReact={true}
