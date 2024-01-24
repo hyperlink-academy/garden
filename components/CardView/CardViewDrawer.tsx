@@ -10,6 +10,9 @@ import {
 } from "./Discussion";
 import { useViewportSize } from "@react-aria/utils";
 import { useUIState } from "hooks/useUIState";
+import { springConfig } from "src/constants";
+import useMeasure from "react-use-measure";
+import { animated, useSpring } from "@react-spring/web";
 
 export const CardViewDrawer = (props: {
   entityID: string;
@@ -19,37 +22,46 @@ export const CardViewDrawer = (props: {
   let viewportHeight = useViewportSize().height;
   let [reply, setReply] = useState<string | null>(null);
 
+  let [measure, { height }] = useMeasure();
+  let drawerSpring = useSpring({
+    height: props.drawerOpen ? height : 0,
+    springConfig: springConfig,
+  });
   return (
-    <div className="z-10 ">
+    <div className="z-10">
       <div className="cardDrawerHeader -mx-3 -mt-6  md:-mx-4">
         <div className="cardDrawerTabs flex items-end gap-2 border-b border-b-grey-80 pl-4">
           <CommentsTab entityID={props.entityID} />
           <BacklinkTab entityID={props.entityID} />
         </div>
       </div>
-      <MessageWindow
-        style={{
-          maxHeight: props.drawerOpen
-            ? `min(60vh, ${viewportHeight - 128}px)`
-            : "",
-        }}
-        className={`cardDrawerContent no-scrollbar relative flex shrink flex-col gap-2 overflow-x-hidden overflow-y-scroll ${
-          props.drawerOpen ? " h-fit" : "h-0 "
-        }`}
-      >
-        {drawer === "comments" ? (
-          <DiscussionContent
-            entityID={props.entityID}
-            open={props.drawerOpen}
-            setReply={setReply}
-          />
-        ) : (
-          <Backlinks entityID={props.entityID} />
-        )}
-        {/* <div className="scroll-m-8 bg-white" /> */}
-      </MessageWindow>
-      {(drawer === "comments" || drawer === null) && (
-        <div className="sticky bottom-0  mt-2 ">
+      <animated.div style={drawerSpring}>
+        <div ref={measure}>
+          <MessageWindow
+            onDragTop={() => useUIState.getState().closeDrawer(props.entityID)}
+            style={{
+              maxHeight: props.drawerOpen
+                ? `min(60vh, ${viewportHeight - 128}px)`
+                : "",
+            }}
+            className={`cardDrawerContent no-scrollbar relative flex h-fit shrink flex-col gap-2 overflow-x-hidden overflow-y-scroll`}
+          >
+            {drawer === "comments" ? (
+              <DiscussionContent
+                entityID={props.entityID}
+                open={props.drawerOpen}
+                setReply={setReply}
+              />
+            ) : (
+              <Backlinks entityID={props.entityID} />
+            )}
+            {/* <div className="scroll-m-8 b ${
+          }g-white" /> */}
+          </MessageWindow>
+        </div>
+      </animated.div>
+      <div className={`sticky bottom-0  mt-2 bg-white pb-2`}>
+        {(drawer === "comments" || drawer === null) && (
           <MessageInput
             entityID={props.entityID}
             allowReact={true}
@@ -60,8 +72,8 @@ export const CardViewDrawer = (props: {
               useUIState.getState().openDrawer(props.entityID, "comments")
             }
           />
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

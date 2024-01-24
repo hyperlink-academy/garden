@@ -25,6 +25,7 @@ import { useRoom, useUIState } from "hooks/useUIState";
 import { useFilteredCards } from "../CardFilter";
 import { useAuth } from "hooks/useAuth";
 import { memberColors, memberColorsLight } from "src/colors";
+import { useGesture } from "@use-gesture/react";
 
 export const DiscussionRoom = (props: {
   entityID: string;
@@ -117,6 +118,7 @@ export const useMarkRead = (entityID: string, focused: boolean) => {
 
 export const MessageWindow = (props: {
   style?: HTMLAttributes<HTMLDivElement>["style"];
+  onDragTop?: () => void;
   children: React.ReactNode;
   className: string;
 }) => {
@@ -130,8 +132,21 @@ export const MessageWindow = (props: {
       });
     }
   });
+  let bind = useGesture({
+    onDrag: (data) => {
+      if (
+        (data.currentTarget as HTMLElement)?.scrollTop === 0 &&
+        data.direction[1] > 0 &&
+        data.distance[1] > 8 &&
+        data.distance[0] < 8
+      ) {
+        props.onDragTop?.();
+      }
+    },
+  });
   return (
     <div
+      {...bind()}
       style={props.style}
       onScroll={(e) => {
         if (!e.isTrusted) return;

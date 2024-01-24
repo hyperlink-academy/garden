@@ -38,6 +38,7 @@ import { Modal } from "components/Modal";
 import { Title } from "./Title";
 import { LinkPreview } from "components/LinkPreview";
 import { useLinkPreviewManager } from "hooks/useLinkPreviewManager";
+import { useDrag, useGesture } from "@use-gesture/react";
 
 const borderStyles = (args: { member: boolean }) => {
   switch (true) {
@@ -184,8 +185,6 @@ export const CardView = (props: {
             flex-col       
             items-stretch
             overflow-x-hidden overflow-y-hidden
-            pb-3
-            sm:pb-4
             ${contentStyles({
               member: !!memberName,
             })}
@@ -211,17 +210,34 @@ export const CardContent = (props: {
   let { authorized } = useMutations();
   let drawerOpen = useUIState((s) => s.cardStates[props.entityID]?.drawerOpen);
   let cardCreator = db.useEntity(props.entityID, "card/created-by");
+  let drawer = useUIState((s) => s.cardStates[props.entityID]?.drawer);
   let cardCreatorName = db.useEntity(
     cardCreator?.value.value as string,
     "member/name"
   )?.value;
+
+  useDrag(
+    (data) => {
+      let target = data.event.currentTarget as HTMLElement;
+      if (
+        target &&
+        target.scrollTop >= target.scrollHeight - target.clientHeight - 1 &&
+        data.direction[1] < 0 &&
+        data.distance[1] > 8 &&
+        data.distance[0] < 8
+      ) {
+        useUIState.getState().openDrawer(props.entityID, drawer || "comments");
+      }
+    },
+    { target: ref }
+  );
 
   return (
     <>
       {/* START CARD CONTENT */}
       <div
         ref={ref}
-        className={`cardContentWrapper no-scrollbar relative z-0 flex grow flex-col items-stretch overflow-y-scroll overscroll-y-none pb-3 sm:pb-4 ${
+        className={`cardContentWrapper no-scrollbar relative z-0 flex grow flex-col items-stretch overflow-y-scroll overscroll-y-none ${
           !memberName ? "pt-3 sm:pt-4" : ""
         }`}
         onClick={() => {
