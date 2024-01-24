@@ -38,7 +38,7 @@ import { Modal } from "components/Modal";
 import { Title } from "./Title";
 import { LinkPreview } from "components/LinkPreview";
 import { useLinkPreviewManager } from "hooks/useLinkPreviewManager";
-import { useDrag, useGesture } from "@use-gesture/react";
+import { useDrag } from "@use-gesture/react";
 
 const borderStyles = (args: { member: boolean }) => {
   switch (true) {
@@ -227,6 +227,15 @@ export const CardContent = (props: {
         data.distance[0] < 8
       ) {
         useUIState.getState().openDrawer(props.entityID, drawer || "comments");
+      }
+      if (
+        target &&
+        target.scrollTop === 0 &&
+        data.direction[1] > 0 &&
+        data.distance[1] > 8 &&
+        data.distance[0] < 8
+      ) {
+        useUIState.getState().closeDrawer(props.entityID);
       }
     },
     { target: ref }
