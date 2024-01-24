@@ -36,7 +36,7 @@ export const PresenceTag = (props: {
     <>
       <div
         className={`absolute -top-5  ${
-          props.outerControls ? "right-5" : "right-1"
+          props.outerControls ? "right-1" : "right-5"
         } flex flex-row-reverse`}
       >
         {present.length > 1 && props.size === "small" ? (
