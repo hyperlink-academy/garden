@@ -2,7 +2,11 @@ import { db, scanIndex } from "hooks/useReplicache";
 import { RoomMember } from "./Icons";
 import { Fact } from "data/Facts";
 
-export const PresenceTag = (props: { entityID: string; size: string }) => {
+export const PresenceTag = (props: {
+  entityID: string;
+  size: string;
+  outerControls: boolean;
+}) => {
   let present = db.useQuery(
     async (tx) => {
       return (
@@ -32,7 +36,7 @@ export const PresenceTag = (props: { entityID: string; size: string }) => {
     <>
       <div
         className={`absolute -top-5  ${
-          props.size === "small" ? "right-4" : "right-2"
+          props.outerControls ? "right-5" : "right-1"
         } flex flex-row-reverse`}
       >
         {present.length > 1 && props.size === "small" ? (
