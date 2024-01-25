@@ -226,7 +226,7 @@ export const CardContent = (props: {
         data.distance[1] > 8 &&
         data.distance[0] < 8
       ) {
-        useUIState.getState().openDrawer(props.entityID, drawer || "comments");
+        useUIState.getState().openDrawer(props.entityID, drawer || "chat");
       }
       if (
         target &&

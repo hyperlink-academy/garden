@@ -195,7 +195,7 @@ export const BigCardBody = (
                 onClick={() => {
                   if (!props.entityID) return;
                   open({ entityID: props.entityID });
-                  useUIState.getState().openDrawer(props.entityID, "comments");
+                  useUIState.getState().openDrawer(props.entityID, "chat");
                   setTimeout(() => {
                     document.getElementById("messageInput")?.focus();
                   }, 50);
