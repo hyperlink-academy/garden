@@ -104,7 +104,7 @@ const List = (props: { spaces: Array<SpaceData> }) => {
           let presences = peopleInSpaces.filter((p) => p.value === space.do_id);
           return (
             <div className="relative" key={space.id}>
-              <div className="absolute right-0">
+              <div className="absolute right-2 top-1">
                 {presences.slice(0, 4).map((p) => (
                   <SpacePresence entityID={p.entity} key={p.entity} />
                 ))}
