@@ -31,7 +31,7 @@ export const CardViewDrawer = (props: {
     <div className="z-10">
       <div className="cardDrawerHeader -mx-3 -mt-6  md:-mx-4">
         <div className="cardDrawerTabs flex items-end gap-2 border-b border-b-grey-80 pl-4">
-          <CommentsTab entityID={props.entityID} />
+          <ChatTab entityID={props.entityID} />
           <BacklinkTab entityID={props.entityID} />
         </div>
       </div>
@@ -46,7 +46,7 @@ export const CardViewDrawer = (props: {
             }}
             className={`cardDrawerContent no-scrollbar relative flex h-fit shrink flex-col gap-2 overflow-x-hidden overflow-y-scroll`}
           >
-            {drawer === "comments" ? (
+            {drawer === "chat" ? (
               <DiscussionContent
                 entityID={props.entityID}
                 open={props.drawerOpen}
@@ -61,7 +61,7 @@ export const CardViewDrawer = (props: {
         </div>
       </animated.div>
       <div className={`sticky bottom-0  mt-2 bg-white pb-2`}>
-        {(drawer === "comments" || !drawer) && (
+        {(drawer === "chat" || !drawer) && (
           <MessageInput
             entityID={props.entityID}
             allowReact={true}
@@ -69,7 +69,7 @@ export const CardViewDrawer = (props: {
             reply={reply}
             setReply={setReply}
             onSend={() =>
-              useUIState.getState().openDrawer(props.entityID, "comments")
+              useUIState.getState().openDrawer(props.entityID, "chat")
             }
           />
         )}
@@ -97,13 +97,13 @@ const DiscussionContent = (props: {
   );
 };
 
-const CommentsTab = (props: { entityID: string }) => {
+const ChatTab = (props: { entityID: string }) => {
   let messages = db.useMessages(props.entityID);
   return (
     <Tab
       entityID={props.entityID}
-      text={`comments (${messages.length})`}
-      id="comments"
+      text={`chat (${messages.length})`}
+      id="chat"
     />
   );
 };
@@ -125,19 +125,19 @@ const BacklinkTab = (props: { entityID: string }) => {
   return (
     <Tab
       entityID={props.entityID}
-      text={`mentioned in (${references})`}
+      text={`mentions (${references})`}
       id="backlinks"
     />
   );
 };
 
 const Tab = (props: {
-  id: "backlinks" | "comments";
+  id: "backlinks" | "chat";
   text: string;
   entityID: string;
 }) => {
   let currentTab =
-    useUIState((s) => s.cardStates[props.entityID]?.drawer) || "comments";
+    useUIState((s) => s.cardStates[props.entityID]?.drawer) || "chat";
   let drawerOpen = useUIState((s) => s.cardStates[props.entityID]?.drawerOpen);
   return (
     <button
