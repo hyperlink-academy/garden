@@ -76,32 +76,44 @@ export function JoinStudio(props: { data: StudioData }) {
         )}
 
         {session.session ? (
-          <>
-            <div className="flex flex-col gap-2">
-              <p className="text-center text-lg font-bold ">
-                Take a moment to introduce yourself! <br />
-                Let other&apos;s know what you&apos;re up to.
-              </p>
-              <div className="relative">
-                <div className="mx-auto mb-2  w-[448px] max-w-full">
-                  <div className={`relative grow`}>
-                    <MemberCard
-                      spaces={[]}
-                      bio={bio}
-                      onBioChange={setBio}
-                      memberStudio={session.session?.studio || ""}
-                      memberName={session.session.username}
-                    />
+          !session.session.username ? (
+            <Link
+              href={`/setup?redirectTo=${encodeURIComponent(
+                window.location.pathname + `?code=${code}`
+              )}`}
+            >
+              <ButtonPrimary content="Finish setting up your account!" />
+            </Link>
+          ) : (
+            <>
+              <div className="flex flex-col gap-2">
+                <p className="text-center text-lg font-bold ">
+                  Take a moment to introduce yourself! <br />
+                  Let other&apos;s know what you&apos;re up to.
+                </p>
+                <div className="relative">
+                  <div className="mx-auto mb-2  w-[448px] max-w-full">
+                    <div className={`relative grow`}>
+                      <MemberCard
+                        spaces={[]}
+                        bio={bio}
+                        onBioChange={setBio}
+                        memberStudio={session.session?.studio || ""}
+                        memberName={session.session.username}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-            <ButtonPrimary
-              content={state === "loading" ? <DotLoader /> : "Join the Studio"}
-              icon={<Member />}
-              onClick={onClick}
-            />
-          </>
+              <ButtonPrimary
+                content={
+                  state === "loading" ? <DotLoader /> : "Join the Studio"
+                }
+                icon={<Member />}
+                onClick={onClick}
+              />
+            </>
+          )
         ) : (
           <LoginOrSignup code={code} id={props.data.id} />
         )}
