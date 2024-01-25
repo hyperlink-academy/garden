@@ -11,6 +11,7 @@ import { db, useMutations } from "hooks/useReplicache";
 import { Props } from "./index";
 import { useUIState } from "hooks/useUIState";
 import { SmallLinkCard } from "./LinkPreviewCard";
+import { LinkPreviewCondensed, LinkPreviewTiny } from "components/LinkPreview";
 
 export const SmallCardBody = (
   props: {
@@ -70,35 +71,43 @@ export const BaseSmallCard = (
         props.isMember ? "pb-1 pl-2 pr-1 pt-2" : "px-2 py-2"
       }`}
       style={{
-        background: props.imageUrl ? `url(${props.imageUrl})` : "",
+        background:
+          props.imageUrl && !linkPreview ? `url(${props.imageUrl})` : "",
       }}
     >
       {/* Small Card Preview Content Wrapper (is it default or member?) */}
       {!props.isMember ? (
         /* Default Content (Member Content Further Down) */
         <div
-          className="flex h-full w-full flex-col items-stretch gap-1 "
+          className="flex h-full w-full flex-col items-stretch gap-1"
           style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
         >
           {/* Small Card Preview Title Or Content */}
-          <a className="h-full ">
-            {/* if we have an image, do NOT show 'Untitled' placeholder */}
-            {props.title ? (
-              <div className="-m-1 max-h-full w-fit overflow-hidden text-ellipsis rounded-[4px] bg-white bg-opacity-70 p-1 font-bold leading-tight text-grey-35">
-                {props.title}
-              </div>
-            ) : props.content ? (
-              <pre className="-m-1 max-h-full w-fit overflow-hidden truncate whitespace-pre-wrap rounded-[4px] bg-white bg-opacity-60 p-1 leading-tight">
-                {props?.content}
-              </pre>
-            ) : !props.imageUrl ? (
-              <div className="block w-full font-bold italic !text-grey-80">
-                Untitled
-              </div>
-            ) : null}
-          </a>
+          {!linkPreview && (
+            <a className="h-full">
+              {/* if we have a link preview, ALWAYS hide title */}
+              {/* if we have an image, do NOT show 'Untitled' placeholder */}
+              {props.title ? (
+                <div className="-m-1 max-h-full w-fit overflow-hidden text-ellipsis rounded-[4px] bg-white bg-opacity-70 p-1 font-bold leading-tight text-grey-35">
+                  {props.title}
+                </div>
+              ) : props.content ? (
+                <pre className="-m-1 max-h-full w-fit overflow-hidden truncate whitespace-pre-wrap rounded-[4px] bg-white bg-opacity-60 p-1 leading-tight">
+                  {props?.content}
+                </pre>
+              ) : !props.imageUrl ? (
+                <div className="block w-full font-bold italic !text-grey-80">
+                  Untitled
+                </div>
+              ) : null}
+            </a>
+          )}
 
           {/* Small Card Preview - External Link */}
+          {linkPreview && props.entityID && (
+            <LinkPreviewTiny entityID={props.entityID} />
+          )}
+
           {/* NB: turning this off to simplify! */}
           {/* {url ? (
             <a

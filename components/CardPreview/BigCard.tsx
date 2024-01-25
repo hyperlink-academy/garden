@@ -38,25 +38,6 @@ export const BigCardBody = (
         }
       : {};
 
-  // if (linkPreview)
-  //   return (
-  //     <div
-  //       {...listenersAndAttributes}
-  //       className={`CardPreview flex h-full grow flex-row !bg-cover !bg-center !bg-no-repeat pl-2 text-sm`}
-  //       style={{
-  //         wordBreak: "break-word",
-  //       }} //no tailwind equiv - need for long titles to wrap
-  //       onClick={(e) => {
-  //         if (e.defaultPrevented) return;
-  //         let cardView = document.getElementById("cardViewerWrapper");
-  //         open({ entityID: props.entityID });
-  //         cardView ? cardView.scrollIntoView({ behavior: "smooth" }) : null;
-  //       }}
-  //     >
-  //       <ListLinkCard entityID={linkPreview.value.value} />
-  //     </div>
-  //   );
-
   return (
     <div
       {...listenersAndAttributes}
@@ -66,7 +47,10 @@ export const BigCardBody = (
       style={{
         wordBreak: "break-word",
         background:
-          props.hideContent && props.data.imageUrl && !props.data.isMember
+          props.hideContent &&
+          props.data.imageUrl &&
+          !props.data.isMember &&
+          !linkPreview
             ? `url(${props.data.imageUrl})`
             : "",
       }} //no tailwind equiv - need for long titles to wrap
@@ -81,11 +65,30 @@ export const BigCardBody = (
     >
       {/* Big Card Preview Content Wrapper */}
       <div
-        className={`cardPreviewContent flex w-full flex-col  ${
+        className={`cardPreviewContent flex w-full flex-col gap-2 ${
           editing ? "" : "hover:cursor-pointer"
         }`}
       >
+        {/* TODO: remove this, seems to be unused??? */}
+        {/* {props.showRelated && <Backlinks entityID={props.entityID} />} */}
+
+        {/* Link Preview  */}
+        {linkPreview && (
+          <div
+            className={`-mx-[9px] -mt-[9px] ${
+              props.hideContent &&
+              (linkPreview.value.url === props.data.title?.value ||
+                !props.data.title)
+                ? "-mb-2"
+                : ""
+            }`}
+          >
+            <LinkPreviewCondensed entityID={props.entityID} />
+          </div>
+        )}
+
         {/* Big Card Preview Title*/}
+        {/* show AFTER link preview if we have one, and only if expanded */}
         {/* show title and remove button
            if (you're in list view) 
         or if (theres a title) 
@@ -132,17 +135,13 @@ export const BigCardBody = (
             )}
           </div>
         )}
-        {props.showRelated && <Backlinks entityID={props.entityID} />}
 
-        {linkPreview && <LinkPreviewCondensed entityID={props.entityID} />}
-        {/* Big Card Preview Default Content (show if not you're in preview mode OR there is content/image OR you're in edit mode)*/}
+        {/* Big Card Preview Default Content*/}
+        {/* (show if you're in preview mode OR there is content/image OR you're in edit mode) */}
         {!props.hideContent &&
-          (editing ||
-            !!props.data.content?.value ||
-            !!props.data.imageUrl ||
-            linkPreview) && (
+          (editing || !!props.data.content?.value || !!props.data.imageUrl) && (
             <div
-              className={`cardPreviewDefaultContent flex flex-col gap-2 pb-2 ${
+              className={`cardPreviewDefaultContent flex flex-col gap-2 ${
                 props.data.isMember &&
                 !props.hideContent &&
                 props.data.content?.value
@@ -181,7 +180,7 @@ export const BigCardBody = (
         {/* Reactions + Discussions WRAPPER */}
         {/* NB: show ONLY for non-member cards for now */}
         {!props.data.isMember && (
-          <div className="cardPreviewActionsWrapper flex w-full items-center justify-between gap-2 pt-1">
+          <div className="cardPreviewActionsWrapper flex w-full items-center justify-between gap-2">
             <div className="cardPreviewActions flex  gap-2">
               {/* Discussions */}
               {/* three states: unread, existing, none */}
