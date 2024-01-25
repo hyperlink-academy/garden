@@ -306,13 +306,18 @@ const MyHomeEmpty = (props: { studioSpaceID: string; studioName: string }) => {
           priority
         />
       ) : (
-        <Image
-          src={sandboxSpot}
-          priority
-          alt="a door overgrown with moss"
-          width={300}
-          height={600}
-        />
+        <div
+          style={{ width: "300px", position: "relative" }}
+          className="shrink-0"
+        >
+          <Image
+            style={{ objectFit: "cover" }}
+            src={sandboxSpot}
+            priority
+            fill
+            alt="a door overgrown with moss"
+          />
+        </div>
       )}
 
       <div className=" flex h-full flex-col gap-3 p-4 text-grey-35 sm:p-8 sm:py-4 ">
