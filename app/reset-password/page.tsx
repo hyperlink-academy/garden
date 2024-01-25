@@ -37,7 +37,7 @@ export default function LoginPage() {
   );
 }
 
-export function ResetPasswordForm() {
+function ResetPasswordForm() {
   let [data, setData] = useState({
     email: "",
   });
