@@ -300,10 +300,15 @@ const MyHomeEmpty = (props: { studioSpaceID: string; studioName: string }) => {
   return (
     <div className="lightBorder flex flex-col bg-white sm:flex-row">
       {isMobile ? (
-        <Image src={mobileSandboxSpot} alt="a door overgrown with moss" />
+        <Image
+          src={mobileSandboxSpot}
+          alt="a door overgrown with moss"
+          priority
+        />
       ) : (
         <Image
           src={sandboxSpot}
+          priority
           alt="a door overgrown with moss"
           width={300}
           height={600}
