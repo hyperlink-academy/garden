@@ -10,8 +10,7 @@ import { useReactions } from "hooks/useReactions";
 import { db, useMutations } from "hooks/useReplicache";
 import { Props } from "./index";
 import { useUIState } from "hooks/useUIState";
-import { SmallLinkCard } from "./LinkPreviewCard";
-import { LinkPreviewCondensed, LinkPreviewTiny } from "components/LinkPreview";
+import { LinkPreviewTiny } from "components/LinkPreview";
 
 export const SmallCardBody = (
   props: {
@@ -107,29 +106,6 @@ export const BaseSmallCard = (
           {linkPreview && props.entityID && (
             <LinkPreviewTiny entityID={props.entityID} />
           )}
-
-          {/* NB: turning this off to simplify! */}
-          {/* {url ? (
-            <a
-              className="fixed -bottom-[12px] right-[52px] rounded-md border border-grey-80 bg-white p-1 text-accent-blue"
-              href={props.content}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
-            >
-              <ExternalLink />
-            </a>
-          ) : null} */}
-
-          {/* Small Card Preview - Date */}
-          {/* NB: turning off to simplify! */}
-          {/* {date ? (
-            <div className="text-grey-35">
-              <CalendarMedium />
-            </div>
-          ) : null} */}
 
           {/* Small Card Preview - Reactions */}
           {props.reactions && props.reactions.length > 0 ? (
