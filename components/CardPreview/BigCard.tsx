@@ -79,7 +79,7 @@ export const BigCardBody = (
               props.hideContent &&
               (linkPreview.value.url === props.data.title?.value ||
                 !props.data.title)
-                ? "-mb-2"
+                ? "-mb-1"
                 : ""
             }`}
           >

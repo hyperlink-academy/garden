@@ -1,5 +1,6 @@
 import { db } from "hooks/useReplicache";
 import { useIsMobile } from "hooks/utils";
+import { ExternalLink } from "./Icons";
 
 export const LinkPreview = (props: { entityID: string }) => {
   let data = db.useEntity(props.entityID, "card/link-preview");
@@ -21,9 +22,13 @@ export const LinkPreview = (props: { entityID: string }) => {
             height={isMobile ? 86 : 120}
             width={isMobile ? 86 : 120}
             alt={`website logo for ${data.value.url}`}
-            className="shrink-0"
+            className="m-2 h-fit rounded-md"
           />
-        ) : null}
+        ) : (
+          <div className="w-[64px] pl-4 pt-3 text-accent-blue">
+            <ExternalLink />
+          </div>
+        )}
         <div className="flex flex-col gap-2 py-1 pr-1 sm:py-2 sm:pr-2">
           <p className="font-bold text-accent-blue">{data?.value.title}</p>
           <p className="text-sm text-grey-55">{data?.value.description}</p>
@@ -54,12 +59,16 @@ export const LinkPreviewCondensed = (props: { entityID: string }) => {
         ) : data?.value.logo ? (
           <img
             src={data.value.logo.url}
-            height={64}
-            width={64}
+            height={32}
+            width={32}
             alt={`website logo for ${data.value.url}`}
-            className="shrink-0"
+            className="m-2 h-fit rounded-md"
           />
-        ) : null}
+        ) : (
+          <div className="w-[32px] pl-2 pt-[10px] text-accent-blue">
+            <ExternalLink />
+          </div>
+        )}
         <div className="h-full py-1 pr-1 sm:py-2 sm:pr-2">
           <p className="h-full overflow-hidden font-bold text-accent-blue">
             {data?.value.title}
@@ -94,12 +103,16 @@ export const LinkPreviewTiny = (props: { entityID: string }) => {
         ) : data?.value.logo ? (
           <img
             src={data.value.logo.url}
-            height={64}
-            width={64}
+            height={32}
+            width={32}
             alt={`website logo for ${data.value.url}`}
-            className="shrink-0"
+            className="h-fit pl-2 pt-[6px]"
           />
-        ) : null}
+        ) : (
+          <div className="w-[24px] pl-2 pt-[6px] text-accent-blue">
+            <ExternalLink />
+          </div>
+        )}
         <div className="h-full py-1 pr-1">
           <p className="h-full overflow-hidden text-sm font-bold text-accent-blue">
             {data?.value.title}
