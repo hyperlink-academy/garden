@@ -1,6 +1,5 @@
 import { workerAPI } from "backend/lib/api";
 import { useAuth } from "hooks/useAuth";
-import { useRouter } from "next/router";
 import { useState } from "react";
 import { ButtonLink, ButtonSecondary } from "./Buttons";
 import { Send } from "./Icons";

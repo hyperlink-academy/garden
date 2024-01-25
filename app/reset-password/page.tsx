@@ -1,13 +1,16 @@
+"use client";
 import { ButtonPrimary } from "components/Buttons";
 import { useEffect, useState } from "react";
 import { DotLoader } from "components/DotLoader";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { supabaseBrowserClient } from "supabase/clients";
+import { useAuth } from "hooks/useAuth";
 
 export default function LoginPage() {
   let [state, setState] = useState<"normal" | "new-password" | "signed-in">(
     "normal"
   );
+  let { session } = useAuth();
   let supabase = supabaseBrowserClient();
   useEffect(() => {
     supabase.auth.onAuthStateChange(async (event) => {
@@ -22,7 +25,9 @@ export default function LoginPage() {
   return (
     <div className="mx-auto -mt-4 flex h-[calc(100vh-1rem)] max-w-md items-center">
       <div className="lightBorder h-fit w-full bg-white p-4">
-        {state === "new-password" || state === "signed-in" ? (
+        {state === "new-password" ||
+        state === "signed-in" ||
+        session.session ? (
           <NewPasswordForm />
         ) : (
           <ResetPasswordForm />

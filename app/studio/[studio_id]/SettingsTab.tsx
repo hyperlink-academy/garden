@@ -5,7 +5,7 @@ import { ButtonPrimary } from "components/Buttons";
 import { DotLoader } from "components/DotLoader";
 import { useAuth } from "hooks/useAuth";
 import { spaceAPI, workerAPI } from "backend/lib/api";
-import Router from "next/router";
+import { useRouter } from "next/navigation";
 import { ModalSubmitButton, Modal } from "components/Modal";
 import { WORKER_URL } from "src/constants";
 import { Delete } from "components/Icons";
@@ -81,6 +81,7 @@ export function StudioSettings(props: { id: string }) {
 }
 
 const DeleteStudioForm = (props: { studioID: string }) => {
+  let router = useRouter();
   let [state, setState] = useState({ studioName: "" });
   let [open, setOpen] = useState(false);
   let [status, setStatus] = useState<"normal" | "loading">("normal");
@@ -125,7 +126,7 @@ const DeleteStudioForm = (props: { studioID: string }) => {
                 }
               );
               setStatus("normal");
-              Router.push("/s/" + session.session?.username);
+              router.push("/s/" + session.session?.username);
             }}
             disabled={data?.name !== state.studioName}
             destructive

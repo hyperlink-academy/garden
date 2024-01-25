@@ -27,7 +27,6 @@ import { useIsActiveRoom, useRoom, useSetRoom } from "hooks/useUIState";
 import { ModalSubmitButton, Modal } from "components/Modal";
 import { useUIState } from "hooks/useUIState";
 import { Truncate } from "components/Truncate";
-import router from "next/router";
 import { SpaceData } from "components/SpacesList";
 import { uuidToBase62 } from "src/uuidHelpers";
 import { HelpButton } from "components/Space";

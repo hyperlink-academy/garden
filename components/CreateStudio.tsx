@@ -4,11 +4,11 @@ import { useAuth } from "hooks/useAuth";
 import { useRandomValue } from "hooks/useRandomValue";
 import { useState } from "react";
 import { DotLoader } from "./DotLoader";
-import Router from "next/router";
 import { useIdentityData } from "hooks/useIdentityData";
 import { uuidToBase62 } from "src/uuidHelpers";
 import { Modal } from "./Modal";
 import { useIsMobile } from "hooks/utils";
+import { useRouter } from "next/navigation";
 
 let weird_studios = [
   "Bauhaus",
@@ -67,6 +67,7 @@ export function CreateStudio(props: { username: string }) {
   });
   let { authToken } = useAuth();
   let isMobile = useIsMobile();
+  let router = useRouter();
   return (
     <>
       <ButtonLink
@@ -90,7 +91,7 @@ export function CreateStudio(props: { username: string }) {
             if (!studio.success) return;
             setOpen(false);
             setFormState({ name: "", description: "" });
-            Router.push(`/studio/${uuidToBase62(studio.data.id)}`);
+            router.push(`/studio/${uuidToBase62(studio.data.id)}`);
           }}
         >
           <StudioForm formState={formState} setFormState={setFormState} />

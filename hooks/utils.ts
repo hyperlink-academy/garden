@@ -1,4 +1,3 @@
-import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import useWindowDimensions from "./useWindowDimensions";
 

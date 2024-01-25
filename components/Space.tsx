@@ -5,7 +5,6 @@ import { Sidebar } from "components/SpaceLayout";
 import { useEffect, useRef, useState } from "react";
 import useWindowDimensions from "hooks/useWindowDimensions";
 import { Room } from "components/Room";
-import { SpaceMetaTitle } from "components/SpaceMetaTitle";
 import { useUIState } from "hooks/useUIState";
 import { PresenceHandler } from "components/PresenceHandler";
 import { useSpaceSyncState } from "hooks/useSpaceSyncState";
@@ -48,7 +47,6 @@ export const Space = (props: Props) => {
   if (!isClient) return null;
   return (
     <>
-      <SpaceMetaTitle />
       <PresenceHandler />
       <SmallCardDragContext>
         {width > 640 || width === 0 ? (
