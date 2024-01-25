@@ -38,8 +38,8 @@ type Value<A extends AttributeName> = Attribute[A] extends {
         } | null;
         logo?: {
           url: string;
-          width: number;
-          height: number;
+          width?: number;
+          height?: number;
         } | null;
         author?: string | null;
       };

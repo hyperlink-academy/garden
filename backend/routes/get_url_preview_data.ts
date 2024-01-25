@@ -19,8 +19,8 @@ let expectedAPIResponse = z.object({
     logo: z
       .object({
         url: z.string(),
-        width: z.number(),
-        height: z.number(),
+        width: z.number().optional(),
+        height: z.number().optional(),
       })
       .nullable()
       .optional(),
@@ -36,7 +36,7 @@ export const get_url_preview_data_route = makeRoute({
     let result = await get_url_preview_data(msg.url, env);
     if (!result.success)
       return {
-        data: { success: false } as const,
+        data: { success: false, result } as const,
       };
     let data = result.data.data;
     return {
