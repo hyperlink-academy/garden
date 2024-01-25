@@ -208,11 +208,17 @@ const ResendEmail = (props: { email: string; password: string }) => {
   let [status, setStatus] = useState<"normal" | "loading" | "sent">("normal");
   return (
     <div>
-      You need to confirm your email.{" "}
+      You need to confirm your email.
       {status === "loading" ? (
-        <DotLoader />
+        <div>
+          <div className="lightBorder flex w-full place-items-center justify-center bg-bg-blue py-1 font-bold text-grey-55">
+            <DotLoader />
+          </div>
+        </div>
       ) : status === "sent" ? (
-        <div>sent</div>
+        <div className="lightBorder flex w-full place-items-center justify-center bg-bg-blue py-1 font-bold text-grey-55">
+          <p>sent!</p>
+        </div>
       ) : (
         <ButtonLink
           content="Resend confirmation email?"
@@ -222,7 +228,6 @@ const ResendEmail = (props: { email: string; password: string }) => {
               email: props.email,
               password: props.password,
             });
-            console.log(result);
             setStatus("sent");
           }}
         />

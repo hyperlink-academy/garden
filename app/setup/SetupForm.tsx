@@ -87,17 +87,15 @@ export function SignupPageForm() {
     );
 
   return (
-    <div className=" -my-4 mx-auto flex h-screen  max-w-md flex-col items-center justify-center gap-4 ">
-      <div className="lightBorder flex max-w-md flex-col gap-4 bg-white p-4">
+    <div className=" -my-4 mx-auto flex h-screen max-w-md flex-col items-center justify-center gap-4 px-3 ">
+      <div className="lightBorder mt-3 flex w-full max-w-md flex-col gap-4 bg-white p-3 sm:p-4">
         <img
           className="place-self-end"
           width={"264px"}
           alt="a house in an overgrown field"
           src="/img/spotIllustration/welcome.png"
         />
-        <div className="grid-auto-rows m-auto grid gap-2">
-          <h3>Hi, welcome to Hyperlink!</h3>
-        </div>
+        <h3>Hi, welcome to Hyperlink!</h3>
 
         <form onSubmit={onSubmit} className="grid w-full gap-4 text-grey-35">
           {/* pick a username */}
@@ -150,25 +148,20 @@ export function SignupPageForm() {
         </form>
         {/* <Divider /> */}
         {/* get started */}
-        <div className="lightBorder flex flex-col gap-4 bg-bg-blue p-4 text-sm">
-          <div className="flex flex-col gap-4">
-            {/* <p className="font-bold italic">psst, you should get the app!</p> */}
-            <h3 className="m-auto w-fit -rotate-2 -skew-x-6 rounded-md bg-accent-gold px-4 py-2 text-center">
-              Get the Hyperlink app!
-            </h3>
+      </div>
+      <div className="lightBorder mb-3 flex w-full flex-col gap-2 bg-bg-blue p-3 text-sm text-grey-55 sm:p-4">
+        {/* <p className="font-bold italic">psst, you should get the app!</p> */}
+        <h4 className="text-grey-35">Get the Hyperlink app!</h4>
 
-            <div className="flex flex-col gap-2 text-sm text-grey-55">
-              <p>
-                Hyperlink is made for collaboration. Get the app for
-                notifications from others in shared Spaces.
-              </p>
+        <div className="flex flex-col gap-2 text-sm ">
+          <p>
+            Hyperlink is made for collaboration. Get the app for notifications
+            from others in shared Spaces.
+          </p>
 
-              <p>
-                Log in on a mobile browser and open your settings to find out
-                how ✨
-              </p>
-            </div>
-          </div>
+          <p>
+            Log in on a mobile browser and open your settings to find out how ✨
+          </p>
         </div>
       </div>
     </div>

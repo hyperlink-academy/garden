@@ -86,9 +86,9 @@ export function JoinStudio(props: { data: StudioData }) {
             </Link>
           ) : (
             <>
-              <div className="flex flex-col gap-2">
+              <div className="flex w-full flex-col gap-2">
                 <p className="text-center text-lg font-bold ">
-                  Take a moment to introduce yourself! <br />
+                  Introduce yourself! <br />
                   Let other&apos;s know what you&apos;re up to.
                 </p>
                 <div className="relative">
