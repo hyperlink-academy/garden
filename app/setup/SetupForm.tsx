@@ -10,6 +10,8 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { WORKER_URL } from "src/constants";
 import { supabaseBrowserClient } from "supabase/clients";
+import Image from "next/image";
+import spotIllo from "public/img/spotIllustration/welcome.png";
 
 export function SignupPageForm() {
   let router = useRouter();
@@ -89,11 +91,11 @@ export function SignupPageForm() {
   return (
     <div className=" -my-4 mx-auto flex h-screen max-w-md flex-col items-center justify-center gap-4 px-3 ">
       <div className="lightBorder mt-3 flex w-full max-w-md flex-col gap-4 bg-white p-3 sm:p-4">
-        <img
+        <Image
+          src={spotIllo}
           className="place-self-end"
-          width={"264px"}
+          width={264}
           alt="a house in an overgrown field"
-          src="/img/spotIllustration/welcome.png"
         />
         <h3>Hi, welcome to Hyperlink!</h3>
 

@@ -1,6 +1,8 @@
 import { ButtonPrimary } from "components/Buttons";
 import { CreateSpace } from "components/CreateSpace";
 import { Divider } from "components/Layout";
+import Image from "next/image";
+import sanboxSpotIllo from "public/img/spotIllustration/sandbox.png";
 
 export const NewStudio = (props: {
   studioSpaceID: string;
@@ -26,11 +28,11 @@ export const NewStudio = (props: {
           </div>
         </div>
         <div className="flex shrink-0  flex-col items-center gap-2 ">
-          <img
+          <Image
             className="rounded-md"
-            width={"280px"}
+            width={280}
             alt="an overgrown door with a ladder leading up to it"
-            src="/img/spotIllustration/sandbox.png"
+            src={sanboxSpotIllo}
           />
         </div>
       </div>

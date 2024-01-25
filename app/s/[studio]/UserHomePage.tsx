@@ -17,6 +17,9 @@ import { IdentityData } from "backend/routes/get_identity_data";
 import { useParams } from "next/dist/client/components/navigation";
 import { LoginButton } from "app/studio/[studio_id]/space/SpaceViewerHeader";
 import { useIsMobile } from "hooks/utils";
+import Image from "next/image";
+import sandboxSpot from "public/img/spotIllustration/sandbox.png";
+import mobileSandboxSpot from "public/img/spotIllustration/sandboxMobile.png";
 
 export default function UserHomePage(props: { data: IdentityData }) {
   let { session } = useAuth();
@@ -289,16 +292,18 @@ const YourHomeEmpty = (props: { username: string }) => {
 };
 const MyHomeEmpty = (props: { studioSpaceID: string; studioName: string }) => {
   let isMobile = useIsMobile();
+  let [client, setClient] = useState(false);
+  useEffect(() => {
+    setClient(true);
+  }, []);
+  if (!client) return null;
   return (
     <div className="lightBorder flex flex-col bg-white sm:flex-row">
       {isMobile ? (
-        <img
-          src="/img/spotIllustration/sandboxMobile.png"
-          alt="a door overgrown with moss"
-        />
+        <Image src={mobileSandboxSpot} alt="a door overgrown with moss" />
       ) : (
-        <img
-          src="/img/spotIllustration/sandbox.png"
+        <Image
+          src={sandboxSpot}
           alt="a door overgrown with moss"
           width={300}
           height={600}
@@ -366,7 +371,7 @@ const MyHomeEmpty = (props: { studioSpaceID: string; studioName: string }) => {
         </p> */}
         {/* </div> */}
         <div className="lightBorder mt-4 flex flex-col gap-2 bg-bg-blue p-4 text-center">
-          <h4>Let&apos;s get started!</h4>
+          <h4>{"Let's get started!"}</h4>
           <div className="m-auto">
             <CreateSpace
               studioSpaceID={props.studioSpaceID}

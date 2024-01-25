@@ -10,6 +10,11 @@ import { ModalSubmitButton } from "components/Modal";
 import { DotLoader } from "components/DotLoader";
 import { supabaseBrowserClient } from "supabase/clients";
 
+import Image from "next/image";
+import signupSpotIllo from "public/img/spotIllustration/signup.png";
+import loginSpotIllo from "public/img/spotIllustration/login.png";
+import checkMailSpotIllo from "public/img/spotIllustration/checkMail.png";
+
 export const LoginOrSignupModal = (props: {
   state: "login" | "signup" | "closed";
   setState: (s: "login" | "signup" | "closed") => void;
@@ -111,11 +116,11 @@ export function LoginForm(props: {
   };
   return (
     <div className="flex flex-col gap-2">
-      <img
+      <Image
         className="rounded-md"
-        width={"216px"}
+        width={216}
         alt="a desktop covered in tictures, paper, and plants"
-        src="/img/spotIllustration/login.png"
+        src={loginSpotIllo}
       />
       <div className="mt-4 flex items-baseline justify-between">
         <h2 className="text-grey-15">Log in</h2>{" "}
@@ -271,11 +276,11 @@ export function SignupForm(props: {
   if (status === "confirm")
     return (
       <div className="signUpConfirmEmail flex w-full flex-col gap-2">
-        <img
+        <Image
           className=""
-          width={"220px"}
+          width={220}
           alt="an overgrown USPS collection box"
-          src="/img/spotIllustration/checkMail.png"
+          src={checkMailSpotIllo}
         />
         <h3>Confirm your email! </h3>
         <p>
@@ -302,11 +307,11 @@ export function SignupForm(props: {
 
   return (
     <div className="flex w-full flex-col gap-2">
-      <img
+      <Image
         className="rounded-md"
-        width={"216px"}
+        width={216}
         alt="a boat soaring over a pastoral plain"
-        src="/img/spotIllustration/signup.png"
+        src={signupSpotIllo}
       />
       <div className="flex items-baseline justify-between gap-1 pt-4">
         <h2 className="text-grey-15">Sign Up!</h2>
