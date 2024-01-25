@@ -48,25 +48,25 @@ export function AddSpace(props: { id: string }) {
               and otherwise change it.
             </p>
             <button
-              className="rounded-md border-2 border-grey-80 px-4 py-3 hover:border-accent-blue hover:bg-bg-blue"
+              className="border-grey-80 hover:border-accent-blue hover:bg-bg-blue rounded-md border-2 px-4 py-3"
               onClick={() => {
                 setState("add-new");
               }}
             >
               <h4>New Space</h4>
-              <p className="italic text-grey-35">
+              <p className="text-grey-35 italic">
                 Create a brand new Space; it will also appear in your Homepage
               </p>
             </button>
 
             <button
-              className="rounded-md border-2 border-grey-80 px-4 py-3 hover:border-accent-blue hover:bg-bg-blue"
+              className="border-grey-80 hover:border-accent-blue hover:bg-bg-blue rounded-md border-2 px-4 py-3"
               onClick={() => {
                 setState("add-existing");
               }}
             >
               <h4>Existing Space</h4>
-              <p className="italic text-grey-35">
+              <p className="text-grey-35 italic">
                 Bring any space that you&apos;re a member of into this Studio
               </p>
             </button>
@@ -216,13 +216,13 @@ const AddExistingSpace = (props: { onClose: () => void; studioID: string }) => {
             >
               <p className="font-bold">{space_data.display_name}</p>
               {space_data.archived && (
-                <p className="text-sm italic text-grey-55">archived</p>
+                <p className="text-grey-55 text-sm italic">archived</p>
               )}
             </button>
           ) : null
         )}
       </div>
-      <div className="sticky -bottom-4 -mx-4 -mb-4 flex  flex-row justify-end gap-2 border-t border-grey-80 bg-white px-4 pb-4 pt-2 sm:-bottom-4 ">
+      <div className="border-grey-80 sticky -bottom-4 -mx-4 -mb-4  flex flex-row justify-end gap-2 border-t bg-white px-4 pb-4 pt-2 sm:-bottom-4 ">
         <ButtonLink
           content="nevermind"
           className="font-normal"
@@ -274,6 +274,7 @@ const AddExistingSpace = (props: { onClose: () => void; studioID: string }) => {
               setAddedSpaces([]);
             }
             mutateStudioData();
+            props.onClose();
           }}
           disabled={addedSpaces.length === 0}
           content={
