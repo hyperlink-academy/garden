@@ -16,7 +16,7 @@ export const LinkPreview = (props: { entityID: string }) => {
             className="max-w-[64px] object-cover"
             alt={`preview image for ${data.value.url}`}
           />
-        ) : data?.value.logo ? (
+        ) : data?.value.logo && data.value.logo.height ? (
           <img
             src={data.value.logo.url}
             height={isMobile ? 86 : 120}
