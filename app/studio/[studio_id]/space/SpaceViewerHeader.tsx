@@ -114,10 +114,14 @@ const SpaceName = (props: { truncate?: boolean }) => {
     <div className={`spaceName flex min-w-0 bg-inherit text-grey-35`}>
       {props.truncate ? (
         <Truncate className="w-full max-w-none overflow-hidden bg-inherit">
-          <h3 className="SpaceName whitespace-nowrap">{data?.display_name}</h3>
+          <h3 className="SpaceName min-h-[30px] whitespace-nowrap">
+            {data?.display_name}
+          </h3>
         </Truncate>
       ) : (
-        <h3 className="SpaceName whitespace-normal">{data?.display_name}</h3>
+        <h3 className="SpaceName min-h-[30px] whitespace-normal">
+          {data?.display_name}
+        </h3>
       )}
     </div>
   );
