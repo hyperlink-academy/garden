@@ -1,13 +1,16 @@
 import { db, useMutations, useSpaceID } from "hooks/useReplicache";
 import { useAuth } from "hooks/useAuth";
 import { spaceAPI } from "backend/lib/api";
-import { CloseLinedTiny } from "components/Icons";
+import {
+  CloseLinedTiny,
+  GoBackToPageLined,
+  RotateTiny,
+} from "components/Icons";
 import { useEffect, useState } from "react";
 import { DotLoader } from "components/DotLoader";
 import { LightBoxModal } from "../Layout";
-import useMeasure from "react-use-measure";
 import { Fact } from "data/Facts";
-import { useIsMobile } from "hooks/utils";
+import useMeasure from "react-use-measure";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 
@@ -50,121 +53,211 @@ export const MakeImage = (props: {
 
 export const ImageSection = (props: { entityID: string }) => {
   let images = db.useEntity(props.entityID, "card/image");
-  let isMobile = useIsMobile();
+  let [lightBoxOpen, setLightBoxOpen] = useState(false);
+  let [selectedImage, setSelectedImage] = useState<Fact<"card/image"> | null>(
+    null
+  );
+
   return (
     <div
-      className={`grid w-full ${
-        isMobile ? "grid-cols-1" : "grid-cols-[min-content_auto] "
-      } gap-2`}
+      className={`flex w-full flex-col gap-3 sm:gap-4
+    `}
     >
       {images?.map((image) => {
-        return <Image entityID={props.entityID} fact={image} key={image.id} />;
+        return (
+          <CardImage
+            entityID={props.entityID}
+            fact={image}
+            key={image.id}
+            onClick={() => {
+              setLightBoxOpen(true);
+              setSelectedImage(image);
+            }}
+          />
+        );
       })}
+      <ImageLightbox
+        lightBoxOpen={lightBoxOpen}
+        setLightBoxClosed={() => setLightBoxOpen(false)}
+        entityID={props.entityID}
+        selectedImage={selectedImage}
+        setSelectedImage={setSelectedImage}
+      />
     </div>
   );
 };
 
-export const Image = (props: {
+export const ImageLightbox = (props: {
+  lightBoxOpen: boolean;
+  setSelectedImage: (image: Fact<"card/image">) => void;
+  selectedImage: Fact<"card/image"> | null;
+  setLightBoxClosed: () => void;
   entityID: string;
-  fact: Fact<"card/image">;
 }) => {
-  let { authToken } = useAuth();
-  let { mutate, authorized } = useMutations();
-  let spaceID = useSpaceID();
-  let rotation = db.useEntity(props.fact.id || null, "image/rotation");
-  let [lightBoxOpen, setLightBoxOpen] = useState(false);
-  let image = props.fact;
+  let rotation = db.useEntity(
+    props.selectedImage?.id || null,
+    "image/rotation"
+  );
+  let images = db.useEntity(props.entityID, "card/image") || [];
+  let currentImageIndex = images?.findIndex(
+    (image) => image.id === props.selectedImage?.id
+  );
+  if (!props.lightBoxOpen || !props.selectedImage) return null;
+
   let src =
-    image.value.filetype === "image"
-      ? `${WORKER_URL}/static/${image.value.id}`
-      : image.value.url;
+    props.selectedImage.value.filetype === "image"
+      ? `${WORKER_URL}/static/${props.selectedImage.value.id}`
+      : props.selectedImage.value.url;
+
   return (
-    // FOCUS ON DIV AND PASTE AN IMAGE
-    <div className="flex w-fit flex-col rounded-md border border-grey-80 p-1">
-      <div
-        id="card-image"
-        style={{
-          height: 256,
-          width: 256,
-        }}
-        className="group relative flex grid w-full auto-rows-max items-center justify-center justify-items-center gap-1 "
-      >
+    <LightBoxModal
+      open={props.lightBoxOpen}
+      onClose={() => props.setLightBoxClosed()}
+    >
+      <div className="flex flex-col gap-1">
+        <div className="flex items-center justify-between ">
+          <button
+            className="text-grey-55 hover:text-accent-blue bg-white-90  rounded-full bg-white p-1"
+            onClick={() => {
+              props.setLightBoxClosed();
+            }}
+          >
+            <CloseLinedTiny />
+          </button>
+          <div className="flex gap-2">
+            <button
+              className="text-grey-55 hover:text-accent-blue"
+              onClick={() => {
+                props.setSelectedImage(
+                  images[
+                    currentImageIndex === 0
+                      ? images.length - 1
+                      : currentImageIndex - 1
+                  ]
+                );
+              }}
+            >
+              <GoBackToPageLined />
+            </button>
+            <div className="text-grey-55 text-sm font-bold">
+              <sup>{currentImageIndex + 1}</sup>/<sub>{images.length}</sub>
+            </div>
+            <button
+              className="text-grey-55 hover:text-accent-blue rotate-180"
+              onClick={() => {
+                props.setSelectedImage(
+                  images[
+                    currentImageIndex === images.length - 1
+                      ? 0
+                      : currentImageIndex + 1
+                  ]
+                );
+              }}
+            >
+              {" "}
+              <GoBackToPageLined />
+            </button>
+          </div>
+        </div>
         <img
           alt=""
-          className="h-full w-full rounded-md hover:cursor-pointer"
+          className="m-auto"
+          style={{
+            transform: `rotate(${90 * (rotation?.value || 0)}deg)`,
+          }}
+          src={src}
+        />
+      </div>
+    </LightBoxModal>
+  );
+};
+
+export const CardImage = (props: {
+  entityID: string;
+  fact: Fact<"card/image">;
+  onClick: () => void;
+}) => {
+  let rotation = db.useEntity(props.fact.id || null, "image/rotation");
+  let image = props.fact;
+  let [imageRef, { width: imageWidth }] = useMeasure();
+  let rot = rotation?.value || 0;
+
+  return (
+    // FOCUS ON DIV AND PASTE AN IMAGE
+    <div className="relative flex w-full flex-col rounded-md ">
+      <div
+        id="card-image"
+        ref={imageRef}
+        style={{
+          width: "100%",
+          position: "relative",
+        }}
+        className="group relative  w-full auto-rows-max items-center justify-center justify-items-center gap-1 "
+      >
+        <img
+          onClick={props.onClick}
+          alt=""
+          className="rounded-md hover:cursor-pointer"
           src={
             image.value.filetype === "image"
               ? `${WORKER_URL}/static/${image.value.id}`
               : image.value.url
           }
           style={{
-            position: "absolute",
             objectFit: "contain",
             transformOrigin: "center",
             transform: `rotate(${90 * (rotation?.value || 0)}deg)`,
-          }}
-          onClick={() => {
-            setLightBoxOpen(true);
+            height: rot % 2 === 0 ? "auto" : imageWidth,
+            width: rot % 2 === 0 ? "100%" : "auto",
           }}
         />
-
-        {lightBoxOpen && (
-          <LightBoxModal
-            open={lightBoxOpen}
-            onClose={() => setLightBoxOpen(false)}
-          >
-            <div className="relative">
-              <button
-                className="bg-white/ absolute right-4 top-4 rounded-full bg-white/90 p-1 text-grey-55 hover:text-accent-blue"
-                onClick={() => {
-                  setLightBoxOpen(false);
-                }}
-              >
-                <CloseLinedTiny />
-              </button>
-              <img
-                alt=""
-                className="m-auto"
-                style={{
-                  transform: `rotate(${90 * (rotation?.value || 0)}deg)`,
-                }}
-                src={src}
-              />
-            </div>
-          </LightBoxModal>
-        )}
       </div>
-      {!authorized ? null : (
-        <div className="flex w-full justify-center justify-items-center gap-2">
-          <button
-            className="text-sm text-grey-55 hover:text-accent-blue"
-            onClick={() => {
-              if (!authToken) return;
-              mutate("retractFact", { id: image.id });
-              if (image.value.filetype === "external_image") return;
-              spaceAPI(`${WORKER_URL}/space/${spaceID}`, "delete_file_upload", {
-                authToken,
-                fileID: image.value.id,
-              });
-            }}
-          >
-            remove
-          </button>
-          <button
-            className="text-sm text-grey-55 hover:text-accent-blue"
-            onClick={() => {
-              mutate("assertFact", {
-                entity: image.id,
-                attribute: "image/rotation",
-                value: ((rotation?.value || 0) + 1) % 4,
-                positions: {},
-              });
-            }}
-          >
-            rotate
-          </button>
-        </div>
-      )}
+      <div className="imageOptionsWrapper absolute right-2 top-2">
+        <ImageOptions fact={props.fact} />
+      </div>
+    </div>
+  );
+};
+
+export const ImageOptions = (props: { fact: Fact<"card/image"> }) => {
+  let { authToken } = useAuth();
+  let { mutate, authorized } = useMutations();
+  let spaceID = useSpaceID();
+  let rotation = db.useEntity(props.fact.id || null, "image/rotation");
+  let rot = rotation?.value || 0;
+  let image = props.fact;
+
+  if (!authorized) return null;
+
+  return (
+    <div className="imageOptions flex w-full justify-center justify-items-center gap-2">
+      <button
+        className="text-grey-55 hover:text-accent-blue boder-grey-80 hover:border-text-blue hover:bg-bg-blue flex h-6 w-6 shrink-0 items-center justify-center rounded-full border bg-white text-sm"
+        onClick={() => {
+          mutate("assertFact", {
+            entity: image.id,
+            attribute: "image/rotation",
+            value: (rot + 1) % 4,
+            positions: {},
+          });
+        }}
+      >
+        <RotateTiny />
+      </button>
+      <button
+        className="text-grey-55 hover:text-accent-blue boder-grey-80 hover:border-text-blue hover:bg-bg-blue flex h-6 w-6 shrink-0 items-center justify-center rounded-full border bg-white text-sm"
+        onClick={() => {
+          if (!authToken) return;
+          mutate("retractFact", { id: image.id });
+          if (image.value.filetype === "external_image") return;
+          spaceAPI(`${WORKER_URL}/space/${spaceID}`, "delete_file_upload", {
+            authToken,
+            fileID: image.value.id,
+          });
+        }}
+      >
+        <CloseLinedTiny />
+      </button>
     </div>
   );
 };
@@ -177,7 +270,7 @@ export const AddImage: React.FC<
   let [state, setState] = useState<"normal" | "uploading">("normal");
 
   return (
-    <label className="inline-block h-full w-full cursor-pointer text-grey-55 hover:text-accent-blue">
+    <label className="text-grey-55 hover:text-accent-blue inline-block h-full w-full cursor-pointer">
       {state === "normal" ? (
         props.children
       ) : (
