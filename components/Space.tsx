@@ -74,7 +74,10 @@ const DesktopLayout = (props: Props) => {
           <Search />
         </div>
       </div>
-      <div className=" no-scrollbar spaceLargeSplitLayout mx-auto flex h-full w-full max-w-[1332px] snap-x snap-mandatory flex-row items-stretch gap-4 overflow-y-hidden overflow-x-scroll scroll-smooth px-4 sm:gap-4  md:overflow-x-hidden">
+      <div
+        id="space-layout"
+        className=" no-scrollbar spaceLargeSplitLayout mx-auto flex h-full w-full max-w-[1332px] snap-x snap-mandatory flex-row items-stretch gap-4 overflow-y-hidden overflow-x-scroll scroll-smooth px-4 sm:gap-4  md:overflow-x-hidden"
+      >
         <div className="spaceRoomAndSidebar flex shrink-0  snap-center snap-always flex-row  rounded-md border border-grey-90">
           <div className="shrink-0 rounded-l-md border border-transparent border-r-grey-90 bg-white">
             <Sidebar />
@@ -162,6 +165,7 @@ const MobileLayout = (props: Props) => {
   return (
     <div className="mobileLayout flex h-full w-full flex-col">
       <div
+        id="space-layout"
         className="mobileRoomAndCard no-scrollbar pwa-padding my-2 flex h-full touch-none snap-x snap-mandatory flex-row overflow-y-hidden overflow-x-scroll overscroll-x-none scroll-smooth"
         {...bind()}
       >

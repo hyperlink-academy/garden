@@ -81,12 +81,9 @@ export function CardViewer() {
   useAppEventListener(
     "cardviewer.open-card",
     () => {
-      setTimeout(() => {
-        cardViewerRef.current?.scrollIntoView({
-          inline: "center",
-          behavior: "smooth",
-        });
-      }, 10);
+      document
+        .getElementById("space-layout")
+        ?.scrollTo({ behavior: "smooth", left: 5000 });
     },
     []
   );

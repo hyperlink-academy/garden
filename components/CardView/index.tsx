@@ -342,15 +342,12 @@ const BackButton = () => {
         !authorized ? "" : "mt-3"
       }`}
       onClick={() => {
-        if (history.length < 2) {
-          setTimeout(() => {
-            let roomView = document.getElementById("roomWrapper");
-            if (roomView) {
-              roomView.scrollIntoView({ behavior: "smooth" });
-            }
-          }, 5);
-        }
         closeCard();
+        if (history.length < 2) {
+          document
+            .getElementById("space-layout")
+            ?.scrollTo({ behavior: "smooth", left: 0 });
+        }
       }}
     >
       {history.length < 2 ? <CloseLinedTiny /> : <GoBackToPageLined />}
@@ -582,11 +579,8 @@ export const SectionAdder = (props: {
 
   setDateEditing: () => void;
 }) => {
-  let { authorized, mutate } = useMutations();
-  let image = db.useEntity(props.entityID, "card/image");
-  let attachedCards = db.useEntity(props.entityID, "deck/contains");
+  let { authorized } = useMutations();
   let date = db.useEntity(props.entityID, "card/date");
-  let reactions = useReactions(props.entityID);
 
   let [reactionPickerOpen, setReactionPickerOpen] = useState(false);
 
@@ -651,7 +645,7 @@ export const SectionAdder = (props: {
       <Popover.Root
         onOpenChange={() => setReactionPickerOpen(!reactionPickerOpen)}
       >
-        <Popover.Trigger className="flex items-center">
+        <Popover.Trigger className="flex items-center" asChild>
           <button
             className={`${toggledOffStyle} ${
               !reactionPickerOpen

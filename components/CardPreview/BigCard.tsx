@@ -58,9 +58,7 @@ export const BigCardBody = (
         // if card is clicked (and its not in edit mode), open that card in cardView.
         if (editing) return;
         if (e.defaultPrevented) return;
-        let cardView = document.getElementById("cardViewerWrapper");
         open({ entityID: props.entityID });
-        cardView ? cardView.scrollIntoView({ behavior: "smooth" }) : null;
       }}
     >
       {/* Big Card Preview Content Wrapper */}
