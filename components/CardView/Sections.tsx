@@ -133,6 +133,7 @@ export const SingleTextSection = (
 
   let newProps = { ...props };
   delete newProps.autocompleteCardNames;
+  delete newProps.focusText;
   return (
     <>
       {suggestionPrefix && cursorCoordinates && suggestions.length > 0 ? (
