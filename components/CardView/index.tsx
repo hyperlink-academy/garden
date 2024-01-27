@@ -238,7 +238,7 @@ export const CardContent = (props: {
         useUIState.getState().closeDrawer(props.entityID);
       }
     },
-    { target: ref }
+    { target: ref, pointer: { keys: false } }
   );
 
   return (
