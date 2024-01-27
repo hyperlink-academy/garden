@@ -117,6 +117,7 @@ export function LoginForm(props: {
   return (
     <div className="flex flex-col gap-2">
       <Image
+        priority
         className="rounded-md"
         width={216}
         alt="a desktop covered in tictures, paper, and plants"
@@ -277,6 +278,7 @@ export function SignupForm(props: {
     return (
       <div className="signUpConfirmEmail flex w-full flex-col gap-2">
         <Image
+          priority
           className=""
           width={220}
           alt="an overgrown USPS collection box"
@@ -308,6 +310,7 @@ export function SignupForm(props: {
   return (
     <div className="flex w-full flex-col gap-2">
       <Image
+        priority
         className="rounded-md"
         width={216}
         alt="a boat soaring over a pastoral plain"
