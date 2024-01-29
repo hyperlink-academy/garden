@@ -98,13 +98,17 @@ export function FilterByReactions(props: {
         return (
           <button
             key={reaction}
-            onClick={() => {
+            onClick={(e) => {
+              let isAltPressed = false;
+              if (e.altKey) isAltPressed = true;
               props.setFilters((oldFilters) => {
                 let existingFilter = oldFilters.find(
                   (f) => f.reaction === reaction
                 );
                 if (!existingFilter)
-                  return [...oldFilters, { reaction, not: false }];
+                  return isAltPressed
+                    ? [...oldFilters, { reaction, not: true }]
+                    : [...oldFilters, { reaction, not: false }];
                 if (existingFilter.not)
                   return oldFilters.filter((f) => f.reaction !== reaction);
                 return oldFilters.map((f) =>
