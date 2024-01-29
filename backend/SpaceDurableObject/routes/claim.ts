@@ -63,7 +63,13 @@ export const claimRoute = makeRoute({
       env.factStore.assertFact({
         entity: readmeCardPositionFact,
         attribute: "card/position-in",
-        value: { x: 64, y: 32, rotation: 0.2, size: "small", type: "position" },
+        value: {
+          x: 32,
+          y: 32,
+          rotation: 0,
+          size: "small",
+          type: "position",
+        },
         positions: {},
       }),
       env.factStore.assertFact({
