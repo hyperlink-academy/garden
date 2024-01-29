@@ -126,6 +126,7 @@ const AutocompleteItem = (props: {
       className={`flex w-full flex-row gap-1 px-2 text-left ${
         props.selected === props.index ? "bg-bg-blue" : ""
       }`}
+      style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
     >
       <CardSmall className="shrink-0 grow-0" />
       {props.name}
