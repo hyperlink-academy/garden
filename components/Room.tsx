@@ -165,7 +165,7 @@ export const Room = () => {
       {/* per-room wrappers + components */}
       {room ? (
         roomType?.value === "collection" ? (
-          <div className="flex grow flex-col gap-2 pb-3">
+          <div className="flex grow flex-col gap-2 pb-3 pt-2">
             <CardCollection
               cards={cardsFiltered}
               entityID={room}
