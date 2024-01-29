@@ -1,10 +1,9 @@
-import { db, useMutations } from "hooks/useReplicache";
+import { db, scanIndex, useMutations } from "hooks/useReplicache";
 import { SingleTextSection } from "./Sections";
 import { useCallback, useState } from "react";
 import { useOpenCard } from "hooks/useUIState";
 import * as Popover from "@radix-ui/react-popover";
 import { CardSmall } from "components/Icons";
-import { createPortal } from "react-dom";
 
 export const Title = (props: { entityID: string }) => {
   let { authorized, mutate, action } = useMutations();
@@ -47,13 +46,14 @@ export const Title = (props: { entityID: string }) => {
     },
     [props.entityID, action, mutate, openCard]
   );
+
   return (
     <div>
       <SingleTextSection
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         id="card-title"
-        className="bg-inherit text-xl font-bold"
+        className="bg-inherit text-lg font-bold"
         onKeyDown={async (e) => {
           if (e.key === "Enter") {
             e.preventDefault();
@@ -126,6 +126,7 @@ const AutocompleteItem = (props: {
       className={`flex w-full flex-row gap-1 px-2 text-left ${
         props.selected === props.index ? "bg-bg-blue" : ""
       }`}
+      style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
     >
       <CardSmall className="shrink-0 grow-0" />
       {props.name}

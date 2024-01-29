@@ -1,29 +1,37 @@
 import { workerAPI } from "backend/lib/api";
-import { useEffect, useMemo, useState } from "react";
-import {
-  SessionContextProvider,
-  useSession,
-  useSupabaseClient,
-} from "@supabase/auth-helpers-react";
-import { createPagesBrowserClient } from "@supabase/auth-helpers-nextjs";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useIdentityData } from "./useIdentityData";
+import { supabaseBrowserClient } from "supabase/clients";
+import { Session } from "@supabase/supabase-js";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 
-export const AuthProvider: React.FC<React.PropsWithChildren<unknown>> = (
-  props
-) => {
-  const [supabaseClient] = useState(() => createPagesBrowserClient());
+let SessionContext = createContext<Session | null>(null);
+
+export const AuthProvider = (props: {
+  children: React.ReactNode;
+  session: Session | null;
+}) => {
+  let [session, setSession] = useState(props.session);
+  let supabase = supabaseBrowserClient();
+  useEffect(() => {
+    let subscription = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+    return () => subscription.data.subscription.unsubscribe();
+  }, []);
   return (
-    <SessionContextProvider supabaseClient={supabaseClient}>
+    <SessionContext.Provider value={session}>
       {props.children}
       <RefreshSession />
-    </SessionContextProvider>
+    </SessionContext.Provider>
   );
 };
 
+let useSession = () => useContext(SessionContext);
+
 const RefreshSession = () => {
-  const supabaseClient = useSupabaseClient();
+  const supabaseClient = supabaseBrowserClient();
   let session = useSession();
   useEffect(() => {
     if (!session || !session.expires_at) return;
@@ -45,7 +53,7 @@ export const useAuthIdentityData = () => {
 };
 
 export const useAuth = () => {
-  const supabaseClient = useSupabaseClient();
+  const supabaseClient = supabaseBrowserClient();
   let session = useSession();
   let authToken = useMemo(() => {
     if (!session) return null;

@@ -1,6 +1,7 @@
+"use client";
+import { Reflect } from "@rocicorp/reflect/client";
 import { ReplicacheContext } from "hooks/useReplicache";
 import { useEffect, useState } from "react";
-import { Reflect } from "@rocicorp/reflect/client";
 import { useAuth } from "hooks/useAuth";
 import { UndoManager } from "@rocicorp/undo";
 import { AuthString, mutators, ReplicacheMutators } from "reflect";

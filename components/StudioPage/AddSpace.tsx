@@ -8,6 +8,7 @@ import { useAuth } from "hooks/useAuth";
 import { useIdentityData } from "hooks/useIdentityData";
 import { scanIndex, useMutations } from "hooks/useReplicache";
 import { useStudioData } from "hooks/useStudioData";
+import useWindowDimensions from "hooks/useWindowDimensions";
 import { useEffect, useState } from "react";
 import { generateKeyBetween } from "src/fractional-indexing";
 import { ulid } from "src/ulid";
@@ -15,49 +16,58 @@ import { ulid } from "src/ulid";
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export function AddSpace(props: { id: string }) {
   let [open, setOpen] = useState(false);
-  let { data } = useStudioData(props.id);
   let [state, setState] = useState<"normal" | "add-new" | "add-existing">(
     "normal"
   );
+  let { width } = useWindowDimensions();
+
   useEffect(() => {
     if (!open) setState("normal");
   }, [open]);
   return (
     <>
-      <ButtonTertiary
-        content={"Add a Space"}
+      <ButtonPrimary
         onClick={() => setOpen(true)}
+        content={width > 640 ? `Add a Space` : `Add`}
         icon={<SpaceCreate />}
       />
-      <Modal header="Add a Space" open={open} onClose={() => setOpen(false)}>
+      <Modal
+        header="Add a Space to this Studio"
+        open={open}
+        onClose={() => setOpen(false)}
+      >
         {state === "normal" ? (
           <>
             <p>
-              Studio members will be able to <b>post</b> about the Space and{" "}
-              <b>highlight cards</b> they appreciate!
+              Your Studiomates can{" "}
+              <span className="font-bold">chat and comment</span> in any Spaces
+              in the Studio!
             </p>
-            <p>They&apos;ll still need an invite to join a Space.</p>
+            <p>
+              But they still need an invite to a specific Space to add, remove,
+              and otherwise change it.
+            </p>
             <button
-              className="rounded-md border-2 border-grey-80 px-4 py-3 hover:border-accent-blue hover:bg-bg-blue"
+              className="border-grey-80 hover:border-accent-blue hover:bg-bg-blue rounded-md border-2 px-4 py-3"
               onClick={() => {
                 setState("add-new");
               }}
             >
-              <h3>New Space</h3>
-              <p className="italic text-grey-35">
+              <h4>New Space</h4>
+              <p className="text-grey-35 italic">
                 Create a brand new Space; it will also appear in your Homepage
               </p>
             </button>
 
             <button
-              className="rounded-md border-2 border-grey-80 px-4 py-3 hover:border-accent-blue hover:bg-bg-blue"
+              className="border-grey-80 hover:border-accent-blue hover:bg-bg-blue rounded-md border-2 px-4 py-3"
               onClick={() => {
                 setState("add-existing");
               }}
             >
-              <h3>Existing Space</h3>
-              <p className="italic text-grey-35">
-                Spaces can be linked to multiple Studios
+              <h4>Existing Space</h4>
+              <p className="text-grey-35 italic">
+                Bring any space that you&apos;re a member of into this Studio
               </p>
             </button>
           </>
@@ -183,11 +193,8 @@ const AddExistingSpace = (props: { onClose: () => void; studioID: string }) => {
 
   return (
     <div className="flex flex-col gap-4">
-      <div>
-        <h3> Select Space(s) to Add </h3>
-        <p className="text-grey-55">
-          You can only add Spaces that are upcoming, active, or unscheduled
-        </p>
+      <div className="flex flex-col gap-2">
+        <h4> Select Spaces to Add </h4>
       </div>
       <div className="flex flex-col gap-2">
         {spaces?.map(({ space_data }) =>
@@ -201,18 +208,21 @@ const AddExistingSpace = (props: { onClose: () => void; studioID: string }) => {
                   );
                 else setAddedSpaces((spaces) => [...spaces, space_data.do_id]);
               }}
-              className={`w-full rounded-lg border ${
+              className={`flex w-full items-center justify-between rounded-md border ${
                 addedSpaces.includes(space_data.do_id)
                   ? "border-accent-blue bg-accent-blue text-white"
                   : "border-grey-80 hover:border-accent-blue hover:bg-bg-blue"
-              } px-3 py-2 text-left `}
+              } px-3 py-2 text-left`}
             >
-              <h3>{space_data.display_name}</h3>
+              <p className="font-bold">{space_data.display_name}</p>
+              {space_data.archived && (
+                <p className="text-grey-55 text-sm italic">archived</p>
+              )}
             </button>
           ) : null
         )}
       </div>
-      <div className="flex flex-row justify-end gap-2">
+      <div className="border-grey-80 sticky -bottom-4 -mx-4 -mb-4  flex flex-row justify-end gap-2 border-t bg-white px-4 pb-4 pt-2 sm:-bottom-4 ">
         <ButtonLink
           content="nevermind"
           className="font-normal"
@@ -264,6 +274,7 @@ const AddExistingSpace = (props: { onClose: () => void; studioID: string }) => {
               setAddedSpaces([]);
             }
             mutateStudioData();
+            props.onClose();
           }}
           disabled={addedSpaces.length === 0}
           content={

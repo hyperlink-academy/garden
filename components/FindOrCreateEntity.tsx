@@ -126,7 +126,7 @@ export const FindOrCreate = (props: {
               <Combobox.Input
                 value={input}
                 className="mx-3 mt-4"
-                placeholder="find or create cards..."
+                placeholder="find or create cards…"
                 onKeyDown={(e: React.KeyboardEvent) => {
                   //HeadlessUI handles keyboard nav from here!!
 
@@ -146,7 +146,7 @@ export const FindOrCreate = (props: {
 
               {/* if isMultiselect = true, take all the stuff in the added[] and display it at the top, with a submit button. If not, show nothing! */}
               {isMultiSelect.current === false ? (
-                <div className="mx-3 mt-2 mb-2">
+                <div className="mx-3 mb-2 mt-2">
                   <span className="hidden text-sm italic text-grey-55 sm:block">
                     SHIFT + click to select multiple cards!
                   </span>
@@ -155,7 +155,7 @@ export const FindOrCreate = (props: {
                   </span>
                 </div>
               ) : (
-                <div className="addedList mx-3 mt-2 mb-3 flex flex-col gap-2">
+                <div className="addedList mx-3 mb-3 mt-2 flex flex-col gap-2">
                   {addedItemsList === false ? null : (
                     <ul className="lightBorder no-scrollbar flex flex-col gap-2 bg-bg-blue p-3">
                       {added.length === 0 ? (
@@ -230,7 +230,7 @@ export const FindOrCreate = (props: {
               <Divider />
               <Combobox.Options
                 static
-                className="flex h-min w-full flex-col gap-2 overflow-y-auto pt-2 pb-2"
+                className="flex h-min w-full flex-col gap-2 overflow-y-auto pb-2 pt-2"
               >
                 {!input && !props.allowBlank ? null : (
                   <CreateButton

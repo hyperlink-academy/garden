@@ -66,84 +66,87 @@ export const Room = () => {
           authToken,
           spaceID
         );
-        if (!data.success) return;
+        if (data.length == 0) return;
 
         //prevent image from opening in new tab
         e.preventDefault();
+        for (let image of data) {
+          if (image.success === false) continue;
 
-        let newCard = ulid();
-        action.start();
-        let factID = ulid();
-        await mutate("createCard", {
-          memberEntity,
-          entityID: newCard,
-          title: "",
-        });
-        await create(
-          newCard,
-          {
-            addToEnd: true,
-            parentID: room,
-            positionKey: "eav",
-            attribute: "desktop/contains",
-          },
-          rep,
-          mutate,
-          factID
-        );
-        await mutate("assertFact", {
-          entity: newCard,
-          attribute: "card/image",
-          value: { type: "file", id: data.data.id, filetype: "image" },
-          positions: {},
-        });
-        if (roomType.value === "canvas") {
-          let siblingPositions = await rep.query(async (tx) => {
-            let siblings = await scanIndex(tx).eav(room, "desktop/contains");
-
-            return Promise.all(
-              siblings.map(async (c) =>
-                scanIndex(tx).eav(c.id, "card/position-in")
-              )
-            );
-          });
-
-          let siblingsSortedByPosition = siblingPositions.sort(
-            (a, b) => (a?.value.y || 0) - (b?.value.y || 0)
-          );
-
-          let lastSiblingPosition =
-            siblingsSortedByPosition[siblingsSortedByPosition.length - 2]?.value
-              .y;
-
-          await mutate("assertFact", {
-            entity: factID,
-            attribute: "card/position-in",
-            value: {
-              type: "position",
-              x: 64,
-              y: lastSiblingPosition ? lastSiblingPosition + 124 : 32,
-              rotation: 0,
-              size: "small",
+          let newCard = ulid();
+          action.start();
+          let factID = ulid();
+          await create(
+            newCard,
+            {
+              addToEnd: true,
+              parentID: room,
+              positionKey: "eav",
+              attribute: "desktop/contains",
             },
+            rep,
+            mutate,
+            factID
+          );
+          await mutate("createCard", {
+            memberEntity,
+            entityID: newCard,
+            title: "",
+          });
+          await mutate("assertFact", {
+            entity: newCard,
+            attribute: "card/image",
+            value: { type: "file", id: image.data.id, filetype: "image" },
             positions: {},
           });
+          if (roomType.value === "canvas") {
+            let siblingPositions = await rep.query(async (tx) => {
+              let siblings = await scanIndex(tx).eav(room, "desktop/contains");
 
-          let roomElement = document.getElementById("room-wrapper");
-          roomElement?.scrollTo({
-            top: lastSiblingPosition ? lastSiblingPosition : 0,
-            behavior: "smooth",
-          });
-        }
+              return Promise.all(
+                siblings.map(async (c) =>
+                  scanIndex(tx).eav(c.id, "card/position-in")
+                )
+              );
+            });
 
-        if (roomType.value === "collection") {
-          let roomElement = document.getElementById("room-wrapper");
-          roomElement?.scrollTo({
-            top: roomElement.scrollHeight,
-            behavior: "smooth",
-          });
+            let siblingsSortedByPosition = siblingPositions.sort(
+              (a, b) => (a?.value.y || 0) - (b?.value.y || 0)
+            );
+
+            let lastSiblingPosition =
+              siblingsSortedByPosition[siblingsSortedByPosition.length - 2]
+                ?.value.y;
+
+            await mutate("assertFact", {
+              entity: factID,
+              attribute: "card/position-in",
+              value: {
+                type: "position",
+                x: 64,
+                y: lastSiblingPosition ? lastSiblingPosition + 124 : 32,
+                rotation: 0,
+                size: "small",
+              },
+              positions: {},
+            });
+
+            let roomElement = document.getElementById("room-wrapper");
+            roomElement?.scrollTo({
+              top: lastSiblingPosition ? lastSiblingPosition : 0,
+              behavior: "smooth",
+            });
+          }
+
+          if (roomType.value === "collection") {
+            let roomElement = document.getElementById("room-wrapper");
+            roomElement?.scrollTo({
+              top: roomElement.scrollHeight,
+              behavior: "smooth",
+            });
+          }
+          open({ entityID: newCard, focus: "title" });
         }
-        open({ entityID: newCard, focus: "title" });
 
         action.end();
       }}
@@ -162,7 +165,7 @@ export const Room = () => {
       {/* per-room wrappers + components */}
       {room ? (
         roomType?.value === "collection" ? (
-          <div className="flex grow flex-col gap-2 pb-3">
+          <div className="flex grow flex-col gap-2 pb-3 pt-2">
             <CardCollection
               cards={cardsFiltered}
               entityID={room}
@@ -239,11 +242,6 @@ const AddCardButton = (props: {
           if (!roomType || !memberEntity || !authorized || !rep) return;
           if (roomType.value === "chat") return;
           let newEntity = ulid();
-          await mutate("createCard", {
-            entityID: newEntity,
-            title: "",
-            memberEntity,
-          });
 
           if (roomType.value === "collection") {
             let siblings = (
@@ -313,6 +311,11 @@ const AddCardButton = (props: {
             });
           }
 
+          await mutate("createCard", {
+            entityID: newEntity,
+            title: "",
+            memberEntity,
+          });
           open({ entityID: newEntity, focus: "title" });
 
           //open the card

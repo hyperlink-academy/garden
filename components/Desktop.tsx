@@ -24,6 +24,7 @@ import { useAuth } from "hooks/useAuth";
 import { getAndUploadFile } from "src/getAndUploadFile";
 import { useCardPreviewData } from "hooks/CardPreviewData";
 import { useRemoveCardFromRoomHistory } from "hooks/useUIState";
+import { create } from "components/CardStack";
 
 const GRID_SIZE = 8;
 const snap = (x: number) => Math.round(x / GRID_SIZE) * GRID_SIZE;
@@ -69,34 +70,29 @@ export const Desktop = (props: { entityID: string }) => {
         case "new-card": {
           if (!memberEntity) return;
           let entityID = ulid();
+
+          await mutate("addCardToDesktop", {
+            factID: ulid(),
+            entity: entityID,
+            desktop: props.entityID,
+            position: {
+              ...newPosition,
+              rotation: 0,
+              size: "small",
+            },
+          });
+
           await mutate("createCard", {
             entityID,
             title: "",
             memberEntity,
           });
           open({ entityID: entityID, focus: "title" });
-
-          await mutate("addCardToDesktop", {
-            factID: ulid(),
-            entity: entityID,
-            desktop: props.entityID,
-            position: {
-              ...newPosition,
-              rotation: 0,
-              size: "small",
-            },
-          });
           break;
         }
         case "new-search-card": {
           if (!memberEntity) return;
           let entityID = ulid();
-          await mutate("createCard", {
-            entityID,
-            title: data.title,
-            memberEntity,
-          });
-          open({ entityID: entityID, focus: "title" });
 
           await mutate("addCardToDesktop", {
             factID: ulid(),
@@ -108,6 +104,14 @@ export const Desktop = (props: { entityID: string }) => {
               size: "small",
             },
           });
+
+          await mutate("createCard", {
+            entityID,
+            title: data.title,
+            memberEntity,
+          });
+
+          open({ entityID: entityID, focus: "title" });
           break;
         }
         case "search-card": {
@@ -177,11 +181,6 @@ export const Desktop = (props: { entityID: string }) => {
           if (e.ctrlKey || e.metaKey || e.detail === 2) {
             action.start();
             let entity = ulid();
-            await mutate("createCard", {
-              title: "",
-              entityID: entity,
-              memberEntity,
-            });
             mutate("addCardToDesktop", {
               entity,
               factID: ulid(),
@@ -193,6 +192,11 @@ export const Desktop = (props: { entityID: string }) => {
                 y: Math.max(e.clientY - parentRect.top - 42, 0),
               },
             });
+            await mutate("createCard", {
+              title: "",
+              entityID: entity,
+              memberEntity,
+            });
 
             open({ entityID: entity, focus: "title" });
 
@@ -202,35 +206,44 @@ export const Desktop = (props: { entityID: string }) => {
         onDragOver={(e) => e.preventDefault()}
         onDrop={async (e) => {
           e.preventDefault();
-          if (!authToken || !spaceID) return;
+          if (!authToken || !spaceID || !memberEntity) return;
           let parentRect = e.currentTarget.getBoundingClientRect();
           let data = await getAndUploadFile(
             e.dataTransfer.items,
             authToken,
             spaceID
           );
-          if (!data.success) return;
+          if (data.length === 0) return;
+          for (let i = 0; i < data.length; i++) {
+            let image = data[i];
+            if (image.success === false) continue;
+            let entity = ulid();
 
-          let entity = ulid();
-          await mutate("assertFact", {
-            entity,
-            factID: ulid(),
-            attribute: "card/image",
-            value: { type: "file", id: data.data.id, filetype: "image" },
-            positions: {},
-          });
+            await mutate("createCard", {
+              entityID: entity,
+              title: "",
+              memberEntity,
+            });
+            await mutate("assertFact", {
+              entity,
+              factID: ulid(),
+              attribute: "card/image",
+              value: { type: "file", id: image.data.id, filetype: "image" },
+              positions: {},
+            });
 
-          await mutate("addCardToDesktop", {
-            entity,
-            factID: ulid(),
-            desktop: props.entityID,
-            position: {
-              rotation: 0,
-              size: "small",
-              x: Math.max(e.clientX - parentRect.left - 128, 0),
-              y: Math.max(e.clientY - parentRect.top - 42, 0),
-            },
-          });
+            await mutate("addCardToDesktop", {
+              entity,
+              factID: ulid(),
+              desktop: props.entityID,
+              position: {
+                rotation: 0,
+                size: "small",
+                x: Math.max(e.clientX - parentRect.left - 128, 0),
+                y: Math.max(e.clientY - parentRect.top - 42 + i * 128, 0),
+              },
+            });
+          }
         }}
         style={{
           zIndex: 1,

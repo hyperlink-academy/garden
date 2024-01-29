@@ -4,10 +4,11 @@ import { useAuth } from "hooks/useAuth";
 import { useRandomValue } from "hooks/useRandomValue";
 import { useState } from "react";
 import { DotLoader } from "./DotLoader";
-import Router from "next/router";
 import { useIdentityData } from "hooks/useIdentityData";
 import { uuidToBase62 } from "src/uuidHelpers";
 import { Modal } from "./Modal";
+import { useIsMobile } from "hooks/utils";
+import { useRouter } from "next/navigation";
 
 let weird_studios = [
   "Bauhaus",
@@ -30,40 +31,26 @@ export const StudioForm = ({
   let example_studio = useRandomValue(weird_studios);
   return (
     <>
-      <div className="flex flex-col gap-1">
-        <p className="font-bold">Name this Studio</p>
-        <input
-          placeholder={example_studio + "..."}
-          className="w-full"
-          maxLength={64}
-          value={formState.name}
-          onChange={(e) => {
-            let value = e.currentTarget.value;
-            setFormState((form) => ({
-              ...form,
-              name: value,
-            }));
-          }}
-        />
-        <div className="text-xs italic">{formState.name.length}/64</div>
-      </div>
-
       <div className="flex flex-col gap-2">
-        <p className="font-bold">Write a short description</p>
-        <textarea
-          className="min-h-[128px] w-full rounded-md border border-grey-55"
-          value={formState.description}
-          maxLength={256}
-          placeholder="write something..."
-          onChange={(e) => {
-            let value = e.currentTarget.value;
-            setFormState((form) => ({
-              ...form,
-              description: value,
-            }));
-          }}
-        />
-        <div className="text-xs italic">{formState.description.length}/256</div>
+        <p className="font-bold">Name this Studio</p>
+        <div className="flex flex-col gap-0.5">
+          <input
+            placeholder={example_studio + "…"}
+            className="w-full"
+            maxLength={64}
+            value={formState.name}
+            onChange={(e) => {
+              let value = e.currentTarget.value;
+              setFormState((form) => ({
+                ...form,
+                name: value,
+              }));
+            }}
+          />
+          <div className="text-xs italic text-grey-55">
+            {formState.name.length}/64
+          </div>
+        </div>
       </div>
     </>
   );
@@ -79,16 +66,18 @@ export function CreateStudio(props: { username: string }) {
     description: "",
   });
   let { authToken } = useAuth();
+  let isMobile = useIsMobile();
+  let router = useRouter();
   return (
     <>
-      <ButtonTertiary
-        content={"Create a Studio"}
+      <ButtonLink
+        content={isMobile ? "Create" : "Create a Studio"}
         onClick={() => setOpen(true)}
       />
       <Modal
         open={open}
         onClose={() => setOpen(false)}
-        header="Create A New Studio"
+        header="Create New Studio"
       >
         <form
           className="flex flex-col gap-4"
@@ -102,7 +91,7 @@ export function CreateStudio(props: { username: string }) {
             if (!studio.success) return;
             setOpen(false);
             setFormState({ name: "", description: "" });
-            Router.push(`/studio/${uuidToBase62(studio.data.id)}`);
+            router.push(`/studio/${uuidToBase62(studio.data.id)}`);
           }}
         >
           <StudioForm formState={formState} setFormState={setFormState} />

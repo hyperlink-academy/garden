@@ -182,11 +182,7 @@ export const makeMutationContext = (tx: WriteTransaction): MutationContext => ({
     if (tx.env && tx.auth?.userID) {
       let id = await tx.get<string>("meta-room-id");
       if (!id) return;
-      let result = await cb({
-        id,
-        env: tx.env as Env,
-        user_studio: tx.auth?.userID,
-      });
+      let result = await cb({ ...(tx.env as Env), id }, tx.auth?.userID);
       return result;
     }
   },

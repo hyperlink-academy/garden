@@ -3,8 +3,7 @@ import { makeRoute } from "backend/lib/api";
 import { Env } from "..";
 import { generateShareCode } from "../lib/generate_share_code";
 import { authTokenVerifier, verifyIdentity } from "backend/lib/auth";
-import { createClient } from "backend/lib/supabase";
-import { isMember } from "../lib/isMember";
+import { isUserMember } from "../lib/isMember";
 
 export const get_share_code_route = makeRoute({
   route: "get_share_code",
@@ -16,9 +15,7 @@ export const get_share_code_route = makeRoute({
         data: { success: false, error: "Invalid session token" },
       } as const;
 
-    let supabase = createClient(env.env);
-
-    if (!isMember(supabase, env, session.id))
+    if (!isUserMember(env, session.id))
       return {
         data: { success: false, error: "user is not a member" },
       } as const;

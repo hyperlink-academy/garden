@@ -7,7 +7,8 @@ import { Divider } from "./Layout";
 import { CollectionListTiny, CollectionPreviewTiny, GoToTop } from "./Icons";
 
 export const UnreadsRoom = () => {
-  let { authorized, memberEntity } = useMutations();
+  let { memberEntity, permissions } = useMutations();
+  let authorized = permissions.commentAndReact;
   let unreadCards = db.useReference(memberEntity, "card/unread-by");
   let chatRooms = db
     .useAttribute("room/type")
@@ -25,9 +26,11 @@ export const UnreadsRoom = () => {
         if (!newUnreads.find((u) => u.entity === unread.entity))
           newUnreads.push(unread);
       }
-      return newUnreads;
+      return newUnreads.filter(
+        (unread) => !chatRooms.find((room) => room.entity === unread.entity)
+      );
     });
-  }, [unreadCards]);
+  }, [unreadCards, chatRooms]);
 
   useEffect(() => {
     setCachedUnreads((existingUnreads) => {

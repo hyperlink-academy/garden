@@ -1,11 +1,11 @@
 import { spaceAPI } from "backend/lib/api";
 import { useAuth } from "hooks/useAuth";
-import { useMutations } from "hooks/useReplicache";
 import { useEffect, useState } from "react";
 import { ButtonPrimary, ButtonSecondary } from "./Buttons";
 import { DoorSelector } from "./DoorSelector";
 import { SpaceCreate } from "./Icons";
 import { Modal } from "./Modal";
+import { useRouter } from "next/navigation";
 
 import { useSpaceData } from "hooks/useSpaceData";
 import { useIdentityData } from "hooks/useIdentityData";
@@ -13,6 +13,7 @@ import { Form, SubmitButton } from "./Form";
 import { DotLoader } from "./DotLoader";
 import { makeReflect } from "./ReplicacheProvider";
 import { ulid } from "src/ulid";
+import { useIsMobile } from "hooks/utils";
 
 export type CreateSpaceFormState = {
   display_name: string;
@@ -28,7 +29,6 @@ export const CreateSpace = (props: {
   let { mutate } = useIdentityData(props.studioName);
   let [open, setOpen] = useState(false);
 
-  let { authorized } = useMutations();
   let [formState, setFormState] = useState<CreateSpaceFormState>({
     display_name: "",
     description: "",
@@ -36,14 +36,15 @@ export const CreateSpace = (props: {
     default_space_image: null,
   });
   let auth = useAuth();
-  if (!authorized) return null;
+  let router = useRouter();
+  let isMobile = useIsMobile();
   return (
-    <div className="">
-      <a className="flex w-full place-items-center">
+    <>
+      <a className="flex w-fit">
         <ButtonSecondary
           className="mx-auto"
           icon={<SpaceCreate />}
-          content="Create New Space!"
+          content={isMobile ? "Create" : "Create New Space!"}
           onClick={() => setOpen(true)}
         />
       </a>
@@ -89,6 +90,7 @@ export const CreateSpace = (props: {
                   username: auth.session.session.username,
                   studio: auth.session.session.studio,
                 });
+              router.push(`${d.owner.username}/s/${d.name}/${d.display_name}`);
             }
             setFormState({
               display_name: "",
@@ -105,7 +107,7 @@ export const CreateSpace = (props: {
           <SubmitButton content="Create!" onClose={() => setOpen(false)} />
         </Form>
       </Modal>
-    </div>
+    </>
   );
 };
 
@@ -341,7 +343,7 @@ export const CreateSpaceForm = ({
       <div className="flex flex-col gap-1">
         <p className="font-bold">Name this Space</p>
         {disableName ? (
-          <h3>{formState.display_name}</h3>
+          <h4>{formState.display_name}</h4>
         ) : (
           <input
             className="w-full"

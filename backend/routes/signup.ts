@@ -71,7 +71,7 @@ export const SignupRoute = makeRoute({
     app_event(env, {
       event: "signup",
       spaceID: newSpaceID.toString(),
-      user: username,
+      user: session.user.id,
     });
     return { data: { success: true } } as const;
   },

@@ -4,7 +4,7 @@ import { authTokenVerifier, verifyIdentity } from "backend/lib/auth";
 import { createClient } from "backend/lib/supabase";
 import { z } from "zod";
 import { Env } from "..";
-import { isMember } from "../lib/isMember";
+import { isUserMember } from "../lib/isMember";
 
 export const leave_route = makeRoute({
   route: "leave",
@@ -20,9 +20,9 @@ export const leave_route = makeRoute({
       } as const;
 
     let space_type = await env.storage.get<string>("meta-space-type");
+    let isMember = isUserMember(env, session.id);
 
-    if (!isMember(supabase, env, session.id))
-      return { data: { success: true } };
+    if (!isMember) return { data: { success: true } };
 
     if (space_type === "studio") {
       await supabase
@@ -39,9 +39,9 @@ export const leave_route = makeRoute({
     }
 
     env.poke();
-    app_event(env.env, {
-      event: "joined_space",
-      user: session.username,
+    await app_event(env.env, {
+      event: "left_space",
+      user: session.id,
       spaceID: env.id,
     });
     return { data: { success: true } } as const;

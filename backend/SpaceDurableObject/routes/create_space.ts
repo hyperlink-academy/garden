@@ -63,7 +63,7 @@ export const create_space_route = makeRoute({
     env.poke();
     app_event(env.env, {
       event: "create_space",
-      user: session.username,
+      user: session.id,
       spaceID: env.id,
     });
     return { data: { success: true, data } } as const;

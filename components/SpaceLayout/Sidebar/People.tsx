@@ -32,9 +32,18 @@ import { spaceAPI } from "backend/lib/api";
 import { ButtonPrimary, ButtonTertiary } from "components/Buttons";
 import { Modal } from "components/Modal";
 import { Truncate } from "components/Truncate";
+import { useSpaceData } from "hooks/useSpaceData";
 
 export const People = () => {
-  let members = db.useAttribute("member/name");
+  let spaceID = useSpaceID();
+  let spaceData = useSpaceData(spaceID);
+  let members = db
+    .useAttribute("member/name")
+    .filter((m) =>
+      spaceData?.data?.members_in_spaces.find(
+        (f) => f.identity_data?.username === m.value
+      )
+    );
   let membersInCall = db.useAttribute("presence/in-call");
   let callOngoing = membersInCall.length > 0;
 
@@ -51,7 +60,7 @@ export const People = () => {
   let offlineMembers = members.filter((f) => !uniqueSessions.has(f.entity));
 
   return (
-    <div className="people flex flex-col border-t border-grey-80 px-3 pb-2 text-sm">
+    <div className="peopleList no-scrollbar flex h-fit flex-col overflow-y-scroll border-t border-grey-80 px-3 pb-2 text-sm">
       <div className="peopleOnline  mt-1 flex  flex-col ">
         <button
           onClick={() => {
@@ -96,7 +105,11 @@ export const People = () => {
           </div>
         </>
       )}
-      <div className="mb-2">{authorized && <InviteMember />}</div>
+      {authorized && (
+        <div className="mb-2">
+          <InviteMember />
+        </div>
+      )}
       {!callOngoing && <JoinCall />}
     </div>
   );
@@ -186,7 +199,7 @@ const CallPanel = (props: {
             className="w-full pt-2 text-left"
             onClick={() => props.toggleCallExpanded()}
           >
-            {inCall ? "in call..." : "call ongoing..."}
+            {inCall ? "in call…" : "call ongoing…"}
           </button>
           {inCall ? <CallSettings /> : <JoinCall />}
         </div>
@@ -383,52 +396,50 @@ const Member = (props: { entityID: string; showInCall?: boolean }) => {
   if (participant && !props.showInCall) return null;
 
   return (
-    <div>
-      <div
-        className="flex w-full flex-row items-start gap-1 overflow-hidden bg-white"
-        style={{
-          color:
-            activeSessions.length > 0
-              ? color?.value
-              : tailwind.theme.colors["grey-55"],
-        }}
-      >
-        <div className="mt-0.5 shrink-0 ">
-          {!participant ? (
-            <RoomMember />
-          ) : participant.tracks.audio.state === "playable" ? (
-            <CallUnMutedTiny />
-          ) : (
-            <div className="text-grey-55">
-              <CallMutedTiny />
-            </div>
-          )}
-        </div>
-        <div className="w-full min-w-0 grow bg-inherit">
-          <div
-            className={`break-all text-sm ${
-              activeSessions.length > 0 ? "font-bold" : ""
-            }`}
-          >
-            {memberEntity === props.entityID ? "You" : name?.value}
+    <div
+      className="flex w-full flex-row items-start gap-1 overflow-hidden bg-white"
+      style={{
+        color:
+          activeSessions.length > 0
+            ? color?.value
+            : tailwind.theme.colors["grey-55"],
+      }}
+    >
+      <div className="mt-0.5 shrink-0 ">
+        {!participant ? (
+          <RoomMember />
+        ) : participant.tracks.audio.state === "playable" ? (
+          <CallUnMutedTiny />
+        ) : (
+          <div className="text-grey-55">
+            <CallMutedTiny />
           </div>
-          {cardTitle && memberEntity !== props.entityID && (
-            <div className="flex w-full min-w-0  gap-[5px] overflow-hidden bg-inherit text-xs italic text-grey-55">
-              in{" "}
-              <Truncate className="w-full min-w-0 grow overflow-hidden bg-inherit ">
-                <div
-                  role="button"
-                  className="over:cursor-pointer whitespace-nowrap underline"
-                  onClick={() => {
-                    if (onCard) open(onCard.value.value);
-                  }}
-                >
-                  {cardTitle?.value || "Untitled Card"}
-                </div>
-              </Truncate>
-            </div>
-          )}
+        )}
+      </div>
+      <div className="w-full min-w-0 grow bg-inherit">
+        <div
+          className={`break-all text-sm ${
+            activeSessions.length > 0 ? "font-bold" : ""
+          }`}
+        >
+          {memberEntity === props.entityID ? "You" : name?.value}
         </div>
+        {cardTitle && memberEntity !== props.entityID && (
+          <div className="flex w-full min-w-0  gap-[5px] overflow-hidden bg-inherit text-xs italic text-grey-55">
+            in{" "}
+            <Truncate className="w-full min-w-0 grow overflow-hidden bg-inherit ">
+              <div
+                role="button"
+                className="over:cursor-pointer whitespace-nowrap underline"
+                onClick={() => {
+                  if (onCard) open(onCard.value.value);
+                }}
+              >
+                {cardTitle?.value || "Untitled Card"}
+              </div>
+            </Truncate>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -447,9 +458,9 @@ const InviteMember = () => {
   let [open, setInviteOpen] = useState(false);
   let isMember = db.useUniqueAttribute("space/member", session.session?.studio);
   let { authorized } = useMutations();
-
   let smoker = useSmoker();
   const spaceID = useSpaceID();
+  let { data } = useSpaceData(spaceID);
   let { data: inviteLink } = useSWR(
     !isMember ? null : `${WORKER_URL}/space/${spaceID}/get_share_code`,
     async () => {
@@ -460,7 +471,11 @@ const InviteMember = () => {
         { authToken }
       );
       if (code.success) {
-        return `${document.location.protocol}//${document.location.host}${document.location.pathname}/join?code=${code.code}`;
+        return `${document.location.protocol}//${document.location.host}/s/${
+          data?.owner.username
+        }/s/${data?.name}/${encodeURIComponent(
+          data?.display_name || ""
+        )}/join?code=${code.code}`;
       }
     }
   );
@@ -483,17 +498,20 @@ const InviteMember = () => {
           <AddTiny className="text-grey-80" /> invite
         </button>
       )}
-      <Modal open={open} onClose={() => setInviteOpen(false)}>
-        <div className="inviteMemberModal flex flex-col place-items-center gap-4 p-0 text-center">
+      <Modal
+        open={open}
+        header="Send a friend this invite link…"
+        onClose={() => setInviteOpen(false)}
+      >
+        <div className="inviteMemberModal flex flex-col  gap-2 p-0 ">
           <div className="flex flex-col gap-2">
-            <h3>Send a friend this invite link…</h3>
             <p>So they can join as a member of this Space!</p>
             <p>
               Members have full access — they can create and edit cards, and
               invite other members.
             </p>
           </div>
-          <div className="inviteMemberModalLink flex w-full gap-2">
+          <div className="inviteMemberModalLink flex w-full gap-2 pt-4">
             <input
               className="grow bg-grey-90 text-grey-35"
               readOnly

@@ -12,3 +12,18 @@ export const memberColors = [
   "#9200D4",
   "#0C56BD",
 ];
+
+export const memberColorsLight = [
+  "#fbdada",
+  "#d0f1fb",
+  "#feeec3",
+  "#ebf9bd",
+  "#fbdaed",
+  "#e8d9fc",
+  "#d1faf6",
+  "#fde0c4",
+  "#fcd9fc",
+  "#dbfadd",
+  "#f1d9fc",
+  "#d7e7fe",
+];

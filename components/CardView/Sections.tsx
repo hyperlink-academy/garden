@@ -131,6 +131,9 @@ export const SingleTextSection = (
     }
   }
 
+  let newProps = { ...props };
+  delete newProps.autocompleteCardNames;
+  delete newProps.focusText;
   return (
     <>
       {suggestionPrefix && cursorCoordinates && suggestions.length > 0 ? (
@@ -184,7 +187,7 @@ export const SingleTextSection = (
         />
       ) : null}
       <Textarea
-        {...props}
+        {...newProps}
         textareaRef={textareaRef}
         onKeyDown={async (e, ref) => {
           props?.onKeyDown?.(e);

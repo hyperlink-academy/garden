@@ -1,0 +1,171 @@
+"use client";
+
+import { Tab } from "@headlessui/react";
+import { NonUndefined } from "@use-gesture/react";
+import { useStudioData } from "hooks/useStudioData";
+import { Fragment, useEffect, useState } from "react";
+import { Members } from "./MemberTab";
+import { StudioSettings } from "./SettingsTab";
+import { SpaceList } from "./SpacesTab";
+import { About } from "./AboutTab";
+import { ArrowDown, ArrowUp } from "components/Icons";
+import Link from "next/link";
+import { useAuth } from "hooks/useAuth";
+import useWindowDimensions from "hooks/useWindowDimensions";
+import { ButtonPrimary } from "components/Buttons";
+import { LoginOrSignupModal } from "components/LoginModal";
+
+export type Props = {
+  data: NonUndefined<ReturnType<typeof useStudioData>["data"]>;
+  isAdmin: boolean;
+};
+
+const Tabs = { About: About, Spaces: SpaceList, Members: Members } as {
+  [key: string]: (props: Props) => React.ReactNode;
+};
+export function StudioPageContent(props: Props) {
+  let { data } = useStudioData(props.data?.id, props.data);
+  let [selectedIndex, setSelectedIndex] = useState(1);
+  let { session } = useAuth();
+  let { width } = useWindowDimensions();
+
+  const [isClient, setIsClient] = useState(false);
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+  if (props.isAdmin) Tabs["Settings"] = Settings;
+  if (!isClient) return null;
+  return (
+    <div className="pwa-padding studioWrapper flex w-full items-stretch px-3 sm:h-screen sm:px-4">
+      <div className="studio relative mx-auto flex w-full max-w-6xl flex-col sm:flex-row">
+        <Tab.Group
+          manual
+          selectedIndex={selectedIndex}
+          onChange={setSelectedIndex}
+        >
+          {width > 640 ? (
+            <StudioDesktopNav data={props.data} isAdmin={props.isAdmin} />
+          ) : (
+            <StudioMobileNav data={props.data} isAdmin={props.isAdmin} />
+          )}
+
+          <div
+            className={`StudioContent flex w-full grow flex-col items-stretch`}
+          >
+            <Tab.Panels className="StudioTabContent h-full min-h-0 ">
+              {Object.values(Tabs).map((T, index) => (
+                <Tab.Panel key={index} className="h-full">
+                  <T data={data || props.data} isAdmin={props.isAdmin} />
+                </Tab.Panel>
+              ))}
+            </Tab.Panels>
+          </div>
+        </Tab.Group>
+      </div>
+    </div>
+  );
+}
+
+const TabItem = (props: { name: string }) => (
+  <Tab as={Fragment}>
+    {({ selected }) => (
+      <button
+        className={`text-right outline-none ${
+          selected
+            ? "font-bold text-accent-blue"
+            : "text-grey-35 hover:text-accent-blue"
+        }`}
+      >
+        {props.name}
+      </button>
+    )}
+  </Tab>
+);
+
+function Settings({ data }: Props) {
+  return (
+    <>
+      <StudioSettings id={data.id} />
+    </>
+  );
+}
+
+const StudioDesktopNav = (props: Props) => {
+  let { data } = useStudioData(props.data?.id, props.data);
+  let { session } = useAuth();
+
+  return (
+    <div className="studioNav my-6 mr-4 w-64 flex-col justify-between border-r border-grey-80 pr-4">
+      <div className="flex w-full flex-col gap-2 text-right">
+        <h3>{data?.name}</h3>
+        <Tab.List className="StudioTabs flex flex-col gap-2 ">
+          {Object.keys(Tabs).map((tab) => (
+            <TabItem name={tab} key={tab} />
+          ))}
+        </Tab.List>
+        {session.session ? (
+          <Link
+            href={`/s/${session.session.username}`}
+            className="flex items-center justify-end gap-2 text-grey-55 hover:text-accent-blue"
+          >
+            <ArrowDown className="rotate-90" height={16} width={16} /> home
+          </Link>
+        ) : (
+          <div className="self-end">
+            <LoginButton />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const StudioMobileNav = (props: Props) => {
+  let { data } = useStudioData(props.data?.id, props.data);
+  let { session } = useAuth();
+
+  return (
+    <>
+      {/* translate3d is necessary to fix a bug in safari where sticky z-index is reordered on scroll */}
+      {session.session ? (
+        <Link
+          href={`/s/${session.session.username}`}
+          className="z-30 mt-3 flex items-center gap-2 text-sm text-grey-55 hover:text-accent-blue"
+          style={{ transform: "translate3D(0,0,0)" }}
+        >
+          <ArrowDown className="rotate-90" height={16} width={16} /> home
+        </Link>
+      ) : (
+        <div style={{ transform: "translate3D(0,0,0)" }} className="z-20 my-4">
+          <LoginButton />
+        </div>
+      )}
+      <h3
+        style={{ transform: "translate3D(0,0,0)" }}
+        className="z-20 -mb-3 mt-2"
+      >
+        {data?.name}
+      </h3>
+
+      <div className="pwa-padding pwa-negative-margin sticky top-0 z-10 -mx-3  mb-4 border-b border-grey-80 bg-background px-3 pb-1">
+        <div className=" flex gap-2 pt-4">
+          <Tab.List className="StudioTabs flex gap-4">
+            {Object.keys(Tabs).map((tab) => (
+              <TabItem name={tab} key={tab} />
+            ))}
+          </Tab.List>
+        </div>
+      </div>
+    </>
+  );
+};
+
+const LoginButton = () => {
+  let [state, setState] = LoginOrSignupModal.useState("closed");
+  return (
+    <>
+      <ButtonPrimary content="Log In" onClick={() => setState("login")} />
+      <LoginOrSignupModal state={state} setState={setState} />
+    </>
+  );
+};

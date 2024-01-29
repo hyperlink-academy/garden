@@ -24,7 +24,7 @@ import { ulid } from "src/ulid";
 import { Textarea } from "components/Textarea";
 import { generateKeyBetween } from "src/fractional-indexing";
 import { SingleTextSection } from "components/CardView/Sections";
-import { useIsActiveRoom, useSetRoom } from "hooks/useUIState";
+import { useIsActiveRoom, useRoom, useSetRoom } from "hooks/useUIState";
 import { Form, SubmitButton } from "components/Form";
 
 export const EditRoomModal = (props: {
@@ -94,7 +94,7 @@ export const EditRoomModal = (props: {
               value={descriptionState}
               maxLength={500}
               placeholder={
-                currentRoomDescription?.value || "Add a description..."
+                currentRoomDescription?.value || "Add a description…"
               }
               onChange={(e) => {
                 let value = e.currentTarget.value;
@@ -102,21 +102,26 @@ export const EditRoomModal = (props: {
               }}
             />
           </div>
-          <ModalSubmitButton content="Edit Room" onClose={props.onClose} />
+          <ModalSubmitButton content="Save Changes" onClose={props.onClose} />
 
           <Divider />
-
-          <ButtonPrimary
-            destructive
-            type="button"
-            onClick={() => {
-              setAreYouSureRoomDeletionModalOpen(true);
-              console.log("yo");
-            }}
-            content="Delete Room"
-            icon={<Delete />}
-            className="place-self-end"
-          />
+          <div className="lightBorder flex flex-col gap-2 p-3 text-center ">
+            <p className="text-sm text-grey-55">
+              Don&apos;t worry, deleting this room won&apos;t delete the cards
+              inside of it!
+            </p>
+            <ButtonPrimary
+              destructive
+              type="button"
+              onClick={() => {
+                setAreYouSureRoomDeletionModalOpen(true);
+                console.log("yo");
+              }}
+              content="Delete Room"
+              icon={<Delete />}
+              className="place-self-center"
+            />
+          </div>
         </>
       </form>
       {areYouSureRoomDeletionModalOpen && (
@@ -142,6 +147,8 @@ const AreYouSureRoomDeletionModal = (props: {
   currentRoomName: Fact<"room/name"> | Fact<"member/name"> | null;
 }) => {
   let { mutate } = useMutations();
+  let setRoom = useSetRoom();
+  let rooms = db.useAttribute("room/name").sort(sortByPosition("roomList"));
 
   return (
     <Modal header="Are You Sure?" open={props.open} onClose={props.onClose}>
@@ -153,6 +160,8 @@ const AreYouSureRoomDeletionModal = (props: {
           icon={<Delete />}
           onSubmit={async () => {
             await mutate("deleteEntity", { entity: props.entityID });
+            let nextRoom = rooms.filter((r) => r.entity === props.entityID)[0];
+            setRoom(nextRoom.entity);
             props.onClose();
           }}
           onClose={() => {

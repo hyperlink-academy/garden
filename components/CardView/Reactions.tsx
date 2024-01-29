@@ -197,7 +197,7 @@ export const EditReactions = (props: {
             })
             .map((r) => (
               <div key={r.value} className="lightBorder w-20 p-1 text-center">
-                <div className="text-lg font-bold">{r.value} </div>
+                <h4>{r.value} </h4>
                 <button
                   className="text-sm italic text-grey-55 hover:text-accent-blue"
                   onClick={async () => {

@@ -1,9 +1,9 @@
 import { ButtonPrimary } from "components/Buttons";
 import * as Popover from "@radix-ui/react-popover";
 import {
-  ArrowDown,
   CardAdd,
   CardSmall,
+  CardAddLined,
   CloseLinedTiny,
   GoToBottom,
   Member,
@@ -14,15 +14,18 @@ import { RenderedText } from "components/Textarea/RenderedText";
 import { db, useMutations } from "hooks/useReplicache";
 import { HTMLAttributes, useEffect, useRef, useState } from "react";
 import { ulid } from "src/ulid";
-import { Message } from "data/Messages";
+import type { Message } from "data/Messages";
 import AutosizeTextarea from "components/Textarea/AutosizeTextarea";
 import { FindOrCreate, useAllItems } from "components/FindOrCreateEntity";
 import { ref } from "data/Facts";
 import { CardPreviewWithData } from "components/CardPreview";
-import { LogInModal } from "components/LoginModal";
+import { LoginOrSignupModal } from "components/LoginModal";
 import { RoomHeader } from "components/Room";
 import { useRoom, useUIState } from "hooks/useUIState";
 import { useFilteredCards } from "../CardFilter";
+import { useAuth } from "hooks/useAuth";
+import { memberColors, memberColorsLight } from "src/colors";
+import { useGesture } from "@use-gesture/react";
 
 export const DiscussionRoom = (props: {
   entityID: string;
@@ -35,9 +38,16 @@ export const DiscussionRoom = (props: {
   let { reactions, filters, setFilters, cardsFiltered, total } =
     useFilteredCards(room, "desktop/contains");
 
+  let { permissions } = useMutations();
+
+  let authorized = permissions.commentAndReact;
   return (
-    <div className="relative h-full w-full">
-      <div className="absolute w-full px-3 sm:px-4">
+    // trying this w/ ~same wrapper as other rooms
+    <div
+      className="no-scrollbar flex h-full w-[336px] flex-col items-stretch overflow-x-hidden overflow-y-scroll text-sm "
+      id="room-wrapper"
+    >
+      <div className="discussionRoomHeaderWrapper -mb-3 px-3 sm:px-4">
         <RoomHeader
           totalCount={total}
           filteredCount={cardsFiltered.length}
@@ -47,14 +57,18 @@ export const DiscussionRoom = (props: {
           setFilters={setFilters}
         />
       </div>
-      <MessageWindow className="no-scrollbar relative flex h-full flex-col overflow-x-hidden overflow-y-scroll p-3 pb-12 sm:p-4 sm:pb-12">
+      <MessageWindow
+        className={`discussionWindow no-scrollbar relative flex h-full flex-col overflow-x-hidden overflow-y-scroll ${
+          authorized ? "pb-[64px]" : "pb-[88px]"
+        }`}
+      >
         <Messages
           entityID={props.entityID}
           setReply={setReply}
           isRoom={props.isRoom}
         />
       </MessageWindow>
-      <div className="absolute bottom-0 w-full px-3 sm:px-4">
+      <div className="discussionInputWrapper absolute bottom-3 right-0 w-full ">
         <MessageInput
           entityID={props.entityID}
           allowReact={props.allowReact}
@@ -71,6 +85,7 @@ export const useMarkRead = (entityID: string, focused: boolean) => {
   let unreadBy = db.useEntity(entityID, "discussion/unread-by");
   let [windowFocus, setWindowFocus] = useState(true);
   let { mutate, memberEntity } = useMutations();
+  let { session } = useAuth();
   useEffect(() => {
     let callback = () => setWindowFocus(true);
     window.addEventListener("focus", callback);
@@ -79,21 +94,31 @@ export const useMarkRead = (entityID: string, focused: boolean) => {
     };
   }, []);
   useEffect(() => {
-    if (entityID && memberEntity) {
+    if (entityID && memberEntity && session.user) {
       if (!windowFocus || !focused) return;
       let unread = unreadBy?.find((f) => f.value.value === memberEntity);
       if (unread)
         mutate("markRead", {
           memberEntity,
+          userID: session.user.id,
           entityID: entityID,
           attribute: "discussion/unread-by",
         });
     }
-  }, [entityID, unreadBy, memberEntity, mutate, windowFocus, focused]);
+  }, [
+    entityID,
+    unreadBy,
+    memberEntity,
+    mutate,
+    windowFocus,
+    focused,
+    session.user,
+  ]);
 };
 
 export const MessageWindow = (props: {
   style?: HTMLAttributes<HTMLDivElement>["style"];
+  onDragTop?: () => void;
   children: React.ReactNode;
   className: string;
 }) => {
@@ -107,8 +132,21 @@ export const MessageWindow = (props: {
       });
     }
   });
+  let bind = useGesture({
+    onDrag: (data) => {
+      if (
+        (data.currentTarget as HTMLElement)?.scrollTop === 0 &&
+        data.direction[1] > 0 &&
+        data.distance[1] > 8 &&
+        data.distance[0] < 8
+      ) {
+        props.onDragTop?.();
+      }
+    },
+  });
   return (
     <div
+      {...bind()}
       style={props.style}
       onScroll={(e) => {
         if (!e.isTrusted) return;
@@ -131,28 +169,31 @@ export const MessageInput = (props: {
   isRoom: boolean;
   reply: string | null;
   setReply: (reply: string | null) => void;
+  onSend?: () => void;
 }) => {
-  let [unread, setUnread] = useState<boolean | null>(null);
   let value = useUIState((s) => s.chatInputStates[props.entityID]?.value || "");
   let attachedCards = useUIState(
     (s) => s.chatInputStates[props.entityID]?.attachedCards || []
   );
   let setValue = useUIState((s) => s.setChatInputValue);
   let setAttachedCards = useUIState((s) => s.setChatInputAttachedCards);
-  let { mutate, memberEntity, authorized } = useMutations();
+  let { mutate, permissions } = useMutations();
+  let { session } = useAuth();
+
+  let authorized = permissions.commentAndReact;
+
   let replyMessage = db.useMessageByID(props.reply);
   let replyToName = db.useEntity(replyMessage?.sender || null, "member/name");
-  let [loginIsOpen, setLoginOpen] = useState(false);
+
   const send = async () => {
-    if (!memberEntity || !value) return;
-    let message: Message = {
+    if (!session.session || !value) return;
+    let message: Omit<Message, "sender"> = {
       id: ulid(),
       topic: props.entityID,
       ts: Date.now().toString(),
-      sender: memberEntity,
+      replyTo: props.reply,
       content: value || "",
     };
-    if (props.reply) message.replyTo = props.reply;
     if (attachedCards.length > 0) {
       let entity = ulid();
       message.entity = entity;
@@ -167,12 +208,16 @@ export const MessageInput = (props: {
       );
     }
     await mutate("replyToDiscussion", {
+      session: session.session,
       discussion: props.entityID,
       message,
     });
     setValue(props.entityID, "");
     setAttachedCards(props.entityID, []);
     props.setReply(null);
+    if (props.onSend) {
+      props.onSend();
+    }
     setTimeout(() => {
       let el = document.getElementById("card-comments");
       if (!el) return;
@@ -181,102 +226,125 @@ export const MessageInput = (props: {
   };
   return (
     <>
-      {!authorized ? (
-        <>
-          <div className="messageLogIn mx-2 mb-2 flex h-[38px] place-items-center gap-2 rounded-md bg-grey-90">
-            <p className=" w-full text-center text-sm italic text-grey-55">
-              <span
-                role="button"
-                className="font-bold text-accent-blue"
-                onClick={() => {
-                  setLoginOpen(true);
-                }}
-              >
-                Log In
-              </span>{" "}
-              to join the discussion!
-            </p>
-          </div>
-          <LogInModal
-            isOpen={loginIsOpen}
-            onClose={() => setLoginOpen(false)}
-          />
-        </>
+      {!session?.loggedIn ? (
+        <Login />
+      ) : !authorized ? (
+        <div className="messageLogIn  mx-3 mb-3 flex place-items-center gap-2 rounded-md bg-grey-90 p-2 text-center  text-sm italic text-grey-55 sm:mx-4 sm:mb-4">
+          Only members and studio mates can add to this chat!
+        </div>
       ) : (
-        <div className="messageInput flex w-full flex-col gap-2  pb-2 pt-1">
-          {unread && (
-            <button
-              className="messageUnreadsAvailable sticky bottom-0 mx-auto flex  w-fit flex-row items-center justify-between gap-2 rounded-full bg-accent-blue px-4 py-1.5 text-sm font-bold italic text-white"
-              onClick={() => {
-                document
-                  .getElementById("card-comments")
-                  ?.scrollIntoView({ behavior: "smooth", block: "end" });
-              }}
-            >
-              <div>unread messages</div>
-              <GoToBottom />
-            </button>
-          )}
-          {/* IF MESSAGE IS IN REPLY */}
-          {props.reply && (
-            <div className="messageInputReply -mb-2">
-              <div className="flex items-start justify-between gap-2 rounded-md border border-grey-80 bg-white p-2 text-xs italic text-grey-55">
-                <div className="flex flex-col gap-[1px]">
-                  <div className="font-bold"> {replyToName?.value}</div>
-                  <div>{replyMessage?.content}</div>
+        <div
+          className={`flex items-end gap-1 ${
+            props.isRoom ? "bg-background px-3 sm:px-4" : "bg-white"
+          } `}
+        >
+          <div className="shrink-0 pb-1">
+            <AttachCard
+              attachedCards={attachedCards}
+              setAttachedCards={(cards) =>
+                setAttachedCards(props.entityID, cards)
+              }
+            />
+          </div>
+          <div className={`messageInput flex w-full flex-col gap-2`}>
+            {/* IF MESSAGE IS IN REPLY */}
+            {props.reply && (
+              <div className="messageInputReply -mb-2">
+                <div className="flex items-start justify-between gap-2 rounded-lg border border-grey-80  px-[6px] py-[5px] text-xs italic text-grey-55">
+                  <div className="flex flex-col gap-[1px]">
+                    <div className="font-bold"> {replyToName?.value}</div>
+                    <div className="text-grey-55">{replyMessage?.content}</div>
+                  </div>
+                  <button className="" onClick={() => props.setReply(null)}>
+                    <CloseLinedTiny />
+                  </button>
                 </div>
-                <button className="" onClick={() => props.setReply(null)}>
-                  <CloseLinedTiny />
-                </button>
+                <div className="ml-auto mr-2 h-2 w-0 border border-grey-80" />
               </div>
-              <div className="ml-2 h-2 w-0 border border-grey-80" />
-            </div>
-          )}
-          {/* ACTUAL MESSAGE INPUT */}
-          <div className="flex w-full items-end gap-2">
-            <div className="flex w-full items-center gap-1 rounded-md border border-grey-55 bg-white px-2 py-1 text-sm text-grey-15">
-              <AutosizeTextarea
-                onKeyDown={(e) => {
-                  if (e.key === "Escape") {
-                    e.currentTarget.blur();
-                  }
-                  if (!e.shiftKey && e.key === "Enter") {
+            )}
+            {attachedCards.length > 0 && (
+              <div className="flex flex-col gap-1 ">
+                {attachedCards?.map((card) => {
+                  return (
+                    <div key={card} className="w-full">
+                      <CardPreviewWithData
+                        entityID={card}
+                        size="big"
+                        hideContent={true}
+                        key={card}
+                        onDelete={() =>
+                          setAttachedCards(
+                            props.entityID,
+                            attachedCards.filter((c) => c !== card)
+                          )
+                        }
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+            {/* ACTUAL MESSAGE INPUT */}
+
+            <div className="flex w-full flex-col items-end gap-1">
+              <div className="flex w-full items-center gap-2 rounded-lg border border-grey-55 bg-white py-1 pl-2 pr-1 text-base text-grey-15">
+                <AutosizeTextarea
+                  onKeyDown={(e) => {
+                    if (e.key === "Escape") {
+                      e.currentTarget.blur();
+                    }
+                    if (!e.shiftKey && e.key === "Enter") {
+                      e.preventDefault();
+                      send();
+                    }
+                  }}
+                  value={value}
+                  onChange={(e) => setValue(props.entityID, e.target.value)}
+                  placeholder=""
+                  className="w-full grow text-sm"
+                  id="messageInput"
+                />
+
+                <ButtonPrimary
+                  className="shrink-0 self-end !px-0 !py-0"
+                  disabled={!value}
+                  onPointerDown={(e) => {
+                    e.preventDefault();
+                  }}
+                  onClick={(e) => {
                     e.preventDefault();
                     send();
-                  }
-                }}
-                value={value}
-                onChange={(e) => setValue(props.entityID, e.target.value)}
-                placeholder=""
-                className="w-full"
-                id="messageInput"
-              />
-              <div className="place-self-end">
-                <AttachCard
-                  attachedCards={attachedCards}
-                  setAttachedCards={(cards) =>
-                    setAttachedCards(props.entityID, cards)
-                  }
+                  }}
+                  icon={<Send />}
                 />
               </div>
-            </div>
-
-            <div className="flex h-min justify-end text-grey-55">
-              <ButtonPrimary
-                disabled={!value}
-                onPointerDown={(e)=> {
-                  e.preventDefault()
-                }}
-                onClick={(e) => {
-                  e.preventDefault();
-                  send();
-                }}
-                icon={<Send />}
-              />
             </div>
           </div>
         </div>
       )}
+    </>
+  );
+};
+
+const Login = () => {
+  let [state, setState] = LoginOrSignupModal.useState("closed");
+  return (
+    <>
+      <div className="messageLogIn mx-3 mb-3 flex place-items-center gap-2 rounded-md bg-grey-90 p-2 sm:mx-4 sm:mb-4">
+        <p className=" w-full text-center text-sm italic text-grey-55">
+          <span
+            role="button"
+            className="font-bold text-accent-blue"
+            onClick={() => {
+              setState("login");
+            }}
+          >
+            Log In
+          </span>{" "}
+          to join the discussion!
+        </p>
+      </div>
+      <LoginOrSignupModal state={state} setState={setState} />
     </>
   );
 };
@@ -290,65 +358,20 @@ const AttachCard = ({
 }) => {
   let [open, setOpen] = useState(false);
   let items = useAllItems(open);
-  let { authorized, mutate, memberEntity, action } = useMutations();
+  let { mutate, memberEntity, action, permissions } = useMutations();
+  let authorized = permissions.commentAndReact;
+
   if (!authorized) return null;
   return (
     <>
       {/* decide styling of button via children */}
-      {attachedCards.length === 0 ? (
-        <button onClick={() => setOpen(true)} className="flex text-grey-55">
-          {/* {props.expanded ? "Attach Card" : ""} */}
-          <CardAdd />
-        </button>
-      ) : (
-        <Popover.Root>
-          <Popover.Trigger asChild>
-            <button className="flex items-center gap-[1px] text-sm text-grey-55">
-              {attachedCards.length} <CardAdd />
-            </button>
-          </Popover.Trigger>
-          <Popover.Portal>
-            <Popover.Content
-              className="PopoverContent"
-              sideOffset={12}
-              collisionPadding={{ left: 24, right: 24 }}
-              side="top"
-              align="end"
-              alignOffset={-6}
-            >
-              <div className="flex w-72 flex-col gap-0 rounded-md border border-grey-80 bg-white py-1 shadow-sm">
-                {attachedCards.map((card) => {
-                  return (
-                    <div
-                      className="flex w-full items-start justify-between gap-2 px-2 py-1 text-sm hover:bg-bg-blue"
-                      key={card}
-                    >
-                      <AttachedCard entityID={card} />
-                      <button
-                        className="pt-1 text-grey-55 hover:text-accent-blue"
-                        onClick={() =>
-                          setAttachedCards(
-                            attachedCards.filter((c) => c !== card)
-                          )
-                        }
-                      >
-                        <CloseLinedTiny />
-                      </button>
-                    </div>
-                  );
-                })}
-                <button
-                  onClick={() => setOpen(true)}
-                  className="flex gap-2 px-2 py-1 text-sm text-grey-55 hover:text-accent-blue"
-                >
-                  <CardAdd />
-                  attach another card
-                </button>
-              </div>
-            </Popover.Content>
-          </Popover.Portal>
-        </Popover.Root>
-      )}
+      <button
+        onClick={() => setOpen(true)}
+        className="flex text-grey-55 hover:text-accent-blue"
+      >
+        <CardAddLined />
+      </button>
+
       <FindOrCreate
         allowBlank={true}
         onClose={() => setOpen(false)}
@@ -360,6 +383,7 @@ const AttachCard = ({
 
           action.start();
 
+          let newAttachedCards = [...attachedCards];
           for (let d of cards) {
             let entity: string;
             if (d.type === "existing") entity = d.entity;
@@ -371,8 +395,9 @@ const AttachCard = ({
                 memberEntity,
               });
             }
-            setAttachedCards([...attachedCards, entity]);
+            newAttachedCards.push(entity);
           }
+          setAttachedCards(newAttachedCards);
 
           action.end();
         }}
@@ -382,23 +407,6 @@ const AttachCard = ({
         items={items}
       />
     </>
-  );
-};
-
-const AttachedCard = (props: { entityID: string }) => {
-  let name = db.useEntity(props.entityID, "card/title");
-  let memberName = db.useEntity(props.entityID, "member/name");
-  return (
-    <div className="flex w-full items-start gap-2">
-      <div className="shrink-0 text-grey-35">
-        {memberName ? <Member /> : <CardSmall />}
-      </div>
-      <div className="grow pt-[2px]">
-        {memberName?.value || name?.value || (
-          <span className="italic text-grey-55">untitled</span>
-        )}
-      </div>
-    </div>
   );
 };
 
@@ -414,9 +422,9 @@ export const Messages = (props: {
   return (
     <>
       {messages.length == 0 && authorized ? (
-        <div className="messagesEmpty mt-auto flex flex-col gap-4 py-1 text-sm italic text-grey-35">
-          <p>Welcome to the chat!</p>
-          <p>Go ahead, start the conversation 🌱</p>
+        <div className="messagesEmpty mt-auto flex flex-col gap-2 px-3 py-1  text-sm italic text-grey-55 sm:px-4">
+          <p>Welcome to the chat room!</p>
+          <p>Start a conversation 🌱</p>
         </div>
       ) : null}
       {[...messages].map((m, index, reversedMessages) => (
@@ -447,13 +455,18 @@ const Message = (props: {
   author: string;
   date: string;
   id: string;
-  reply?: string;
+  reply?: string | null;
   entity?: string;
   setReply: (reply: string) => void;
 }) => {
   let { authorized } = useMutations();
 
+  let { session } = useAuth();
+
   let memberName = db.useEntity(props.author, "member/name");
+  let memberColor = db.useEntity(props.author, "member/color");
+
+  let isMe = session.session?.username == memberName?.value;
   let time = new Date(parseInt(props.date));
   let replyMessage = db.useMessageByID(props.reply || null);
   let replyToName = db.useEntity(replyMessage?.sender || null, "member/name");
@@ -463,79 +476,117 @@ const Message = (props: {
   );
   return (
     <div
-      id={props.id}
-      className={`message flex flex-col text-sm first:mt-auto ${
+      className={`group mx-3 flex items-end gap-1 sm:mx-4 ${
         !props.multipleFromSameAuthor ? "pt-4" : "pt-1"
-      }`}
+      } ${isMe && "flex-row-reverse"}`}
     >
-      {/* MESSAGE HEADER */}
-      {!props.multipleFromSameAuthor && (
-        <div className="flex justify-between gap-2 text-grey-55">
-          <div className="messageInfo flex gap-2">
-            <span className="messageAuthor text-sm font-bold italic">
-              {memberName?.value}
-            </span>
-            <span className="messageTimeStamp self-center text-xs">
-              {time.toLocaleDateString(undefined, {
-                month: "short",
-                day: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </span>
-          </div>
-        </div>
-      )}
-
-      {/* IF THE MESSAGE IS IN REPLY TO SOMEONE */}
-      {replyMessage && (
-        <>
-          <div className="mt-1 flex flex-col gap-[1px] rounded-md border border-grey-80 p-2 text-xs">
-            <div className="font-bold italic text-grey-55">
-              {replyToName?.value}
-            </div>
-            <div className="italic text-grey-55">{replyMessage?.content}</div>
-          </div>
-          <div className="ml-2 h-2 w-0 border border-grey-80" />
-        </>
-      )}
-      <div className="group -mx-4 flex items-end gap-1 px-4 py-1 hover:bg-bg-blue">
-        <RenderedText
-          className="messageContent grow text-sm text-grey-35"
-          text={props.content}
-          tabIndex={0}
-          style={{
-            whiteSpace: "pre-wrap",
-          }}
-        />
-        {authorized ? (
-          <span className="messageReplyButton mb-[1px] h-4 w-4 shrink-0 text-xs">
-            <button
-              className="hidden text-grey-55 hover:text-accent-blue group-hover:block"
-              onClick={() => {
-                props.setReply(props.id);
-                document.getElementById("messageInput")?.focus();
-              }}
+      <div
+        id={props.id}
+        className={`message mt-2 flex grow flex-col  gap-1 text-sm  first:mt-auto ${
+          isMe && "place-items-end"
+        }`}
+      >
+        {/* MESSAGE HEADER */}
+        {!props.multipleFromSameAuthor && (
+          <div
+            className={`messageHeader flex w-full gap-2 text-grey-55 ${
+              isMe && "flex-row-reverse"
+            } `}
+            style={{ color: memberColor?.value }}
+          >
+            <div
+              className={`messageInfo flex gap-2 ${isMe && "flex-row-reverse"}`}
             >
-              <Reply />
-            </button>
-          </span>
-        ) : null}
-      </div>
-      {attachedCards && (
-        <div className="mt-2 flex flex-col gap-1">
-          {attachedCards?.map((c) => (
-            <div key={c.id} className="w-full">
-              <CardPreviewWithData
-                entityID={c.value.value}
-                size="big"
-                hideContent={true}
-                key={c.id}
-              />
+              <span className="messageAuthor text-sm font-bold italic">
+                {isMe ? null : memberName?.value}
+              </span>
+              <span className="messageTimeStamp self-center text-xs">
+                {time.toLocaleDateString(undefined, {
+                  month: "short",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </span>
             </div>
-          ))}
+          </div>
+        )}
+        {replyMessage && (
+          <div className={`-mb-1 w-fit ${isMe ? "ml-6" : "mr-6"}`}>
+            <div className="mt-0.5 flex max-h-[118px] flex-col overflow-hidden rounded-lg border border-grey-80 px-2 py-1 text-xs">
+              <div className={`font-bold italic text-grey-55`}>
+                {replyToName?.value}
+              </div>
+              <div className=" italic text-grey-55">
+                {replyMessage?.content}
+              </div>
+            </div>
+            <div
+              className={` mt-0 h-2 w-0 border border-grey-80 ${
+                isMe ? "ml-auto mr-2" : "ml-2"
+              } `}
+            />
+          </div>
+        )}
+        <div className={`flex items-end gap-2 ${isMe && "flex-row-reverse"}`}>
+          <div
+            className={`messageContent  rounded-lg border border-grey-80 px-2 py-[5px] text-white  ${
+              attachedCards ? "w-full " : "w-fit"
+            } ${!isMe && "group-hover:!bg-bg-blue"}`}
+            style={{
+              backgroundColor: isMe ? memberColor?.value : "#FDFCFA",
+            }}
+          >
+            {/* if comment is in reply, show reply content  */}
+
+            {attachedCards && (
+              <div className="mb-1 mt-[3px] flex w-full flex-col gap-1">
+                {attachedCards?.map((c) => (
+                  <div key={c.id} className="w-full">
+                    <CardPreviewWithData
+                      entityID={c.value.value}
+                      size="big"
+                      hideContent={true}
+                      key={c.id}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+            <div>
+              <div className="flex items-end gap-1 ">
+                <RenderedText
+                  className={`messageTextContent text-sm ${
+                    isMe ? "text-white" : "text-grey-35"
+                  }`}
+                  text={props.content}
+                  tabIndex={0}
+                  style={{
+                    whiteSpace: "pre-wrap",
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+          {authorized ? (
+            <span className="messageReplyButton mb-[1px] h-4 w-4 shrink-0 text-xs">
+              <button
+                className={`hidden text-grey-55 hover:text-accent-blue group-hover:block ${
+                  isMe && "-scale-x-100"
+                }`}
+                onClick={() => {
+                  props.setReply(props.id);
+                  document.getElementById("messageInput")?.focus();
+                }}
+              >
+                <Reply />
+              </button>
+            </span>
+          ) : (
+            <div className="h-4 w-4 " />
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 };

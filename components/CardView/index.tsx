@@ -5,7 +5,7 @@ import {
   Delete,
   Member,
   CalendarMedium,
-  CardSmallLined,
+  CardAddLined,
   SectionImageAdd,
   ReactionAdd,
   CloseLinedTiny,
@@ -32,11 +32,13 @@ import { useUndoableState } from "hooks/useUndoableState";
 import { Fact } from "data/Facts";
 import { getAndUploadFile } from "src/getAndUploadFile";
 import { useReactions } from "hooks/useReactions";
-import { HighlightCard } from "./HighlightCard";
 import { CardViewDrawer } from "./CardViewDrawer";
 import { useCloseCard, useRoomHistory, useUIState } from "hooks/useUIState";
 import { Modal } from "components/Modal";
 import { Title } from "./Title";
+import { LinkPreview } from "components/LinkPreview";
+import { useLinkPreviewManager } from "hooks/useLinkPreviewManager";
+import { useDrag } from "@use-gesture/react";
 
 const borderStyles = (args: { member: boolean }) => {
   switch (true) {
@@ -152,15 +154,18 @@ export const CardView = (props: {
             authToken,
             spaceID
           );
-          if (!data.success) return;
+          if (data.length === 0) return;
           e.preventDefault();
-          await mutate("assertFact", {
-            entity: props.entityID,
-            factID: ulid(),
-            attribute: "card/image",
-            value: { type: "file", id: data.data.id, filetype: "image" },
-            positions: {},
-          });
+          for (let image of data) {
+            if (!image.success) continue;
+            await mutate("assertFact", {
+              entity: props.entityID,
+              factID: ulid(),
+              attribute: "card/image",
+              value: { type: "file", id: image.data.id, filetype: "image" },
+              positions: {},
+            });
+          }
         }}
       >
         {/* IF MEMBER CARD, INCLUDE LINK TO STUDIO  */}
@@ -180,7 +185,6 @@ export const CardView = (props: {
             flex-col       
             items-stretch
             overflow-x-hidden overflow-y-hidden
-            pb-0
             ${contentStyles({
               member: !!memberName,
             })}
@@ -198,6 +202,7 @@ export const CardContent = (props: {
   onDelete?: () => void;
   referenceFactID?: string;
 }) => {
+  useLinkPreviewManager(props.entityID);
   let { ref } = usePreserveScroll<HTMLDivElement>(props.entityID);
   let date = db.useEntity(props.entityID, "card/date");
   let [dateEditing, setDateEditing] = useUndoableState(false);
@@ -205,17 +210,43 @@ export const CardContent = (props: {
   let { authorized } = useMutations();
   let drawerOpen = useUIState((s) => s.cardStates[props.entityID]?.drawerOpen);
   let cardCreator = db.useEntity(props.entityID, "card/created-by");
+  let drawer = useUIState((s) => s.cardStates[props.entityID]?.drawer);
   let cardCreatorName = db.useEntity(
     cardCreator?.value.value as string,
     "member/name"
   )?.value;
+
+  useDrag(
+    (data) => {
+      let target = data.event.currentTarget as HTMLElement;
+      if (
+        target &&
+        target.scrollTop >= target.scrollHeight - target.clientHeight - 1 &&
+        data.direction[1] < 0 &&
+        data.distance[1] > 8 &&
+        data.distance[0] < 8
+      ) {
+        useUIState.getState().openDrawer(props.entityID, drawer || "chat");
+      }
+      if (
+        target &&
+        target.scrollTop === 0 &&
+        data.direction[1] > 0 &&
+        data.distance[1] > 8 &&
+        data.distance[0] < 8
+      ) {
+        useUIState.getState().closeDrawer(props.entityID);
+      }
+    },
+    { target: ref, pointer: { keys: false } }
+  );
 
   return (
     <>
       {/* START CARD CONTENT */}
       <div
         ref={ref}
-        className={`cardContentWrapper no-scrollbar relative z-0 flex grow flex-col items-stretch overflow-y-scroll overscroll-y-none pb-3 sm:pb-4 ${
+        className={`cardContentWrapper no-scrollbar relative z-0 flex grow flex-col items-stretch overflow-y-scroll overscroll-y-none ${
           !memberName ? "pt-3 sm:pt-4" : ""
         }`}
         onClick={() => {
@@ -246,7 +277,6 @@ export const CardContent = (props: {
             {/* NB: keep wrapper for spacing with CardMoreOptionsMenu even if no cardCreatorName */}
 
             <div className="flex flex-row gap-2 text-grey-55">
-              <HighlightCard entityID={props.entityID} />
               <CardMoreOptionsMenu
                 onDelete={props.onDelete}
                 entityID={props.entityID}
@@ -278,6 +308,8 @@ export const CardContent = (props: {
 
           <DefaultTextSection entityID={props.entityID} />
 
+          <CardLinkPreview entityID={props.entityID} />
+
           <ImageSection entityID={props.entityID} />
 
           <AttachedCardSection entityID={props.entityID} />
@@ -294,6 +326,12 @@ export const CardContent = (props: {
   );
 };
 
+const CardLinkPreview = (props: { entityID: string }) => {
+  let linkPreview = db.useEntity(props.entityID, "card/link-preview");
+  if (linkPreview) return <LinkPreview entityID={props.entityID} />;
+  return null;
+};
+
 const BackButton = () => {
   let history = useRoomHistory();
   let closeCard = useCloseCard();
@@ -304,15 +342,12 @@ const BackButton = () => {
         !authorized ? "" : "mt-3"
       }`}
       onClick={() => {
-        if (history.length < 2) {
-          setTimeout(() => {
-            let roomView = document.getElementById("roomWrapper");
-            if (roomView) {
-              roomView.scrollIntoView({ behavior: "smooth" });
-            }
-          }, 5);
-        }
         closeCard();
+        if (history.length < 2) {
+          document
+            .getElementById("space-layout")
+            ?.scrollTo({ behavior: "smooth", left: 0 });
+        }
       }}
     >
       {history.length < 2 ? <CloseLinedTiny /> : <GoBackToPageLined />}
@@ -372,7 +407,7 @@ const AreYouSureCardDeletionModal = (props: {
     <Modal open={props.open} onClose={props.onClose}>
       <div className="flex flex-col gap-3 text-grey-35">
         <div className="modal flex flex-col gap-3">
-          <p className="text-lg font-bold">Are you sure?</p>
+          <h4>Are you sure?</h4>
           <p className="text-sm">
             This will permanently delete the card and its contents.
           </p>
@@ -518,17 +553,22 @@ const DefaultTextSection = (props: { entityID: string }) => {
           authToken,
           spaceID
         );
-        if (!data.success) return;
-        await mutate("assertFact", {
-          entity: props.entityID,
-          attribute: "card/image",
-          value: { type: "file", id: data.data.id, filetype: "image" },
-          positions: {},
-        });
+        if (data.length === 0) return;
+        e.preventDefault();
+
+        for (let image of data) {
+          if (!image.success) continue;
+          await mutate("assertFact", {
+            entity: props.entityID,
+            attribute: "card/image",
+            value: { type: "file", id: image.data.id, filetype: "image" },
+            positions: {},
+          });
+        }
       }}
       entityID={props.entityID}
       section={"card/content"}
-      placeholder={authorized ? "write something..." : ""}
+      placeholder={authorized ? "write something…" : ""}
     />
   );
 };
@@ -539,11 +579,8 @@ export const SectionAdder = (props: {
 
   setDateEditing: () => void;
 }) => {
-  let { authorized, mutate } = useMutations();
-  let image = db.useEntity(props.entityID, "card/image");
-  let attachedCards = db.useEntity(props.entityID, "deck/contains");
+  let { authorized } = useMutations();
   let date = db.useEntity(props.entityID, "card/date");
-  let reactions = useReactions(props.entityID);
 
   let [reactionPickerOpen, setReactionPickerOpen] = useState(false);
 
@@ -557,7 +594,7 @@ export const SectionAdder = (props: {
     <div className="pointer-events-auto flex w-fit items-center gap-1 rounded-full border border-grey-90 bg-white px-4 py-2 text-grey-55 shadow">
       {/* IMAGE ADDER */}
       <MakeImage entity={props.entityID}>
-        <div className={`${image ? toggledOnStyle : toggledOffStyle} `}>
+        <div className={`${toggledOffStyle} `}>
           <SectionImageAdd />
         </div>
       </MakeImage>
@@ -577,7 +614,7 @@ export const SectionAdder = (props: {
         }}
       >
         <div className={`${toggledOffStyle} `}>
-          <CardSmallLined />
+          <CardAddLined />
         </div>
       </AddExistingCard>
       {/* END LINKED CARD ADDER */}
@@ -608,7 +645,7 @@ export const SectionAdder = (props: {
       <Popover.Root
         onOpenChange={() => setReactionPickerOpen(!reactionPickerOpen)}
       >
-        <Popover.Trigger className="flex items-center">
+        <Popover.Trigger className="flex items-center" asChild>
           <button
             className={`${toggledOffStyle} ${
               !reactionPickerOpen

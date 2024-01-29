@@ -7,12 +7,11 @@ import {
   useRoom,
   useUIState,
 } from "hooks/useUIState";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { CardView } from "./CardView";
-import { useViewportSize } from "hooks/useViewportSize";
-import { isIOS } from "@react-aria/utils";
 import { focusElement } from "src/utils";
 import { useIsMobile } from "hooks/utils";
+import { useAuth } from "hooks/useAuth";
 
 export const useCardViewer = () => {
   let spaceID = useSpaceID();
@@ -49,21 +48,23 @@ export function CardViewer() {
   });
   let cardViewerRef = useRef<HTMLDivElement | null>(null);
   let { mutate, memberEntity, client } = useMutations();
+  let { session } = useAuth();
   let unreadBy = db.useEntity(
     room ? history[0] || null : null,
     "card/unread-by"
   );
   useEffect(() => {
-    if (room && history[0] && memberEntity) {
+    if (room && history[0] && memberEntity && session.user) {
       let unread = unreadBy?.find((f) => f.value.value === memberEntity);
       if (unread)
         mutate("markRead", {
           memberEntity,
+          userID: session.user.id,
           entityID: history[0],
           attribute: "card/unread-by",
         });
     }
-  }, [history, room, unreadBy, memberEntity, mutate]);
+  }, [history, room, unreadBy, memberEntity, mutate, session.user]);
   useEffect(() => {
     if (!client || !room) return;
     let currentCard = history[0];
@@ -80,17 +81,19 @@ export function CardViewer() {
   useAppEventListener(
     "cardviewer.open-card",
     () => {
-      setTimeout(() => {
-        cardViewerRef.current?.scrollIntoView({
-          inline: "center",
-          behavior: "smooth",
-        });
-      }, 10);
+      document
+        .getElementById("space-layout")
+        ?.scrollTo({ behavior: "smooth", left: 5000 });
     },
     []
   );
+  let [render, setRender] = useState(false);
+  useEffect(() => {
+    setRender(true);
+  }, []);
   let removeCardFromRoomHistory = useRemoveCardFromRoomHistory();
   let isMobile = useIsMobile();
+  if (!render) return null;
   if (!history[0] && isMobile) return null;
 
   return (

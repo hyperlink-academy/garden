@@ -10,6 +10,7 @@ import { WriteTransaction } from "@rocicorp/reflect";
 import { getMemberColor } from "backend/SpaceDurableObject/routes/join";
 import { generateKeyBetween } from "src/fractional-indexing";
 import { app_event } from "backend/lib/analytics";
+import { getOrCreateMemberEntity } from "src/getOrCreateMemberEntity";
 import { createClient } from "backend/lib/supabase";
 
 export type MutationContext = {
@@ -34,16 +35,16 @@ export type MutationContext = {
     undoAction?: boolean
   ) => Promise<{ success: boolean }>;
   runOnServer: (
-    fn: (args: {
-      id: string;
+    fn: (
       env: {
+        id: string;
         NEXT_API_URL: string;
         RPC_SECRET: string;
         SUPABASE_API_TOKEN: string;
         SUPABASE_URL: string;
-      };
-      user_studio: string;
-    }) => Promise<void>
+      },
+      user_studio: string
+    ) => Promise<void>
   ) => Promise<void>;
   retractFact: (id: string, undoAction?: boolean) => Promise<void>;
   retractEphemeralFact: (clientID: string, id: string) => Promise<void>;
@@ -233,10 +234,10 @@ const createCard: Mutation<{
     },
     ctx
   );
-  await ctx.runOnServer(async ({ id, env, user_studio }) => {
+  await ctx.runOnServer(async (env, user_studio) => {
     await app_event(env, {
       event: "created_card",
-      spaceID: id,
+      spaceID: env.id,
       user: user_studio,
     });
   });
@@ -352,7 +353,8 @@ const updateTitleFact: Mutation<{
 
 const replyToDiscussion: Mutation<{
   discussion: string;
-  message: Message;
+  session: { username: string; studio: string };
+  message: Omit<Message, "sender">;
 }> = async (args, ctx) => {
   let messageCount = await ctx.scanIndex.eav(
     args.discussion,
@@ -364,22 +366,20 @@ const replyToDiscussion: Mutation<{
     value: messageCount ? messageCount.value + 1 : 1,
     positions: {},
   });
+  let sender = await getOrCreateMemberEntity(args.session, ctx);
 
   await markUnread(
     {
       entityID: args.discussion,
-      memberEntity: args.message.sender,
+      memberEntity: sender,
       attribute: "discussion/unread-by",
     },
     ctx
   );
 
-  await ctx.postMessage(args.message);
-  let senderStudio = await ctx.scanIndex.eav(
-    args.message.sender,
-    "space/member"
-  );
-  await ctx.runOnServer(async ({ id, env, user_studio }) => {
+  await ctx.postMessage({ ...args.message, sender });
+  let senderStudio = await ctx.scanIndex.eav(sender, "space/member");
+  await ctx.runOnServer(async (env, userID) => {
     if (!senderStudio) return;
 
     let title: Fact<"room/name" | "card/title"> | null =
@@ -388,8 +388,8 @@ const replyToDiscussion: Mutation<{
 
     await app_event(env, {
       event: "sent_message",
-      spaceID: id,
-      user: user_studio,
+      spaceID: env.id,
+      user: userID,
     });
 
     try {
@@ -398,7 +398,7 @@ const replyToDiscussion: Mutation<{
         title: title?.value || "Untitled",
         senderStudio: senderStudio.value,
         message: args.message,
-        spaceID: id,
+        spaceID: env.id,
       };
       let payloadString = JSON.stringify(payload);
       fetch(`${env.NEXT_API_URL}/api/web_push`, {
@@ -434,10 +434,10 @@ const createRoom: Mutation<{
     value: args.type,
     positions: {},
   });
-  await ctx.runOnServer(async ({ id, env, user_studio }) => {
+  await ctx.runOnServer(async (env, user_studio) => {
     await app_event(env, {
       event: "created_room",
-      spaceID: id,
+      spaceID: env.id,
       user: user_studio,
     });
   });
@@ -484,13 +484,14 @@ const addReaction: Mutation<{
 const markRead: Mutation<{
   entityID: string;
   memberEntity: string;
+  userID: string;
   attribute: "discussion/unread-by" | "card/unread-by";
 }> = async (args, ctx) => {
   let unreads = await ctx.scanIndex.eav(args.entityID, args.attribute);
   let unread = unreads.find((u) => u.value.value === args.memberEntity);
   if (unread) await ctx.retractFact(unread.id);
 
-  await ctx.runOnServer(async ({ id, env }) => {
+  await ctx.runOnServer(async (env, id) => {
     let space = await ctx.scanIndex.eav(args.memberEntity, "space/member");
     if (!space) return;
     let supabase = createClient(env);
@@ -549,7 +550,7 @@ const joinSpace: Mutation<{
 
   //TODO I should make this use the auth context to ensure that the user is
   //joining legitimately
-  return ctx.runOnServer(async ({ user_studio }) => {
+  return ctx.runOnServer(async (_env, user_studio) => {
     let existingMember = await ctx.scanIndex.ave("space/member", user_studio);
     if (existingMember) return;
 
@@ -580,7 +581,7 @@ const leaveSpace: Mutation<{ memberEntity: string }> = async (
   { memberEntity },
   ctx
 ) => {
-  return ctx.runOnServer(async ({ user_studio }) => {
+  return ctx.runOnServer(async (_env, user_studio) => {
     let studio = await ctx.scanIndex.eav(memberEntity, "space/member");
     if (!studio || studio.value !== user_studio) return;
     let references = await ctx.scanIndex.vae(memberEntity);
@@ -711,3 +712,9 @@ export const Mutations = {
   leaveSpace,
   createRoom,
 };
+
+export const StudioMatePermissions: Array<keyof typeof Mutations> = [
+  "replyToDiscussion",
+  "markRead",
+  "addReaction",
+];

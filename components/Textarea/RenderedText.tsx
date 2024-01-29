@@ -17,6 +17,7 @@ export const RenderedText = forwardRef<
     text: string;
     renderLinks?: boolean;
     entityID?: string;
+    placeholder?: string;
   } & JSX.IntrinsicElements["pre"]
 >((props, elRef) => {
   let { open } = useCardViewer();

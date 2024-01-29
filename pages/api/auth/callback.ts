@@ -3,7 +3,6 @@ import { createPagesServerClient } from "@supabase/auth-helpers-nextjs";
 
 const handler: NextApiHandler = async (req, res) => {
   const { code } = req.query;
-  console.log("YOOOOOSDKLFJHSDLKJF");
 
   if (code) {
     const supabase = createPagesServerClient({ req, res });

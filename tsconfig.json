@@ -2,8 +2,15 @@
   "compilerOptions": {
     "downlevelIteration": true,
     "target": "es5",
-    "lib": ["dom", "dom.iterable", "esnext", "webworker"],
-    "types": ["@cloudflare/workers-types"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext",
+      "webworker"
+    ],
+    "types": [
+      "@cloudflare/workers-types"
+    ],
     "allowJs": true,
     "baseUrl": ".",
     "skipLibCheck": true,
@@ -17,8 +24,20 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "incremental": true
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

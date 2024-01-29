@@ -13,8 +13,18 @@ import { useSubscribe } from "hooks/useSubscribe";
 import { useAuth } from "./useAuth";
 import { UndoManager } from "@rocicorp/undo";
 import { Reflect } from "@rocicorp/reflect/client";
-import { ReplicacheMutators, scanIndex } from "reflect";
+import { scanIndex } from "reflect";
 export { scanIndex } from "reflect";
+import { useSpaceData } from "./useSpaceData";
+import { useStudioDataByDOID } from "./useStudioData";
+import { WriteTransaction } from "@rocicorp/reflect";
+
+export type ReplicacheMutators = {
+  [k in keyof typeof Mutations]: (
+    tx: WriteTransaction,
+    args: Parameters<(typeof Mutations)[k]>[0]
+  ) => Promise<void>;
+};
 
 export let ReplicacheContext = createContext<{
   rep: Reflect<ReplicacheMutators>;
@@ -174,7 +184,9 @@ export const useSpaceID = () => {
 export const useMutations = () => {
   let { session } = useAuth();
   let rep = useContext(ReplicacheContext);
-  let auth = useSubscribe(
+  let { data: spaceData } = useSpaceData(rep?.id);
+  let { data: studioData } = useStudioDataByDOID(rep?.id);
+  let memberEntity = useSubscribe(
     async (tx) => {
       if (!session || !session.loggedIn || !session.session?.studio)
         return null;
@@ -190,6 +202,25 @@ export const useMutations = () => {
     null,
     [session.session?.studio],
     "auth"
+  );
+  let auth =
+    session.user &&
+    (spaceData?.members_in_spaces.find((m) => m.member === session.user?.id) ||
+      studioData?.members_in_studios?.find(
+        (m) => m.member === session.user?.id
+      ));
+  let permissions = useMemo(
+    () => ({
+      commentAndReact:
+        !!memberEntity ||
+        (session &&
+          spaceData?.spaces_in_studios.find((s) =>
+            s.studios?.members_in_studios.find(
+              (m) => m.member === session.user?.id
+            )
+          )),
+    }),
+    [spaceData, session, memberEntity]
   );
   let client = useSubscribe(
     async (tx) => {
@@ -210,11 +241,11 @@ export const useMutations = () => {
       mutation: T,
       args: Parameters<(typeof Mutations)[T]>[0]
     ) {
-      if (!session || !auth) return;
+      if (!session) return;
       //@ts-ignore
       return rep?.rep.mutate[mutation](args);
     },
-    [session, auth, rep]
+    [session, memberEntity, rep]
   );
   let action = useMemo(
     () => ({
@@ -239,9 +270,10 @@ export const useMutations = () => {
   return {
     rep: rep?.rep,
     authorized: !!auth,
-    memberEntity: auth?.entity || null,
+    memberEntity: memberEntity?.entity || null,
     client,
     mutate,
     action,
+    permissions,
   };
 };

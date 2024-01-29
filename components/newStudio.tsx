@@ -1,6 +1,8 @@
 import { ButtonPrimary } from "components/Buttons";
 import { CreateSpace } from "components/CreateSpace";
 import { Divider } from "components/Layout";
+import Image from "next/image";
+import sanboxSpotIllo from "public/img/spotIllustration/sandbox.png";
 
 export const NewStudio = (props: {
   studioSpaceID: string;
@@ -10,7 +12,7 @@ export const NewStudio = (props: {
     <div className="flex flex-col gap-6 pt-4 text-grey-35">
       <div className=" lightBorder flex flex-col-reverse items-center gap-4 bg-white p-4 text-center sm:flex-row ">
         <div className="flex grow  flex-col place-items-center gap-3">
-          <h1>Welcome to Hyperlink!</h1>
+          <h2>Welcome to Hyperlink!</h2>
           <p className="text-lg">
             <span className="font-bold">Here, you make and join Spaces.</span>
             <br />
@@ -26,11 +28,11 @@ export const NewStudio = (props: {
           </div>
         </div>
         <div className="flex shrink-0  flex-col items-center gap-2 ">
-          <img
+          <Image
             className="rounded-md"
-            width={"280px"}
+            width={280}
             alt="an overgrown door with a ladder leading up to it"
-            src="/img/spotIllustration/sandbox.png"
+            src={sanboxSpotIllo}
           />
         </div>
       </div>

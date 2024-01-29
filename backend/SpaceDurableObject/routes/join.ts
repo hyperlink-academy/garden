@@ -5,15 +5,16 @@ import { createClient } from "backend/lib/supabase";
 import { z } from "zod";
 import { memberColors } from "src/colors";
 import { Env } from "..";
-import { MutationContext } from "data/mutations";
 import { webPushPayloadParser } from "pages/api/web_push";
 import { sign } from "src/sign";
+import { MutationContext } from "data/mutations";
 
 export const join_route = makeRoute({
   route: "join",
   input: z.object({
     code: z.string(),
     authToken: authTokenVerifier,
+    bio: z.string().optional(),
   }),
   handler: async (msg, env: Env) => {
     let supabase = createClient(env.env);
@@ -86,14 +87,16 @@ export const join_route = makeRoute({
     env.updateLastUpdated();
     app_event(env.env, {
       event: "joined_space",
-      user: session.username,
+      user: session.id,
       spaceID: env.id,
     });
     return { data: { success: true } } as const;
   },
 });
 
-export const getMemberColor = async (fact_store: MutationContext) => {
+export const getMemberColor = async (
+  fact_store: Pick<MutationContext, "scanIndex">
+) => {
   let existingMemberColors = await fact_store.scanIndex.aev("member/color");
   let color;
   let unassignedColors = memberColors.filter(

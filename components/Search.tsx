@@ -38,6 +38,10 @@ export function Search() {
   let [open, setOpen] = useState(false);
   let [focused, ref] = useIsElementOrChildFocused();
   let inputRef = useRef<HTMLInputElement>(null);
+  let [render, setRender] = useState(false);
+  useEffect(() => {
+    setRender(true);
+  }, []);
   useEffect(() => {
     let listener = (e: KeyboardEvent) => {
       if (e.key == "k" && (e.metaKey || e.ctrlKey)) {
@@ -65,27 +69,32 @@ export function Search() {
   let room = useRoom();
   let currentOpenCard = useCurrentOpenCard();
   let roomType = db.useEntity(room, "room/type");
+  if (!render) return null;
+
   return (
     <Popover.Root open>
-      <div style={{ width: 336 }}>
-        <Popover.Anchor />
+      <div className="w-full">
+        {/* this transparent anchor is a hack, but you need some content in the div to ensure that the popover positions itself correctly on page load */}
+        <Popover.Anchor className="h-8 text-transparent">.</Popover.Anchor>
         <Popover.Portal>
           <Popover.Content
+            side="bottom"
+            sideOffset={-40}
             ref={combinedRefs}
             onOpenAutoFocus={(e) => e.preventDefault()}
-            className={`no-scrollbar z-0 -mr-4 flex max-h-80 flex-col gap-1  overflow-x-scroll pb-1 text-sm ${
-              open ? "-mt-2 rounded-md border-grey-90 bg-white shadow-drop" : ""
+            className={`no-scrollbar relative z-0 flex max-h-80 flex-col gap-1 overflow-x-scroll rounded-md border text-sm ${
+              open
+                ? " border-grey-90 bg-white shadow-drop"
+                : "border-transparent"
             }`}
             style={{ width: "var(--radix-popper-anchor-width)" }}
           >
             <div
-              className={`sticky top-0 z-20 px-2 ${open && "bg-white pt-2"} `}
+              className={`sticky top-0 z-20  px-2 pt-2  ${
+                open && " bg-white"
+              } `}
             >
-              <RoomSearch
-                className={`absolute right-4  text-grey-55 ${
-                  open ? "top-4" : "top-2"
-                }`}
-              />
+              <RoomSearch className={`absolute right-4 top-4 text-grey-55`} />
               <input
                 ref={inputRef}
                 tabIndex={-1}
@@ -235,8 +244,8 @@ export function Search() {
                 }
               />
               {open && (
-                <div className="flex flex-col gap-1 pt-2 text-grey-55">
-                  <div className="flex w-full items-start justify-between text-xs">
+                <div className="flex flex-col text-grey-55">
+                  <div className="flex w-full items-start justify-between py-2 text-xs">
                     {shortcutHelpOpen ? (
                       <div className="flex flex-col gap-1 italic">
                         <div className="flex gap-2">
@@ -282,30 +291,32 @@ export function Search() {
                 </div>
               )}
             </div>
-            <div className="z-10 flex w-full flex-col">
-              {open && input.length > 0 ? (
-                <SearchResults
-                  onClick={() => setOpen(false)}
-                  results={results}
-                  suggestionIndex={suggestionIndex}
-                />
-              ) : !authorized && input.length > 3 ? (
-                <SearchResults
-                  onClick={() => setOpen(false)}
-                  results={results}
-                  suggestionIndex={suggestionIndex}
-                />
-              ) : null}
-              {open && input && !exactMatch && authorized && (
-                <div
-                  className={`px-2 py-1 ${
-                    suggestionIndex === results.length ? "bg-bg-blue" : ""
-                  }`}
-                >
-                  <NewCard title={input} onClick={() => setOpen(false)} />
-                </div>
-              )}
-            </div>
+            {open && input.length > 0 && (
+              <div className="z-10 flex w-full flex-col pt-3">
+                {open && input.length > 0 ? (
+                  <SearchResults
+                    onClick={() => setOpen(false)}
+                    results={results}
+                    suggestionIndex={suggestionIndex}
+                  />
+                ) : !authorized && input.length > 3 ? (
+                  <SearchResults
+                    onClick={() => setOpen(false)}
+                    results={results}
+                    suggestionIndex={suggestionIndex}
+                  />
+                ) : null}
+                {open && input && !exactMatch && authorized && (
+                  <div
+                    className={`px-2 py-1 ${
+                      suggestionIndex === results.length ? "bg-bg-blue" : ""
+                    }`}
+                  >
+                    <NewCard title={input} onClick={() => setOpen(false)} />
+                  </div>
+                )}
+              </div>
+            )}
           </Popover.Content>
         </Popover.Portal>
       </div>
@@ -506,7 +517,7 @@ export const MobileSearch = () => {
                 ref={inputRef}
                 value={input}
                 onChange={(e) => setInput(e.currentTarget.value)}
-                placeholder="search cards..."
+                placeholder="search cards…"
               />
             </div>
             <button onClick={() => setState("normal")} className="text-grey-15">

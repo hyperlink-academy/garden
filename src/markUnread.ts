@@ -1,6 +1,7 @@
 import { ref } from "data/Facts";
 import { MutationContext } from "data/mutations";
 import { createClient } from "backend/lib/supabase";
+import { getOrCreateMemberEntity } from "./getOrCreateMemberEntity";
 
 export const markUnread = async (
   args: {
@@ -23,20 +24,40 @@ export const markUnread = async (
     });
   }
 
-  await ctx.runOnServer(async ({ id, env }) => {
+  await ctx.runOnServer(async (env) => {
     let supabase = createClient(env);
-    await supabase.from("user_space_unreads").upsert(
-      await Promise.all(
-        members.map(async (m) => {
-          let unreads = await calculateUnreads(m.entity, ctx);
-          return {
-            user: m.value,
-            space: id,
-            unreads,
-          };
-        })
+    let { data } = await supabase
+      .from("space_data")
+      .select(
+        "members_in_spaces(identity_data(*)), spaces_in_studios(studios(members_in_studios(identity_data(*))))"
       )
-    );
+      .eq("do_id", env.id)
+      .single();
+    if (!data) return;
+    let members = [
+      ...data.members_in_spaces,
+      ...data.spaces_in_studios.flatMap(
+        (m) => (m.studios as NonNullable<typeof m.studios>).members_in_studios
+      ),
+    ].map((m) => m.identity_data as NonNullable<typeof m.identity_data>);
+    for (let i = 0; i < members.length; i++) {
+      let memberEntity = await getOrCreateMemberEntity(members[i], ctx);
+
+      if (memberEntity !== args.memberEntity)
+        await ctx.assertFact({
+          entity: args.entityID,
+          attribute: args.attribute,
+          value: ref(memberEntity),
+          positions: {},
+        });
+
+      let unreads = await calculateUnreads(memberEntity, ctx);
+      await supabase.from("user_space_unreads").upsert({
+        user: members[i].id,
+        space: env.id,
+        unreads,
+      });
+    }
   });
 };
 

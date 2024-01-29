@@ -62,6 +62,7 @@ export class SpaceDurableObject implements DurableObject {
         for (let i = 0; i < pendingMigrations.length; i++) {
           await pendingMigrations[i].run(this.state.storage, {
             id: this.state.id.toString(),
+            ...env,
           });
         }
       } catch (e) {

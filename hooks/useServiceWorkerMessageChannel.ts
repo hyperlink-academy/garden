@@ -1,8 +1,9 @@
 import { useEffect } from "react";
 import { ServiceWorkerMessages } from "worker";
-import Router from "next/router";
+import { useRouter } from "next/navigation";
 
 export const useServiceWorkerMessageChannel = () => {
+  let router = useRouter();
   useEffect(() => {
     if (!navigator.serviceWorker) return;
     const messageChannel = new MessageChannel();
@@ -13,10 +14,8 @@ export const useServiceWorkerMessageChannel = () => {
     messageChannel.port1.onmessage = (event) => {
       let data: ServiceWorkerMessages = event.data;
       if (data.type === "navigate")
-        Router.push(
-          `${data.spaceURL}${data.card ? `?openCard=${data.card}` : ""}`,
-          undefined,
-          { shallow: true }
+        router.push(
+          `${data.spaceURL}${data.card ? `?openCard=${data.card}` : ""}`
         );
     };
 

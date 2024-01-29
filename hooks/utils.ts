@@ -1,4 +1,3 @@
-import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import useWindowDimensions from "./useWindowDimensions";
 
@@ -93,3 +92,10 @@ export function useIsMobile() {
   const { width } = useWindowDimensions();
   return width < 640 || width === 0;
 }
+export const useIsClient = () => {
+  const [isClient, setIsClient] = useState(false);
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+  return isClient;
+};

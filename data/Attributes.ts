@@ -18,6 +18,7 @@ export const BaseAttributes = {
       "last-read-message",
       "timestamp",
       "feed_post",
+      "link-preview",
       "post/attached-card",
       "string",
       "union",
@@ -103,8 +104,18 @@ export const DefaultAttributes = {
     unique: false,
     cardinality: "one",
   },
+  "image/rotation": {
+    type: "number",
+    cardinality: "one",
+    unique: false,
+  },
   "card/image": {
     type: "file",
+    unique: false,
+    cardinality: "many",
+  },
+  "card/link-preview": {
+    type: "link-preview",
     unique: false,
     cardinality: "one",
   },
@@ -150,6 +161,11 @@ export const DefaultAttributes = {
   },
   "card/reaction": {
     type: "string",
+    unique: false,
+    cardinality: "many",
+  },
+  "card/blocks": {
+    type: "reference",
     unique: false,
     cardinality: "many",
   },
@@ -284,6 +300,12 @@ export const DefaultAttributes = {
     type: "string",
     cardinality: "one",
     unique: true,
+    ephemeral: true,
+  },
+  "presence/in-space": {
+    type: "string",
+    cardinality: "one",
+    unique: false,
     ephemeral: true,
   },
   "presence/in-room": {

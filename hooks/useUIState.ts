@@ -24,7 +24,7 @@ export let useUIState = create(
       },
       cardStates: {} as {
         [entityID: string]: {
-          drawer: null | "backlinks" | "comments";
+          drawer: null | "backlinks" | "chat";
           drawerOpen: boolean;
         };
       },
@@ -68,7 +68,7 @@ export let useUIState = create(
             open === undefined ? !state.mobileSidebarOpen : open,
         }));
       },
-      openDrawer: (entityID: string, drawer: "backlinks" | "comments") => {
+      openDrawer: (entityID: string, drawer: "backlinks" | "chat") => {
         set((state) => ({
           ...state,
           cardStates: {

@@ -2,10 +2,9 @@ import { z } from "zod";
 import { makeRoute } from "backend/lib/api";
 import { Env } from "..";
 import { authTokenVerifier, verifyIdentity } from "backend/lib/auth";
-import { Database } from "backend/lib/database.types";
 import { uuidToBase62 } from "src/uuidHelpers";
 import { createClient } from "backend/lib/supabase";
-import { isMember } from "../lib/isMember";
+import { isUserMember } from "../lib/isMember";
 
 export const get_daily_token_route = makeRoute({
   route: "get_daily_token",
@@ -26,7 +25,7 @@ export const get_daily_token_route = makeRoute({
 
     const supabase = createClient(env.env);
 
-    if (!isMember(supabase, env, session.id)) {
+    if (!isUserMember(env, session.id)) {
       return {
         data: { success: false, error: "user is not a member" },
       } as const;

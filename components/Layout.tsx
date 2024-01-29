@@ -4,17 +4,19 @@ import React, { Fragment } from "react";
 export const Divider = (props: {
   dark?: boolean;
   vertical?: boolean;
-  px?: number;
-  py?: number;
+  mx?: number;
+  my?: number;
 }) => {
   return (
     <div
-      className={`w-full border-l border-t ${
+      className={` border-l border-t ${
         props.dark ? `border-grey-55` : `border-grey-80`
-      } ${props.vertical ? "h-full" : ""} 
+      } ${props.vertical ? "100vh w-[1px]" : "h-[1px] w-full"} 
       `}
       style={{
-        padding: `${props.py}px ${props.px}px ${props.py}px ${props.px}px`,
+        margin: `${props.my || 0}px ${props.mx || 0}px ${props.my || 0}px ${
+          props.mx || 0
+        }px`,
       }}
     ></div>
   );

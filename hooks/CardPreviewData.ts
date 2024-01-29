@@ -11,7 +11,7 @@ export const useCardPreviewData = (entityID: string) => {
   let member = db.useEntity(entityID, "member/name");
   let title = db.useEntity(entityID, "card/title");
   let content = db.useEntity(entityID, "card/content");
-  let image = db.useEntity(entityID, "card/image");
+  let image = db.useEntity(entityID, "card/image")?.[0];
   let date = db.useEntity(entityID, "card/date");
 
   let imageUrl = !image

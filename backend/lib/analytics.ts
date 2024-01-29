@@ -4,6 +4,7 @@ type AppEvents =
   | "signup"
   | "create_space"
   | "joined_space"
+  | "left_space"
   | "created_card"
   | "sent_message"
   | "created_room";

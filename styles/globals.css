@@ -47,6 +47,7 @@ body {
   @apply h-full;
   @apply p-0;
   @apply text-grey-15;
+  @apply overscroll-y-none;
   min-height: -webkit-fill-available;
   font-family: "Quattro";
 }
@@ -67,14 +68,13 @@ h2 {
 }
 
 h3 {
-  @apply text-lg;
+  @apply text-[20px];
   @apply font-bold;
 }
 
 h4 {
-  @apply text-[.95rem];
+  @apply text-lg;
   @apply font-bold;
-  @apply text-grey-35;
 }
 
 a {
@@ -238,20 +238,25 @@ textarea {
   scrollbar-width: none; /* Firefox */
 }
 
-@media (display-mode: standalone),
-  (display-mode: fullscreen) and (max-width: 640px) {
-  .pwa-padding {
-    padding-top: env(safe-area-inset-top) !important;
-  }
-  .pwa-bottom-padding {
-    padding-bottom: env(safe-area-inset-bottom) !important;
-  }
+.pwa-padding {
+  padding-top: env(safe-area-inset-top) !important;
+}
 
-  .pwa-margin {
-    margin-top: env(safe-area-inset-top) !important;
-  }
+.pwa-padding-bottom {
+  padding-bottom: env(safe-area-inset-bottom) !important;
+}
 
-  .safari-pwa-height {
-    height: 100lvh !important;
-  }
+.pwa-margin {
+  margin-top: env(safe-area-inset-top) !important;
+}
+.pwa-margin-bottom {
+  margin-bottom: env(safe-area-inset-top) !important;
+}
+
+.pwa-negative-margin {
+  margin-top: calc(env(safe-area-inset-top) * -1) !important;
+}
+
+.safari-pwa-height {
+  height: 100lvh !important;
 }

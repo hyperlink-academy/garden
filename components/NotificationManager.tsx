@@ -1,15 +1,13 @@
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
-import { Database } from "backend/lib/database.types";
-import { Divider } from "./Layout";
 import { useEffect, useState } from "react";
 import { Settings } from "./Icons";
 import { ButtonPrimary, ButtonSecondary } from "./Buttons";
 import { useAuth } from "hooks/useAuth";
 import { Modal } from "./Modal";
 import { HelpAppInfo } from "./HelpCenter";
+import { supabaseBrowserClient } from "supabase/clients";
 
 export const NotificationManager = () => {
-  let supabase = useSupabaseClient<Database>();
+  let supabase = supabaseBrowserClient();
   let { logout } = useAuth();
   let [open, setOpen] = useState(false);
   let [notificationPermissionState, setNotificationPermissionState] =
@@ -130,7 +128,7 @@ const NotificationModalContent = ({
   setPushPermissionState: React.Dispatch<React.SetStateAction<string>>;
   setNotificationPermissionState: React.Dispatch<React.SetStateAction<string>>;
 }) => {
-  let supabase = useSupabaseClient<Database>();
+  let supabase = supabaseBrowserClient();
 
   if (
     notificationPermissionState === "unavailable" ||
@@ -179,7 +177,7 @@ const NotificationModalContent = ({
                     });
                     setExistingSubscription(result);
                     setNotificationPermissionState("granted");
-                    setPushPermissionState("granted")
+                    setPushPermissionState("granted");
                     let { data: session } = await supabase.auth.getSession();
                     if (!session.session) return;
                     await supabase.from("push_subscriptions").insert({

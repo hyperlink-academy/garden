@@ -49,13 +49,23 @@ export const DoorImage = (props: {
       <defs>
         <>
           <style>
-            {`.cls-1{fill:`}
-            {light}
-            {`;} .cls-2{fill:`}
-            {medium}
-            {`;} .cls-3{fill:`}
-            {dark}
-            {`;} .cls-4{fill:white;}`}
+            {`
+        .cls-1 {
+          fill: ${light};
+        }
+
+        .cls-2 {
+          fill: ${medium};
+        }
+
+        .cls-3 {
+          fill: ${dark};
+        }
+
+        .cls-4 {
+          fill: white;
+        }
+        `}
           </style>
           <OuterFrameClipPath small={props.small} />
 
