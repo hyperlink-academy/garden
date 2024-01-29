@@ -314,8 +314,8 @@ const MemberOptions = () => {
         open={leaveModalOpen}
         onClose={() => setLeaveModalOpen(false)}
       >
-        You won&apos;t be able to make any changes to this space anymore. It
-        will also be removed from your space list.
+        You&apos;ll no longer be able to edit this Space, and it will be removed
+        from your homepage.
         <ModalSubmitButton
           destructive
           content={loading ? "" : "Leave Space"}
