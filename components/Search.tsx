@@ -82,7 +82,7 @@ export function Search() {
             sideOffset={-40}
             ref={combinedRefs}
             onOpenAutoFocus={(e) => e.preventDefault()}
-            className={`no-scrollbar relative z-0 flex max-h-80 flex-col gap-1 overflow-x-scroll rounded-md border pb-1 text-sm ${
+            className={`no-scrollbar relative z-0 flex max-h-80 flex-col gap-1 overflow-x-scroll rounded-md border text-sm ${
               open
                 ? " border-grey-90 bg-white shadow-drop"
                 : "border-transparent"
@@ -244,8 +244,8 @@ export function Search() {
                 }
               />
               {open && (
-                <div className="flex flex-col gap-1 pt-2 text-grey-55">
-                  <div className="flex w-full items-start justify-between text-xs">
+                <div className="flex flex-col text-grey-55">
+                  <div className="flex w-full items-start justify-between py-2 text-xs">
                     {shortcutHelpOpen ? (
                       <div className="flex flex-col gap-1 italic">
                         <div className="flex gap-2">
@@ -291,30 +291,32 @@ export function Search() {
                 </div>
               )}
             </div>
-            <div className="z-10 flex w-full flex-col">
-              {open && input.length > 0 ? (
-                <SearchResults
-                  onClick={() => setOpen(false)}
-                  results={results}
-                  suggestionIndex={suggestionIndex}
-                />
-              ) : !authorized && input.length > 3 ? (
-                <SearchResults
-                  onClick={() => setOpen(false)}
-                  results={results}
-                  suggestionIndex={suggestionIndex}
-                />
-              ) : null}
-              {open && input && !exactMatch && authorized && (
-                <div
-                  className={`px-2 py-1 ${
-                    suggestionIndex === results.length ? "bg-bg-blue" : ""
-                  }`}
-                >
-                  <NewCard title={input} onClick={() => setOpen(false)} />
-                </div>
-              )}
-            </div>
+            {open && input.length > 0 && (
+              <div className="z-10 flex w-full flex-col pt-3">
+                {open && input.length > 0 ? (
+                  <SearchResults
+                    onClick={() => setOpen(false)}
+                    results={results}
+                    suggestionIndex={suggestionIndex}
+                  />
+                ) : !authorized && input.length > 3 ? (
+                  <SearchResults
+                    onClick={() => setOpen(false)}
+                    results={results}
+                    suggestionIndex={suggestionIndex}
+                  />
+                ) : null}
+                {open && input && !exactMatch && authorized && (
+                  <div
+                    className={`px-2 py-1 ${
+                      suggestionIndex === results.length ? "bg-bg-blue" : ""
+                    }`}
+                  >
+                    <NewCard title={input} onClick={() => setOpen(false)} />
+                  </div>
+                )}
+              </div>
+            )}
           </Popover.Content>
         </Popover.Portal>
       </div>
