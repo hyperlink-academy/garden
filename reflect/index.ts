@@ -11,6 +11,7 @@ import { z } from "zod";
 import { migrations } from "./migrations";
 import { initializeSpace } from "./initializeSpace";
 import { createClient } from "backend/lib/supabase";
+import { isUserMember } from "backend/SpaceDurableObject/lib/isMember";
 
 export { makeOptions as default };
 export type Env = z.infer<typeof EnvValidator>;
@@ -98,8 +99,8 @@ function makeOptions(): ReflectServerOptions<ReplicacheMutators> {
 
       let supabase = createClient(env);
       let { data: session } = await supabase.auth.setSession(auth.authToken);
-      let authorized = session.user.id
-        ? await isUserMember(env, sesison.user.id)
+      let authorized = session.user?.id
+        ? !!(await isUserMember({ env, id: roomID }, session.user.id))
         : false;
       return {
         userID: session?.user?.id || "unauthorized",
