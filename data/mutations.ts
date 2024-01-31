@@ -38,10 +38,12 @@ export type MutationContext = {
     fn: (
       env: {
         id: string;
-        NEXT_API_URL: string;
-        RPC_SECRET: string;
-        SUPABASE_API_TOKEN: string;
-        SUPABASE_URL: string;
+        env: {
+          NEXT_API_URL: string;
+          RPC_SECRET: string;
+          SUPABASE_API_TOKEN: string;
+          SUPABASE_URL: string;
+        };
       },
       user_studio: string
     ) => Promise<void>
@@ -235,7 +237,7 @@ const createCard: Mutation<{
     ctx
   );
   await ctx.runOnServer(async (env, user_studio) => {
-    await app_event(env, {
+    await app_event(env.env, {
       event: "created_card",
       spaceID: env.id,
       user: user_studio,
@@ -386,7 +388,7 @@ const replyToDiscussion: Mutation<{
       await ctx.scanIndex.eav(args.discussion, "card/title");
     if (!title) title = await ctx.scanIndex.eav(args.discussion, "room/name");
 
-    await app_event(env, {
+    await app_event(env.env, {
       event: "sent_message",
       spaceID: env.id,
       user: userID,
@@ -401,14 +403,14 @@ const replyToDiscussion: Mutation<{
         spaceID: env.id,
       };
       let payloadString = JSON.stringify(payload);
-      fetch(`${env.NEXT_API_URL}/api/web_push`, {
+      fetch(`${env.env.NEXT_API_URL}/api/web_push`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           payload: payloadString,
-          sig: await sign(payloadString, env.RPC_SECRET),
+          sig: await sign(payloadString, env.env.RPC_SECRET),
         }),
       });
     } catch (e) {
@@ -435,7 +437,7 @@ const createRoom: Mutation<{
     positions: {},
   });
   await ctx.runOnServer(async (env, user_studio) => {
-    await app_event(env, {
+    await app_event(env.env, {
       event: "created_room",
       spaceID: env.id,
       user: user_studio,
@@ -494,7 +496,7 @@ const markRead: Mutation<{
   await ctx.runOnServer(async (env, id) => {
     let space = await ctx.scanIndex.eav(args.memberEntity, "space/member");
     if (!space) return;
-    let supabase = createClient(env);
+    let supabase = createClient(env.env);
     let unreads = await calculateUnreads(args.memberEntity, ctx);
     await supabase
       .from("user_space_unreads")

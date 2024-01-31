@@ -25,7 +25,7 @@ export const markUnread = async (
   }
 
   await ctx.runOnServer(async (env) => {
-    let supabase = createClient(env);
+    let supabase = createClient(env.env);
     let { data } = await supabase
       .from("space_data")
       .select(
