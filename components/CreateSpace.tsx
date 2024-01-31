@@ -1,7 +1,6 @@
 import { spaceAPI } from "backend/lib/api";
 import { useAuth } from "hooks/useAuth";
-import { ReplicacheContext, useMutations } from "hooks/useReplicache";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { ButtonPrimary, ButtonSecondary } from "./Buttons";
 import { DoorSelector } from "./DoorSelector";
 import { SpaceCreate } from "./Icons";
@@ -12,6 +11,8 @@ import { useSpaceData } from "hooks/useSpaceData";
 import { useIdentityData } from "hooks/useIdentityData";
 import { Form, SubmitButton } from "./Form";
 import { DotLoader } from "./DotLoader";
+import { makeReflect } from "./ReplicacheProvider";
+import { ulid } from "src/ulid";
 import { useIsMobile } from "hooks/utils";
 
 export type CreateSpaceFormState = {
@@ -35,7 +36,6 @@ export const CreateSpace = (props: {
     default_space_image: null,
   });
   let auth = useAuth();
-  let rep = useContext(ReplicacheContext);
   let router = useRouter();
   let isMobile = useIsMobile();
   return (
@@ -79,6 +79,17 @@ export const CreateSpace = (props: {
                   owner: [...s.owner, d],
                 };
               });
+              let reflect = makeReflect({
+                roomID: result.data.do_id,
+                authToken,
+                userID: auth.session.user?.id,
+              });
+              if (auth.session.session)
+                await reflect.mutate.joinSpace({
+                  memberEntity: ulid(),
+                  username: auth.session.session.username,
+                  studio: auth.session.session.studio,
+                });
               router.push(`${d.owner.username}/s/${d.name}/${d.display_name}`);
             }
             setFormState({
@@ -87,8 +98,7 @@ export const CreateSpace = (props: {
               image: null,
               default_space_image: null,
             });
-            rep?.rep.pull();
-            // setOpen(false);
+            setOpen(false);
           }}
         >
           <CreateSpaceForm formState={formState} setFormState={setFormState} />

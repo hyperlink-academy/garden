@@ -1,4 +1,3 @@
-import { Env } from "backend/SpaceDurableObject";
 import { calculateUnreads, markUnread } from "src/markUnread";
 import { Attribute, FilterAttributes, ReferenceAttributes } from "./Attributes";
 import { Fact, ref } from "./Facts";
@@ -6,11 +5,17 @@ import { Message } from "./Messages";
 import { z } from "zod";
 import { webPushPayloadParser } from "pages/api/web_push";
 import { sign } from "src/sign";
+import { ulid } from "src/ulid";
+import { WriteTransaction } from "@rocicorp/reflect";
+import { getMemberColor } from "backend/SpaceDurableObject/routes/join";
+import { generateKeyBetween } from "src/fractional-indexing";
 import { app_event } from "backend/lib/analytics";
 import { getOrCreateMemberEntity } from "src/getOrCreateMemberEntity";
 import { createClient } from "backend/lib/supabase";
 
 export type MutationContext = {
+  tx: WriteTransaction;
+  auth?: { userID: string; userStudio: string };
   assertEmphemeralFact: <A extends keyof FilterAttributes<{ ephemeral: true }>>(
     clientID: string,
     d: Pick<Fact<A>, "entity" | "attribute" | "value" | "positions"> & {
@@ -26,11 +31,22 @@ export type MutationContext = {
   ) => Promise<{ success: false } | { success: true; factID: string }>;
   updateFact: (
     id: string,
-    data: Partial<Fact<any>>,
+    data: Partial<Fact<keyof Attribute>>,
     undoAction?: boolean
   ) => Promise<{ success: boolean }>;
   runOnServer: (
-    fn: (env: Env, userID: string) => Promise<void>
+    fn: (
+      env: {
+        id: string;
+        env: {
+          NEXT_API_URL: string;
+          RPC_SECRET: string;
+          SUPABASE_API_TOKEN: string;
+          SUPABASE_URL: string;
+        };
+      },
+      user_studio: string
+    ) => Promise<void>
   ) => Promise<void>;
   retractFact: (id: string, undoAction?: boolean) => Promise<void>;
   retractEphemeralFact: (clientID: string, id: string) => Promise<void>;
@@ -220,11 +236,11 @@ const createCard: Mutation<{
     },
     ctx
   );
-  await ctx.runOnServer(async (env, userID) => {
+  await ctx.runOnServer(async (env, user_studio) => {
     await app_event(env.env, {
       event: "created_card",
       spaceID: env.id,
-      user: userID,
+      user: user_studio,
     });
   });
 };
@@ -420,11 +436,11 @@ const createRoom: Mutation<{
     value: args.type,
     positions: {},
   });
-  await ctx.runOnServer(async (env, userID) => {
+  await ctx.runOnServer(async (env, user_studio) => {
     await app_event(env.env, {
       event: "created_room",
       spaceID: env.id,
-      user: userID,
+      user: user_studio,
     });
   });
 };
@@ -477,14 +493,14 @@ const markRead: Mutation<{
   let unread = unreads.find((u) => u.value.value === args.memberEntity);
   if (unread) await ctx.retractFact(unread.id);
 
-  await ctx.runOnServer(async (env) => {
+  await ctx.runOnServer(async (env, id) => {
+    let space = await ctx.scanIndex.eav(args.memberEntity, "space/member");
+    if (!space) return;
     let supabase = createClient(env.env);
     let unreads = await calculateUnreads(args.memberEntity, ctx);
-    await supabase.from("user_space_unreads").upsert({
-      user: args.userID,
-      space: env.id,
-      unreads,
-    });
+    await supabase
+      .from("user_space_unreads")
+      .upsert({ user: space.value, unreads, space: id });
   });
 };
 
@@ -527,6 +543,138 @@ const setClientInCall: Mutation<{
   }
 };
 
+const joinSpace: Mutation<{
+  memberEntity: string;
+  username: string;
+  studio: string;
+}> = async ({ memberEntity, username, studio }, ctx) => {
+  let color = await getMemberColor(ctx);
+
+  //TODO I should make this use the auth context to ensure that the user is
+  //joining legitimately
+  return ctx.runOnServer(async (_env, user_studio) => {
+    let existingMember = await ctx.scanIndex.ave("space/member", user_studio);
+    if (existingMember) return;
+
+    await Promise.all([
+      ctx.assertFact({
+        entity: memberEntity,
+        attribute: "member/color",
+        value: color,
+        positions: {},
+      }),
+      ctx.assertFact({
+        entity: memberEntity,
+        attribute: "space/member",
+        value: studio,
+        positions: {},
+      }),
+      ctx.assertFact({
+        entity: memberEntity,
+        attribute: "member/name",
+        value: username,
+        positions: {},
+      }),
+    ]);
+  });
+};
+
+const leaveSpace: Mutation<{ memberEntity: string }> = async (
+  { memberEntity },
+  ctx
+) => {
+  return ctx.runOnServer(async (_env, user_studio) => {
+    let studio = await ctx.scanIndex.eav(memberEntity, "space/member");
+    if (!studio || studio.value !== user_studio) return;
+    let references = await ctx.scanIndex.vae(memberEntity);
+    let facts = await ctx.scanIndex.eav(memberEntity, null);
+    await Promise.all(
+      facts.concat(references).map((f) => ctx.retractFact(f.id))
+    );
+  });
+};
+
+const postToFeed: Mutation<{
+  cardPosition?: { x: number; y: number };
+  contentPosition?: { x: number; y: number };
+  content: string;
+  spaceID: string;
+  cardEntity: string;
+  memberStudioDO: string;
+}> = async (msg, ctx) => {
+  //TODO verify that the authed member is the one creating
+  let entity = ulid();
+  await ctx.assertFact({
+    entity,
+    attribute: "post/attached-card",
+    value: { space_do_id: msg.spaceID, cardEntity: msg.cardEntity },
+    positions: {},
+  });
+
+  await ctx.assertFact({
+    entity,
+    attribute: "card/content",
+    value: msg.content,
+    positions: {},
+  });
+  if (msg.contentPosition)
+    await ctx.assertFact({
+      entity,
+      attribute: "post/content/position",
+      positions: {},
+      value: {
+        type: "position",
+        x: msg.contentPosition?.x || 0,
+        y: msg.contentPosition?.y || 0,
+        rotation: 0,
+        size: "small",
+      },
+    });
+
+  if (msg.contentPosition)
+    await ctx.assertFact({
+      entity,
+      attribute: "post/attached-card/position",
+      positions: {},
+      value: {
+        type: "position",
+        x: msg.cardPosition?.x || 0,
+        y: msg.cardPosition?.y || 0,
+        rotation: 0,
+        size: "small",
+      },
+    });
+
+  let memberEntity = await ctx.scanIndex.ave(
+    "space/member",
+    msg.memberStudioDO
+  );
+  if (!memberEntity) return;
+  await ctx.assertFact({
+    entity,
+    attribute: "card/created-by",
+    value: ref(memberEntity?.entity),
+    positions: {},
+  });
+
+  //getClientID somehow
+  let latestPosts = await ctx.scanIndex.aev("feed/post");
+  await ctx.assertFact({
+    entity,
+    attribute: "feed/post",
+    value: generateKeyBetween(
+      null,
+      latestPosts.sort((a, b) => {
+        let aPosition = a.value,
+          bPosition = b.value;
+        if (aPosition === bPosition) return a.id > b.id ? 1 : -1;
+        return aPosition > bPosition ? 1 : -1;
+      })[0]?.value || null
+    ),
+    positions: {},
+  });
+};
+
 const replaceCard: Mutation<{ currentCard: string; newCard: string }> = async (
   args,
   ctx
@@ -555,12 +703,15 @@ export const Mutations = {
   assertEmphemeralFact,
   retractFact,
   updateFact,
+  postToFeed,
   updatePositionInDesktop,
   removeCardFromDesktopOrCollection,
   addCardToDesktop,
   addReaction,
   initializeClient,
   setClientInCall,
+  joinSpace,
+  leaveSpace,
   createRoom,
 };
 

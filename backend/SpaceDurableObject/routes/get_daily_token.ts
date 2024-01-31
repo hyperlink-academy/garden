@@ -2,9 +2,9 @@ import { z } from "zod";
 import { makeRoute } from "backend/lib/api";
 import { Env } from "..";
 import { authTokenVerifier, verifyIdentity } from "backend/lib/auth";
-import { createClient } from "@supabase/supabase-js";
-import { Database } from "backend/lib/database.types";
 import { uuidToBase62 } from "src/uuidHelpers";
+import { createClient } from "backend/lib/supabase";
+import { isUserMember } from "../lib/isMember";
 
 export const get_daily_token_route = makeRoute({
   route: "get_daily_token",
@@ -23,21 +23,13 @@ export const get_daily_token_route = makeRoute({
         data: { success: false, error: "Invalid session token" },
       } as const;
 
-    let isMember = await env.factStore.scanIndex.ave(
-      "space/member",
-      session.studio
-    );
+    const supabase = createClient(env.env);
 
-    if (!isMember) {
+    if (!isUserMember(env, session.id)) {
       return {
         data: { success: false, error: "user is not a member" },
       } as const;
     }
-
-    const supabase = createClient<Database>(
-      env.env.SUPABASE_URL,
-      env.env.SUPABASE_API_TOKEN
-    );
 
     let { data } = await supabase
       .from("space_data")

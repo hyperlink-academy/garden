@@ -13,6 +13,8 @@ import { SpaceCard, SpaceData } from "components/SpacesList";
 import { Divider } from "components/Layout";
 import { WORKER_URL } from "src/constants";
 import { useSearchParams } from "next/dist/client/components/navigation";
+import { makeReflect } from "components/ReplicacheProvider";
+import { ulid } from "src/ulid";
 export function JoinSpace() {
   let id = useSpaceID();
   let { session, authToken } = useAuth();
@@ -22,12 +24,23 @@ export function JoinSpace() {
   let { data } = useSpaceData(id);
 
   const onClick = async () => {
-    if (!authToken || !code || !id) return;
+    if (!authToken || !code || !id || !session.user) return;
     let data = await spaceAPI(`${WORKER_URL}/space/${id}`, "join", {
       authToken,
       code,
     });
     if (data.success) {
+      let reflect = makeReflect({
+        roomID: id,
+        authToken,
+        userID: session.user.id,
+      });
+      if (session.session)
+        await reflect.mutate.joinSpace({
+          memberEntity: ulid(),
+          username: session.session.username,
+          studio: session.session.studio,
+        });
       router.push(`/s/${query?.studio}/s/${query?.space}`);
     }
   };

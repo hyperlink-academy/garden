@@ -2,7 +2,6 @@ import React, { useContext, useState } from "react";
 import { ReferenceAttributes } from "data/Attributes";
 import {
   ReplicacheContext,
-  ReplicacheMutators,
   scanIndex,
   db,
   useMutations,
@@ -12,9 +11,10 @@ import { ulid } from "src/ulid";
 import { sortByPosition } from "src/position_helpers";
 import { generateKeyBetween } from "src/fractional-indexing";
 import { useLongPress } from "hooks/useLongPress";
-import { Replicache } from "replicache";
 import { useCardViewer } from "./CardViewerContext";
 import { CardSearch } from "./Icons";
+import { Reflect } from "@rocicorp/reflect/client";
+import { ReplicacheMutators } from "reflect";
 import { NewCardPreview, useOnDragEndCollection } from "./CardCollection";
 import { useDroppableZone } from "./DragContext";
 import { CardPreview, PlaceholderNewCard } from "./CardPreview";
@@ -53,10 +53,7 @@ export const CardAdder = (
     return null;
   } else
     return (
-      <div
-
-          ref={droppableRef}
-      >
+      <div ref={droppableRef}>
         {over &&
           (over.type === "card" || over.type === "search-card" ? (
             <div className="pb-2 opacity-60">
@@ -74,9 +71,7 @@ export const CardAdder = (
               <PlaceholderNewCard title={over.title} />
             </div>
           ) : null)}
-        <div
-          className="justify-left flex w-full shrink-0 items-center gap-2 rounded-lg border border-dashed border-grey-80 px-2 py-1 text-sm text-grey-55 group-hover:border-accent-blue"
-        >
+        <div className="justify-left flex w-full shrink-0 items-center gap-2 rounded-lg border border-dashed border-grey-80 px-2 py-1 text-sm text-grey-55 group-hover:border-accent-blue">
           <button
             className="group grow text-left font-bold hover:text-accent-blue"
             onClick={async () => {
@@ -214,7 +209,7 @@ export const AddExistingCard = (
 export const create = async (
   entity: string,
   props: StackData,
-  rep: Replicache<ReplicacheMutators>,
+  rep: Reflect<ReplicacheMutators>,
   mutate: ReturnType<typeof useMutations>["mutate"],
   factID?: string
 ) => {

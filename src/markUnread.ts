@@ -1,6 +1,6 @@
-import { createClient } from "backend/lib/supabase";
 import { ref } from "data/Facts";
 import { MutationContext } from "data/mutations";
+import { createClient } from "backend/lib/supabase";
 import { getOrCreateMemberEntity } from "./getOrCreateMemberEntity";
 
 export const markUnread = async (

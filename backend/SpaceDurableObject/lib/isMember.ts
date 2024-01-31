@@ -1,7 +1,13 @@
 import { createClient } from "backend/lib/supabase";
 import { Env } from "..";
 
-export async function isUserMember(env: Env, userID: string) {
+export async function isUserMember(
+  env: {
+    env: { SUPABASE_API_TOKEN: string; SUPABASE_URL: string };
+    id: string;
+  },
+  userID: string
+) {
   let supabase = createClient(env.env);
   let { data: isMember } = await supabase
     .from("identity_data")
@@ -18,4 +24,8 @@ export async function isUserMember(env: Env, userID: string) {
     (isMember.members_in_spaces.length > 0 ||
       isMember.members_in_studios.length > 0)
   );
+}
+
+export function isAuthorized(env: Env, userID: string) {
+  return env.id === userID;
 }

@@ -4,29 +4,20 @@ import {
   ReferenceAttributes,
   UniqueAttributes,
 } from "data/Attributes";
-import { Fact, ReferenceType, Schema, TimestampeType } from "data/Facts";
+import { Fact } from "data/Facts";
 import { Message } from "data/Messages";
-import {
-  CardinalityResult,
-  MutationContext,
-  Mutations,
-  FactInput,
-} from "data/mutations";
+import { CardinalityResult, Mutations } from "data/mutations";
 import { createContext, useCallback, useContext, useMemo } from "react";
-import {
-  Puller,
-  Pusher,
-  ReadTransaction,
-  ReadonlyJSONValue,
-  Replicache,
-  WriteTransaction,
-} from "replicache";
+import { ReadTransaction, ReadonlyJSONValue } from "replicache";
 import { useSubscribe } from "hooks/useSubscribe";
-import { ulid } from "src/ulid";
 import { useAuth } from "./useAuth";
 import { UndoManager } from "@rocicorp/undo";
+import { Reflect } from "@rocicorp/reflect/client";
+import { scanIndex } from "reflect";
+export { scanIndex } from "reflect";
 import { useSpaceData } from "./useSpaceData";
-import { useStudioData, useStudioDataByDOID } from "./useStudioData";
+import { useStudioDataByDOID } from "./useStudioData";
+import { WriteTransaction } from "@rocicorp/reflect";
 
 export type ReplicacheMutators = {
   [k in keyof typeof Mutations]: (
@@ -36,341 +27,10 @@ export type ReplicacheMutators = {
 };
 
 export let ReplicacheContext = createContext<{
-  rep: Replicache<ReplicacheMutators>;
+  rep: Reflect<ReplicacheMutators>;
   id: string;
   undoManager: UndoManager;
 } | null>(null);
-
-export const scanIndex = (tx: ReadTransaction) => {
-  const q: MutationContext["scanIndex"] = {
-    aev: async (attribute, entity) => {
-      if (!attribute) return [];
-      let results = await tx
-        .scan({
-          indexName: "aev",
-          prefix: `${attribute}-${entity || ""}`,
-        })
-        .values()
-        .toArray();
-      return results as Fact<typeof attribute>[];
-    },
-    eav: async (entity, attribute) => {
-      let results = await tx
-        .scan({
-          indexName: "eav",
-          prefix: `${entity}-${attribute ? `${attribute}-` : ""}`,
-        })
-        .values()
-        .toArray();
-
-      if (!attribute) return results as CardinalityResult<typeof attribute>;
-      let schema = await getSchema(tx, attribute);
-      if (schema?.cardinality === "one")
-        return results[0] as CardinalityResult<typeof attribute>;
-      return results as CardinalityResult<typeof attribute>;
-    },
-    vae: async (entity, attribute) => {
-      let results = await tx
-        .scan({
-          indexName: "vae",
-          prefix: `${entity}-${attribute || ""}`,
-        })
-        .values()
-        .toArray();
-      return results as Fact<Exclude<typeof attribute, undefined>>[];
-    },
-    ave: async (attribute, value) => {
-      let results = await tx
-        .scan({
-          indexName: "ave",
-          prefix: `${attribute}-${value}`,
-        })
-        .values()
-        .toArray();
-      return results[0] as Fact<typeof attribute>;
-    },
-  };
-  return q;
-};
-const getSchema = async (tx: ReadTransaction, attributeName: string) => {
-  let defaultAttr = Attribute[attributeName as keyof Attribute];
-  if (defaultAttr) return defaultAttr;
-  let q = scanIndex(tx);
-  let attribute = await q.ave("name", attributeName);
-  if (!attribute) return;
-
-  let schema: Schema = {
-    type: (await q.eav(attribute.entity, "type"))?.value || "string",
-    unique: (await q.eav(attribute.entity, "unique"))?.value || false,
-    cardinality: (await q.eav(attribute.entity, "cardinality"))?.value || "one",
-  };
-  return schema;
-};
-
-export function MessageWithIndexes(m: Message) {
-  return {
-    ...m,
-    indexes: {
-      messageByEntity: `${m.entity}`,
-      messages: `${m.topic || "general"}-${m.ts}-${m.id}`,
-    },
-  };
-}
-
-export function FactWithIndexes<A extends keyof Attribute>(f: Fact<A>) {
-  let indexes: {
-    eav: string;
-    aev: string;
-    at?: string;
-    ave?: string;
-    vae?: string;
-    feed?: string;
-  } = {
-    eav: `${f.entity}-${f.attribute}-${f.id}`,
-    aev: `${f.attribute}-${f.entity}-${f.id}`,
-  };
-  if (f.schema.type === "feed_post")
-    indexes.feed = `${f.attribute}-${f.value}-${f.id}`;
-  if (f.schema.unique) indexes.ave = `${f.attribute}-${f.value}`;
-  if (f.schema.type === "reference")
-    indexes.vae = `${(f.value as ReferenceType).value}-${f.attribute}`;
-  if (f.schema.type === "timestamp")
-    indexes.at = `${f.attribute}-${(f.value as TimestampeType).value}-${f.id}`;
-  return { ...f, indexes };
-}
-
-function makeMutators(
-  dataFunc: () => {
-    rep: Replicache<ReplicacheMutators>;
-    undoManager: UndoManager;
-  }
-): ReplicacheMutators {
-  let mutators: ReplicacheMutators = Object.keys(Mutations).reduce((acc, k) => {
-    acc[k as keyof typeof Mutations] = async (
-      tx: WriteTransaction,
-      mutationArgs: any
-    ) => {
-      let q = scanIndex(tx);
-      let context: MutationContext = {
-        runOnServer: async () => {},
-        scanIndex: q,
-        postMessage: async (m) => {
-          await tx.put(m.id, MessageWithIndexes(m));
-          return { success: true };
-        },
-        retractFact: async (id, undoAction) => {
-          let { rep, undoManager } = dataFunc();
-
-          let existingFact = (await tx.get(id)) as
-            | Fact<keyof Attribute>
-            | undefined;
-
-          console.log("retracting");
-          await tx.del(id);
-
-          if (!undoAction) {
-            undoManager.add({
-              undo: async () => {
-                if (!existingFact) return;
-                await rep.mutate.assertFact({
-                  ...existingFact,
-                  factID: id,
-                  undoAction: true,
-                } as FactInput);
-              },
-              redo: async () => {
-                await rep.mutate.retractFact({ id, undoAction: true });
-              },
-            });
-          }
-
-          return;
-        },
-        updateFact: async (id, data, undoAction) => {
-          let { rep, undoManager } = dataFunc();
-
-          let existingFact = (await tx.get(id)) as
-            | Fact<keyof Attribute>
-            | undefined;
-          if (!existingFact) return { success: false };
-
-          await tx.put(
-            id,
-            FactWithIndexes({
-              ...existingFact,
-              ...data,
-              positions: { ...existingFact.positions, ...data.positions },
-            })
-          );
-
-          if (!undoAction) {
-            undoManager.add({
-              undo: async () => {
-                if (!existingFact) return;
-                await rep.mutate.updateFact({
-                  id,
-                  data: existingFact,
-                  undoAction: true,
-                });
-              },
-              redo: async () => {
-                await rep.mutate.updateFact({ id, data, undoAction: true });
-              },
-            });
-          }
-
-          return { success: true };
-        },
-        retractEphemeralFact: async (_clientID, factID) => {
-          await tx.del(factID);
-        },
-        assertEmphemeralFact: async (_clientID, fact) => {
-          let schema = await getSchema(tx, fact.attribute);
-          if (!schema) return { success: false, error: "no schema" };
-          let lastUpdated = Date.now().toString();
-          let newID: string = "";
-          let existingFact: Fact<keyof Attribute> | undefined;
-          if (schema.cardinality === "one") {
-            existingFact = (await q.eav(fact.entity, fact.attribute)) as
-              | Fact<keyof Attribute>
-              | undefined;
-            if (existingFact) {
-              newID = existingFact.id;
-            }
-          }
-          if (!newID) newID = fact.factID || ulid();
-          let data = FactWithIndexes({
-            id: newID,
-            ...fact,
-            positions: { ...existingFact?.positions, ...fact.positions },
-            lastUpdated,
-            schema,
-          });
-          await tx.put(newID, data);
-          return { success: true };
-        },
-        assertFact: async (fact, undoAction) => {
-          let { rep, undoManager } = dataFunc();
-
-          let schema = await getSchema(tx, fact.attribute);
-          if (!schema) return { success: false, error: "no schema" };
-          let lastUpdated = Date.now().toString();
-          let newID: string = "";
-          let existingFact: Fact<keyof Attribute> | undefined;
-          if (schema.cardinality === "one") {
-            existingFact = (await q.eav(fact.entity, fact.attribute)) as
-              | Fact<keyof Attribute>
-              | undefined;
-            if (existingFact) {
-              newID = existingFact.id;
-            }
-          }
-          if (!newID) newID = fact.factID || ulid();
-          let data = FactWithIndexes({
-            id: newID,
-            ...fact,
-            positions: { ...existingFact?.positions, ...fact.positions },
-            lastUpdated,
-            schema,
-          });
-          await tx.put(newID, data);
-
-          if (!undoAction) {
-            undoManager.add({
-              undo: async () => {
-                if (existingFact) {
-                  let value = existingFact.value;
-                  let position = existingFact.positions;
-
-                  console.log(
-                    "UNDO assert",
-                    fact.entity,
-                    fact.attribute,
-                    value
-                  );
-
-                  await rep.mutate.assertFact({
-                    entity: fact.entity,
-                    attribute: fact.attribute,
-                    value: value,
-                    positions: position,
-                    undoAction: true,
-                  } as FactInput);
-                } else {
-                  console.log("UNDO retract", fact);
-
-                  await rep.mutate.retractFact({ id: newID, undoAction: true });
-                }
-              },
-              redo: async () => {
-                console.log(
-                  "REDO assert",
-                  fact.entity,
-                  fact.attribute,
-                  fact.value
-                );
-
-                await rep.mutate.assertFact({
-                  ...fact,
-                  undoAction: true,
-                } as FactInput);
-              },
-            });
-          }
-
-          return { success: true, factID: newID };
-        },
-      };
-      return Mutations[k as keyof typeof Mutations](mutationArgs, context);
-    };
-    return acc;
-  }, {} as ReplicacheMutators);
-
-  return mutators;
-}
-
-export const makeReplicache = (args: {
-  puller: Puller;
-  pusher: Pusher;
-  name: string;
-  undoManager: UndoManager;
-}) => {
-  let grabData = function (): {
-    rep: Replicache<ReplicacheMutators>;
-    undoManager: UndoManager;
-  } {
-    return {
-      undoManager: args.undoManager,
-      rep: rep,
-    };
-  };
-
-  // let [undoManager] = useState(new UndoManager());
-  let rep = new Replicache({
-    licenseKey: "l381074b8d5224dabaef869802421225a",
-    schemaVersion: "1.0.2",
-    name: args.name,
-    pushDelay: 500,
-    pusher: args.pusher,
-    puller: args.puller,
-    mutators: makeMutators(grabData),
-    logLevel: "error",
-    indexes: {
-      eav: { jsonPointer: "/indexes/eav", allowEmpty: true },
-      aev: { jsonPointer: "/indexes/aev", allowEmpty: true },
-      ave: { jsonPointer: "/indexes/ave", allowEmpty: true },
-      vae: { jsonPointer: "/indexes/vae", allowEmpty: true },
-      at: { jsonPointer: "/indexes/at", allowEmpty: true },
-      messageByEntity: {
-        jsonPointer: "/indexes/messageByEntity",
-        allowEmpty: true,
-      },
-      messages: { jsonPointer: "/indexes/messages", allowEmpty: true },
-    },
-  });
-
-  return rep;
-};
 
 export const db = {
   useQuery<A extends ReadonlyJSONValue>(
@@ -392,9 +52,9 @@ export const db = {
       async (tx) => {
         let results = await tx
           .scan({
-            indexName: "at",
-            prefix: match && start ? `${attribute}-${start}` : `${attribute}-`,
-            start: start ? { key: `${attribute}-${start}` } : undefined,
+            prefix:
+              match && start ? `${attribute}-${start}` : `at-${attribute}-`,
+            start: start ? { key: `at-${attribute}-${start}` } : undefined,
           })
           .values()
           .toArray();
@@ -443,8 +103,7 @@ export const db = {
         if (!attribute) return [];
         let results = await tx
           .scan({
-            indexName: "aev",
-            prefix: `${attribute}-${entity || ""}`,
+            prefix: `aev-${attribute}-${entity || ""}`,
           })
           .values()
           .toArray();
@@ -464,8 +123,7 @@ export const db = {
         if (!entity) return [];
         let results = await tx
           .scan({
-            indexName: "vae",
-            prefix: `${entity}-${attribute || ""}`,
+            prefix: `vae-${entity}-${attribute || ""}`,
           })
           .values()
           .toArray();
@@ -480,14 +138,14 @@ export const db = {
     return useSubscribe(
       async (tx) => {
         let messages = await tx
-          .scan({ indexName: "messages", prefix: topic })
+          .scan({ prefix: `messages-${topic}` })
           .values()
           .toArray();
         return messages as Message[];
       },
       [],
       [topic],
-      topic
+      "messages" + topic
     );
   },
   useMessageByEntity(entity: string | null) {
@@ -495,7 +153,7 @@ export const db = {
       async (tx) => {
         if (!entity) return null;
         let messages = await tx
-          .scan({ indexName: "messageByEntity", prefix: entity })
+          .scan({ prefix: `messageByEntity-${entity}` })
           .values()
           .toArray();
         return messages[0] as Message;
@@ -534,8 +192,7 @@ export const useMutations = () => {
         return null;
       let fact = (await tx
         .scan({
-          indexName: "ave",
-          prefix: `space/member-${session.session.studio}`,
+          prefix: `ave-space/member-${session.session.studio}`,
         })
         .values()
         .toArray()) as Fact<"space/member">[];
@@ -585,6 +242,7 @@ export const useMutations = () => {
       args: Parameters<(typeof Mutations)[T]>[0]
     ) {
       if (!session) return;
+      //@ts-ignore
       return rep?.rep.mutate[mutation](args);
     },
     [session, memberEntity, rep]

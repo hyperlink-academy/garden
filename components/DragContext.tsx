@@ -288,7 +288,6 @@ export type DroppableData = {
   id: string;
   disabled?: boolean;
   entityID: string;
-
   onDragCancel?: () => void | Promise<void>;
   onDragEnter?: (data: DraggableData) => void | Promise<void>;
   onDragExit?: (data: DraggableData) => void | Promise<void>;

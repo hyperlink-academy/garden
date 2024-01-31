@@ -12,6 +12,8 @@ import { WORKER_URL } from "src/constants";
 import { supabaseBrowserClient } from "supabase/clients";
 import Image from "next/image";
 import spotIllo from "public/img/spotIllustration/welcome.png";
+import { makeReflect } from "components/ReplicacheProvider";
+import { ulid } from "src/ulid";
 
 export function SignupPageForm() {
   let router = useRouter();
@@ -59,9 +61,20 @@ export function SignupPageForm() {
         else router.push(`/s/${data.username}`);
       }
     }
+
     if (res.success) {
       let { data } = await supabase.auth.refreshSession();
-      if (data.session) {
+      if (data.user && data.session) {
+        let reflect = makeReflect({
+          roomID: data.user?.user_metadata.studio,
+          authToken: tokens,
+          userID: data.user.id,
+        });
+        reflect.mutate.joinSpace({
+          memberEntity: ulid(),
+          username: data.user?.user_metadata.username,
+          studio: data.user?.user_metadata.studio,
+        });
         await supabase.auth.setSession(data?.session);
         if (redirectTo) router.push(redirectTo);
         else router.push(`/s/${data.user?.user_metadata.username}`);

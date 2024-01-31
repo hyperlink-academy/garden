@@ -158,7 +158,7 @@ export const store = (storage: BasicStorage, ctx: { id: string }) => {
     },
   };
 
-  let context: Omit<MutationContext, "runOnServer"> = {
+  let context: Omit<MutationContext, "runOnServer" | "tx"> = {
     scanIndex,
     updateFact: async (id, data) => {
       return lock.withLock(async () => {

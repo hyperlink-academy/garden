@@ -1,12 +1,9 @@
 "use client";
-import { useMeetingState } from "@daily-co/daily-react";
-import { ref } from "data/Facts";
 import { useMutations } from "hooks/useReplicache";
 import { useRoom } from "hooks/useUIState";
-import { useAtomValue } from "jotai";
 import { useEffect } from "react";
 import { ulid } from "src/ulid";
-import { SpaceProvider, socketStateAtom } from "components/ReplicacheProvider";
+import { SpaceProvider } from "components/ReplicacheProvider";
 import { SpaceData } from "components/SpacesList";
 import { useParams } from "next/navigation";
 
@@ -38,22 +35,18 @@ export const SpacePageStudioPresenceHandler = (props: { space: SpaceData }) => {
   );
 };
 export const PresenceHandler = (props: { space_do_id: string }) => {
-  let { rep, mutate, authorized, memberEntity, client, permissions } =
-    useMutations();
+  let { rep, mutate, authorized, memberEntity, client } = useMutations();
   let room = useRoom();
-  let socketState = useAtomValue(socketStateAtom);
 
   useEffect(() => {
-    if (!authorized || !rep || !memberEntity || socketState !== "connected")
-      return;
-    rep.clientID.then((clientID) => {
-      mutate("initializeClient", {
-        clientID,
-        clientEntity: ulid(),
-        memberEntity: memberEntity as string,
-      });
+    if (!authorized || !rep || !memberEntity) return;
+
+    mutate("initializeClient", {
+      clientID: rep.clientID,
+      clientEntity: ulid(),
+      memberEntity: memberEntity as string,
     });
-  }, [rep, authorized, memberEntity, socketState, mutate]);
+  }, [rep, authorized, memberEntity, mutate]);
 
   useEffect(() => {
     if (!client?.entity || !authorized) return;

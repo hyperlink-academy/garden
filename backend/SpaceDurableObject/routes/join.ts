@@ -2,11 +2,9 @@ import { app_event } from "backend/lib/analytics";
 import { makeRoute } from "backend/lib/api";
 import { authTokenVerifier, verifyIdentity } from "backend/lib/auth";
 import { createClient } from "backend/lib/supabase";
-import { ulid } from "src/ulid";
 import { z } from "zod";
 import { memberColors } from "src/colors";
 import { Env } from "..";
-import { store } from "../fact_store";
 import { webPushPayloadParser } from "pages/api/web_push";
 import { sign } from "src/sign";
 import { MutationContext } from "data/mutations";
@@ -52,39 +50,6 @@ export const join_route = makeRoute({
       isMember = !!data;
     }
 
-    let color = await getMemberColor(env.factStore);
-    let memberEntity = ulid();
-    console.log("creating members");
-    console.log(
-      await Promise.all([
-        env.factStore.assertFact({
-          entity: memberEntity,
-          attribute: "member/color",
-          value: color,
-          positions: {},
-        }),
-        env.factStore.assertFact({
-          entity: memberEntity,
-          attribute: "space/member",
-          value: session.studio,
-          positions: {},
-        }),
-        msg.bio
-          ? env.factStore.assertFact({
-              entity: memberEntity,
-              attribute: "card/content",
-              value: msg.bio,
-              positions: {},
-            })
-          : null,
-        env.factStore.assertFact({
-          entity: memberEntity,
-          attribute: "member/name",
-          value: session.username,
-          positions: {},
-        }),
-      ])
-    );
     if (space_type === "studio") {
       let { data: studio_ID } = await supabase
         .from("studios")

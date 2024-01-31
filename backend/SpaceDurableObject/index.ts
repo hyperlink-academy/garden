@@ -8,21 +8,17 @@ import { delete_file_upload_route } from "./routes/delete_file_upload";
 import { get_share_code_route } from "./routes/get_share_code";
 import { join_route } from "./routes/join";
 import { pullRoute } from "./routes/pull";
-import { push_route } from "./routes/push";
 import { connect } from "./socket";
 import { handleFileUpload } from "./upload_file";
 import { migrations } from "./migrations";
 import { update_self_route } from "./routes/update_self";
 import { delete_self_route } from "./routes/delete_self";
 import { get_daily_token_route } from "./routes/get_daily_token";
-import { post_feed_route } from "./routes/post_feed";
-import { get_card_data_route } from "./routes/get_card_data";
 import type { WebSocket as DOWebSocket } from "@cloudflare/workers-types";
 import { leave_route } from "./routes/leave";
 import { createClient } from "backend/lib/supabase";
 
 export type Env = {
-  factStore: ReturnType<typeof store>;
   storage: DurableObjectStorage;
   state: DurableObjectState;
   poke: () => void;
@@ -33,9 +29,7 @@ export type Env = {
 };
 
 let routes = [
-  get_card_data_route,
   pullRoute,
-  push_route,
   claimRoute,
   create_space_route,
   get_share_code_route,
@@ -44,7 +38,6 @@ let routes = [
   update_self_route,
   delete_self_route,
   get_daily_token_route,
-  post_feed_route,
   leave_route,
 ];
 export type SpaceRoutes = typeof routes;
