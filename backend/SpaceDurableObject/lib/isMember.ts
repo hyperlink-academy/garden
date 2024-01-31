@@ -2,7 +2,10 @@ import { createClient } from "backend/lib/supabase";
 import { Env } from "..";
 
 export async function isUserMember(
-  env: Pick<Env, "id" | "env">,
+  env: {
+    env: { SUPABASE_API_TOKEN: string; SUPABASE_URL: string };
+    id: string;
+  },
   userID: string
 ) {
   let supabase = createClient(env.env);
