@@ -71,6 +71,7 @@ export const makeReflect = ({
     authToken,
   };
   return new Reflect({
+    kvStore: "idb",
     mutators: mutators,
     auth: JSON.stringify(auth),
     userID: userID || "unauthorized",
