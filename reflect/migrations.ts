@@ -41,9 +41,3 @@ export const migrations: Migration[] = [
     },
   },
 ];
-
-//Okay now I need to decide where to put the initialization code to create the
-//files I need.
-//
-//Space initialization needs: rooms created + cards
-//Also need to create member data for the owner.
