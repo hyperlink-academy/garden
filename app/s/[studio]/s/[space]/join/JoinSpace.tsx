@@ -24,16 +24,16 @@ export function JoinSpace() {
   let { data } = useSpaceData(id);
 
   const onClick = async () => {
-    if (!authToken || !code || !id) return;
+    if (!authToken || !code || !id || !session.user) return;
     let data = await spaceAPI(`${WORKER_URL}/space/${id}`, "join", {
       authToken,
       code,
     });
     if (data.success) {
       let reflect = makeReflect({
-        id,
+        roomID: id,
         authToken,
-        studio: session.session?.studio,
+        userID: session.user.id,
       });
       if (session.session)
         await reflect.mutate.joinSpace({

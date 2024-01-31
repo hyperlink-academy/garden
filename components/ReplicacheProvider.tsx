@@ -39,9 +39,9 @@ export const SpaceProvider: React.FC<
   let { session, authToken } = useAuth();
   useEffect(() => {
     let newRep = makeReflect({
-      id: props.id,
+      roomID: props.id,
       authToken,
-      studio: session.session?.studio,
+      userID: session.user?.id,
     });
     setRep(newRep);
     return () => {
@@ -59,13 +59,13 @@ export const SpaceProvider: React.FC<
 };
 
 export const makeReflect = ({
-  id,
+  roomID: id,
   authToken,
-  studio,
+  userID,
 }: {
-  id: string;
+  roomID: string;
   authToken: { access_token: string; refresh_token: string } | null;
-  studio?: string;
+  userID?: string;
 }) => {
   let auth: AuthString = {
     authToken,
@@ -73,7 +73,7 @@ export const makeReflect = ({
   return new Reflect({
     mutators: mutators,
     auth: JSON.stringify(auth),
-    userID: studio || "unauthorized",
+    userID: userID || "unauthorized",
     server: process.env.NEXT_PUBLIC_REFLECT_SERVER,
     roomID: id,
   });

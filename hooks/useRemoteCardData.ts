@@ -13,8 +13,8 @@ export const useRemoteCardData = (do_id?: string, cardEntity?: string) => {
     if (!do_id) return;
     let newRep = makeReflect({
       authToken,
-      studio: session.session?.studio || "unauthorized",
-      id: do_id,
+      userID: session.user?.id,
+      roomID: do_id,
     });
     setRep(newRep);
     return () => {

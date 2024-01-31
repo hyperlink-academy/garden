@@ -80,9 +80,9 @@ export const CreateSpace = (props: {
                 };
               });
               let reflect = makeReflect({
-                id: result.data.do_id,
+                roomID: result.data.do_id,
                 authToken,
-                studio: auth.session.session?.studio,
+                userID: auth.session.user?.id,
               });
               if (auth.session.session)
                 await reflect.mutate.joinSpace({

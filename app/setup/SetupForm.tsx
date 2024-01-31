@@ -64,11 +64,11 @@ export function SignupPageForm() {
 
     if (res.success) {
       let { data } = await supabase.auth.refreshSession();
-      if (data.session) {
+      if (data.user && data.session) {
         let reflect = makeReflect({
-          id: data.user?.user_metadata.studio,
+          roomID: data.user?.user_metadata.studio,
           authToken: tokens,
-          studio: data.user?.user_metadata.studio,
+          userID: data.user.id,
         });
         reflect.mutate.joinSpace({
           memberEntity: ulid(),

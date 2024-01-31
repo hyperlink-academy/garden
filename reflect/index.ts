@@ -47,6 +47,9 @@ export const mutators = {
 
 type Auth = {
   userID: string;
+  user: {
+    id: string;
+  } | null;
   authorized: boolean;
 };
 
@@ -90,23 +93,17 @@ function makeOptions(): ReflectServerOptions<ReplicacheMutators> {
           .object({ authToken: authTokenVerifier })
           .parse(JSON.parse(auth_string));
       } catch (e) {
-        return { userID: "unauthorized", authorized: false };
+        return { userID: "unauthorized", authorized: false, user: null };
       }
 
       let supabase = createClient(env);
       let { data: session } = await supabase.auth.setSession(auth.authToken);
-      let authorized = false;
-      if (session.user?.id) {
-        let { data } = await supabase
-          .from("space_authorizations")
-          .select("user")
-          .eq("user", session.user.id)
-          .eq("space_do_id", roomID)
-          .single();
-        if (data) authorized = true;
-      }
+      let authorized = session.user.id
+        ? await isUserMember(env, sesison.user.id)
+        : false;
       return {
-        userID: session?.user?.user_metadata?.studio || "unauthorized",
+        userID: session?.user?.id || "unauthorized",
+        user: session.user ? { id: session.user.id } : null,
         authorized,
       };
     },
