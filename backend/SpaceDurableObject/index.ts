@@ -18,7 +18,6 @@ import { get_daily_token_route } from "./routes/get_daily_token";
 import { post_feed_route } from "./routes/post_feed";
 import { get_card_data_route } from "./routes/get_card_data";
 import type { WebSocket as DOWebSocket } from "@cloudflare/workers-types";
-import { leave_route } from "./routes/leave";
 import { createClient } from "backend/lib/supabase";
 
 export type Env = {
@@ -45,7 +44,6 @@ let routes = [
   delete_self_route,
   get_daily_token_route,
   post_feed_route,
-  leave_route,
 ];
 export type SpaceRoutes = typeof routes;
 let router = makeRouter(routes);

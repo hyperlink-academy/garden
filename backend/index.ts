@@ -12,6 +12,7 @@ import {
 } from "./routes/get_space_data";
 import { get_studio_data_route } from "./routes/get_studio_data";
 import { get_url_preview_data_route } from "./routes/get_url_preview_data";
+import { leave_space_route } from "./routes/leave_space";
 import { LoginRoute } from "./routes/login";
 import { SignupRoute } from "./routes/signup";
 import { update_studio_data } from "./routes/update_studio_data";
@@ -35,6 +36,7 @@ const Routes = [
   update_studio_data,
   create_studio_route,
   feedback_route,
+  leave_space_route,
 ];
 
 export type WorkerRoutes = typeof Routes;
