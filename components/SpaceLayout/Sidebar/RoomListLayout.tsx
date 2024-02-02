@@ -115,7 +115,6 @@ export const EditRoomModal = (props: {
               type="button"
               onClick={() => {
                 setAreYouSureRoomDeletionModalOpen(true);
-                console.log("yo");
               }}
               content="Delete Room"
               icon={<Delete />}
@@ -160,7 +159,7 @@ const AreYouSureRoomDeletionModal = (props: {
           icon={<Delete />}
           onSubmit={async () => {
             await mutate("deleteEntity", { entity: props.entityID });
-            let nextRoom = rooms.filter((r) => r.entity === props.entityID)[0];
+            let nextRoom = rooms.filter((r) => r.entity !== props.entityID)[0];
             setRoom(nextRoom.entity);
             props.onClose();
           }}
