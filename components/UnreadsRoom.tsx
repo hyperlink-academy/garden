@@ -1,6 +1,6 @@
 import { Fact } from "data/Facts";
 import { db, useMutations } from "hooks/useReplicache";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CardPreviewWithData } from "./CardPreview";
 import { RoomWrapper } from "./RoomLayout";
 import { Divider } from "./Layout";
@@ -10,9 +10,10 @@ export const UnreadsRoom = () => {
   let { memberEntity, permissions } = useMutations();
   let authorized = permissions.commentAndReact;
   let unreadCards = db.useReference(memberEntity, "card/unread-by");
-  let chatRooms = db
-    .useAttribute("room/type")
-    .filter((room) => room.value === "chat");
+  let rooms = db.useAttribute("room/type");
+  let chatRooms = useMemo(() => {
+    return rooms.filter((room) => room.value === "chat");
+  }, [rooms]);
   let unreadDiscussions = db.useReference(memberEntity, "discussion/unread-by");
   let [scrolledTop, setScrolledTop] = useState(true);
   let [listType, setListType] = useState<"cardpreview" | "list">("list");
