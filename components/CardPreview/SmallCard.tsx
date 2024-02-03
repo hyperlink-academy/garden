@@ -59,7 +59,9 @@ export const BaseSmallCard = (
         ...props?.dragHandleProps?.listeners,
       }
     : {};
-
+  let cardBackgroundColor =
+    props.entityID &&
+    db.useEntity(props.entityID, "card/background-color")?.value;
   return (
     <div
       {...listenersAndAttributes}
@@ -71,7 +73,9 @@ export const BaseSmallCard = (
       }`}
       style={{
         background:
-          props.imageUrl && !linkPreview ? `url(${props.imageUrl})` : "",
+          props.imageUrl && !linkPreview
+            ? `url(${props.imageUrl})`
+            : cardBackgroundColor || "white",
       }}
     >
       {/* Small Card Preview Content Wrapper (is it default or member?) */}
@@ -87,15 +91,25 @@ export const BaseSmallCard = (
               {/* if we have a link preview, ALWAYS hide title */}
               {/* if we have an image, do NOT show 'Untitled' placeholder */}
               {props.title ? (
-                <div className="-m-1 max-h-full w-fit overflow-hidden text-ellipsis rounded-[4px] bg-white bg-opacity-70 p-1 font-bold leading-tight text-grey-35">
+                <div
+                  style={{
+                    backgroundColor: cardBackgroundColor + "70" || "#FFFFFF70",
+                  }}
+                  className="text-grey-35 -m-1 max-h-full w-fit overflow-hidden text-ellipsis rounded-[4px] p-1 font-bold leading-tight"
+                >
                   {props.title}
                 </div>
               ) : props.content ? (
-                <pre className="-m-1 max-h-full w-fit overflow-hidden truncate whitespace-pre-wrap rounded-[4px] bg-white bg-opacity-60 p-1 leading-tight">
+                <pre
+                  style={{
+                    backgroundColor: cardBackgroundColor + "70" || "#FFFFFF70",
+                  }}
+                  className="-m-1 max-h-full w-fit overflow-hidden truncate whitespace-pre-wrap rounded-[4px] p-1 leading-tight"
+                >
                   {props?.content}
                 </pre>
               ) : !props.imageUrl ? (
-                <div className="block w-full font-bold italic !text-grey-80">
+                <div className="!text-grey-80 block w-full font-bold italic">
                   Untitled
                 </div>
               ) : null}
@@ -122,7 +136,10 @@ export const BaseSmallCard = (
                   );
               })}
               {props.reactions.length > 1 ? (
-                <span className="rounded-md border border-grey-90 bg-white px-1 py-0.5 text-xs text-grey-55">
+                <span
+                  style={{ backgroundColor: cardBackgroundColor || "white" }}
+                  className="border-grey-90 text-grey-55 rounded-md border  px-1 py-0.5 text-xs"
+                >
                   {`+${props.reactions.length - 1}`}
                 </span>
               ) : (
@@ -135,12 +152,11 @@ export const BaseSmallCard = (
           {/* three states: unread, existing, none */}
           {/* clicking = shortcut to focus input for a new message */}
           <button
+            style={{ backgroundColor: cardBackgroundColor || "white" }}
             className={`unreadCount fixed -bottom-[10px] right-[24px]  rounded-md border p-[2px] ${
               props.unreadDiscussions
-                ? "unreadCardGlow bg-background text-accent-blue hover:bg-accent-blue hover:text-background"
-                : props.messagesCount && props.messagesCount > 0
-                ? "border-grey-80 bg-background text-grey-55 hover:border-accent-blue hover:bg-bg-blue hover:text-accent-blue"
-                : "border-grey-80 bg-white text-grey-55 hover:border-accent-blue hover:bg-bg-blue hover:text-accent-blue"
+                ? "unreadCardGlow text-accent-blue hover:!bg-accent-blue hover:text-white"
+                : "border-grey-80 text-grey-55 hover:border-accent-blue hover:bg-bg-blue hover:text-accent-blue "
             } `}
             onClick={() => {
               if (!props.entityID) return;
@@ -167,12 +183,12 @@ export const BaseSmallCard = (
           </div>
           <div
             className={`
-            flex h-full 
-            grow
-            items-end overflow-y-hidden 
-            rounded-md bg-white px-2 
-            py-1 font-bold
-            leading-tight text-accent-red
+            text-accent-red flex
+            h-full
+            grow items-end
+            overflow-y-hidden rounded-md bg-white
+            px-2 py-1
+            font-bold leading-tight
             `}
           >
             <p className="overflow-hidden">{props.memberName}</p>

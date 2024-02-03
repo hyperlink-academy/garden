@@ -127,14 +127,21 @@ export const CardView = (props: {
       }, 100);
     },
   });
+  let cardBackgroundColor = db.useEntity(
+    props.entityID,
+    "card/background-color"
+  )?.value;
 
   return (
     <div className="flex h-full flex-col items-stretch">
       <div
         ref={setNodeRef}
+        style={{
+          backgroundColor: cardBackgroundColor ? cardBackgroundColor : "white",
+        }}
         className={`
           card
-          relative       
+          relative
           mx-auto
           flex h-[42px]
           w-full max-w-3xl
@@ -180,9 +187,9 @@ export const CardView = (props: {
         <div
           id="card-container"
           className={`
-            no-scrollbar flex 
-            h-full  grow   
-            flex-col       
+            no-scrollbar flex
+            h-full  grow
+            flex-col
             items-stretch
             overflow-x-hidden overflow-y-hidden
             ${contentStyles({
@@ -276,7 +283,7 @@ export const CardContent = (props: {
           >
             {/* NB: keep wrapper for spacing with CardMoreOptionsMenu even if no cardCreatorName */}
 
-            <div className="flex flex-row gap-2 text-grey-55">
+            <div className="text-grey-55 flex flex-row gap-2">
               <CardMoreOptionsMenu
                 onDelete={props.onDelete}
                 entityID={props.entityID}
@@ -313,7 +320,7 @@ export const CardContent = (props: {
           <ImageSection entityID={props.entityID} />
 
           <AttachedCardSection entityID={props.entityID} />
-          <div className=" h-[28px] gap-2  text-sm italic text-grey-55">
+          <div className=" text-grey-55 h-[28px]  gap-2 text-sm italic">
             created by {cardCreatorName}
           </div>
         </div>
@@ -338,7 +345,7 @@ const BackButton = () => {
   let { authorized } = useMutations();
   return (
     <button
-      className={`pointer-events-auto  flex h-min w-fit items-center gap-1 rounded-full border border-grey-90 bg-white p-1 text-grey-55 shadow ${
+      className={`border-grey-90  text-grey-55 pointer-events-auto flex h-min w-fit items-center gap-1 rounded-full border bg-white p-1 shadow ${
         !authorized ? "" : "mt-3"
       }`}
       onClick={() => {
@@ -373,18 +380,20 @@ const CardMoreOptionsMenu = (props: {
         <MoreOptionsTiny />
       </Menu.Button>
       <MenuContainer>
-        {authorized && (
-          <MenuItem
-            onClick={() => {
-              setAreYouSureCardDeletionModalOpen(true);
-            }}
-          >
-            <p className="font-bold text-accent-red">Delete Card</p>
-            <div className="text-accent-red">
-              <Delete />
-            </div>
-          </MenuItem>
-        )}
+        <MenuItem>
+          <CardBackgroundColorPicker entityID={props.entityID} />
+        </MenuItem>
+        <Divider my={8} />
+        <MenuItem
+          onClick={() => {
+            setAreYouSureCardDeletionModalOpen(true);
+          }}
+        >
+          <p className="text-accent-red font-bold">Delete Card</p>
+          <div className="text-accent-red">
+            <Delete />
+          </div>
+        </MenuItem>
       </MenuContainer>
       <AreYouSureCardDeletionModal
         open={areYouSureCardDeletionModalOpen}
@@ -405,7 +414,7 @@ const AreYouSureCardDeletionModal = (props: {
   let { mutate, action } = useMutations();
   return (
     <Modal open={props.open} onClose={props.onClose}>
-      <div className="flex flex-col gap-3 text-grey-35">
+      <div className="text-grey-35 flex flex-col gap-3">
         <div className="modal flex flex-col gap-3">
           <h4>Are you sure?</h4>
           <p className="text-sm">
@@ -439,6 +448,55 @@ const AreYouSureCardDeletionModal = (props: {
         </div>
       </div>
     </Modal>
+  );
+};
+
+const CardBackgroundColors = [
+  "#FFFFFF", //white
+  "#F4FFE7", //green
+  "#FFEEF2", //pink
+  "#ECF8FF", //blue
+  "#FFFAE7", //yellow
+];
+
+const CardBackgroundColorPicker = (props: { entityID: string }) => {
+  let cardBackgroundColor = db.useEntity(
+    props.entityID,
+    "card/background-color"
+  )?.value;
+  let { mutate } = useMutations();
+  let setCardBackgroudColor = async (color: string) => {
+    await mutate("assertFact", {
+      entity: props.entityID,
+      attribute: "card/background-color",
+      value: color,
+      positions: {},
+    });
+  };
+
+  return (
+    <div className="flex flex-col gap-1 font-bold">
+      Set Card Color
+      <div className="flex gap-2">
+        {CardBackgroundColors.map((color) => {
+          return (
+            <button
+              key={color}
+              className={`h-5 w-5 rounded-full border hover:cursor-pointer
+               ${
+                 !cardBackgroundColor || cardBackgroundColor === color
+                   ? "border-grey-55 border-2"
+                   : "border-grey-80 hover:border-2"
+               }`}
+              style={{ backgroundColor: color }}
+              onClick={() => {
+                setCardBackgroudColor(color);
+              }}
+            />
+          );
+        })}
+      </div>
+    </div>
   );
 };
 
@@ -479,12 +537,12 @@ const ScheduledDate = (props: {
   return (
     <div
       id="card-date"
-      className="flex place-items-center gap-2 text-sm italic text-grey-55"
+      className="text-grey-55 flex place-items-center gap-2 text-sm italic"
     >
       {props.dateEditing ? (
         <>
           <input
-            className="border-grey-80 px-1 py-[2px] text-grey-55"
+            className="border-grey-80 text-grey-55 px-1 py-[2px]"
             onBlur={() => props.closeDateEditing()}
             onChange={(e) => {
               setDateInputValue(e.currentTarget.value);
@@ -504,7 +562,7 @@ const ScheduledDate = (props: {
           />
 
           <button
-            className="justify-self-center text-sm text-grey-55 hover:text-accent-blue"
+            className="text-grey-55 hover:text-accent-blue justify-self-center text-sm"
             onClick={() => {
               if (props.date) {
                 mutate("retractFact", { id: props.date.id });
@@ -521,7 +579,7 @@ const ScheduledDate = (props: {
       ) : date ? (
         authorized ? (
           <button
-            className="-ml-[5px] border border-transparent px-1 py-[3px] text-sm italic text-grey-55 underline hover:text-accent-blue"
+            className="text-grey-55 hover:text-accent-blue -ml-[5px] border border-transparent px-1 py-[3px] text-sm italic underline"
             onClick={() => {
               props.openDateEditing();
             }}
@@ -529,7 +587,7 @@ const ScheduledDate = (props: {
             {date.month} {date.day}, {date.year}
           </button>
         ) : (
-          <div className="-ml-[4px] px-1 py-1 text-sm text-grey-55">
+          <div className="text-grey-55 -ml-[4px] px-1 py-1 text-sm">
             {date.month} {date.day}, {date.year}
           </div>
         )
@@ -591,7 +649,7 @@ export const SectionAdder = (props: {
 
   if (!authorized) return null;
   return (
-    <div className="pointer-events-auto flex w-fit items-center gap-1 rounded-full border border-grey-90 bg-white px-4 py-2 text-grey-55 shadow">
+    <div className="border-grey-90 text-grey-55 pointer-events-auto flex w-fit items-center gap-1 rounded-full border bg-white px-4 py-2 shadow">
       {/* IMAGE ADDER */}
       <MakeImage entity={props.entityID}>
         <div className={`${toggledOffStyle} `}>
@@ -650,7 +708,7 @@ export const SectionAdder = (props: {
             className={`${toggledOffStyle} ${
               !reactionPickerOpen
                 ? ""
-                : "rounded-md border border-accent-blue p-0.5 text-accent-blue"
+                : "border-accent-blue text-accent-blue rounded-md border p-0.5"
             }`}
           >
             <ReactionAdd />

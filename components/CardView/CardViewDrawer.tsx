@@ -27,10 +27,14 @@ export const CardViewDrawer = (props: {
     height: props.drawerOpen ? height : 0,
     springConfig: springConfig,
   });
+  let cardBackgroundColor = db.useEntity(
+    props.entityID,
+    "card/background-color"
+  )?.value;
   return (
     <div className="z-10">
       <div className="cardDrawerHeader -mx-3 -mt-6  md:-mx-4">
-        <div className="cardDrawerTabs flex items-end gap-2 border-b border-b-grey-80 pl-4">
+        <div className="cardDrawerTabs border-b-grey-80 flex items-end gap-2 border-b pl-4">
           <ChatTab entityID={props.entityID} />
           <BacklinkTab entityID={props.entityID} />
         </div>
@@ -60,7 +64,10 @@ export const CardViewDrawer = (props: {
           </MessageWindow>
         </div>
       </animated.div>
-      <div className={`sticky bottom-0  mt-2 bg-white pb-2`}>
+      <div
+        className={`sticky bottom-0  mt-2  pb-2`}
+        style={{ backgroundColor: cardBackgroundColor }}
+      >
         {(drawer === "chat" || !drawer) && (
           <MessageInput
             entityID={props.entityID}
@@ -139,6 +146,10 @@ const Tab = (props: {
   let currentTab =
     useUIState((s) => s.cardStates[props.entityID]?.drawer) || "chat";
   let drawerOpen = useUIState((s) => s.cardStates[props.entityID]?.drawerOpen);
+  let cardBackgroundColor = db.useEntity(
+    props.entityID,
+    "card/background-color"
+  )?.value;
   return (
     <button
       onClick={() => {
@@ -148,11 +159,16 @@ const Tab = (props: {
           useUIState.getState().closeDrawer(props.entityID);
         }
       }}
+      style={{
+        backgroundColor:
+          (currentTab === props.id && cardBackgroundColor) || "white",
+        borderBottom:
+          (currentTab === props.id && "1px solid " + cardBackgroundColor) ||
+          undefined,
+      }}
       className={`${
-        currentTab === props.id
-          ? "border-b-white bg-white font-bold"
-          : "bg-grey-90"
-      } -mb-[1px] w-fit shrink-0 rounded-t-md border border-grey-80  px-2  pt-0.5 text-sm text-grey-35`}
+        currentTab === props.id ? `font-bold` : "bg-grey-90"
+      } border-grey-80 text-grey-35 -mb-[1px] w-fit shrink-0 rounded-t-md  border  px-2 pt-0.5 text-sm`}
     >
       {props.text}
     </button>

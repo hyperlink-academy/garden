@@ -29,7 +29,10 @@ export const BigCardBody = (
   let editing = useUIState((s) => s.focusedCard === props.entityID);
   let setFocusedCard = useUIState((s) => s.setFocusedCard);
   let linkPreview = db.useEntity(props.entityID, "card/link-preview");
-
+  let cardBackgroundColor = db.useEntity(
+    props.entityID,
+    "card/background-color"
+  )?.value;
   let listenersAndAttributes =
     authorized && !editing
       ? {
@@ -52,7 +55,7 @@ export const BigCardBody = (
           !props.data.isMember &&
           !linkPreview
             ? `url(${props.data.imageUrl})`
-            : "",
+            : cardBackgroundColor,
       }} //no tailwind equiv - need for long titles to wrap
       onClick={(e) => {
         // if card is clicked (and its not in edit mode), open that card in cardView.
@@ -88,9 +91,9 @@ export const BigCardBody = (
         {/* Big Card Preview Title*/}
         {/* show AFTER link preview if we have one, and only if expanded */}
         {/* show title and remove button
-           if (you're in list view) 
-        or if (theres a title) 
-        or if (its a member card) 
+           if (you're in list view)
+        or if (theres a title)
+        or if (its a member card)
         or if (you're in edit mode) */}
         {!(
           linkPreview &&
@@ -103,6 +106,12 @@ export const BigCardBody = (
                 whiteSpace: "pre-wrap",
                 fontFamily: "inherit",
                 width: "100%",
+                backgroundColor:
+                  (props.data.imageUrl &&
+                    props.hideContent &&
+                    !props.data.isMember &&
+                    cardBackgroundColor) ||
+                  undefined,
               }}
               entityID={props.entityID}
               section={props.data.member ? "member/name" : "card/title"}
@@ -112,7 +121,7 @@ export const BigCardBody = (
                 props.data.isMember ? "w-fit text-white" : "text-grey-35"
               } ${
                 props.data.imageUrl && props.hideContent && !props.data.isMember
-                  ? "rounded-[3px] !bg-white px-1"
+                  ? "rounded-[3px] px-1"
                   : ""
               }`}
               onKeyDown={(e) => {
@@ -143,7 +152,7 @@ export const BigCardBody = (
                 props.data.isMember &&
                 !props.hideContent &&
                 props.data.content?.value
-                  ? "rounded-md bg-white pt-2 text-accent-red"
+                  ? "text-accent-red rounded-md bg-white pt-2"
                   : ""
               }`}
             >
@@ -184,10 +193,13 @@ export const BigCardBody = (
               {/* three states: unread, existing, none */}
               {/* clicking = shortcut to focus input for a new message */}
               <button
+                style={{
+                  backgroundColor: cardBackgroundColor,
+                }}
                 className={`cardPreviewComments relative rounded-md border ${
                   props.unreadDiscussions
-                    ? "unreadCardGlow bg-background text-accent-blue hover:bg-accent-blue hover:text-background"
-                    : "border-transparent bg-white text-grey-55 hover:border-accent-blue hover:bg-bg-blue hover:text-accent-blue"
+                    ? "unreadCardGlow text-accent-blue hover:bg-accent-blue hover:text-background"
+                    : "text-grey-55 hover:border-accent-blue hover:bg-bg-blue hover:text-accent-blue border-transparent"
                 } `}
                 onClick={() => {
                   if (!props.entityID) return;
@@ -229,7 +241,7 @@ export const BigCardBody = (
                         );
                       })}
                     {props.data.reactions.length > 3 ? (
-                      <span className="px-1 py-0.5 text-xs text-grey-55">
+                      <span className="text-grey-55 px-1 py-0.5 text-xs">
                         {`+${props.data.reactions.length - 3}`}
                       </span>
                     ) : (
@@ -274,7 +286,10 @@ export const BigCardBody = (
               {!props.outerControls && props.onDelete && authorized ? (
                 <>
                   <button
-                    className="cardPreviewRemove h-fit rounded-md bg-white p-0.5 text-grey-80 hover:text-accent-blue"
+                    style={{
+                      backgroundColor: cardBackgroundColor,
+                    }}
+                    className="cardPreviewRemove text-grey-80 hover:text-accent-blue h-fit rounded-md p-0.5"
                     onClick={(e) => {
                       e.stopPropagation();
                       props.onDelete?.();
