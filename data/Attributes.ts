@@ -164,6 +164,11 @@ export const DefaultAttributes = {
     unique: false,
     cardinality: "many",
   },
+  "card/background-color": {
+    type: "string",
+    unique: false,
+    cardinality: "one",
+  },
   "card/blocks": {
     type: "reference",
     unique: false,
