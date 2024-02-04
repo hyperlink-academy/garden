@@ -5,6 +5,7 @@ import { SWRConfig } from "swr";
 import { useServiceWorkerMessageChannel } from "hooks/useServiceWorkerMessageChannel";
 import { CallProvider } from "components/Calls/CallProvider";
 import { Session } from "@supabase/supabase-js";
+import { Analytics } from "@vercel/analytics/react";
 export const SharedProviders = (props: {
   children: React.ReactNode;
   session: Session | null;
@@ -12,6 +13,7 @@ export const SharedProviders = (props: {
   useServiceWorkerMessageChannel();
   return (
     <SWRCache>
+      <Analytics />
       <CallProvider>
         <SmokeProvider>
           <AuthProvider session={props.session}>{props.children}</AuthProvider>

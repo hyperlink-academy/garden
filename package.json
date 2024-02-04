@@ -45,6 +45,7 @@
     "@supabase/supabase-js": "^2.38.4",
     "@types/mdx": "^2.0.9",
     "@use-gesture/react": "^10.3.0",
+    "@vercel/analytics": "^1.1.2",
     "bcryptjs": "^2.4.3",
     "cookie": "^0.4.2",
     "eslint": "^8.47.0",
