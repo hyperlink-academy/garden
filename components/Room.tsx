@@ -219,7 +219,7 @@ const AddCardButton = (props: {
       {showHelp && (
         <div className="absolute bottom-10 flex flex-col place-items-center">
           <div className=" w-max rounded-md bg-accent-blue px-2 py-1 text-center text-sm font-bold text-white">
-            Drag to add a Card!
+            Drag to add a card!
           </div>
           <svg
             className="-mt-0.5 "

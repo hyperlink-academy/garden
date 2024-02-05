@@ -159,7 +159,7 @@ Welcome to Hyperlink! This card will:
 2) Help you get started making Spaces
 3) Inspire you to try some fun experiments!
 
-==For more info, click "i" in the sidebar==
+==For more info, click "?" in the sidebar==
 
 # How Hyperlink Works
 
@@ -169,7 +169,7 @@ The very basics: make cards; organize them in rooms; talk about them together!
 
 - make a room from the sidebar
 - make a card (double click the canvas)
-- add card content — image, linked cards, date, reactions — from the toolbar up top
+- add card content — text, or other media from the toolbar up top
 - add a comment at the bottom of a card
 
 **When you invite others, you'll also find:**
@@ -199,7 +199,7 @@ Quick checklist for setting up a Space:
 
 # Things to Try
 
-Space are super flexible…you can design many *games* with these basic pieces:
+Spaces are super flexible…you can design many *games* with these basic pieces:
 
 - **reading club**: add readings & discuss
 - **writing group**: share drafts and feedback
@@ -207,7 +207,7 @@ Space are super flexible…you can design many *games* with these basic pieces:
 - **prompts**: e.g. each share a daily drawing
 - **interactive workshops** or other sessions
 
-Click "i" in the sidebar for ==examples of real Spaces we've made== for inspiration ✨🔮
+Click "?" in the sidebar for ==examples of real Spaces we've made== for inspiration ✨🔮
 
 …and if you have questions or feedback, reach out any time! --> contact@hyperlink.academy
 

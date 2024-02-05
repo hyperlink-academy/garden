@@ -34,7 +34,7 @@ export const CardViewDrawer = (props: {
   return (
     <div className="z-10">
       <div className="cardDrawerHeader -mx-3 -mt-6  md:-mx-4">
-        <div className="cardDrawerTabs border-b-grey-80 flex items-end gap-2 border-b pl-4">
+        <div className="cardDrawerTabs flex items-end gap-2 border-b border-b-grey-80 pl-4">
           <ChatTab entityID={props.entityID} />
           <BacklinkTab entityID={props.entityID} />
         </div>
@@ -132,7 +132,7 @@ const BacklinkTab = (props: { entityID: string }) => {
   return (
     <Tab
       entityID={props.entityID}
-      text={`mentions (${references})`}
+      text={`backlinks (${references})`}
       id="backlinks"
     />
   );
@@ -168,7 +168,7 @@ const Tab = (props: {
       }}
       className={`${
         currentTab === props.id ? `font-bold` : "bg-grey-90"
-      } border-grey-80 text-grey-35 -mb-[1px] w-fit shrink-0 rounded-t-md  border  px-2 pt-0.5 text-sm`}
+      } -mb-[1px] w-fit shrink-0 rounded-t-md border border-grey-80  px-2  pt-0.5 text-sm text-grey-35`}
     >
       {props.text}
     </button>
