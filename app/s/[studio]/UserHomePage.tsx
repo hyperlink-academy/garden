@@ -102,7 +102,12 @@ export default function UserHomePage(props: { data: IdentityData }) {
                     key={studio.id}
                   >
                     <div className="flex h-fit flex-col">
-                      <h4 className="text-accent-blue">{studio.name}</h4>
+                      <h4
+                        className="text-accent-blue"
+                        style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
+                      >
+                        {studio.name}
+                      </h4>
                       <p className="text-sm italic text-grey-55">
                         {studio.spaces_in_studios.length} spaces
                       </p>
