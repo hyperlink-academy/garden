@@ -223,7 +223,7 @@ export const MessageInput = (props: {
       {!session?.loggedIn ? (
         <Login />
       ) : !authorized ? (
-        <div className="messageLogIn  bg-grey-90 text-grey-55 mx-3 mb-3 flex place-items-center gap-2 rounded-md p-2  text-center text-sm italic sm:mx-4 sm:mb-4">
+        <div className="messageLogIn  mx-3 mb-3 flex place-items-center gap-2 rounded-md bg-grey-90 p-2 text-center  text-sm italic text-grey-55 sm:mx-4 sm:mb-4">
           Only members and studio mates can add to this chat!
         </div>
       ) : (
@@ -249,7 +249,7 @@ export const MessageInput = (props: {
             {/* IF MESSAGE IS IN REPLY */}
             {props.reply && (
               <div className="messageInputReply -mb-2">
-                <div className="border-grey-80 text-grey-55 flex items-start justify-between gap-2 rounded-lg  border px-[6px] py-[5px] text-xs italic">
+                <div className="flex items-start justify-between gap-2 rounded-lg border border-grey-80  px-[6px] py-[5px] text-xs italic text-grey-55">
                   <div className="flex flex-col gap-[1px]">
                     <div className="font-bold"> {replyToName?.value}</div>
                     <div className="text-grey-55">{replyMessage?.content}</div>
@@ -258,7 +258,7 @@ export const MessageInput = (props: {
                     <CloseLinedTiny />
                   </button>
                 </div>
-                <div className="border-grey-80 ml-auto mr-2 h-2 w-0 border" />
+                <div className="ml-auto mr-2 h-2 w-0 border border-grey-80" />
               </div>
             )}
             {attachedCards.length > 0 && (
@@ -286,7 +286,7 @@ export const MessageInput = (props: {
             {/* ACTUAL MESSAGE INPUT */}
 
             <div className="flex w-full flex-col items-end gap-1">
-              <div className="border-grey-55 text-grey-15 flex w-full items-center gap-2 rounded-lg border bg-white py-1 pl-2 pr-1 text-base">
+              <div className="flex w-full items-center gap-2 rounded-lg border border-grey-55 bg-white py-1 pl-2 pr-1 text-base text-grey-15">
                 <AutosizeTextarea
                   onKeyDown={(e) => {
                     if (e.key === "Escape") {
@@ -329,11 +329,11 @@ const Login = () => {
   let [state, setState] = LoginOrSignupModal.useState("closed");
   return (
     <>
-      <div className="messageLogIn bg-grey-90 mx-3 mb-3 flex place-items-center gap-2 rounded-md p-2 sm:mx-4 sm:mb-4">
-        <p className=" text-grey-55 w-full text-center text-sm italic">
+      <div className="messageLogIn mx-3 mb-3 flex place-items-center gap-2 rounded-md bg-grey-90 p-2 sm:mx-4 sm:mb-4">
+        <p className=" w-full text-center text-sm italic text-grey-55">
           <span
             role="button"
-            className="text-accent-blue font-bold"
+            className="font-bold text-accent-blue"
             onClick={() => {
               setState("login");
             }}
@@ -366,7 +366,7 @@ const AttachCard = ({
       {/* decide styling of button via children */}
       <button
         onClick={() => setOpen(true)}
-        className="text-grey-55 hover:text-accent-blue flex"
+        className="flex text-grey-55 hover:text-accent-blue"
       >
         <CardAddLined />
       </button>
@@ -421,7 +421,7 @@ export const Messages = (props: {
   return (
     <>
       {messages.length == 0 && authorized ? (
-        <div className="messagesEmpty text-grey-55 mt-auto flex flex-col gap-2 px-3  py-1 text-sm italic sm:px-4">
+        <div className="messagesEmpty mt-auto flex flex-col gap-2 px-3 py-1  text-sm italic text-grey-55 sm:px-4">
           <p>Welcome to the chat room!</p>
           <p>Start a conversation 🌱</p>
         </div>
@@ -475,7 +475,7 @@ const Message = (props: {
   );
   return (
     <div
-      className={`group mx-3 flex items-end gap-1 sm:mx-4 ${
+      className={`group mx-3 flex items-end gap-1 first:mt-auto sm:mx-4 ${
         !props.multipleFromSameAuthor ? "pt-4" : "pt-1"
       } ${isMe && "flex-row-reverse"}`}
     >
@@ -488,7 +488,7 @@ const Message = (props: {
         {/* MESSAGE HEADER */}
         {!props.multipleFromSameAuthor && (
           <div
-            className={`messageHeader text-grey-55 flex w-full gap-2 ${
+            className={`messageHeader flex w-full gap-2 text-grey-55 ${
               isMe && "flex-row-reverse"
             } `}
             style={{ color: memberColor?.value }}
@@ -512,16 +512,16 @@ const Message = (props: {
         )}
         {replyMessage && (
           <div className={`-mb-1 w-fit ${isMe ? "ml-6" : "mr-6"}`}>
-            <div className="border-grey-80 mt-0.5 flex max-h-[118px] flex-col overflow-hidden rounded-lg border px-2 py-1 text-xs">
-              <div className={`text-grey-55 font-bold italic`}>
+            <div className="mt-0.5 flex max-h-[118px] flex-col overflow-hidden rounded-lg border border-grey-80 px-2 py-1 text-xs">
+              <div className={`font-bold italic text-grey-55`}>
                 {replyToName?.value}
               </div>
-              <div className=" text-grey-55 italic">
+              <div className=" italic text-grey-55">
                 {replyMessage?.content}
               </div>
             </div>
             <div
-              className={` border-grey-80 mt-0 h-2 w-0 border ${
+              className={` mt-0 h-2 w-0 border border-grey-80 ${
                 isMe ? "ml-auto mr-2" : "ml-2"
               } `}
             />
@@ -529,7 +529,7 @@ const Message = (props: {
         )}
         <div className={`flex items-end gap-2 ${isMe && "flex-row-reverse"}`}>
           <div
-            className={`messageContent  border-grey-80 rounded-lg border px-2 py-[5px] text-white  ${
+            className={`messageContent  rounded-lg border border-grey-80 px-2 py-[5px] text-white  ${
               attachedCards ? "w-full " : "w-fit"
             } ${!isMe && "group-hover:!bg-bg-blue"}`}
             style={{
@@ -570,7 +570,7 @@ const Message = (props: {
           {authorized ? (
             <span className="messageReplyButton mb-[1px] h-4 w-4 shrink-0 text-xs">
               <button
-                className={`text-grey-55 hover:text-accent-blue hidden group-hover:block ${
+                className={`hidden text-grey-55 hover:text-accent-blue group-hover:block ${
                   isMe && "-scale-x-100"
                 }`}
                 onClick={() => {
