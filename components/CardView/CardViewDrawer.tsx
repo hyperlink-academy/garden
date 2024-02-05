@@ -27,10 +27,8 @@ export const CardViewDrawer = (props: {
     height: props.drawerOpen ? height : 0,
     springConfig: springConfig,
   });
-  let cardBackgroundColor = db.useEntity(
-    props.entityID,
-    "card/background-color"
-  )?.value;
+  let cardBackgroundColor =
+    db.useEntity(props.entityID, "card/background-color")?.value || "#FFFFFF";
   return (
     <div className="z-10">
       <div className="cardDrawerHeader -mx-3 -mt-6  md:-mx-4">
@@ -146,10 +144,8 @@ const Tab = (props: {
   let currentTab =
     useUIState((s) => s.cardStates[props.entityID]?.drawer) || "chat";
   let drawerOpen = useUIState((s) => s.cardStates[props.entityID]?.drawerOpen);
-  let cardBackgroundColor = db.useEntity(
-    props.entityID,
-    "card/background-color"
-  )?.value;
+  let cardBackgroundColor =
+    db.useEntity(props.entityID, "card/background-color")?.value || "#FFFFFF";
   return (
     <button
       onClick={() => {
@@ -160,11 +156,9 @@ const Tab = (props: {
         }
       }}
       style={{
-        backgroundColor:
-          (currentTab === props.id && cardBackgroundColor) || "white",
+        backgroundColor: currentTab === props.id ? cardBackgroundColor : "",
         borderBottom:
-          (currentTab === props.id && "1px solid " + cardBackgroundColor) ||
-          undefined,
+          currentTab === props.id ? "1px solid " + cardBackgroundColor : "",
       }}
       className={`${
         currentTab === props.id ? `font-bold` : "bg-grey-90"

@@ -127,17 +127,15 @@ export const CardView = (props: {
       }, 100);
     },
   });
-  let cardBackgroundColor = db.useEntity(
-    props.entityID,
-    "card/background-color"
-  )?.value;
+  let cardBackgroundColor =
+    db.useEntity(props.entityID, "card/background-color")?.value || "white";
 
   return (
     <div className="flex h-full flex-col items-stretch">
       <div
         ref={setNodeRef}
         style={{
-          backgroundColor: cardBackgroundColor ? cardBackgroundColor : "white",
+          backgroundColor: cardBackgroundColor,
         }}
         className={`
           card
@@ -460,10 +458,8 @@ const CardBackgroundColors = [
 ];
 
 const CardBackgroundColorPicker = (props: { entityID: string }) => {
-  let cardBackgroundColor = db.useEntity(
-    props.entityID,
-    "card/background-color"
-  )?.value;
+  let cardBackgroundColor =
+    db.useEntity(props.entityID, "card/background-color")?.value || "#FFFFFF";
   let { mutate } = useMutations();
   let setCardBackgroudColor = async (color: string) => {
     await mutate("assertFact", {
@@ -484,9 +480,9 @@ const CardBackgroundColorPicker = (props: { entityID: string }) => {
               key={color}
               className={`h-5 w-5 rounded-full border hover:cursor-pointer
                ${
-                 !cardBackgroundColor || cardBackgroundColor === color
+                 cardBackgroundColor === color
                    ? "border-grey-55 border-2"
-                   : "border-grey-80 hover:border-2"
+                   : "border-grey-80 border-1 hover:border-2"
                }`}
               style={{ backgroundColor: color }}
               onClick={() => {

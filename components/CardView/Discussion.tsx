@@ -175,10 +175,8 @@ export const MessageInput = (props: {
 
   let replyMessage = db.useMessageByID(props.reply);
   let replyToName = db.useEntity(replyMessage?.sender || null, "member/name");
-  let cardBackgroundColor = db.useEntity(
-    props.entityID,
-    "card/background-color"
-  )?.value;
+  let cardBackgroundColor =
+    db.useEntity(props.entityID, "card/background-color")?.value || "#FFFFFF";
   const send = async () => {
     if (!session.session || !value) return;
     let message: Omit<Message, "sender"> = {
