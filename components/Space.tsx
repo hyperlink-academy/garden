@@ -97,21 +97,19 @@ const DesktopLayout = (props: Props) => {
 const Header = () => {
   let { session } = useAuth();
   return (
-    <div className="spaceHeaderInfo group group -mb-1 ml-2 flex min-w-0 shrink grow flex-row items-stretch gap-2 rounded-md border border-transparent px-3 py-1 font-bold ">
-      <div
-        className={`spaceName flex w-full min-w-0 grow justify-between bg-background text-grey-35`}
-      >
+    <div className="spaceHeaderInfo -mb-1 ml-2 flex min-w-0 shrink grow flex-row items-stretch gap-2 px-3 py-1 font-bold ">
+      <div className="spaceName flex w-full min-w-0 grow justify-between bg-background text-grey-35">
         <div className="flex w-full flex-col gap-0">
           <div className="flex flex-row items-center gap-2">
             {session.session && (
               <Link href={`/s/${session.session.username}`}>
-                <h4 className="text-sm text-grey-55 hover:text-accent-blue ">
+                <h4 className="text-sm text-grey-55 hover:text-accent-blue">
                   home
                 </h4>
               </Link>
             )}
           </div>
-          <div className="flex w-full flex-row items-center justify-between gap-2 bg-inherit ">
+          <div className="flex w-full flex-row items-center justify-between gap-2 bg-inherit">
             <SpaceName truncate />
           </div>
         </div>
