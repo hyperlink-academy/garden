@@ -50,7 +50,7 @@ export const CardViewDrawer = (props: {
             }}
             className={`cardDrawerContent no-scrollbar relative flex h-fit shrink flex-col gap-2 overflow-x-hidden overflow-y-scroll`}
           >
-            {drawer === "chat" ? (
+            {!drawer || drawer === "chat" ? (
               <DiscussionContent
                 entityID={props.entityID}
                 open={props.drawerOpen}
