@@ -1,4 +1,5 @@
-import { spaceAPI, workerAPI } from "backend/lib/api";
+import { add_space } from "app/studio/[studio_id]/add_space";
+import { spaceAPI } from "backend/lib/api";
 import { ButtonLink, ButtonPrimary, ButtonTertiary } from "components/Buttons";
 import { CreateSpaceForm, CreateSpaceFormState } from "components/CreateSpace";
 import { DotLoader } from "components/DotLoader";
@@ -131,8 +132,7 @@ const AddNewSpace = (props: { onClose: () => void; studioID: string }) => {
             );
             if (!result.success) return;
 
-            await workerAPI(WORKER_URL, "add_space_to_studio", {
-              authToken: auth.authToken,
+            await add_space({
               studio_id: props.studioID,
               space_do_id: result.data.do_id,
             });
@@ -236,8 +236,7 @@ const AddExistingSpace = (props: { onClose: () => void; studioID: string }) => {
             for (let space of addedSpaces) {
               if (studioData?.spaces_in_studios.find((s) => s.space === space))
                 continue;
-              await workerAPI(WORKER_URL, "add_space_to_studio", {
-                authToken,
+              await add_space({
                 studio_id: props.studioID,
                 space_do_id: space,
               });

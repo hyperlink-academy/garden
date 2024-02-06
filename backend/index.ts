@@ -1,6 +1,5 @@
 import { makeRouter } from "./lib/api";
 import { handleOptions } from "./lib/handleOptions";
-import { add_space_to_studio } from "./routes/add_space_to_studio";
 import { create_studio_route } from "./routes/create_studio";
 import { feedback_route } from "./routes/feedback";
 import { get_identity_data_route } from "./routes/get_identity_data";
@@ -32,7 +31,6 @@ const Routes = [
   get_space_data_by_id_route,
   get_studio_data_route,
   get_url_preview_data_route,
-  add_space_to_studio,
   update_studio_data,
   create_studio_route,
   feedback_route,
