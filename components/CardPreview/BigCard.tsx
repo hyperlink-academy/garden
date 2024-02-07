@@ -29,10 +29,8 @@ export const BigCardBody = (
   let editing = useUIState((s) => s.focusedCard === props.entityID);
   let setFocusedCard = useUIState((s) => s.setFocusedCard);
   let linkPreview = db.useEntity(props.entityID, "card/link-preview");
-  let cardBackgroundColor = db.useEntity(
-    props.entityID,
-    "card/background-color"
-  )?.value;
+  let cardBackgroundColor =
+    db.useEntity(props.entityID, "card/background-color")?.value || "#FFFFFF";
   let listenersAndAttributes =
     authorized && !editing
       ? {
@@ -107,11 +105,11 @@ export const BigCardBody = (
                 fontFamily: "inherit",
                 width: "100%",
                 backgroundColor:
-                  (props.data.imageUrl &&
-                    props.hideContent &&
-                    !props.data.isMember &&
-                    cardBackgroundColor) ||
-                  undefined,
+                  props.data.imageUrl &&
+                  props.hideContent &&
+                  !props.data.isMember
+                    ? cardBackgroundColor
+                    : "transparent",
               }}
               entityID={props.entityID}
               section={props.data.member ? "member/name" : "card/title"}

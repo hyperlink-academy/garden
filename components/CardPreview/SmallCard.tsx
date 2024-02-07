@@ -60,8 +60,9 @@ export const BaseSmallCard = (
       }
     : {};
   let cardBackgroundColor =
-    props.entityID &&
-    db.useEntity(props.entityID, "card/background-color")?.value;
+    (props.entityID &&
+      db.useEntity(props.entityID, "card/background-color")?.value) ||
+    "#FFFFFF";
   return (
     <div
       {...listenersAndAttributes}
@@ -75,7 +76,7 @@ export const BaseSmallCard = (
         background:
           props.imageUrl && !linkPreview
             ? `url(${props.imageUrl})`
-            : cardBackgroundColor || "white",
+            : cardBackgroundColor,
       }}
     >
       {/* Small Card Preview Content Wrapper (is it default or member?) */}
@@ -93,7 +94,7 @@ export const BaseSmallCard = (
               {props.title ? (
                 <div
                   style={{
-                    backgroundColor: cardBackgroundColor + "70" || "#FFFFFF70",
+                    backgroundColor: cardBackgroundColor + "B3",
                   }}
                   className="text-grey-35 -m-1 max-h-full w-fit overflow-hidden text-ellipsis rounded-[4px] p-1 font-bold leading-tight"
                 >
@@ -102,7 +103,7 @@ export const BaseSmallCard = (
               ) : props.content ? (
                 <pre
                   style={{
-                    backgroundColor: cardBackgroundColor + "70" || "#FFFFFF70",
+                    backgroundColor: cardBackgroundColor + "B3",
                   }}
                   className="-m-1 max-h-full w-fit overflow-hidden truncate whitespace-pre-wrap rounded-[4px] p-1 leading-tight"
                 >
