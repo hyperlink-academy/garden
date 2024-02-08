@@ -6,7 +6,10 @@ type UnwrapPromise<T> = T extends Promise<infer U> ? U : T;
 
 export const workerAPI = makeAPIClient<WorkerRoutes>("api");
 export const internalWorkerAPI = (env: { SELF_WORKER: Fetcher }) =>
-  makeAPIClient<WorkerRoutes>("api", env.SELF_WORKER.fetch.bind(env.SELF));
+  makeAPIClient<WorkerRoutes>(
+    "api",
+    env.SELF_WORKER.fetch.bind(env.SELF_WORKER)
+  );
 
 export const spaceAPI = makeAPIClient<SpaceRoutes>("api");
 //Rename these,
