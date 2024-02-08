@@ -26,7 +26,7 @@ import { ulid } from "src/ulid";
 import { useAuth } from "./useAuth";
 import { UndoManager } from "@rocicorp/undo";
 import { useSpaceData } from "./useSpaceData";
-import { useStudioData, useStudioDataByDOID } from "./useStudioData";
+import { useStudioDataByDOID } from "./useStudioData";
 
 export type ReplicacheMutators = {
   [k in keyof typeof Mutations]: (
@@ -37,6 +37,9 @@ export type ReplicacheMutators = {
 
 export let ReplicacheContext = createContext<{
   rep: Replicache<ReplicacheMutators>;
+  data:
+    | { space_id: string; studio_id: undefined }
+    | { studio_id: string; space_id: undefined };
   id: string;
   undoManager: UndoManager;
 } | null>(null);
@@ -526,7 +529,7 @@ export const useSpaceID = () => {
 export const useMutations = () => {
   let { session } = useAuth();
   let rep = useContext(ReplicacheContext);
-  let { data: spaceData } = useSpaceData(rep?.id);
+  let { data: spaceData } = useSpaceData({ space_id: rep?.data.space_id });
   let { data: studioData } = useStudioDataByDOID(rep?.id);
   let memberEntity = useSubscribe(
     async (tx) => {

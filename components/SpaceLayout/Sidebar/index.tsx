@@ -8,7 +8,6 @@ import {
   ArrowDown,
   ArrowUp,
   BellSmall,
-  MoreOptionsSmall,
   RoomCalendar,
   Settings,
   SidebarIcon,
@@ -18,7 +17,7 @@ import { EditSpaceModal } from "components/CreateSpace";
 import { useParams, useRouter } from "next/navigation";
 import { EditRoomModal } from "./RoomListLayout";
 import { SharedRoomList } from "./SharedRoomList";
-import { ButtonPrimary, ButtonTertiary } from "components/Buttons";
+import { ButtonPrimary } from "components/Buttons";
 import { LoginOrSignupModal } from "components/LoginModal";
 import { useSpaceData } from "hooks/useSpaceData";
 import { People } from "./People";
@@ -30,11 +29,12 @@ import { Truncate } from "components/Truncate";
 import { SpaceData } from "components/SpacesList";
 import { uuidToBase62 } from "src/uuidHelpers";
 import { HelpButton } from "components/Space";
-import { spaceAPI, workerAPI } from "backend/lib/api";
+import { workerAPI } from "backend/lib/api";
 import { WORKER_URL } from "src/constants";
 
 export const Sidebar = (props: {
   mobile?: boolean;
+  space_id: string;
   studio?: { spaces: SpaceData[]; studioName: string; studioID: string };
 }) => {
   let [roomEditOpen, setRoomEditOpen] = useState(false);
@@ -75,7 +75,7 @@ export const Sidebar = (props: {
 
               <div className="flex w-full flex-row items-start gap-2 ">
                 <div className="grow">
-                  <SpaceName />
+                  <SpaceName space_id={props.space_id} />
                 </div>
               </div>
             </div>
@@ -104,7 +104,7 @@ export const Sidebar = (props: {
 
       {/* wrapper so both items (people + nav) display at end on mobile */}
       <div className="flex max-h-[50%] flex-col gap-2">
-        <People />
+        <People space_id={props.space_id} />
         {props.mobile && (
           <div className="flex flex-row items-center justify-between p-2 pt-0 text-grey-55">
             <button onClick={() => setMobileSidebarOpen()}>
@@ -112,7 +112,7 @@ export const Sidebar = (props: {
             </button>
             <div className="flex gap-2">
               <HelpButton />
-              <LoginOrHome />
+              <LoginOrHome space_id={props.space_id} />
             </div>
           </div>
         )}
@@ -224,9 +224,8 @@ const RoomButton = (props: { roomID: string; children: React.ReactNode }) => {
   );
 };
 
-export const SpaceName = (props: { truncate?: boolean }) => {
-  let spaceID = useSpaceID();
-  let { data } = useSpaceData(spaceID);
+export const SpaceName = (props: { truncate?: boolean; space_id: string }) => {
+  let { data } = useSpaceData({ space_id: props.space_id });
 
   return (
     <div className={`spaceName flex min-w-0 bg-inherit text-grey-35`}>
@@ -241,10 +240,10 @@ export const SpaceName = (props: { truncate?: boolean }) => {
   );
 };
 
-export const SpaceOptions = () => {
+export const SpaceOptions = (props: { space_id: string }) => {
   let spaceID = useSpaceID();
   let { authorized } = useMutations();
-  let { data } = useSpaceData(spaceID);
+  let { data } = useSpaceData(props);
   let router = useRouter();
   let { session } = useAuth();
 
@@ -270,6 +269,7 @@ export const SpaceOptions = () => {
       )}
 
       <EditSpaceModal
+        space_id={props.space_id}
         open={editModal}
         onDelete={() => {
           if (!session.session) return;
@@ -338,10 +338,8 @@ const MemberOptions = () => {
   );
 };
 
-const LoginOrHome = () => {
+const LoginOrHome = (props: { space_id: string }) => {
   let { session } = useAuth();
-
-  let [infoOpen, setInfoOpen] = useState(false);
   let [loginOrSignupState, setLoginOrSignupState] =
     LoginOrSignupModal.useState("closed");
 
@@ -357,22 +355,6 @@ const LoginOrHome = () => {
       />
     </div>
   ) : (
-    <SpaceOptions />
-    // <Link
-    //   className="hover:text-accent-blue"
-    //   href={`/s/${session.session.username}`}
-    //   onPointerDown={() => {
-    //     if (session.session?.username)
-    //       prefetchIdentityData(session.session.username);
-    //   }}
-    // >
-    //   <ButtonTertiary
-    //     content={
-    //       <div className="flex flex-row gap-2">
-    //         Back Home <StudioFilled />
-    //       </div>
-    //     }
-    //   />
-    // </Link>
+    <SpaceOptions space_id={props.space_id} />
   );
 };

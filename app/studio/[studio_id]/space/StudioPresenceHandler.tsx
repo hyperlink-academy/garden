@@ -13,12 +13,16 @@ import { useParams } from "next/navigation";
 export const StudioPresenceHandler = (props: {
   spaces: SpaceData[];
   studio_do_id: string;
+  studio_id: string;
 }) => {
   let params = useParams<{ space_id: string; studio_id: string }>();
   let activeSpace =
     props.spaces.find((x) => x.id === params?.space_id) || props.spaces[0];
   return (
-    <SpaceProvider id={props.studio_do_id}>
+    <SpaceProvider
+      id={props.studio_do_id}
+      data={{ studio_id: props.studio_id, space_id: undefined }}
+    >
       <PresenceHandler space_do_id={activeSpace.do_id} />
     </SpaceProvider>
   );
@@ -29,7 +33,11 @@ export const SpacePageStudioPresenceHandler = (props: { space: SpaceData }) => {
     <>
       {props.space.spaces_in_studios.map((studio) =>
         studio.studios ? (
-          <SpaceProvider id={studio.studios.do_id} key={studio.studio}>
+          <SpaceProvider
+            id={studio.studios.do_id}
+            key={studio.studio}
+            data={{ studio_id: studio.studio, space_id: undefined }}
+          >
             <PresenceHandler space_do_id={props.space.do_id} />
           </SpaceProvider>
         ) : null

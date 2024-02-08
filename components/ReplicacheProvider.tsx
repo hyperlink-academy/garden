@@ -18,7 +18,12 @@ import { atom, useSetAtom } from "jotai";
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL as string;
 export const SpaceProvider: React.FC<
-  React.PropsWithChildren<{ id: string }>
+  React.PropsWithChildren<{
+    id: string;
+    data:
+      | { space_id: string; studio_id: undefined }
+      | { studio_id: string; space_id: undefined };
+  }>
 > = (props) => {
   let [rep, setRep] = useState<ReturnType<typeof makeReplicache>>();
   let [undoManager] = useState(new UndoManager());
@@ -67,7 +72,7 @@ export const SpaceProvider: React.FC<
 
   return (
     <ReplicacheContext.Provider
-      value={rep ? { rep, id: props.id, undoManager } : null}
+      value={rep ? { rep, id: props.id, undoManager, data: props.data } : null}
     >
       {props.children}
     </ReplicacheContext.Provider>

@@ -1,19 +1,19 @@
 import { makeRouter } from "./lib/api";
 import { handleOptions } from "./lib/handleOptions";
+import { create_space_route } from "./routes/create_space";
 import { create_studio_route } from "./routes/create_studio";
 import { feedback_route } from "./routes/feedback";
 import { get_identity_data_route } from "./routes/get_identity_data";
-import { get_space_route } from "./routes/get_space";
 import {
   get_space_data_by_id_route,
   get_space_data_by_name_route,
-  get_space_data_route,
 } from "./routes/get_space_data";
 import { get_studio_data_route } from "./routes/get_studio_data";
 import { get_url_preview_data_route } from "./routes/get_url_preview_data";
 import { leave_space_route } from "./routes/leave_space";
 import { LoginRoute } from "./routes/login";
 import { SignupRoute } from "./routes/signup";
+import { update_space_route } from "./routes/update_space";
 import { update_studio_data } from "./routes/update_studio_data";
 export { SpaceDurableObject } from "./SpaceDurableObject";
 
@@ -25,14 +25,14 @@ const Routes = [
   SignupRoute,
   LoginRoute,
   get_identity_data_route,
-  get_space_route,
-  get_space_data_route,
   get_space_data_by_name_route,
   get_space_data_by_id_route,
   get_studio_data_route,
   get_url_preview_data_route,
   update_studio_data,
   create_studio_route,
+  create_space_route,
+  update_space_route,
   feedback_route,
   leave_space_route,
 ];

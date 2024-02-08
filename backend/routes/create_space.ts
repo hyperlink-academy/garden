@@ -1,16 +1,15 @@
-import { app_event } from "backend/lib/analytics";
+import { Bindings } from "backend";
 import { internalSpaceAPI, makeRoute } from "backend/lib/api";
 import { verifyIdentity, authTokenVerifier } from "backend/lib/auth";
 import { createClient } from "backend/lib/supabase";
 import { z } from "zod";
-import { Env } from "..";
-
 export const space_input = z.object({
   display_name: z.string().trim().max(64),
   description: z.string().max(256),
   image: z.string().nullable().optional(),
   default_space_image: z.string().nullable().optional(),
 });
+
 export const create_space_route = makeRoute({
   route: "create_space",
   input: z
@@ -18,28 +17,22 @@ export const create_space_route = makeRoute({
       authToken: authTokenVerifier,
     })
     .merge(space_input),
-  handler: async (msg, env: Env) => {
-    const supabase = createClient(env.env);
-    let creator = await env.storage.get("meta-creator");
-    let session = await verifyIdentity(env.env, msg.authToken);
+  handler: async (msg, env: Bindings) => {
+    const supabase = createClient(env);
+    let session = await verifyIdentity(env, msg.authToken);
 
-    if (!session || session.studio !== creator || !creator)
+    if (!session)
       return {
         data: { success: false, error: "unauthorized" },
       } as const;
 
-    let spaceIndex =
-      (await env.storage.get<number>("meta-space-created-index")) || 0;
-    await env.storage.put("meta-space-created-index", spaceIndex + 1);
-
-    let newSpace = env.env.SPACES.newUniqueId();
-    let stub = env.env.SPACES.get(newSpace);
+    let newSpace = env.SPACES.newUniqueId();
+    let stub = env.SPACES.get(newSpace);
 
     let { data } = await supabase
       .from("space_data")
       .insert({
         do_id: newSpace.toString(),
-        name: (spaceIndex + 1).toString(),
         owner: session.id,
         display_name: msg.display_name,
         description: msg.description,
@@ -60,12 +53,6 @@ export const create_space_route = makeRoute({
       ownerName: session.username,
     });
 
-    env.poke();
-    app_event(env.env, {
-      event: "create_space",
-      user: session.id,
-      spaceID: env.id,
-    });
     return { data: { success: true, data } } as const;
   },
 });

@@ -4,18 +4,15 @@ import { ArrowUp } from "components/Icons";
 import { LoginOrSignupModal } from "components/LoginModal";
 import { SpaceData } from "components/SpacesList";
 import { Truncate } from "components/Truncate";
-import { useAuth } from "hooks/useAuth";
-import { useSpaceID } from "hooks/useReplicache";
 import { useSpaceData } from "hooks/useSpaceData";
 import { useParams, useRouter } from "next/navigation";
-import { useState } from "react";
 import Link from "next/link";
 
 export const SpaceViewerHeader = (props: {
   spaces: SpaceData[];
+  space_id: string;
   studioName: string;
 }) => {
-  let { session } = useAuth();
   let params = useParams<{ space_id: string; studio_id: string }>();
   return (
     <div className="spaceHeaderInfo -mb-1 ml-2 flex min-w-0 shrink grow flex-row items-stretch gap-2 px-3 py-1 font-bold">
@@ -30,7 +27,7 @@ export const SpaceViewerHeader = (props: {
             <SpaceSwitcher spaces={props.spaces} />
           </div>
           <div className="flex w-full flex-row items-center justify-between gap-2 bg-inherit">
-            <SpaceName truncate />
+            <SpaceName truncate space_id={props.space_id} />
           </div>
         </div>
       </div>
@@ -104,9 +101,8 @@ export const LoginButton = () => {
   );
 };
 
-const SpaceName = (props: { truncate?: boolean }) => {
-  let spaceID = useSpaceID();
-  let { data } = useSpaceData(spaceID);
+const SpaceName = (props: { truncate?: boolean; space_id: string }) => {
+  let { data } = useSpaceData({ space_id: props.space_id });
 
   return (
     <div className={`spaceName flex min-w-0 bg-inherit text-grey-35`}>

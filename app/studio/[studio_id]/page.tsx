@@ -29,7 +29,10 @@ export default async function StudioPage(props: {
   let isAdmin = data.data.creator === session?.data.user?.id;
   return (
     <>
-      <SpaceProvider id={data?.data.do_id}>
+      <SpaceProvider
+        id={data?.data.do_id}
+        data={{ studio_id: data.data.id, space_id: undefined }}
+      >
         <StudioPageContent data={data.data} isAdmin={isAdmin} />
       </SpaceProvider>
     </>

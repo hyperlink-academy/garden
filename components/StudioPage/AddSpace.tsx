@@ -1,6 +1,6 @@
 import { add_space } from "app/studio/[studio_id]/add_space";
-import { spaceAPI } from "backend/lib/api";
-import { ButtonLink, ButtonPrimary, ButtonTertiary } from "components/Buttons";
+import { workerAPI } from "backend/lib/api";
+import { ButtonLink, ButtonPrimary } from "components/Buttons";
 import { CreateSpaceForm, CreateSpaceFormState } from "components/CreateSpace";
 import { DotLoader } from "components/DotLoader";
 import { SpaceCreate } from "components/Icons";
@@ -49,25 +49,25 @@ export function AddSpace(props: { id: string }) {
               and otherwise change it.
             </p>
             <button
-              className="border-grey-80 hover:border-accent-blue hover:bg-bg-blue rounded-md border-2 px-4 py-3"
+              className="rounded-md border-2 border-grey-80 px-4 py-3 hover:border-accent-blue hover:bg-bg-blue"
               onClick={() => {
                 setState("add-new");
               }}
             >
               <h4>New Space</h4>
-              <p className="text-grey-35 italic">
+              <p className="italic text-grey-35">
                 Create a brand new Space; it will also appear in your Homepage
               </p>
             </button>
 
             <button
-              className="border-grey-80 hover:border-accent-blue hover:bg-bg-blue rounded-md border-2 px-4 py-3"
+              className="rounded-md border-2 border-grey-80 px-4 py-3 hover:border-accent-blue hover:bg-bg-blue"
               onClick={() => {
                 setState("add-existing");
               }}
             >
               <h4>Existing Space</h4>
-              <p className="text-grey-35 italic">
+              <p className="italic text-grey-35">
                 Bring any space that you&apos;re a member of into this Studio
               </p>
             </button>
@@ -122,14 +122,10 @@ const AddNewSpace = (props: { onClose: () => void; studioID: string }) => {
               !formState.display_name
             )
               return;
-            let result = await spaceAPI(
-              `${WORKER_URL}/space/${auth.session.session?.studio}`,
-              "create_space",
-              {
-                authToken: auth.authToken,
-                ...formState,
-              }
-            );
+            let result = await workerAPI(WORKER_URL, "create_space", {
+              authToken: auth.authToken,
+              ...formState,
+            });
             if (!result.success) return;
 
             await add_space({
@@ -216,13 +212,13 @@ const AddExistingSpace = (props: { onClose: () => void; studioID: string }) => {
             >
               <p className="font-bold">{space_data.display_name}</p>
               {space_data.archived && (
-                <p className="text-grey-55 text-sm italic">archived</p>
+                <p className="text-sm italic text-grey-55">archived</p>
               )}
             </button>
           ) : null
         )}
       </div>
-      <div className="border-grey-80 sticky -bottom-4 -mx-4 -mb-4  flex flex-row justify-end gap-2 border-t bg-white px-4 pb-4 pt-2 sm:-bottom-4 ">
+      <div className="sticky -bottom-4 -mx-4 -mb-4 flex  flex-row justify-end gap-2 border-t border-grey-80 bg-white px-4 pb-4 pt-2 sm:-bottom-4 ">
         <ButtonLink
           content="nevermind"
           className="font-normal"
