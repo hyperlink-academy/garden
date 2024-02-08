@@ -7,7 +7,7 @@ import {
   useRoom,
   useUIState,
 } from "hooks/useUIState";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { CardView } from "./CardView";
 import { focusElement } from "src/utils";
 import { useIsMobile } from "hooks/utils";
@@ -37,7 +37,7 @@ export const useCardViewer = () => {
   };
 };
 
-export function CardViewer() {
+export function CardViewer(props: { space_id: string }) {
   let room = useRoom();
   let roomType = db.useEntity(room, "room/type")?.value;
   let spaceID = useSpaceID();
@@ -60,11 +60,20 @@ export function CardViewer() {
         mutate("markRead", {
           memberEntity,
           userID: session.user.id,
+          space_id: props.space_id,
           entityID: history[0],
           attribute: "card/unread-by",
         });
     }
-  }, [history, room, unreadBy, memberEntity, mutate, session.user]);
+  }, [
+    history,
+    room,
+    unreadBy,
+    memberEntity,
+    mutate,
+    session.user,
+    props.space_id,
+  ]);
   useEffect(() => {
     if (!client || !room) return;
     let currentCard = history[0];

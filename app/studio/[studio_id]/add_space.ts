@@ -7,10 +7,7 @@ import {
   supabaseServerClient,
 } from "supabase/server";
 
-export async function add_space(msg: {
-  studio_id: string;
-  space_do_id: string;
-}) {
+export async function add_space(msg: { studio_id: string; space_id: string }) {
   let supabase = supabaseServerClient();
   let { data: session } = await supabase.auth.getUser();
   console.log(session);
@@ -32,7 +29,7 @@ export async function add_space(msg: {
     .from("spaces_in_studios")
     .insert({
       studio: msg.studio_id,
-      space: msg.space_do_id,
+      space_id: msg.space_id,
     })
     .select("*");
 

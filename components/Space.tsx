@@ -97,7 +97,7 @@ const DesktopLayout = (props: Props) => {
           </div>
         </div>
 
-        <CardViewer />
+        <CardViewer space_id={props.space_id} />
       </div>
     </div>
   );
@@ -188,7 +188,7 @@ const MobileLayout = (props: Props) => {
         </div>
 
         <div className="cardViewerWrapper snap-center snap-always ">
-          <CardViewer />
+          <CardViewer space_id={props.space_id} />
         </div>
         <div className="w-2 shrink-0 snap-start" />
       </div>

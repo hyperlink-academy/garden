@@ -1,8 +1,8 @@
 import { ButtonPrimary } from "components/Buttons";
 import { CardAddLined, CloseLinedTiny, Reply, Send } from "components/Icons";
 import { RenderedText } from "components/Textarea/RenderedText";
-import { db, useMutations } from "hooks/useReplicache";
-import { HTMLAttributes, useEffect, useRef, useState } from "react";
+import { ReplicacheContext, db, useMutations } from "hooks/useReplicache";
+import { HTMLAttributes, useContext, useEffect, useRef, useState } from "react";
 import { ulid } from "src/ulid";
 import type { Message } from "data/Messages";
 import AutosizeTextarea from "components/Textarea/AutosizeTextarea";
@@ -73,6 +73,7 @@ export const DiscussionRoom = (props: {
 };
 
 export const useMarkRead = (entityID: string, focused: boolean) => {
+  let rep = useContext(ReplicacheContext);
   let unreadBy = db.useEntity(entityID, "discussion/unread-by");
   let [windowFocus, setWindowFocus] = useState(true);
   let { mutate, memberEntity } = useMutations();
@@ -87,16 +88,19 @@ export const useMarkRead = (entityID: string, focused: boolean) => {
   useEffect(() => {
     if (entityID && memberEntity && session.user) {
       if (!windowFocus || !focused) return;
+      if (!rep || !rep.data.space_id) return;
       let unread = unreadBy?.find((f) => f.value.value === memberEntity);
       if (unread)
         mutate("markRead", {
           memberEntity,
+          space_id: rep.data.space_id,
           userID: session.user.id,
           entityID: entityID,
           attribute: "discussion/unread-by",
         });
     }
   }, [
+    rep,
     entityID,
     unreadBy,
     memberEntity,

@@ -130,7 +130,7 @@ const AddNewSpace = (props: { onClose: () => void; studioID: string }) => {
 
             await add_space({
               studio_id: props.studioID,
-              space_do_id: result.data.do_id,
+              space_id: result.data.id,
             });
 
             let latestPost = await rep.query(async (tx) => {
@@ -183,7 +183,7 @@ const AddExistingSpace = (props: { onClose: () => void; studioID: string }) => {
   let [addedSpaces, setAddedSpaces] = useState<string[]>([]);
   let spaces = data?.members_in_spaces.filter((s) => {
     return !studioData?.spaces_in_studios.find(
-      (f) => f.space === s.space_data?.do_id
+      (f) => f.space_id === s.space_data?.id
     );
   });
 
@@ -200,9 +200,9 @@ const AddExistingSpace = (props: { onClose: () => void; studioID: string }) => {
               onClick={() => {
                 if (addedSpaces.includes(space_data.do_id))
                   setAddedSpaces((spaces) =>
-                    spaces.filter((space) => space !== space_data.do_id)
+                    spaces.filter((space) => space !== space_data.id)
                   );
-                else setAddedSpaces((spaces) => [...spaces, space_data.do_id]);
+                else setAddedSpaces((spaces) => [...spaces, space_data.id]);
               }}
               className={`flex w-full items-center justify-between rounded-md border ${
                 addedSpaces.includes(space_data.do_id)
@@ -230,11 +230,13 @@ const AddExistingSpace = (props: { onClose: () => void; studioID: string }) => {
             if (!authToken || !rep) return;
 
             for (let space of addedSpaces) {
-              if (studioData?.spaces_in_studios.find((s) => s.space === space))
+              if (
+                studioData?.spaces_in_studios.find((s) => s.space_id === space)
+              )
                 continue;
               await add_space({
                 studio_id: props.studioID,
-                space_do_id: space,
+                space_id: space,
               });
               let latestPost = await rep.query(async (tx) => {
                 let posts = await scanIndex(tx).aev("feed/post");

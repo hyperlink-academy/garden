@@ -1,5 +1,5 @@
 import { Bindings } from "backend";
-import { createClient } from "./supabase";
+import { internalWorkerAPI } from "./api";
 
 type AppEvents =
   | "signup"
@@ -12,24 +12,7 @@ type AppEvents =
 
 export const app_event = async (
   env: Bindings,
-  event: { event: AppEvents; user: string; spaceID: string }
+  event: { event: AppEvents; user: string; space_do_id: string }
 ) => {
-  let supabase = createClient(env);
-  await supabase
-    .from("space_events")
-    .insert({ event: event.event, user: event.user, space: event.spaceID });
-  env.APP_EVENT_ANALYTICS?.writeDataPoint({
-    blobs: [event.event, event.spaceID, event.user],
-    doubles: [],
-    indexes: [hexToArrayBuffer(event.spaceID)],
-  });
+  internalWorkerAPI(env)("http://internal/v0", "app_event", event);
 };
-
-function hexToArrayBuffer(hex: string) {
-  const view = new Uint8Array(hex.length / 2);
-  for (let i = 0; i < hex.length; i += 2) {
-    view[i / 2] = parseInt(hex.substring(i, i + 2), 16);
-  }
-
-  return view;
-}

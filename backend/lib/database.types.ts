@@ -133,17 +133,17 @@ export interface Database {
         Row: {
           joined_at: string | null
           member: string
-          space_do_id: string
+          space_id: string
         }
         Insert: {
           joined_at?: string | null
           member: string
-          space_do_id: string
+          space_id: string
         }
         Update: {
           joined_at?: string | null
           member?: string
-          space_do_id?: string
+          space_id?: string
         }
         Relationships: [
           {
@@ -153,10 +153,10 @@ export interface Database {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "members_in_spaces_space_do_id_fkey"
-            columns: ["space_do_id"]
+            foreignKeyName: "members_in_spaces_space_id_fkey"
+            columns: ["space_id"]
             referencedRelation: "space_data"
-            referencedColumns: ["do_id"]
+            referencedColumns: ["id"]
           }
         ]
       }
@@ -297,29 +297,29 @@ export interface Database {
           at: string
           event: string
           id: number
-          space: string
+          space_id: string
           user: string
         }
         Insert: {
           at?: string
           event: string
           id?: number
-          space: string
+          space_id: string
           user: string
         }
         Update: {
           at?: string
           event?: string
           id?: number
-          space?: string
+          space_id?: string
           user?: string
         }
         Relationships: [
           {
-            foreignKeyName: "space_events_space_fkey"
-            columns: ["space"]
+            foreignKeyName: "space_events_space_id_fkey"
+            columns: ["space_id"]
             referencedRelation: "space_data"
-            referencedColumns: ["do_id"]
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "space_events_user_fkey"
@@ -331,23 +331,23 @@ export interface Database {
       }
       spaces_in_studios: {
         Row: {
-          space: string
+          space_id: string
           studio: string
         }
         Insert: {
-          space: string
+          space_id: string
           studio: string
         }
         Update: {
-          space?: string
+          space_id?: string
           studio?: string
         }
         Relationships: [
           {
-            foreignKeyName: "spaces_in_studios_space_fkey"
-            columns: ["space"]
+            foreignKeyName: "spaces_in_studios_space_id_fkey"
+            columns: ["space_id"]
             referencedRelation: "space_data"
-            referencedColumns: ["do_id"]
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "spaces_in_studios_studio_fkey"
@@ -393,26 +393,26 @@ export interface Database {
       }
       user_space_unreads: {
         Row: {
-          space: string
+          space_id: string
           unreads: number
           user: string
         }
         Insert: {
-          space: string
+          space_id: string
           unreads?: number
           user: string
         }
         Update: {
-          space?: string
+          space_id?: string
           unreads?: number
           user?: string
         }
         Relationships: [
           {
-            foreignKeyName: "user_space_unreads_space_fkey"
-            columns: ["space"]
+            foreignKeyName: "user_space_unreads_space_id_fkey"
+            columns: ["space_id"]
             referencedRelation: "space_data"
-            referencedColumns: ["do_id"]
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "user_space_unreads_user_fkey"

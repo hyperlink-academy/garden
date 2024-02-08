@@ -43,7 +43,7 @@ export const create_space_route = makeRoute({
       .single();
     if (!data) return { data: { success: false } } as const;
     await supabase.from("members_in_spaces").insert({
-      space_do_id: newSpace.toString(),
+      space_id: data.id,
       member: session.id,
     });
 

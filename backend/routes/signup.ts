@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { Bindings } from "backend";
 import { internalSpaceAPI, makeRoute } from "backend/lib/api";
-import { app_event } from "backend/lib/analytics";
 import { createClient } from "backend/lib/supabase";
 
 export const SignupRoute = makeRoute({
@@ -67,11 +66,6 @@ export const SignupRoute = makeRoute({
       type: "user",
       ownerID: newSpaceID.toString(),
       ownerName: username,
-    });
-    app_event(env, {
-      event: "signup",
-      spaceID: newSpaceID.toString(),
-      user: session.user.id,
     });
     return { data: { success: true } } as const;
   },
