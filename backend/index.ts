@@ -1,5 +1,6 @@
 import { makeRouter } from "./lib/api";
 import { handleOptions } from "./lib/handleOptions";
+import { app_event_route } from "./routes/app_event";
 import { create_space_route } from "./routes/create_space";
 import { create_studio_route } from "./routes/create_studio";
 import { feedback_route } from "./routes/feedback";
@@ -35,6 +36,7 @@ const Routes = [
   update_space_route,
   feedback_route,
   leave_space_route,
+  app_event_route,
 ];
 
 export type WorkerRoutes = typeof Routes;
@@ -42,6 +44,7 @@ export type WorkerRoutes = typeof Routes;
 let router = makeRouter(Routes);
 
 export type Bindings = {
+  SELF_WORKER: Fetcher;
   APP_EVENT_ANALYTICS: AnalyticsEngineDataset;
   SUPABASE_API_TOKEN: string;
   SUPABASE_URL: string;

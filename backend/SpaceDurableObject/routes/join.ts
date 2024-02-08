@@ -6,7 +6,6 @@ import { ulid } from "src/ulid";
 import { z } from "zod";
 import { memberColors } from "src/colors";
 import { Env } from "..";
-import { store } from "../fact_store";
 import { webPushPayloadParser } from "pages/api/web_push";
 import { sign } from "src/sign";
 import { MutationContext } from "data/mutations";
@@ -96,9 +95,20 @@ export const join_route = makeRoute({
         .from("members_in_studios")
         .insert({ member: session.id, studio: studio_ID.id });
     } else {
+      let { data: space_ID } = await supabase
+        .from("space_data")
+        .select("id")
+        .eq("do_id", env.id)
+        .single();
+      if (!space_ID) return { data: { success: false } };
       await supabase
         .from("members_in_spaces")
-        .insert({ space_do_id: env.id, member: session.id });
+        .insert({ space_id: space_ID.id, member: session.id });
+      app_event(env.env, {
+        event: "joined_space",
+        user: session.id,
+        space_do_id: env.id,
+      });
     }
 
     let payload: z.TypeOf<typeof webPushPayloadParser> = {
@@ -120,11 +130,6 @@ export const join_route = makeRoute({
 
     env.poke();
     env.updateLastUpdated();
-    app_event(env.env, {
-      event: "joined_space",
-      user: session.id,
-      spaceID: env.id,
-    });
     return { data: { success: true } } as const;
   },
 });
