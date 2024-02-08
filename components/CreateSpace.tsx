@@ -1,6 +1,6 @@
-import { spaceAPI } from "backend/lib/api";
+import { spaceAPI, workerAPI } from "backend/lib/api";
 import { useAuth } from "hooks/useAuth";
-import { ReplicacheContext, useMutations } from "hooks/useReplicache";
+import { ReplicacheContext } from "hooks/useReplicache";
 import { useContext, useEffect, useState } from "react";
 import { ButtonPrimary, ButtonSecondary } from "./Buttons";
 import { DoorSelector } from "./DoorSelector";
@@ -12,7 +12,7 @@ import { useSpaceData } from "hooks/useSpaceData";
 import { useIdentityData } from "hooks/useIdentityData";
 import { Form, SubmitButton } from "./Form";
 import { DotLoader } from "./DotLoader";
-import { useIsMobile } from "hooks/utils";
+import { spacePath, useIsMobile } from "hooks/utils";
 
 export type CreateSpaceFormState = {
   display_name: string;
@@ -62,14 +62,10 @@ export const CreateSpace = (props: {
           }}
           className="flex flex-col gap-6 overflow-y-auto"
           onSubmit={async ({ authToken }) => {
-            let result = await spaceAPI(
-              `${WORKER_URL}/space/${props.studioSpaceID}`,
-              "create_space",
-              {
-                authToken: authToken,
-                ...formState,
-              }
-            );
+            let result = await workerAPI(WORKER_URL, "create_space", {
+              authToken: authToken,
+              ...formState,
+            });
             if (result.success) {
               let d = result.data;
               mutate((s) => {
@@ -79,7 +75,13 @@ export const CreateSpace = (props: {
                   owner: [...s.owner, d],
                 };
               });
-              router.push(`${d.owner.username}/s/${d.name}/${d.display_name}`);
+              router.push(
+                spacePath({
+                  studio: d.owner.username,
+                  id: d.id,
+                  display_name: d.display_name,
+                })
+              );
             }
             setFormState({
               display_name: "",
@@ -107,9 +109,10 @@ export const EditSpaceModal = (props: {
   onDelete: () => void;
   onClose: () => void;
   spaceID?: string;
+  space_id: string;
 }) => {
   let { authToken } = useAuth();
-  let { data, mutate } = useSpaceData(props.spaceID);
+  let { data, mutate } = useSpaceData({ space_id: props.space_id });
 
   let [formState, setFormState] = useState<CreateSpaceFormState>({
     display_name: "",
@@ -150,11 +153,12 @@ export const EditSpaceModal = (props: {
         <Form
           className="flex flex-col gap-4"
           validate={() => {
-            if (!authToken || !props.spaceID) return;
-            return { authToken, spaceID: props.spaceID };
+            if (!authToken) return;
+            return { authToken };
           }}
-          onSubmit={async ({ authToken, spaceID }) => {
-            await spaceAPI(`${WORKER_URL}/space/${spaceID}`, "update_self", {
+          onSubmit={async ({ authToken }) => {
+            await workerAPI(WORKER_URL, "update_space", {
+              space_id: props.space_id,
               authToken,
               data: formState,
             });
@@ -198,6 +202,7 @@ export const EditSpaceModal = (props: {
               )}
               <div className="mx-auto">
                 <ArchiveButton
+                  space_id={props.space_id}
                   spaceID={props.spaceID}
                   onSubmit={props.onSubmit}
                 />
@@ -222,6 +227,7 @@ export const EditSpaceModal = (props: {
         <>
           {!props.spaceID ? null : (
             <DeleteSpaceForm
+              space_id={props.space_id}
               spaceID={props.spaceID}
               onCancel={() => setMode("normal")}
               onDelete={() => {
@@ -235,8 +241,12 @@ export const EditSpaceModal = (props: {
   );
 };
 
-const ArchiveButton = (props: { spaceID?: string; onSubmit?: () => void }) => {
-  let { data, mutate } = useSpaceData(props.spaceID);
+const ArchiveButton = (props: {
+  spaceID?: string;
+  onSubmit?: () => void;
+  space_id: string;
+}) => {
+  let { data, mutate } = useSpaceData(props);
   let { authToken } = useAuth();
   let [loading, setLoading] = useState(false);
   return (
@@ -251,8 +261,9 @@ const ArchiveButton = (props: { spaceID?: string; onSubmit?: () => void }) => {
         });
         if (loading || !data || !props.spaceID || !authToken) return;
         setLoading(true);
-        await spaceAPI(`${WORKER_URL}/space/${props.spaceID}`, "update_self", {
+        await workerAPI(WORKER_URL, "update_space", {
           authToken,
+          space_id: props.space_id,
           data: {
             ...data,
             display_name: data?.display_name || "",
@@ -279,12 +290,13 @@ const ArchiveButton = (props: { spaceID?: string; onSubmit?: () => void }) => {
 
 const DeleteSpaceForm = (props: {
   spaceID: string;
+  space_id: string;
   onCancel: () => void;
   onDelete: () => void;
 }) => {
   let [state, setState] = useState({ spaceName: "" });
   let { authToken } = useAuth();
-  let { data } = useSpaceData(props.spaceID);
+  let { data } = useSpaceData({ space_id: props.space_id });
   return (
     <>
       <Form

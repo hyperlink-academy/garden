@@ -1,17 +1,12 @@
-import { db, useMutations } from "hooks/useReplicache";
+import { useMutations } from "hooks/useReplicache";
 import Link from "next/link";
-import { useState } from "react";
-import { ButtonLink } from "./Buttons";
 import { DoorImage } from "./Doors";
-import { Information, RoomMember, Settings } from "./Icons";
+import { RoomMember } from "./Icons";
 import { useAuth } from "hooks/useAuth";
 import { spacePath } from "hooks/utils";
-import { EditSpaceModal } from "./CreateSpace";
-import { useSpaceData } from "hooks/useSpaceData";
 export type { SpaceData } from "backend/routes/get_space_data";
 import type { SpaceData } from "backend/routes/get_space_data";
 import { getCurrentDate } from "src/utils";
-import { Modal } from "./Modal";
 
 export const SpaceList = (props: {
   spaces: Array<SpaceData>;
@@ -47,8 +42,15 @@ export const SpaceCard = (
   } & SpaceData
 ) => {
   let data = props;
+  if (!data.owner) return <BaseSpaceCard {...props} />;
   return (
-    <Link href={`${spacePath(data?.owner?.username, data?.name || "")}`}>
+    <Link
+      href={`${spacePath({
+        studio: data.owner.username,
+        id: data.id,
+        display_name: data.display_name || "",
+      })}`}
+    >
       <BaseSpaceCard {...props} />
     </Link>
   );

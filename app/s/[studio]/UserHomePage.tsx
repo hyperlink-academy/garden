@@ -1,5 +1,4 @@
 "use client";
-import { SpaceProvider } from "components/ReplicacheProvider";
 import { SpaceData, SpaceList } from "components/SpacesList";
 import { CreateSpace } from "components/CreateSpace";
 import { CreateStudio } from "components/CreateStudio";
@@ -10,7 +9,6 @@ import { DisclosureCollapseTiny, DisclosureExpandTiny } from "components/Icons";
 import Head from "next/head";
 import { NotificationManager } from "components/NotificationManager";
 import { Divider } from "components/Layout";
-import { HelpExampleSpaces } from "components/HelpCenter";
 import { uuidToBase62 } from "src/uuidHelpers";
 import Link from "next/link";
 import { IdentityData } from "backend/routes/get_identity_data";
@@ -70,21 +68,59 @@ export default function UserHomePage(props: { data: IdentityData }) {
       <Head>
         <title key="title">{currentStudioName}</title>
       </Head>
-      <SpaceProvider id={data.studio}>
-        <div className="mb-0 flex flex-col gap-2 pt-4">
-          <div className="flex w-full flex-row items-center justify-between gap-2">
-            <h2 className="grow">{currentStudioName}</h2>
+      <div className="mb-0 flex flex-col gap-2 pt-4">
+        <div className="flex w-full flex-row items-center justify-between gap-2">
+          <h2 className="grow">{currentStudioName}</h2>
 
-            {session?.loggedIn ? (
-              session.session?.username === currentStudioName && (
-                <NotificationManager />
-              )
-            ) : (
-              <LoginButton />
-            )}
-          </div>
+          {session?.loggedIn ? (
+            session.session?.username === currentStudioName && (
+              <NotificationManager />
+            )
+          ) : (
+            <LoginButton />
+          )}
+        </div>
 
-          {studios.length > 0 ? (
+        {studios.length > 0 ? (
+          <>
+            <div className="flex flex-row items-center justify-between">
+              <h4>Studios</h4>
+              {session.session &&
+                session.session?.username === currentStudioName && (
+                  <CreateStudio username={session.session.username} />
+                )}
+            </div>
+            <div className="grid  w-full grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3">
+              {studios.map((studio) => (
+                <Link
+                  prefetch
+                  href={`/studio/${uuidToBase62(studio.id)}`}
+                  className="grid h-[120px] w-full flex-col place-items-center rounded-md border border-accent-blue bg-bg-blue text-center hover:border-2"
+                  key={studio.id}
+                >
+                  <div className="flex h-fit flex-col">
+                    <h4
+                      className="text-accent-blue"
+                      style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
+                    >
+                      {studio.name}
+                    </h4>
+                    <p className="text-sm italic text-grey-55">
+                      {studio.spaces_in_studios.length} spaces
+                    </p>
+                    <p className="text-sm italic text-grey-55">
+                      {studio.members_in_studios.length} members
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+            <div className="pb-2 pt-4">
+              <Divider />
+            </div>
+          </>
+        ) : (
+          spaces.length > 0 && (
             <>
               <div className="flex flex-row items-center justify-between">
                 <h4>Studios</h4>
@@ -93,101 +129,57 @@ export default function UserHomePage(props: { data: IdentityData }) {
                     <CreateStudio username={session.session.username} />
                   )}
               </div>
-              <div className="grid  w-full grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3">
-                {studios.map((studio) => (
-                  <Link
-                    prefetch
-                    href={`/studio/${uuidToBase62(studio.id)}`}
-                    className="grid h-[120px] w-full flex-col place-items-center rounded-md border border-accent-blue bg-bg-blue text-center hover:border-2"
-                    key={studio.id}
-                  >
-                    <div className="flex h-fit flex-col">
-                      <h4
-                        className="text-accent-blue"
-                        style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
-                      >
-                        {studio.name}
-                      </h4>
-                      <p className="text-sm italic text-grey-55">
-                        {studio.spaces_in_studios.length} spaces
-                      </p>
-                      <p className="text-sm italic text-grey-55">
-                        {studio.members_in_studios.length} members
-                      </p>
-                    </div>
-                  </Link>
-                ))}
+              <div className="max-w-lg text-sm italic text-grey-55">
+                Studios are places for groups to work together and share related
+                Spaces — like a collection of projects or gatherings.
               </div>
               <div className="pb-2 pt-4">
                 <Divider />
               </div>
             </>
-          ) : (
-            spaces.length > 0 && (
-              <>
-                <div className="flex flex-row items-center justify-between">
-                  <h4>Studios</h4>
-                  {session.session &&
-                    session.session?.username === currentStudioName && (
-                      <CreateStudio username={session.session.username} />
-                    )}
-                </div>
-                <div className="max-w-lg text-sm italic text-grey-55">
-                  Studios are places for groups to work together and share
-                  related Spaces — like a collection of projects or gatherings.
-                </div>
-                <div className="pb-2 pt-4">
-                  <Divider />
-                </div>
-              </>
-            )
-          )}
+          )
+        )}
 
-          {spaces.length === 0 ? null : (
-            <>
-              <div className="flex justify-between gap-2">
-                <h4 className="">Spaces</h4>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex flex-row gap-2 text-sm">
-                  <button
-                    onClick={() => setSortOrder("lastUpdated")}
-                    className={`h-fit rounded-md border px-1 py-0.5 hover:border-grey-80 ${
-                      sortOrder === "lastUpdated"
-                        ? " border-grey-80 text-grey-35"
-                        : "border-transparent text-grey-55"
-                    }`}
-                  >
-                    last updated
-                  </button>
-                  <button
-                    onClick={() => setSortOrder("name")}
-                    className={`h-fit rounded-md border px-1 py-0.5 hover:border-grey-80 ${
-                      sortOrder === "name"
-                        ? " border-grey-80 text-grey-35"
-                        : "border-transparent text-grey-55"
-                    } `}
-                  >
-                    name
-                  </button>
-                </div>{" "}
-                {session.session?.username === currentStudioName &&
-                  spaces.length !== 0 && (
-                    <CreateSpace
-                      studioSpaceID={data.studio}
-                      studioName={currentStudioName as string}
-                    />
-                  )}
-              </div>
-            </>
-          )}
-          <List
-            spaces={spaces}
-            id={data.studio}
-            name={query?.studio as string}
-          />
-        </div>
-      </SpaceProvider>
+        {spaces.length === 0 ? null : (
+          <>
+            <div className="flex justify-between gap-2">
+              <h4 className="">Spaces</h4>
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex flex-row gap-2 text-sm">
+                <button
+                  onClick={() => setSortOrder("lastUpdated")}
+                  className={`h-fit rounded-md border px-1 py-0.5 hover:border-grey-80 ${
+                    sortOrder === "lastUpdated"
+                      ? " border-grey-80 text-grey-35"
+                      : "border-transparent text-grey-55"
+                  }`}
+                >
+                  last updated
+                </button>
+                <button
+                  onClick={() => setSortOrder("name")}
+                  className={`h-fit rounded-md border px-1 py-0.5 hover:border-grey-80 ${
+                    sortOrder === "name"
+                      ? " border-grey-80 text-grey-35"
+                      : "border-transparent text-grey-55"
+                  } `}
+                >
+                  name
+                </button>
+              </div>{" "}
+              {session.session?.username === currentStudioName &&
+                spaces.length !== 0 && (
+                  <CreateSpace
+                    studioSpaceID={data.studio}
+                    studioName={currentStudioName as string}
+                  />
+                )}
+            </div>
+          </>
+        )}
+        <List spaces={spaces} id={data.studio} name={query?.studio as string} />
+      </div>
     </>
   );
 }

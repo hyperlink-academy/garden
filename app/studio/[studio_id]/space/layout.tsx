@@ -5,7 +5,6 @@ import { SpaceViewer } from "./SpaceViewer";
 import { PageHeightContainer } from "components/PageHeightContainer";
 import { Space } from "components/Space";
 import { StudioPresenceHandler } from "./StudioPresenceHandler";
-import { useParams } from "next/navigation";
 export const fetchCache = "force-no-store";
 
 export default async function StudioSpaceLayout(props: {
@@ -23,16 +22,16 @@ export default async function StudioSpaceLayout(props: {
 
   return (
     <PageHeightContainer>
-      <StudioPresenceHandler spaces={spaces} studio_do_id={data.data.do_id} />
-      <SpaceViewer studioName={data.data.name} spaces={spaces}>
-        <Space
-          studio={{
-            spaces,
-            studioName: data.data.name,
-            studioID: data.data.id,
-          }}
-        />
-      </SpaceViewer>
+      <StudioPresenceHandler
+        spaces={spaces}
+        studio_do_id={data.data.do_id}
+        studio_id={data.data.id}
+      />
+      <SpaceViewer
+        studioName={data.data.name}
+        spaces={spaces}
+        studioID={data.data.id}
+      />
     </PageHeightContainer>
   );
 }

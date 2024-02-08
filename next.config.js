@@ -8,16 +8,7 @@ const nextConfig = {
   reactStrictMode: true,
   pageExtensions: ["js", "jsx", "mdx", "ts", "tsx"],
   async rewrites() {
-    return [
-      {
-        source: "/s/:studio/s/:space/:slug/:path*",
-        destination: "/s/:studio/s/:space/:path*",
-      },
-      {
-        source: "/s/:studio/s/:space/:slug",
-        destination: "/s/:studio/s/:space",
-      },
-    ];
+    return [];
   },
   async redirects() {
     return [
