@@ -1,3 +1,4 @@
+import { submit_club_proposal } from "backend/actions/submit_club_proposal";
 import { ButtonPrimary } from "components/Buttons";
 import { DotLoader } from "components/DotLoader";
 
@@ -7,7 +8,10 @@ export const metadata = {
 
 export default async function ProposeClubForm() {
   return (
-    <form className="proposeClubForm mx-auto flex w-full max-w-2xl flex-col gap-4 p-4">
+    <form
+      action={submit_club_proposal}
+      className="proposeClubForm mx-auto flex w-full max-w-2xl flex-col gap-4 p-4"
+    >
       <div className="flex flex-col gap-4">
         <h1>Propose an Internet Club!</h1>
         <p>
