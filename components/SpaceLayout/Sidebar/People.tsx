@@ -32,6 +32,7 @@ import { ButtonPrimary, ButtonTertiary } from "components/Buttons";
 import { Modal } from "components/Modal";
 import { Truncate } from "components/Truncate";
 import { useSpaceData } from "hooks/useSpaceData";
+import { spacePath } from "hooks/utils";
 
 export const People = (props: { space_id: string }) => {
   let spaceData = useSpaceData(props);
@@ -447,28 +448,27 @@ function useParticipantInCall(username?: string) {
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 const InviteMember = (props: { space_id: string }) => {
-  let { authToken, session } = useAuth();
+  let { authToken } = useAuth();
   let [open, setInviteOpen] = useState(false);
-  let isMember = db.useUniqueAttribute("space/member", session.session?.studio);
   let { authorized } = useMutations();
   let smoker = useSmoker();
   const spaceID = useSpaceID();
   let { data } = useSpaceData(props);
   let { data: inviteLink } = useSWR(
-    !isMember ? null : `${WORKER_URL}/space/${spaceID}/get_share_code`,
+    !authorized ? null : `${WORKER_URL}/space/${spaceID}/get_share_code`,
     async () => {
-      if (!spaceID || !authToken) return;
+      if (!spaceID || !authToken || !data) return;
       let code = await spaceAPI(
         `${WORKER_URL}/space/${spaceID}`,
         "get_share_code",
         { authToken }
       );
       if (code.success) {
-        return `${document.location.protocol}//${document.location.host}/s/${
-          data?.owner.username
-        }/s/${data?.name}/${encodeURIComponent(
-          data?.display_name || ""
-        )}/join?code=${code.code}`;
+        return `${document.location.protocol}//${
+          document.location.host
+        }${spacePath({ studio: data.owner.username, ...data })}/join?code=${
+          code.code
+        }`;
       }
     }
   );

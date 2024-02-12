@@ -16,9 +16,10 @@ export async function generateMetadata(props: {
 }
 
 export default async function JoinSpacePage(props: {
-  params: { space: string; studio: string };
+  params: { space: string; studio: string; display_name: string };
 }) {
   let data = await getData(props.params);
+  console.log(data, "yooo");
   if (!data.success)
     return redirectToIDURL(props.params, <div>404 - space not found</div>);
   let supabase = supabaseServerClient();
@@ -29,7 +30,9 @@ export default async function JoinSpacePage(props: {
       (member) => member.member === user.user?.id
     )
   )
-    redirect(`/s/${props.params.studio}/s/${props.params.space}}`);
+    redirect(
+      `/s/${props.params.studio}/s/${props.params.space}/${props.params.display_name}`
+    );
 
   return (
     <SpaceProvider

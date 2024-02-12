@@ -29,10 +29,11 @@ export const get_share_code_route = makeRoute({
     } else {
       let { data } = await supabase
         .from("members_in_spaces")
-        .select("member")
+        .select("member, space_data!inner(do_id)")
         .eq("member", session.id)
-        .eq("space_do_id", env.id)
+        .eq("space_data.do_id", env.id)
         .single();
+
       isMember = !!data;
     }
 
