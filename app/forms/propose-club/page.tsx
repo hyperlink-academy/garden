@@ -48,12 +48,12 @@ export default async function ProposeClubForm() {
 
       <label className="grid-flow-rows grid gap-2" htmlFor="name">
         <p className="font-bold">Name</p>
-        <input className="" type="text" required id="name" />
+        <input className="" type="text" required name="name" />
       </label>
 
       <label className="grid-flow-rows grid gap-2" htmlFor="email">
         <p className="font-bold">Email</p>
-        <input className="" type="email" required id="email" />
+        <input className="" type="email" required name="email" />
       </label>
 
       <label className="grid-flow-rows grid gap-2" htmlFor="about">
@@ -62,7 +62,7 @@ export default async function ProposeClubForm() {
           in a few words e.g. &quot;pottery craft circle&quot; or &quot;internet
           history reading group&quot;
         </p>
-        <input className="" type="text" required id="about" />
+        <input className="" type="text" required name="about" />
       </label>
 
       <label className="grid-flow-rows grid gap-2" htmlFor="activity">
@@ -72,7 +72,7 @@ export default async function ProposeClubForm() {
           log for a personal website&quot; or &quot;each reading a book and
           sharing notes&quot;
         </p>
-        <textarea className="" required id="activity" />
+        <textarea className="" required name="activity" />
       </label>
 
       <label className="grid-flow-rows grid gap-2" htmlFor="structure">
@@ -85,7 +85,7 @@ export default async function ProposeClubForm() {
           months&quot; or &quot;10-20 people, sharing daily updates for a
           week&quot;
         </p>
-        <textarea className="" required id="structure" />
+        <textarea className="" required name="structure" />
       </label>
 
       <label className="grid-flow-rows grid gap-2" htmlFor="success">
@@ -94,7 +94,7 @@ export default async function ProposeClubForm() {
           how do you want it to end, and what do you want to get out of it? any
           ideal artifacts or output?
         </p>
-        <textarea className="" required id="success" />
+        <textarea className="" required name="success" />
       </label>
 
       <div className="grid justify-items-end text-right">
