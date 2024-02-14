@@ -514,7 +514,10 @@ const Message = (props: {
         )}
         {replyMessage && (
           <div className={`-mb-1 w-fit ${isMe ? "ml-6" : "mr-6"}`}>
-            <div className="mt-0.5 flex max-h-[118px] flex-col overflow-hidden rounded-lg border border-grey-80 px-2 py-1 text-xs">
+            <div
+              className="mt-0.5 flex max-h-[118px] flex-col overflow-hidden rounded-lg border border-grey-80 px-2 py-1 text-xs"
+              style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
+            >
               <div className={`font-bold italic text-grey-55`}>
                 {replyToName?.value}
               </div>

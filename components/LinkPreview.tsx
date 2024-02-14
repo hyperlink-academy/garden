@@ -8,7 +8,10 @@ export const LinkPreview = (props: { entityID: string }) => {
 
   return (
     <a href={data?.value.url} target="_blank" rel="noopener noreferrer">
-      <div className=" flex h-[86px] w-full gap-3 overflow-hidden rounded-md border border-grey-80 hover:bg-bg-blue sm:h-[120px] sm:gap-4">
+      <div
+        className="flex h-[86px] w-full gap-3 overflow-hidden rounded-md border border-grey-80 hover:bg-bg-blue sm:h-[120px] sm:gap-4"
+        style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
+      >
         {/* use image if it exists, logo if not */}
         {data?.value.image ? (
           <img
