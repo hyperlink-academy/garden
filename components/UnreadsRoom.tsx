@@ -145,24 +145,25 @@ export const UnreadsRoom = () => {
               New cards and comments you haven&apos;t yet seen will appear here
             </div>
           ) : (
-            cachedUnreads
-              .filter(
-                (unread) =>
-                  !chatRooms.find((room) => room.entity === unread.entity)
-              )
-              .sort((a, b) => {
-                if (a.lastUpdated > b.lastUpdated) return -1;
-                return 0;
-              })
-
-              .map((unread) => (
-                <CardPreviewWithData
-                  hideContent={listType === "list"}
-                  key={unread.id}
-                  entityID={unread.entity}
-                  size="big"
-                />
-              ))
+            <div className="flex flex-col gap-2 pt-3">
+              {cachedUnreads
+                .filter(
+                  (unread) =>
+                    !chatRooms.find((room) => room.entity === unread.entity)
+                )
+                .sort((a, b) => {
+                  if (a.lastUpdated > b.lastUpdated) return -1;
+                  return 0;
+                })
+                .map((unread) => (
+                  <CardPreviewWithData
+                    hideContent={listType === "list"}
+                    key={unread.id}
+                    entityID={unread.entity}
+                    size="big"
+                  />
+                ))}
+            </div>
           )}
         </div>
       )}
