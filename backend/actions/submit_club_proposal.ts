@@ -27,18 +27,16 @@ export async function submit_club_proposal(formData: FormData) {
       Subject: `Club Proposal from ${name} - ${email}`,
       ReplyTo: email,
       TextBody: `
-		New internet club proposal!\n\n
-		Name: ${name}\n\n
-		Email: ${email}\n\n
-		What's your club about?:\n ${about}\n\n
-		What activity are participants doing?:\n ${activity}\n\n
-		What's the structure?:\n ${structure}\n\n
-		What does success look like?:\n ${success}
-		`,
+New internet club proposal!\n
+Name: ${name}\n
+Email: ${email}\n
+What's your club about?:\n${about}\n
+What activity are participants doing?:\n${activity}\n
+What's the structure?:\n${structure}\n
+What does success look like?:\n${success}
+`,
     }),
   });
   console.log(await res.json());
   return { data: {} };
-
-  // return { data: { success: true, data } } as const;
 }
