@@ -493,12 +493,12 @@ const InviteMember = (props: { space_id: string }) => {
       )}
       <Modal
         open={open}
-        header="Send a friend this invite link…"
+        header="Invite Members to this Space"
         onClose={() => setInviteOpen(false)}
       >
         <div className="inviteMemberModal flex flex-col  gap-2 p-0 ">
           <div className="flex flex-col gap-2">
-            <p>So they can join as a member of this Space!</p>
+            <p>Send this link to anyone you&apos;d like to join!</p>
             <p>
               Members have full access — they can create and edit cards, and
               invite other members.
