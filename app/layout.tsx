@@ -17,7 +17,25 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   manifest: "/site.webmanifest",
+  icons: [
+    {
+      type: "apple-touch-icon",
+      sizes: "180x180",
+      url: "/apple-touch-icon.png",
+    },
+    {
+      type: "image/png",
+      sizes: "32x32",
+      url: "/favicon-32x32.png",
+    },
+    {
+      type: "image/png",
+      sizes: "16x16",
+      url: "/favicon-16x16.png",
+    },
+  ],
   appleWebApp: {
+    title: "Hyperlink Academy",
     statusBarStyle: "black-translucent",
     capable: true,
   },
