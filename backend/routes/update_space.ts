@@ -30,7 +30,7 @@ export const update_space_route = makeRoute({
         archived: msg.data.archived,
       })
       .eq("owner", session.id)
-      .eq("do_id", msg.space_id);
+      .eq("id", msg.space_id);
 
     return { data: { success: true } } as const;
   },
