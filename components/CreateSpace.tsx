@@ -166,6 +166,17 @@ export const EditSpaceModal = (props: {
               if (!s) return;
               return { ...s, ...formState };
             });
+            if (formState.display_name !== data?.display_name && data) {
+              window.history.replaceState(
+                null,
+                "",
+                spacePath({
+                  studio: data.owner.username,
+                  id: data.id,
+                  display_name: formState.display_name,
+                })
+              );
+            }
             props.onSubmit?.();
             props.onClose();
           }}
