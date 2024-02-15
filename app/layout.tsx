@@ -16,6 +16,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
+  manifest: "/site.webmanifest",
   appleWebApp: {
     statusBarStyle: "black-translucent",
     capable: true,
