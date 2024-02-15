@@ -50,7 +50,7 @@ export function spacePath({
 }) {
   return `/s/${encodeURIComponent(studio || "")}/s/${uuidToBase62(
     id
-  )}/${display_name}`;
+  )}/${encodeURIComponent(display_name || "")}`;
 }
 
 export function useIsElementOrChildFocused() {
