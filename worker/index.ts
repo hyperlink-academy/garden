@@ -1,8 +1,20 @@
+import { defaultCache } from "@serwist/next/browser";
+import { installSerwist } from "@serwist/sw";
 export {};
-declare let self: ServiceWorkerGlobalScope;
+declare let self: ServiceWorkerGlobalScope & {
+  __SW_MANIFEST: string[];
+  __WB_DISABLE_DEV_LOGS: boolean;
+};
 
-//@ts-ignore
 self.__WB_DISABLE_DEV_LOGS = true;
+
+installSerwist({
+  precacheEntries: self.__SW_MANIFEST,
+  skipWaiting: true,
+  clientsClaim: true,
+  navigationPreload: true,
+  runtimeCaching: defaultCache,
+});
 
 export type HyperlinkNotification =
   | {
