@@ -8,12 +8,13 @@ import { Members } from "./MemberTab";
 import { StudioSettings } from "./SettingsTab";
 import { SpaceList } from "./SpacesTab";
 import { About } from "./AboutTab";
-import { ArrowDown, ArrowUp } from "components/Icons";
+import { ArrowDown, Information } from "components/Icons";
 import Link from "next/link";
 import { useAuth } from "hooks/useAuth";
 import useWindowDimensions from "hooks/useWindowDimensions";
 import { ButtonPrimary } from "components/Buttons";
 import { LoginOrSignupModal } from "components/LoginModal";
+import * as Popover from "@radix-ui/react-popover";
 
 export type Props = {
   data: NonUndefined<ReturnType<typeof useStudioData>["data"]>;
@@ -25,9 +26,14 @@ const Tabs = { About: About, Spaces: SpaceList, Members: Members } as {
 };
 export function StudioPageContent(props: Props) {
   let { data } = useStudioData(props.data?.id, props.data);
-  let [selectedIndex, setSelectedIndex] = useState(1);
-  let { session } = useAuth();
   let { width } = useWindowDimensions();
+  let { session } = useAuth();
+  let authorized = data?.members_in_studios.find(
+    (m) => m.member === session.user?.id
+  );
+  let [selectedIndex, setSelectedIndex] = useState(
+    session.session && authorized ? 1 : 0
+  );
 
   const [isClient, setIsClient] = useState(false);
   useEffect(() => {
@@ -36,31 +42,34 @@ export function StudioPageContent(props: Props) {
   if (props.isAdmin) Tabs["Settings"] = Settings;
   if (!isClient) return null;
   return (
-    <div className="pwa-padding studioWrapper flex w-full items-stretch px-3 sm:h-screen sm:px-4">
-      <div className="studio relative mx-auto flex w-full max-w-6xl flex-col sm:flex-row">
-        <Tab.Group
-          manual
-          selectedIndex={selectedIndex}
-          onChange={setSelectedIndex}
-        >
-          {width > 640 ? (
-            <StudioDesktopNav data={props.data} isAdmin={props.isAdmin} />
-          ) : (
-            <StudioMobileNav data={props.data} isAdmin={props.isAdmin} />
-          )}
-
-          <div
-            className={`StudioContent flex w-full grow flex-col items-stretch`}
+    <div className="pwa-padding studioWrapper  flex w-full items-stretch sm:h-screen">
+      <div className="flex flex-col">
+        <StudioBanner />
+        <div className="studio relative mx-auto flex w-full max-w-7xl grow flex-col px-3 sm:flex-row sm:overflow-hidden sm:px-4">
+          <Tab.Group
+            manual
+            selectedIndex={selectedIndex}
+            onChange={setSelectedIndex}
           >
-            <Tab.Panels className="StudioTabContent h-full min-h-0 ">
-              {Object.values(Tabs).map((T, index) => (
-                <Tab.Panel key={index} className="h-full">
-                  <T data={data || props.data} isAdmin={props.isAdmin} />
-                </Tab.Panel>
-              ))}
-            </Tab.Panels>
-          </div>
-        </Tab.Group>
+            {width > 640 ? (
+              <StudioDesktopNav data={props.data} isAdmin={props.isAdmin} />
+            ) : (
+              <StudioMobileNav data={props.data} isAdmin={props.isAdmin} />
+            )}
+
+            <div
+              className={`StudioContent flex w-full grow flex-col items-stretch`}
+            >
+              <Tab.Panels className="StudioTabContent h-full min-h-0 ">
+                {Object.values(Tabs).map((T, index) => (
+                  <Tab.Panel key={index} className="h-full">
+                    <T data={data || props.data} isAdmin={props.isAdmin} />
+                  </Tab.Panel>
+                ))}
+              </Tab.Panels>
+            </div>
+          </Tab.Group>
+        </div>
       </div>
     </div>
   );
@@ -72,7 +81,7 @@ const TabItem = (props: { name: string }) => (
       <button
         className={`text-right outline-none ${
           selected
-            ? "font-bold text-accent-blue"
+            ? "text-accent-blue font-bold"
             : "text-grey-35 hover:text-accent-blue"
         }`}
       >
@@ -95,7 +104,7 @@ const StudioDesktopNav = (props: Props) => {
   let { session } = useAuth();
 
   return (
-    <div className="studioNav my-6 mr-4 w-64 flex-col justify-between border-r border-grey-80 pr-4">
+    <div className="studioNav border-grey-80 my-6 mr-4 w-64 flex-col justify-between border-r pr-4">
       <div className="flex w-full flex-col gap-2 text-right">
         <h3
           style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
@@ -110,15 +119,11 @@ const StudioDesktopNav = (props: Props) => {
         {session.session ? (
           <Link
             href={`/s/${session.session.username}`}
-            className="flex items-center justify-end gap-2 text-grey-55 hover:text-accent-blue"
+            className="text-grey-55 hover:text-accent-blue flex items-center justify-end gap-2"
           >
             <ArrowDown className="rotate-90" height={16} width={16} /> home
           </Link>
-        ) : (
-          <div className="self-end">
-            <LoginButton />
-          </div>
-        )}
+        ) : null}
       </div>
     </div>
   );
@@ -134,16 +139,12 @@ const StudioMobileNav = (props: Props) => {
       {session.session ? (
         <Link
           href={`/s/${session.session.username}`}
-          className="z-30 mt-3 flex items-center gap-2 text-sm text-grey-55 hover:text-accent-blue"
+          className="text-grey-55 hover:text-accent-blue z-30 mt-3 flex items-center gap-2 text-sm"
           style={{ transform: "translate3D(0,0,0)" }}
         >
           <ArrowDown className="rotate-90" height={16} width={16} /> home
         </Link>
-      ) : (
-        <div style={{ transform: "translate3D(0,0,0)" }} className="z-20 my-4">
-          <LoginButton />
-        </div>
-      )}
+      ) : null}
       <h3
         style={{ transform: "translate3D(0,0,0)" }}
         className="z-20 -mb-3 mt-2"
@@ -151,7 +152,7 @@ const StudioMobileNav = (props: Props) => {
         {data?.name}
       </h3>
 
-      <div className="pwa-padding pwa-negative-margin sticky top-0 z-10 -mx-3  mb-4 border-b border-grey-80 bg-background px-3 pb-1">
+      <div className="pwa-padding pwa-negative-margin border-grey-80 bg-background sticky top-0  z-10 -mx-3 mb-4 border-b px-3 pb-1">
         <div className=" flex gap-2 pt-4">
           <Tab.List className="StudioTabs flex gap-4">
             {Object.keys(Tabs).map((tab) => (
@@ -171,5 +172,48 @@ const LoginButton = () => {
       <ButtonPrimary content="Log In" onClick={() => setState("login")} />
       <LoginOrSignupModal state={state} setState={setState} />
     </>
+  );
+};
+
+const StudioBanner = () => {
+  return (
+    <div className="studioBanner bg-bg-blue border-grey-80 flex w-screen shrink-0 grow-0 justify-between border-b px-3 pb-0.5 pt-2 text-sm sm:px-4">
+      <div className="studioBannerInvite flex w-full items-center justify-center gap-3">
+        <div className="text-grey-55 flex items-center gap-2 font-bold">
+          You&apos;re invited to join this studio!
+          <Popover.Root>
+            <Popover.Trigger>
+              <button className="pt-[5px]">
+                <Information />
+              </button>
+            </Popover.Trigger>
+            <Popover.Content sideOffset={0}>
+              <div className="lightBorder text-grey-55 z-50 max-w-xs rounded-sm bg-white p-2 text-sm font-normal shadow-lg">
+                Members can create new spaces, and comment in spaces within the
+                studio. <br /> However, in order to add or edit cards in spaces
+                you must be invited separately to each space.
+              </div>
+              <Popover.Close />
+            </Popover.Content>
+          </Popover.Root>
+        </div>
+        <ButtonPrimary
+          content="Join!"
+          onClick={() => {
+            {
+              /* if logged in, join studio, if not logged in, show signup modal */
+            }
+          }}
+        />
+      </div>
+
+      {/* <div className="studioBannerNoInvite flex w-full justify-between gap-3">
+      <div>
+        You are spectating this studio. Only invited members can comment,
+        chat, and make spaces.
+      </div>
+      {!session.session && <LoginButton />}
+    </div> */}
+    </div>
   );
 };
