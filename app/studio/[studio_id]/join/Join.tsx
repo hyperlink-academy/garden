@@ -13,13 +13,15 @@ import { useAuth } from "hooks/useAuth";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { WORKER_URL } from "src/constants";
 import { uuidToBase62 } from "src/uuidHelpers";
 import { MemberCard } from "../MemberTab";
 import { DotLoader } from "components/DotLoader";
 import { Divider } from "components/Layout";
 
+export const joinCodeLocalStorageKey = (studio_id: string) =>
+  `${studio_id}-join-code`;
 export function JoinStudio(props: { data: StudioData }) {
   let { push } = useRouter();
   let query = useSearchParams();
@@ -27,6 +29,9 @@ export function JoinStudio(props: { data: StudioData }) {
   let { session, authToken } = useAuth();
   let [bio, setBio] = useState("");
   let [state, setState] = useState<"loading" | "normal">("normal");
+  useEffect(() => {
+    localStorage.setItem(joinCodeLocalStorageKey(props.data.id), code);
+  }, [code, props.data.id]);
   let [logInModalState, setLogInModalState] =
     LoginOrSignupModal.useState("closed");
 
@@ -156,38 +161,6 @@ export function JoinStudio(props: { data: StudioData }) {
     </>
   );
 }
-
-const LoginOrSignup = (props: {
-  id: string | undefined;
-  code: string | null | undefined;
-}) => {
-  let [logInModalState, setLogInModalState] =
-    LoginOrSignupModal.useState("closed");
-  return (
-    <>
-      <div className="display flex flex-row gap-2">
-        <ButtonPrimary
-          content="Log In"
-          onClick={() => setLogInModalState("login")}
-          className="justify-self-center"
-        />
-        <p className="self-center text-sm italic">or</p>
-        <ButtonSecondary
-          content="Sign Up"
-          onClick={() => setLogInModalState("signup")}
-          className="justify-self-center"
-        />
-      </div>
-      <LoginOrSignupModal
-        state={logInModalState}
-        setState={setLogInModalState}
-        redirectTo={`/studio/${uuidToBase62(props.id || "")}/join?code=${
-          props.code
-        }`}
-      />
-    </>
-  );
-};
 
 export const YoureInvited = () => {
   return (

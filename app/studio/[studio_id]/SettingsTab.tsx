@@ -64,6 +64,11 @@ export function StudioSettings(props: { id: string }) {
       </form>
       <GetStartedForm />
 
+      <div className="flex gap-2 font-bold">
+        <input type="checkbox" id="open-space-toggle" />
+        Spen Spaces to Members
+      </div>
+
       <hr className="border-grey-80" />
 
       <div className="lightBorder flex flex-col items-center gap-2 p-4 text-center">

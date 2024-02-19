@@ -15,6 +15,9 @@ import useWindowDimensions from "hooks/useWindowDimensions";
 import { ButtonPrimary } from "components/Buttons";
 import { LoginOrSignupModal } from "components/LoginModal";
 import * as Popover from "@radix-ui/react-popover";
+import { joinCodeLocalStorageKey } from "./join/Join";
+import { spaceAPI } from "backend/lib/api";
+import { WORKER_URL } from "src/constants";
 
 export type Props = {
   data: NonUndefined<ReturnType<typeof useStudioData>["data"]>;
@@ -43,8 +46,8 @@ export function StudioPageContent(props: Props) {
   if (!isClient) return null;
   return (
     <div className="pwa-padding studioWrapper  flex w-full items-stretch sm:h-screen">
-      <div className="flex flex-col">
-        <StudioBanner />
+      <div className="flex w-full flex-col">
+        <StudioBanner {...props} />
         <div className="studio relative mx-auto flex w-full max-w-7xl grow flex-col px-3 sm:flex-row sm:overflow-hidden sm:px-4">
           <Tab.Group
             manual
@@ -175,45 +178,91 @@ const LoginButton = () => {
   );
 };
 
-const StudioBanner = () => {
-  return (
-    <div className="studioBanner bg-bg-blue border-grey-80 flex w-screen shrink-0 grow-0 justify-between border-b px-3 pb-0.5 pt-2 text-sm sm:px-4">
-      <div className="studioBannerInvite flex w-full items-center justify-center gap-3">
-        <div className="text-grey-55 flex items-center gap-2 font-bold">
-          You&apos;re invited to join this studio!
-          <Popover.Root>
-            <Popover.Trigger>
-              <button className="pt-[5px]">
-                <Information />
-              </button>
-            </Popover.Trigger>
-            <Popover.Content sideOffset={0}>
-              <div className="lightBorder text-grey-55 z-50 max-w-xs rounded-sm bg-white p-2 text-sm font-normal shadow-lg">
-                Members can create new spaces, and comment in spaces within the
-                studio. <br /> However, in order to add or edit cards in spaces
-                you must be invited separately to each space.
-              </div>
-              <Popover.Close />
-            </Popover.Content>
-          </Popover.Root>
-        </div>
-        <ButtonPrimary
-          content="Join!"
-          onClick={() => {
-            {
-              /* if logged in, join studio, if not logged in, show signup modal */
-            }
-          }}
-        />
-      </div>
+const StudioBanner = (props: Props) => {
+  let { data, mutate } = useStudioData(props.data?.id, props.data);
+  let [joinCode, setJoinCode] = useState<null | string>(null);
+  let { session, authToken } = useAuth();
+  let isMember = props.data.members_in_studios.find(
+    (m) => m.member === session.user?.id
+  );
+  let [loginOrSignupState, setLoginOrSignupState] =
+    LoginOrSignupModal.useState("closed");
+  useEffect(() => {
+    let localJoinCode = localStorage.getItem(
+      joinCodeLocalStorageKey(props.data.id)
+    );
+    setJoinCode(localJoinCode);
+  }, [props.data.id]);
 
-      {/* <div className="studioBannerNoInvite flex w-full justify-between gap-3">
-      <div>
-        You are spectating this studio. Only invited members can comment,
-        chat, and make spaces.
+  if (isMember) return null;
+  if (!joinCode)
+    return (
+      <div className="studioBannerNoInvite flex w-full justify-between gap-3">
+        <div>
+          You are spectating this studio. Only invited members can comment,
+          chat, and make spaces.
+        </div>
+        {!session.session && <LoginButton />}
       </div>
-      {!session.session && <LoginButton />}
-    </div> */}
-    </div>
+    );
+
+  const join = async () => {
+    if (!props.data || !authToken || !joinCode) return;
+    let data = await spaceAPI(
+      `${WORKER_URL}/space/${props.data?.do_id}`,
+      "join",
+      {
+        authToken,
+        code: joinCode,
+        bio: "",
+      }
+    );
+
+    if (data.success) {
+      mutate();
+    }
+  };
+  return (
+    <>
+      <LoginOrSignupModal
+        state={loginOrSignupState}
+        setState={setLoginOrSignupState}
+      />
+      <div className="studioBanner bg-bg-blue border-grey-80 flex w-screen shrink-0 grow-0 justify-between border-b px-3 pb-0.5 pt-2 text-sm sm:px-4">
+        <div className="studioBannerInvite flex w-full items-center justify-center gap-3">
+          <div className="text-grey-55 flex items-center gap-2 font-bold">
+            You&apos;re invited to join this studio!
+            <Popover.Root>
+              <Popover.Trigger>
+                <button className="pt-[5px]">
+                  <Information />
+                </button>
+              </Popover.Trigger>
+              <Popover.Content sideOffset={0}>
+                <div className="lightBorder text-grey-55 z-50 max-w-xs rounded-sm bg-white p-2 text-sm font-normal shadow-lg">
+                  Members can create new spaces, and comment in spaces within
+                  the studio. <br /> However, in order to add or edit cards in
+                  spaces you must be invited separately to each space.
+                </div>
+                <Popover.Close />
+              </Popover.Content>
+            </Popover.Root>
+          </div>
+          {session.session ? (
+            <ButtonPrimary
+              content="Join!"
+              onClick={() => {
+                join();
+              }}
+            />
+          ) : (
+            <ButtonPrimary
+              content="Signup or Login to Join!"
+              onClick={() => setLoginOrSignupState("signup")}
+            />
+          )}
+        </div>
+      </div>
+    </>
   );
 };
