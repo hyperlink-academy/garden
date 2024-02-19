@@ -47,7 +47,7 @@ export const StudioForm = ({
               }));
             }}
           />
-          <div className="text-xs italic text-grey-55">
+          <div className="text-grey-55 text-xs italic">
             {formState.name.length}/64
           </div>
         </div>
