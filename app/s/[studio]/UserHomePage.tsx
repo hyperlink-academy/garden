@@ -23,18 +23,7 @@ export default function UserHomePage(props: { data: IdentityData }) {
   let { session } = useAuth();
   let query = useParams<{ studio: string }>();
   let { data } = useIdentityData(query?.studio as string, props.data);
-  let [sortOrder, _setSortOrder] = useState<"lastUpdated" | "name">(
-    "lastUpdated"
-  );
 
-  const setSortOrder = (sortOrder: "lastUpdated" | "name") => {
-    _setSortOrder(sortOrder);
-    localStorage.setItem(`${query?.studio}/sortOrder`, sortOrder);
-  };
-  useEffect(() => {
-    let savedSortOrder = localStorage.getItem(`${query?.studio}/sortOrder`);
-    if (savedSortOrder) _setSortOrder(savedSortOrder as "lastUpdated" | "name");
-  }, [query?.studio, _setSortOrder]);
   if (!data) return <div>loading </div>;
 
   let currentStudioName = query?.studio;
@@ -44,23 +33,7 @@ export default function UserHomePage(props: { data: IdentityData }) {
   let spaces = [
     ...data.members_in_spaces
       ?.filter((s) => !!s.space_data)
-      .map((s) => s.space_data as SpaceData)
-      .sort((a, b) => {
-        if (sortOrder === "name") {
-          if (!a.display_name || !b.display_name) {
-            if (a.display_name) return -1;
-            if (b.display_name) return 1;
-            return 0;
-          }
-          return a.display_name.localeCompare(b.display_name);
-        }
-        if (!a.lastUpdated || !b.lastUpdated) {
-          if (a.lastUpdated) return -1;
-          if (b.lastUpdated) return 1;
-          return 0;
-        }
-        return a.lastUpdated > b.lastUpdated ? -1 : 1;
-      }),
+      .map((s) => s.space_data as SpaceData),
   ];
 
   let myStudioName = session.session?.username;
@@ -96,42 +69,11 @@ export default function UserHomePage(props: { data: IdentityData }) {
         ) : (
           <>
             <Studios studios={studios} currentStudioName={currentStudioName} />
-
-            <div className="flex justify-between gap-2">
-              <h4 className="">Spaces</h4>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex flex-row gap-2 text-sm">
-                <button
-                  onClick={() => setSortOrder("lastUpdated")}
-                  className={`hover:border-grey-80 h-fit rounded-md border px-1 py-0.5 ${
-                    sortOrder === "lastUpdated"
-                      ? " border-grey-80 text-grey-35"
-                      : "text-grey-55 border-transparent"
-                  }`}
-                >
-                  last updated
-                </button>
-                <button
-                  onClick={() => setSortOrder("name")}
-                  className={`hover:border-grey-80 h-fit rounded-md border px-1 py-0.5 ${
-                    sortOrder === "name"
-                      ? " border-grey-80 text-grey-35"
-                      : "text-grey-55 border-transparent"
-                  } `}
-                >
-                  name
-                </button>
-              </div>{" "}
-              {session.session?.username === currentStudioName &&
-                spaces.length !== 0 && (
-                  <CreateSpace
-                    studioSpaceID={data.studio}
-                    studioName={currentStudioName as string}
-                  />
-                )}
-            </div>
-            <List spaces={spaces} name={query?.studio as string} />
+            <Spaces
+              spaces={spaces}
+              name={currentStudioName as string}
+              id={data.studio}
+            />
           </>
         )}
       </div>
@@ -209,6 +151,90 @@ const Studios = ({
   );
 };
 
+const Spaces = (props: {
+  spaces: Array<SpaceData>;
+  name: string;
+  id: string;
+}) => {
+  let [sortOrder, _setSortOrder] = useState<"lastUpdated" | "name">(
+    "lastUpdated"
+  );
+  const setSortOrder = (sortOrder: "lastUpdated" | "name") => {
+    _setSortOrder(sortOrder);
+    localStorage.setItem(`${props.name}/sortOrder`, sortOrder);
+  };
+  useEffect(() => {
+    let savedSortOrder = localStorage.getItem(`${props.name}/sortOrder`);
+    if (savedSortOrder) _setSortOrder(savedSortOrder as "lastUpdated" | "name");
+  }, [props.name, _setSortOrder]);
+  let spaces = props.spaces
+    .filter((s) => !s.archived)
+    .sort((a, b) => {
+      if (sortOrder === "name") {
+        if (!a.display_name || !b.display_name) {
+          if (a.display_name) return -1;
+          if (b.display_name) return 1;
+          return 0;
+        }
+        return a.display_name.localeCompare(b.display_name);
+      }
+      if (!a.lastUpdated || !b.lastUpdated) {
+        if (a.lastUpdated) return -1;
+        if (b.lastUpdated) return 1;
+        return 0;
+      }
+      return a.lastUpdated > b.lastUpdated ? -1 : 1;
+    });
+  let { session } = useAuth();
+  let { mutate } = useIdentityData(props.name);
+
+  return (
+    <>
+      <div className="flex justify-between gap-2">
+        <h4 className="">Spaces</h4>
+      </div>
+      <div className="flex items-center justify-between">
+        <div className="flex flex-row gap-2 text-sm">
+          <button
+            onClick={() => setSortOrder("lastUpdated")}
+            className={`hover:border-grey-80 h-fit rounded-md border px-1 py-0.5 ${
+              sortOrder === "lastUpdated"
+                ? " border-grey-80 text-grey-35"
+                : "text-grey-55 border-transparent"
+            }`}
+          >
+            last updated
+          </button>
+          <button
+            onClick={() => setSortOrder("name")}
+            className={`hover:border-grey-80 h-fit rounded-md border px-1 py-0.5 ${
+              sortOrder === "name"
+                ? " border-grey-80 text-grey-35"
+                : "text-grey-55 border-transparent"
+            } `}
+          >
+            name
+          </button>
+        </div>
+        {session.session?.username === props.name && spaces.length !== 0 && (
+          <CreateSpace studioSpaceID={props.id} studioName={props.name} />
+        )}
+      </div>
+      <div className="flex flex-col gap-8">
+        {spaces.length > 0 ? (
+          <SpaceList
+            spaces={spaces}
+            onEdit={() => {
+              mutate();
+            }}
+          />
+        ) : null}
+        <HistoryList spaces={props.spaces} />
+      </div>
+    </>
+  );
+};
+
 const HistoryList = (props: { spaces: Array<SpaceData> }) => {
   let spacesHistory = props.spaces.filter((s) => s.archived);
   let [showHistory, setShowHistory] = useState(false);
@@ -244,35 +270,6 @@ const HistoryList = (props: { spaces: Array<SpaceData> }) => {
         </div>
       ) : null}
     </>
-  );
-};
-
-/*
-three lists:
-- active (scheduled - now)
-- upcoming (scheduled - soon)
-- unscheduled (i.e. implicit draft)
-
-NB: calendar.tsx uses same date calculations
-but simplified b/c calendar requires start + end dates
-*/
-const List = (props: { spaces: Array<SpaceData>; name: string }) => {
-  let spaces = props.spaces.filter((s) => !s.archived);
-  let { mutate } = useIdentityData(props.name);
-
-  return (
-    <div className="flex flex-col gap-8">
-      {spaces.length > 0 ? (
-        <SpaceList
-          spaces={spaces}
-          onEdit={() => {
-            mutate();
-          }}
-        />
-      ) : null}
-
-      <HistoryList spaces={props.spaces} />
-    </div>
   );
 };
 
