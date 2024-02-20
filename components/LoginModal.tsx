@@ -18,7 +18,13 @@ import checkMailSpotIllo from "public/img/spotIllustration/checkMail.png";
 export const LoginOrSignupModal = (props: {
   state: "login" | "signup" | "closed";
   setState: (s: "login" | "signup" | "closed") => void;
-  redirectOnLogin?: (s: { username?: string }) => void;
+  redirectOnLogin?: (s: {
+    username?: string;
+    authToken: {
+      access_token: string;
+      refresh_token: string;
+    };
+  }) => void;
   redirectTo?: string;
 }) => {
   return (
@@ -77,7 +83,13 @@ export const OAuth = (props: { actionLabel: string }) => {
 };
 
 export function LoginForm(props: {
-  onLogin?: (s: { username?: string }) => void;
+  onLogin?: (s: {
+    username?: string;
+    authToken: {
+      access_token: string;
+      refresh_token: string;
+    };
+  }) => void;
   onClose?: () => void;
   onSwitchToSignUp?: () => void;
 }) {
@@ -103,7 +115,7 @@ export function LoginForm(props: {
       setStatus("confirmEmail");
       return;
     }
-    if (!result?.data?.user) setStatus("incorrect");
+    if (!result?.data?.user || !result.data.session) setStatus("incorrect");
     else {
       setStatus("normal");
       if (!props.onLogin) {
@@ -111,7 +123,10 @@ export function LoginForm(props: {
           ? router.push(`/s/${result.data.user.user_metadata.username}`)
           : router.push("/setup");
       } else
-        props.onLogin(result.data.user.user_metadata as { username?: string });
+        props.onLogin({
+          username: result.data.user.user_metadata.username as string,
+          authToken: result.data.session,
+        });
     }
   };
   return (
