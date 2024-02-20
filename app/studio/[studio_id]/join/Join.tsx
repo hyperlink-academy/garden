@@ -30,6 +30,7 @@ export function JoinStudio(props: { data: StudioData }) {
   let [bio, setBio] = useState("");
   let [state, setState] = useState<"loading" | "normal">("normal");
   useEffect(() => {
+    if (!code) return;
     localStorage.setItem(joinCodeLocalStorageKey(props.data.id), code);
   }, [code, props.data.id]);
   let [logInModalState, setLogInModalState] =
