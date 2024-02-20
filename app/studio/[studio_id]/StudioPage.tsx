@@ -213,7 +213,11 @@ const StudioBanner = (props: Props) => {
 
     if (data.success) {
       mutate();
-      toaster({ text: "Joined studio", type: "success", icon: null });
+      toaster({
+        text: "Yes! You've joined this Studio!",
+        type: "success",
+        icon: null,
+      });
     }
   }, [authToken, joinCode, props.data, mutate, toaster]);
 
@@ -242,7 +246,7 @@ const StudioBanner = (props: Props) => {
       <div className="studioBanner bg-bg-blue border-grey-80 flex w-screen shrink-0 grow-0 justify-between border-b px-3 pb-0.5 pt-2 text-sm sm:px-4">
         <div className="studioBannerInvite flex w-full items-center justify-center gap-3">
           <div className="text-grey-55 flex items-center gap-2 font-bold">
-            You&apos;re invited to join this studio!
+            You&apos;ve been invited to join this studio!
             <Popover.Root>
               <Popover.Trigger>
                 <button className="pt-[5px]">
