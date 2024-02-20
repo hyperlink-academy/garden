@@ -57,10 +57,19 @@ export default function UserHomePage(props: { data: IdentityData }) {
 
         {spaces.length == 0 ? (
           session?.loggedIn && myStudioName == currentStudioName ? (
-            <MyHomeEmpty
-              studioSpaceID={data.studio}
-              studioName={myStudioName as string}
-            /> /* me as in the logged in user who can make spaces here */
+            <>
+              {studios.length > 0 ? (
+                <Studios
+                  studios={studios}
+                  currentStudioName={currentStudioName}
+                />
+              ) : null}
+              <MyHomeEmpty
+                studioSpaceID={data.studio}
+                studioName={myStudioName as string}
+              />
+              {/* me as in the logged in user who can make spaces here  */}
+            </>
           ) : (
             <YourHomeEmpty
               username={currentStudioName || ""}
@@ -68,7 +77,12 @@ export default function UserHomePage(props: { data: IdentityData }) {
           )
         ) : (
           <>
-            <Studios studios={studios} currentStudioName={currentStudioName} />
+            {session?.loggedIn && myStudioName == currentStudioName && (
+              <Studios
+                studios={studios}
+                currentStudioName={currentStudioName}
+              />
+            )}
             <Spaces
               spaces={spaces}
               name={currentStudioName as string}
@@ -94,22 +108,25 @@ const Studios = ({
   currentStudioName?: string;
 }) => {
   let { session } = useAuth();
-  if (studios.length === 0) return;
-  <>
-    <div className="flex flex-row items-center justify-between">
-      <h4>Studios</h4>
-      {session.session && session.session?.username === currentStudioName && (
-        <CreateStudio username={session.session.username} />
-      )}
-    </div>
-    <div className="text-grey-55 max-w-lg text-sm italic">
-      Studios are places for groups to work together and share related Spaces —
-      like a collection of projects or gatherings.
-    </div>
-    <div className="pb-2 pt-4">
-      <Divider />
-    </div>
-  </>;
+  if (studios.length === 0)
+    return (
+      <>
+        <div className="flex flex-row items-center justify-between">
+          <h4>Studios</h4>
+          {session.session &&
+            session.session?.username === currentStudioName && (
+              <CreateStudio username={session.session.username} />
+            )}
+        </div>
+        <div className="text-grey-55 max-w-lg text-sm italic">
+          Studios are places for groups to work together and share related
+          Spaces — like a collection of projects or gatherings.
+        </div>
+        <div className="pb-2 pt-4">
+          <Divider />
+        </div>
+      </>
+    );
 
   return (
     <>
