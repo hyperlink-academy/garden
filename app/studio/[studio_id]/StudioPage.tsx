@@ -3,7 +3,7 @@
 import { Tab } from "@headlessui/react";
 import { NonUndefined } from "@use-gesture/react";
 import { useStudioData } from "hooks/useStudioData";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 import { Members } from "./MemberTab";
 import { StudioSettings } from "./SettingsTab";
 import { SpaceList } from "./SpacesTab";
@@ -18,6 +18,7 @@ import * as Popover from "@radix-ui/react-popover";
 import { joinCodeLocalStorageKey } from "./join/Join";
 import { spaceAPI } from "backend/lib/api";
 import { WORKER_URL } from "src/constants";
+import { useSearchParams } from "next/navigation";
 
 export type Props = {
   data: NonUndefined<ReturnType<typeof useStudioData>["data"]>;
@@ -182,6 +183,8 @@ const StudioBanner = (props: Props) => {
   let { data, mutate } = useStudioData(props.data?.id, props.data);
   let [joinCode, setJoinCode] = useState<null | string>(null);
   let { session, authToken } = useAuth();
+  let query = useSearchParams();
+  let joinOnLoad = query?.get("join") === "true";
   let isMember = props.data.members_in_studios.find(
     (m) => m.member === session.user?.id
   );
@@ -194,19 +197,7 @@ const StudioBanner = (props: Props) => {
     setJoinCode(localJoinCode);
   }, [props.data.id]);
 
-  if (isMember) return null;
-  if (!joinCode)
-    return (
-      <div className="studioBannerNoInvite flex w-full justify-between gap-3">
-        <div>
-          You are spectating this studio. Only invited members can comment,
-          chat, and make spaces.
-        </div>
-        {!session.session && <LoginButton />}
-      </div>
-    );
-
-  const join = async () => {
+  const join = useCallback(async () => {
     if (!props.data || !authToken || !joinCode) return;
     let data = await spaceAPI(
       `${WORKER_URL}/space/${props.data?.do_id}`,
@@ -221,7 +212,24 @@ const StudioBanner = (props: Props) => {
     if (data.success) {
       mutate();
     }
-  };
+  }, [authToken, joinCode, props.data, mutate]);
+
+  useEffect(() => {
+    if (joinOnLoad === true) join();
+  }, [joinOnLoad, join]);
+
+  if (isMember) return null;
+  if (!joinCode)
+    return (
+      <div className="studioBannerNoInvite flex w-full justify-between gap-3">
+        <div>
+          You are spectating this studio. Only invited members can comment,
+          chat, and make spaces.
+        </div>
+        {!session.session && <LoginButton />}
+      </div>
+    );
+
   return (
     <>
       <LoginOrSignupModal

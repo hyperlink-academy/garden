@@ -97,34 +97,11 @@ export function JoinStudio(props: { data: StudioData }) {
               <ButtonPrimary content="Finish setting up your account!" />
             </Link>
           ) : (
-            <>
-              <div className="flex w-full flex-col gap-2">
-                <p className="text-center text-lg font-bold ">
-                  Introduce yourself! <br />
-                  Let other&apos;s know what you&apos;re up to.
-                </p>
-                <div className="relative">
-                  <div className="mx-auto mb-2  w-[448px] max-w-full">
-                    <div className={`relative grow`}>
-                      <MemberCard
-                        spaces={[]}
-                        bio={bio}
-                        onBioChange={setBio}
-                        memberStudio={session.session?.studio || ""}
-                        memberName={session.session.username}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <ButtonPrimary
-                content={
-                  state === "loading" ? <DotLoader /> : "Join the Studio"
-                }
-                icon={<Member />}
-                onClick={() => join(authToken)}
-              />
-            </>
+            <ButtonPrimary
+              content={state === "loading" ? <DotLoader /> : "Join the Studio"}
+              icon={<Member />}
+              onClick={() => join(authToken)}
+            />
           )
         ) : (
           <div className="flex flex-col place-items-center gap-3">
@@ -151,9 +128,16 @@ export function JoinStudio(props: { data: StudioData }) {
             <LoginOrSignupModal
               state={logInModalState}
               setState={setLogInModalState}
-              redirectOnLogin={(s) => {
-                if (s.authToken) join(s.authToken);
-              }}
+              redirectTo={`/studio/${
+                uuidToBase62(props.data.id) + `?code=${code}` + `&join=true`
+              }`}
+
+              // redirectOnLogin={(s) => {
+              //   if (s.authToken) {
+              //     join(s.authToken);
+              //     console.log(s.authToken);
+              //   }
+              // }}
             />
           </div>
         )}

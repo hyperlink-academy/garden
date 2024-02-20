@@ -383,7 +383,7 @@ export function SignupForm(props: {
           />
         ) : (
           <ButtonPrimary
-            className=" signUpSubmit  float-right mt-4 content-end items-end justify-end justify-items-end self-end justify-self-end"
+            className="signUpSubmit float-right mt-4 content-end items-end justify-end justify-items-end self-end justify-self-end"
             type="submit"
             content={status === "loading" ? "" : "Sign Up!"}
             icon={status === "loading" ? <DotLoader /> : undefined}
