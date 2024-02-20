@@ -16,23 +16,27 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { WORKER_URL } from "src/constants";
 import { uuidToBase62 } from "src/uuidHelpers";
-import { MemberCard } from "../MemberTab";
 import { DotLoader } from "components/DotLoader";
 import { Divider } from "components/Layout";
+import { useToaster } from "components/Smoke";
 
 export const joinCodeLocalStorageKey = (studio_id: string) =>
   `${studio_id}-join-code`;
 export function JoinStudio(props: { data: StudioData }) {
   let { push } = useRouter();
-  let query = useSearchParams();
-  let code = query?.get("code");
   let { session, authToken } = useAuth();
-  let [bio, setBio] = useState("");
+  let toaster = useToaster();
+  let query = useSearchParams();
+
+  let code = query?.get("code");
+
   let [state, setState] = useState<"loading" | "normal">("normal");
+
   useEffect(() => {
     if (!code) return;
     localStorage.setItem(joinCodeLocalStorageKey(props.data.id), code);
   }, [code, props.data.id]);
+
   let [logInModalState, setLogInModalState] =
     LoginOrSignupModal.useState("closed");
 
@@ -45,7 +49,6 @@ export function JoinStudio(props: { data: StudioData }) {
       {
         authToken: a,
         code,
-        bio,
       }
     );
 
@@ -65,12 +68,6 @@ export function JoinStudio(props: { data: StudioData }) {
 
       <div className="mx-auto flex max-w-3xl flex-col place-items-center gap-6 px-4 py-8">
         <YoureInvited />
-        {/* <h2>
-          You&apos;ve Been Invited to a{" "}
-          <em>
-            Studio<sup className="text-grey-55">†</sup>
-          // </em>
-        </h2> */}
         <div className="flex flex-col gap-1">
           <h2>{data?.name}</h2>
 
@@ -128,16 +125,18 @@ export function JoinStudio(props: { data: StudioData }) {
             <LoginOrSignupModal
               state={logInModalState}
               setState={setLogInModalState}
-              redirectTo={`/studio/${
-                uuidToBase62(props.data.id) + `?code=${code}` + `&join=true`
-              }`}
-
-              // redirectOnLogin={(s) => {
-              //   if (s.authToken) {
-              //     join(s.authToken);
-              //     console.log(s.authToken);
-              //   }
-              // }}
+              redirectTo={`/studio/${uuidToBase62(props.data.id)}?join=true`}
+              redirectOnLogin={(s) => {
+                if (s.authToken) {
+                  join(s.authToken);
+                  console.log(s.authToken);
+                  toaster({
+                    text: "Joined studio",
+                    type: "success",
+                    icon: null,
+                  });
+                }
+              }}
             />
           </div>
         )}

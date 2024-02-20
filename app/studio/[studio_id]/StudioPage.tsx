@@ -19,6 +19,7 @@ import { joinCodeLocalStorageKey } from "./join/Join";
 import { spaceAPI } from "backend/lib/api";
 import { WORKER_URL } from "src/constants";
 import { useSearchParams } from "next/navigation";
+import { useToaster } from "components/Smoke";
 
 export type Props = {
   data: NonUndefined<ReturnType<typeof useStudioData>["data"]>;
@@ -115,6 +116,7 @@ const StudioDesktopNav = (props: Props) => {
         >
           {data?.name}
         </h3>
+
         <Tab.List className="StudioTabs flex flex-col gap-2 ">
           {Object.keys(Tabs).map((tab) => (
             <TabItem name={tab} key={tab} />
@@ -196,7 +198,7 @@ const StudioBanner = (props: Props) => {
     );
     setJoinCode(localJoinCode);
   }, [props.data.id]);
-
+  let toaster = useToaster();
   const join = useCallback(async () => {
     if (!props.data || !authToken || !joinCode) return;
     let data = await spaceAPI(
@@ -211,8 +213,9 @@ const StudioBanner = (props: Props) => {
 
     if (data.success) {
       mutate();
+      toaster({ text: "Joined studio", type: "success", icon: null });
     }
-  }, [authToken, joinCode, props.data, mutate]);
+  }, [authToken, joinCode, props.data, mutate, toaster]);
 
   useEffect(() => {
     if (joinOnLoad === true) join();
@@ -256,6 +259,7 @@ const StudioBanner = (props: Props) => {
               </Popover.Content>
             </Popover.Root>
           </div>
+
           {session.session ? (
             <ButtonPrimary
               content="Join!"

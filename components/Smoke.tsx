@@ -11,7 +11,7 @@ import { CloseLinedTiny } from "./Icons";
 type Toast = {
   text: string;
   type: "info" | "error" | "success";
-  icon: React.ReactNode;
+  icon?: React.ReactNode;
 };
 
 type Smoke = {
@@ -82,8 +82,14 @@ const Toast = (props: {
   console.log(props.toast);
   let transitions = useTransition(props.toast ? [props.toast] : [], {
     from: { bottom: -32 },
-    enter: { bottom: 16 },
+    enter: { bottom: 38 },
     leave: { bottom: -32 },
+    trail: 250,
+    config: {
+      mass: 8,
+      friction: 150,
+      tension: 2000,
+    },
   });
 
   return transitions((style, item) => {
@@ -92,11 +98,22 @@ const Toast = (props: {
         style={style}
         className={`fixed bottom-0 left-0 right-0 z-50 h-4 w-full`}
       >
-        <div className="mx-auto flex max-w-2xl flex-row justify-between rounded-md border">
-          <div>
-            {item.icon} {item.text}
+        <div
+          className={`mx-auto flex max-w-7xl flex-row gap-2 rounded-full border px-3 py-1 text-center italic ${
+            props.toast?.type === "error"
+              ? "bg-accent-red text-white"
+              : props.toast?.type === "success"
+              ? "bg-accent-green text-white"
+              : "bg-bg-blue border-grey-80 text-grey-55  border"
+          }`}
+        >
+          <div className="flex grow justify-center font-bold">
+            <div className="flex gap-2">
+              {item.icon} {item.text}
+            </div>
           </div>
           <button
+            className="shrink-0"
             onClick={() => {
               props.setToast(null);
             }}
