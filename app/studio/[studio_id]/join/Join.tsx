@@ -36,15 +36,14 @@ export function JoinStudio(props: { data: StudioData }) {
   let [logInModalState, setLogInModalState] =
     LoginOrSignupModal.useState("closed");
 
-  const onClick = async () => {
-    console.log(!props.data, !authToken, !code);
-    if (!props.data || !authToken || !code) return;
+  const join = async (a: typeof authToken) => {
+    if (!props.data || !a || !code) return;
     setState("loading");
     let data = await spaceAPI(
       `${WORKER_URL}/space/${props.data?.do_id}`,
       "join",
       {
-        authToken,
+        authToken: a,
         code,
         bio,
       }
@@ -123,7 +122,7 @@ export function JoinStudio(props: { data: StudioData }) {
                   state === "loading" ? <DotLoader /> : "Join the Studio"
                 }
                 icon={<Member />}
-                onClick={onClick}
+                onClick={() => join(authToken)}
               />
             </>
           )
@@ -152,9 +151,9 @@ export function JoinStudio(props: { data: StudioData }) {
             <LoginOrSignupModal
               state={logInModalState}
               setState={setLogInModalState}
-              redirectTo={`/studio/${uuidToBase62(
-                props.data.id || ""
-              )}/join?code=${code}`}
+              redirectOnLogin={(s) => {
+                if (s.authToken) join(s.authToken);
+              }}
             />
           </div>
         )}
