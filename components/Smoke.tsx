@@ -99,7 +99,7 @@ const Toast = (props: {
         className={`fixed bottom-0 left-0 right-0 z-50 h-4 w-full`}
       >
         <div
-          className={`mx-auto flex max-w-7xl flex-row gap-2 rounded-full border px-3 py-1 text-center italic ${
+          className={`mx-3 flex max-w-7xl flex-row gap-2 rounded-full border px-3 py-1 text-center italic sm:mx-4 ${
             props.toast?.type === "error"
               ? "bg-accent-red text-white"
               : props.toast?.type === "success"

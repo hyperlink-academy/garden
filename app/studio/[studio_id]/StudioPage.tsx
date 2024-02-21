@@ -48,10 +48,10 @@ export function StudioPageContent(props: Props) {
   if (props.isAdmin) Tabs["Settings"] = Settings;
   if (!isClient) return null;
   return (
-    <div className="pwa-padding studioWrapper  flex w-full items-stretch sm:h-screen">
+    <div className="pwa-padding studioWrapper  flex w-full items-stretch px-3 sm:h-screen sm:px-4">
       <div className="flex w-full flex-col">
         <StudioBanner {...props} />
-        <div className="studio relative mx-auto flex w-full max-w-7xl grow flex-col px-3 sm:flex-row sm:overflow-hidden sm:px-4">
+        <div className="studio relative mx-auto flex w-full max-w-7xl grow flex-col sm:flex-row sm:overflow-hidden ">
           <Tab.Group
             manual
             selectedIndex={selectedIndex}
@@ -108,6 +108,7 @@ function Settings({ data }: Props) {
 const StudioDesktopNav = (props: Props) => {
   let { data } = useStudioData(props.data?.id, props.data);
   let { session } = useAuth();
+  let toaster = useToaster();
 
   return (
     <div className="studioNav border-grey-80 my-6 mr-4 w-64 flex-col justify-between border-r pr-4">
@@ -117,7 +118,6 @@ const StudioDesktopNav = (props: Props) => {
         >
           {data?.name}
         </h3>
-
         <Tab.List className="StudioTabs flex flex-col gap-2 ">
           {Object.keys(Tabs).map((tab) => (
             <TabItem name={tab} key={tab} />
@@ -221,7 +221,7 @@ const StudioBanner = (props: Props) => {
         });
       }
     },
-    [authToken, joinCode, props.data, mutate, toaster]
+    [joinCode, props.data, mutate, toaster]
   );
 
   useEffect(() => {
@@ -229,16 +229,6 @@ const StudioBanner = (props: Props) => {
   }, [joinOnLoad, join, authToken]);
 
   if (isMember) return null;
-  if (!joinCode)
-    return (
-      <div className="studioBannerNoInvite flex w-full justify-between gap-3">
-        <div>
-          You are spectating this studio. Only invited members can comment,
-          chat, and make spaces.
-        </div>
-        {!session.session && <LoginButton />}
-      </div>
-    );
 
   return (
     <>
@@ -258,46 +248,69 @@ const StudioBanner = (props: Props) => {
         }}
       />
 
-      <div className="studioBanner bg-bg-blue border-grey-80 flex  w-screen shrink-0 grow-0 justify-between border-b px-3 pb-0.5 pt-2 text-sm sm:px-4">
-        <div className="studioBannerInvite text-grey-55 flex w-full items-center justify-center gap-4 font-bold">
-          <Link
-            href={`/studio/${uuidToBase62(
-              props.data.id
-            )}/join?code=${joinCode}`}
-          >
-            <GoBackToPageLined />
-          </Link>
-          You&apos;ve been invited to join this studio!
-          <div className="flex items-center gap-2">
-            <Popover.Root>
-              <Popover.Trigger>
-                <button className="pt-[5px]">
-                  <Information />
-                </button>
-              </Popover.Trigger>
-              <Popover.Content sideOffset={0}>
-                <div className="lightBorder text-grey-55 z-50 max-w-xs rounded-sm bg-white p-2 text-sm font-normal shadow-lg">
-                  Members can create new spaces, and comment in spaces within
-                  the studio. <br /> However, in order to add or edit cards in
-                  spaces you must join to each space.
+      <div
+        className={`studioBanner lightBorder text-grey-55  mt-4 flex w-full shrink-0 grow-0 border px-2 py-1 text-sm sm:px-4 ${
+          joinCode ? " bg-bg-blue" : "bg-grey-90 "
+        }`}
+      >
+        <div className="studioBannerInvite flex w-full flex-col items-center justify-items-center gap-0 font-bold sm:flex-row sm:gap-2">
+          {joinCode ? (
+            <>
+              <div className="shrink-0 grow-0">
+                <Link
+                  className="hover:text-accent-blue "
+                  href={`/studio/${uuidToBase62(
+                    props.data.id
+                  )}/join?code=${joinCode}`}
+                >
+                  <GoBackToPageLined />
+                </Link>
+              </div>
+              <div className="flex w-full items-center justify-center gap-4">
+                You&apos;ve been invited to join this studio!
+                <div className="flex gap-2">
+                  {session.session ? (
+                    <ButtonPrimary
+                      content="Join!"
+                      onClick={() => {
+                        join(authToken);
+                      }}
+                    />
+                  ) : (
+                    <ButtonPrimary
+                      content="Signup or Login to Join!"
+                      onClick={() => setLoginOrSignupState("signup")}
+                    />
+                  )}
+                  <Popover.Root>
+                    <Popover.Trigger>
+                      <button className="flex place-items-center">
+                        <Information />
+                      </button>
+                    </Popover.Trigger>
+                    <Popover.Portal>
+                      <Popover.Content sideOffset={2}>
+                        <div className="lightBorder text-grey-55 z-50 max-w-xs rounded-sm bg-white p-2 text-sm font-normal shadow-lg">
+                          Members can create new spaces, and comment in spaces
+                          within the studio. <br /> However, in order to add or
+                          edit cards in spaces you must join to each space.
+                        </div>
+                        <Popover.Close />
+                      </Popover.Content>
+                    </Popover.Portal>
+                  </Popover.Root>
                 </div>
-                <Popover.Close />
-              </Popover.Content>
-            </Popover.Root>
-            {session.session ? (
-              <ButtonPrimary
-                content="Join!"
-                onClick={() => {
-                  join(authToken);
-                }}
-              />
-            ) : (
-              <ButtonPrimary
-                content="Signup or Login to Join!"
-                onClick={() => setLoginOrSignupState("signup")}
-              />
-            )}
-          </div>
+              </div>
+            </>
+          ) : (
+            <div className="studioBannerNoInvite flex w-full items-center justify-center gap-2">
+              <div>
+                You are spectating this studio. Only invited members can
+                comment, chat, and make spaces.
+              </div>
+              {!session.session && <LoginButton />}
+            </div>
+          )}
         </div>
       </div>
     </>
