@@ -59,7 +59,7 @@ export const People = (props: { space_id: string }) => {
   let offlineMembers = members.filter((f) => !uniqueSessions.has(f.entity));
 
   return (
-    <div className="peopleList no-scrollbar flex h-fit flex-col overflow-y-scroll border-t border-grey-80 px-3 pb-2 text-sm">
+    <div className="peopleList no-scrollbar border-grey-80 flex h-fit flex-col overflow-y-scroll border-t px-3 pb-2 text-sm">
       <div className="peopleOnline  mt-1 flex  flex-col ">
         <button
           onClick={() => {
@@ -72,13 +72,14 @@ export const People = (props: { space_id: string }) => {
               setCallExpanded(true);
             }
           }}
-          className={` h-[28px]  gap-1 text-left text-sm  font-bold text-grey-35  hover:text-accent-blue`}
+          className={` text-grey-35  hover:text-accent-blue h-[28px] gap-1  text-left text-sm  font-bold`}
         >
           Online {onlineExpanded === false && `(${onlineMembers.length})`}
         </button>
 
         {callOngoing ? (
           <CallPanel
+            space_id={props.space_id}
             callExpanded={callExpanded}
             toggleCallExpanded={() => setCallExpanded(!callExpanded)}
           />
@@ -92,7 +93,7 @@ export const People = (props: { space_id: string }) => {
           <div className="peopleOffline flex  flex-col ">
             <button
               onClick={() => setOfflineExpanded(!offlineExpanded)}
-              className={`h-[28px]  gap-1 text-left text-sm font-bold  text-grey-55  hover:text-accent-blue`}
+              className={`text-grey-55  hover:text-accent-blue h-[28px] gap-1 text-left  text-sm  font-bold`}
             >
               Offline{" "}
               {offlineExpanded === false && `(${offlineMembers.length})`}
@@ -109,15 +110,15 @@ export const People = (props: { space_id: string }) => {
           <InviteMember space_id={props.space_id} />
         </div>
       )}
-      {!callOngoing && <JoinCall />}
+      {!callOngoing && <JoinCall space_id={props.space_id} />}
     </div>
   );
 };
 
-const JoinCall = () => {
+const JoinCall = (props: { space_id: string }) => {
   let { authorized } = useMutations();
   let [loading, setLoading] = useState(false);
-  let joinCall = useJoinCall();
+  let joinCall = useJoinCall(props);
 
   let membersInCall = db.useAttribute("presence/in-call");
   let callOngoing = membersInCall.length > 0;
@@ -168,6 +169,7 @@ const JoinCall = () => {
 
 const CallPanel = (props: {
   callExpanded: boolean;
+  space_id: string;
   toggleCallExpanded: () => void;
 }) => {
   let meetingState = useMeetingState();
@@ -195,7 +197,7 @@ const CallPanel = (props: {
           >
             {inCall ? "in call…" : "call ongoing…"}
           </button>
-          {inCall ? <CallSettings /> : <JoinCall />}
+          {inCall ? <CallSettings /> : <JoinCall space_id={props.space_id} />}
         </div>
         {props.callExpanded && inCall && (
           <div
@@ -204,7 +206,7 @@ const CallPanel = (props: {
                 ? "border-accent-blue"
                 : muted
                 ? "border-grey-55 "
-                : "border border-accent-blue"
+                : "border-accent-blue border"
             }`}
           >
             <div className="flex flex-col gap-2 pt-1">
@@ -242,7 +244,7 @@ const CallSettings = () => {
             {muted ? "unmute" : "mute"}
           </button>
           <button
-            className="shrink-0 rounded-md border border-white px-2 py-0 text-sm font-bold hover:border-accent-red hover:text-accent-red"
+            className="hover:border-accent-red hover:text-accent-red shrink-0 rounded-md border border-white px-2 py-0 text-sm font-bold"
             onClick={(e) => {
               e.preventDefault();
               if (inCall) return call?.leave();
@@ -331,7 +333,7 @@ const MembersList = ({
         <div className="flex flex-col gap-1">
           <button
             onClick={() => setOfflineExpanded(!offlineExpanded)}
-            className="flex flex-row items-center gap-1 text-sm font-bold text-grey-55"
+            className="text-grey-55 flex flex-row items-center gap-1 text-sm font-bold"
           >
             {offlineExpanded ? (
               <DisclosureExpandTiny />
@@ -419,7 +421,7 @@ const Member = (props: { entityID: string; showInCall?: boolean }) => {
           {memberEntity === props.entityID ? "You" : name?.value}
         </div>
         {cardTitle && memberEntity !== props.entityID && (
-          <div className="flex w-full min-w-0  gap-[5px] overflow-hidden bg-inherit text-xs italic text-grey-55">
+          <div className="text-grey-55 flex w-full  min-w-0 gap-[5px] overflow-hidden bg-inherit text-xs italic">
             in{" "}
             <Truncate className="w-full min-w-0 grow overflow-hidden bg-inherit ">
               <div
@@ -485,7 +487,7 @@ const InviteMember = (props: { space_id: string }) => {
         // (callOngoing ? (
 
         <button
-          className="flex items-center gap-2 text-sm italic text-grey-55"
+          className="text-grey-55 flex items-center gap-2 text-sm italic"
           onClick={() => setInviteOpen(true)}
         >
           <AddTiny className="text-grey-80" /> invite
@@ -506,7 +508,7 @@ const InviteMember = (props: { space_id: string }) => {
           </div>
           <div className="inviteMemberModalLink flex w-full gap-2 pt-4">
             <input
-              className="grow bg-grey-90 text-grey-35"
+              className="bg-grey-90 text-grey-35 grow"
               readOnly
               value={inviteLink}
               onClick={getShareLink}

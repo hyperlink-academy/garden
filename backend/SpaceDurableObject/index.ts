@@ -12,7 +12,6 @@ import { connect } from "./socket";
 import { handleFileUpload } from "./upload_file";
 import { migrations } from "./migrations";
 import { delete_self_route } from "./routes/delete_self";
-import { get_daily_token_route } from "./routes/get_daily_token";
 import { post_feed_route } from "./routes/post_feed";
 import { get_card_data_route } from "./routes/get_card_data";
 import type { WebSocket as DOWebSocket } from "@cloudflare/workers-types";
@@ -38,7 +37,6 @@ let routes = [
   join_route,
   delete_file_upload_route,
   delete_self_route,
-  get_daily_token_route,
   post_feed_route,
 ];
 export type SpaceRoutes = typeof routes;
