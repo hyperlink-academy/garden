@@ -28,6 +28,7 @@ export type ReplicacheMutators = {
 
 export let ReplicacheContext = createContext<{
   rep: Reflect<ReplicacheMutators>;
+  id: string;
   data:
     | { space_id: string; studio_id: undefined }
     | { studio_id: string; space_id: undefined };

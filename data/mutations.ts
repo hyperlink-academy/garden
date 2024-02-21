@@ -236,7 +236,7 @@ const createCard: Mutation<{
     },
     ctx
   );
-  await ctx.runOnServer(async (env, user_studio) => {
+  await ctx.runOnServer(async (env, userID) => {
     await app_event(env.env, {
       event: "created_card",
       space_do_id: env.id,
