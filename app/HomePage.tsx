@@ -27,19 +27,19 @@ export function HomePage() {
           <div className="landingTitle flex flex-col justify-center gap-8 text-center ">
             {/* hyperlink */}
             <div className="flex flex-col">
-              <div className="z-10 -mb-[12px] flex w-3/4 rounded-md border-[12px] border-accent-red p-2 text-sm sm:-mb-[24px] sm:w-1/2 sm:border-[24px] sm:p-4 sm:text-base md:w-1/3">
+              <div className="border-accent-red z-10 -mb-[12px] flex w-3/4 rounded-md border-[12px] p-2 text-sm sm:-mb-[24px] sm:w-1/2 sm:border-[24px] sm:p-4 sm:text-base md:w-1/3">
                 <div className="m-auto flex gap-2 self-center">
                   <span>
                     <em>hello! welcome to…</em>
                   </span>
                 </div>
               </div>
-              <div className="w-11/12 self-center rounded-md border-x-[24px] border-y-[24px] border-accent-gold p-4 sm:border-x-[96px] sm:border-y-[48px] sm:p-8">
-                <h1 className="plexSerifBoldItalic md:text-7xl text-2xl sm:text-[3rem]">
+              <div className="border-accent-gold w-11/12 self-center rounded-md border-x-[24px] border-y-[24px] p-4 sm:border-x-[96px] sm:border-y-[48px] sm:p-8">
+                <h1 className="plexSerifBoldItalic text-2xl sm:text-[3rem] md:text-7xl">
                   Hyperlink Academy
                 </h1>
               </div>
-              <div className="z-10 -mt-[12px] flex w-4/5 self-end rounded-md border-[12px] border-accent-blue p-2 text-sm sm:-mt-[24px] sm:w-1/2 sm:border-[24px] sm:p-4 sm:text-base md:w-1/3">
+              <div className="border-accent-blue z-10 -mt-[12px] flex w-4/5 self-end rounded-md border-[12px] p-2 text-sm sm:-mt-[24px] sm:w-1/2 sm:border-[24px] sm:p-4 sm:text-base md:w-1/3">
                 {/* login / signup links */}
                 <div className="m-auto flex flex-row gap-2 self-center">
                   {!session?.loggedIn ? (
@@ -58,7 +58,7 @@ export function HomePage() {
                       <LoginOrSignupModal
                         state={loginOrSignupState}
                         setState={setLoginOrSignupState}
-                        redirectOnLogin={(s) =>
+                        onLogin={(s) =>
                           s.username
                             ? router.push(`/s/${s.username}`)
                             : router.push("/setup")
@@ -68,7 +68,7 @@ export function HomePage() {
                   ) : session.session?.username ? (
                     <Link
                       href={`/s/${session.session.username}`}
-                      className="mx-auto flex items-center justify-center gap-2 hover:text-accent-blue"
+                      className="hover:text-accent-blue mx-auto flex items-center justify-center gap-2"
                     >
                       <BackToHome />
                       <span>
@@ -78,7 +78,7 @@ export function HomePage() {
                   ) : (
                     <Link
                       href={`/setup`}
-                      className="mx-auto flex items-center justify-center gap-2 hover:text-accent-blue"
+                      className="hover:text-accent-blue mx-auto flex items-center justify-center gap-2"
                     >
                       <BackToHome />
                       <span>
@@ -92,7 +92,7 @@ export function HomePage() {
           </div>
           {/* what is hyperlink */}
           <div className={`landingWhatIsHyperlink text-center ${textFormat}`}>
-            <h2 className="sm:text-3xl text-xl">What is Hyperlink?</h2>
+            <h2 className="text-xl sm:text-3xl">What is Hyperlink?</h2>
             <p className="text-lg">
               It&apos;s where we make <strong>Spaces</strong> to make things
               happen — places to do meaningful work with close collaborators.
@@ -158,16 +158,16 @@ export function HomePage() {
               <div className="my-8 flex h-96 w-full rounded-md border-2 shadow-lg">
                 {/* rooms */}
                 <div className="flex h-full w-[calc(25%-8px)] flex-col gap-2 rounded-md border-r bg-white p-2 sm:w-[calc(25%-16px)] sm:p-4">
-                  <div className="h-4 w-[75%] rounded-md bg-grey-90"></div>
-                  <hr className="my-2 border-grey-80" />
-                  <div className="h-4 rounded-md bg-grey-90"></div>
-                  <div className="h-4 rounded-md bg-accent-blue"></div>
-                  <div className="h-4 rounded-md bg-grey-90"></div>
-                  <div className="h-4 rounded-md bg-grey-90"></div>
-                  <hr className="my-2 border-grey-80" />
-                  <div className="h-4 rounded-md bg-bg-blue"></div>
-                  <div className="h-4 rounded-md bg-bg-red"></div>
-                  <div className="h-4 rounded-md bg-bg-gold"></div>
+                  <div className="bg-grey-90 h-4 w-[75%] rounded-md"></div>
+                  <hr className="border-grey-80 my-2" />
+                  <div className="bg-grey-90 h-4 rounded-md"></div>
+                  <div className="bg-accent-blue h-4 rounded-md"></div>
+                  <div className="bg-grey-90 h-4 rounded-md"></div>
+                  <div className="bg-grey-90 h-4 rounded-md"></div>
+                  <hr className="border-grey-80 my-2" />
+                  <div className="bg-bg-blue h-4 rounded-md"></div>
+                  <div className="bg-bg-red h-4 rounded-md"></div>
+                  <div className="bg-bg-gold h-4 rounded-md"></div>
                 </div>
                 {/* canvas */}
                 <div className="m-2 h-[calc(100%-16px)] w-[calc(30%-8px)] sm:m-4 sm:h-[calc(100%-32px)] sm:w-[calc(30%-16px)]">
@@ -180,20 +180,20 @@ export function HomePage() {
                 {/* open card */}
                 <div className="m-2 flex h-[calc(100%-16px)] w-[calc(45%-16px)] flex-col justify-between gap-4 rounded-md border bg-white p-4 sm:m-4 sm:h-[calc(100%-32px)]">
                   <div className="flex flex-col gap-4">
-                    <div className="h-6 w-[50%] rounded-md bg-grey-90"></div>
+                    <div className="bg-grey-90 h-6 w-[50%] rounded-md"></div>
                     <div className="flex h-fit flex-col gap-1">
-                      <div className="h-4 rounded-md bg-grey-90"></div>
-                      <div className="h-4 rounded-md bg-grey-90"></div>
-                      <div className="h-4 rounded-md bg-grey-90"></div>
-                      <div className="h-4 rounded-md bg-grey-90"></div>
+                      <div className="bg-grey-90 h-4 rounded-md"></div>
+                      <div className="bg-grey-90 h-4 rounded-md"></div>
+                      <div className="bg-grey-90 h-4 rounded-md"></div>
+                      <div className="bg-grey-90 h-4 rounded-md"></div>
                     </div>
                   </div>
                   <div className="flex w-full flex-row items-center gap-2">
-                    <div className="flex h-fit w-full flex-col gap-1 rounded-md border bg-white p-2 text-left text-sm text-grey-80">
-                      <div className="h-4 w-full rounded-md bg-grey-90"></div>
-                      <div className="h-4 w-[80%] rounded-md bg-grey-90"></div>
+                    <div className="text-grey-80 flex h-fit w-full flex-col gap-1 rounded-md border bg-white p-2 text-left text-sm">
+                      <div className="bg-grey-90 h-4 w-full rounded-md"></div>
+                      <div className="bg-grey-90 h-4 w-[80%] rounded-md"></div>
                     </div>
-                    <div className="self-end text-accent-blue">
+                    <div className="text-accent-blue self-end">
                       <Send />
                     </div>
                   </div>
@@ -222,18 +222,18 @@ export function HomePage() {
           <DividerSmall />
           {/* get started CTA! */}
           <div className={`getStarted text-center ${textFormat}`}>
-            <h2 className="sm:text-3xl pb-4 text-xl leading-loose sm:leading-[3rem]">
+            <h2 className="pb-4 text-xl leading-loose sm:text-3xl sm:leading-[3rem]">
               <span className="text-lg sm:text-xl">Set up your new</span>
               <br />
-              <span className="rounded-md border-b-4 border-accent-blue px-2 py-1">
+              <span className="border-accent-blue rounded-md border-b-4 px-2 py-1">
                 Studio
               </span>
               {""}•{""}
-              <span className="rounded-md border-b-4 border-accent-gold px-2 py-1">
+              <span className="border-accent-gold rounded-md border-b-4 px-2 py-1">
                 Lab
               </span>
               {""}•
-              <span className="rounded-md border-b-4 border-accent-red px-2 py-1">
+              <span className="border-accent-red rounded-md border-b-4 px-2 py-1">
                 Campus
               </span>
             </h2>
@@ -259,7 +259,7 @@ export function HomePage() {
           <DividerSmall />
         </div>
         {/* about hyperlink wrapper */}
-        <div className="-mx-4 -mb-4 bg-bg-blue px-4 py-8 sm:-mx-8 sm:-mb-8 sm:px-8">
+        <div className="bg-bg-blue -mx-4 -mb-4 px-4 py-8 sm:-mx-8 sm:-mb-8 sm:px-8">
           {/* who and why */}
           <div className={`whoAndWhy1 text-center ${textFormat}`}>
             <h2 className="text-xl sm:text-2xl">About Hyperlink</h2>
@@ -289,7 +289,7 @@ export function HomePage() {
             className={`whoAndWhy2 mb-32 mt-4 items-center text-center ${textFormat}`}
           >
             <div className="relative right-4 top-6 flex w-64 rotate-6 flex-col gap-2 rounded-md border bg-white p-4 sm:right-16">
-              <p className="m-auto w-fit rounded-full bg-accent-gold px-3 py-1 text-xs italic">
+              <p className="bg-accent-gold m-auto w-fit rounded-full px-3 py-1 text-xs italic">
                 2020–2021
               </p>
               <h3 className="text-base">Hyperlink Academy 1.0</h3>
@@ -297,14 +297,14 @@ export function HomePage() {
                 an indie internet course platform for seriously effective
                 learning
               </p>
-              <button className="text-black m-auto w-fit rounded-md border bg-[white] p-2 text-sm hover:bg-[black] hover:text-[white]">
+              <button className="m-auto w-fit rounded-md border bg-[white] p-2 text-sm text-black hover:bg-[black] hover:text-[white]">
                 <a href="https://year-one.hyperlink.academy/">
                   hyperlink archive →
                 </a>
               </button>
             </div>
             <div className="relative left-4 top-8 flex w-64 -rotate-3 flex-col gap-2 rounded-md border bg-white p-4 sm:left-16">
-              <p className="m-auto w-fit rounded-full bg-accent-gold px-3 py-1 text-xs italic">
+              <p className="bg-accent-gold m-auto w-fit rounded-full px-3 py-1 text-xs italic">
                 2020–present
               </p>
               <h3 className="text-base">Hypotenuse</h3>
@@ -312,14 +312,14 @@ export function HomePage() {
                 our newsletter on learning futures & the process of building
                 hyperlink
               </p>
-              <button className="m-auto w-fit rounded-md border bg-[white] p-2 text-sm text-accent-blue hover:bg-accent-blue hover:text-white">
+              <button className="text-accent-blue hover:bg-accent-blue m-auto w-fit rounded-md border bg-[white] p-2 text-sm hover:text-white">
                 <a href="https://year-one.hyperlink.academy/">
                   subscribe here →
                 </a>
               </button>
             </div>
             <div className="relative right-2 top-12 flex w-64 rotate-2 flex-col gap-2 rounded-md border bg-white p-4">
-              <p className="m-auto w-fit rounded-full bg-accent-gold px-3 py-1 text-xs italic">
+              <p className="bg-accent-gold m-auto w-fit rounded-full px-3 py-1 text-xs italic">
                 2021
               </p>
               <h3 className="text-base">Hyperspace</h3>
@@ -328,7 +328,7 @@ export function HomePage() {
               </p>
             </div>
             <div className="relative left-6 top-16 flex w-64 -rotate-3 flex-col gap-2 rounded-md border bg-white p-4 sm:left-20">
-              <p className="m-auto w-fit rounded-full bg-accent-gold px-3 py-1 text-xs italic">
+              <p className="bg-accent-gold m-auto w-fit rounded-full px-3 py-1 text-xs italic">
                 2022–2023
               </p>
               <h3 className="text-base">
@@ -340,7 +340,7 @@ export function HomePage() {
               </p>
             </div>
             <div className="relative top-24 flex w-64 flex-col gap-2 rounded-md border bg-white p-4">
-              <p className="m-auto w-fit rounded-full bg-accent-gold px-3 py-1 text-xs italic">
+              <p className="bg-accent-gold m-auto w-fit rounded-full px-3 py-1 text-xs italic">
                 2023
               </p>
               <h3 className="text-base">Hyperlink Academy 2.0</h3>
@@ -348,7 +348,7 @@ export function HomePage() {
                 a place to play and learn with friends; spaces for doing
                 meaningful things together
               </p>
-              <hr className="m-auto my-2 w-[25px] border-grey-80" />
+              <hr className="border-grey-80 m-auto my-2 w-[25px]" />
               <p className="text-sm">intrigued? to try Hyperlink…</p>
               <div className="my-0 flex self-center">
                 {/* NB: opens same modal as above - just an extra button here! */}
@@ -371,7 +371,7 @@ export function HomePage() {
         {/* END LANDING WRAPPER */}
       </div>
       <hr className=" border-grey-80" />
-      <div className="flex flex-row gap-2 px-2 text-sm italic text-grey-55">
+      <div className="text-grey-55 flex flex-row gap-2 px-2 text-sm italic">
         <Link href="/privacy" className="hover:text-accent-blue">
           privacy policy
         </Link>{" "}
@@ -453,9 +453,9 @@ const Features = () => {
 };
 
 const DividerSmall = () => (
-  <div className="m-auto my-2 rounded-md bg-accent-gold p-2 sm:my-4 sm:p-4">
-    <div className="rounded-md bg-accent-red p-2 sm:p-4">
-      <div className="rounded-md bg-accent-blue p-1 sm:p-2"></div>
+  <div className="bg-accent-gold m-auto my-2 rounded-md p-2 sm:my-4 sm:p-4">
+    <div className="bg-accent-red rounded-md p-2 sm:p-4">
+      <div className="bg-accent-blue rounded-md p-1 sm:p-2"></div>
     </div>
   </div>
 );

@@ -8,7 +8,7 @@ import { Members } from "./MemberTab";
 import { StudioSettings } from "./SettingsTab";
 import { SpaceList } from "./SpacesTab";
 import { About } from "./AboutTab";
-import { ArrowDown, Information } from "components/Icons";
+import { ArrowDown, GoBackToPageLined, Information } from "components/Icons";
 import Link from "next/link";
 import { useAuth } from "hooks/useAuth";
 import useWindowDimensions from "hooks/useWindowDimensions";
@@ -20,6 +20,7 @@ import { spaceAPI } from "backend/lib/api";
 import { WORKER_URL } from "src/constants";
 import { useSearchParams } from "next/navigation";
 import { useToaster } from "components/Smoke";
+import { uuidToBase62 } from "src/uuidHelpers";
 
 export type Props = {
   data: NonUndefined<ReturnType<typeof useStudioData>["data"]>;
@@ -187,7 +188,7 @@ const StudioBanner = (props: Props) => {
   let { session, authToken } = useAuth();
   let query = useSearchParams();
   let joinOnLoad = query?.get("join") === "true";
-  let isMember = props.data.members_in_studios.find(
+  let isMember = data?.members_in_studios.find(
     (m) => m.member === session.user?.id
   );
   let [loginOrSignupState, setLoginOrSignupState] =
@@ -199,31 +200,33 @@ const StudioBanner = (props: Props) => {
     setJoinCode(localJoinCode);
   }, [props.data.id]);
   let toaster = useToaster();
-  const join = useCallback(async () => {
-    if (!props.data || !authToken || !joinCode) return;
-    let data = await spaceAPI(
-      `${WORKER_URL}/space/${props.data?.do_id}`,
-      "join",
-      {
-        authToken,
-        code: joinCode,
-        bio: "",
-      }
-    );
+  const join = useCallback(
+    async (a: typeof authToken) => {
+      if (!props.data || !a || !joinCode) return;
+      let data = await spaceAPI(
+        `${WORKER_URL}/space/${props.data?.do_id}`,
+        "join",
+        {
+          authToken: a,
+          code: joinCode,
+        }
+      );
 
-    if (data.success) {
-      mutate();
-      toaster({
-        text: "Yes! You've joined this Studio!",
-        type: "success",
-        icon: null,
-      });
-    }
-  }, [authToken, joinCode, props.data, mutate, toaster]);
+      if (data.success) {
+        mutate();
+        toaster({
+          text: "Yes! You've joined this Studio!",
+          type: "success",
+          icon: null,
+        });
+      }
+    },
+    [authToken, joinCode, props.data, mutate, toaster]
+  );
 
   useEffect(() => {
-    if (joinOnLoad === true) join();
-  }, [joinOnLoad, join]);
+    if (joinOnLoad === true) join(authToken);
+  }, [joinOnLoad, join, authToken]);
 
   if (isMember) return null;
   if (!joinCode)
@@ -242,11 +245,30 @@ const StudioBanner = (props: Props) => {
       <LoginOrSignupModal
         state={loginOrSignupState}
         setState={setLoginOrSignupState}
+        redirectTo={`/studio/${uuidToBase62(props.data.id)}?join=true`}
+        onLogin={(s) => {
+          if (s.authToken) {
+            join(s.authToken);
+            toaster({
+              text: "Joined studio",
+              type: "success",
+              icon: null,
+            });
+          }
+        }}
       />
-      <div className="studioBanner bg-bg-blue border-grey-80 flex w-screen shrink-0 grow-0 justify-between border-b px-3 pb-0.5 pt-2 text-sm sm:px-4">
-        <div className="studioBannerInvite flex w-full items-center justify-center gap-3">
-          <div className="text-grey-55 flex items-center gap-2 font-bold">
-            You&apos;ve been invited to join this studio!
+
+      <div className="studioBanner bg-bg-blue border-grey-80 flex  w-screen shrink-0 grow-0 justify-between border-b px-3 pb-0.5 pt-2 text-sm sm:px-4">
+        <div className="studioBannerInvite text-grey-55 flex w-full items-center justify-center gap-4 font-bold">
+          <Link
+            href={`/studio/${uuidToBase62(
+              props.data.id
+            )}/join?code=${joinCode}`}
+          >
+            <GoBackToPageLined />
+          </Link>
+          You&apos;ve been invited to join this studio!
+          <div className="flex items-center gap-2">
             <Popover.Root>
               <Popover.Trigger>
                 <button className="pt-[5px]">
@@ -257,26 +279,25 @@ const StudioBanner = (props: Props) => {
                 <div className="lightBorder text-grey-55 z-50 max-w-xs rounded-sm bg-white p-2 text-sm font-normal shadow-lg">
                   Members can create new spaces, and comment in spaces within
                   the studio. <br /> However, in order to add or edit cards in
-                  spaces you must be invited separately to each space.
+                  spaces you must join to each space.
                 </div>
                 <Popover.Close />
               </Popover.Content>
             </Popover.Root>
+            {session.session ? (
+              <ButtonPrimary
+                content="Join!"
+                onClick={() => {
+                  join(authToken);
+                }}
+              />
+            ) : (
+              <ButtonPrimary
+                content="Signup or Login to Join!"
+                onClick={() => setLoginOrSignupState("signup")}
+              />
+            )}
           </div>
-
-          {session.session ? (
-            <ButtonPrimary
-              content="Join!"
-              onClick={() => {
-                join();
-              }}
-            />
-          ) : (
-            <ButtonPrimary
-              content="Signup or Login to Join!"
-              onClick={() => setLoginOrSignupState("signup")}
-            />
-          )}
         </div>
       </div>
     </>

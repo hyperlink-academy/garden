@@ -18,7 +18,7 @@ import checkMailSpotIllo from "public/img/spotIllustration/checkMail.png";
 export const LoginOrSignupModal = (props: {
   state: "login" | "signup" | "closed";
   setState: (s: "login" | "signup" | "closed") => void;
-  redirectOnLogin?: (s: {
+  onLogin?: (s: {
     username?: string;
     authToken: {
       access_token: string;
@@ -36,12 +36,13 @@ export const LoginOrSignupModal = (props: {
       {props.state === "login" ? (
         <LoginForm
           onLogin={(s) => {
-            if (props.redirectOnLogin) {
-              props.redirectOnLogin(s);
+            if (props.onLogin) {
+              props.onLogin(s);
             }
           }}
           onClose={() => props.setState("closed")}
           onSwitchToSignUp={() => props.setState("signup")}
+          redirectTo={props.redirectTo}
         />
       ) : (
         <SignupForm
@@ -60,13 +61,20 @@ LoginOrSignupModal.useState = (initialState: "login" | "signup" | "closed") => {
 
 const buttonClass =
   "lightBorder flex w-full items-center bg-white  justify-center gap-2 px-2 py-2 hover:border-accent-blue hover:bg-bg-blue";
-export const OAuth = (props: { actionLabel: string }) => {
+export const OAuth = (props: { actionLabel: string; redirectTo?: string }) => {
   let supabase = supabaseBrowserClient();
   return (
     <div className="LogInSSO text-grey-35 flex flex-col gap-2 font-bold">
       <button
         className={buttonClass}
-        onClick={() => supabase.auth.signInWithOAuth({ provider: "google" })}
+        onClick={() =>
+          supabase.auth.signInWithOAuth({
+            provider: "google",
+            options: {
+              redirectTo: props.redirectTo,
+            },
+          })
+        }
       >
         <img src="/sso/google.svg" width={16} alt="google" />
         <p>{props.actionLabel} with Google</p>
@@ -90,6 +98,7 @@ export function LoginForm(props: {
       refresh_token: string;
     };
   }) => void;
+  redirectTo?: string;
   onClose?: () => void;
   onSwitchToSignUp?: () => void;
 }) {
@@ -219,7 +228,7 @@ export function LoginForm(props: {
         <p className="text-grey-55 shrink-0 italic">or</p>
         <hr className="grow" />
       </div>
-      <OAuth actionLabel="Log In" />
+      <OAuth actionLabel="Log In" redirectTo={props.redirectTo} />
     </div>
   );
 }
@@ -395,7 +404,7 @@ export function SignupForm(props: {
         <p className="text-grey-55 shrink-0 italic">or</p>
         <hr className="grow" />
       </div>
-      <OAuth actionLabel="Sign Up" />
+      <OAuth actionLabel="Sign Up" redirectTo={props.redirectTo} />
       {/* <div className="flex flex-col gap-2 rounded-md bg-bg-gold p-4 text-center">
         <p className="text-grey-15">
           we&apos;ll <strong>only</strong> email about your account

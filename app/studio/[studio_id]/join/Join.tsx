@@ -104,7 +104,10 @@ export function JoinStudio(props: { data: StudioData }) {
           <div className="flex flex-col place-items-center gap-3">
             <h4>Log In to Hyperlink to Join!</h4>
             <div className="flex flex-col items-center gap-2">
-              <OAuth actionLabel="Sign Up" />
+              <OAuth
+                actionLabel="Sign Up"
+                redirectTo={`/studio/${uuidToBase62(props.data.id)}?join=true`}
+              />
 
               <ButtonPrimary
                 content="Sign Up with Email"
@@ -126,10 +129,9 @@ export function JoinStudio(props: { data: StudioData }) {
               state={logInModalState}
               setState={setLogInModalState}
               redirectTo={`/studio/${uuidToBase62(props.data.id)}?join=true`}
-              redirectOnLogin={(s) => {
+              onLogin={(s) => {
                 if (s.authToken) {
                   join(s.authToken);
-                  console.log(s.authToken);
                   toaster({
                     text: "Joined studio",
                     type: "success",
