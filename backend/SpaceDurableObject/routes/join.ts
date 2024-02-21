@@ -117,16 +117,16 @@ export const join_route = makeRoute({
       spaceID: env.id,
     };
     let payloadString = JSON.stringify(payload);
-    // fetch(`${env.env.NEXT_API_URL}/api/web_push`, {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify({
-    //     payload: payloadString,
-    //     sig: await sign(payloadString, env.env.RPC_SECRET),
-    //   }),
-    // });
+    fetch(`${env.env.NEXT_API_URL}/api/web_push`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        payload: payloadString,
+        sig: await sign(payloadString, env.env.RPC_SECRET),
+      }),
+    });
 
     env.poke();
     env.updateLastUpdated();
