@@ -79,7 +79,7 @@ export function JoinStudio(props: { data: StudioData }) {
           </Link>
         </div>
         {data?.welcome_message && (
-          <div className="border-grey-80 max-w-2xl rounded-md border bg-white p-2">
+          <div className="border-grey-80 max-w-lg rounded-md border bg-white p-2">
             <Textarea previewOnly value={data?.welcome_message} />
           </div>
         )}

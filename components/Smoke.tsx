@@ -56,7 +56,7 @@ export const SmokeProvider: React.FC<React.PropsWithChildren<unknown>> = (
       setToastState(toast);
       toastTimeout.current = window.setTimeout(() => {
         setToastState(null);
-      }, 2000);
+      }, 3000);
     },
     [setToastState]
   );
@@ -81,10 +81,9 @@ const Toast = (props: {
 }) => {
   console.log(props.toast);
   let transitions = useTransition(props.toast ? [props.toast] : [], {
-    from: { bottom: -32 },
-    enter: { bottom: 38 },
-    leave: { bottom: -32 },
-    trail: 250,
+    from: { top: -32 },
+    enter: { top: 20 },
+    leave: { top: -32 },
     config: {
       mass: 8,
       friction: 150,
@@ -98,28 +97,30 @@ const Toast = (props: {
         style={style}
         className={`fixed bottom-0 left-0 right-0 z-50 h-4 w-full`}
       >
-        <div
-          className={`mx-3 flex max-w-7xl flex-row gap-2 rounded-full border px-3 py-1 text-center italic sm:mx-4 ${
-            props.toast?.type === "error"
-              ? "bg-accent-red text-white"
-              : props.toast?.type === "success"
-              ? "bg-accent-green text-white"
-              : "border border-grey-80 bg-bg-blue  text-grey-55"
-          }`}
-        >
-          <div className="flex grow justify-center font-bold">
-            <div className="flex gap-2">
-              {item.icon} {item.text}
-            </div>
-          </div>
-          <button
-            className="shrink-0"
-            onClick={() => {
-              props.setToast(null);
-            }}
+        <div className="absolute left-1/2 w-full max-w-7xl -translate-x-1/2 px-3 sm:px-4 ">
+          <div
+            className={`to flex  flex-row gap-2 rounded-full border px-3 py-1 text-center italic ${
+              props.toast?.type === "error"
+                ? "bg-accent-red text-white"
+                : props.toast?.type === "success"
+                ? "bg-accent-green text-white"
+                : "border-grey-80 bg-bg-blue text-grey-55  border"
+            }`}
           >
-            <CloseLinedTiny />
-          </button>
+            <div className="flex grow justify-center font-bold">
+              <div className="flex gap-2">
+                {item.icon} {item.text}
+              </div>
+            </div>
+            <button
+              className="shrink-0"
+              onClick={() => {
+                props.setToast(null);
+              }}
+            >
+              <CloseLinedTiny />
+            </button>
+          </div>
         </div>
       </animated.div>
     ) : null;
@@ -133,7 +134,7 @@ const Smoke: React.FC<
     <div
       className={`smoke pointer-events-none absolute z-50 rounded-full px-2 py-1 text-sm  ${
         props.error
-          ? "border border-accent-red bg-white text-accent-red"
+          ? "border-accent-red text-accent-red border bg-white"
           : "bg-accent-blue text-white"
       }`}
     >
