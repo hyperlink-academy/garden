@@ -18,7 +18,13 @@ import checkMailSpotIllo from "public/img/spotIllustration/checkMail.png";
 export const LoginOrSignupModal = (props: {
   state: "login" | "signup" | "closed";
   setState: (s: "login" | "signup" | "closed") => void;
-  redirectOnLogin?: (s: { username?: string }) => void;
+  onLogin?: (s: {
+    username?: string;
+    authToken: {
+      access_token: string;
+      refresh_token: string;
+    };
+  }) => void;
   redirectTo?: string;
 }) => {
   return (
@@ -30,12 +36,13 @@ export const LoginOrSignupModal = (props: {
       {props.state === "login" ? (
         <LoginForm
           onLogin={(s) => {
-            if (props.redirectOnLogin) {
-              props.redirectOnLogin(s);
+            if (props.onLogin) {
+              props.onLogin(s);
             }
           }}
           onClose={() => props.setState("closed")}
           onSwitchToSignUp={() => props.setState("signup")}
+          redirectTo={props.redirectTo}
         />
       ) : (
         <SignupForm
@@ -53,16 +60,23 @@ LoginOrSignupModal.useState = (initialState: "login" | "signup" | "closed") => {
 };
 
 const buttonClass =
-  "lightBorder flex w-full items-center  justify-center gap-4 py-2 hover:border-accent-blue hover:bg-bg-blue";
-export const OAuth = (props: { actionLabel: string }) => {
+  "lightBorder flex w-full items-center bg-white  justify-center gap-2 px-2 py-2 hover:border-accent-blue hover:bg-bg-blue";
+export const OAuth = (props: { actionLabel: string; redirectTo?: string }) => {
   let supabase = supabaseBrowserClient();
   return (
-    <div className="LogInSSO flex flex-col gap-2 font-bold text-grey-35">
+    <div className="LogInSSO text-grey-35 flex flex-col gap-2 font-bold">
       <button
         className={buttonClass}
-        onClick={() => supabase.auth.signInWithOAuth({ provider: "google" })}
+        onClick={() =>
+          supabase.auth.signInWithOAuth({
+            provider: "google",
+            options: {
+              redirectTo: props.redirectTo,
+            },
+          })
+        }
       >
-        <img src="/sso/google.svg" width={24} alt="google" />
+        <img src="/sso/google.svg" width={16} alt="google" />
         <p>{props.actionLabel} with Google</p>
       </button>
       {/* <button
@@ -77,7 +91,14 @@ export const OAuth = (props: { actionLabel: string }) => {
 };
 
 export function LoginForm(props: {
-  onLogin?: (s: { username?: string }) => void;
+  onLogin?: (s: {
+    username?: string;
+    authToken: {
+      access_token: string;
+      refresh_token: string;
+    };
+  }) => void;
+  redirectTo?: string;
   onClose?: () => void;
   onSwitchToSignUp?: () => void;
 }) {
@@ -103,7 +124,7 @@ export function LoginForm(props: {
       setStatus("confirmEmail");
       return;
     }
-    if (!result?.data?.user) setStatus("incorrect");
+    if (!result?.data?.user || !result.data.session) setStatus("incorrect");
     else {
       setStatus("normal");
       if (!props.onLogin) {
@@ -111,7 +132,10 @@ export function LoginForm(props: {
           ? router.push(`/s/${result.data.user.user_metadata.username}`)
           : router.push("/setup");
       } else
-        props.onLogin(result.data.user.user_metadata as { username?: string });
+        props.onLogin({
+          username: result.data.user.user_metadata.username as string,
+          authToken: result.data.session,
+        });
     }
   };
   return (
@@ -128,7 +152,7 @@ export function LoginForm(props: {
         <p>
           or{" "}
           <button
-            className="font-bold text-accent-blue hover:underline"
+            className="text-accent-blue font-bold hover:underline"
             onClick={() => {
               if (props.onSwitchToSignUp) {
                 props.onSwitchToSignUp();
@@ -162,7 +186,7 @@ export function LoginForm(props: {
           <div className="flex items-baseline justify-between">
             Password{" "}
             <Link
-              className="font-normal text-accent-blue
+              className="text-accent-blue font-normal
             "
               href={`/reset-password`}
             >
@@ -172,7 +196,7 @@ export function LoginForm(props: {
         </label>
         {status === "normal" || status === "loading" ? null : status ===
           "incorrect" ? (
-          <div className="text-sm text-accent-red">
+          <div className="text-accent-red text-sm">
             Your email or password is incorrect.
           </div>
         ) : (
@@ -199,12 +223,12 @@ export function LoginForm(props: {
           />
         )}
       </form>
-      <div className="LogInDivider flex items-center gap-2 py-2 text-grey-80">
+      <div className="LogInDivider text-grey-80 flex items-center gap-2 py-2">
         <hr className="grow" />{" "}
-        <p className="shrink-0 italic text-grey-55">or</p>
+        <p className="text-grey-55 shrink-0 italic">or</p>
         <hr className="grow" />
       </div>
-      <OAuth actionLabel="Log In" />
+      <OAuth actionLabel="Log In" redirectTo={props.redirectTo} />
     </div>
   );
 }
@@ -217,12 +241,12 @@ const ResendEmail = (props: { email: string; password: string }) => {
       You need to confirm your email.
       {status === "loading" ? (
         <div>
-          <div className="lightBorder flex w-full place-items-center justify-center bg-bg-blue py-1 font-bold text-grey-55">
+          <div className="lightBorder bg-bg-blue text-grey-55 flex w-full place-items-center justify-center py-1 font-bold">
             <DotLoader />
           </div>
         </div>
       ) : status === "sent" ? (
-        <div className="lightBorder flex w-full place-items-center justify-center bg-bg-blue py-1 font-bold text-grey-55">
+        <div className="lightBorder bg-bg-blue text-grey-55 flex w-full place-items-center justify-center py-1 font-bold">
           <p>sent!</p>
         </div>
       ) : (
@@ -289,13 +313,13 @@ export function SignupForm(props: {
           We sent a confirmation link to{" "}
           <span className="font-bold">{input.email}</span>{" "}
         </p>
-        <hr className="my-2 text-grey-80" />
-        <div className="lightBorder flex flex-col gap-2 bg-bg-blue p-3">
+        <hr className="text-grey-80 my-2" />
+        <div className="lightBorder bg-bg-blue flex flex-col gap-2 p-3">
           <a
             href="https://buttondown.email/hyperlink/"
             target="_blank"
             rel="noopener noreferrer"
-            className="font-bold text-accent-blue"
+            className="text-accent-blue font-bold"
           >
             And subscribe to our newsletter 💌
           </a>
@@ -321,7 +345,7 @@ export function SignupForm(props: {
         <p className="text-grey-55">
           or{" "}
           <button
-            className="font-bold text-accent-blue hover:underline"
+            className="text-accent-blue font-bold hover:underline"
             onClick={() => {
               if (props.onSwitchToLogIn) {
                 props.onSwitchToLogIn();
@@ -368,19 +392,19 @@ export function SignupForm(props: {
           />
         ) : (
           <ButtonPrimary
-            className=" signUpSubmit  float-right mt-4 content-end items-end justify-end justify-items-end self-end justify-self-end"
+            className="signUpSubmit float-right mt-4 content-end items-end justify-end justify-items-end self-end justify-self-end"
             type="submit"
             content={status === "loading" ? "" : "Sign Up!"}
             icon={status === "loading" ? <DotLoader /> : undefined}
           />
         )}
       </form>
-      <div className="signUpDivider flex items-center gap-2 py-2 text-grey-80">
+      <div className="signUpDivider text-grey-80 flex items-center gap-2 py-2">
         <hr className="grow" />{" "}
-        <p className="shrink-0 italic text-grey-55">or</p>
+        <p className="text-grey-55 shrink-0 italic">or</p>
         <hr className="grow" />
       </div>
-      <OAuth actionLabel="Sign Up" />
+      <OAuth actionLabel="Sign Up" redirectTo={props.redirectTo} />
       {/* <div className="flex flex-col gap-2 rounded-md bg-bg-gold p-4 text-center">
         <p className="text-grey-15">
           we&apos;ll <strong>only</strong> email about your account

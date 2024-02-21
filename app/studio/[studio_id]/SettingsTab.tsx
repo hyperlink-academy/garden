@@ -1,14 +1,14 @@
 import { useStudioData } from "hooks/useStudioData";
 import { useEffect, useState } from "react";
 import { StudioForm } from "components/CreateStudio";
-import { ButtonPrimary } from "components/Buttons";
+import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
 import { DotLoader } from "components/DotLoader";
 import { useAuth } from "hooks/useAuth";
 import { spaceAPI, workerAPI } from "backend/lib/api";
 import { useRouter } from "next/navigation";
 import { ModalSubmitButton, Modal } from "components/Modal";
 import { WORKER_URL } from "src/constants";
-import { Delete } from "components/Icons";
+import { CloseLinedTiny, Delete } from "components/Icons";
 
 export function StudioSettings(props: { id: string }) {
   let { session, authToken } = useAuth();
@@ -18,7 +18,6 @@ export function StudioSettings(props: { id: string }) {
     name: "",
     description: "",
   });
-
   let [mode, setMode] = useState<"normal" | "delete">("normal");
 
   useEffect(() => {
@@ -54,7 +53,7 @@ export function StudioSettings(props: { id: string }) {
       >
         <StudioForm setFormState={setFormState} formState={formState} />
         <ButtonPrimary
-          className="place-self-end"
+          className="mt-8 place-self-end"
           content={loading ? "" : "Update Studio"}
           icon={loading ? <DotLoader /> : undefined}
           disabled={
@@ -63,6 +62,12 @@ export function StudioSettings(props: { id: string }) {
           }
         />
       </form>
+      {/* <GetStartedForm /> */}
+      {/*
+      <div className="flex gap-2 font-bold">
+        <input type="checkbox" id="open-space-toggle" />
+        Spen Spaces to Members
+      </div> */}
 
       <hr className="border-grey-80" />
 
@@ -80,6 +85,87 @@ export function StudioSettings(props: { id: string }) {
   );
 }
 
+const GetStartedForm = () => {
+  let [getStarted, setGetStarted] = useState(false);
+  let [getStartedInput, setGetStartedInput] = useState("");
+  let [getStartedItems, setGetStartedItems] = useState([
+    "Introduce yourself! Write a short bio on your member card in the Members tab!",
+    "Create your first space in the Space Tab!",
+  ]);
+
+  return (
+    <div className="settingsGetStarted flex flex-col gap-2">
+      <div className="flex flex-col gap-0.5 ">
+        <h4>Get Started</h4>
+        <div className="text-grey-35 text-sm">
+          If you use this, new members will see a &quot;Get Started&quot; tab
+          when they join the studio. Use it to create an onboarding checklist so
+          new members know what to do when they join! <br />
+          The tab will be visible until all items are checked off.
+        </div>
+      </div>
+      <div className="flex gap-2 font-bold">
+        <input
+          type="checkbox"
+          id="getting-started-toggle"
+          checked={getStarted}
+          onChange={(e) => setGetStarted(e.currentTarget.checked)}
+        />
+        Use Get Started
+      </div>
+      {getStarted && (
+        <div className="flex flex-col gap-3">
+          {getStartedItems.map((item, i) => (
+            <div key={i} className="lightBorder flex items-start gap-2 p-2">
+              <div className="text-grey-35 grow">{item}</div>
+              <button
+                className="hover:text-accent-blue text-grey-55 pt-1"
+                onClick={() => {
+                  setGetStartedItems((s) => {
+                    let newItems = [...s];
+                    newItems.splice(i, 1);
+                    return newItems;
+                  });
+                }}
+              >
+                <CloseLinedTiny className="shrink-0 grow-0" />
+              </button>
+            </div>
+          ))}
+          <div className="mt-3 flex w-full gap-2">
+            <input
+              className="grow"
+              id="get-started-input"
+              value={getStartedInput}
+              onChange={(e) => {
+                setGetStartedInput(e.currentTarget.value);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && getStartedInput !== "") {
+                  // e.preventDefault();
+                  setGetStartedItems((s) => [...s, getStartedInput]);
+                  setGetStartedInput("");
+                  console.log(getStartedItems);
+                } else return;
+              }}
+            />
+            <ButtonSecondary
+              content="Add"
+              onClick={(e) => {
+                e.preventDefault();
+                if (getStartedInput !== "") {
+                  setGetStartedItems((s) => [...s, getStartedInput]);
+                  setGetStartedInput("");
+                  console.log(getStartedItems);
+                }
+              }}
+            />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 const DeleteStudioForm = (props: { studioID: string }) => {
   let router = useRouter();
   let [state, setState] = useState({ studioName: "" });

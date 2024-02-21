@@ -75,7 +75,7 @@ export const useAuth = () => {
         } | null,
       },
       login: async (login_data: { email: string; password: string }) => {
-        if (session) return { success: true, data: session } as const;
+        if (session) return { success: true } as const;
         let res = await workerAPI(WORKER_URL, "login", login_data);
         if (res.error === "confirmEmail") {
           return { success: false, error: "confirmEmail" } as const;

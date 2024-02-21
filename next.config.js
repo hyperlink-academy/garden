@@ -48,6 +48,7 @@ const withSerwist = require("@serwist/next").default({
   swDest: "public/sw.js",
   reloadOnOnline: false,
   register: true,
+  disable: process.env.NODE_ENV === "development",
 });
 
 module.exports = withMDX(withSerwist(nextConfig));
