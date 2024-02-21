@@ -27,6 +27,8 @@ export const CardViewDrawer = (props: {
     height: props.drawerOpen ? height : 0,
     springConfig: springConfig,
   });
+  let cardBackgroundColor =
+    db.useEntity(props.entityID, "card/background-color")?.value || "#FFFFFF";
   return (
     <div className="z-10">
       <div className="cardDrawerHeader -mx-3 -mt-6  md:-mx-4">
@@ -46,7 +48,7 @@ export const CardViewDrawer = (props: {
             }}
             className={`cardDrawerContent no-scrollbar relative flex h-fit shrink flex-col gap-2 overflow-x-hidden overflow-y-scroll`}
           >
-            {drawer === "chat" ? (
+            {!drawer || drawer === "chat" ? (
               <DiscussionContent
                 entityID={props.entityID}
                 open={props.drawerOpen}
@@ -60,7 +62,10 @@ export const CardViewDrawer = (props: {
           </MessageWindow>
         </div>
       </animated.div>
-      <div className={`sticky bottom-0  mt-2 bg-white pb-2`}>
+      <div
+        className={`sticky bottom-0  mt-2  pb-2`}
+        style={{ backgroundColor: cardBackgroundColor }}
+      >
         {(drawer === "chat" || !drawer) && (
           <MessageInput
             entityID={props.entityID}
@@ -125,7 +130,7 @@ const BacklinkTab = (props: { entityID: string }) => {
   return (
     <Tab
       entityID={props.entityID}
-      text={`mentions (${references})`}
+      text={`backlinks (${references})`}
       id="backlinks"
     />
   );
@@ -139,6 +144,8 @@ const Tab = (props: {
   let currentTab =
     useUIState((s) => s.cardStates[props.entityID]?.drawer) || "chat";
   let drawerOpen = useUIState((s) => s.cardStates[props.entityID]?.drawerOpen);
+  let cardBackgroundColor =
+    db.useEntity(props.entityID, "card/background-color")?.value || "#FFFFFF";
   return (
     <button
       onClick={() => {
@@ -148,10 +155,13 @@ const Tab = (props: {
           useUIState.getState().closeDrawer(props.entityID);
         }
       }}
+      style={{
+        backgroundColor: currentTab === props.id ? cardBackgroundColor : "",
+        borderBottom:
+          currentTab === props.id ? "1px solid " + cardBackgroundColor : "",
+      }}
       className={`${
-        currentTab === props.id
-          ? "border-b-white bg-white font-bold"
-          : "bg-grey-90"
+        currentTab === props.id ? `font-bold` : "bg-grey-90"
       } -mb-[1px] w-fit shrink-0 rounded-t-md border border-grey-80  px-2  pt-0.5 text-sm text-grey-35`}
     >
       {props.text}

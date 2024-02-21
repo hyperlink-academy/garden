@@ -1,5 +1,4 @@
 "use client";
-import { SpaceProvider } from "components/ReplicacheProvider";
 import { SpaceData, SpaceList } from "components/SpacesList";
 import { CreateSpace } from "components/CreateSpace";
 import { CreateStudio } from "components/CreateStudio";
@@ -10,7 +9,6 @@ import { DisclosureCollapseTiny, DisclosureExpandTiny } from "components/Icons";
 import Head from "next/head";
 import { NotificationManager } from "components/NotificationManager";
 import { Divider } from "components/Layout";
-import { HelpExampleSpaces } from "components/HelpCenter";
 import { uuidToBase62 } from "src/uuidHelpers";
 import Link from "next/link";
 import { IdentityData } from "backend/routes/get_identity_data";
@@ -25,18 +23,7 @@ export default function UserHomePage(props: { data: IdentityData }) {
   let { session } = useAuth();
   let query = useParams<{ studio: string }>();
   let { data } = useIdentityData(query?.studio as string, props.data);
-  let [sortOrder, _setSortOrder] = useState<"lastUpdated" | "name">(
-    "lastUpdated"
-  );
 
-  const setSortOrder = (sortOrder: "lastUpdated" | "name") => {
-    _setSortOrder(sortOrder);
-    localStorage.setItem(`${query?.studio}/sortOrder`, sortOrder);
-  };
-  useEffect(() => {
-    let savedSortOrder = localStorage.getItem(`${query?.studio}/sortOrder`);
-    if (savedSortOrder) _setSortOrder(savedSortOrder as "lastUpdated" | "name");
-  }, [query?.studio, _setSortOrder]);
   if (!data) return <div>loading </div>;
 
   let currentStudioName = query?.studio;
@@ -46,146 +33,207 @@ export default function UserHomePage(props: { data: IdentityData }) {
   let spaces = [
     ...data.members_in_spaces
       ?.filter((s) => !!s.space_data)
-      .map((s) => s.space_data as SpaceData)
-      .sort((a, b) => {
-        if (sortOrder === "name") {
-          if (!a.display_name || !b.display_name) {
-            if (a.display_name) return -1;
-            if (b.display_name) return 1;
-            return 0;
-          }
-          return a.display_name.localeCompare(b.display_name);
-        }
-        if (!a.lastUpdated || !b.lastUpdated) {
-          if (a.lastUpdated) return -1;
-          if (b.lastUpdated) return 1;
-          return 0;
-        }
-        return a.lastUpdated > b.lastUpdated ? -1 : 1;
-      }),
+      .map((s) => s.space_data as SpaceData),
   ];
 
+  let myStudioName = session.session?.username;
   return (
     <>
       <Head>
         <title key="title">{currentStudioName}</title>
       </Head>
-      <SpaceProvider id={data.studio}>
-        <div className="mb-0 flex flex-col gap-2 pt-4">
-          <div className="flex w-full flex-row items-center justify-between gap-2">
-            <h2 className="grow">{currentStudioName}</h2>
+      <div className="mb-0 flex flex-col gap-2 pt-4">
+        <div className="flex w-full flex-row items-center justify-between gap-2">
+          <h2 className="grow">{currentStudioName}</h2>
 
-            {session?.loggedIn ? (
-              session.session?.username === currentStudioName && (
-                <NotificationManager />
-              )
-            ) : (
-              <LoginButton />
-            )}
-          </div>
-
-          {studios.length > 0 ? (
-            <>
-              <div className="flex flex-row items-center justify-between">
-                <h4>Studios</h4>
-                {session.session &&
-                  session.session?.username === currentStudioName && (
-                    <CreateStudio username={session.session.username} />
-                  )}
-              </div>
-              <div className="grid  w-full grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3">
-                {studios.map((studio) => (
-                  <Link
-                    prefetch
-                    href={`/studio/${uuidToBase62(studio.id)}`}
-                    className="grid h-[120px] w-full flex-col place-items-center rounded-md border border-accent-blue bg-bg-blue text-center hover:border-2"
-                    key={studio.id}
-                  >
-                    <div className="flex h-fit flex-col">
-                      <h4 className="text-accent-blue">{studio.name}</h4>
-                      <p className="text-sm italic text-grey-55">
-                        {studio.spaces_in_studios.length} spaces
-                      </p>
-                      <p className="text-sm italic text-grey-55">
-                        {studio.members_in_studios.length} members
-                      </p>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-              <div className="pb-2 pt-4">
-                <Divider />
-              </div>
-            </>
-          ) : (
-            spaces.length > 0 && (
-              <>
-                <div className="flex flex-row items-center justify-between">
-                  <h4>Studios</h4>
-                  {session.session &&
-                    session.session?.username === currentStudioName && (
-                      <CreateStudio username={session.session.username} />
-                    )}
-                </div>
-                <div className="max-w-lg text-sm italic text-grey-55">
-                  Studios are places for groups to work together and share
-                  related Spaces — like a collection of projects or gatherings.
-                </div>
-                <div className="pb-2 pt-4">
-                  <Divider />
-                </div>
-              </>
+          {session?.loggedIn ? (
+            session.session?.username === currentStudioName && (
+              <NotificationManager />
             )
+          ) : (
+            <LoginButton />
           )}
-
-          {spaces.length === 0 ? null : (
-            <>
-              <div className="flex justify-between gap-2">
-                <h4 className="">Spaces</h4>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex flex-row gap-2 text-sm">
-                  <button
-                    onClick={() => setSortOrder("lastUpdated")}
-                    className={`h-fit rounded-md border px-1 py-0.5 hover:border-grey-80 ${
-                      sortOrder === "lastUpdated"
-                        ? " border-grey-80 text-grey-35"
-                        : "border-transparent text-grey-55"
-                    }`}
-                  >
-                    last updated
-                  </button>
-                  <button
-                    onClick={() => setSortOrder("name")}
-                    className={`h-fit rounded-md border px-1 py-0.5 hover:border-grey-80 ${
-                      sortOrder === "name"
-                        ? " border-grey-80 text-grey-35"
-                        : "border-transparent text-grey-55"
-                    } `}
-                  >
-                    name
-                  </button>
-                </div>{" "}
-                {session.session?.username === currentStudioName &&
-                  spaces.length !== 0 && (
-                    <CreateSpace
-                      studioSpaceID={data.studio}
-                      studioName={currentStudioName as string}
-                    />
-                  )}
-              </div>
-            </>
-          )}
-          <List
-            spaces={spaces}
-            id={data.studio}
-            name={query?.studio as string}
-          />
         </div>
-      </SpaceProvider>
+
+        {spaces.length == 0 ? (
+          session?.loggedIn && myStudioName == currentStudioName ? (
+            <MyHomeEmpty
+              studioSpaceID={data.studio}
+              studioName={myStudioName as string}
+            /> /* me as in the logged in user who can make spaces here */
+          ) : (
+            <YourHomeEmpty
+              username={currentStudioName || ""}
+            /> /* you as in I'm viewing a homepage that's not mine-the-authed-user's */
+          )
+        ) : (
+          <>
+            <Studios studios={studios} currentStudioName={currentStudioName} />
+            <Spaces
+              spaces={spaces}
+              name={currentStudioName as string}
+              id={data.studio}
+            />
+          </>
+        )}
+      </div>
     </>
   );
 }
+
+const Studios = ({
+  studios,
+  currentStudioName,
+}: {
+  studios: {
+    id: string;
+    name: string;
+    spaces_in_studios: {}[];
+    members_in_studios: {}[];
+  }[];
+  currentStudioName?: string;
+}) => {
+  let { session } = useAuth();
+  if (studios.length === 0) return;
+  <>
+    <div className="flex flex-row items-center justify-between">
+      <h4>Studios</h4>
+      {session.session && session.session?.username === currentStudioName && (
+        <CreateStudio username={session.session.username} />
+      )}
+    </div>
+    <div className="text-grey-55 max-w-lg text-sm italic">
+      Studios are places for groups to work together and share related Spaces —
+      like a collection of projects or gatherings.
+    </div>
+    <div className="pb-2 pt-4">
+      <Divider />
+    </div>
+  </>;
+
+  return (
+    <>
+      <div className="flex flex-row items-center justify-between">
+        <h4>Studios</h4>
+        {session.session && session.session?.username === currentStudioName && (
+          <CreateStudio username={session.session.username} />
+        )}
+      </div>
+      <div className="grid  w-full grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3">
+        {studios.map((studio) => (
+          <Link
+            prefetch
+            href={`/studio/${uuidToBase62(studio.id)}`}
+            className="border-accent-blue bg-bg-blue grid h-[120px] w-full flex-col place-items-center rounded-md border text-center hover:border-2"
+            key={studio.id}
+          >
+            <div className="flex h-fit flex-col">
+              <h4
+                className="text-accent-blue"
+                style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
+              >
+                {studio.name}
+              </h4>
+              <p className="text-grey-55 text-sm italic">
+                {studio.spaces_in_studios.length} spaces
+              </p>
+              <p className="text-grey-55 text-sm italic">
+                {studio.members_in_studios.length} members
+              </p>
+            </div>
+          </Link>
+        ))}
+      </div>
+      <div className="pb-2 pt-4">
+        <Divider />
+      </div>
+    </>
+  );
+};
+
+const Spaces = (props: {
+  spaces: Array<SpaceData>;
+  name: string;
+  id: string;
+}) => {
+  let [sortOrder, _setSortOrder] = useState<"lastUpdated" | "name">(
+    "lastUpdated"
+  );
+  const setSortOrder = (sortOrder: "lastUpdated" | "name") => {
+    _setSortOrder(sortOrder);
+    localStorage.setItem(`${props.name}/sortOrder`, sortOrder);
+  };
+  useEffect(() => {
+    let savedSortOrder = localStorage.getItem(`${props.name}/sortOrder`);
+    if (savedSortOrder) _setSortOrder(savedSortOrder as "lastUpdated" | "name");
+  }, [props.name, _setSortOrder]);
+  let spaces = props.spaces
+    .filter((s) => !s.archived)
+    .sort((a, b) => {
+      if (sortOrder === "name") {
+        if (!a.display_name || !b.display_name) {
+          if (a.display_name) return -1;
+          if (b.display_name) return 1;
+          return 0;
+        }
+        return a.display_name.localeCompare(b.display_name);
+      }
+      if (!a.lastUpdated || !b.lastUpdated) {
+        if (a.lastUpdated) return -1;
+        if (b.lastUpdated) return 1;
+        return 0;
+      }
+      return a.lastUpdated > b.lastUpdated ? -1 : 1;
+    });
+  let { session } = useAuth();
+  let { mutate } = useIdentityData(props.name);
+
+  return (
+    <>
+      <div className="flex justify-between gap-2">
+        <h4 className="">Spaces</h4>
+      </div>
+      <div className="flex items-center justify-between">
+        <div className="flex flex-row gap-2 text-sm">
+          <button
+            onClick={() => setSortOrder("lastUpdated")}
+            className={`hover:border-grey-80 h-fit rounded-md border px-1 py-0.5 ${
+              sortOrder === "lastUpdated"
+                ? " border-grey-80 text-grey-35"
+                : "text-grey-55 border-transparent"
+            }`}
+          >
+            last updated
+          </button>
+          <button
+            onClick={() => setSortOrder("name")}
+            className={`hover:border-grey-80 h-fit rounded-md border px-1 py-0.5 ${
+              sortOrder === "name"
+                ? " border-grey-80 text-grey-35"
+                : "text-grey-55 border-transparent"
+            } `}
+          >
+            name
+          </button>
+        </div>
+        {session.session?.username === props.name && spaces.length !== 0 && (
+          <CreateSpace studioSpaceID={props.id} studioName={props.name} />
+        )}
+      </div>
+      <div className="flex flex-col gap-8">
+        {spaces.length > 0 ? (
+          <SpaceList
+            spaces={spaces}
+            onEdit={() => {
+              mutate();
+            }}
+          />
+        ) : null}
+        <HistoryList spaces={props.spaces} />
+      </div>
+    </>
+  );
+};
 
 const HistoryList = (props: { spaces: Array<SpaceData> }) => {
   let spacesHistory = props.spaces.filter((s) => s.archived);
@@ -197,7 +245,7 @@ const HistoryList = (props: { spaces: Array<SpaceData> }) => {
       {spacesHistory.length > 0 ? (
         <div className="myStudioCompleted">
           <button
-            className={`flex items-center gap-2 hover:text-accent-blue ${
+            className={`hover:text-accent-blue flex items-center gap-2 ${
               showHistory ? "text-grey-15" : "text-grey-55"
             }`}
             onClick={() => {
@@ -222,63 +270,6 @@ const HistoryList = (props: { spaces: Array<SpaceData> }) => {
         </div>
       ) : null}
     </>
-  );
-};
-
-/*
-three lists:
-- active (scheduled - now) 
-- upcoming (scheduled - soon)
-- unscheduled (i.e. implicit draft)
-
-NB: calendar.tsx uses same date calculations
-but simplified b/c calendar requires start + end dates
-*/
-const List = (props: {
-  spaces: Array<SpaceData>;
-  id: string;
-  name: string;
-}) => {
-  let { session } = useAuth();
-
-  let myStudioName = session.session?.username;
-
-  let spaces = props.spaces.filter((s) => !s.archived);
-
-  let { mutate } = useIdentityData(props.name);
-
-  return (
-    <div className="flex flex-col gap-8">
-      {spaces.length > 0 ? (
-        <SpaceList
-          spaces={spaces}
-          onEdit={() => {
-            mutate();
-          }}
-        />
-      ) : null}
-
-      {/* empty state - if user homepage has NO ACTIVE SPACES */}
-      {/* different messages for logged in user vs. viewing someone else's home */}
-      {spaces.length == 0 ? (
-        session?.loggedIn && myStudioName == props.name ? (
-          // <NewStudio
-          //   studioSpaceID={props.id}
-          //   studioName={myStudioName as string}
-          // />
-          <MyHomeEmpty
-            studioSpaceID={props.id}
-            studioName={myStudioName as string}
-          /> /* me as in the logged in user who can make spaces here */
-        ) : (
-          <YourHomeEmpty
-            username={props.name}
-          /> /* you as in I'm viewing a homepage that's not mine-the-authed-user's */
-        )
-      ) : null}
-
-      <HistoryList spaces={props.spaces} />
-    </div>
   );
 };
 
@@ -320,7 +311,7 @@ const MyHomeEmpty = (props: { studioSpaceID: string; studioName: string }) => {
         </div>
       )}
 
-      <div className=" flex h-full flex-col gap-3 p-4 text-grey-35 sm:p-8 sm:py-4 ">
+      <div className=" text-grey-35 flex h-full flex-col gap-3 p-4 sm:p-8 sm:py-4 ">
         <h3 className="text-grey-15">Welcome to Hyperlink!</h3>
 
         <p>
@@ -380,7 +371,7 @@ const MyHomeEmpty = (props: { studioSpaceID: string; studioName: string }) => {
           to get things done…Spaces are even better with friends :)
         </p> */}
         {/* </div> */}
-        <div className="lightBorder mt-4 flex flex-col gap-2 bg-bg-blue p-4 text-center">
+        <div className="lightBorder bg-bg-blue mt-4 flex flex-col gap-2 p-4 text-center">
           <h4>{"Let's get started!"}</h4>
           <div className="m-auto">
             <CreateSpace

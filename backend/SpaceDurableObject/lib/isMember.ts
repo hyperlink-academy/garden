@@ -1,5 +1,4 @@
 import { createClient } from "backend/lib/supabase";
-import { Env } from "..";
 
 export async function isUserMember(
   env: {

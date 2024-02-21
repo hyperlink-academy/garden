@@ -28,7 +28,9 @@ export type ReplicacheMutators = {
 
 export let ReplicacheContext = createContext<{
   rep: Reflect<ReplicacheMutators>;
-  id: string;
+  data:
+    | { space_id: string; studio_id: undefined }
+    | { studio_id: string; space_id: undefined };
   undoManager: UndoManager;
 } | null>(null);
 
@@ -184,7 +186,7 @@ export const useSpaceID = () => {
 export const useMutations = () => {
   let { session } = useAuth();
   let rep = useContext(ReplicacheContext);
-  let { data: spaceData } = useSpaceData(rep?.id);
+  let { data: spaceData } = useSpaceData({ space_id: rep?.data.space_id });
   let { data: studioData } = useStudioDataByDOID(rep?.id);
   let memberEntity = useSubscribe(
     async (tx) => {

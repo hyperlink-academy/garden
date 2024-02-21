@@ -15,13 +15,14 @@ import { WORKER_URL } from "src/constants";
 import { useSearchParams } from "next/dist/client/components/navigation";
 import { makeReflect } from "components/ReplicacheProvider";
 import { ulid } from "src/ulid";
-export function JoinSpace() {
+
+export function JoinSpace({ space_id }: { space_id: string }) {
   let id = useSpaceID();
   let { session, authToken } = useAuth();
   let router = useRouter();
   let code = useSearchParams()?.get("code");
   let query = useParams();
-  let { data } = useSpaceData(id);
+  let { data } = useSpaceData({ space_id });
 
   const onClick = async () => {
     if (!authToken || !code || !id || !session.user) return;

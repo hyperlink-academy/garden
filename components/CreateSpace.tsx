@@ -1,4 +1,4 @@
-import { spaceAPI } from "backend/lib/api";
+import { spaceAPI, workerAPI } from "backend/lib/api";
 import { useAuth } from "hooks/useAuth";
 import { useEffect, useState } from "react";
 import { ButtonPrimary, ButtonSecondary } from "./Buttons";
@@ -13,7 +13,7 @@ import { Form, SubmitButton } from "./Form";
 import { DotLoader } from "./DotLoader";
 import { makeReflect } from "./ReplicacheProvider";
 import { ulid } from "src/ulid";
-import { useIsMobile } from "hooks/utils";
+import { spacePath, useIsMobile } from "hooks/utils";
 
 export type CreateSpaceFormState = {
   display_name: string;
@@ -62,14 +62,10 @@ export const CreateSpace = (props: {
           }}
           className="flex flex-col gap-6 overflow-y-auto"
           onSubmit={async ({ authToken }) => {
-            let result = await spaceAPI(
-              `${WORKER_URL}/space/${props.studioSpaceID}`,
-              "create_space",
-              {
-                authToken: authToken,
-                ...formState,
-              }
-            );
+            let result = await workerAPI(WORKER_URL, "create_space", {
+              authToken: authToken,
+              ...formState,
+            });
             if (result.success) {
               let d = result.data;
               mutate((s) => {
@@ -90,7 +86,13 @@ export const CreateSpace = (props: {
                   username: auth.session.session.username,
                   studio: auth.session.session.studio,
                 });
-              router.push(`${d.owner.username}/s/${d.name}/${d.display_name}`);
+              router.push(
+                spacePath({
+                  studio: d.owner.username,
+                  id: d.id,
+                  display_name: d.display_name,
+                })
+              );
             }
             setFormState({
               display_name: "",
@@ -117,9 +119,10 @@ export const EditSpaceModal = (props: {
   onDelete: () => void;
   onClose: () => void;
   spaceID?: string;
+  space_id: string;
 }) => {
   let { authToken } = useAuth();
-  let { data, mutate } = useSpaceData(props.spaceID);
+  let { data, mutate } = useSpaceData({ space_id: props.space_id });
 
   let [formState, setFormState] = useState<CreateSpaceFormState>({
     display_name: "",
@@ -160,11 +163,12 @@ export const EditSpaceModal = (props: {
         <Form
           className="flex flex-col gap-4"
           validate={() => {
-            if (!authToken || !props.spaceID) return;
-            return { authToken, spaceID: props.spaceID };
+            if (!authToken) return;
+            return { authToken };
           }}
-          onSubmit={async ({ authToken, spaceID }) => {
-            await spaceAPI(`${WORKER_URL}/space/${spaceID}`, "update_self", {
+          onSubmit={async ({ authToken }) => {
+            await workerAPI(WORKER_URL, "update_space", {
+              space_id: props.space_id,
               authToken,
               data: formState,
             });
@@ -172,6 +176,17 @@ export const EditSpaceModal = (props: {
               if (!s) return;
               return { ...s, ...formState };
             });
+            if (formState.display_name !== data?.display_name && data) {
+              window.history.replaceState(
+                null,
+                "",
+                spacePath({
+                  studio: data.owner.username,
+                  id: data.id,
+                  display_name: formState.display_name,
+                })
+              );
+            }
             props.onSubmit?.();
             props.onClose();
           }}
@@ -187,34 +202,35 @@ export const EditSpaceModal = (props: {
           {/* archive + delete section */}
           <div className="flex flex-col gap-2">
             <div
-              className={`mx-auto flex w-full flex-col rounded-md border border-grey-80  p-2 text-center ${
+              className={`border-grey-80 mx-auto flex w-full flex-col rounded-md border  p-2 text-center ${
                 data?.archived ? "bg-grey-90" : "bg-bg-blue"
               }`}
             >
               {data?.archived ? (
                 <>
                   <p className="font-bold">This Space is Archived</p>
-                  <p className="mb-4 text-sm text-grey-35">
+                  <p className="text-grey-35 mb-4 text-sm">
                     But you can still edit it at any time!
                   </p>
                 </>
               ) : (
                 <>
                   <p className="font-bold">This Space is Active</p>
-                  <p className="mb-4 text-sm text-grey-35">
+                  <p className="text-grey-35 mb-4 text-sm">
                     It&apos;ll appear in the active section on your homepage
                   </p>
                 </>
               )}
               <div className="mx-auto">
                 <ArchiveButton
+                  space_id={props.space_id}
                   spaceID={props.spaceID}
                   onSubmit={props.onSubmit}
                 />
               </div>
             </div>
-            <div className="mx-auto flex w-full flex-col rounded-md border border-grey-80 p-2 text-center">
-              <p className="text-sm text-grey-35">
+            <div className="border-grey-80 mx-auto flex w-full flex-col rounded-md border p-2 text-center">
+              <p className="text-grey-35 text-sm">
                 Deleting is permanent and will remove <br />
                 EVERYTHING from this space
               </p>
@@ -232,6 +248,7 @@ export const EditSpaceModal = (props: {
         <>
           {!props.spaceID ? null : (
             <DeleteSpaceForm
+              space_id={props.space_id}
               spaceID={props.spaceID}
               onCancel={() => setMode("normal")}
               onDelete={() => {
@@ -245,8 +262,12 @@ export const EditSpaceModal = (props: {
   );
 };
 
-const ArchiveButton = (props: { spaceID?: string; onSubmit?: () => void }) => {
-  let { data, mutate } = useSpaceData(props.spaceID);
+const ArchiveButton = (props: {
+  spaceID?: string;
+  onSubmit?: () => void;
+  space_id: string;
+}) => {
+  let { data, mutate } = useSpaceData(props);
   let { authToken } = useAuth();
   let [loading, setLoading] = useState(false);
   return (
@@ -261,8 +282,9 @@ const ArchiveButton = (props: { spaceID?: string; onSubmit?: () => void }) => {
         });
         if (loading || !data || !props.spaceID || !authToken) return;
         setLoading(true);
-        await spaceAPI(`${WORKER_URL}/space/${props.spaceID}`, "update_self", {
+        await workerAPI(WORKER_URL, "update_space", {
           authToken,
+          space_id: props.space_id,
           data: {
             ...data,
             display_name: data?.display_name || "",
@@ -289,12 +311,13 @@ const ArchiveButton = (props: { spaceID?: string; onSubmit?: () => void }) => {
 
 const DeleteSpaceForm = (props: {
   spaceID: string;
+  space_id: string;
   onCancel: () => void;
   onDelete: () => void;
 }) => {
   let [state, setState] = useState({ spaceName: "" });
   let { authToken } = useAuth();
-  let { data } = useSpaceData(props.spaceID);
+  let { data } = useSpaceData({ space_id: props.space_id });
   return (
     <>
       <Form
@@ -365,7 +388,7 @@ export const CreateSpaceForm = ({
         <p className="font-bold">Add a Description</p>
         {/* NB: Textarea component = broken w/o placeholder */}
         <textarea
-          className="!important box-border min-h-[90px] w-full rounded-md border border-grey-55 bg-white p-2"
+          className="!important border-grey-55 box-border min-h-[90px] w-full rounded-md border bg-white p-2"
           placeholder=""
           maxLength={256}
           value={formState.description}
@@ -401,7 +424,7 @@ export const CreateSpaceForm = ({
       {/* TODO: add actual public vs. private setting here */}
       <div className="flex flex-col gap-1">
         <p className="font-bold">Visibility</p>
-        <div className="flex flex-col gap-2 rounded-md bg-bg-gold p-4 text-sm italic">
+        <div className="bg-bg-gold flex flex-col gap-2 rounded-md p-4 text-sm italic">
           <p className="font-bold">Note: Spaces are publicly viewable.</p>
           <p>Private Spaces are coming soon 🔐🌱</p>
         </div>

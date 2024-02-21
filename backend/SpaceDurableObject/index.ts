@@ -3,7 +3,6 @@ import { Lock } from "src/lock";
 import { makeRouter } from "backend/lib/api";
 import { store } from "./fact_store";
 import { claimRoute } from "./routes/claim";
-import { create_space_route } from "./routes/create_space";
 import { delete_file_upload_route } from "./routes/delete_file_upload";
 import { get_share_code_route } from "./routes/get_share_code";
 import { join_route } from "./routes/join";
@@ -11,11 +10,9 @@ import { pullRoute } from "./routes/pull";
 import { connect } from "./socket";
 import { handleFileUpload } from "./upload_file";
 import { migrations } from "./migrations";
-import { update_self_route } from "./routes/update_self";
 import { delete_self_route } from "./routes/delete_self";
 import { get_daily_token_route } from "./routes/get_daily_token";
 import type { WebSocket as DOWebSocket } from "@cloudflare/workers-types";
-import { leave_route } from "./routes/leave";
 import { createClient } from "backend/lib/supabase";
 
 export type Env = {
@@ -31,14 +28,11 @@ export type Env = {
 let routes = [
   pullRoute,
   claimRoute,
-  create_space_route,
   get_share_code_route,
   join_route,
   delete_file_upload_route,
-  update_self_route,
   delete_self_route,
   get_daily_token_route,
-  leave_route,
 ];
 export type SpaceRoutes = typeof routes;
 let router = makeRouter(routes);

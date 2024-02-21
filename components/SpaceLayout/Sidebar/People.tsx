@@ -13,7 +13,6 @@ import {
   CallUnMutedTiny,
   DisclosureCollapseTiny,
   DisclosureExpandTiny,
-  MemberAdd,
   MoreOptionsSmall,
   RoomMember,
 } from "components/Icons";
@@ -33,10 +32,10 @@ import { ButtonPrimary, ButtonTertiary } from "components/Buttons";
 import { Modal } from "components/Modal";
 import { Truncate } from "components/Truncate";
 import { useSpaceData } from "hooks/useSpaceData";
+import { spacePath } from "hooks/utils";
 
-export const People = () => {
-  let spaceID = useSpaceID();
-  let spaceData = useSpaceData(spaceID);
+export const People = (props: { space_id: string }) => {
+  let spaceData = useSpaceData(props);
   let members = db
     .useAttribute("member/name")
     .filter((m) =>
@@ -107,7 +106,7 @@ export const People = () => {
       )}
       {authorized && (
         <div className="mb-2">
-          <InviteMember />
+          <InviteMember space_id={props.space_id} />
         </div>
       )}
       {!callOngoing && <JoinCall />}
@@ -173,14 +172,9 @@ const CallPanel = (props: {
 }) => {
   let meetingState = useMeetingState();
   let members = db.useAttribute("member/name");
-  let membersInCall = db.useAttribute("presence/in-call");
 
   let localPariticpant = useLocalParticipant();
   let muted = localPariticpant?.tracks.audio.state !== "playable";
-
-  let activeSessions = db
-    .useAttribute("presence/client-member")
-    .map((m) => m.value.value);
 
   let inCall = meetingState === "joined-meeting";
   return (
@@ -453,29 +447,28 @@ function useParticipantInCall(username?: string) {
 }
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
-const InviteMember = () => {
-  let { authToken, session } = useAuth();
+const InviteMember = (props: { space_id: string }) => {
+  let { authToken } = useAuth();
   let [open, setInviteOpen] = useState(false);
-  let isMember = db.useUniqueAttribute("space/member", session.session?.studio);
   let { authorized } = useMutations();
   let smoker = useSmoker();
   const spaceID = useSpaceID();
-  let { data } = useSpaceData(spaceID);
+  let { data } = useSpaceData(props);
   let { data: inviteLink } = useSWR(
-    !isMember ? null : `${WORKER_URL}/space/${spaceID}/get_share_code`,
+    !authorized ? null : `${WORKER_URL}/space/${spaceID}/get_share_code`,
     async () => {
-      if (!spaceID || !authToken) return;
+      if (!spaceID || !authToken || !data) return;
       let code = await spaceAPI(
         `${WORKER_URL}/space/${spaceID}`,
         "get_share_code",
         { authToken }
       );
       if (code.success) {
-        return `${document.location.protocol}//${document.location.host}/s/${
-          data?.owner.username
-        }/s/${data?.name}/${encodeURIComponent(
-          data?.display_name || ""
-        )}/join?code=${code.code}`;
+        return `${document.location.protocol}//${
+          document.location.host
+        }${spacePath({ studio: data.owner.username, ...data })}/join?code=${
+          code.code
+        }`;
       }
     }
   );
@@ -500,12 +493,12 @@ const InviteMember = () => {
       )}
       <Modal
         open={open}
-        header="Send a friend this invite link…"
+        header="Invite Members to this Space"
         onClose={() => setInviteOpen(false)}
       >
         <div className="inviteMemberModal flex flex-col  gap-2 p-0 ">
           <div className="flex flex-col gap-2">
-            <p>So they can join as a member of this Space!</p>
+            <p>Send this link to anyone you&apos;d like to join!</p>
             <p>
               Members have full access — they can create and edit cards, and
               invite other members.

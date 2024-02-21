@@ -66,14 +66,10 @@ export function CreateStudio(props: { username: string }) {
     description: "",
   });
   let { authToken } = useAuth();
-  let isMobile = useIsMobile();
   let router = useRouter();
   return (
     <>
-      <ButtonLink
-        content={isMobile ? "Create" : "Create a Studio"}
-        onClick={() => setOpen(true)}
-      />
+      <ButtonLink content={"Create"} onClick={() => setOpen(true)} />
       <Modal
         open={open}
         onClose={() => setOpen(false)}

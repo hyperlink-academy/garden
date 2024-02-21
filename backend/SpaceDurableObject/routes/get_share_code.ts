@@ -3,7 +3,7 @@ import { makeRoute } from "backend/lib/api";
 import { Env } from "..";
 import { generateShareCode } from "../lib/generate_share_code";
 import { authTokenVerifier, verifyIdentity } from "backend/lib/auth";
-import { isUserMember } from "../lib/isMember";
+import { createClient } from "backend/lib/supabase";
 
 export const get_share_code_route = makeRoute({
   route: "get_share_code",
@@ -15,7 +15,29 @@ export const get_share_code_route = makeRoute({
         data: { success: false, error: "Invalid session token" },
       } as const;
 
-    if (!isUserMember(env, session.id))
+    let supabase = createClient(env.env);
+    let space_type = await env.storage.get<string>("meta-space-type");
+    let isMember;
+    if (space_type === "studio") {
+      let { data } = await supabase
+        .from("members_in_studios")
+        .select("member, studios!inner(do_id)")
+        .eq("member", session.id)
+        .eq("studios.do_id", env.id)
+        .single();
+      isMember = !!data;
+    } else {
+      let { data } = await supabase
+        .from("members_in_spaces")
+        .select("member, space_data!inner(do_id)")
+        .eq("member", session.id)
+        .eq("space_data.do_id", env.id)
+        .single();
+
+      isMember = !!data;
+    }
+
+    if (!isMember)
       return {
         data: { success: false, error: "user is not a member" },
       } as const;

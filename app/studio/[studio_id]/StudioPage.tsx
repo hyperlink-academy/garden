@@ -97,7 +97,11 @@ const StudioDesktopNav = (props: Props) => {
   return (
     <div className="studioNav my-6 mr-4 w-64 flex-col justify-between border-r border-grey-80 pr-4">
       <div className="flex w-full flex-col gap-2 text-right">
-        <h3>{data?.name}</h3>
+        <h3
+          style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
+        >
+          {data?.name}
+        </h3>
         <Tab.List className="StudioTabs flex flex-col gap-2 ">
           {Object.keys(Tabs).map((tab) => (
             <TabItem name={tab} key={tab} />

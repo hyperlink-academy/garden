@@ -1,18 +1,8 @@
 import { ButtonPrimary } from "components/Buttons";
-import * as Popover from "@radix-ui/react-popover";
-import {
-  CardAdd,
-  CardSmall,
-  CardAddLined,
-  CloseLinedTiny,
-  GoToBottom,
-  Member,
-  Reply,
-  Send,
-} from "components/Icons";
+import { CardAddLined, CloseLinedTiny, Reply, Send } from "components/Icons";
 import { RenderedText } from "components/Textarea/RenderedText";
-import { db, useMutations } from "hooks/useReplicache";
-import { HTMLAttributes, useEffect, useRef, useState } from "react";
+import { ReplicacheContext, db, useMutations } from "hooks/useReplicache";
+import { HTMLAttributes, useContext, useEffect, useRef, useState } from "react";
 import { ulid } from "src/ulid";
 import type { Message } from "data/Messages";
 import AutosizeTextarea from "components/Textarea/AutosizeTextarea";
@@ -24,8 +14,9 @@ import { RoomHeader } from "components/Room";
 import { useRoom, useUIState } from "hooks/useUIState";
 import { useFilteredCards } from "../CardFilter";
 import { useAuth } from "hooks/useAuth";
-import { memberColors, memberColorsLight } from "src/colors";
 import { useGesture } from "@use-gesture/react";
+import { theme } from "tailwind.config";
+let { colors } = theme;
 
 export const DiscussionRoom = (props: {
   entityID: string;
@@ -82,6 +73,7 @@ export const DiscussionRoom = (props: {
 };
 
 export const useMarkRead = (entityID: string, focused: boolean) => {
+  let rep = useContext(ReplicacheContext);
   let unreadBy = db.useEntity(entityID, "discussion/unread-by");
   let [windowFocus, setWindowFocus] = useState(true);
   let { mutate, memberEntity } = useMutations();
@@ -96,16 +88,19 @@ export const useMarkRead = (entityID: string, focused: boolean) => {
   useEffect(() => {
     if (entityID && memberEntity && session.user) {
       if (!windowFocus || !focused) return;
+      if (!rep || !rep.data.space_id) return;
       let unread = unreadBy?.find((f) => f.value.value === memberEntity);
       if (unread)
         mutate("markRead", {
           memberEntity,
+          space_id: rep.data.space_id,
           userID: session.user.id,
           entityID: entityID,
           attribute: "discussion/unread-by",
         });
     }
   }, [
+    rep,
     entityID,
     unreadBy,
     memberEntity,
@@ -184,7 +179,8 @@ export const MessageInput = (props: {
 
   let replyMessage = db.useMessageByID(props.reply);
   let replyToName = db.useEntity(replyMessage?.sender || null, "member/name");
-
+  let cardBackgroundColor =
+    db.useEntity(props.entityID, "card/background-color")?.value || "#FFFFFF";
   const send = async () => {
     if (!session.session || !value) return;
     let message: Omit<Message, "sender"> = {
@@ -229,13 +225,18 @@ export const MessageInput = (props: {
       {!session?.loggedIn ? (
         <Login />
       ) : !authorized ? (
-        <div className="messageLogIn  mx-3 mb-3 flex place-items-center gap-2 rounded-md bg-grey-90 p-2 text-center  text-sm italic text-grey-55 sm:mx-4 sm:mb-4">
-          Only members and studio mates can add to this chat!
+        <div className="messageNonAuth flex justify-center rounded-md bg-grey-90 p-2 text-center text-sm italic text-grey-55">
+          Only members and studiomates can chat!
         </div>
       ) : (
         <div
+          style={{
+            backgroundColor: props.isRoom
+              ? colors.background
+              : cardBackgroundColor,
+          }}
           className={`flex items-end gap-1 ${
-            props.isRoom ? "bg-background px-3 sm:px-4" : "bg-white"
+            props.isRoom ? "px-3 sm:px-4" : ""
           } `}
         >
           <div className="shrink-0 pb-1">
@@ -330,7 +331,7 @@ const Login = () => {
   let [state, setState] = LoginOrSignupModal.useState("closed");
   return (
     <>
-      <div className="messageLogIn mx-3 mb-3 flex place-items-center gap-2 rounded-md bg-grey-90 p-2 sm:mx-4 sm:mb-4">
+      <div className="messageLogIn flex justify-center rounded-md bg-grey-90 p-2">
         <p className=" w-full text-center text-sm italic text-grey-55">
           <span
             role="button"
@@ -476,7 +477,7 @@ const Message = (props: {
   );
   return (
     <div
-      className={`group mx-3 flex items-end gap-1 sm:mx-4 ${
+      className={`group mx-3 flex items-end gap-1 first:mt-auto sm:mx-4 ${
         !props.multipleFromSameAuthor ? "pt-4" : "pt-1"
       } ${isMe && "flex-row-reverse"}`}
     >
@@ -513,7 +514,10 @@ const Message = (props: {
         )}
         {replyMessage && (
           <div className={`-mb-1 w-fit ${isMe ? "ml-6" : "mr-6"}`}>
-            <div className="mt-0.5 flex max-h-[118px] flex-col overflow-hidden rounded-lg border border-grey-80 px-2 py-1 text-xs">
+            <div
+              className="mt-0.5 flex max-h-[118px] flex-col overflow-hidden rounded-lg border border-grey-80 px-2 py-1 text-xs"
+              style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
+            >
               <div className={`font-bold italic text-grey-55`}>
                 {replyToName?.value}
               </div>

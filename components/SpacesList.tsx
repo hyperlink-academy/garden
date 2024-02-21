@@ -42,8 +42,15 @@ export const SpaceCard = (
   } & SpaceData
 ) => {
   let data = props;
+  if (!data.owner) return <BaseSpaceCard {...props} />;
   return (
-    <Link href={`${spacePath(data?.owner?.username, data?.name || "")}`}>
+    <Link
+      href={`${spacePath({
+        studio: data.owner.username,
+        id: data.id,
+        display_name: data.display_name || "",
+      })}`}
+    >
       <BaseSpaceCard {...props} />
     </Link>
   );
@@ -79,7 +86,7 @@ export const BaseSpaceCard = (props: Parameters<typeof SpaceCard>[0]) => {
             >
               <div
                 className={
-                  !data?.display_name ? "italic text-grey-55" : " font-bold"
+                  !data?.display_name ? "text-grey-55 italic" : " font-bold"
                 }
               >
                 {data?.display_name || "space deleted"}
@@ -87,7 +94,7 @@ export const BaseSpaceCard = (props: Parameters<typeof SpaceCard>[0]) => {
             </div>
           </div>
           {data && data.owner ? (
-            <div className=" flex items-center gap-1 place-self-end text-sm italic text-grey-55">
+            <div className=" text-grey-55 flex items-center gap-1 place-self-end text-sm italic">
               <RoomMember />
               {data.owner.username}{" "}
               {data.members_in_spaces?.length > 1 && (

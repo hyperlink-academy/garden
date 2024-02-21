@@ -7,7 +7,12 @@ import { UndoManager } from "@rocicorp/undo";
 import { AuthString, mutators, ReplicacheMutators } from "reflect";
 
 export const SpaceProvider: React.FC<
-  React.PropsWithChildren<{ id: string }>
+  React.PropsWithChildren<{
+    id: string;
+    data:
+      | { space_id: string; studio_id: undefined }
+      | { studio_id: string; space_id: undefined };
+  }>
 > = (props) => {
   let [rep, setRep] = useState<Reflect<ReplicacheMutators>>();
   let [undoManager] = useState(new UndoManager());
@@ -51,7 +56,7 @@ export const SpaceProvider: React.FC<
 
   return (
     <ReplicacheContext.Provider
-      value={rep ? { rep, id: props.id, undoManager } : null}
+      value={rep ? { rep, id: props.id, undoManager, data: props.data } : null}
     >
       {props.children}
     </ReplicacheContext.Provider>

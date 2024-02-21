@@ -8,16 +8,7 @@ const nextConfig = {
   reactStrictMode: true,
   pageExtensions: ["js", "jsx", "mdx", "ts", "tsx"],
   async rewrites() {
-    return [
-      {
-        source: "/s/:studio/s/:space/:slug/:path*",
-        destination: "/s/:studio/s/:space/:path*",
-      },
-      {
-        source: "/s/:studio/s/:space/:slug",
-        destination: "/s/:studio/s/:space",
-      },
-    ];
+    return [];
   },
   async redirects() {
     return [
@@ -50,10 +41,13 @@ const nextConfig = {
   },
 };
 
-const withPWA = require("next-pwa")({
-  dest: "public",
-  mode: "production",
-  disable: process.env.NODE_ENV !== "production",
+const withSerwist = require("@serwist/next").default({
+  // Note: This is only an example. If you use Pages Router,
+  // use something else that works, such as "service-worker/index.ts".
+  swSrc: "worker/index.ts",
+  swDest: "public/sw.js",
+  reloadOnOnline: false,
+  register: true,
 });
 
-module.exports = withMDX(withPWA(nextConfig));
+module.exports = withMDX(withSerwist(nextConfig));

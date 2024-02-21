@@ -1,27 +1,24 @@
-import { Env } from "..";
+import { Bindings } from "backend";
 import { makeRoute } from "backend/lib/api";
 import { z } from "zod";
 import { space_input } from "./create_space";
 import { authTokenVerifier, verifyIdentity } from "backend/lib/auth";
 import { createClient } from "backend/lib/supabase";
 
-export const update_self_route = makeRoute({
-  route: "update_self",
+export const update_space_route = makeRoute({
+  route: "update_space",
   input: z.object({
     authToken: authTokenVerifier,
+    space_id: z.string(),
     data: space_input.merge(z.object({ archived: z.boolean().optional() })),
   }),
-  handler: async (msg, env: Env) => {
-    const supabase = createClient(env.env);
-    let session = await verifyIdentity(env.env, msg.authToken);
+  handler: async (msg, env: Bindings) => {
+    const supabase = createClient(env);
+    let session = await verifyIdentity(env, msg.authToken);
     if (!session)
       return {
         data: { success: false, error: "Invalid session token" },
       } as const;
-    let creator = await env.storage.get("meta-creator");
-    if (!creator) return { data: { success: false } } as const;
-    if (creator !== session.studio)
-      return { data: { success: false } } as const;
 
     await supabase
       .from("space_data")
@@ -32,7 +29,8 @@ export const update_self_route = makeRoute({
         description: msg.data.description,
         archived: msg.data.archived,
       })
-      .eq("do_id", env.id);
+      .eq("owner", session.id)
+      .eq("id", msg.space_id);
 
     return { data: { success: true } } as const;
   },

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import useWindowDimensions from "./useWindowDimensions";
+import { uuidToBase62 } from "src/uuidHelpers";
 
 export function usePrevious<T>(value: T) {
   const ref = useRef<T>();
@@ -38,13 +39,18 @@ export function useDebouncedEffect(cb: () => void, delay: number, deps: any[]) {
   }, [cb, delay, ...deps]);
 }
 
-export function spacePath(
-  studio: string | string[] | undefined,
-  space: string | string[] | undefined
-) {
-  return `/s/${encodeURIComponent(studio as string)}/s/${encodeURIComponent(
-    space as string
-  )}`;
+export function spacePath({
+  studio,
+  id,
+  display_name,
+}: {
+  studio: string | undefined;
+  id: string;
+  display_name: string | null;
+}) {
+  return `/s/${encodeURIComponent(studio || "")}/s/${uuidToBase62(
+    id
+  )}/${encodeURIComponent(display_name || "")}`;
 }
 
 export function useIsElementOrChildFocused() {

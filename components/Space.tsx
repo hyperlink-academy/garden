@@ -2,7 +2,7 @@
 import { CardViewer } from "components/CardViewerContext";
 import { SmallCardDragContext, useDroppableZone } from "components/DragContext";
 import { Sidebar } from "components/SpaceLayout";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import useWindowDimensions from "hooks/useWindowDimensions";
 import { Room } from "components/Room";
 import { useUIState } from "hooks/useUIState";
@@ -29,6 +29,7 @@ import { useIsClient } from "hooks/utils";
 
 type Props = {
   studio?: { spaces: SpaceData[]; studioName: string; studioID: string };
+  space_id: string;
 };
 
 export const Space = (props: Props) => {
@@ -65,11 +66,19 @@ const DesktopLayout = (props: Props) => {
   return (
     <div className="mx-auto flex h-full w-full flex-col gap-2 overflow-hidden">
       <div className="spaceHeader mx-auto flex w-full max-w-[1332px] flex-row items-end justify-between gap-4 px-2">
-        {props.studio ? <SpaceViewerHeader {...props.studio} /> : <Header />}
+        {props.studio ? (
+          <SpaceViewerHeader {...props.studio} space_id={props.space_id} />
+        ) : (
+          <Header space_id={props.space_id} />
+        )}
         <div className="spaceHeaderSearch flex w-[440px] shrink-0 flex-row items-center gap-2 text-grey-55">
           <HelpButton />
 
-          {!session.loggedIn ? <LoginButton /> : <SpaceOptions />}
+          {!session.loggedIn ? (
+            <LoginButton />
+          ) : (
+            <SpaceOptions space_id={props.space_id} />
+          )}
 
           <Search />
         </div>
@@ -80,7 +89,7 @@ const DesktopLayout = (props: Props) => {
       >
         <div className="spaceRoomAndSidebar flex shrink-0  snap-center snap-always flex-row  rounded-md border border-grey-90">
           <div className="shrink-0 rounded-l-md border border-transparent border-r-grey-90 bg-white">
-            <Sidebar />
+            <Sidebar space_id={props.space_id} />
           </div>
 
           <div className="spaceRoomWrapper no-scrollbar relative flex h-full flex-shrink-0 flex-col gap-0">
@@ -88,31 +97,29 @@ const DesktopLayout = (props: Props) => {
           </div>
         </div>
 
-        <CardViewer />
+        <CardViewer space_id={props.space_id} />
       </div>
     </div>
   );
 };
 
-const Header = () => {
+const Header = (props: { space_id: string }) => {
   let { session } = useAuth();
   return (
-    <div className="spaceHeaderInfo group group -mb-1 ml-2 flex min-w-0 shrink grow flex-row items-stretch gap-2 rounded-md border border-transparent px-3 py-1 font-bold ">
-      <div
-        className={`spaceName flex w-full min-w-0 grow justify-between bg-background text-grey-35`}
-      >
+    <div className="spaceHeaderInfo -mb-1 ml-2 flex min-w-0 shrink grow flex-row items-stretch gap-2 px-3 py-1 font-bold ">
+      <div className="spaceName flex w-full min-w-0 grow justify-between bg-background text-grey-35">
         <div className="flex w-full flex-col gap-0">
           <div className="flex flex-row items-center gap-2">
             {session.session && (
               <Link href={`/s/${session.session.username}`}>
-                <h4 className="text-sm text-grey-55 hover:text-accent-blue ">
+                <h4 className="text-sm text-grey-55 hover:text-accent-blue">
                   home
                 </h4>
               </Link>
             )}
           </div>
-          <div className="flex w-full flex-row items-center justify-between gap-2 bg-inherit ">
-            <SpaceName truncate />
+          <div className="flex w-full flex-row items-center justify-between gap-2 bg-inherit">
+            <SpaceName truncate space_id={props.space_id} />
           </div>
         </div>
       </div>
@@ -132,7 +139,6 @@ const LoginButton = () => {
 
 const MobileLayout = (props: Props) => {
   let setSidebarOpen = useUIState((s) => s.setMobileSidebarOpen);
-  let ref = useRef<HTMLDivElement>(null);
   let { setNodeRef: droppableRef, over } = useDroppableZone({
     type: "trigger",
     id: "mobile-sidebar-button",
@@ -182,7 +188,7 @@ const MobileLayout = (props: Props) => {
         </div>
 
         <div className="cardViewerWrapper snap-center snap-always ">
-          <CardViewer />
+          <CardViewer space_id={props.space_id} />
         </div>
         <div className="w-2 shrink-0 snap-start" />
       </div>
@@ -273,7 +279,7 @@ const MobileSidebar = (props: Props) => {
           className="h-full touch-none rounded-md border border-grey-90 bg-white"
           {...bindSidebar()}
         >
-          <Sidebar mobile studio={props.studio} />
+          <Sidebar mobile studio={props.studio} space_id={props.space_id} />
         </div>
       </animated.div>
     </>,

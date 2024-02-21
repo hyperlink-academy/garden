@@ -29,7 +29,7 @@ export const markUnread = async (
     let { data } = await supabase
       .from("space_data")
       .select(
-        "members_in_spaces(identity_data(*)), spaces_in_studios(studios(members_in_studios(identity_data(*))))"
+        "id, members_in_spaces(identity_data(*)), spaces_in_studios(studios(members_in_studios(identity_data(*))))"
       )
       .eq("do_id", env.id)
       .single();
@@ -40,6 +40,8 @@ export const markUnread = async (
         (m) => (m.studios as NonNullable<typeof m.studios>).members_in_studios
       ),
     ].map((m) => m.identity_data as NonNullable<typeof m.identity_data>);
+    let upserts: Array<{ user: string; space_id: string; unreads: number }> =
+      [];
     for (let i = 0; i < members.length; i++) {
       let memberEntity = await getOrCreateMemberEntity(members[i], ctx);
 
@@ -52,12 +54,13 @@ export const markUnread = async (
         });
 
       let unreads = await calculateUnreads(memberEntity, ctx);
-      await supabase.from("user_space_unreads").upsert({
+      upserts.push({
         user: members[i].id,
-        space: env.id,
+        space_id: data.id,
         unreads,
       });
     }
+    await supabase.from("user_space_unreads").upsert(upserts);
   });
 };
 

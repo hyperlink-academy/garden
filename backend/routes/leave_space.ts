@@ -1,49 +1,43 @@
-import { app_event } from "backend/lib/analytics";
+import { Bindings } from "backend";
+import { isUserMember } from "backend/SpaceDurableObject/lib/isMember";
 import { makeRoute } from "backend/lib/api";
 import { authTokenVerifier, verifyIdentity } from "backend/lib/auth";
 import { createClient } from "backend/lib/supabase";
 import { z } from "zod";
-import { Env } from "..";
-import { isUserMember } from "../lib/isMember";
 
-export const leave_route = makeRoute({
-  route: "leave",
+export const leave_space_route = makeRoute({
+  route: "leave_space",
   input: z.object({
+    do_id: z.string(),
+    type: z.union([z.literal("space"), z.literal("studio")]),
     authToken: authTokenVerifier,
   }),
-  handler: async (msg, env: Env) => {
-    let supabase = createClient(env.env);
-    let session = await verifyIdentity(env.env, msg.authToken);
+  handler: async (msg, env: Bindings) => {
+    const supabase = createClient(env);
+    let session = await verifyIdentity(env, msg.authToken);
     if (!session)
       return {
         data: { success: false, error: "Invalid session token" },
       } as const;
 
-    let space_type = await env.storage.get<string>("meta-space-type");
-    let isMember = isUserMember(env, session.id);
+    let isMember = isUserMember({ env, id: msg.do_id }, session.id);
 
     if (!isMember) return { data: { success: true } };
 
-    if (space_type === "studio") {
+    if (msg.type === "studio") {
       await supabase
         .from("members_in_studios")
         .delete()
         .eq("member", session.id)
-        .eq("studios.do_id", env.id);
+        .eq("studios.do_id", msg.do_id);
     } else {
       await supabase
         .from("members_in_spaces")
         .delete()
         .eq("member", session.id)
-        .eq("space_do_id", env.id);
+        .eq("space_do_id", msg.do_id);
     }
 
-    env.poke();
-    await app_event(env.env, {
-      event: "left_space",
-      user: session.id,
-      spaceID: env.id,
-    });
     return { data: { success: true } } as const;
   },
 });

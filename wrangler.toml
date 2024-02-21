@@ -15,6 +15,10 @@ analytics_engine_datasets = [
     { binding = "APP_EVENT_ANALYTICS" }
 ]
 
+services = [
+  { binding = "SELF_WORKER", service = "hyperlink-garden" }
+]
+
 [[r2_buckets]]
 binding = 'USER_UPLOADS' # <~ valid JavaScript variable name
 bucket_name = 'garden-user-uploads'

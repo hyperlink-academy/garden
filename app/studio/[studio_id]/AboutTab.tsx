@@ -17,7 +17,7 @@ export function About() {
   return (
     <div className="mx-auto h-full max-w-2xl  pb-6 sm:pt-6">
       <div className="relative h-full">
-        {!image && (
+        {!image && authorized && (
           <div className="absolute right-3 top-3 z-10 flex items-center gap-2 rounded-md border border-grey-80 bg-white p-1 text-accent-blue sm:-top-4">
             <AddImage
               onUpload={(imageID) => {

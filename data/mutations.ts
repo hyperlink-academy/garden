@@ -239,8 +239,8 @@ const createCard: Mutation<{
   await ctx.runOnServer(async (env, user_studio) => {
     await app_event(env.env, {
       event: "created_card",
-      spaceID: env.id,
-      user: user_studio,
+      space_do_id: env.id,
+      user: userID,
     });
   });
 };
@@ -390,7 +390,7 @@ const replyToDiscussion: Mutation<{
 
     await app_event(env.env, {
       event: "sent_message",
-      spaceID: env.id,
+      space_do_id: env.id,
       user: userID,
     });
 
@@ -436,11 +436,11 @@ const createRoom: Mutation<{
     value: args.type,
     positions: {},
   });
-  await ctx.runOnServer(async (env, user_studio) => {
+  await ctx.runOnServer(async (env, userID) => {
     await app_event(env.env, {
       event: "created_room",
-      spaceID: env.id,
-      user: user_studio,
+      space_do_id: env.id,
+      user: userID,
     });
   });
 };
@@ -485,6 +485,7 @@ const addReaction: Mutation<{
 
 const markRead: Mutation<{
   entityID: string;
+  space_id: string;
   memberEntity: string;
   userID: string;
   attribute: "discussion/unread-by" | "card/unread-by";
@@ -498,9 +499,11 @@ const markRead: Mutation<{
     if (!space) return;
     let supabase = createClient(env.env);
     let unreads = await calculateUnreads(args.memberEntity, ctx);
-    await supabase
-      .from("user_space_unreads")
-      .upsert({ user: space.value, unreads, space: id });
+    await supabase.from("user_space_unreads").upsert({
+      user: args.userID,
+      space_id: args.space_id,
+      unreads,
+    });
   });
 };
 
