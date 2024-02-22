@@ -181,6 +181,12 @@ const LoginButton = () => {
   );
 };
 
+const JoinSuccessToast = {
+  text: "Yes! You've joined this Studio!",
+  type: "success",
+  icon: null,
+} as const;
+
 const StudioBanner = (props: Props) => {
   let { data, mutate } = useStudioData(props.data?.id, props.data);
   let [joinCode, setJoinCode] = useState<null | string>(null);
@@ -213,11 +219,7 @@ const StudioBanner = (props: Props) => {
 
       if (data.success) {
         mutate();
-        toaster({
-          text: "Yes! You've joined this Studio!",
-          type: "success",
-          icon: null,
-        });
+        toaster(JoinSuccessToast);
       }
     },
     [joinCode, props.data, mutate, toaster]
@@ -238,11 +240,7 @@ const StudioBanner = (props: Props) => {
         onLogin={(s) => {
           if (s.authToken) {
             join(s.authToken);
-            toaster({
-              text: "Joined studio",
-              type: "success",
-              icon: null,
-            });
+            toaster(JoinSuccessToast);
           }
         }}
       />
