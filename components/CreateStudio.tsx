@@ -24,7 +24,7 @@ type FormState = {
   description: string;
   allow_members_to_join_spaces: boolean;
 };
-export const StudioForm = ({
+const StudioNameForm = ({
   formState,
   setFormState,
 }: {
@@ -98,7 +98,7 @@ export function CreateStudio(props: { username: string }) {
             router.push(`/studio/${uuidToBase62(studio.data.id)}`);
           }}
         >
-          <StudioForm formState={formState} setFormState={setFormState} />
+          <StudioNameForm formState={formState} setFormState={setFormState} />
 
           <div className="flex flex-row justify-end gap-2">
             <ButtonTertiary
