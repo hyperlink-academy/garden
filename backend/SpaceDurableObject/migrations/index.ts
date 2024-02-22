@@ -18,6 +18,7 @@ import m2023_03_20 from "./2023-03-20";
 import m2023_09_04 from "./2023-09-04";
 import m2023_09_08 from "./2023-09-08";
 import m2024_01_20 from "./2024-01-20";
+import m2024_02_21 from "./2024-02-21";
 
 export const latestMigration = "2022-07-19";
 export const migrations = [
@@ -41,6 +42,7 @@ export const migrations = [
   m2023_09_04,
   m2023_09_08,
   m2024_01_20,
+  m2024_02_21,
 ].sort((a, b) => {
   return a.date > b.date ? 1 : -1;
 });
