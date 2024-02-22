@@ -248,6 +248,7 @@ export interface Database {
           end_date: string | null
           id: string
           image: string | null
+          join_code: string | null
           lastUpdated: string | null
           name: string | null
           owner: string
@@ -263,6 +264,7 @@ export interface Database {
           end_date?: string | null
           id?: string
           image?: string | null
+          join_code?: string | null
           lastUpdated?: string | null
           name?: string | null
           owner: string
@@ -278,6 +280,7 @@ export interface Database {
           end_date?: string | null
           id?: string
           image?: string | null
+          join_code?: string | null
           lastUpdated?: string | null
           name?: string | null
           owner?: string
@@ -363,6 +366,7 @@ export interface Database {
           description: string | null
           do_id: string
           id: string
+          join_code: string | null
           name: string
           welcome_message: string
         }
@@ -371,6 +375,7 @@ export interface Database {
           description?: string | null
           do_id: string
           id?: string
+          join_code?: string | null
           name: string
           welcome_message?: string
         }
@@ -379,6 +384,7 @@ export interface Database {
           description?: string | null
           do_id?: string
           id?: string
+          join_code?: string | null
           name?: string
           welcome_message?: string
         }
@@ -399,7 +405,7 @@ export interface Database {
         }
         Insert: {
           space_id: string
-          unreads?: number
+          unreads: number
           user: string
         }
         Update: {
