@@ -129,15 +129,8 @@ export function JoinStudio(props: { data: StudioData }) {
               state={logInModalState}
               setState={setLogInModalState}
               redirectTo={`/studio/${uuidToBase62(props.data.id)}?join=true`}
-              onLogin={(s) => {
-                if (s.authToken) {
-                  join(s.authToken);
-                  toaster({
-                    text: "Joined studio",
-                    type: "success",
-                    icon: null,
-                  });
-                }
+              onLogin={() => {
+                push(`/studio/${uuidToBase62(props.data.id)}?join=true`);
               }}
             />
           </div>
