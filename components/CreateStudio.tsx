@@ -7,7 +7,6 @@ import { DotLoader } from "./DotLoader";
 import { useIdentityData } from "hooks/useIdentityData";
 import { uuidToBase62 } from "src/uuidHelpers";
 import { Modal } from "./Modal";
-import { useIsMobile } from "hooks/utils";
 import { useRouter } from "next/navigation";
 
 let weird_studios = [
@@ -20,7 +19,11 @@ let weird_studios = [
 ];
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
-type FormState = { name: string; description: string };
+type FormState = {
+  name: string;
+  description: string;
+  allow_members_to_join_spaces: boolean;
+};
 export const StudioForm = ({
   formState,
   setFormState,
@@ -61,9 +64,10 @@ export function CreateStudio(props: { username: string }) {
 
   let { mutate } = useIdentityData(props.username);
   let [loading, setLoading] = useState(false);
-  let [formState, setFormState] = useState({
+  let [formState, setFormState] = useState<FormState>({
     name: "",
     description: "",
+    allow_members_to_join_spaces: false,
   });
   let { authToken } = useAuth();
   let router = useRouter();
@@ -86,7 +90,11 @@ export function CreateStudio(props: { username: string }) {
             mutate();
             if (!studio.success) return;
             setOpen(false);
-            setFormState({ name: "", description: "" });
+            setFormState({
+              name: "",
+              description: "",
+              allow_members_to_join_spaces: false,
+            });
             router.push(`/studio/${uuidToBase62(studio.data.id)}`);
           }}
         >

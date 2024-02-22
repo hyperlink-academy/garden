@@ -17,6 +17,7 @@ export function StudioSettings(props: { id: string }) {
   let [formState, setFormState] = useState({
     name: "",
     description: "",
+    allow_members_to_join_spaces: false,
   });
   let [mode, setMode] = useState<"normal" | "delete">("normal");
 
@@ -24,8 +25,9 @@ export function StudioSettings(props: { id: string }) {
     setFormState({
       description: data?.description || "",
       name: data?.name || "",
+      allow_members_to_join_spaces: data?.allow_members_to_join_spaces || false,
     });
-  }, [data?.description, data?.name]);
+  }, [data]);
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-8 pb-6 sm:pt-6">
       <form
@@ -45,6 +47,8 @@ export function StudioSettings(props: { id: string }) {
             data: {
               name: formState.name,
               description: formState.description,
+              allow_members_to_join_spaces:
+                formState.allow_members_to_join_spaces,
             },
           });
           setLoading(false);
@@ -52,22 +56,33 @@ export function StudioSettings(props: { id: string }) {
         }}
       >
         <StudioForm setFormState={setFormState} formState={formState} />
+        <div className="flex gap-2 font-bold">
+          <input
+            type="checkbox"
+            id="open-space-toggle"
+            checked={formState.allow_members_to_join_spaces}
+            onChange={(e) =>
+              setFormState({
+                ...formState,
+                allow_members_to_join_spaces: e.currentTarget.checked,
+              })
+            }
+          />
+          Open Spaces to Members
+        </div>
         <ButtonPrimary
           className="mt-8 place-self-end"
           content={loading ? "" : "Update Studio"}
           icon={loading ? <DotLoader /> : undefined}
           disabled={
             formState.name === data?.name &&
-            formState.description === data?.description
+            formState.description === data?.description &&
+            formState.allow_members_to_join_spaces ===
+              data?.allow_members_to_join_spaces
           }
         />
       </form>
-      <GetStartedForm />
-
-      <div className="flex gap-2 font-bold">
-        <input type="checkbox" id="open-space-toggle" />
-        Spen Spaces to Members
-      </div>
+      {/* <GetStartedForm /> */}
 
       <hr className="border-grey-80" />
 

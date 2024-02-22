@@ -359,6 +359,7 @@ export interface Database {
       }
       studios: {
         Row: {
+          allow_members_to_join_spaces: boolean
           creator: string
           description: string | null
           do_id: string
@@ -367,6 +368,7 @@ export interface Database {
           welcome_message: string
         }
         Insert: {
+          allow_members_to_join_spaces?: boolean
           creator: string
           description?: string | null
           do_id: string
@@ -375,6 +377,7 @@ export interface Database {
           welcome_message?: string
         }
         Update: {
+          allow_members_to_join_spaces?: boolean
           creator?: string
           description?: string | null
           do_id?: string
