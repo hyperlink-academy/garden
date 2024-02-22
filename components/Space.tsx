@@ -8,7 +8,7 @@ import { Room } from "components/Room";
 import { useUIState } from "hooks/useUIState";
 import { PresenceHandler } from "components/PresenceHandler";
 import { useSpaceSyncState } from "hooks/useSpaceSyncState";
-import { springConfig } from "src/constants";
+import { WORKER_URL, springConfig } from "src/constants";
 import { useViewportSize } from "hooks/useViewportSize";
 import { Information, Question, SidebarIcon } from "components/Icons";
 import { SpaceName, SpaceOptions } from "components/SpaceLayout/Sidebar";
@@ -27,6 +27,8 @@ import { SpaceData } from "components/SpacesList";
 import { SpaceViewerHeader } from "app/studio/[studio_id]/space/SpaceViewerHeader";
 import { useIsClient } from "hooks/utils";
 import * as Popover from "@radix-ui/react-popover";
+import { useSpaceData } from "hooks/useSpaceData";
+import { spaceAPI } from "backend/lib/api";
 
 type Props = {
   studio?: { spaces: SpaceData[]; studioName: string; studioID: string };
@@ -73,17 +75,7 @@ const DesktopLayout = (props: Props) => {
           <Header space_id={props.space_id} />
         )}
         <div>
-          <div className="bg-bg-blue lightBorder mx-3 flex w-fit items-center gap-1 px-2 py-1 text-sm font-bold sm:mx-4">
-            You&apos;re a Studiomate!{" "}
-            <InfoPopover>
-              <p>You can comment and react on cards. You can also chat!</p>{" "}
-              <p>
-                In order to make and edit cards, you need to become a space
-                member!
-              </p>
-            </InfoPopover>
-            <ButtonPrimary content="join!" />
-          </div>
+          <SpaceRoleBadge space_id={props.space_id} />
           <div className="spaceHeaderSearch text-grey-55 flex w-[440px] shrink-0 flex-row items-center gap-2">
             <HelpButton />
 
@@ -113,6 +105,51 @@ const DesktopLayout = (props: Props) => {
 
         <CardViewer space_id={props.space_id} />
       </div>
+    </div>
+  );
+};
+
+const SpaceRoleBadge = (props: { space_id: string }) => {
+  let { session, authToken } = useAuth();
+  let { data: spaceData, mutate } = useSpaceData(props);
+  let isMember = spaceData?.members_in_spaces.find(
+    (m) => m.member === session.user?.id
+  );
+  let isStudioMate = spaceData?.spaces_in_studios.find(
+    (s) =>
+      s.studios?.allow_members_to_join_spaces &&
+      !!s.studios.members_in_studios.find((f) => f.member === session.user?.id)
+  );
+
+  if (!isMember && !isStudioMate) return null;
+
+  return (
+    <div className="bg-bg-blue lightBorder mx-3 flex w-fit items-center gap-1 px-2 py-1 text-sm font-bold sm:mx-4">
+      {isMember ? `You're a member!` : `You&apos;re a Studiomate!`}
+      <InfoPopover>
+        <p>You can comment and react on cards. You can also chat!</p>{" "}
+        <p>
+          In order to make and edit cards, you need to become a space member!
+        </p>
+      </InfoPopover>
+      {!isMember && isStudioMate && (
+        <ButtonPrimary
+          content="join!"
+          onClick={async () => {
+            if (!authToken) return;
+            let data = await spaceAPI(
+              `${WORKER_URL}/space/${spaceData?.do_id}`,
+              "join",
+              {
+                authToken,
+                code: "",
+                joinFromStudioMate: true,
+              }
+            );
+            if (data.success) mutate();
+          }}
+        />
+      )}
     </div>
   );
 };
