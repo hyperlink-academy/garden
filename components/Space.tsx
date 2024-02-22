@@ -10,7 +10,7 @@ import { PresenceHandler } from "components/PresenceHandler";
 import { useSpaceSyncState } from "hooks/useSpaceSyncState";
 import { springConfig } from "src/constants";
 import { useViewportSize } from "hooks/useViewportSize";
-import { Question, SidebarIcon } from "components/Icons";
+import { Information, Question, SidebarIcon } from "components/Icons";
 import { SpaceName, SpaceOptions } from "components/SpaceLayout/Sidebar";
 import { useSpring, animated } from "@react-spring/web";
 import { createPortal } from "react-dom";
@@ -26,6 +26,7 @@ import { useSpaceShortcuts } from "hooks/useSpaceShortcuts";
 import { SpaceData } from "components/SpacesList";
 import { SpaceViewerHeader } from "app/studio/[studio_id]/space/SpaceViewerHeader";
 import { useIsClient } from "hooks/utils";
+import * as Popover from "@radix-ui/react-popover";
 
 type Props = {
   studio?: { spaces: SpaceData[]; studioName: string; studioID: string };
@@ -71,24 +72,37 @@ const DesktopLayout = (props: Props) => {
         ) : (
           <Header space_id={props.space_id} />
         )}
-        <div className="spaceHeaderSearch flex w-[440px] shrink-0 flex-row items-center gap-2 text-grey-55">
-          <HelpButton />
+        <div>
+          <div className="bg-bg-blue lightBorder mx-3 flex w-fit items-center gap-1 px-2 py-1 text-sm font-bold sm:mx-4">
+            You&apos;re a Studiomate!{" "}
+            <InfoPopover>
+              <p>You can comment and react on cards. You can also chat!</p>{" "}
+              <p>
+                In order to make and edit cards, you need to become a space
+                member!
+              </p>
+            </InfoPopover>
+            <ButtonPrimary content="join!" />
+          </div>
+          <div className="spaceHeaderSearch text-grey-55 flex w-[440px] shrink-0 flex-row items-center gap-2">
+            <HelpButton />
 
-          {!session.loggedIn ? (
-            <LoginButton />
-          ) : (
-            <SpaceOptions space_id={props.space_id} />
-          )}
+            {!session.loggedIn ? (
+              <LoginButton />
+            ) : (
+              <SpaceOptions space_id={props.space_id} />
+            )}
 
-          <Search />
+            <Search />
+          </div>
         </div>
       </div>
       <div
         id="space-layout"
         className=" no-scrollbar spaceLargeSplitLayout mx-auto flex h-full w-full max-w-[1332px] snap-x snap-mandatory flex-row items-stretch gap-4 overflow-y-hidden overflow-x-scroll scroll-smooth px-4 sm:gap-4  md:overflow-x-hidden"
       >
-        <div className="spaceRoomAndSidebar flex shrink-0  snap-center snap-always flex-row  rounded-md border border-grey-90">
-          <div className="shrink-0 rounded-l-md border border-transparent border-r-grey-90 bg-white">
+        <div className="spaceRoomAndSidebar border-grey-90 flex  shrink-0 snap-center snap-always  flex-row rounded-md border">
+          <div className="border-r-grey-90 shrink-0 rounded-l-md border border-transparent bg-white">
             <Sidebar space_id={props.space_id} />
           </div>
 
@@ -107,12 +121,12 @@ const Header = (props: { space_id: string }) => {
   let { session } = useAuth();
   return (
     <div className="spaceHeaderInfo -mb-1 ml-2 flex min-w-0 shrink grow flex-row items-stretch gap-2 px-3 py-1 font-bold ">
-      <div className="spaceName flex w-full min-w-0 grow justify-between bg-background text-grey-35">
+      <div className="spaceName bg-background text-grey-35 flex w-full min-w-0 grow justify-between">
         <div className="flex w-full flex-col gap-0">
           <div className="flex flex-row items-center gap-2">
             {session.session && (
               <Link href={`/s/${session.session.username}`}>
-                <h4 className="text-sm text-grey-55 hover:text-accent-blue">
+                <h4 className="text-grey-55 hover:text-accent-blue text-sm">
                   home
                 </h4>
               </Link>
@@ -151,7 +165,7 @@ const MobileLayout = (props: Props) => {
       setSidebarOpen(true);
     }, 500);
     return () => window.clearTimeout(timeout);
-  }, [over]);
+  }, [over, setSidebarOpen]);
 
   let { active } = useDndContext();
   let bind = useGesture({
@@ -181,7 +195,7 @@ const MobileLayout = (props: Props) => {
         >
           <div
             id="roomInnerWrapper"
-            className="roomInnerWrapper no-scrollbar relative flex h-full flex-shrink-0 flex-col gap-0 rounded-md border border-grey-90 "
+            className="roomInnerWrapper no-scrollbar border-grey-90 relative flex h-full flex-shrink-0 flex-col gap-0 rounded-md border "
           >
             <Room />
           </div>
@@ -194,7 +208,7 @@ const MobileLayout = (props: Props) => {
       </div>
       <div className="navFooter pwa-padding-bottom flex flex-row justify-between px-2">
         <div
-          className="sidebarTrigger flex flex-row gap-2 text-grey-55"
+          className="sidebarTrigger text-grey-55 flex flex-row gap-2"
           ref={droppableRef}
         >
           <button onClick={() => setSidebarOpen()}>
@@ -237,7 +251,7 @@ const MobileSidebar = (props: Props) => {
       setSidebarOpen(false);
     }, 500);
     return () => window.clearTimeout(timeout);
-  }, [over]);
+  }, [over, setSidebarOpen]);
 
   const bindOverlay = useGesture({
     onDrag: (data) => {
@@ -265,7 +279,7 @@ const MobileSidebar = (props: Props) => {
         <animated.div
           {...bindOverlay()}
           onClick={() => setSidebarOpen(false)}
-          className="fixed inset-0 z-40 touch-none bg-grey-15"
+          className="bg-grey-15 fixed inset-0 z-40 touch-none"
           style={{ ...opacity, display: open ? "block" : "none" }}
         >
           <div className="z-40 ml-auto h-full w-2/3" ref={droppableRef} />
@@ -276,7 +290,7 @@ const MobileSidebar = (props: Props) => {
         className="pwa-padding pwa-padding-bottom fixed top-0 z-50 ml-2 p-1 py-[2px] pl-0"
       >
         <div
-          className="h-full touch-none rounded-md border border-grey-90 bg-white"
+          className="border-grey-90 h-full touch-none rounded-md border bg-white"
           {...bindSidebar()}
         >
           <Sidebar mobile studio={props.studio} space_id={props.space_id} />
@@ -299,5 +313,25 @@ export const HelpButton = () => {
       </button>
       <HelpModal open={open} onClose={() => setOpen(false)} />
     </>
+  );
+};
+
+const InfoPopover = (props: { children: React.ReactNode }) => {
+  return (
+    <Popover.Root>
+      <Popover.Trigger>
+        <button className="flex place-items-center ">
+          <Information />
+        </button>
+      </Popover.Trigger>
+      <Popover.Portal>
+        <Popover.Content sideOffset={2} className="z-50">
+          <div className="lightBorder text-grey-55 flex max-w-xs flex-col gap-2 rounded-sm bg-white p-2 text-xs font-normal shadow-lg">
+            {props.children}
+          </div>
+          <Popover.Close />
+        </Popover.Content>
+      </Popover.Portal>
+    </Popover.Root>
   );
 };
