@@ -108,6 +108,7 @@ function Settings({ data }: Props) {
 const StudioDesktopNav = (props: Props) => {
   let { data } = useStudioData(props.data?.id, props.data);
   let { session } = useAuth();
+  let toaster = useToaster();
 
   return (
     <div className="studioNav border-grey-80 my-6 mr-4 w-64 flex-col justify-between border-r pr-4">

@@ -1,6 +1,5 @@
 import { useStudioData } from "hooks/useStudioData";
 import { useEffect, useState } from "react";
-import { StudioForm } from "components/CreateStudio";
 import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
 import { DotLoader } from "components/DotLoader";
 import { useAuth } from "hooks/useAuth";
@@ -17,6 +16,7 @@ export function StudioSettings(props: { id: string }) {
   let [formState, setFormState] = useState({
     name: "",
     description: "",
+    allow_members_to_join_spaces: false,
   });
   let [mode, setMode] = useState<"normal" | "delete">("normal");
 
@@ -24,8 +24,9 @@ export function StudioSettings(props: { id: string }) {
     setFormState({
       description: data?.description || "",
       name: data?.name || "",
+      allow_members_to_join_spaces: data?.allow_members_to_join_spaces || false,
     });
-  }, [data?.description, data?.name]);
+  }, [data]);
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-8 pb-6 sm:pt-6">
       <form
@@ -45,20 +46,25 @@ export function StudioSettings(props: { id: string }) {
             data: {
               name: formState.name,
               description: formState.description,
+              allow_members_to_join_spaces:
+                formState.allow_members_to_join_spaces,
             },
           });
           setLoading(false);
           mutate();
         }}
       >
-        <StudioForm setFormState={setFormState} formState={formState} />
+        <StudioNameForm setFormState={setFormState} formState={formState} />
+        <OpenSpacesForm setFormState={setFormState} formState={formState} />
         <ButtonPrimary
           className="mt-8 place-self-end"
           content={loading ? "" : "Update Studio"}
           icon={loading ? <DotLoader /> : undefined}
           disabled={
             formState.name === data?.name &&
-            formState.description === data?.description
+            formState.description === data?.description &&
+            formState.allow_members_to_join_spaces ===
+              data?.allow_members_to_join_spaces
           }
         />
       </form>
@@ -84,6 +90,87 @@ export function StudioSettings(props: { id: string }) {
     </div>
   );
 }
+
+type FormState = {
+  name: string;
+  description: string;
+  allow_members_to_join_spaces: boolean;
+};
+
+const StudioNameForm = ({
+  formState,
+  setFormState,
+}: {
+  formState: FormState;
+  setFormState: React.Dispatch<React.SetStateAction<FormState>>;
+}) => {
+  return (
+    <>
+      <div className="lightBorder flex flex-col gap-2 p-3">
+        <h4 className="font-bold">Name this Studio</h4>
+        <div className="flex flex-col gap-0.5">
+          <input
+            className="w-full"
+            maxLength={64}
+            value={formState.name}
+            onChange={(e) => {
+              let value = e.currentTarget.value;
+              setFormState((form) => ({
+                ...form,
+                name: value,
+              }));
+            }}
+          />
+          <div className="text-grey-55 text-xs italic">
+            {formState.name.length}/64
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
+const OpenSpacesForm = ({
+  formState,
+  setFormState,
+}: {
+  formState: FormState;
+  setFormState: React.Dispatch<React.SetStateAction<FormState>>;
+}) => {
+  return (
+    <div className="lightBorder flex flex-col gap-4 p-3">
+      <div className="flex flex-col gap-1 ">
+        <h4>Open Spaces</h4>
+
+        <div className="text-grey-35 flex flex-col gap-2 text-sm">
+          <p>
+            Members of studios can comment and chat in spaces in this studio,
+            but <b>cannot make or edit cards</b> in them unless they join the
+            spaces as members.
+          </p>
+          <p>
+            <b>If you enable this, members will be able to join any spaces</b>{" "}
+            in this studio without needing an explicit invite.
+          </p>
+        </div>
+      </div>
+      <div className="flex gap-2 font-bold">
+        <input
+          type="checkbox"
+          id="open-space-toggle"
+          checked={formState.allow_members_to_join_spaces}
+          onChange={(e) =>
+            setFormState({
+              ...formState,
+              allow_members_to_join_spaces: e.currentTarget.checked,
+            })
+          }
+        />
+        Open Spaces to Members
+      </div>
+    </div>
+  );
+};
 
 const GetStartedForm = () => {
   let [getStarted, setGetStarted] = useState(false);

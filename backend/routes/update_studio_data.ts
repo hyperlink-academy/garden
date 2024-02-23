@@ -9,11 +9,14 @@ export const update_studio_data = makeRoute({
   input: z.object({
     authToken: authTokenVerifier,
     studio_id: z.string(),
-    data: z.object({
-      welcome_message: z.string(),
-      name: z.string(),
-      description: z.string(),
-    }).partial()
+    data: z
+      .object({
+        welcome_message: z.string(),
+        name: z.string(),
+        allow_members_to_join_spaces: z.boolean(),
+        description: z.string(),
+      })
+      .partial(),
   }),
   handler: async (msg, env: Bindings) => {
     const supabase = createClient(env);

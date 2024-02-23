@@ -42,12 +42,12 @@ export const Sidebar = (props: {
   let setMobileSidebarOpen = useUIState((s) => s.setMobileSidebarOpen);
 
   return (
-    <div className="Sidebar flex h-full w-52 flex-col items-stretch justify-between gap-2 overflow-x-visible   text-grey-35">
+    <div className="Sidebar text-grey-35 flex h-full w-52 flex-col items-stretch justify-between gap-2   overflow-x-visible">
       <div className="roomList no-scrollbar flex h-fit w-full flex-col gap-2 overflow-y-scroll px-3 pt-3">
         {props.mobile && (
           <>
             <div
-              className={`spaceName flex w-full flex-col bg-white text-grey-35`}
+              className={`spaceName text-grey-35 flex w-full flex-col bg-white`}
             >
               {props.studio ? (
                 <div className="flex justify-between">
@@ -55,7 +55,7 @@ export const Sidebar = (props: {
                     prefetch
                     href={`/studio/${uuidToBase62(props.studio.studioID)}`}
                   >
-                    <div className="-mb-0.5  text-sm font-bold text-grey-55">
+                    <div className="text-grey-55  -mb-0.5 text-sm font-bold">
                       {props.studio.studioName}
                     </div>
                   </Link>
@@ -66,7 +66,7 @@ export const Sidebar = (props: {
                   href={
                     session.session ? `/s/${session.session.username}` : "/"
                   }
-                  className="-mb-0.5 flex items-center gap-1 text-sm font-bold text-grey-55"
+                  className="text-grey-55 -mb-0.5 flex items-center gap-1 text-sm font-bold"
                 >
                   <ArrowDown className="rotate-90" height={16} width={16} />{" "}
                   home
@@ -106,12 +106,12 @@ export const Sidebar = (props: {
       <div className="flex max-h-[50%] flex-col gap-2">
         <People space_id={props.space_id} />
         {props.mobile && (
-          <div className="flex flex-row items-center justify-between p-2 pt-0 text-grey-55">
+          <div className="text-grey-55 flex flex-row items-center justify-between p-2 pt-0">
             <button onClick={() => setMobileSidebarOpen()}>
               <SidebarIcon />
             </button>
             <div className="flex gap-2">
-              <HelpButton />
+              <HelpButton onClick={() => setMobileSidebarOpen(false)} />
               <LoginOrHome space_id={props.space_id} />
             </div>
           </div>
@@ -131,7 +131,7 @@ const SpaceSwitcher = (props: { spaces: SpaceData[] }) => {
   return (
     <div className="flex items-center gap-2">
       <button
-        className="flex items-center gap-0 text-grey-55 hover:text-accent-blue "
+        className="text-grey-55 hover:text-accent-blue flex items-center gap-0 "
         onClick={() => {
           if (!params) return;
           router.push(
@@ -149,7 +149,7 @@ const SpaceSwitcher = (props: { spaces: SpaceData[] }) => {
         />
       </button>
       <button
-        className="flex items-center gap-0 text-grey-55 hover:text-accent-blue"
+        className="text-grey-55 hover:text-accent-blue flex items-center gap-0"
         onClick={() => {
           if (!params) return;
           router.push(
@@ -210,8 +210,8 @@ const RoomButton = (props: { roomID: string; children: React.ReactNode }) => {
     <button
       className={`relative flex w-full items-center gap-1 rounded-md border border-white px-1 py-0.5 ${
         isActiveRoom
-          ? "rounded-md border border-accent-blue bg-accent-blue font-bold text-white"
-          : "text-grey-35 hover:border hover:border-grey-80"
+          ? "border-accent-blue bg-accent-blue rounded-md border font-bold text-white"
+          : "text-grey-35 hover:border-grey-80 hover:border"
       }`}
       onClick={() => {
         let roomView = document.getElementById("roomWrapper");
@@ -228,7 +228,7 @@ export const SpaceName = (props: { truncate?: boolean; space_id: string }) => {
   let { data } = useSpaceData({ space_id: props.space_id });
 
   return (
-    <div className={`spaceName flex min-w-0 bg-inherit text-grey-35`}>
+    <div className={`spaceName text-grey-35 flex min-w-0 bg-inherit`}>
       {props.truncate ? (
         <Truncate className="w-full max-w-none overflow-hidden bg-inherit">
           <h3 className="SpaceName whitespace-nowrap">{data?.display_name}</h3>
@@ -260,7 +260,7 @@ export const SpaceOptions = (props: { space_id: string }) => {
             setEditModal(true);
             setMobileSidebarOpen(false);
           }}
-          className="shrink-0 rounded-md border border-transparent pt-[1px]  hover:text-accent-blue"
+          className="hover:text-accent-blue shrink-0 rounded-md border border-transparent  pt-[1px]"
         >
           <Settings />
         </button>
@@ -292,16 +292,16 @@ const MemberOptions = () => {
   return (
     <>
       <Popover.Root>
-        <Popover.Trigger className="shrink-0 rounded-md border border-transparent pt-[1px]  hover:text-accent-blue">
+        <Popover.Trigger className="hover:text-accent-blue shrink-0 rounded-md border border-transparent  pt-[1px]">
           <Settings />
         </Popover.Trigger>
         <Popover.Portal>
           <Popover.Content
-            className="z-50 flex max-w-xs flex-col gap-2 rounded-md border border-grey-80 bg-white py-2 drop-shadow-md"
+            className="border-grey-80 z-50 flex max-w-xs flex-col gap-2 rounded-md border bg-white py-2 drop-shadow-md"
             sideOffset={4}
           >
             <button
-              className="px-2 font-bold text-accent-red hover:bg-bg-blue"
+              className="text-accent-red hover:bg-bg-blue px-2 font-bold"
               onClick={() => setLeaveModalOpen(true)}
             >
               Leave space

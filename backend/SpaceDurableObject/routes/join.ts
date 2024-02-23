@@ -14,6 +14,7 @@ export const join_route = makeRoute({
   route: "join",
   input: z.object({
     code: z.string(),
+    joinFromStudioMate: z.boolean().optional(),
     authToken: authTokenVerifier,
     bio: z.string().optional(),
   }),
@@ -25,10 +26,38 @@ export const join_route = makeRoute({
         data: { success: false, error: "Invalid session token" },
       } as const;
 
-    let code = await env.storage.get<string>("meta-shareLink");
-    if (code !== msg.code)
+    let authorized = false;
+    if (msg.joinFromStudioMate) {
+      let { data, error } = await supabase
+        .from("spaces_in_studios")
+        .select(
+          `space_data!inner(do_id), studios!inner(members_in_studios!inner(member), allow_members_to_join_spaces)`
+        )
+        .eq("studios.members_in_studios.member", session.id)
+        .eq("space_data.do_id", env.id)
+        .single();
+      console.log(error);
+      if (!data)
+        return { data: { success: false, error: "Cannot find studio" } };
+      if (!data?.studios?.allow_members_to_join_spaces)
+        return {
+          data: {
+            success: false,
+            error: "Studio members are not allowed to join spaces",
+          },
+        };
+      authorized = true;
+    } else {
+      let code = await env.storage.get<string>("meta-shareLink");
+      if (code === msg.code) authorized = true;
+    }
+
+    if (!authorized)
       return {
-        data: { success: "false", error: "invalid share code" },
+        data: {
+          success: "false",
+          error: "You are not authorized to join this space",
+        },
       } as const;
 
     let space_type = await env.storage.get<string>("meta-space-type");
@@ -50,6 +79,13 @@ export const join_route = makeRoute({
         .single();
       isMember = !!data;
     }
+    if (isMember)
+      return {
+        data: {
+          success: false,
+          error: "You are already a member of this space",
+        },
+      } as const;
 
     let color = await getMemberColor(env.factStore);
     let memberEntity = ulid();
