@@ -18,6 +18,7 @@ export const useHasGetStartedItems = (props: Props) => {
   let completed = db.useEntity(home?.entity, "checklist/completed-by");
   if (!isMember) return false;
   if (
+    !getStartedItems ||
     getStartedItems.length === 0 ||
     completed?.find((m) => m.value.value === memberEntity)
   )
