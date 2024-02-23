@@ -4,6 +4,7 @@ import { app_event_route } from "./routes/app_event";
 import { create_space_route } from "./routes/create_space";
 import { create_studio_route } from "./routes/create_studio";
 import { feedback_route } from "./routes/feedback";
+import { get_daily_token_route } from "./routes/get_daily_token";
 import { get_identity_data_route } from "./routes/get_identity_data";
 import {
   get_space_data_by_id_route,
@@ -26,6 +27,7 @@ const Routes = [
   SignupRoute,
   LoginRoute,
   get_identity_data_route,
+  get_daily_token_route,
   get_space_data_by_name_route,
   get_space_data_by_id_route,
   get_studio_data_route,

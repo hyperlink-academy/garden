@@ -6,8 +6,7 @@ import {
 } from "@daily-co/daily-react";
 import { useCallback, useRef } from "react";
 import { useAuth } from "hooks/useAuth";
-import { useSpaceID } from "hooks/useReplicache";
-import { spaceAPI } from "backend/lib/api";
+import { workerAPI } from "backend/lib/api";
 
 export const CallProvider = (props: { children: React.ReactNode }) => {
   return (
@@ -37,18 +36,16 @@ const ScreenWake = () => {
 };
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
-export const useJoinCall = () => {
+export const useJoinCall = ({ space_id }: { space_id: string }) => {
   let call = useDaily();
   let { session, authToken } = useAuth();
-  let spaceID = useSpaceID();
 
   return useCallback(async () => {
     if (!session.session || !authToken || !call) return;
-    let token = await spaceAPI(
-      `${WORKER_URL}/space/${spaceID}`,
-      "get_daily_token",
-      { authToken }
-    );
+    let token = await workerAPI(`${WORKER_URL}`, "get_daily_token", {
+      authToken,
+      id: space_id,
+    });
     if (!token.success) return;
     call.updateInputSettings({
       audio: { processor: { type: "noise-cancellation" } },
@@ -59,5 +56,5 @@ export const useJoinCall = () => {
       userName: session.session?.username,
     });
     call.setLocalAudio(true);
-  }, [call, session.session, authToken, spaceID]);
+  }, [call, session.session, authToken, space_id]);
 };
