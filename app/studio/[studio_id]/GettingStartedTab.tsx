@@ -53,9 +53,9 @@ export function GetStartedTab(props: {
   );
 
   return (
-    <div className="mx-auto flex h-full max-w-2xl flex-col gap-2 pb-6 sm:pt-11">
+    <div className="mx-auto flex h-full max-w-2xl flex-col gap-4 pb-6 sm:pt-11">
       <h4 className="text-grey-35">
-        Welcome! Complete the following to get set up in this Studio!
+        Welcome! Complete the following to get set up in this Studio:
       </h4>
       <div className="lightBorder flex flex-col gap-2 p-2">
         {items.map((item) => {
@@ -89,9 +89,8 @@ export function GetStartedTab(props: {
           content="Complete Get Started!"
         />
         {completed === items.length && (
-          <div className="text-grey-55 text-sm">
-            Completing the Get Started removes <br /> it from your studio
-            sidebar!
+          <div className="max-w-[16rem] text-sm text-grey-55">
+            Completing removes <em>Get Started</em> from your Studio sidebar
           </div>
         )}
       </div>
@@ -126,8 +125,8 @@ function GetStartedItem(props: { entityID: string; value: string }) {
       <div
         className={`${
           checkedByUser
-            ? "text-grey-55 decoration-grey-80 line-through"
-            : "text-grey-35 font-bold"
+            ? "text-grey-55 line-through decoration-grey-80"
+            : "font-bold text-grey-35"
         } `}
       >
         {props.value}

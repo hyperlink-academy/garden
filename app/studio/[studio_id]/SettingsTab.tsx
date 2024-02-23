@@ -121,7 +121,7 @@ const StudioNameForm = ({
               }));
             }}
           />
-          <div className="text-grey-55 text-xs italic">
+          <div className="text-xs italic text-grey-55">
             {formState.name.length}/64
           </div>
         </div>
@@ -139,18 +139,20 @@ const OpenSpacesForm = ({
 }) => {
   return (
     <div className=" flex flex-col gap-4">
-      <div className="flex flex-col gap-1 ">
+      <div className="flex flex-col gap-2">
         <h4>Open Spaces</h4>
-
-        <div className="text-grey-35 flex flex-col gap-2 text-sm">
+        <div className="flex flex-col gap-2 text-sm text-grey-35">
           <p>
-            Members of studios can comment and chat in spaces in this studio,
-            but <b>cannot make or edit cards</b> in them unless they join the
-            spaces as members.
+            Studio members can comment and chat in Spaces in the Studio, but{" "}
+            <b>cannot make or edit cards</b> in them unless they join each
+            Space.
           </p>
           <p>
-            <b>If you enable this, members will be able to join any spaces</b>{" "}
-            in this studio without needing an explicit invite.
+            <b>
+              If you enable this setting, members will be able to join any
+              Spaces
+            </b>{" "}
+            in this Studio without needing an explicit invite link.
           </p>
         </div>
       </div>
@@ -191,11 +193,11 @@ const GetStartedForm = () => {
         {
           id: ulid(),
           value:
-            "Introduce yourself! Write a short bio on your member card in the Members tab!",
+            "Introduce yourself! Write a short bio on your member card in the 'Members' tab",
         },
         {
           id: ulid(),
-          value: "Create your first space in the Space Tab!",
+          value: "Create your first Space in the 'Spaces' tab!",
         },
       ]);
     } else {
@@ -219,17 +221,17 @@ const GetStartedForm = () => {
   return (
     <div className="flex w-full flex-col place-items-end gap-3">
       <div className="settingsGetStarted lightBorder flex flex-col gap-4 p-3">
-        <div className="flex flex-col gap-0.5 ">
+        <div className="flex flex-col gap-2">
           <h4>Get Started</h4>
-          <div className="text-grey-35 text-sm">
+          <p className="text-sm text-grey-35">
             If you enable this,{" "}
             <b>new members will see a &quot;Get Started&quot; tab </b>
-            when they join.
-            <br />
-            Create an onboarding checklist so new members know where to start!{" "}
-            <br />
+            when they join. Add an onboarding checklist so new members know
+            where to start!
+          </p>
+          <p className="text-sm text-grey-35">
             The tab will be visible until all items are checked off.
-          </div>
+          </p>
         </div>
         <div className="flex gap-2 font-bold">
           <input
@@ -249,7 +251,7 @@ const GetStartedForm = () => {
               >
                 <div className="grow">{item.value}</div>
                 <button
-                  className="hover:text-accent-blue text-grey-55 pt-1"
+                  className="pt-1 text-grey-55 hover:text-accent-blue"
                   onClick={() => {
                     setGetStartedItems((s) => {
                       let newItems = [...s];
@@ -282,7 +284,7 @@ const GetStartedForm = () => {
                 }}
               />
               <button
-                className="text-accent-blue pr-1"
+                className="pr-1 text-accent-blue"
                 onClick={(e) => {
                   e.preventDefault();
                   if (getStartedInput !== "") {
