@@ -10,12 +10,12 @@ import { PresenceHandler } from "components/PresenceHandler";
 import { useSpaceSyncState } from "hooks/useSpaceSyncState";
 import { WORKER_URL, springConfig } from "src/constants";
 import { useViewportSize } from "hooks/useViewportSize";
-import { Information, Question, SidebarIcon } from "components/Icons";
+import { InfoTiny, Information, Question, SidebarIcon } from "components/Icons";
 import { SpaceName, SpaceOptions } from "components/SpaceLayout/Sidebar";
 import { useSpring, animated } from "@react-spring/web";
 import { createPortal } from "react-dom";
 import { useAuth } from "hooks/useAuth";
-import { ButtonPrimary } from "components/Buttons";
+import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
 import { LoginOrSignupModal } from "components/LoginModal";
 import Link from "next/link";
 import { Search, MobileSearch } from "components/Search";
@@ -74,16 +74,13 @@ const DesktopLayout = (props: Props) => {
         ) : (
           <Header space_id={props.space_id} />
         )}
-        <div>
-          <SpaceRoleBadge space_id={props.space_id} />
-          <div className="spaceHeaderSearch text-grey-55 flex w-[440px] shrink-0 flex-row items-center gap-2">
-            <HelpButton />
+        <div className="flex flex-col place-items-end gap-1 ">
+          <HelpButton />
 
-            {!session.loggedIn ? (
-              <LoginButton />
-            ) : (
-              <SpaceOptions space_id={props.space_id} />
-            )}
+          <div className="spaceHeaderSearch text-grey-55 flex w-[480px] shrink-0 flex-row items-center gap-0">
+            {session.loggedIn && <SpaceOptions space_id={props.space_id} />}
+
+            <SpaceRoleBadge space_id={props.space_id} />
 
             <Search />
           </div>
@@ -117,24 +114,55 @@ const SpaceRoleBadge = (props: { space_id: string }) => {
   );
   let isStudioMate = spaceData?.spaces_in_studios.find(
     (s) =>
-      s.studios?.allow_members_to_join_spaces &&
-      !!s.studios.members_in_studios.find((f) => f.member === session.user?.id)
+      !!s.studios?.members_in_studios.find((f) => f.member === session.user?.id)
   );
 
-  if (!isMember && !isStudioMate) return null;
+  let spaceIsOpenInvite = spaceData?.spaces_in_studios?.find(
+    (s) => s.studios?.allow_members_to_join_spaces
+  )?.studios?.allow_members_to_join_spaces;
 
   return (
-    <div className="bg-bg-blue lightBorder mx-3 flex w-fit items-center gap-1 px-2 py-1 text-sm font-bold sm:mx-4">
-      {isMember ? `You're a member!` : `You&apos;re a Studiomate!`}
-      <InfoPopover>
-        <p>You can comment and react on cards. You can also chat!</p>{" "}
-        <p>
-          In order to make and edit cards, you need to become a space member!
-        </p>
-      </InfoPopover>
-      {!isMember && isStudioMate && (
-        <ButtonPrimary
-          content="join!"
+    <div className="flex gap-2">
+      <div
+        className={`flex h-[30px] w-fit items-center gap-2 place-self-end rounded-full border px-[8px] py-[2px] text-sm font-bold ${
+          isMember
+            ? "border-grey-80 bg-bg-blue text-grey-55 ml-2"
+            : isStudioMate
+            ? "border-grey-80 bg-grey-90 text-grey-55 "
+            : "border-grey-80 text-grey-55"
+        }`}
+      >
+        {isMember ? (
+          <InfoPopover triggerTitle="Member">
+            <p>
+              <b>You have full access!</b> Make and edit cards, comment, chat,
+              anything you want!
+            </p>
+          </InfoPopover>
+        ) : isStudioMate ? (
+          <InfoPopover triggerTitle="Studiomate">
+            <p>
+              You can <b>comment and react on cards</b>. You can also{" "}
+              <b>chat</b>!
+            </p>
+            <p>
+              In order to make and edit cards, you need to join this space.
+              {!spaceIsOpenInvite && "Ask a member to invite you!"}
+            </p>
+          </InfoPopover>
+        ) : (
+          <div className="flex w-max items-center">
+            <div>Guest</div>
+          </div>
+        )}
+      </div>
+
+      {!session.loggedIn && <LoginButton />}
+
+      {!isMember && isStudioMate && spaceIsOpenInvite && (
+        <ButtonSecondary
+          content="Join!"
+          className="!mr-2 !bg-transparent !py-[1px]"
           onClick={async () => {
             if (!authToken) return;
             let data = await spaceAPI(
@@ -182,7 +210,11 @@ const LoginButton = () => {
   let [state, setState] = LoginOrSignupModal.useState("closed");
   return (
     <>
-      <ButtonPrimary content="Log In" onClick={() => setState("login")} />
+      <ButtonPrimary
+        content="Log In"
+        onClick={() => setState("login")}
+        className="!mr-2 !py-[1px]"
+      />
       <LoginOrSignupModal state={state} setState={setState} />
     </>
   );
@@ -243,14 +275,17 @@ const MobileLayout = (props: Props) => {
         </div>
         <div className="w-2 shrink-0 snap-start" />
       </div>
-      <div className="navFooter pwa-padding-bottom flex flex-row justify-between px-2">
+      <div className="mobileFooter pwa-padding-bottom flex w-full flex-row gap-2 px-2">
         <div
-          className="sidebarTrigger text-grey-55 flex flex-row gap-2"
+          className="sidebarTrigger text-grey-55 flex grow flex-row gap-2"
           ref={droppableRef}
         >
           <button onClick={() => setSidebarOpen()}>
             <SidebarIcon />
           </button>
+        </div>
+        <div color="">
+          <SpaceRoleBadge space_id={props.space_id} />
         </div>
         <MobileSearch />
       </div>
@@ -338,31 +373,38 @@ const MobileSidebar = (props: Props) => {
   );
 };
 
-export const HelpButton = () => {
+export const HelpButton = (props: { onClick?: () => void }) => {
   let [open, setOpen] = useState(false);
   return (
     <>
       <button
-        onClick={() => setOpen(true)}
-        className="  text-grey-55 hover:text-accent-blue "
+        onClick={() => {
+          setOpen(true);
+          props.onClick?.();
+        }}
+        className="hover:text-accent-blue text-grey-55 mr-2 w-fit text-sm hover:underline"
       >
-        <Question />
+        help docs!
       </button>
       <HelpModal open={open} onClose={() => setOpen(false)} />
     </>
   );
 };
 
-const InfoPopover = (props: { children: React.ReactNode }) => {
+const InfoPopover = (props: {
+  children: React.ReactNode;
+  triggerTitle: string;
+}) => {
   return (
     <Popover.Root>
       <Popover.Trigger>
-        <button className="flex place-items-center ">
-          <Information />
+        <button className="flex place-items-center gap-1">
+          {props.triggerTitle}
+          <InfoTiny />
         </button>
       </Popover.Trigger>
       <Popover.Portal>
-        <Popover.Content sideOffset={2} className="z-50">
+        <Popover.Content sideOffset={2} collisionPadding={16} className="z-50">
           <div className="lightBorder text-grey-55 flex max-w-xs flex-col gap-2 rounded-sm bg-white p-2 text-xs font-normal shadow-lg">
             {props.children}
           </div>
