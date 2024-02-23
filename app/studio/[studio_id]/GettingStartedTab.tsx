@@ -21,7 +21,7 @@ export function GettingStartedTab() {
   let home = db.useAttribute("home")[0];
   let items = db.useEntity(home?.entity, "checklist/item") || [];
   return (
-    <div>
+    <div className="mx-auto flex h-full max-w-2xl flex-col gap-3 pb-6 sm:pt-6">
       {items.map((item) => {
         return (
           <GettingStartedItem
@@ -41,9 +41,10 @@ function GettingStartedItem(props: { entityID: string; value: string }) {
   let checkedByUser = checkedBy?.find((m) => m.value.value === memberEntity);
 
   return (
-    <div className="flex flex-row gap-2">
+    <div className="lightBorder flex w-full flex-row items-start gap-3 bg-white p-2 ">
       <input
         type="checkbox"
+        className="mt-[7px]"
         checked={!!checkedByUser}
         onChange={async (e) => {
           if (!memberEntity) return;
@@ -53,8 +54,16 @@ function GettingStartedItem(props: { entityID: string; value: string }) {
             checked: e.currentTarget.checked,
           });
         }}
-      />{" "}
-      {props.value}
+      />
+      <div
+        className={`${
+          checkedByUser
+            ? "text-grey-55 decoration-grey-80 line-through"
+            : "test-grey-35 font-bold"
+        } `}
+      >
+        {props.value}
+      </div>
     </div>
   );
 }
