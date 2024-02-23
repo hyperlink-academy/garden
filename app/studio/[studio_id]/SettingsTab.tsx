@@ -217,7 +217,7 @@ const GetStartedForm = () => {
     }, false) || getStartedItems.length !== existingGetStartedItems?.length;
 
   return (
-    <div className="flex flex-col place-items-end gap-3">
+    <div className="flex w-full flex-col place-items-end gap-3">
       <div className="settingsGetStarted lightBorder flex flex-col gap-4 p-3">
         <div className="flex flex-col gap-0.5 ">
           <h4>Get Started</h4>
