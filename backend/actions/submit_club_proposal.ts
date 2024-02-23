@@ -1,16 +1,21 @@
 "use server";
 
-export async function submit_club_proposal(formData: FormData) {
-  const name = formData.get("name");
-  const email = formData.get("email");
-  const about = formData.get("about");
-  const activity = formData.get("activity");
-  const structure = formData.get("structure");
-  const success = formData.get("success");
-  if (!email || !name || !about || !activity || !structure || !success) {
-    return;
-  }
-
+export type FormState = {
+  name: string;
+  email: string;
+  about: string;
+  activity: string;
+  structure: string;
+  success: string;
+};
+export async function submit_club_proposal({
+  name,
+  email,
+  about,
+  activity,
+  structure,
+  success,
+}: FormState) {
   const postmarkApiToken = process.env.POSTMARK_API_TOKEN;
   if (!postmarkApiToken) return;
 
@@ -37,6 +42,5 @@ What does success look like?:\n${success}
 `,
     }),
   });
-  console.log(await res.json());
   return { data: {} };
 }
