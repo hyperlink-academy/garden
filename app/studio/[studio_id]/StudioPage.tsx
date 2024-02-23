@@ -21,6 +21,8 @@ import { WORKER_URL } from "src/constants";
 import { useSearchParams } from "next/navigation";
 import { useToaster } from "components/Smoke";
 import { uuidToBase62 } from "src/uuidHelpers";
+import { Settings as SettingsIcon } from "components/Icons";
+
 import { GetStartedTab, useHasGetStartedItems } from "./GettingStartedTab";
 
 export type Props = {
@@ -36,7 +38,7 @@ const TabsList = (props: Props & { className: string }) => {
       <TabItem name="About" />
       <TabItem name="Spaces" />
       <TabItem name="Members" />
-      {props.isAdmin ? <TabItem name="Settings" /> : null}
+      {props.isAdmin ? <TabItem name={<SettingsIcon />} /> : null}
     </Tab.List>
   );
 };
@@ -70,11 +72,11 @@ const TabPanels = (
   );
 };
 
-const TabItem = (props: { name: string }) => (
+const TabItem = (props: { name: React.ReactNode }) => (
   <Tab as={Fragment}>
     {({ selected }) => (
       <button
-        className={`text-right outline-none ${
+        className={`place-self-end  outline-none ${
           selected
             ? "text-accent-blue font-bold"
             : "text-grey-35 hover:text-accent-blue"
@@ -200,9 +202,7 @@ const StudioMobileNav = (props: Props) => {
       </h3>
 
       <div className="pwa-padding pwa-negative-margin border-grey-80 bg-background sticky top-0  z-10 -mx-3 mb-4 border-b px-3 pb-1">
-        <div className=" flex gap-2 pt-4">
-          <TabsList className="StudioTabs flex gap-4" {...props} />
-        </div>
+        <TabsList className="StudioTabs flex gap-3 pt-4" {...props} />
       </div>
     </>
   );
