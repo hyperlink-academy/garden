@@ -8,7 +8,7 @@ import { DotLoader } from "components/DotLoader";
 import { useState } from "react";
 export function ProposeClubForm() {
   let [status, setStatus] = useState<"normal" | "loading" | "success">(
-    "success"
+    "normal"
   );
   let [formState, setFormState] = useState<FormState>({
     name: "",
