@@ -96,6 +96,12 @@ export function StudioPageContent(props: Props) {
   let [selectedIndex, setSelectedIndex] = useState(
     session.session && authorized ? 1 : 0
   );
+  let hasGettingStartedItems = useHasGetStartedItems(props);
+  useEffect(() => {
+    setSelectedIndex(
+      hasGettingStartedItems ? 0 : session.session && authorized ? 2 : 1
+    );
+  }, [hasGettingStartedItems, session, authorized]);
 
   const [isClient, setIsClient] = useState(false);
   useEffect(() => {
