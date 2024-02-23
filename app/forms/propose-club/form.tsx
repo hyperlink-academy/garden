@@ -199,12 +199,10 @@ export function ProposeClubForm() {
       </label>
 
       <div className="grid justify-items-end text-right">
-        (
         <ButtonPrimary
           content={status === "loading" ? <DotLoader /> : "Submit!"}
           type="submit"
         />
-        )
       </div>
     </form>
   );
