@@ -35,19 +35,26 @@ const TabsList = (props: Props & { className: string }) => {
   let hasGettingStartedItems = useHasGettingStartedItems(props);
   return (
     <Tab.List className={props.className}>
+      {hasGettingStartedItems ? <TabItem name="Getting Started" /> : null}
       <TabItem name="About" />
       <TabItem name="Spaces" />
       <TabItem name="Members" />
       {props.isAdmin ? <TabItem name="Settings" /> : null}
-      {hasGettingStartedItems ? <TabItem name="Getting Started" /> : null}
     </Tab.List>
   );
 };
 
-const TabPanels = (props: Props) => {
+const TabPanels = (
+  props: Props & { setSelectedIndex: (i: number) => void }
+) => {
   let hasGettingStartedItems = useHasGettingStartedItems(props);
   return (
     <Tab.Panels className="StudioTabContent h-full min-h-0 ">
+      {hasGettingStartedItems ? (
+        <Tab.Panel className="h-full">
+          <GettingStartedTab setSelectedTab={props.setSelectedIndex} />
+        </Tab.Panel>
+      ) : null}
       <Tab.Panel className="h-full">
         <About />
       </Tab.Panel>
@@ -60,11 +67,6 @@ const TabPanels = (props: Props) => {
       {props.isAdmin ? (
         <Tab.Panel className="h-full">
           <Settings {...props} />
-        </Tab.Panel>
-      ) : null}
-      {hasGettingStartedItems ? (
-        <Tab.Panel className="h-full">
-          <GettingStartedTab />
         </Tab.Panel>
       ) : null}
     </Tab.Panels>
@@ -122,7 +124,11 @@ export function StudioPageContent(props: Props) {
             <div
               className={`StudioContent flex w-full grow flex-col items-stretch`}
             >
-              <TabPanels data={data || props.data} isAdmin={props.isAdmin} />
+              <TabPanels
+                data={data || props.data}
+                isAdmin={props.isAdmin}
+                setSelectedIndex={setSelectedIndex}
+              />
             </div>
           </Tab.Group>
         </div>
