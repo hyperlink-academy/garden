@@ -25,7 +25,7 @@ export function ProposeClubForm() {
         <div className="lightBorder mx-auto flex max-w-md flex-col justify-center gap-2 bg-white p-2 text-center text-lg font-bold">
           Thanks for proposing a club!
           <br />
-          We'll get back to you soon.
+          We&apos;ll get back to you soon.
           <ButtonPrimary
             className="mx-auto justify-self-center"
             onClick={() => {
