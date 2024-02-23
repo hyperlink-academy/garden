@@ -78,7 +78,7 @@ const TabItem = (props: { name: React.ReactNode }) => (
       <button
         className={`place-self-end  outline-none ${
           selected
-            ? "text-accent-blue font-bold"
+            ? "font-bold text-accent-blue"
             : "text-grey-35 hover:text-accent-blue"
         }`}
       >
@@ -155,13 +155,13 @@ const StudioDesktopNav = (props: Props) => {
   let { session } = useAuth();
 
   return (
-    <div className="studioNav border-grey-80 my-6 mr-4 w-64 flex-col justify-between border-r pr-4">
+    <div className="studioNav my-6 mr-4 w-64 flex-col justify-between border-r border-grey-80 pr-4">
       <div className="flex w-full flex-col gap-2 text-right">
         <div className="flex flex-col gap-0">
           {session.session ? (
             <Link
               href={`/s/${session.session.username}`}
-              className="text-grey-55 hover:text-accent-blue -mb-1 flex items-center justify-end gap-2 text-sm font-bold"
+              className="-mb-1 flex items-center justify-end gap-2 text-sm font-bold text-grey-55 hover:text-accent-blue"
             >
               <ArrowDown className="rotate-90" height={16} width={16} /> home
             </Link>
@@ -188,7 +188,7 @@ const StudioMobileNav = (props: Props) => {
       {session.session ? (
         <Link
           href={`/s/${session.session.username}`}
-          className="text-grey-55 hover:text-accent-blue z-30 mt-3 flex items-center gap-2 text-sm"
+          className="z-30 mt-3 flex items-center gap-2 text-sm text-grey-55 hover:text-accent-blue"
           style={{ transform: "translate3D(0,0,0)" }}
         >
           <ArrowDown className="rotate-90" height={16} width={16} /> home
@@ -201,7 +201,7 @@ const StudioMobileNav = (props: Props) => {
         {data?.name}
       </h3>
 
-      <div className="pwa-padding pwa-negative-margin border-grey-80 bg-background sticky top-0  z-10 -mx-3 mb-4 border-b px-3 pb-1">
+      <div className="pwa-padding pwa-negative-margin sticky top-0 z-10 -mx-3  mb-4 border-b border-grey-80 bg-background px-3 pb-1">
         <TabsList className="StudioTabs flex gap-3 pt-4" {...props} />
       </div>
     </>
@@ -285,7 +285,7 @@ const StudioBanner = (props: Props) => {
       />
 
       <div
-        className={`studioBanner lightBorder text-grey-55 mx-auto mt-4 flex w-full max-w-7xl shrink-0 grow-0 border px-2 py-1 text-sm sm:px-4 ${
+        className={`studioBanner lightBorder mx-auto mt-4 flex w-full max-w-7xl shrink-0 grow-0 border px-2 py-1 text-sm text-grey-55 sm:px-4 ${
           joinCode ? " bg-bg-blue" : "bg-grey-90 "
         }`}
       >
@@ -304,16 +304,16 @@ const StudioBanner = (props: Props) => {
               </div>
               <div className="flex w-full flex-col  items-center justify-center gap-1 sm:flex-row sm:gap-6">
                 <div className="flex items-center gap-1 ">
-                  You&apos;re invited to join this studio!
+                  You&apos;re invited to join this Studio!
                   <InfoPopover>
                     <p>
-                      Members can <b> create new spaces</b>, and{" "}
-                      <b>comment in spaces </b>
-                      within the studio.
+                      Members can <b> add new Spaces</b>, and{" "}
+                      <b>comment in Spaces </b>
+                      within the Studio.
                     </p>
                     <p>
-                      However, you need to <b>join to each space</b> in order to
-                      add or edit cards in them.
+                      However, you need to <b>join each Space</b> to add or edit
+                      cards in them.
                     </p>
                   </InfoPopover>
                 </div>
@@ -335,9 +335,10 @@ const StudioBanner = (props: Props) => {
           ) : (
             <div className="studioBannerNoInvite z-30 flex w-full items-center justify-between gap-6 sm:justify-center">
               <div className="flex items-center gap-1 ">
-                You are spectating this studio!{" "}
+                You are spectating this Studio!{" "}
                 <InfoPopover>
-                  You need an invite to add spaces or make comments here!
+                  You&apos;ll need an invite to add Spaces or comment on Spaces
+                  here.
                 </InfoPopover>
               </div>
               {!session.session && <LoginButton />}
@@ -359,7 +360,7 @@ const InfoPopover = (props: { children: React.ReactNode }) => {
       </Popover.Trigger>
       <Popover.Portal>
         <Popover.Content sideOffset={2} className="z-50">
-          <div className="lightBorder text-grey-55 flex max-w-xs flex-col gap-2 rounded-sm bg-white p-2 text-xs font-normal shadow-lg">
+          <div className="lightBorder rounded-sm flex max-w-xs flex-col gap-2 bg-white p-2 text-xs font-normal text-grey-55 shadow-lg">
             {props.children}
           </div>
           <Popover.Close />

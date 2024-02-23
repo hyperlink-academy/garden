@@ -31,8 +31,7 @@ export async function submit_club_proposal({
       CC: email,
       Subject: `Club Proposal from ${name} - ${email}`,
       ReplyTo: email,
-      TextBody: `
-New internet club proposal!\n
+      TextBody: `New internet club proposal!\n
 Name: ${name}\n
 Email: ${email}\n
 What's your club about?:\n${about}\n

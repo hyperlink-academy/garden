@@ -21,11 +21,13 @@ export function ProposeClubForm() {
 
   if (status === "success")
     return (
-      <div className="flex h-screen place-items-center p-2">
+      <div className="flex h-screen place-items-center p-4">
         <div className="lightBorder mx-auto flex max-w-md flex-col justify-center gap-2 bg-white p-2 text-center text-lg font-bold">
-          Thanks for proposing a club!
-          <br />
-          We&apos;ll get back to you soon.
+          <h2>Thanks for proposing a club!</h2>
+          <p>
+            We emailed you a copy of your submission, and we&apos;ll get back to
+            you soon.
+          </p>
           <ButtonPrimary
             className="mx-auto justify-self-center"
             onClick={() => {

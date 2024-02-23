@@ -77,7 +77,7 @@ const DesktopLayout = (props: Props) => {
         <div className="flex flex-col place-items-end gap-1 ">
           <HelpButton />
 
-          <div className="spaceHeaderSearch text-grey-55 flex w-[480px] shrink-0 flex-row items-center gap-0">
+          <div className="spaceHeaderSearch flex w-[480px] shrink-0 flex-row items-center gap-0 text-grey-55">
             {session.loggedIn && <SpaceOptions space_id={props.space_id} />}
 
             <SpaceRoleBadge space_id={props.space_id} />
@@ -90,8 +90,8 @@ const DesktopLayout = (props: Props) => {
         id="space-layout"
         className=" no-scrollbar spaceLargeSplitLayout mx-auto flex h-full w-full max-w-[1332px] snap-x snap-mandatory flex-row items-stretch gap-4 overflow-y-hidden overflow-x-scroll scroll-smooth px-4 sm:gap-4  md:overflow-x-hidden"
       >
-        <div className="spaceRoomAndSidebar border-grey-90 flex  shrink-0 snap-center snap-always  flex-row rounded-md border">
-          <div className="border-r-grey-90 shrink-0 rounded-l-md border border-transparent bg-white">
+        <div className="spaceRoomAndSidebar flex shrink-0  snap-center snap-always flex-row  rounded-md border border-grey-90">
+          <div className="shrink-0 rounded-l-md border border-transparent border-r-grey-90 bg-white">
             <Sidebar space_id={props.space_id} />
           </div>
 
@@ -126,7 +126,7 @@ const SpaceRoleBadge = (props: { space_id: string }) => {
       <div
         className={`flex h-[30px] w-fit items-center gap-2 place-self-end rounded-full border px-[8px] py-[2px] text-sm font-bold ${
           isMember
-            ? "border-grey-80 bg-bg-blue text-grey-55 ml-2"
+            ? "ml-2 border-grey-80 bg-bg-blue text-grey-55"
             : isStudioMate
             ? "border-grey-80 bg-grey-90 text-grey-55 "
             : "border-grey-80 text-grey-55"
@@ -142,12 +142,11 @@ const SpaceRoleBadge = (props: { space_id: string }) => {
         ) : isStudioMate ? (
           <InfoPopover triggerTitle="Studiomate">
             <p>
-              You can <b>comment and react on cards</b>. You can also{" "}
-              <b>chat</b>!
+              You can <b>chat and comment on cards</b> here!
             </p>
             <p>
-              In order to make and edit cards, you need to join this space.
-              {!spaceIsOpenInvite && "Ask a member to invite you!"}
+              To make and edit cards, you need to join this Space.
+              {!spaceIsOpenInvite && " Ask a member to invite you!"}
             </p>
           </InfoPopover>
         ) : (
@@ -186,12 +185,12 @@ const Header = (props: { space_id: string }) => {
   let { session } = useAuth();
   return (
     <div className="spaceHeaderInfo -mb-1 ml-2 flex min-w-0 shrink grow flex-row items-stretch gap-2 px-3 py-1 font-bold ">
-      <div className="spaceName bg-background text-grey-35 flex w-full min-w-0 grow justify-between">
+      <div className="spaceName flex w-full min-w-0 grow justify-between bg-background text-grey-35">
         <div className="flex w-full flex-col gap-0">
           <div className="flex flex-row items-center gap-2">
             {session.session && (
               <Link href={`/s/${session.session.username}`}>
-                <h4 className="text-grey-55 hover:text-accent-blue text-sm">
+                <h4 className="text-sm text-grey-55 hover:text-accent-blue">
                   home
                 </h4>
               </Link>
@@ -264,7 +263,7 @@ const MobileLayout = (props: Props) => {
         >
           <div
             id="roomInnerWrapper"
-            className="roomInnerWrapper no-scrollbar border-grey-90 relative flex h-full flex-shrink-0 flex-col gap-0 rounded-md border "
+            className="roomInnerWrapper no-scrollbar relative flex h-full flex-shrink-0 flex-col gap-0 rounded-md border border-grey-90 "
           >
             <Room />
           </div>
@@ -277,7 +276,7 @@ const MobileLayout = (props: Props) => {
       </div>
       <div className="mobileFooter pwa-padding-bottom flex w-full flex-row gap-2 px-2">
         <div
-          className="sidebarTrigger text-grey-55 flex grow flex-row gap-2"
+          className="sidebarTrigger flex grow flex-row gap-2 text-grey-55"
           ref={droppableRef}
         >
           <button onClick={() => setSidebarOpen()}>
@@ -351,7 +350,7 @@ const MobileSidebar = (props: Props) => {
         <animated.div
           {...bindOverlay()}
           onClick={() => setSidebarOpen(false)}
-          className="bg-grey-15 fixed inset-0 z-40 touch-none"
+          className="fixed inset-0 z-40 touch-none bg-grey-15"
           style={{ ...opacity, display: open ? "block" : "none" }}
         >
           <div className="z-40 ml-auto h-full w-2/3" ref={droppableRef} />
@@ -362,7 +361,7 @@ const MobileSidebar = (props: Props) => {
         className="pwa-padding pwa-padding-bottom fixed top-0 z-50 ml-2 p-1 py-[2px] pl-0"
       >
         <div
-          className="border-grey-90 h-full touch-none rounded-md border bg-white"
+          className="h-full touch-none rounded-md border border-grey-90 bg-white"
           {...bindSidebar()}
         >
           <Sidebar mobile studio={props.studio} space_id={props.space_id} />
@@ -382,7 +381,7 @@ export const HelpButton = (props: { onClick?: () => void }) => {
           setOpen(true);
           props.onClick?.();
         }}
-        className="hover:text-accent-blue text-grey-55 mr-2 w-fit text-sm hover:underline"
+        className="mr-2 w-fit text-sm text-grey-55 hover:text-accent-blue hover:underline"
       >
         help docs!
       </button>
@@ -405,7 +404,7 @@ const InfoPopover = (props: {
       </Popover.Trigger>
       <Popover.Portal>
         <Popover.Content sideOffset={2} collisionPadding={16} className="z-50">
-          <div className="lightBorder text-grey-55 flex max-w-xs flex-col gap-2 rounded-sm bg-white p-2 text-xs font-normal shadow-lg">
+          <div className="lightBorder rounded-sm flex max-w-xs flex-col gap-2 bg-white p-2 text-xs font-normal text-grey-55 shadow-lg">
             {props.children}
           </div>
           <Popover.Close />
