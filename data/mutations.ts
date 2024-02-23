@@ -542,6 +542,31 @@ const replaceCard: Mutation<{ currentCard: string; newCard: string }> = async (
   ]);
 };
 
+export const checkCheckListItem: Mutation<{
+  itemEntity: string;
+  memberEntity: string;
+  checked: boolean;
+}> = async (args, ctx) => {
+  let checkedBy = await ctx.scanIndex.eav(
+    args.itemEntity,
+    "checklist/item-completed-by"
+  );
+  let memberChecked = checkedBy.find(
+    (c) => c.value.value === args.memberEntity
+  );
+  if (!!memberChecked === args.checked) return;
+  if (args.checked)
+    await ctx.assertFact({
+      entity: args.itemEntity,
+      attribute: "checklist/item-completed-by",
+      value: ref(args.memberEntity),
+      positions: {},
+    });
+  else if (memberChecked) {
+    await ctx.retractFact(memberChecked.id);
+  }
+};
+
 export const Mutations = {
   replaceCard,
   markRead,
@@ -563,6 +588,7 @@ export const Mutations = {
   initializeClient,
   setClientInCall,
   createRoom,
+  checkCheckListItem,
 };
 
 export const StudioMatePermissions: Array<keyof typeof Mutations> = [

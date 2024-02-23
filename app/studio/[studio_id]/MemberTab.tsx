@@ -26,14 +26,14 @@ export function Members({ data, isAdmin }: Props) {
 
   return (
     <div className="no-scrollbar mx-auto  h-full max-w-md  overflow-y-scroll  ">
-      <div className="flex flex-col gap-4 pb-6 sm:pt-6">
+      <div className="flex flex-col gap-4 pb-6 sm:pt-8">
         {isAdmin && (
           <InviteModal welcomeMessage={data.welcome_message} id={data.id} />
         )}
         {/* your studio member card */}
         {session.session && authorized && (
           <div className="flex flex-col gap-2">
-            <div className="text-sm italic text-grey-55">
+            <div className="text-grey-55 text-sm italic">
               click your bio to edit it!
             </div>
 
@@ -154,7 +154,7 @@ export const MemberCard = (props: {
         </div>
         <div className="grow p-1 pt-1">
           <div
-            className={`studioMemberContent mt-0 flex h-full flex-col items-start gap-2 overflow-hidden rounded-md bg-white p-2 text-sm text-grey-35 ${
+            className={`studioMemberContent text-grey-35 mt-0 flex h-full flex-col items-start gap-2 overflow-hidden rounded-md bg-white p-2 text-sm ${
               !expanded && "max-h-[200px]"
             }`}
           >
@@ -201,7 +201,7 @@ export const MemberCard = (props: {
               <>
                 <Divider />
                 <div
-                  className={`flex shrink-0  gap-1 text-grey-55 ${
+                  className={`text-grey-55 flex  shrink-0 gap-1 ${
                     expanded ? "flex-col" : "justify-between"
                   }`}
                 >
@@ -212,7 +212,7 @@ export const MemberCard = (props: {
                         className="w-fit"
                         key={space.id}
                       >
-                        <div className="flex flex-row gap-1 text-sm hover:font-bold hover:text-accent-blue">
+                        <div className="hover:text-accent-blue flex flex-row gap-1 text-sm hover:font-bold">
                           <DoorImage small {...space} width="16" />
                           {space.display_name}
                         </div>
@@ -224,7 +224,7 @@ export const MemberCard = (props: {
                         href={`/studio/${params?.studio_id}/space/${props.spaces[0].id}`}
                         className="w-fit"
                       >
-                        <div className="flex flex-row gap-1 text-sm hover:font-bold hover:text-accent-blue">
+                        <div className="hover:text-accent-blue flex flex-row gap-1 text-sm hover:font-bold">
                           <DoorImage small {...props.spaces[0]} width="16" />
                           {props.spaces[0].display_name}
                         </div>
@@ -274,7 +274,7 @@ function InviteModal(props: { welcomeMessage: string; id: string }) {
 
   return (
     <>
-      <div className="lightBorder m-auto flex w-full max-w-2xl flex-row items-center justify-between bg-bg-blue p-2 text-grey-55">
+      <div className="lightBorder bg-bg-blue text-grey-55 m-auto flex w-full max-w-2xl flex-row items-center justify-between p-2">
         Add a new member!{" "}
         <ButtonPrimary
           icon={<MemberAdd />}
@@ -297,11 +297,11 @@ function InviteModal(props: { welcomeMessage: string; id: string }) {
             They won&apos;t be able to otherwise edit Spaces unless explicitly
             invited.
           </p>
-          <div className="flex flex-col gap-3 rounded-md border border-grey-80 bg-bg-blue p-2">
+          <div className="border-grey-80 bg-bg-blue flex flex-col gap-3 rounded-md border p-2">
             <h4>Send this invite link</h4>
             <div className="inviteMemberModalLink flex w-full gap-2">
               <input
-                className="grow bg-grey-90 text-grey-35"
+                className="bg-grey-90 text-grey-35 grow"
                 readOnly
                 value={inviteLink}
                 onClick={getShareLink}
@@ -325,7 +325,7 @@ function InviteModal(props: { welcomeMessage: string; id: string }) {
               <Textarea
                 value={welcomeMessage}
                 onChange={(e) => setWelcomeMessage(e.currentTarget.value)}
-                className="w-full rounded-md border border-grey-55 p-2"
+                className="border-grey-55 w-full rounded-md border p-2"
                 placeholder="Add a welcome message…"
               />
               <ButtonPrimary

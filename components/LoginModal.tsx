@@ -19,6 +19,7 @@ export const LoginOrSignupModal = (props: {
   state: "login" | "signup" | "closed";
   setState: (s: "login" | "signup" | "closed") => void;
   onLogin?: (s: {
+    id: string;
     username?: string;
     authToken: {
       access_token: string;
@@ -92,6 +93,7 @@ export const OAuth = (props: { actionLabel: string; redirectTo?: string }) => {
 
 export function LoginForm(props: {
   onLogin?: (s: {
+    id: string;
     username?: string;
     authToken: {
       access_token: string;
@@ -133,6 +135,7 @@ export function LoginForm(props: {
           : router.push("/setup");
       } else
         props.onLogin({
+          id: result.data.user.id,
           username: result.data.user.user_metadata.username as string,
           authToken: result.data.session,
         });

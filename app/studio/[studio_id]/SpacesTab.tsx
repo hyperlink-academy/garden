@@ -45,14 +45,14 @@ export function SpaceList({ data }: Props) {
 
   if (!data) return;
   return (
-    <div className="no-scrollbar studioSpacesWrapper mx-auto h-full overflow-y-scroll pb-6 sm:pt-6">
+    <div className="no-scrollbar studioSpacesWrapper mx-auto h-full overflow-y-scroll pb-6 sm:pt-10">
       <div className="studioSpaces flex h-full w-full flex-col gap-4">
         <div className="studioSpacesOptions flex w-full items-center justify-between gap-3  ">
           {authorized && <AddSpace id={data.id} />}
 
           {allSpaces.length > 0 && (
             <div className="studioSpacesSearch relative flex flex-row">
-              <RoomSearch className="absolute right-2 top-[10px] text-grey-55" />
+              <RoomSearch className="text-grey-55 absolute right-2 top-[10px]" />
               <input
                 className="h-fit w-full max-w-sm bg-white py-1 pl-2 pr-6 outline-none sm:w-64"
                 value={search}
@@ -68,7 +68,7 @@ export function SpaceList({ data }: Props) {
             </div>
           )}
         </div>
-        <div className=" studioSpaceListWrapper no-scrollbar relative flex h-full w-full flex-col gap-8 overflow-y-scroll pt-4">
+        <div className=" studioSpaceListWrapper no-scrollbar relative flex h-full w-full flex-col gap-8 overflow-y-scroll ">
           {allSpaces.length > 0 ? (
             <>
               <List
@@ -109,7 +109,7 @@ const List = (props: { spaces: Array<SpaceData> }) => {
                   <SpacePresence entityID={p.entity} key={p.entity} />
                 ))}
                 {presences.length < 5 ? null : (
-                  <div className=" mt-1 flex items-center gap-0.5 rounded-t-md bg-accent-blue px-[6px]  pb-2 pt-0.5 text-xs font-bold text-white">
+                  <div className=" bg-accent-blue mt-1 flex items-center gap-0.5 rounded-t-md px-[6px]  pb-2 pt-0.5 text-xs font-bold text-white">
                     + {presences.length - 4}
                     <span>
                       <RoomMember />
@@ -156,7 +156,7 @@ const HistoryList = (props: { spaces: Array<SpaceData> }) => {
       {spacesHistory.length > 0 ? (
         <div className="myStudioCompleted">
           <button
-            className={`flex items-center gap-2 hover:text-accent-blue ${
+            className={`hover:text-accent-blue flex items-center gap-2 ${
               showHistory ? "text-grey-15" : "text-grey-55"
             }`}
             onClick={() => {
@@ -196,7 +196,7 @@ const HistoryList = (props: { spaces: Array<SpaceData> }) => {
 
 const EmptyStudio = () => {
   return (
-    <div className="lightBorder flex h-fit flex-col gap-4 bg-bg-blue p-4">
+    <div className="lightBorder bg-bg-blue flex h-fit flex-col gap-4 p-4">
       <h3>⚠️ under construction ⚠️</h3>
       <p>This Studio does not yet contain any Spaces!</p>
     </div>

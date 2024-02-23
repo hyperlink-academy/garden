@@ -7,7 +7,10 @@ import { spaceAPI, workerAPI } from "backend/lib/api";
 import { useRouter } from "next/navigation";
 import { ModalSubmitButton, Modal } from "components/Modal";
 import { WORKER_URL } from "src/constants";
-import { CloseLinedTiny, Delete } from "components/Icons";
+import { AddSmall, CloseLinedTiny, Delete } from "components/Icons";
+import { db, useMutations } from "hooks/useReplicache";
+import { ulid } from "src/ulid";
+import { generateNKeysBetween } from "src/fractional-indexing";
 
 export function StudioSettings(props: { id: string }) {
   let { session, authToken } = useAuth();
@@ -28,7 +31,7 @@ export function StudioSettings(props: { id: string }) {
     });
   }, [data]);
   return (
-    <div className="mx-auto flex max-w-2xl flex-col gap-8 pb-6 sm:pt-6">
+    <div className="settingsWrapper no-scrollbar mx-auto flex h-full max-w-2xl flex-col gap-8 overflow-y-scroll pb-8 sm:pt-7">
       <form
         className="flex flex-col gap-3"
         onSubmit={async (e) => {
@@ -54,10 +57,12 @@ export function StudioSettings(props: { id: string }) {
           mutate();
         }}
       >
-        <StudioNameForm setFormState={setFormState} formState={formState} />
-        <OpenSpacesForm setFormState={setFormState} formState={formState} />
+        <div className="lightBorder flex flex-col gap-6 p-3">
+          <StudioNameForm setFormState={setFormState} formState={formState} />
+          <OpenSpacesForm setFormState={setFormState} formState={formState} />
+        </div>
         <ButtonPrimary
-          className="mt-8 place-self-end"
+          className=" place-self-end"
           content={loading ? "" : "Update Studio"}
           icon={loading ? <DotLoader /> : undefined}
           disabled={
@@ -68,16 +73,11 @@ export function StudioSettings(props: { id: string }) {
           }
         />
       </form>
-      {/* <GetStartedForm /> */}
-      {/*
-      <div className="flex gap-2 font-bold">
-        <input type="checkbox" id="open-space-toggle" />
-        Spen Spaces to Members
-      </div> */}
+      <GetStartedForm />
 
       <hr className="border-grey-80" />
 
-      <div className="lightBorder flex flex-col items-center gap-2 p-4 text-center">
+      <div className="lightBorder flex flex-col items-center gap-2 p-3 text-center">
         <h3>Delete Studio</h3>
         <p className="text-sm">
           Spaces will <strong>not</strong> be deleted; they will be available
@@ -106,7 +106,7 @@ const StudioNameForm = ({
 }) => {
   return (
     <>
-      <div className="lightBorder flex flex-col gap-2 p-3">
+      <div className="flex flex-col gap-1">
         <h4 className="font-bold">Name this Studio</h4>
         <div className="flex flex-col gap-0.5">
           <input
@@ -138,7 +138,7 @@ const OpenSpacesForm = ({
   setFormState: React.Dispatch<React.SetStateAction<FormState>>;
 }) => {
   return (
-    <div className="lightBorder flex flex-col gap-4 p-3">
+    <div className=" flex flex-col gap-4">
       <div className="flex flex-col gap-1 ">
         <h4>Open Spaces</h4>
 
@@ -175,81 +175,163 @@ const OpenSpacesForm = ({
 const GetStartedForm = () => {
   let [getStarted, setGetStarted] = useState(false);
   let [getStartedInput, setGetStartedInput] = useState("");
-  let [getStartedItems, setGetStartedItems] = useState([
-    "Introduce yourself! Write a short bio on your member card in the Members tab!",
-    "Create your first space in the Space Tab!",
-  ]);
+  let [getStartedItems, setGetStartedItems] = useState<
+    { id: string; value: string }[]
+  >([]);
+
+  let { mutate } = useMutations();
+  let home = db.useAttribute("home")[0];
+  let existingGetStartedItems =
+    db.useEntity(home?.entity, "checklist/item") || [];
+  useEffect(() => {
+    if (existingGetStartedItems.length === 0) {
+      setGetStarted(false);
+
+      setGetStartedItems([
+        {
+          id: ulid(),
+          value:
+            "Introduce yourself! Write a short bio on your member card in the Members tab!",
+        },
+        {
+          id: ulid(),
+          value: "Create your first space in the Space Tab!",
+        },
+      ]);
+    } else {
+      setGetStarted(true);
+      setGetStartedItems(
+        existingGetStartedItems.map((f) => ({
+          id: f.id,
+          value: f.value,
+        }))
+      );
+    }
+  }, [existingGetStartedItems]);
+
+  let newItems =
+    getStartedItems.reduce((acc, item) => {
+      return (
+        acc || !existingGetStartedItems?.find((i) => i.value === item.value)
+      );
+    }, false) || getStartedItems.length !== existingGetStartedItems?.length;
 
   return (
-    <div className="settingsGetStarted flex flex-col gap-2">
-      <div className="flex flex-col gap-0.5 ">
-        <h4>Get Started</h4>
-        <div className="text-grey-35 text-sm">
-          If you use this, new members will see a &quot;Get Started&quot; tab
-          when they join the studio. Use it to create an onboarding checklist so
-          new members know what to do when they join! <br />
-          The tab will be visible until all items are checked off.
-        </div>
-      </div>
-      <div className="flex gap-2 font-bold">
-        <input
-          type="checkbox"
-          id="getting-started-toggle"
-          checked={getStarted}
-          onChange={(e) => setGetStarted(e.currentTarget.checked)}
-        />
-        Use Get Started
-      </div>
-      {getStarted && (
-        <div className="flex flex-col gap-3">
-          {getStartedItems.map((item, i) => (
-            <div key={i} className="lightBorder flex items-start gap-2 p-2">
-              <div className="text-grey-35 grow">{item}</div>
-              <button
-                className="hover:text-accent-blue text-grey-55 pt-1"
-                onClick={() => {
-                  setGetStartedItems((s) => {
-                    let newItems = [...s];
-                    newItems.splice(i, 1);
-                    return newItems;
-                  });
-                }}
-              >
-                <CloseLinedTiny className="shrink-0 grow-0" />
-              </button>
-            </div>
-          ))}
-          <div className="mt-3 flex w-full gap-2">
-            <input
-              className="grow"
-              id="get-started-input"
-              value={getStartedInput}
-              onChange={(e) => {
-                setGetStartedInput(e.currentTarget.value);
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && getStartedInput !== "") {
-                  // e.preventDefault();
-                  setGetStartedItems((s) => [...s, getStartedInput]);
-                  setGetStartedInput("");
-                  console.log(getStartedItems);
-                } else return;
-              }}
-            />
-            <ButtonSecondary
-              content="Add"
-              onClick={(e) => {
-                e.preventDefault();
-                if (getStartedInput !== "") {
-                  setGetStartedItems((s) => [...s, getStartedInput]);
-                  setGetStartedInput("");
-                  console.log(getStartedItems);
-                }
-              }}
-            />
+    <div className="flex flex-col place-items-end gap-3">
+      <div className="settingsGetStarted lightBorder flex flex-col gap-4 p-3">
+        <div className="flex flex-col gap-0.5 ">
+          <h4>Get Started</h4>
+          <div className="text-grey-35 text-sm">
+            If you enable this,{" "}
+            <b>new members will see a &quot;Get Started&quot; tab </b>
+            when they join.
+            <br />
+            Create an onboarding checklist so new members know where to start!{" "}
+            <br />
+            The tab will be visible until all items are checked off.
           </div>
         </div>
-      )}
+        <div className="flex gap-2 font-bold">
+          <input
+            type="checkbox"
+            id="getting-started-toggle"
+            checked={getStarted}
+            onChange={(e) => setGetStarted(e.currentTarget.checked)}
+          />
+          Use Get Started
+        </div>
+        {getStarted && (
+          <div className="flex flex-col gap-2">
+            {getStartedItems.map((item, i) => (
+              <div
+                key={item.id}
+                className="lightBorder flex items-start gap-2 p-2"
+              >
+                <div className="grow">{item.value}</div>
+                <button
+                  className="hover:text-accent-blue text-grey-55 pt-1"
+                  onClick={() => {
+                    setGetStartedItems((s) => {
+                      let newItems = [...s];
+                      newItems.splice(i, 1);
+                      return newItems;
+                    });
+                  }}
+                >
+                  <CloseLinedTiny className="shrink-0 grow-0" />
+                </button>
+              </div>
+            ))}
+            <div className="mt-3 flex w-full items-center gap-2">
+              <input
+                className="grow"
+                id="get-started-input"
+                value={getStartedInput}
+                onChange={(e) => {
+                  setGetStartedInput(e.currentTarget.value);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && getStartedInput !== "") {
+                    // e.preventDefault();
+                    setGetStartedItems((s) => [
+                      ...s,
+                      { id: ulid(), value: getStartedInput },
+                    ]);
+                    setGetStartedInput("");
+                  } else return;
+                }}
+              />
+              <button
+                className="text-accent-blue pr-1"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (getStartedInput !== "") {
+                    setGetStartedItems((s) => [
+                      ...s,
+                      { id: ulid(), value: getStartedInput },
+                    ]);
+                    setGetStartedInput("");
+                    document.getElementById("get-started-input")?.focus();
+                  }
+                }}
+              >
+                <AddSmall />
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+      <ButtonPrimary
+        content="Update Get Started"
+        disabled={
+          !(newItems || (existingGetStartedItems.length > 0 && !getStarted))
+        }
+        onClick={async () => {
+          for (let existing of existingGetStartedItems) {
+            await mutate("retractFact", {
+              id: existing.id,
+            });
+          }
+          if (!getStarted && existingGetStartedItems) {
+            return;
+          }
+          let positionKeys = generateNKeysBetween(
+            null,
+            null,
+            getStartedItems.length
+          );
+          mutate(
+            "assertFact",
+            getStartedItems.map((item, index) => ({
+              entity: home.entity,
+              attribute: "checklist/item",
+              value: item.value,
+              factID: item.id,
+              positions: { eav: positionKeys[index] },
+            }))
+          );
+        }}
+      />
     </div>
   );
 };
