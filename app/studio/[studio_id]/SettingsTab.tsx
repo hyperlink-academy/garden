@@ -8,6 +8,9 @@ import { useRouter } from "next/navigation";
 import { ModalSubmitButton, Modal } from "components/Modal";
 import { WORKER_URL } from "src/constants";
 import { CloseLinedTiny, Delete } from "components/Icons";
+import { db, useMutations } from "hooks/useReplicache";
+import { ulid } from "src/ulid";
+import { generateNKeysBetween } from "src/fractional-indexing";
 
 export function StudioSettings(props: { id: string }) {
   let { session, authToken } = useAuth();
@@ -68,7 +71,7 @@ export function StudioSettings(props: { id: string }) {
           }
         />
       </form>
-      {/* <GetStartedForm /> */}
+      <GetStartedForm />
 
       <hr className="border-grey-80" />
 
@@ -170,10 +173,46 @@ const OpenSpacesForm = ({
 const GetStartedForm = () => {
   let [getStarted, setGetStarted] = useState(false);
   let [getStartedInput, setGetStartedInput] = useState("");
-  let [getStartedItems, setGetStartedItems] = useState([
-    "Introduce yourself! Write a short bio on your member card in the Members tab!",
-    "Create your first space in the Space Tab!",
-  ]);
+  let [getStartedItems, setGetStartedItems] = useState<
+    { id: string; value: string }[]
+  >([]);
+
+  let { mutate } = useMutations();
+  let home = db.useAttribute("home")[0];
+  let existingGetStartedItems =
+    db.useEntity(home?.entity, "checklist/item") || [];
+  useEffect(() => {
+    if (existingGetStartedItems.length === 0) {
+      setGetStarted(false);
+
+      setGetStartedItems([
+        {
+          id: ulid(),
+          value:
+            "Introduce yourself! Write a short bio on your member card in the Members tab!",
+        },
+        {
+          id: ulid(),
+          value: "Create your first space in the Space Tab!",
+        },
+      ]);
+    } else {
+      setGetStarted(true);
+      setGetStartedItems(
+        existingGetStartedItems.map((f) => ({
+          id: f.id,
+          value: f.value,
+        }))
+      );
+    }
+  }, [existingGetStartedItems]);
+
+  let newItems =
+    getStartedItems.reduce((acc, item) => {
+      return (
+        acc || !existingGetStartedItems?.find((i) => i.value === item.value)
+      );
+    }, false) || getStartedItems.length !== existingGetStartedItems?.length;
 
   return (
     <div className="settingsGetStarted flex flex-col gap-2">
@@ -198,8 +237,11 @@ const GetStartedForm = () => {
       {getStarted && (
         <div className="flex flex-col gap-3">
           {getStartedItems.map((item, i) => (
-            <div key={i} className="lightBorder flex items-start gap-2 p-2">
-              <div className="text-grey-35 grow">{item}</div>
+            <div
+              key={item.id}
+              className="lightBorder flex items-start gap-2 p-2"
+            >
+              <div className="text-grey-35 grow">{item.value}</div>
               <button
                 className="hover:text-accent-blue text-grey-55 pt-1"
                 onClick={() => {
@@ -225,9 +267,11 @@ const GetStartedForm = () => {
               onKeyDown={(e) => {
                 if (e.key === "Enter" && getStartedInput !== "") {
                   // e.preventDefault();
-                  setGetStartedItems((s) => [...s, getStartedInput]);
+                  setGetStartedItems((s) => [
+                    ...s,
+                    { id: ulid(), value: getStartedInput },
+                  ]);
                   setGetStartedInput("");
-                  console.log(getStartedItems);
                 } else return;
               }}
             />
@@ -236,7 +280,10 @@ const GetStartedForm = () => {
               onClick={(e) => {
                 e.preventDefault();
                 if (getStartedInput !== "") {
-                  setGetStartedItems((s) => [...s, getStartedInput]);
+                  setGetStartedItems((s) => [
+                    ...s,
+                    { id: ulid(), value: getStartedInput },
+                  ]);
                   setGetStartedInput("");
                   console.log(getStartedItems);
                 }
@@ -244,6 +291,36 @@ const GetStartedForm = () => {
             />
           </div>
         </div>
+      )}
+      {(newItems || (existingGetStartedItems.length > 0 && !getStarted)) && (
+        <ButtonSecondary
+          content="Save"
+          onClick={async () => {
+            for (let existing of existingGetStartedItems) {
+              await mutate("retractFact", {
+                id: existing.id,
+              });
+            }
+            if (!getStarted && existingGetStartedItems) {
+              return;
+            }
+            let positionKeys = generateNKeysBetween(
+              null,
+              null,
+              getStartedItems.length
+            );
+            mutate(
+              "assertFact",
+              getStartedItems.map((item, index) => ({
+                entity: home.entity,
+                attribute: "checklist/item",
+                value: item.value,
+                factID: item.id,
+                positions: { eav: positionKeys[index] },
+              }))
+            );
+          }}
+        />
       )}
     </div>
   );

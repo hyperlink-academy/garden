@@ -3,7 +3,7 @@
 import { Tab } from "@headlessui/react";
 import { NonUndefined } from "@use-gesture/react";
 import { useStudioData } from "hooks/useStudioData";
-import { Fragment, ReactNode, useCallback, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 import { Members } from "./MemberTab";
 import { StudioSettings } from "./SettingsTab";
 import { SpaceList } from "./SpacesTab";
@@ -21,15 +21,72 @@ import { WORKER_URL } from "src/constants";
 import { useSearchParams } from "next/navigation";
 import { useToaster } from "components/Smoke";
 import { uuidToBase62 } from "src/uuidHelpers";
+import {
+  GettingStartedTab,
+  useHasGettingStartedItems,
+} from "./GettingStartedTab";
 
 export type Props = {
   data: NonUndefined<ReturnType<typeof useStudioData>["data"]>;
   isAdmin: boolean;
 };
 
-const Tabs = { About: About, Spaces: SpaceList, Members: Members } as {
-  [key: string]: (props: Props) => React.ReactNode;
+const TabsList = (props: Props & { className: string }) => {
+  let hasGettingStartedItems = useHasGettingStartedItems(props);
+  return (
+    <Tab.List className={props.className}>
+      <TabItem name="About" />
+      <TabItem name="Spaces" />
+      <TabItem name="Members" />
+      {props.isAdmin ? <TabItem name="Settings" /> : null}
+      {hasGettingStartedItems ? <TabItem name="Getting Started" /> : null}
+    </Tab.List>
+  );
 };
+
+const TabPanels = (props: Props) => {
+  let hasGettingStartedItems = useHasGettingStartedItems(props);
+  return (
+    <Tab.Panels className="StudioTabContent h-full min-h-0 ">
+      <Tab.Panel className="h-full">
+        <About />
+      </Tab.Panel>
+      <Tab.Panel className="h-full">
+        <Members data={props.data} isAdmin={props.isAdmin} />
+      </Tab.Panel>
+      <Tab.Panel className="h-full">
+        <SpaceList data={props.data} />
+      </Tab.Panel>
+      {props.isAdmin ? (
+        <Tab.Panel className="h-full">
+          <Settings {...props} />
+        </Tab.Panel>
+      ) : null}
+      {hasGettingStartedItems ? (
+        <Tab.Panel className="h-full">
+          <GettingStartedTab />
+        </Tab.Panel>
+      ) : null}
+    </Tab.Panels>
+  );
+};
+
+const TabItem = (props: { name: string }) => (
+  <Tab as={Fragment}>
+    {({ selected }) => (
+      <button
+        className={`text-right outline-none ${
+          selected
+            ? "text-accent-blue font-bold"
+            : "text-grey-35 hover:text-accent-blue"
+        }`}
+      >
+        {props.name}
+      </button>
+    )}
+  </Tab>
+);
+
 export function StudioPageContent(props: Props) {
   let { data } = useStudioData(props.data?.id, props.data);
   let { width } = useWindowDimensions();
@@ -45,7 +102,6 @@ export function StudioPageContent(props: Props) {
   useEffect(() => {
     setIsClient(true);
   }, []);
-  if (props.isAdmin) Tabs["Settings"] = Settings;
   if (!isClient) return null;
   return (
     <div className="pwa-padding studioWrapper  flex w-full items-stretch px-3 sm:h-screen sm:px-4">
@@ -66,13 +122,7 @@ export function StudioPageContent(props: Props) {
             <div
               className={`StudioContent flex w-full grow flex-col items-stretch`}
             >
-              <Tab.Panels className="StudioTabContent h-full min-h-0 ">
-                {Object.values(Tabs).map((T, index) => (
-                  <Tab.Panel key={index} className="h-full">
-                    <T data={data || props.data} isAdmin={props.isAdmin} />
-                  </Tab.Panel>
-                ))}
-              </Tab.Panels>
+              <TabPanels data={data || props.data} isAdmin={props.isAdmin} />
             </div>
           </Tab.Group>
         </div>
@@ -80,22 +130,6 @@ export function StudioPageContent(props: Props) {
     </div>
   );
 }
-
-const TabItem = (props: { name: string }) => (
-  <Tab as={Fragment}>
-    {({ selected }) => (
-      <button
-        className={`text-right outline-none ${
-          selected
-            ? "text-accent-blue font-bold"
-            : "text-grey-35 hover:text-accent-blue"
-        }`}
-      >
-        {props.name}
-      </button>
-    )}
-  </Tab>
-);
 
 function Settings({ data }: Props) {
   return (
@@ -108,7 +142,6 @@ function Settings({ data }: Props) {
 const StudioDesktopNav = (props: Props) => {
   let { data } = useStudioData(props.data?.id, props.data);
   let { session } = useAuth();
-  let toaster = useToaster();
 
   return (
     <div className="studioNav border-grey-80 my-6 mr-4 w-64 flex-col justify-between border-r pr-4">
@@ -118,11 +151,7 @@ const StudioDesktopNav = (props: Props) => {
         >
           {data?.name}
         </h3>
-        <Tab.List className="StudioTabs flex flex-col gap-2 ">
-          {Object.keys(Tabs).map((tab) => (
-            <TabItem name={tab} key={tab} />
-          ))}
-        </Tab.List>
+        <TabsList className="StudioTabs flex flex-col gap-2 " {...props} />
         {session.session ? (
           <Link
             href={`/s/${session.session.username}`}
@@ -161,11 +190,7 @@ const StudioMobileNav = (props: Props) => {
 
       <div className="pwa-padding pwa-negative-margin border-grey-80 bg-background sticky top-0  z-10 -mx-3 mb-4 border-b px-3 pb-1">
         <div className=" flex gap-2 pt-4">
-          <Tab.List className="StudioTabs flex gap-4">
-            {Object.keys(Tabs).map((tab) => (
-              <TabItem name={tab} key={tab} />
-            ))}
-          </Tab.List>
+          <TabsList className="StudioTabs flex gap-4" {...props} />
         </div>
       </div>
     </>

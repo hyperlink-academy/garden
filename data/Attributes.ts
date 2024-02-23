@@ -104,6 +104,21 @@ export const DefaultAttributes = {
     unique: false,
     cardinality: "one",
   },
+  "checklist/item": {
+    type: "string",
+    unique: false,
+    cardinality: "many",
+  },
+  "checklist/item-completed-by": {
+    type: "reference",
+    unique: false,
+    cardinality: "many",
+  },
+  "checklist/completed-by": {
+    type: "reference",
+    unique: false,
+    cardinality: "many",
+  },
   "image/rotation": {
     type: "number",
     cardinality: "one",
