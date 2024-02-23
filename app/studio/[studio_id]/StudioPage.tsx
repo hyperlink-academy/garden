@@ -239,9 +239,11 @@ const StudioBanner = (props: Props) => {
         setState={setLoginOrSignupState}
         redirectTo={`/studio/${uuidToBase62(props.data.id)}?join=true`}
         onLogin={(s) => {
-          if (s.authToken) {
+          if (
+            s.authToken &&
+            !props.data.members_in_studios.find((m) => m.member === s.id)
+          ) {
             join(s.authToken);
-            toaster(JoinSuccessToast);
           }
         }}
       />
