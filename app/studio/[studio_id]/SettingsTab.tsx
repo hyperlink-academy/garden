@@ -31,7 +31,7 @@ export function StudioSettings(props: { id: string }) {
     });
   }, [data]);
   return (
-    <div className="mx-auto flex max-w-2xl flex-col gap-8 pb-6 sm:pt-6">
+    <div className="settingsWrapper no-scollbar mx-auto flex h-full max-w-2xl flex-col gap-8 overflow-y-scroll pb-6 sm:pt-8">
       <form
         className="flex flex-col gap-3"
         onSubmit={async (e) => {
@@ -215,13 +215,15 @@ const GetStartedForm = () => {
     }, false) || getStartedItems.length !== existingGetStartedItems?.length;
 
   return (
-    <div className="settingsGetStarted flex flex-col gap-2">
+    <div className="settingsGetStarted lightBorder flex flex-col gap-2 p-2">
       <div className="flex flex-col gap-0.5 ">
         <h4>Get Started</h4>
         <div className="text-grey-35 text-sm">
-          If you use this, new members will see a &quot;Get Started&quot; tab
-          when they join the studio. Use it to create an onboarding checklist so
-          new members know what to do when they join! <br />
+          If you enable this,{" "}
+          <b>new members will see a &quot;Get Started&quot; tab</b>
+          when they join the studio. <br />
+          Use it to create an onboarding checklist so new members know what to
+          do when they join! <br />
           The tab will be visible until all items are checked off.
         </div>
       </div>

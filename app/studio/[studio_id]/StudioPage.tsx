@@ -21,10 +21,7 @@ import { WORKER_URL } from "src/constants";
 import { useSearchParams } from "next/navigation";
 import { useToaster } from "components/Smoke";
 import { uuidToBase62 } from "src/uuidHelpers";
-import {
-  GettingStartedTab,
-  useHasGettingStartedItems,
-} from "./GettingStartedTab";
+import { GetStartedTab, useHasGetStartedItems } from "./GettingStartedTab";
 
 export type Props = {
   data: NonUndefined<ReturnType<typeof useStudioData>["data"]>;
@@ -32,10 +29,10 @@ export type Props = {
 };
 
 const TabsList = (props: Props & { className: string }) => {
-  let hasGettingStartedItems = useHasGettingStartedItems(props);
+  let hasGetStartedItems = useHasGetStartedItems(props);
   return (
     <Tab.List className={props.className}>
-      {hasGettingStartedItems ? <TabItem name="Getting Started" /> : null}
+      {hasGetStartedItems ? <TabItem name="Get Started" /> : null}
       <TabItem name="About" />
       <TabItem name="Spaces" />
       <TabItem name="Members" />
@@ -47,22 +44,22 @@ const TabsList = (props: Props & { className: string }) => {
 const TabPanels = (
   props: Props & { setSelectedIndex: (i: number) => void }
 ) => {
-  let hasGettingStartedItems = useHasGettingStartedItems(props);
+  let hasGetStartedItems = useHasGetStartedItems(props);
   return (
     <Tab.Panels className="StudioTabContent h-full min-h-0 ">
-      {hasGettingStartedItems ? (
+      {hasGetStartedItems ? (
         <Tab.Panel className="h-full">
-          <GettingStartedTab setSelectedTab={props.setSelectedIndex} />
+          <GetStartedTab setSelectedTab={props.setSelectedIndex} />
         </Tab.Panel>
       ) : null}
       <Tab.Panel className="h-full">
         <About />
       </Tab.Panel>
       <Tab.Panel className="h-full">
-        <Members data={props.data} isAdmin={props.isAdmin} />
+        <SpaceList data={props.data} />
       </Tab.Panel>
       <Tab.Panel className="h-full">
-        <SpaceList data={props.data} />
+        <Members data={props.data} isAdmin={props.isAdmin} />
       </Tab.Panel>
       {props.isAdmin ? (
         <Tab.Panel className="h-full">
@@ -152,20 +149,22 @@ const StudioDesktopNav = (props: Props) => {
   return (
     <div className="studioNav border-grey-80 my-6 mr-4 w-64 flex-col justify-between border-r pr-4">
       <div className="flex w-full flex-col gap-2 text-right">
-        <h3
-          style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
-        >
-          {data?.name}
-        </h3>
-        <TabsList className="StudioTabs flex flex-col gap-2 " {...props} />
-        {session.session ? (
-          <Link
-            href={`/s/${session.session.username}`}
-            className="text-grey-55 hover:text-accent-blue flex items-center justify-end gap-2"
+        <div className="flex flex-col gap-0">
+          {session.session ? (
+            <Link
+              href={`/s/${session.session.username}`}
+              className="text-grey-55 hover:text-accent-blue -mb-1 flex items-center justify-end gap-2 text-sm font-bold"
+            >
+              <ArrowDown className="rotate-90" height={16} width={16} /> home
+            </Link>
+          ) : null}
+          <h3
+            style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
           >
-            <ArrowDown className="rotate-90" height={16} width={16} /> home
-          </Link>
-        ) : null}
+            {data?.name}
+          </h3>
+        </div>
+        <TabsList className="StudioTabs flex flex-col gap-2 " {...props} />
       </div>
     </div>
   );

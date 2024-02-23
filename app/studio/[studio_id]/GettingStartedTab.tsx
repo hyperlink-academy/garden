@@ -6,7 +6,7 @@ import { useSubscribe } from "hooks/useSubscribe";
 import { ButtonPrimary } from "components/Buttons";
 import { useToaster } from "components/Smoke";
 
-export const useHasGettingStartedItems = (props: Props) => {
+export const useHasGetStartedItems = (props: Props) => {
   let { session } = useAuth();
   let { memberEntity } = useMutations();
   let home = db.useAttribute("home")[0];
@@ -14,17 +14,17 @@ export const useHasGettingStartedItems = (props: Props) => {
     (m) => m.member === session.user?.id
   );
 
-  let gettingStartedItems = db.useEntity(home?.entity, "checklist/item");
+  let getStartedItems = db.useEntity(home?.entity, "checklist/item");
   let completed = db.useEntity(home?.entity, "checklist/completed-by");
   if (!isMember) return false;
   if (
-    !gettingStartedItems ||
+    !getStartedItems ||
     completed?.find((m) => m.value.value === memberEntity)
   )
     return false;
   return true;
 };
-export function GettingStartedTab(props: {
+export function GetStartedTab(props: {
   setSelectedTab: (tab: number) => void;
 }) {
   let home = db.useAttribute("home")[0];
@@ -52,51 +52,66 @@ export function GettingStartedTab(props: {
   );
 
   return (
-    <div className="mx-auto flex h-full max-w-2xl flex-col gap-3 pb-6 sm:pt-6">
-      {items.map((item) => {
-        return (
-          <GettingStartedItem
-            key={item.id}
-            entityID={item.id}
-            value={item.value}
-          />
-        );
-      })}
-      <ButtonPrimary
-        disabled={completed !== items.length}
-        onClick={async () => {
-          if (!memberEntity || !home) return;
-          await mutate("assertFact", {
-            entity: home.entity,
-            attribute: "checklist/completed-by",
-            value: ref(memberEntity),
-            positions: {},
-          });
-          props.setSelectedTab(1);
-          toaster({
-            type: "success",
-            text: "Getting started completed!",
-            icon: null,
-          });
-        }}
-        content="Complete getting started!"
-      >
-        Complete
-      </ButtonPrimary>
+    <div className="mx-auto flex h-full max-w-2xl flex-col gap-2 pb-6 sm:pt-11">
+      <h4 className="text-grey-35">
+        Welcome! Complete the following to get set up in this Studio!
+      </h4>
+      <div className="lightBorder flex flex-col gap-2 p-2">
+        {items.map((item) => {
+          return (
+            <GetStartedItem
+              key={item.id}
+              entityID={item.id}
+              value={item.value}
+            />
+          );
+        })}
+      </div>
+      <div className="mt-2 flex flex-col place-items-end gap-1 place-self-end text-right">
+        <ButtonPrimary
+          disabled={completed !== items.length}
+          onClick={async () => {
+            if (!memberEntity || !home) return;
+            await mutate("assertFact", {
+              entity: home.entity,
+              attribute: "checklist/completed-by",
+              value: ref(memberEntity),
+              positions: {},
+            });
+            props.setSelectedTab(1);
+            toaster({
+              type: "success",
+              text: "Congrats! You Got Started!",
+              icon: null,
+            });
+          }}
+          content="Complete Get Started!"
+        />
+        {completed === items.length && (
+          <div className="text-grey-55 text-sm">
+            Completing the Get Started removes <br /> it from your studio
+            sidebar!
+          </div>
+        )}
+      </div>
     </div>
   );
 }
 
-function GettingStartedItem(props: { entityID: string; value: string }) {
+function GetStartedItem(props: { entityID: string; value: string }) {
   let { memberEntity, mutate } = useMutations();
   let checkedBy = db.useEntity(props.entityID, "checklist/item-completed-by");
   let checkedByUser = checkedBy?.find((m) => m.value.value === memberEntity);
 
   return (
-    <div className="lightBorder flex w-full flex-row items-start gap-3 bg-white p-2 ">
+    <div
+      className={`lightBorder flex w-full flex-row items-start gap-3  p-2 ${
+        checkedByUser ? "bg-background" : "bg-white"
+      }`}
+    >
       <input
         type="checkbox"
-        className="mt-[7px]"
+        className="mt-[5px]"
         checked={!!checkedByUser}
         onChange={async (e) => {
           if (!memberEntity) return;
@@ -111,7 +126,7 @@ function GettingStartedItem(props: { entityID: string; value: string }) {
         className={`${
           checkedByUser
             ? "text-grey-55 decoration-grey-80 line-through"
-            : "test-grey-35 font-bold"
+            : "text-grey-35 font-bold"
         } `}
       >
         {props.value}
