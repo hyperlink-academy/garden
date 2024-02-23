@@ -304,7 +304,7 @@ const GetStartedForm = () => {
       <ButtonPrimary
         content="Update Get Started"
         disabled={
-          newItems || (existingGetStartedItems.length > 0 && !getStarted)
+          !(newItems || (existingGetStartedItems.length > 0 && !getStarted))
         }
         onClick={async () => {
           for (let existing of existingGetStartedItems) {
