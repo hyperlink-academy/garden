@@ -3,7 +3,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useIdentityData } from "./useIdentityData";
 import { supabaseBrowserClient } from "supabase/clients";
 import { Session } from "@supabase/supabase-js";
-import { login } from "backend/actions/login";
+import { WORKER_URL } from "src/constants";
 
 let SessionContext = createContext<Session | null>(null);
 
@@ -58,17 +58,17 @@ export const useAuth = () => {
           studio: string;
         } | null,
       },
-      login: async (login_data: {
-        email: string;
-        password: string;
-        redirectTo?: string;
-      }) => {
+      login: async (login_data: { email: string; password: string }) => {
         if (session) return { success: true } as const;
-        let res = await login(login_data);
-        if (res.error?.message === "Email not confirmed") {
+        let res = await workerAPI(WORKER_URL, "login", login_data);
+        if (res.error === "confirmEmail") {
           return { success: false, error: "confirmEmail" } as const;
         }
-        if (res.data) return { success: true, data: res.data };
+        if (!res.session?.session) return null;
+        let { data } = await supabaseClient.auth.setSession(
+          res.session?.session
+        );
+        if (data) return { success: true, data };
         return { success: false, error: "no session" } as const;
       },
       logout: () => {
@@ -90,6 +90,6 @@ export const useAuth = () => {
         });
       },
     }),
-    [session, supabaseClient.auth, authToken]
+    [session, supabaseClient.auth]
   );
 };
