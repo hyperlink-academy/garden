@@ -42,7 +42,7 @@
     "@rocicorp/undo": "^0.2.0",
     "@serwist/next": "^8.4.4",
     "@serwist/sw": "^8.4.4",
-    "@supabase/ssr": "^0.0.10",
+    "@supabase/ssr": "^0.1.0",
     "@supabase/supabase-js": "^2.38.4",
     "@types/mdx": "^2.0.9",
     "@use-gesture/react": "^10.3.0",
