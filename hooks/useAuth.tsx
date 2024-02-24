@@ -5,8 +5,6 @@ import { supabaseBrowserClient } from "supabase/clients";
 import { Session } from "@supabase/supabase-js";
 import { login } from "backend/actions/login";
 
-const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
-
 let SessionContext = createContext<Session | null>(null);
 
 export const AuthProvider = (props: {
@@ -20,30 +18,15 @@ export const AuthProvider = (props: {
       setSession(session);
     });
     return () => subscription.data.subscription.unsubscribe();
-  }, []);
+  }, [supabase.auth]);
   return (
     <SessionContext.Provider value={session}>
       {props.children}
-      <RefreshSession />
     </SessionContext.Provider>
   );
 };
 
 let useSession = () => useContext(SessionContext);
-
-const RefreshSession = () => {
-  const supabaseClient = supabaseBrowserClient();
-  let session = useSession();
-  useEffect(() => {
-    if (!session || !session.expires_at) return;
-    let days_until_expired =
-      (session.expires_at - Date.now() / 1000) / (60 * 60 * 24);
-    if (days_until_expired < 3.5 && session.expires_in > 32000) {
-      supabaseClient.auth.refreshSession();
-    }
-  }, [session]);
-  return <></>;
-};
 
 export const useAuthIdentityData = () => {
   let session = useSession();
@@ -62,7 +45,7 @@ export const useAuth = () => {
       access_token: session.access_token,
       refresh_token: session.refresh_token,
     };
-  }, [session?.access_token, session?.refresh_token]);
+  }, [session]);
 
   return useMemo(
     () => ({
