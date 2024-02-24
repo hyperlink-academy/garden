@@ -55,7 +55,7 @@ const TabPanels = (
         </Tab.Panel>
       ) : null}
       <Tab.Panel className="h-full">
-        <About />
+        <About isAdmin={props.isAdmin} />
       </Tab.Panel>
       <Tab.Panel className="h-full">
         <SpaceList data={props.data} />
