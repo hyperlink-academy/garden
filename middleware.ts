@@ -26,6 +26,11 @@ export async function middleware(request: NextRequest) {
               headers: request.headers,
             },
           });
+          response.cookies.set({
+            name,
+            value,
+            ...options,
+          });
         },
         remove(name: string, options: CookieOptions) {
           request.cookies.set({
@@ -38,12 +43,17 @@ export async function middleware(request: NextRequest) {
               headers: request.headers,
             },
           });
+          response.cookies.set({
+            name,
+            value: "",
+            ...options,
+          });
         },
       },
     }
   );
 
-  await supabase.auth.getSession();
+  await supabase.auth.getUser();
 
   return response;
 }
