@@ -1,7 +1,7 @@
 import { SpaceProvider } from "components/ReplicacheProvider";
 import { PageHeightContainer } from "components/PageHeightContainer";
 import { Space } from "components/Space";
-import { SpacePageStudioPresenceHandler } from "app/studio/[studio_id]/space/StudioPresenceHandler";
+import { SpacePageStudioPresenceHandler } from "app/(app)/studio/[studio_id]/space/StudioPresenceHandler";
 import { UpdateSpaceNameURL } from "./updateDisplayName";
 import { getData, redirectToIDURL } from "./utils";
 

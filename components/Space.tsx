@@ -24,7 +24,7 @@ import { useGesture } from "@use-gesture/react";
 import { useDndContext } from "@dnd-kit/core";
 import { useSpaceShortcuts } from "hooks/useSpaceShortcuts";
 import { SpaceData } from "components/SpacesList";
-import { SpaceViewerHeader } from "app/studio/[studio_id]/space/SpaceViewerHeader";
+import { SpaceViewerHeader } from "app/(app)/studio/[studio_id]/space/SpaceViewerHeader";
 import { useIsClient } from "hooks/utils";
 import * as Popover from "@radix-ui/react-popover";
 import { useSpaceData } from "hooks/useSpaceData";

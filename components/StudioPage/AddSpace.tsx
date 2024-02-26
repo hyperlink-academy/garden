@@ -1,4 +1,4 @@
-import { add_space } from "app/studio/[studio_id]/add_space";
+import { add_space } from "backend/actions/add_space";
 import { workerAPI } from "backend/lib/api";
 import { ButtonLink, ButtonPrimary } from "components/Buttons";
 import { CreateSpaceForm, CreateSpaceFormState } from "components/CreateSpace";

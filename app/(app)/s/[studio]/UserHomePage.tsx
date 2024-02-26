@@ -13,7 +13,7 @@ import { uuidToBase62 } from "src/uuidHelpers";
 import Link from "next/link";
 import { IdentityData } from "backend/routes/get_identity_data";
 import { useParams } from "next/dist/client/components/navigation";
-import { LoginButton } from "app/studio/[studio_id]/space/SpaceViewerHeader";
+import { LoginButton } from "app/(app)/studio/[studio_id]/space/SpaceViewerHeader";
 import { useIsMobile } from "hooks/utils";
 import Image from "next/image";
 import sandboxSpot from "public/img/spotIllustration/sandbox.png";
@@ -118,7 +118,7 @@ const Studios = ({
               <CreateStudio username={session.session.username} />
             )}
         </div>
-        <div className="max-w-lg text-sm italic text-grey-55">
+        <div className="text-grey-55 max-w-lg text-sm italic">
           Studios are places for groups to work together and share related
           Spaces — like a collection of projects or gatherings.
         </div>
@@ -141,7 +141,7 @@ const Studios = ({
           <Link
             prefetch
             href={`/studio/${uuidToBase62(studio.id)}`}
-            className="grid h-[120px] w-full flex-col place-items-center rounded-md border border-accent-blue bg-bg-blue text-center hover:border-2"
+            className="border-accent-blue bg-bg-blue grid h-[120px] w-full flex-col place-items-center rounded-md border text-center hover:border-2"
             key={studio.id}
           >
             <div className="flex h-fit flex-col">
@@ -151,10 +151,10 @@ const Studios = ({
               >
                 {studio.name}
               </h4>
-              <p className="text-sm italic text-grey-55">
+              <p className="text-grey-55 text-sm italic">
                 {studio.spaces_in_studios.length} spaces
               </p>
-              <p className="text-sm italic text-grey-55">
+              <p className="text-grey-55 text-sm italic">
                 {studio.members_in_studios.length} members
               </p>
             </div>
@@ -214,20 +214,20 @@ const Spaces = (props: {
         <div className="flex flex-row gap-2 text-sm">
           <button
             onClick={() => setSortOrder("lastUpdated")}
-            className={`h-fit rounded-md border px-1 py-0.5 hover:border-grey-80 ${
+            className={`hover:border-grey-80 h-fit rounded-md border px-1 py-0.5 ${
               sortOrder === "lastUpdated"
                 ? " border-grey-80 text-grey-35"
-                : "border-transparent text-grey-55"
+                : "text-grey-55 border-transparent"
             }`}
           >
             last updated
           </button>
           <button
             onClick={() => setSortOrder("name")}
-            className={`h-fit rounded-md border px-1 py-0.5 hover:border-grey-80 ${
+            className={`hover:border-grey-80 h-fit rounded-md border px-1 py-0.5 ${
               sortOrder === "name"
                 ? " border-grey-80 text-grey-35"
-                : "border-transparent text-grey-55"
+                : "text-grey-55 border-transparent"
             } `}
           >
             name
@@ -262,7 +262,7 @@ const HistoryList = (props: { spaces: Array<SpaceData> }) => {
       {spacesHistory.length > 0 ? (
         <div className="myStudioCompleted">
           <button
-            className={`flex items-center gap-2 hover:text-accent-blue ${
+            className={`hover:text-accent-blue flex items-center gap-2 ${
               showHistory ? "text-grey-15" : "text-grey-55"
             }`}
             onClick={() => {
@@ -328,7 +328,7 @@ const MyHomeEmpty = (props: { studioSpaceID: string; studioName: string }) => {
         </div>
       )}
 
-      <div className=" flex h-full flex-col gap-3 p-4 text-grey-35 sm:p-8 sm:py-4 ">
+      <div className=" text-grey-35 flex h-full flex-col gap-3 p-4 sm:p-8 sm:py-4 ">
         <h3 className="text-grey-15">Welcome to Hyperlink!</h3>
 
         <p>
@@ -388,7 +388,7 @@ const MyHomeEmpty = (props: { studioSpaceID: string; studioName: string }) => {
           to get things done…Spaces are even better with friends :)
         </p> */}
         {/* </div> */}
-        <div className="lightBorder mt-4 flex flex-col gap-2 bg-bg-blue p-4 text-center">
+        <div className="lightBorder bg-bg-blue mt-4 flex flex-col gap-2 p-4 text-center">
           <h4>{"Let's get started!"}</h4>
           <div className="m-auto">
             <CreateSpace
