@@ -45,7 +45,7 @@ export const useAuth = () => {
       access_token: session.access_token,
       refresh_token: session.refresh_token,
     };
-  }, [session]);
+  }, [session?.access_token, session?.refresh_token]);
 
   return useMemo(
     () => ({
