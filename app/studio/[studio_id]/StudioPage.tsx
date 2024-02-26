@@ -1,9 +1,8 @@
 "use client";
 
-import { Tab } from "@headlessui/react";
 import { NonUndefined } from "@use-gesture/react";
 import { useStudioData } from "hooks/useStudioData";
-import { Fragment, useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Members } from "./MemberTab";
 import { StudioSettings } from "./SettingsTab";
 import { SpaceList } from "./SpacesTab";
@@ -30,62 +29,90 @@ export type Props = {
   isAdmin: boolean;
 };
 
-const TabsList = (props: Props & { className: string }) => {
+export type Tabs = "About" | "Spaces" | "Members" | "Settings" | "Get Started";
+
+const TabsList = (
+  props: Props & {
+    className: string;
+    setTab: (tab: Tabs) => void;
+    currentTab: Tabs;
+  }
+) => {
   let hasGetStartedItems = useHasGetStartedItems(props);
   return (
-    <Tab.List className={props.className}>
-      {hasGetStartedItems ? <TabItem name="Get Started" /> : null}
-      <TabItem name="About" />
-      <TabItem name="Spaces" />
-      <TabItem name="Members" />
-      {props.isAdmin ? <TabItem name={<SettingsIcon />} /> : null}
-    </Tab.List>
+    <div className={props.className}>
+      {hasGetStartedItems ? (
+        <TabItem
+          name="Get Started"
+          setTab={props.setTab}
+          id="Get Started"
+          currentTab={props.currentTab}
+        />
+      ) : null}
+      <TabItem
+        name="About"
+        setTab={props.setTab}
+        id="About"
+        currentTab={props.currentTab}
+      />
+      <TabItem
+        name="Spaces"
+        setTab={props.setTab}
+        id="Spaces"
+        currentTab={props.currentTab}
+      />
+      <TabItem
+        name="Members"
+        setTab={props.setTab}
+        id="Members"
+        currentTab={props.currentTab}
+      />
+      {props.isAdmin ? (
+        <TabItem
+          name={<SettingsIcon />}
+          setTab={props.setTab}
+          id="Settings"
+          currentTab={props.currentTab}
+        />
+      ) : null}
+    </div>
   );
 };
 
 const TabPanels = (
-  props: Props & { setSelectedIndex: (i: number) => void }
+  props: Props & { setTab: (t: Tabs) => void; currentTab: Tabs }
 ) => {
   let hasGetStartedItems = useHasGetStartedItems(props);
-  return (
-    <Tab.Panels className="StudioTabContent h-full min-h-0 ">
-      {hasGetStartedItems ? (
-        <Tab.Panel className="h-full">
-          <GetStartedTab setSelectedTab={props.setSelectedIndex} />
-        </Tab.Panel>
-      ) : null}
-      <Tab.Panel className="h-full">
-        <About isAdmin={props.isAdmin} />
-      </Tab.Panel>
-      <Tab.Panel className="h-full">
-        <SpaceList data={props.data} />
-      </Tab.Panel>
-      <Tab.Panel className="h-full">
-        <Members data={props.data} isAdmin={props.isAdmin} />
-      </Tab.Panel>
-      {props.isAdmin ? (
-        <Tab.Panel className="h-full">
-          <Settings {...props} />
-        </Tab.Panel>
-      ) : null}
-    </Tab.Panels>
-  );
+  switch (props.currentTab) {
+    case "Get Started":
+      return hasGetStartedItems ? <GetStartedTab {...props} /> : null;
+    case "About":
+      return <About {...props} />;
+    case "Members":
+      return <Members {...props} />;
+    case "Settings":
+      return props.isAdmin ? <Settings {...props} /> : null;
+    case "Spaces":
+      return <SpaceList {...props} />;
+  }
 };
 
-const TabItem = (props: { name: React.ReactNode }) => (
-  <Tab as={Fragment}>
-    {({ selected }) => (
-      <button
-        className={`place-self-end  outline-none ${
-          selected
-            ? "font-bold text-accent-blue"
-            : "text-grey-35 hover:text-accent-blue"
-        }`}
-      >
-        {props.name}
-      </button>
-    )}
-  </Tab>
+const TabItem = (props: {
+  name: React.ReactNode;
+  id: Tabs;
+  currentTab: Tabs;
+  setTab: (t: Tabs) => void;
+}) => (
+  <button
+    onClick={() => props.setTab(props.id)}
+    className={`place-self-end  outline-none ${
+      props.currentTab === props.id
+        ? "text-accent-blue font-bold"
+        : "text-grey-35 hover:text-accent-blue"
+    }`}
+  >
+    {props.name}
+  </button>
 );
 
 export function StudioPageContent(props: Props) {
@@ -95,15 +122,29 @@ export function StudioPageContent(props: Props) {
   let authorized = data?.members_in_studios.find(
     (m) => m.member === session.user?.id
   );
-  let [selectedIndex, setSelectedIndex] = useState(
-    session.session && authorized ? 1 : 0
+  let [currentTab, _setTab] = useState<Tabs>("About");
+
+  let setTab = useCallback(
+    (t: Tabs) => {
+      window.sessionStorage.setItem(`${props.data.id}-tab`, t);
+      _setTab(t);
+    },
+    [_setTab, props.data.id]
   );
+
   let hasGettingStartedItems = useHasGetStartedItems(props);
   useEffect(() => {
-    setSelectedIndex(
-      hasGettingStartedItems ? 0 : session.session && authorized ? 2 : 1
-    );
-  }, [hasGettingStartedItems, session, authorized]);
+    let savedTab = window.sessionStorage.getItem(`${props.data.id}-tab`);
+    if (savedTab) setTab(savedTab as Tabs);
+    else
+      setTab(
+        hasGettingStartedItems
+          ? "Get Started"
+          : session.session && authorized
+          ? "Spaces"
+          : "About"
+      );
+  }, [hasGettingStartedItems, session, authorized, props.data.id, setTab]);
 
   const [isClient, setIsClient] = useState(false);
   useEffect(() => {
@@ -115,27 +156,34 @@ export function StudioPageContent(props: Props) {
       <div className="flex w-full flex-col">
         <StudioBanner {...props} />
         <div className="studio relative mx-auto flex w-full max-w-7xl grow flex-col sm:flex-row sm:overflow-hidden ">
-          <Tab.Group
-            manual
-            selectedIndex={selectedIndex}
-            onChange={setSelectedIndex}
-          >
-            {width > 640 ? (
-              <StudioDesktopNav data={props.data} isAdmin={props.isAdmin} />
-            ) : (
-              <StudioMobileNav data={props.data} isAdmin={props.isAdmin} />
-            )}
+          {width > 640 ? (
+            <StudioDesktopNav
+              data={props.data}
+              isAdmin={props.isAdmin}
+              currentTab={currentTab}
+              setTab={setTab}
+            />
+          ) : (
+            <StudioMobileNav
+              data={props.data}
+              isAdmin={props.isAdmin}
+              currentTab={currentTab}
+              setTab={setTab}
+            />
+          )}
 
-            <div
-              className={`StudioContent flex w-full grow flex-col items-stretch`}
-            >
+          <div
+            className={`StudioContent flex w-full grow flex-col items-stretch`}
+          >
+            <div className="w-full">
               <TabPanels
                 data={data || props.data}
                 isAdmin={props.isAdmin}
-                setSelectedIndex={setSelectedIndex}
+                setTab={setTab}
+                currentTab={currentTab}
               />
             </div>
-          </Tab.Group>
+          </div>
         </div>
       </div>
     </div>
@@ -150,18 +198,20 @@ function Settings({ data }: Props) {
   );
 }
 
-const StudioDesktopNav = (props: Props) => {
+const StudioDesktopNav = (
+  props: Props & { currentTab: Tabs; setTab: (t: Tabs) => void }
+) => {
   let { data } = useStudioData(props.data?.id, props.data);
   let { session } = useAuth();
 
   return (
-    <div className="studioNav my-6 mr-4 w-64 flex-col justify-between border-r border-grey-80 pr-4">
+    <div className="studioNav border-grey-80 my-6 mr-4 w-64 flex-col justify-between border-r pr-4">
       <div className="flex w-full flex-col gap-2 text-right">
         <div className="flex flex-col gap-0">
           {session.session ? (
             <Link
               href={`/s/${session.session.username}`}
-              className="-mb-1 flex items-center justify-end gap-2 text-sm font-bold text-grey-55 hover:text-accent-blue"
+              className="text-grey-55 hover:text-accent-blue -mb-1 flex items-center justify-end gap-2 text-sm font-bold"
             >
               <ArrowDown className="rotate-90" height={16} width={16} /> home
             </Link>
@@ -178,7 +228,9 @@ const StudioDesktopNav = (props: Props) => {
   );
 };
 
-const StudioMobileNav = (props: Props) => {
+const StudioMobileNav = (
+  props: Props & { currentTab: Tabs; setTab: (t: Tabs) => void }
+) => {
   let { data } = useStudioData(props.data?.id, props.data);
   let { session } = useAuth();
 
@@ -188,7 +240,7 @@ const StudioMobileNav = (props: Props) => {
       {session.session ? (
         <Link
           href={`/s/${session.session.username}`}
-          className="z-30 mt-3 flex items-center gap-2 text-sm text-grey-55 hover:text-accent-blue"
+          className="text-grey-55 hover:text-accent-blue z-30 mt-3 flex items-center gap-2 text-sm"
           style={{ transform: "translate3D(0,0,0)" }}
         >
           <ArrowDown className="rotate-90" height={16} width={16} /> home
@@ -201,7 +253,7 @@ const StudioMobileNav = (props: Props) => {
         {data?.name}
       </h3>
 
-      <div className="pwa-padding pwa-negative-margin sticky top-0 z-10 -mx-3  mb-4 border-b border-grey-80 bg-background px-3 pb-1">
+      <div className="pwa-padding pwa-negative-margin border-grey-80 bg-background sticky top-0  z-10 -mx-3 mb-4 border-b px-3 pb-1">
         <TabsList className="StudioTabs flex gap-3 pt-4" {...props} />
       </div>
     </>
@@ -285,7 +337,7 @@ const StudioBanner = (props: Props) => {
       />
 
       <div
-        className={`studioBanner lightBorder mx-auto mt-4 flex w-full max-w-7xl shrink-0 grow-0 border px-2 py-1 text-sm text-grey-55 sm:px-4 ${
+        className={`studioBanner lightBorder text-grey-55 mx-auto mt-4 flex w-full max-w-7xl shrink-0 grow-0 border px-2 py-1 text-sm sm:px-4 ${
           joinCode ? " bg-bg-blue" : "bg-grey-90 "
         }`}
       >
@@ -360,7 +412,7 @@ const InfoPopover = (props: { children: React.ReactNode }) => {
       </Popover.Trigger>
       <Popover.Portal>
         <Popover.Content sideOffset={2} className="z-50">
-          <div className="lightBorder rounded-sm flex max-w-xs flex-col gap-2 bg-white p-2 text-xs font-normal text-grey-55 shadow-lg">
+          <div className="lightBorder text-grey-55 flex max-w-xs flex-col gap-2 rounded-sm bg-white p-2 text-xs font-normal shadow-lg">
             {props.children}
           </div>
           <Popover.Close />

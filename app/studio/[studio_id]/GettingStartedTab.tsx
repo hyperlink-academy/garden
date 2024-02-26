@@ -1,6 +1,6 @@
 import { useAuth } from "hooks/useAuth";
 import { db, scanIndex, useMutations } from "hooks/useReplicache";
-import { Props } from "./StudioPage";
+import { Props, Tabs } from "./StudioPage";
 import { ref } from "data/Facts";
 import { useSubscribe } from "hooks/useSubscribe";
 import { ButtonPrimary } from "components/Buttons";
@@ -25,9 +25,7 @@ export const useHasGetStartedItems = (props: Props) => {
     return false;
   return true;
 };
-export function GetStartedTab(props: {
-  setSelectedTab: (tab: number) => void;
-}) {
+export function GetStartedTab(props: { setTab: (t: Tabs) => void }) {
   let home = db.useAttribute("home")[0];
   let toaster = useToaster();
   let { memberEntity, mutate } = useMutations();
@@ -79,7 +77,7 @@ export function GetStartedTab(props: {
               value: ref(memberEntity),
               positions: {},
             });
-            props.setSelectedTab(1);
+            props.setTab("Spaces");
             toaster({
               type: "success",
               text: "Congrats! You Got Started!",
@@ -89,7 +87,7 @@ export function GetStartedTab(props: {
           content="Complete Get Started!"
         />
         {completed === items.length && (
-          <div className="max-w-[16rem] text-sm text-grey-55">
+          <div className="text-grey-55 max-w-[16rem] text-sm">
             Completing removes <em>Get Started</em> from your Studio sidebar
           </div>
         )}
@@ -125,8 +123,8 @@ function GetStartedItem(props: { entityID: string; value: string }) {
       <div
         className={`${
           checkedByUser
-            ? "text-grey-55 line-through decoration-grey-80"
-            : "font-bold text-grey-35"
+            ? "text-grey-55 decoration-grey-80 line-through"
+            : "text-grey-35 font-bold"
         } `}
       >
         {props.value}
