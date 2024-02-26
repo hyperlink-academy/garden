@@ -40,7 +40,7 @@ export const useAuth = () => {
   const supabaseClient = supabaseBrowserClient();
   let session = useSession();
   let authToken = useMemo(() => {
-    if (!session) return null;
+    if (!session?.access_token) return null;
     return {
       access_token: session.access_token,
       refresh_token: session.refresh_token,
@@ -90,6 +90,6 @@ export const useAuth = () => {
         });
       },
     }),
-    [session, supabaseClient.auth]
+    [session, supabaseClient.auth, authToken]
   );
 };
