@@ -175,7 +175,7 @@ export function StudioPageContent(props: Props) {
           <div
             className={`StudioContent flex w-full grow flex-col items-stretch`}
           >
-            <div className="w-full">
+            <div className="no-scrollbar h-full w-full overflow-y-scroll">
               <TabPanels
                 data={data || props.data}
                 isAdmin={props.isAdmin}
