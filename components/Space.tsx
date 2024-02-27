@@ -29,6 +29,7 @@ import { useIsClient } from "hooks/utils";
 import * as Popover from "@radix-ui/react-popover";
 import { useSpaceData } from "hooks/useSpaceData";
 import { spaceAPI } from "backend/lib/api";
+import { useToaster } from "./Smoke";
 
 type Props = {
   studio?: { spaces: SpaceData[]; studioName: string; studioID: string };
