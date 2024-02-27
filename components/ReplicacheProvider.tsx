@@ -8,24 +8,23 @@ import {
   MessageWithIndexes,
   ReplicacheContext,
 } from "hooks/useReplicache";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { PullRequest, PushRequest, Replicache } from "replicache";
+import { useEffect, useRef, useState } from "react";
+import { PullRequest, PushRequest } from "replicache";
 import { useAuth } from "hooks/useAuth";
 import { UndoManager } from "@rocicorp/undo";
 import { authToken } from "backend/lib/auth";
-import { atom, useSetAtom } from "jotai";
+import { atom } from "jotai";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL as string;
-export const SpaceProvider: React.FC<
-  React.PropsWithChildren<{
-    id: string;
-    data:
-      | { space_id: string; studio_id: undefined }
-      | { studio_id: string; space_id: undefined };
-  }>
-> = (props) => {
-  let [rep, setRep] = useState<ReturnType<typeof makeReplicache>>();
+
+export const SpaceProvider = (props: {
+  children: React.ReactNode;
+  id: string;
+  data:
+    | { space_id: string; studio_id: undefined }
+    | { studio_id: string; space_id: undefined };
+}) => {
   let [undoManager] = useState(new UndoManager());
 
   useEffect(() => {
@@ -51,24 +50,14 @@ export const SpaceProvider: React.FC<
 
     return () => window.removeEventListener("keydown", handler);
   }, [undoManager]);
-  let reconnect = useWebSocket(props.id, rep);
-
   let { session, authToken } = useAuth();
-  useEffect(() => {
-    let newRep = makeSpaceReplicache({
-      id: props.id,
-      session: session.session?.studio || "unauthorized",
-      authToken,
-      undoManager: undoManager,
-      onPull: () => {
-        reconnect();
-      },
-    });
-    setRep(newRep);
-    return () => {
-      newRep.close();
-    };
-  }, [props.id, authToken, session.session?.studio, undoManager, reconnect]);
+
+  let rep = useMakeSpaceReplicache({
+    id: props.id,
+    session: session?.session?.studio || "unauthorized",
+    authToken,
+    undoManager: undoManager,
+  });
 
   return (
     <ReplicacheContext.Provider
@@ -79,109 +68,104 @@ export const SpaceProvider: React.FC<
   );
 };
 
-export const makeSpaceReplicache = ({
+let reps = new Map<
+  string,
+  { rep: ReturnType<typeof makeReplicache>; count: number; socket: WebSocket }
+>();
+export const useMakeSpaceReplicache = ({
   id,
   session,
-  onPull,
   authToken,
   undoManager,
 }: {
   id: string;
   session?: string;
-  onPull?: () => void;
   authToken?: authToken | null;
   undoManager: UndoManager;
-}) =>
-  makeReplicache({
-    name: `space-${id}-${session}-${WORKER_URL}`,
-    pusher: async (request) => {
-      let data: PushRequest = await request.json();
-      if (!authToken)
-        return { httpStatusCode: 200, errorMessage: "no user logged in" };
-      await spaceAPI(`${WORKER_URL}/space/${id}`, "push", {
-        ...data,
-        authToken,
-      });
-      return { httpStatusCode: 200, errorMessage: "" };
-    },
-    puller: async (request) => {
-      onPull?.();
-      let data: PullRequest = await request.json();
-      let result = await spaceAPI(
-        `${WORKER_URL}/space/${id}`,
-        "pull",
-        data as z.infer<typeof pullRoute.input>
-      );
-      let ops = result.data.map((fact) => {
-        if (fact.retracted)
-          return {
-            op: "del",
-            key: fact.id,
-          } as const;
-        return {
-          op: "put",
-          key: fact.id,
-          value: FactWithIndexes(fact),
-        } as const;
-      });
-      let messageOps = result.messages.map((m) => {
-        return {
-          op: "put",
-          key: m.id,
-          value: MessageWithIndexes(m),
-        } as const;
-      });
-      let ephemeralFacts = result.ephemeralFacts.map((fact) => {
-        return {
-          op: "put",
-          key: fact.id,
-          value: FactWithIndexes(fact),
-        } as const;
-      });
-      let deletedEphemeralFacts = result.deletedEphemeralFacts.map((fact) => {
-        return { op: "del", key: fact } as const;
-      });
-      return {
-        httpRequestInfo: { httpStatusCode: 200, errorMessage: "" },
-        response: {
-          lastMutationID: result.lastMutationID,
-          cookie: result.cookie,
-          patch: [
-            ...ops,
-            ...messageOps,
-            ...ephemeralFacts,
-            ...deletedEphemeralFacts,
-          ],
+}) => {
+  let [rep, setRep] = useState<ReturnType<typeof makeReplicache>>();
+  let key = `${id}-${session}-${
+    authToken ? `${authToken.access_token}-${authToken.refresh_token}` : ""
+  }`;
+
+  useEffect(() => {
+    let rep = reps.get(key);
+    if (!rep) {
+      let socket = new WebSocket(`${SOCKET_URL}/space/${id}/socket`);
+      let newRep = makeReplicache({
+        name: `space-${id}-${session}-${WORKER_URL}`,
+        pusher: async (request) => {
+          let data: PushRequest = await request.json();
+          if (!authToken)
+            return { httpStatusCode: 200, errorMessage: "no user logged in" };
+          await spaceAPI(`${WORKER_URL}/space/${id}`, "push", {
+            ...data,
+            authToken,
+          });
+          return { httpStatusCode: 200, errorMessage: "" };
         },
-      };
-    },
-    undoManager: undoManager,
-  });
-
-export let socketStateAtom = atom<"connecting" | "connected" | "disconnected">(
-  "disconnected"
-);
-const useWebSocket = (id: string, rep?: Replicache) => {
-  const [reconnectSocket, setReconnect] = useState({});
-  let setSocketState = useSetAtom(socketStateAtom);
-  let socket = useRef<WebSocket>();
-
-  let connectSocket = useCallback(
-    (rep?: Replicache) => {
-      if (socket.current && socket.current.readyState === 1) return;
-      socket.current = new WebSocket(`${SOCKET_URL}/space/${id}/socket`);
-      setSocketState("connecting");
-      socket.current.addEventListener("message", () => {
-        rep?.pull();
+        puller: async (request) => {
+          let data: PullRequest = await request.json();
+          let result = await spaceAPI(
+            `${WORKER_URL}/space/${id}`,
+            "pull",
+            data as z.infer<typeof pullRoute.input>
+          );
+          let ops = result.data.map((fact) => {
+            if (fact.retracted)
+              return {
+                op: "del",
+                key: fact.id,
+              } as const;
+            return {
+              op: "put",
+              key: fact.id,
+              value: FactWithIndexes(fact),
+            } as const;
+          });
+          let messageOps = result.messages.map((m) => {
+            return {
+              op: "put",
+              key: m.id,
+              value: MessageWithIndexes(m),
+            } as const;
+          });
+          let ephemeralFacts = result.ephemeralFacts.map((fact) => {
+            return {
+              op: "put",
+              key: fact.id,
+              value: FactWithIndexes(fact),
+            } as const;
+          });
+          let deletedEphemeralFacts = result.deletedEphemeralFacts.map(
+            (fact) => {
+              return { op: "del", key: fact } as const;
+            }
+          );
+          return {
+            httpRequestInfo: { httpStatusCode: 200, errorMessage: "" },
+            response: {
+              lastMutationID: result.lastMutationID,
+              cookie: result.cookie,
+              patch: [
+                ...ops,
+                ...messageOps,
+                ...ephemeralFacts,
+                ...deletedEphemeralFacts,
+              ],
+            },
+          };
+        },
+        undoManager: undoManager,
       });
-      socket.current.addEventListener("close", () => {
-        setSocketState("disconnected");
+
+      socket.addEventListener("message", () => {
+        newRep.pull();
       });
-      socket.current.addEventListener("open", () => {
-        rep?.clientID.then((clientID) => {
-          if (socket.current?.readyState !== WebSocket.OPEN) return;
-          setSocketState("connected");
-          socket.current?.send(
+      socket.addEventListener("open", () => {
+        newRep.clientID.then((clientID) => {
+          if (socket.readyState !== WebSocket.OPEN) return;
+          socket.send(
             JSON.stringify({
               type: "init",
               data: { clientID },
@@ -189,58 +173,30 @@ const useWebSocket = (id: string, rep?: Replicache) => {
           );
         });
       });
-    },
-    [id, setSocketState]
-  );
-
-  useEffect(() => {
-    let listener = () => {
-      if (socket.current) socket.current.close();
-    };
-    window.addEventListener("beforeunload", listener);
-    return () => window.removeEventListener("beforeunload", listener);
-  }, []);
-  useEffect(() => {
-    let listener = () => {
-      if (socket.current?.readyState !== 1 && rep) connectSocket(rep);
-    };
-    document.addEventListener("visibilitychange", listener);
-    return () => document.removeEventListener("visibilitychange", listener);
-  }, [rep, connectSocket]);
-
-  useEffect(() => {
-    if (!id || !rep) return;
-    connectSocket(rep);
-    return () => {
-      socket.current?.close();
-    };
-  }, [id, rep, reconnectSocket, connectSocket]);
-
-  useEffect(() => {
-    if (rep) {
-      rep.clientID.then((clientID) => {
-        if (socket.current) {
-          if (socket.current.readyState === WebSocket.OPEN)
-            socket.current.send(
-              JSON.stringify({
-                type: "init",
-                data: { clientID },
-              })
-            );
-          else
-            socket.current.addEventListener("open", () => {
-              socket.current?.send(
-                JSON.stringify({
-                  type: "init",
-                  data: { clientID },
-                })
-              );
-            });
-        }
-      });
+      rep = {
+        socket,
+        count: 1,
+        rep: newRep,
+      };
+      reps.set(key, rep);
     }
-  }, [rep]);
-  return useCallback(() => {
-    if (socket.current?.readyState !== 1) setReconnect({});
-  }, []);
+    setRep(rep.rep);
+    rep.count += 1;
+    reps.set(key, rep);
+    return () => {
+      let rep = reps.get(key);
+      if (!rep) return;
+      rep.count -= 1;
+      if (rep.count === 0) {
+        rep.socket.close();
+        rep.rep.close();
+        reps.delete(key);
+      } else reps.set(key, rep);
+    };
+  }, [key, authToken, id, session, undoManager]);
+  return rep;
 };
+
+export let socketStateAtom = atom<"connecting" | "connected" | "disconnected">(
+  "disconnected"
+);

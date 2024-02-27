@@ -20,9 +20,9 @@ import { WORKER_URL } from "src/constants";
 import { useSearchParams } from "next/navigation";
 import { useToaster } from "components/Smoke";
 import { uuidToBase62 } from "src/uuidHelpers";
-import { Settings as SettingsIcon } from "components/Icons";
 
 import { GetStartedTab, useHasGetStartedItems } from "./GettingStartedTab";
+import { useStudioTabs } from "app/(app)/@sidebar/studio/[studio_id]/StudioTabs";
 
 export type Props = {
   data: NonUndefined<ReturnType<typeof useStudioData>["data"]>;
@@ -30,54 +30,6 @@ export type Props = {
 };
 
 export type Tabs = "About" | "Spaces" | "Members" | "Settings" | "Get Started";
-
-const TabsList = (
-  props: Props & {
-    className: string;
-    setTab: (tab: Tabs) => void;
-    currentTab: Tabs;
-  }
-) => {
-  let hasGetStartedItems = useHasGetStartedItems(props);
-  return (
-    <div className={props.className}>
-      {hasGetStartedItems ? (
-        <TabItem
-          name="Get Started"
-          setTab={props.setTab}
-          id="Get Started"
-          currentTab={props.currentTab}
-        />
-      ) : null}
-      <TabItem
-        name="About"
-        setTab={props.setTab}
-        id="About"
-        currentTab={props.currentTab}
-      />
-      <TabItem
-        name="Spaces"
-        setTab={props.setTab}
-        id="Spaces"
-        currentTab={props.currentTab}
-      />
-      <TabItem
-        name="Members"
-        setTab={props.setTab}
-        id="Members"
-        currentTab={props.currentTab}
-      />
-      {props.isAdmin ? (
-        <TabItem
-          name={<SettingsIcon />}
-          setTab={props.setTab}
-          id="Settings"
-          currentTab={props.currentTab}
-        />
-      ) : null}
-    </div>
-  );
-};
 
 const TabPanels = (
   props: Props & { setTab: (t: Tabs) => void; currentTab: Tabs }
@@ -97,54 +49,32 @@ const TabPanels = (
   }
 };
 
-const TabItem = (props: {
-  name: React.ReactNode;
-  id: Tabs;
-  currentTab: Tabs;
-  setTab: (t: Tabs) => void;
-}) => (
-  <button
-    onClick={() => props.setTab(props.id)}
-    className={`place-self-end  outline-none ${
-      props.currentTab === props.id
-        ? "text-accent-blue font-bold"
-        : "text-grey-35 hover:text-accent-blue"
-    }`}
-  >
-    {props.name}
-  </button>
-);
-
 export function StudioPageContent(props: Props) {
   let { data } = useStudioData(props.data?.id, props.data);
-  let { width } = useWindowDimensions();
   let { session } = useAuth();
   let authorized = data?.members_in_studios.find(
     (m) => m.member === session.user?.id
   );
-  let [currentTab, _setTab] = useState<Tabs>("About");
-
-  let setTab = useCallback(
-    (t: Tabs) => {
-      window.sessionStorage.setItem(`${props.data.id}-tab`, t);
-      _setTab(t);
-    },
-    [_setTab, props.data.id]
-  );
+  let [currentTab, setTab] = useStudioTabs(props.data.id);
 
   let hasGettingStartedItems = useHasGetStartedItems(props);
   useEffect(() => {
-    let savedTab = window.sessionStorage.getItem(`${props.data.id}-tab`);
-    if (savedTab) setTab(savedTab as Tabs);
-    else
-      setTab(
-        hasGettingStartedItems
-          ? "Get Started"
-          : session.session && authorized
-          ? "Spaces"
-          : "About"
-      );
-  }, [hasGettingStartedItems, session, authorized, props.data.id, setTab]);
+    if (currentTab) return;
+    setTab(
+      hasGettingStartedItems
+        ? "Get Started"
+        : session.session && authorized
+        ? "Spaces"
+        : "About"
+    );
+  }, [
+    currentTab,
+    hasGettingStartedItems,
+    session,
+    authorized,
+    props.data.id,
+    setTab,
+  ]);
 
   const [isClient, setIsClient] = useState(false);
   useEffect(() => {
@@ -155,34 +85,16 @@ export function StudioPageContent(props: Props) {
     <div className="pwa-padding studioWrapper  flex w-full items-stretch px-3 sm:h-screen sm:px-4">
       <div className="flex w-full flex-col">
         <StudioBanner {...props} />
-        <div className="studio relative mx-auto flex w-full max-w-7xl grow flex-col sm:flex-row sm:overflow-hidden ">
-          {width > 640 ? (
-            <StudioDesktopNav
-              data={props.data}
+        <div
+          className={`StudioContent flex w-full grow flex-col items-stretch`}
+        >
+          <div className="no-scrollbar h-full w-full overflow-y-scroll">
+            <TabPanels
+              data={data || props.data}
               isAdmin={props.isAdmin}
-              currentTab={currentTab}
               setTab={setTab}
-            />
-          ) : (
-            <StudioMobileNav
-              data={props.data}
-              isAdmin={props.isAdmin}
               currentTab={currentTab}
-              setTab={setTab}
             />
-          )}
-
-          <div
-            className={`StudioContent flex w-full grow flex-col items-stretch`}
-          >
-            <div className="no-scrollbar h-full w-full overflow-y-scroll">
-              <TabPanels
-                data={data || props.data}
-                isAdmin={props.isAdmin}
-                setTab={setTab}
-                currentTab={currentTab}
-              />
-            </div>
           </div>
         </div>
       </div>
@@ -197,68 +109,6 @@ function Settings({ data }: Props) {
     </>
   );
 }
-
-const StudioDesktopNav = (
-  props: Props & { currentTab: Tabs; setTab: (t: Tabs) => void }
-) => {
-  let { data } = useStudioData(props.data?.id, props.data);
-  let { session } = useAuth();
-
-  return (
-    <div className="studioNav border-grey-80 my-6 mr-4 w-64 flex-col justify-between border-r pr-4">
-      <div className="flex w-full flex-col gap-2 text-right">
-        <div className="flex flex-col gap-0">
-          {session.session ? (
-            <Link
-              href={`/s/${session.session.username}`}
-              className="text-grey-55 hover:text-accent-blue -mb-1 flex items-center justify-end gap-2 text-sm font-bold"
-            >
-              <ArrowDown className="rotate-90" height={16} width={16} /> home
-            </Link>
-          ) : null}
-          <h3
-            style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
-          >
-            {data?.name}
-          </h3>
-        </div>
-        <TabsList className="StudioTabs flex flex-col gap-2 " {...props} />
-      </div>
-    </div>
-  );
-};
-
-const StudioMobileNav = (
-  props: Props & { currentTab: Tabs; setTab: (t: Tabs) => void }
-) => {
-  let { data } = useStudioData(props.data?.id, props.data);
-  let { session } = useAuth();
-
-  return (
-    <>
-      {/* translate3d is necessary to fix a bug in safari where sticky z-index is reordered on scroll */}
-      {session.session ? (
-        <Link
-          href={`/s/${session.session.username}`}
-          className="text-grey-55 hover:text-accent-blue z-30 mt-3 flex items-center gap-2 text-sm"
-          style={{ transform: "translate3D(0,0,0)" }}
-        >
-          <ArrowDown className="rotate-90" height={16} width={16} /> home
-        </Link>
-      ) : null}
-      <h3
-        style={{ transform: "translate3D(0,0,0)" }}
-        className="z-20 -mb-3 mt-2"
-      >
-        {data?.name}
-      </h3>
-
-      <div className="pwa-padding pwa-negative-margin border-grey-80 bg-background sticky top-0  z-10 -mx-3 mb-4 border-b px-3 pb-1">
-        <TabsList className="StudioTabs flex gap-3 pt-4" {...props} />
-      </div>
-    </>
-  );
-};
 
 const LoginButton = () => {
   let [state, setState] = LoginOrSignupModal.useState("closed");

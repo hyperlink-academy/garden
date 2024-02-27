@@ -1,10 +1,8 @@
-import { workerAPI } from "backend/lib/api";
-import { WORKER_URL } from "src/constants";
 import { base62ToUuid } from "src/uuidHelpers";
 import { SpaceViewer } from "./SpaceViewer";
 import { PageHeightContainer } from "components/PageHeightContainer";
-import { Space } from "components/Space";
 import { StudioPresenceHandler } from "./StudioPresenceHandler";
+import { getStudioPageData } from "../page";
 export const fetchCache = "force-no-store";
 
 export default async function StudioSpaceLayout(props: {
@@ -14,9 +12,7 @@ export default async function StudioSpaceLayout(props: {
   let id = props.params.studio_id as string;
   if (id.length !== 36) id = base62ToUuid(id);
 
-  let data = await workerAPI(WORKER_URL, "get_studio_data", {
-    id,
-  });
+  let data = await getStudioPageData(id);
   if (!data.success) return <>404</>;
   let spaces = data.data.spaces_in_studios.map((x) => x.space_data);
 
