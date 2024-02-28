@@ -173,6 +173,7 @@ export function LoginForm(props: {
             className="w-full font-normal"
             type="email"
             required
+            id="email"
             value={data.email}
             onChange={(e) => setData({ ...data, email: e.currentTarget.value })}
           />
@@ -180,6 +181,7 @@ export function LoginForm(props: {
         <label className="flex flex-col-reverse gap-1 font-bold">
           <input
             type="password"
+            id="password"
             value={data.password}
             required
             onChange={(e) =>
