@@ -34,24 +34,6 @@ export interface Database {
   }
   public: {
     Tables: {
-      communities: {
-        Row: {
-          id: number
-          name: string
-          spaceID: string
-        }
-        Insert: {
-          id?: number
-          name: string
-          spaceID: string
-        }
-        Update: {
-          id?: number
-          name?: string
-          spaceID?: string
-        }
-        Relationships: []
-      }
       debug_logs: {
         Row: {
           data: Json | null
@@ -162,14 +144,17 @@ export interface Database {
       }
       members_in_studios: {
         Row: {
+          joined_at: string | null
           member: string
           studio: string
         }
         Insert: {
+          joined_at?: string | null
           member: string
           studio: string
         }
         Update: {
+          joined_at?: string | null
           member?: string
           studio?: string
         }
@@ -211,18 +196,21 @@ export interface Database {
       }
       push_subscriptions: {
         Row: {
+          created_at: string | null
           endpoint: string
           id: number
           push_subscription: Json
           user_id: string
         }
         Insert: {
+          created_at?: string | null
           endpoint: string
           id?: number
           push_subscription: Json
           user_id: string
         }
         Update: {
+          created_at?: string | null
           endpoint?: string
           id?: number
           push_subscription?: Json
@@ -334,14 +322,17 @@ export interface Database {
       }
       spaces_in_studios: {
         Row: {
+          created_at: string | null
           space_id: string
           studio: string
         }
         Insert: {
+          created_at?: string | null
           space_id: string
           studio: string
         }
         Update: {
+          created_at?: string | null
           space_id?: string
           studio?: string
         }
@@ -363,6 +354,7 @@ export interface Database {
       studios: {
         Row: {
           allow_members_to_join_spaces: boolean
+          created_at: string | null
           creator: string
           description: string | null
           do_id: string
@@ -373,6 +365,7 @@ export interface Database {
         }
         Insert: {
           allow_members_to_join_spaces?: boolean
+          created_at?: string | null
           creator: string
           description?: string | null
           do_id: string
@@ -383,6 +376,7 @@ export interface Database {
         }
         Update: {
           allow_members_to_join_spaces?: boolean
+          created_at?: string | null
           creator?: string
           description?: string | null
           do_id?: string
