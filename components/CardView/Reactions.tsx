@@ -136,14 +136,12 @@ export const AddReaction = (props: {
       <EditReactions
         reactionEditOpen={reactionEditOpen}
         onClose={() => setReactionEditOpen(false)}
-        entityID={props.entityID}
       />
     </div>
   );
 };
 
 export const EditReactions = (props: {
-  entityID: string;
   reactionEditOpen: boolean;
   onClose: () => void;
 }) => {
