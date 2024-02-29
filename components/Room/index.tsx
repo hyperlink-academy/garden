@@ -30,7 +30,7 @@ import { create } from "components/CardStack";
 import { useDraggableCard } from "components/DragContext";
 import { sortByPosition } from "src/position_helpers";
 import { generateKeyBetween } from "src/fractional-indexing";
-import { useRoom } from "hooks/useUIState";
+import { useRoom, useSelectedCards } from "hooks/useUIState";
 import { SingleTextSection } from "components/CardView/Sections";
 import { useCardViewer } from "components/CardViewerContext";
 import { Textarea } from "components/Textarea";
@@ -43,10 +43,10 @@ export const Room = () => {
   let { ref } = usePreserveScroll<HTMLDivElement>(room);
   let { reactions, filters, setFilters, cardsFiltered, total } =
     useFilteredCards(room, "desktop/contains");
-  let [selectedCards, setSelectedCards] = useState(true);
+  let [selectedCards] = useSelectedCards();
 
   let { authToken } = useAuth();
-  let { mutate, rep, action, memberEntity } = useMutations();
+  let { mutate, rep, action, memberEntity, authorized } = useMutations();
   let spaceID = useSpaceID();
 
   if (room === "calendar") return <CalendarRoom />;
@@ -184,22 +184,24 @@ export const Room = () => {
           </div>
         )
       ) : null}
-      <div className="border-grey-80 bg-background absolute bottom-0 left-[136px] z-[2] -mb-[1px] flex h-8 w-16 items-center justify-center rounded-t-full border border-b-0 text-center">
-        {selectedCards ? (
-          <CardActionMenu />
-        ) : (
-          <AddCardButton
-            total={total}
-            firstCard={cardsFiltered[0]?.value.value}
-            roomEntity={room}
-            getViewHeight={() =>
-              ref.current
-                ? ref?.current.clientHeight + ref.current.scrollTop
-                : 0
-            }
-          />
-        )}
-      </div>
+      {authorized && (
+        <div className="border-grey-80 bg-background absolute bottom-0 left-[136px] z-[2] -mb-[1px] flex h-8 w-16 items-center justify-center rounded-t-full border border-b-0 text-center">
+          {selectedCards.length > 0 ? (
+            <CardActionMenu />
+          ) : (
+            <AddCardButton
+              total={total}
+              firstCard={cardsFiltered[0]?.value.value}
+              roomEntity={room}
+              getViewHeight={() =>
+                ref.current
+                  ? ref?.current.clientHeight + ref.current.scrollTop
+                  : 0
+              }
+            />
+          )}
+        </div>
+      )}
     </div>
   );
 };

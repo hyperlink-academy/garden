@@ -72,10 +72,11 @@ export const ReactionList = (props: { entityID: string }) => {
 };
 
 export const AddReaction = (props: {
-  entityID: string;
+  entityID: string | string[];
   onSelect?: () => void;
+  existingReactions?: string[];
 }) => {
-  let { mutate, permissions } = useMutations();
+  let { mutate, permissions, action, memberEntity } = useMutations();
   let { session } = useAuth();
   let authorized = permissions.commentAndReact;
   let reactions = db.useAttribute("space/reaction");
@@ -96,13 +97,28 @@ export const AddReaction = (props: {
               className="font-bold"
               onClick={async () => {
                 if (!session.session || !authorized) return;
-                await mutate("addReaction", {
-                  reaction: r.value,
-                  reactionFactID: ulid(),
-                  reactionAuthorFactID: ulid(),
-                  session: session.session,
-                  cardEntity: props.entityID,
-                });
+                action.start();
+                console.log(props.existingReactions);
+                for (let card of [props.entityID].flat()) {
+                  if (
+                    props.existingReactions?.includes(r.value) &&
+                    memberEntity
+                  )
+                    await mutate("removeReaction", {
+                      cardEntity: card,
+                      memberEntity,
+                      reaction: r.value,
+                    });
+                  else
+                    await mutate("addReaction", {
+                      reaction: r.value,
+                      reactionFactID: ulid(),
+                      reactionAuthorFactID: ulid(),
+                      session: session.session,
+                      cardEntity: card,
+                    });
+                }
+                action.end();
                 props.onSelect ? props.onSelect() : null;
               }}
             >

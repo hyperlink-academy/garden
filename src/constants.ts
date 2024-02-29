@@ -5,3 +5,11 @@ export const springConfig = {
   friction: 10,
   clamp: true,
 };
+
+export const CardBackgroundColors = [
+  "#FFFFFF", //white
+  "#F4FFE7", //green
+  "#FFEEF2", //pink
+  "#ECF8FF", //blue
+  "#FFFAE7", //yellow
+];
