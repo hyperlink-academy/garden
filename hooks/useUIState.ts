@@ -11,6 +11,7 @@ export let useUIState = create(
       mobileSidebarOpen: false,
       spaces: {} as {
         [spaceID: string]: {
+          selectedCards: string[];
           activeRoom?: string;
           rooms: {
             [roomID: string]: string[];
@@ -154,6 +155,61 @@ export let useRoom = () => {
       spaceID ? state.spaces[spaceID]?.activeRoom : null
     ) || firstRoomByID
   );
+};
+
+export let useSelectedCards = () => {
+  let spaceID = useSpaceID();
+  let selectedCards = useUIState((state) =>
+    spaceID ? state.spaces[spaceID]?.selectedCards || [] : []
+  );
+  return [selectedCards] as const;
+};
+
+export let useCardSelectionState = (card: string) => {
+  let spaceID = useSpaceID();
+  let isCardSelected = useUIState((state) =>
+    spaceID ? state.spaces[spaceID]?.selectedCards?.includes(card) : false
+  );
+  let toggleSelectedCard = useCallback(() => {
+    if (!spaceID) return;
+    let sid = spaceID;
+    let isCardSelected = useUIState
+      .getState()
+      .spaces[spaceID]?.selectedCards?.includes(card);
+    if (isCardSelected) {
+      useUIState.setState((state) => {
+        return {
+          ...state,
+          spaces: {
+            ...state.spaces,
+            [sid]: {
+              ...state.spaces[sid],
+              selectedCards:
+                state.spaces[sid]?.selectedCards.filter((c) => c !== card) ||
+                [],
+            },
+          },
+        };
+      });
+    } else {
+      useUIState.setState((state) => {
+        return {
+          ...state,
+          spaces: {
+            ...state.spaces,
+            [sid]: {
+              ...state.spaces[sid],
+              selectedCards: [
+                ...(state.spaces[sid]?.selectedCards || []),
+                card,
+              ],
+            },
+          },
+        };
+      });
+    }
+  }, [spaceID, card]);
+  return [isCardSelected, toggleSelectedCard] as const;
 };
 
 export const useIsActiveRoom = (room: string) => {

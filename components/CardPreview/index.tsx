@@ -24,7 +24,11 @@ import { useAuth } from "hooks/useAuth";
 import { ulid } from "src/ulid";
 import { getAndUploadFile } from "src/getAndUploadFile";
 import { CardPreviewData, useCardPreviewData } from "hooks/CardPreviewData";
-import { useUIState } from "hooks/useUIState";
+import {
+  useCardSelectionState,
+  useSelectedCards,
+  useUIState,
+} from "hooks/useUIState";
 import { PresenceTag } from "components/PresenceTag";
 
 const borderStyles = (args: { isMember: boolean }) => {
@@ -56,12 +60,10 @@ export type Props = {
   isSelected?: boolean;
   selectionMode?: boolean;
   isDragging?: boolean;
-  onLongPress?: () => void;
   pointerUpHandler?: (e: React.PointerEvent) => void;
   data: CardPreviewData;
 };
 
-const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export const CardPreview = (
   props: {
     entityID: string;
@@ -89,13 +91,14 @@ export const CardPreview = (
     [memberEntity, props.entityID]
   );
   let editing = useUIState((s) => s.focusedCard === props.entityID);
+  let [isSelected, toggleCardSelected] = useCardSelectionState(props.entityID);
+  let [selectedcards] = useSelectedCards();
 
   let messagesCount = db.useMessages(props.entityID).length;
 
-  let { handlers, isLongPress } = useLongPress(
-    () => props.onLongPress?.(),
-    props.isDragging
-  );
+  let { handlers, isLongPress } = useLongPress(() => {
+    toggleCardSelected();
+  }, props.isDragging);
 
   return (
     <HoverControls {...props}>
@@ -111,7 +114,9 @@ export const CardPreview = (
         }}
         onDragOver={(e) => e.preventDefault()}
         onClick={() => {
-          props.onClick?.();
+          if (isLongPress.current) return;
+          if (selectedcards.length > 0) toggleCardSelected();
+          else props.onClick?.();
         }}
         onDrop={async (e) => {
           e.preventDefault();
@@ -136,7 +141,9 @@ export const CardPreview = (
         className={`cardPreviewBorder select-none ${
           isUnread ? "unreadCardGlow" : ""
         } relative grow overflow-hidden ${borderStyles({ isMember })} ${
-          props.isSelected || (editing && !isMember) ? "selectedCardGlow" : ""
+          isSelected || props.isSelected || (editing && !isMember)
+            ? "selectedCardGlow"
+            : ""
         } ${props.isOver ? "rounded-[24px] shadow-[0_0_16px_0_#cccccc]" : ""}`}
         style={{ WebkitTapHighlightColor: "transparent" }}
       >
@@ -205,9 +212,9 @@ export const HoverControls = (
       style={{}}
       className={`
       cardPreviewWrapper
-      relative 
+      relative
       ${props.size === "small" ? "h-[6rem] w-[160px]" : "h-full w-full"}
-      group grid  
+      group grid
       grid-cols-[auto_min-content]
       ${props.outerControls ? "gap-1" : ""}
       `}
@@ -220,10 +227,10 @@ export const HoverControls = (
           props.onDelete) ||
         (authorized && props.onResize) ||
         (authorized && props.onRotateDrag) ? (
-        <div className="z-50 flex flex-col justify-between gap-1 pb-1 text-grey-80 opacity-0 group-hover:opacity-100">
+        <div className="text-grey-80 z-50 flex flex-col justify-between gap-1 pb-1 opacity-0 group-hover:opacity-100">
           {authorized && props.onDelete ? (
             <button
-              className="z-50 pt-1 hover:text-accent-blue"
+              className="hover:text-accent-blue z-50 pt-1"
               onClick={() => {
                 props.onDelete?.();
               }}
@@ -254,7 +261,7 @@ export const HoverControls = (
             {authorized && props.onRotateDrag && (
               <div
                 {...bind()}
-                className="touch-none hover:text-accent-blue"
+                className="hover:text-accent-blue touch-none"
                 style={{ cursor: "pointer" }}
               >
                 <DragRotateHandle />
@@ -274,7 +281,7 @@ export const HoverControls = (
 
 export const PlaceholderNewCard = (props: { title: string }) => {
   return (
-    <div className="searchNewCard flex flex-col gap-2 rounded-md border border-dashed border-accent-blue bg-white p-2 text-accent-blue">
+    <div className="searchNewCard border-accent-blue text-accent-blue flex flex-col gap-2 rounded-md border border-dashed bg-white p-2">
       <p className="text-base font-bold">{props.title}</p>
       <div className="flex flex-row gap-2">
         <ChatEmptyTiny /> 0
