@@ -499,7 +499,6 @@ export const useAllItems = (open: boolean) => {
   let titles = db
     .useAttribute(open ? "card/title" : null)
     .filter((f) => !!f.value);
-  let members = db.useAttribute("member/name");
   return titles
     .map((t) => {
       return {
@@ -508,14 +507,5 @@ export const useAllItems = (open: boolean) => {
         icon: <CardSmall />,
       };
     })
-    .concat(
-      members.map((m) => {
-        return {
-          entity: m.entity,
-          display: m.value,
-          icon: <Member />,
-        };
-      })
-    )
     .reverse();
 };
