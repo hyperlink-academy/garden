@@ -365,12 +365,19 @@ const CardMoreOptionsMenu = (props: {
   referenceFactID?: string;
   onDelete?: () => void;
 }) => {
-  let { authorized } = useMutations();
+  let { authorized, permissions } = useMutations();
   let memberName = db.useEntity(props.entityID, "member/name");
   let [areYouSureCardDeletionModalOpen, setAreYouSureCardDeletionModalOpen] =
     useState(false);
   if (!!memberName) return null;
-  if (!authorized) return null;
+  if (!authorized) {
+    if (!permissions.commentAndReact) return null;
+    return (
+      <div className="pointer-events-auto relative pt-4">
+        <ReactionPicker entityID={props.entityID} />
+      </div>
+    );
+  }
 
   return (
     <Menu as="div" className="pointer-events-auto relative">
@@ -627,21 +634,18 @@ const DefaultTextSection = (props: { entityID: string }) => {
   );
 };
 
+let toggledOffStyle =
+  "rounded-md border p-0.5 hover:border-accent-blue hover:text-accent-blue border-transparent";
+let toggledOnStyle =
+  "rounded-md border p-0.5 hover:border-accent-blue hover:text-accent-blue border-grey-90 bg-bg-blue text-grey-80";
+
 export const SectionAdder = (props: {
   entityID: string;
   dateEditing: boolean;
-
   setDateEditing: () => void;
 }) => {
   let { authorized } = useMutations();
   let date = db.useEntity(props.entityID, "card/date");
-
-  let [reactionPickerOpen, setReactionPickerOpen] = useState(false);
-
-  let toggledOffStyle =
-    "rounded-md border p-0.5 hover:border-accent-blue hover:text-accent-blue border-transparent";
-  let toggledOnStyle =
-    "rounded-md border p-0.5 hover:border-accent-blue hover:text-accent-blue border-grey-90 bg-bg-blue text-grey-80";
 
   if (!authorized) return null;
   return (
@@ -696,37 +700,44 @@ export const SectionAdder = (props: {
       <div className="h-full w-[2px] px-2">
         <Divider vertical />
       </div>
-      <Popover.Root
-        onOpenChange={() => setReactionPickerOpen(!reactionPickerOpen)}
-      >
-        <Popover.Trigger className="flex items-center" asChild>
-          <button
-            className={`${toggledOffStyle} ${
-              !reactionPickerOpen
-                ? ""
-                : "border-accent-blue text-accent-blue rounded-md border p-0.5"
-            }`}
-          >
-            <ReactionAdd />
-          </button>
-        </Popover.Trigger>
-        <Popover.Portal>
-          <Popover.Content
-            sideOffset={16}
-            collisionPadding={{ right: 20 }}
-            className="-mt-[1px] max-w-[298px]"
-          >
-            <AddReaction
-              entityID={props.entityID}
-              onSelect={() =>
-                document
-                  .getElementById("card-reactions")
-                  ?.scrollIntoView({ block: "center", behavior: "smooth" })
-              }
-            />
-          </Popover.Content>
-        </Popover.Portal>
-      </Popover.Root>
+      <ReactionPicker entityID={props.entityID} />
     </div>
+  );
+};
+
+const ReactionPicker = (props: { entityID: string }) => {
+  let [reactionPickerOpen, setReactionPickerOpen] = useState(false);
+  return (
+    <Popover.Root
+      onOpenChange={() => setReactionPickerOpen(!reactionPickerOpen)}
+    >
+      <Popover.Trigger className="flex items-center" asChild>
+        <button
+          className={`${toggledOffStyle} ${
+            !reactionPickerOpen
+              ? ""
+              : "border-accent-blue text-accent-blue rounded-md border p-0.5"
+          }`}
+        >
+          <ReactionAdd />
+        </button>
+      </Popover.Trigger>
+      <Popover.Portal>
+        <Popover.Content
+          sideOffset={16}
+          collisionPadding={{ right: 20 }}
+          className="-mt-[1px] max-w-[298px]"
+        >
+          <AddReaction
+            entityID={props.entityID}
+            onSelect={() =>
+              document
+                .getElementById("card-reactions")
+                ?.scrollIntoView({ block: "center", behavior: "smooth" })
+            }
+          />
+        </Popover.Content>
+      </Popover.Portal>
+    </Popover.Root>
   );
 };

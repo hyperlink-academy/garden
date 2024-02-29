@@ -4,6 +4,7 @@ import { Divider } from "components/Layout";
 import { Modal } from "components/Modal";
 import { useSmoker } from "components/Smoke";
 import { ref } from "data/Facts";
+import { useAuth } from "hooks/useAuth";
 import { useReactions } from "hooks/useReactions";
 import { db, useMutations } from "hooks/useReplicache";
 import { useState } from "react";
@@ -74,7 +75,8 @@ export const AddReaction = (props: {
   entityID: string;
   onSelect?: () => void;
 }) => {
-  let { mutate, memberEntity, permissions } = useMutations();
+  let { mutate, permissions } = useMutations();
+  let { session } = useAuth();
   let authorized = permissions.commentAndReact;
   let reactions = db.useAttribute("space/reaction");
   let [reactionEditOpen, setReactionEditOpen] = useState(false);
@@ -93,12 +95,12 @@ export const AddReaction = (props: {
               key={r.id}
               className="font-bold"
               onClick={async () => {
-                if (!memberEntity) return;
+                if (!session.session || !authorized) return;
                 await mutate("addReaction", {
                   reaction: r.value,
                   reactionFactID: ulid(),
                   reactionAuthorFactID: ulid(),
-                  memberEntity,
+                  session: session.session,
                   cardEntity: props.entityID,
                 });
                 props.onSelect ? props.onSelect() : null;

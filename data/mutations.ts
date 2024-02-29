@@ -440,13 +440,14 @@ const addReaction: Mutation<{
   reactionFactID: string;
   reactionAuthorFactID: string;
   reaction: string;
-  memberEntity: string;
+  session: { username: string; studio: string };
 }> = async (args, ctx) => {
   let reactions = await ctx.scanIndex.eav(args.cardEntity, "card/reaction");
+  let memberEntity = await getOrCreateMemberEntity(args.session, ctx);
   for (let reaction of reactions) {
     let author = await ctx.scanIndex.eav(reaction.id, "reaction/author");
     if (
-      author?.value.value === args.memberEntity &&
+      author?.value.value === memberEntity &&
       reaction.value === args.reaction
     )
       return;
@@ -462,7 +463,7 @@ const addReaction: Mutation<{
     entity: args.reactionFactID,
     factID: args.reactionAuthorFactID,
     attribute: "reaction/author",
-    value: ref(args.memberEntity),
+    value: ref(memberEntity),
     positions: {},
   });
 };
