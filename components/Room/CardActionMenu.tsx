@@ -8,27 +8,36 @@ import { Divider } from "components/Layout";
 import * as Popover from "@radix-ui/react-popover";
 import { useSelectedCards } from "hooks/useUIState";
 import { CardBackgroundColors } from "src/constants";
-import { db, scanIndex, useMutations } from "hooks/useReplicache";
-import { useState } from "react";
+import { scanIndex, useMutations } from "hooks/useReplicache";
 import { AddReaction } from "components/CardView/Reactions";
 import { useSubscribe } from "hooks/useSubscribe";
 
 export const CardActionMenu = () => {
-  let [selectedCards] = useSelectedCards();
+  let [selectedCards, setSelectedCards] = useSelectedCards();
   return (
-    <div className="cardActionMenu bg-grey-90 text-grey-35 border-grey-80 mb-6 flex items-center gap-2 rounded-full border px-2 py-1">
-      <div className="bg-accent-blue text-md cardActionCounter relative flex h-6 place-items-center gap-1  rounded-full pl-1 pr-2 font-bold text-white">
-        <CardSmall /> {selectedCards.length}
+    <div className="mb-6 flex flex-row items-center gap-1 ">
+      <div className="cardActionMenu bg-grey-90 text-grey-35 border-grey-80 flex items-center gap-2 rounded-full border px-2 py-1">
+        <div className="bg-accent-blue text-md cardActionCounter relative flex h-6 place-items-center gap-1  rounded-full pl-1 pr-2 font-bold text-white">
+          <CardSmall /> {selectedCards.length}
+        </div>
+        <div className="relative">
+          <ReactionPicker selectedCards={selectedCards} />
+        </div>
+        <div className="relative">
+          <CardBackgroundColorPicker selectedCards={selectedCards} />
+        </div>
+        <div className="h-6">
+          <Divider vertical />
+        </div>
       </div>
-      <div className="relative">
-        <ReactionPicker selectedCards={selectedCards} />
-      </div>
-      <div className="relative">
-        <CardBackgroundColorPicker selectedCards={selectedCards} />
-      </div>
-      <div className="h-6">
-        <Divider vertical />
-      </div>
+      <button
+        className="bg-background border-grey-80 hover:bg-grey-90 rounded-full border p-[3px]"
+        onClick={() => {
+          setSelectedCards([]);
+        }}
+      >
+        <CloseLinedTiny width={16} height={16} className="text-grey-55" />
+      </button>
     </div>
   );
 };

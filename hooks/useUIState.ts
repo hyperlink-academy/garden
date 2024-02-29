@@ -162,7 +162,26 @@ export let useSelectedCards = () => {
   let selectedCards = useUIState((state) =>
     spaceID ? state.spaces[spaceID]?.selectedCards || [] : []
   );
-  return [selectedCards] as const;
+  let setSelectedCards = useCallback(
+    (cards: string[]) => {
+      if (!spaceID) return;
+      let sid = spaceID;
+      useUIState.setState((state) => {
+        return {
+          ...state,
+          spaces: {
+            ...state.spaces,
+            [sid]: {
+              ...state.spaces[sid],
+              selectedCards: cards,
+            },
+          },
+        };
+      });
+    },
+    [spaceID]
+  );
+  return [selectedCards, setSelectedCards] as const;
 };
 
 export let useCardSelectionState = (card: string) => {
