@@ -1,3 +1,5 @@
+// SIDEBAR FOR SPACE FROM STUDIO
+
 import { getStudioPageData } from "app/(app)/studio/[studio_id]/page";
 import { SpaceSwitcher } from "app/(app)/studio/[studio_id]/space/SpaceViewerHeader";
 import { SpaceProvider } from "components/ReplicacheProvider";

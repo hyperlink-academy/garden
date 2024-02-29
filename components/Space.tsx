@@ -100,7 +100,7 @@ const DesktopLayout = (props: Props) => {
   );
 };
 
-const SpaceRoleBadge = (props: { space_id: string }) => {
+export const SpaceRoleBadge = (props: { space_id: string }) => {
   let { session, authToken } = useAuth();
   let { data: spaceData, mutate } = useSpaceData(props);
   let isMember = spaceData?.members_in_spaces.find(
@@ -118,7 +118,7 @@ const SpaceRoleBadge = (props: { space_id: string }) => {
   return (
     <div className="flex gap-2">
       <div
-        className={`flex h-[30px] w-fit items-center gap-2 place-self-end rounded-full border px-[8px] py-[2px] text-sm font-bold ${
+        className={`flex  w-fit items-center gap-2 place-self-end rounded-full border py-[2px] pl-[8px] pr-[4px] text-xs font-bold ${
           isMember
             ? "border-grey-80 bg-bg-blue text-grey-55 ml-2"
             : isStudioMate

@@ -1,3 +1,5 @@
+// SIDEBAR FOR STUDIO PAGE
+
 import { getStudioPageData } from "app/(app)/studio/[studio_id]/page";
 import Link from "next/link";
 import { supabaseServerClient } from "supabase/server";

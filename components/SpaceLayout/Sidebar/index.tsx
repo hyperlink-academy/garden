@@ -10,6 +10,7 @@ import {
   ArrowUp,
   BellSmall,
   RoomCalendar,
+  RoomSettings,
   Settings,
   SidebarIcon,
   UnreadDot,
@@ -43,15 +44,18 @@ export const Sidebar = (props: {
   let setMobileSidebarOpen = useUIState((s) => s.setMobileSidebarOpen);
 
   return (
-    <div className="Sidebar text-grey-35 flex h-full w-52 flex-col items-stretch justify-between gap-2   overflow-x-visible">
-      <div className="roomList no-scrollbar flex h-fit w-full flex-col gap-2 overflow-y-scroll px-3 pt-3">
+    <div className="Sidebar text-grey-35 flex h-full w-full grow flex-col items-stretch justify-between gap-2 overflow-x-visible px-3">
+      <div className="roomList no-scrollbar flex h-fit w-full flex-col gap-2 overflow-y-scroll">
         <div className="flex flex-col">
+          <div className="flex w-full flex-row items-center gap-1 py-0.5 pl-1 pr-0.5 text-left ">
+            <RoomSettings /> Settings
+          </div>
           <UnreadsRoomButton />
-          <RoomButton roomID="calendar">
+          {/* <RoomButton roomID="calendar">
             <RoomCalendar /> Calendar
-          </RoomButton>
+          </RoomButton> */}
         </div>
-        <Divider />
+        <Divider dashed />
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
             <SharedRoomList setRoomEditOpen={() => setRoomEditOpen(true)} />

@@ -59,7 +59,7 @@ export const People = (props: { space_id: string }) => {
   let offlineMembers = members.filter((f) => !uniqueSessions.has(f.entity));
 
   return (
-    <div className="peopleList no-scrollbar border-grey-80 flex h-fit flex-col overflow-y-scroll border-t px-3 pb-2 text-sm">
+    <div className="peopleList no-scrollbar border-grey-80 flex h-fit flex-col overflow-y-scroll border-t  text-sm">
       <div className="peopleOnline  mt-1 flex  flex-col ">
         <button
           onClick={() => {

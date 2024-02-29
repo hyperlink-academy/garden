@@ -1,3 +1,4 @@
+"use client";
 import { Dialog, Menu, Transition } from "@headlessui/react";
 import React, { Fragment } from "react";
 
@@ -6,17 +7,21 @@ export const Divider = (props: {
   vertical?: boolean;
   mx?: number;
   my?: number;
+  dashed?: boolean;
 }) => {
   return (
     <div
       className={` border-l border-t ${
         props.dark ? `border-grey-55` : `border-grey-80`
-      } ${props.vertical ? "100vh w-[1px]" : "h-[1px] w-full"} 
+      } ${props.vertical ? "100vh w-[1px]" : "h-[1px] w-full"} ${
+        props.dashed ? "border-dashed" : ""
+      }
+
       `}
       style={{
         margin: `${props.my || 0}px ${props.mx || 0}px ${props.my || 0}px ${
           props.mx || 0
-        }px`,
+        } px`,
       }}
     ></div>
   );
@@ -29,10 +34,10 @@ export const FloatingContainer: React.FC<
     <div
       onClick={(e) => e.stopPropagation()}
       className={`
-        rounded-md border
-        border-grey-80 bg-white px-4 
+        border-grey-80 shadow-drop
+        rounded-md border bg-white
+        px-4
         py-4
-        shadow-drop
         ${props.className}
         `}
     >
@@ -58,10 +63,10 @@ export const ModalFixedHeight: React.FC<
       <Dialog.Overlay className={props.dark ? "dark-overlay" : "overlay"} />
       <FloatingContainer
         className={`
-              fixed left-1/2 top-1/2 grid h-[calc(100%-32px)] w-[calc(100%-32px)] ${
+              left - 1 / 2 top - 1 / 2 h - [calc(100 % -32px)] w - [calc(100 % -32px)] fixed grid ${
                 props.width ? props.width : "max-w-md"
-              } -translate-x-1/2 -translate-y-1/2 grid-flow-row content-start gap-4 overflow-auto
-              `}
+              } -translate - x - 1 / 2 - translate - y - 1 / 2 - flow - row content - start gap - 4 overflow - auto grid
+    `}
       >
         {props.children}
       </FloatingContainer>
@@ -83,16 +88,16 @@ export const LightBoxModal: React.FC<
         // override default FloatingContainer border and padding!
         // also change to max-w + w-max, better for narrow images
         className={`
-              fixed left-1/2 top-1/2 grid max-h-[calc(100%-100px)]
-              w-max
-              max-w-[calc(100%-50px)]
-              -translate-x-1/2
-              -translate-y-1/2 grid-flow-row
-              gap-4
-              overflow-auto
-              border-none
-              px-0 py-0
-              `}
+              left - 1 / 2 top - 1 / 2 max - h - [calc(100 % -100px)] w -
+  max max -
+  w - [calc(100 % -50px)] - translate
+    - x - 1 / 2 - translate
+    - y - 1 / 2 - flow - row gap - 4
+  overflow - auto
+  - none px
+  - 0 py
+  - 0 fixed grid grid border
+    `}
       >
         {props.children}
       </FloatingContainer>
@@ -115,17 +120,17 @@ export const MenuContainer: React.FC<
     >
       <Menu.Items
         className={`
-            absolute right-0 z-40 
-            flex w-max 
-            origin-top-right flex-col 
-            justify-items-end rounded-md
-            border 
-            border-grey-80 
-            bg-white 
-            py-2 
-            text-right
-            shadow-drop
-            ${props.className}`}
+  - grey - 80 - drop right - 0
+  z - 40 w - max
+            origin - top -
+  right - col justify - items - end
+  - md bg - white
+  py - 2
+  text
+  - right absolute
+  flex flex rounded
+  border border shadow
+            ${props.className} `}
       >
         {props.children}
       </Menu.Items>
@@ -143,13 +148,13 @@ export const MenuItem: React.FC<
     <Menu.Item>
       {({ active }) => (
         <button
-          className={`flex justify-end gap-2 px-3 py-1 text-right ${
+          className={`justify - end gap - 2 px - 3 py - 1 text - right flex ${
             active ? "bg-bg-blue" : ""
           } ${
             props?.disabled
               ? "text-grey-80 line-through hover:bg-transparent"
               : ""
-          }`}
+          } `}
           style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
           onClick={() => props.onClick?.()}
           disabled={props?.disabled}
