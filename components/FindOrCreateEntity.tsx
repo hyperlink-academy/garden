@@ -7,6 +7,7 @@ import {
   CardSmall,
   Checkmark,
   CloseFilledTiny,
+  CloseLinedTiny,
   Member,
 } from "./Icons";
 import { Divider } from "./Layout";
@@ -162,51 +163,22 @@ export const FindOrCreate = (props: {
               ) : (
                 <div className="addedList mx-3 mb-3 mt-2 flex flex-col gap-2">
                   {addedItemsList === false ? null : (
-                    <ul className="lightBorder no-scrollbar bg-bg-blue flex flex-col gap-2 p-3">
+                    <ul className="lightBorder no-scrollbar bg-bg-blue flex flex-col gap-2 p-2">
                       {added.length === 0 ? (
                         <div className="text-grey-55 italic">
                           no cards selected yet!
                         </div>
                       ) : (
                         added.map((addedItem, index) => (
-                          <li
+                          <AddedListItem
                             key={index}
-                            className="addedListItem grid grid-cols-[max-content_auto_max-content] gap-2"
-                          >
-                            <div className="pt-[1px]">
-                              {addedItem.type === "create" ? (
-                                <CardSmall />
-                              ) : (
-                                props.items.find(
-                                  (item) =>
-                                    addedItem.type === "existing" &&
-                                    item.entity === addedItem.entity
-                                )?.icon
-                              )}
-                            </div>
-                            <div>
-                              {addedItem.type === "create" &&
-                              addedItem.name !== ""
-                                ? addedItem.name
-                                : addedItem.type === "create" &&
-                                  addedItem.name === ""
-                                ? "New Untitled Card"
-                                : props.items.find(
-                                    (item) =>
-                                      addedItem.type === "existing" &&
-                                      item.entity === addedItem.entity
-                                  )?.display}
-                            </div>
-                            <button
-                              className=""
-                              onClick={() => {
-                                added.splice(added.indexOf(addedItem), 1);
-                                setAdded([...added]);
-                              }}
-                            >
-                              <CloseFilledTiny />
-                            </button>
-                          </li>
+                            addedItem={addedItem}
+                            items={items}
+                            onClick={() => {
+                              added.splice(added.indexOf(addedItem), 1);
+                              setAdded([...added]);
+                            }}
+                          />
                         ))
                       )}
                     </ul>
@@ -304,6 +276,64 @@ export const FindOrCreate = (props: {
   );
 };
 
+const AddedListItem = (props: {
+  addedItem: AddedItem;
+  items: Item[];
+  onClick: () => void;
+}) => {
+  let entityID =
+    props.addedItem.type === "existing" ? props.addedItem.entity : null;
+  let cardBackgroundColor = db.useEntity(
+    entityID,
+    "card/background-color"
+  )?.value;
+  return (
+    <li
+      style={{
+        backgroundColor:
+          cardBackgroundColor !== "#FFFFFF"
+            ? cardBackgroundColor
+            : "transparent",
+        border:
+          cardBackgroundColor === "#FFFFFF"
+            ? "none"
+            : `1px solid ${colors["grey-90"]}`,
+      }}
+      className="addedListItem grid grid-cols-[max-content_auto_max-content] gap-2 rounded-md px-1 py-0.5"
+    >
+      <div className="pt-[1px]">
+        {props.addedItem.type === "create" ? (
+          <CardSmall />
+        ) : (
+          props.items.find(
+            (item) =>
+              props.addedItem.type === "existing" &&
+              item.entity === props.addedItem.entity
+          )?.icon
+        )}
+      </div>
+      <div>
+        {props.addedItem.type === "create" && props.addedItem.name !== ""
+          ? props.addedItem.name
+          : props.addedItem.type === "create" && props.addedItem.name === ""
+          ? "New Untitled Card"
+          : props.items.find(
+              (item) =>
+                props.addedItem.type === "existing" &&
+                item.entity === props.addedItem.entity
+            )?.display}
+      </div>
+      <button
+        className=""
+        onClick={() => {
+          props.onClick();
+        }}
+      >
+        <CloseLinedTiny />
+      </button>
+    </li>
+  );
+};
 const CreateButton = (props: {
   value: string;
   activeOption?: string;
@@ -413,7 +443,7 @@ const SearchResult = (
               }`}
             >
               <div className="searchResultIcon mt-[1px]">{props.icon}</div>
-              <div className="searchResultName">{props.display} hello</div>
+              <div className="searchResultName">{props.display}</div>
               {props.disabled ? (
                 <Checkmark className="searchReultSelectedCheck text-grey-90 mt-[5px] justify-self-end" />
               ) : props.added ? (
