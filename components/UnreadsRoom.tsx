@@ -2,7 +2,6 @@ import { Fact } from "data/Facts";
 import { db, useMutations } from "hooks/useReplicache";
 import { useEffect, useMemo, useState } from "react";
 import { CardPreviewWithData } from "./CardPreview";
-import { RoomWrapper } from "./RoomLayout";
 import { Divider } from "./Layout";
 import { CollectionListTiny, CollectionPreviewTiny, GoToTop } from "./Icons";
 
@@ -79,10 +78,10 @@ export const UnreadsRoom = () => {
           {/* HEY START SOME SHIT */}
 
           <>
-            <div className="roomHeader sticky top-0 z-20 flex flex-col gap-1 bg-background pt-2 sm:-mx-4 sm:px-4 sm:pt-3">
+            <div className="roomHeader bg-background sticky top-0 z-20 flex flex-col gap-1 pt-2 sm:-mx-4 sm:px-4 sm:pt-3">
               <div className="roomTitle flex justify-between">
                 <button
-                  className={`mb-1 text-lg font-bold text-grey-35 `}
+                  className={`text-grey-35 mb-1 text-lg font-bold `}
                   onClick={() =>
                     document.getElementById("unread-room-wrapper")?.scrollTo({
                       top: 0,
@@ -92,7 +91,7 @@ export const UnreadsRoom = () => {
                   }
                 >
                   Unreads
-                  <span className="text-sm text-grey-35">
+                  <span className="text-grey-35 text-sm">
                     ({unreadCards.length + unreadDiscussions.length})
                   </span>
                 </button>
@@ -138,7 +137,7 @@ export const UnreadsRoom = () => {
             </div>
           </>
           {cachedUnreads.length === 0 ? (
-            <div className="italic text-grey-55">
+            <div className="text-grey-55 italic">
               <p className="pb-2 font-bold">
                 You have no unreads! <br />
               </p>
