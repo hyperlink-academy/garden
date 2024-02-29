@@ -170,8 +170,9 @@ export let useCardSelectionState = (card: string) => {
   let isCardSelected = useUIState((state) =>
     spaceID ? state.spaces[spaceID]?.selectedCards?.includes(card) : false
   );
+  let { authorized } = useMutations();
   let toggleSelectedCard = useCallback(() => {
-    if (!spaceID) return;
+    if (!spaceID || !authorized) return;
     let sid = spaceID;
     let isCardSelected = useUIState
       .getState()
@@ -208,7 +209,7 @@ export let useCardSelectionState = (card: string) => {
         };
       });
     }
-  }, [spaceID, card]);
+  }, [spaceID, card, authorized]);
   return [isCardSelected, toggleSelectedCard] as const;
 };
 
