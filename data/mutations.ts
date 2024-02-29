@@ -468,6 +468,22 @@ const addReaction: Mutation<{
   });
 };
 
+const removeReaction: Mutation<{
+  memberEntity: string;
+  cardEntity: string;
+  reaction: string;
+}> = async (args, ctx) => {
+  let allReactions = await ctx.scanIndex.eav(args.cardEntity, "card/reaction");
+  let reactions = allReactions.filter((r) => r.value === args.reaction);
+  for (let reaction of reactions) {
+    let author = await ctx.scanIndex.eav(reaction.id, "reaction/author");
+    if (author?.value.value === args.memberEntity) {
+      await ctx.retractFact(author.id);
+      await ctx.retractFact(reaction.id);
+    }
+  }
+};
+
 const markRead: Mutation<{
   entityID: string;
   space_id: string;
@@ -586,6 +602,7 @@ export const Mutations = {
   removeCardFromDesktopOrCollection,
   addCardToDesktop,
   addReaction,
+  removeReaction,
   initializeClient,
   setClientInCall,
   createRoom,
@@ -596,4 +613,5 @@ export const StudioMatePermissions: Array<keyof typeof Mutations> = [
   "replyToDiscussion",
   "markRead",
   "addReaction",
+  "removeReaction",
 ];

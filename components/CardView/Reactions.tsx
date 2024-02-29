@@ -236,7 +236,11 @@ export const SingleReaction = (props: {
       onClick={() => {
         if (!memberEntity || !authorized) return;
         if (props.memberReaction)
-          return mutate("retractFact", { id: props.memberReaction });
+          return mutate("removeReaction", {
+            cardEntity: props.entityID,
+            memberEntity,
+            reaction: props.reaction,
+          });
         let factID = ulid();
         mutate("assertFact", [
           {
