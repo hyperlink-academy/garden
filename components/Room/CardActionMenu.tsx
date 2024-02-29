@@ -73,6 +73,21 @@ const ReactionPicker = (props: { selectedCards: string[] }) => {
 
 const CardBackgroundColorPicker = (props: { selectedCards: string[] }) => {
   let { mutate, action } = useMutations();
+  let colors = useSubscribe(
+    async (tx) => {
+      let colors = [] as string[];
+      for (let card of props.selectedCards) {
+        let color =
+          (await scanIndex(tx).eav(card, "card/background-color"))?.value ||
+          "#FFFFFF";
+        if (!colors.includes(color)) colors.push(color);
+      }
+      return colors;
+    },
+    [],
+    [props.selectedCards],
+    ""
+  );
   let setCardBackgroudColor = async (color: string) => {
     action.start();
     for (let card of props.selectedCards) {
@@ -85,6 +100,8 @@ const CardBackgroundColorPicker = (props: { selectedCards: string[] }) => {
     }
     action.end();
   };
+  const gradient =
+    colors.length === 1 ? colors[0] : `conic-gradient(${colors.join(", ")})`;
 
   return (
     <ActionItem
@@ -92,7 +109,7 @@ const CardBackgroundColorPicker = (props: { selectedCards: string[] }) => {
         <button
           className={`h-5 w-5 rounded-full border hover:cursor-pointer
            ${"border-grey-55 border-2"}`}
-          style={{ backgroundColor: "white" }}
+          style={{ background: gradient }}
         />
       }
     >
