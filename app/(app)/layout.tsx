@@ -3,7 +3,7 @@ export default function AppLayout(props: {
   sidebar: React.ReactNode;
 }) {
   return (
-    <div className="flex h-full w-full flex-row gap-2">
+    <div className="flex h-full w-full flex-grow-0 flex-row gap-2">
       {props.sidebar}
       {props.children}
     </div>

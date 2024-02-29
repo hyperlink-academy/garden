@@ -3,12 +3,12 @@ import { PageHeightContainer } from "components/PageHeightContainer";
 import { Space } from "components/Space";
 import { SpacePageStudioPresenceHandler } from "app/(app)/studio/[studio_id]/space/StudioPresenceHandler";
 import { UpdateSpaceNameURL } from "./updateDisplayName";
-import { getData, redirectToIDURL } from "./utils";
+import { getSpaceData, redirectToIDURL } from "./utils";
 
 export async function generateMetadata(props: {
   params: { space: string; studio: string };
 }) {
-  let data = await getData(props.params);
+  let data = await getSpaceData(props.params);
   return {
     title: data.data?.display_name || "404 Space Not Found",
   };
@@ -17,7 +17,7 @@ export async function generateMetadata(props: {
 export default async function SpacePage(props: {
   params: { space: string; studio: string };
 }) {
-  let result = await getData(props.params);
+  let result = await getSpaceData(props.params);
   if (!result.success)
     return redirectToIDURL(props.params, <div>space not found</div>);
 

@@ -45,44 +45,6 @@ export const Sidebar = (props: {
   return (
     <div className="Sidebar text-grey-35 flex h-full w-52 flex-col items-stretch justify-between gap-2   overflow-x-visible">
       <div className="roomList no-scrollbar flex h-fit w-full flex-col gap-2 overflow-y-scroll px-3 pt-3">
-        {props.mobile && (
-          <>
-            <div
-              className={`spaceName text-grey-35 flex w-full flex-col bg-white`}
-            >
-              {props.studio ? (
-                <div className="flex justify-between">
-                  <Link
-                    prefetch
-                    href={`/studio/${uuidToBase62(props.studio.studioID)}`}
-                  >
-                    <div className="text-grey-55  -mb-0.5 text-sm font-bold">
-                      {props.studio.studioName}
-                    </div>
-                  </Link>
-                  <SpaceSwitcher spaces={props.studio?.spaces} />
-                </div>
-              ) : (
-                <Link
-                  href={
-                    session.session ? `/s/${session.session.username}` : "/"
-                  }
-                  className="text-grey-55 -mb-0.5 flex items-center gap-1 text-sm font-bold"
-                >
-                  <ArrowDown className="rotate-90" height={16} width={16} />{" "}
-                  home
-                </Link>
-              )}
-
-              <div className="flex w-full flex-row items-start gap-2 ">
-                <div className="grow">
-                  <SpaceName space_id={props.space_id} />
-                </div>
-              </div>
-            </div>
-            <Divider />
-          </>
-        )}
         <div className="flex flex-col">
           <UnreadsRoomButton />
           <RoomButton roomID="calendar">

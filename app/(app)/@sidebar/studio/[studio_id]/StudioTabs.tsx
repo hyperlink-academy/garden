@@ -94,7 +94,7 @@ const TabItem = (props: {
 }) => (
   <button
     onClick={() => props.setTab(props.id)}
-    className={`place-self-end  outline-none ${
+    className={`text-left ${
       props.currentTab === props.id
         ? "text-accent-blue font-bold"
         : "text-grey-35 hover:text-accent-blue"

@@ -2,12 +2,12 @@ import { SpaceProvider } from "components/ReplicacheProvider";
 import { redirect } from "next/navigation";
 import { supabaseServerClient } from "supabase/server";
 import { JoinSpace } from "./JoinSpace";
-import { getData, redirectToIDURL } from "../utils";
+import { getSpaceData, redirectToIDURL } from "../utils";
 
 export async function generateMetadata(props: {
   params: { space: string; studio: string };
 }) {
-  let data = await getData(props.params);
+  let data = await getSpaceData(props.params);
   return {
     title: data.data?.display_name
       ? `${data.data.display_name}: you're invited!`
@@ -18,7 +18,7 @@ export async function generateMetadata(props: {
 export default async function JoinSpacePage(props: {
   params: { space: string; studio: string; display_name: string };
 }) {
-  let data = await getData(props.params);
+  let data = await getSpaceData(props.params);
   console.log(data, "yooo");
   if (!data.success)
     return redirectToIDURL(props.params, <div>404 - space not found</div>);
