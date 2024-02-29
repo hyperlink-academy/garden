@@ -30,6 +30,7 @@ import {
   useUIState,
 } from "hooks/useUIState";
 import { PresenceTag } from "components/PresenceTag";
+import { useCardViewer } from "components/CardViewerContext";
 
 const borderStyles = (args: { isMember: boolean }) => {
   switch (true) {
@@ -74,6 +75,7 @@ export const CardPreview = (
   let unreadBy = db.useEntity(props.entityID, "card/unread-by") || [];
   let isUnread = unreadBy.find((f) => f.value.value === memberEntity);
   let rep = useContext(ReplicacheContext);
+  let { open } = useCardViewer();
   let { authToken } = useAuth();
   let spaceID = useSpaceID();
   let unreadDiscussions = useSubscribe(
@@ -116,7 +118,10 @@ export const CardPreview = (
         onClick={() => {
           if (isLongPress.current) return;
           if (selectedcards.length > 0) toggleCardSelected();
-          else props.onClick?.();
+          else {
+            if (props.entityID) open({ entityID: props.entityID });
+            props.onClick?.();
+          }
         }}
         onDrop={async (e) => {
           e.preventDefault();

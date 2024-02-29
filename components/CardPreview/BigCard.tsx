@@ -13,7 +13,6 @@ import { db, useMutations } from "hooks/useReplicache";
 import { useUIState } from "hooks/useUIState";
 import { Props } from "./index";
 import { focusElement } from "src/utils";
-import { isUrl } from "src/isUrl";
 import { LinkPreviewCondensed } from "components/LinkPreview";
 
 export const BigCardBody = (
@@ -55,12 +54,6 @@ export const BigCardBody = (
             ? `url(${props.data.imageUrl})`
             : cardBackgroundColor,
       }} //no tailwind equiv - need for long titles to wrap
-      onClick={(e) => {
-        // if card is clicked (and its not in edit mode), open that card in cardView.
-        if (editing) return;
-        if (e.defaultPrevented) return;
-        open({ entityID: props.entityID });
-      }}
     >
       {/* Big Card Preview Content Wrapper */}
       <div

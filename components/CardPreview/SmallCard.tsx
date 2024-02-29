@@ -66,9 +66,6 @@ export const BaseSmallCard = (
   return (
     <div
       {...listenersAndAttributes}
-      onClick={() => {
-        props.entityID && open({ entityID: props.entityID });
-      }}
       className={`h-full w-full !bg-cover !bg-center !bg-no-repeat hover:cursor-pointer ${
         props.isMember ? "pb-1 pl-2 pr-1 pt-2" : "px-2 py-2"
       }`}
