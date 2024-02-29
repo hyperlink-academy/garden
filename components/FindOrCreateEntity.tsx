@@ -324,7 +324,7 @@ const AddedListItem = (props: {
             )?.display}
       </div>
       <button
-        className=""
+        className="text-grey-55"
         onClick={() => {
           props.onClick();
         }}
