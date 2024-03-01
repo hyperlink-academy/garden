@@ -63,10 +63,10 @@ export const ModalFixedHeight: React.FC<
       <Dialog.Overlay className={props.dark ? "dark-overlay" : "overlay"} />
       <FloatingContainer
         className={`
-              left - 1 / 2 top - 1 / 2 h - [calc(100 % -32px)] w - [calc(100 % -32px)] fixed grid ${
-                props.width ? props.width : "max-w-md"
-              } -translate - x - 1 / 2 - translate - y - 1 / 2 - flow - row content - start gap - 4 overflow - auto grid
-    `}
+          fixed left-1/2 top-1/2 grid h-[calc(100%-32px)] w-[calc(100%-32px)] ${
+            props.width ? props.width : "max-w-md"
+          } -translate-x-1/2 -translate-y-1/2 grid-flow-row content-start gap-4 overflow-auto
+        `}
       >
         {props.children}
       </FloatingContainer>
@@ -88,16 +88,16 @@ export const LightBoxModal: React.FC<
         // override default FloatingContainer border and padding!
         // also change to max-w + w-max, better for narrow images
         className={`
-              left - 1 / 2 top - 1 / 2 max - h - [calc(100 % -100px)] w -
-  max max -
-  w - [calc(100 % -50px)] - translate
-    - x - 1 / 2 - translate
-    - y - 1 / 2 - flow - row gap - 4
-  overflow - auto
-  - none px
-  - 0 py
-  - 0 fixed grid grid border
-    `}
+          fixed left-1/2 top-1/2 grid max-h-[calc(100%-100px)]
+          w-max
+          max-w-[calc(100%-50px)]
+          -translate-x-1/2
+          -translate-y-1/2 grid-flow-row
+          gap-4
+          overflow-auto
+          border-none
+          px-0 py-0
+          `}
       >
         {props.children}
       </FloatingContainer>
@@ -120,17 +120,17 @@ export const MenuContainer: React.FC<
     >
       <Menu.Items
         className={`
-  - grey - 80 - drop right - 0
-  z - 40 w - max
-            origin - top -
-  right - col justify - items - end
-  - md bg - white
-  py - 2
-  text
-  - right absolute
-  flex flex rounded
-  border border shadow
-            ${props.className} `}
+        border-grey-80 shadow-drop absolute
+        right-0 z-40
+        flex w-max
+        origin-top-right flex-col
+        justify-items-end
+        rounded-md
+        border
+        bg-white
+        py-2
+        text-right
+        ${props.className}`}
       >
         {props.children}
       </Menu.Items>
@@ -148,7 +148,7 @@ export const MenuItem: React.FC<
     <Menu.Item>
       {({ active }) => (
         <button
-          className={`justify - end gap - 2 px - 3 py - 1 text - right flex ${
+          className={`flex justify-end gap-2 px-3 py-1 text-right ${
             active ? "bg-bg-blue" : ""
           } ${
             props?.disabled
