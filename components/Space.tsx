@@ -64,38 +64,16 @@ export const Space = (props: Props) => {
 };
 
 const DesktopLayout = (props: Props) => {
-  let { session } = useAuth();
-
   return (
-    <div className="mx-auto flex h-full w-full flex-col gap-2 overflow-hidden">
-      <div className="spaceHeader mx-auto flex w-full max-w-[1332px] flex-row items-end justify-between gap-4 px-2">
-        {props.studio ? (
-          <SpaceViewerHeader {...props.studio} space_id={props.space_id} />
-        ) : (
-          <Header space_id={props.space_id} />
-        )}
-        <div className="flex flex-col place-items-end gap-1 ">
-          <HelpButton />
-
-          <div className="spaceHeaderSearch text-grey-55 flex w-[480px] shrink-0 flex-row items-center gap-0">
-            {session.loggedIn && <SpaceOptions space_id={props.space_id} />}
-
-            <SpaceRoleBadge space_id={props.space_id} />
-
-            <Search />
-          </div>
-        </div>
+    <div
+      id="space-layout"
+      className=" no-scrollbar spaceDesktopLayout flex h-full w-full max-w-[1332px] snap-x snap-mandatory flex-row items-stretch gap-4 overflow-y-hidden overflow-x-scroll scroll-smooth  sm:gap-4  md:overflow-x-hidden"
+    >
+      <div className="spaceRoomAndSidebar border-grey-90 flex  shrink-0 snap-center snap-always  flex-row rounded-md border">
+        <Room />
       </div>
-      <div
-        id="space-layout"
-        className=" no-scrollbar spaceLargeSplitLayout mx-auto flex h-full w-full max-w-[1332px] snap-x snap-mandatory flex-row items-stretch gap-4 overflow-y-hidden overflow-x-scroll scroll-smooth px-4 sm:gap-4  md:overflow-x-hidden"
-      >
-        <div className="spaceRoomAndSidebar border-grey-90 flex  shrink-0 snap-center snap-always  flex-row rounded-md border">
-          <Room />
-        </div>
 
-        <CardViewer space_id={props.space_id} />
-      </div>
+      <CardViewer space_id={props.space_id} />
     </div>
   );
 };

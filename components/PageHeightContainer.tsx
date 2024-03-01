@@ -14,9 +14,13 @@ export function PageHeightContainer(props: { children: React.ReactNode }) {
     <>
       <animated.div
         style={
-          isIOS() ? (difference > 10 ? heightSpring : undefined) : heightSpring
+          isIOS()
+            ? difference > 10
+              ? heightSpring
+              : undefined
+            : { height: "auto" }
         }
-        className="spacecontent max-w-screen-xl relative mx-auto flex h-screen w-full grow overflow-y-hidden pb-2  sm:pb-4 sm:pt-2"
+        className="spaceContent relative flex h-full overflow-hidden "
       >
         {props.children}
       </animated.div>
