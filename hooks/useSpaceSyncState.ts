@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { sortByPosition } from "src/position_helpers";
 import { db, scanIndex, useMutations, useSpaceID } from "./useReplicache";
 import { useRoom, useSetRoom, useUIState } from "./useUIState";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 export const useSpaceSyncState = () => {
   let query = useSearchParams();
@@ -22,11 +22,11 @@ export const useSpaceSyncState = () => {
 
   useEffect(() => {
     if (!r && firstRoom) setRoom(firstRoom);
-  }, [r, firstRoom]);
+  }, [r, firstRoom, setRoom]);
 
   let openCard = query?.get("openCard");
   useEffect(() => {
-    if (openCard) {
+    if (openCard && room && spaceID && rep) {
       (async () => {
         let entityID = openCard as string;
         if (!room || !spaceID || !rep) return;
@@ -48,7 +48,7 @@ export const useSpaceSyncState = () => {
         openCardWithoutHistory(spaceID, parent[0]?.entity || room, entityID);
       })();
     }
-  }, [rep, openCard, room, spaceID]);
+  }, [rep, openCard, room, spaceID, openCardWithoutHistory, setRoom]);
 
   useEffect(() => {
     if (!spaceID) return;

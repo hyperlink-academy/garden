@@ -41,7 +41,10 @@ let supabase = createClient({
   SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL as string,
 });
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
+export default async function WebPushEndpoint(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   try {
     let body = bodyParser.safeParse(req.body);
     console.log(body);
@@ -70,7 +73,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     let { data: spaceMembers } = await supabase
       .from("space_data")
       .select(
-        "display_name, name, owner:identity_data!space_data_owner_fkey(username), members_in_spaces(identity_data(*, push_subscriptions(*)))"
+        "display_name, name, id, owner:identity_data!space_data_owner_fkey(username), members_in_spaces(identity_data(*, push_subscriptions(*)))"
       )
       .eq("do_id", payloadBody.data.spaceID)
       .single();
@@ -96,7 +99,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           type: "joined-space",
           data: {
             spaceName: spaceMembers.display_name || "Untitled Space",
-            spaceURL: `/s/${spaceMembers.owner?.username}/s/${spaceMembers.name}`,
+            spaceURL: `/s/${spaceMembers.owner?.username}/s/${spaceMembers.id}/${spaceMembers.display_name}`,
             spaceID: data.spaceID,
             newMemberUsername: data.username,
           },
@@ -133,7 +136,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     res.status(400);
     return;
   }
-};
+}
 
 export const signNode = (input: string, secret: string) => {
   const hmac = crypto.createHmac("sha256", secret);
