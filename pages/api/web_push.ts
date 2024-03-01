@@ -73,12 +73,16 @@ export default async function WebPushEndpoint(
     let { data: spaceMembers } = await supabase
       .from("space_data")
       .select(
-        "display_name, name, id, owner:identity_data!space_data_owner_fkey(username), members_in_spaces(identity_data(*, push_subscriptions(*)))"
+        "display_name, name, id, studios(members_in_studios(identity_data(username, studio))), owner:identity_data!space_data_owner_fkey(username), members_in_spaces(identity_data(*, push_subscriptions(*)))"
       )
       .eq("do_id", payloadBody.data.spaceID)
       .single();
 
     if (spaceMembers) {
+      let members = [
+        ...spaceMembers.members_in_spaces,
+        ...spaceMembers.studios.flatMap((s) => s.members_in_studios),
+      ];
       let notification: HyperlinkNotification;
       if (data.type === "new-message") {
         let senderStudio = data.senderStudio;
@@ -88,9 +92,8 @@ export default async function WebPushEndpoint(
             spaceName: spaceMembers.display_name || "Untitled Space",
             spaceURL: `/s/${spaceMembers.owner?.username}/s/${spaceMembers.name}`,
             senderUsername:
-              spaceMembers.members_in_spaces.find(
-                (f) => f.identity_data?.studio === senderStudio
-              )?.identity_data?.username || "",
+              members.find((f) => f.identity_data?.studio === senderStudio)
+                ?.identity_data?.username || "",
             ...data,
           },
         };
