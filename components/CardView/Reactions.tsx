@@ -5,6 +5,7 @@ import { Modal } from "components/Modal";
 import { useSmoker } from "components/Smoke";
 import { ref } from "data/Facts";
 import { useAuth } from "hooks/useAuth";
+import { useLongPress } from "hooks/useLongPress";
 import { useReactions } from "hooks/useReactions";
 import { db, useMutations } from "hooks/useReplicache";
 import { useState } from "react";
@@ -219,6 +220,7 @@ export const EditReactions = (props: {
 };
 
 export const SingleReaction = (props: {
+  members: string[];
   entityID: string;
   reaction: string;
   count: number;
@@ -226,43 +228,61 @@ export const SingleReaction = (props: {
 }) => {
   let { permissions, mutate, memberEntity } = useMutations();
   let authorized = permissions.commentAndReact;
+  let [hover, setHover] = useState(false);
+  let { isLongPress, handlers } = useLongPress(() => {
+    setHover(true);
+  });
   return (
-    <button
-      className={`text-md flex items-center gap-2 rounded-md border px-2 py-0.5 ${
-        props.memberReaction
-          ? "border-accent-blue bg-bg-blue"
-          : "border-grey-80 bg-white"
-      } ${!authorized ? "cursor-default" : ""}`}
-      onClick={() => {
-        if (!memberEntity || !authorized) return;
-        if (props.memberReaction)
-          return mutate("removeReaction", {
-            cardEntity: props.entityID,
-            memberEntity,
-            reaction: props.reaction,
-          });
-        let factID = ulid();
-        mutate("assertFact", [
-          {
-            entity: props.entityID,
-            factID,
-            attribute: "card/reaction",
-            value: props.reaction,
-            positions: {},
-          },
-          {
-            entity: factID,
-            factID: ulid(),
-            attribute: "reaction/author",
-            value: ref(memberEntity),
-            positions: {},
-          },
-        ]);
-      }}
-    >
-      <strong>{props.reaction}</strong>{" "}
-      <span className="text-grey-55 text-sm">{props.count}</span>
-    </button>
+    <Popover.Root open={hover}>
+      <Popover.Anchor>
+        <button
+          onPointerUp={() => setHover(false)}
+          {...handlers}
+          onMouseEnter={() => setHover(true)}
+          onMouseLeave={() => setHover(false)}
+          className={`text-md flex items-center gap-2 rounded-md border px-2 py-0.5 ${
+            props.memberReaction
+              ? "border-accent-blue bg-bg-blue"
+              : "border-grey-80 bg-white"
+          } ${!authorized ? "cursor-default" : ""}`}
+          onClick={() => {
+            if (!memberEntity || !authorized) return;
+            if (isLongPress.current) return;
+            if (props.memberReaction)
+              return mutate("removeReaction", {
+                cardEntity: props.entityID,
+                memberEntity,
+                reaction: props.reaction,
+              });
+            let factID = ulid();
+            mutate("assertFact", [
+              {
+                entity: props.entityID,
+                factID,
+                attribute: "card/reaction",
+                value: props.reaction,
+                positions: {},
+              },
+              {
+                entity: factID,
+                factID: ulid(),
+                attribute: "reaction/author",
+                value: ref(memberEntity),
+                positions: {},
+              },
+            ]);
+          }}
+        >
+          <strong>{props.reaction}</strong>{" "}
+          <span className="text-grey-55 text-sm">{props.count}</span>
+        </button>
+      </Popover.Anchor>
+      <Popover.Content sideOffset={4}>
+        <div className="text-grey-55 lightBorder rounded-md bg-white px-2 py-1 text-xs">
+          {props.members.join(", ")}
+        </div>
+      </Popover.Content>
+    </Popover.Root>
   );
 };
 
