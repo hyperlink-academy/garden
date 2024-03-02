@@ -19,9 +19,5 @@ export default async function UserStudio(props: {
 }) {
   let data = await getData(props.params.studio);
   if (!data.success) return <div>404 - page not found!</div>;
-  return (
-    <div className="pwa-padding mx-auto max-w-4xl px-3 pb-6 sm:px-4 sm:pb-8">
-      <UserHomePage data={data.data} />
-    </div>
-  );
+  return <UserHomePage data={data.data} />;
 }
