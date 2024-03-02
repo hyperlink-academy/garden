@@ -10,21 +10,20 @@ import { PresenceHandler } from "components/PresenceHandler";
 import { useSpaceSyncState } from "hooks/useSpaceSyncState";
 import { WORKER_URL, springConfig } from "src/constants";
 import { useViewportSize } from "hooks/useViewportSize";
-import { InfoTiny, Information, Question, SidebarIcon } from "components/Icons";
-import { SpaceName, SpaceOptions } from "components/SpaceLayout/Sidebar";
+import { InfoTiny, SidebarIcon } from "components/Icons";
+import { SpaceName } from "components/SpaceLayout/Sidebar";
 import { useSpring, animated } from "@react-spring/web";
 import { createPortal } from "react-dom";
 import { useAuth } from "hooks/useAuth";
 import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
 import { LoginOrSignupModal } from "components/LoginModal";
 import Link from "next/link";
-import { Search, MobileSearch } from "components/Search";
+import { MobileSearch } from "components/Search";
 import { HelpModal } from "components/HelpCenter";
 import { useGesture } from "@use-gesture/react";
 import { useDndContext } from "@dnd-kit/core";
 import { useSpaceShortcuts } from "hooks/useSpaceShortcuts";
 import { SpaceData } from "components/SpacesList";
-import { SpaceViewerHeader } from "app/(app)/studio/[studio_id]/space/SpaceViewerHeader";
 import { useIsClient } from "hooks/utils";
 import * as Popover from "@radix-ui/react-popover";
 import { useSpaceData } from "hooks/useSpaceData";
@@ -67,7 +66,7 @@ const DesktopLayout = (props: Props) => {
   return (
     <div
       id="space-layout"
-      className=" no-scrollbar spaceDesktopLayout flex h-full w-full max-w-[1332px] snap-x snap-mandatory flex-row items-stretch gap-4 overflow-y-hidden overflow-x-scroll scroll-smooth  sm:gap-4  md:overflow-x-hidden"
+      className=" no-scrollbar spaceDesktopLayout flex h-full w-full snap-x snap-mandatory flex-row items-stretch gap-4 overflow-y-hidden overflow-x-scroll scroll-smooth  sm:gap-4  md:overflow-x-hidden"
     >
       <div className="spaceRoomAndSidebar border-grey-90 flex  shrink-0 snap-center snap-always  flex-row rounded-md border">
         <Room />

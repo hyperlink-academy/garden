@@ -42,7 +42,7 @@ export default function UserHomePage(props: { data: IdentityData }) {
       <Head>
         <title key="title">{currentStudioName}</title>
       </Head>
-      <div className="mx-auto flex h-full max-w-4xl flex-col gap-2">
+      <div className="flex h-full max-w-4xl flex-col gap-2">
         <div className="flex w-full flex-row items-center justify-between gap-2">
           <h2 className="grow">{currentStudioName}</h2>
 
