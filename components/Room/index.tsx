@@ -34,7 +34,6 @@ import { useRoom, useSelectedCards } from "hooks/useUIState";
 import { SingleTextSection } from "components/CardView/Sections";
 import { useCardViewer } from "components/CardViewerContext";
 import { Textarea } from "components/Textarea";
-import { CardActionMenu } from "./CardActionMenu";
 
 export const Room = () => {
   let { open } = useCardViewer();
@@ -186,20 +185,16 @@ export const Room = () => {
       ) : null}
       {authorized && (
         <div className="border-grey-80 bg-background absolute bottom-0 left-[136px] z-[2] -mb-[1px] flex h-8 w-16 items-center justify-center rounded-t-full border border-b-0 text-center">
-          {selectedCards.length > 0 ? (
-            <CardActionMenu />
-          ) : (
-            <AddCardButton
-              total={total}
-              firstCard={cardsFiltered[0]?.value.value}
-              roomEntity={room}
-              getViewHeight={() =>
-                ref.current
-                  ? ref?.current.clientHeight + ref.current.scrollTop
-                  : 0
-              }
-            />
-          )}
+          <AddCardButton
+            total={total}
+            firstCard={cardsFiltered[0]?.value.value}
+            roomEntity={room}
+            getViewHeight={() =>
+              ref.current
+                ? ref?.current.clientHeight + ref.current.scrollTop
+                : 0
+            }
+          />
         </div>
       )}
     </div>

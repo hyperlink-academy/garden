@@ -42,7 +42,7 @@ export const Backlinks = (props: { entityID: string }) => {
   let cards = cardBacklinks.sort(sortByPosition("vae"));
   let { mutate } = useMutations();
   return (
-    <div className="mt-4 flex flex-col gap-4">
+    <div className="mt-4  flex flex-col gap-4 px-3 pb-4 sm:px-4">
       <div className="flex flex-col gap-1">
         {rooms.length + roomMessages.length > 0 &&
           cards.length + cardMessages.length + inlineBacklinks.length > 0 && (
@@ -153,14 +153,14 @@ const MessageBacklink = (props: {
     >
       <div className="w-full">{props.children}</div>
       <div className="messageBacklinkContent flex w-full flex-row ">
-        <div className="messageBacklinkConnector ml-3 h-6 w-3 self-start rounded-bl-md border-b border-l border-dashed border-grey-80" />
-        <div className="messageBacklinkMessageWrapper mt-2 flex w-full flex-col rounded-md border border-grey-80 bg-bg-blue px-3 py-2 text-sm text-grey-35">
+        <div className="messageBacklinkConnector border-grey-80 ml-3 h-6 w-3 self-start rounded-bl-md border-b border-l border-dashed" />
+        <div className="messageBacklinkMessageWrapper border-grey-80 bg-bg-blue text-grey-35 mt-2 flex w-full flex-col rounded-md border px-3 py-2 text-sm">
           <div className="flex flex-row items-baseline gap-2">
             <div className=" messageBacklinkSender shrink grow overflow-x-hidden truncate whitespace-nowrap font-bold">
               {sender?.value}
             </div>
 
-            <div className="messageBacklinkTimestamp shrink-0 text-xs italic text-grey-55">
+            <div className="messageBacklinkTimestamp text-grey-55 shrink-0 text-xs italic">
               {time?.toLocaleDateString(undefined, {
                 month: "short",
                 day: "numeric",
@@ -186,7 +186,7 @@ const Room = (props: { entityID: string; onClick?: () => void }) => {
         setRoom(props.entityID);
         props.onClick?.();
       }}
-      className="flex flex-row items-center gap-2 rounded-md border border-grey-80 bg-background p-2 font-bold text-grey-35"
+      className="border-grey-80 bg-background text-grey-35 flex flex-row items-center gap-2 rounded-md border p-2 font-bold"
     >
       {roomType?.value === "collection" ? (
         <RoomCollection />

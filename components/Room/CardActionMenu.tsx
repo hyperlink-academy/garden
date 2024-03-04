@@ -9,7 +9,7 @@ import { useSubscribe } from "hooks/useSubscribe";
 export const CardActionMenu = () => {
   let [selectedCards, setSelectedCards] = useSelectedCards();
   return (
-    <div className="mb-6 flex flex-row items-center gap-1 pl-[24px]">
+    <div className="flex flex-row items-center gap-1 pl-[24px]">
       <div className="cardActionMenu bg-grey-90 text-grey-35 border-grey-80 flex items-center gap-2 rounded-full border px-2 py-1">
         <div className="bg-accent-blue text-md cardActionCounter relative flex h-6 place-items-center gap-1  rounded-full pl-1 pr-2 font-bold text-white">
           <CardSmall /> {selectedCards.length}

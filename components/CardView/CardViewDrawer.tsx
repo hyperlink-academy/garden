@@ -31,8 +31,8 @@ export const CardViewDrawer = (props: {
     db.useEntity(props.entityID, "card/background-color")?.value || "#FFFFFF";
   return (
     <div className="z-10">
-      <div className="cardDrawerHeader -mx-3 -mt-6  md:-mx-4">
-        <div className="cardDrawerTabs flex items-end gap-2 border-b border-b-grey-80 pl-4">
+      <div className="cardDrawerHeader -mt-6  ">
+        <div className="cardDrawerTabs border-b-grey-80 flex items-end gap-2 border-b pl-4">
           <ChatTab entityID={props.entityID} />
           <BacklinkTab entityID={props.entityID} />
         </div>
@@ -62,11 +62,12 @@ export const CardViewDrawer = (props: {
           </MessageWindow>
         </div>
       </animated.div>
-      <div
-        className={`sticky bottom-0  mt-2  pb-2`}
-        style={{ backgroundColor: cardBackgroundColor }}
-      >
-        {(drawer === "chat" || !drawer) && (
+
+      {(drawer === "chat" || !drawer) && (
+        <div
+          className={`sticky bottom-0 mt-2 rounded-b-md  px-3 pb-2 sm:px-4`}
+          style={{ backgroundColor: cardBackgroundColor }}
+        >
           <MessageInput
             entityID={props.entityID}
             allowReact={true}
@@ -77,8 +78,8 @@ export const CardViewDrawer = (props: {
               useUIState.getState().openDrawer(props.entityID, "chat")
             }
           />
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -91,7 +92,7 @@ const DiscussionContent = (props: {
   useMarkRead(props.entityID, props.open);
   return (
     <>
-      <div className="-mx-3 flex flex-col sm:-mx-4">
+      <div className="flex flex-col ">
         <Messages
           entityID={props.entityID}
           isRoom={false}
@@ -162,7 +163,7 @@ const Tab = (props: {
       }}
       className={`${
         currentTab === props.id ? `font-bold` : "bg-grey-90"
-      } -mb-[1px] w-fit shrink-0 rounded-t-md border border-grey-80  px-2  pt-0.5 text-sm text-grey-35`}
+      } border-grey-80 text-grey-35 -mb-[1px] w-fit shrink-0 rounded-t-md  border  px-2 pt-0.5 text-sm`}
     >
       {props.text}
     </button>

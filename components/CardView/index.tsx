@@ -55,7 +55,7 @@ const contentStyles = (args: { member: boolean }) => {
     case args.member:
       return `bg-white rounded-md mx-2 mt-1 mb-3 px-4 py-4`;
     default:
-      return `px-3  sm:px-4`;
+      return ``;
   }
 };
 
@@ -251,7 +251,7 @@ export const CardContent = (props: {
       {/* START CARD CONTENT */}
       <div
         ref={ref}
-        className={`cardContentWrapper no-scrollbar relative z-0 flex grow flex-col items-stretch overflow-y-scroll overscroll-y-none ${
+        className={`cardContentWrapper no-scrollbar relative z-0 flex grow flex-col items-stretch overflow-y-scroll overscroll-y-none px-3 sm:px-4 ${
           !memberName ? "pt-3 sm:pt-4" : ""
         }`}
         onClick={() => {

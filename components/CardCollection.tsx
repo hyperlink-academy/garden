@@ -21,9 +21,10 @@ import {
   useDraggableCard,
   useDroppableZone,
 } from "./DragContext";
-import { useRemoveCardFromRoomHistory, useUIState } from "hooks/useUIState";
-import { useDebouncedValue } from "hooks/useDebouncedValue";
+import { useRemoveCardFromRoomHistory } from "hooks/useUIState";
 import { useCardViewer } from "./CardViewerContext";
+import { CardActionMenu } from "./Room/CardActionMenu";
+import { useSelectedCards } from "hooks/useUIState";
 
 export const CardCollection = (props: {
   entityID: string;
@@ -33,15 +34,20 @@ export const CardCollection = (props: {
   openOnAdd?: boolean;
 }) => {
   let collectionType = db.useEntity(props.entityID, "collection/type");
+  let [selectedCards] = useSelectedCards();
+
   return (
-    <CollectionList
-      editable={props.editable}
-      openOnAdd={props.openOnAdd}
-      attribute={props.attribute}
-      entityID={props.entityID}
-      cards={props.cards}
-      collectionType={collectionType?.value}
-    />
+    <>
+      {selectedCards.length > 0 ? <CardActionMenu /> : null}
+      <CollectionList
+        editable={props.editable}
+        openOnAdd={props.openOnAdd}
+        attribute={props.attribute}
+        entityID={props.entityID}
+        cards={props.cards}
+        collectionType={collectionType?.value}
+      />
+    </>
   );
 };
 
@@ -232,7 +238,7 @@ const DraggableCard = (props: {
 };
 
 export const NewCardPreview = () => (
-  <div className="mb-2 h-[62px] w-full rounded-md border border-dashed border-grey-80" />
+  <div className="border-grey-80 mb-2 h-[62px] w-full rounded-md border border-dashed" />
 );
 
 export const useOnDragEndCollection = (props: {
