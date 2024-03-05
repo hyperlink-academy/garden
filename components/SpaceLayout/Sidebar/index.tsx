@@ -1,26 +1,19 @@
 "use client";
-import Link from "next/link";
-import { Divider } from "components/Layout";
 import { useAuth } from "hooks/useAuth";
 import { db, useMutations, useSpaceID } from "hooks/useReplicache";
 import * as Popover from "@radix-ui/react-popover";
 import { useState } from "react";
 import {
-  ArrowDown,
   ArrowUp,
   BellSmall,
-  RoomCalendar,
   RoomSettings,
   Settings,
-  SidebarIcon,
   UnreadDot,
 } from "../../Icons";
 import { EditSpaceModal } from "components/CreateSpace";
 import { useParams, useRouter } from "next/navigation";
 import { EditRoomModal } from "./RoomListLayout";
 import { SharedRoomList } from "./SharedRoomList";
-import { ButtonPrimary } from "components/Buttons";
-import { LoginOrSignupModal } from "components/LoginModal";
 import { useSpaceData } from "hooks/useSpaceData";
 import { People } from "./People";
 import { DotLoader } from "components/DotLoader";
@@ -29,10 +22,9 @@ import { ModalSubmitButton, Modal } from "components/Modal";
 import { useUIState } from "hooks/useUIState";
 import { Truncate } from "components/Truncate";
 import { SpaceData } from "components/SpacesList";
-import { uuidToBase62 } from "src/uuidHelpers";
-import { HelpButton } from "components/Space";
 import { workerAPI } from "backend/lib/api";
 import { WORKER_URL } from "src/constants";
+import { Divider } from "components/Layout";
 
 export const Sidebar = (props: {
   mobile?: boolean;
@@ -40,7 +32,6 @@ export const Sidebar = (props: {
   studio?: { spaces: SpaceData[]; studioName: string; studioID: string };
 }) => {
   let [roomEditOpen, setRoomEditOpen] = useState(false);
-  let { session } = useAuth();
   let setMobileSidebarOpen = useUIState((s) => s.setMobileSidebarOpen);
 
   return (
@@ -48,7 +39,7 @@ export const Sidebar = (props: {
       <div className="roomList no-scrollbar flex h-fit w-full flex-col gap-2 overflow-y-scroll">
         <div className="flex flex-col">
           <div className="flex w-full flex-row items-center gap-1 py-0.5 pl-1 pr-0.5 text-left ">
-            <RoomSettings /> Settings
+            <SpaceSettings space_id={props.space_id} />
           </div>
           <UnreadsRoomButton />
           {/* <RoomButton roomID="calendar">
@@ -72,66 +63,7 @@ export const Sidebar = (props: {
       {/* wrapper so both items (people + nav) display at end on mobile */}
       <div className="flex max-h-[50%] flex-col gap-2">
         <People space_id={props.space_id} />
-        {props.mobile && (
-          <div className="text-grey-55 flex flex-row items-center justify-between p-2 pt-0">
-            <button onClick={() => setMobileSidebarOpen()}>
-              <SidebarIcon />
-            </button>
-            <div className="flex gap-2">
-              <HelpButton onClick={() => setMobileSidebarOpen(false)} />
-              <LoginOrHome space_id={props.space_id} />
-            </div>
-          </div>
-        )}
       </div>
-    </div>
-  );
-};
-
-const SpaceSwitcher = (props: { spaces: SpaceData[] }) => {
-  let router = useRouter();
-  let params = useParams<{ space_id: string; studio_id: string }>();
-  let activeSpace =
-    props.spaces.find((x) => x.id === params?.space_id) || props.spaces[0];
-  let spaces = props.spaces.filter((s) => s.archived === activeSpace.archived);
-  let index = spaces.findIndex((s) => s.id === params?.space_id);
-  return (
-    <div className="flex items-center gap-2">
-      <button
-        className="text-grey-55 hover:text-accent-blue flex items-center gap-0 "
-        onClick={() => {
-          if (!params) return;
-          router.push(
-            `/studio/${params.studio_id}/space/${
-              //wrap around index - 1
-              spaces[(index - 1 + spaces.length) % spaces.length].id
-            }`
-          );
-        }}
-      >
-        <ArrowUp
-          style={{ transform: "rotate(-90deg)" }}
-          height={16}
-          width={16}
-        />
-      </button>
-      <button
-        className="text-grey-55 hover:text-accent-blue flex items-center gap-0"
-        onClick={() => {
-          if (!params) return;
-          router.push(
-            `/studio/${params.studio_id}/space/${
-              spaces[(index + 1) % spaces.length].id
-            }`
-          );
-        }}
-      >
-        <ArrowUp
-          style={{ transform: "rotate(90deg)" }}
-          height={16}
-          width={16}
-        />
-      </button>
     </div>
   );
 };
@@ -207,7 +139,7 @@ export const SpaceName = (props: { truncate?: boolean; space_id: string }) => {
   );
 };
 
-export const SpaceOptions = (props: { space_id: string }) => {
+const SpaceSettings = (props: { space_id: string }) => {
   let spaceID = useSpaceID();
   let { authorized } = useMutations();
   let { data } = useSpaceData(props);
@@ -223,13 +155,13 @@ export const SpaceOptions = (props: { space_id: string }) => {
     <>
       {!authorized ? null : isOwner ? (
         <button
+          className={`"text-grey-35 hover:border-grey-80 hover:border" relative flex w-full items-center gap-1 rounded-md border border-white px-1 py-0.5          `}
           onClick={() => {
             setEditModal(true);
             setMobileSidebarOpen(false);
           }}
-          className="hover:text-accent-blue shrink-0 rounded-md border border-transparent  pt-[1px]"
         >
-          <Settings />
+          <RoomSettings /> Settings
         </button>
       ) : (
         <MemberOptions />
@@ -302,26 +234,5 @@ const MemberOptions = () => {
         />
       </Modal>
     </>
-  );
-};
-
-const LoginOrHome = (props: { space_id: string }) => {
-  let { session } = useAuth();
-  let [loginOrSignupState, setLoginOrSignupState] =
-    LoginOrSignupModal.useState("closed");
-
-  return !session.session?.username ? (
-    <div>
-      <ButtonPrimary
-        content="Log In"
-        onClick={() => setLoginOrSignupState("login")}
-      />
-      <LoginOrSignupModal
-        setState={setLoginOrSignupState}
-        state={loginOrSignupState}
-      />
-    </div>
-  ) : (
-    <SpaceOptions space_id={props.space_id} />
   );
 };
