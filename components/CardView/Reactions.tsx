@@ -228,6 +228,7 @@ export const SingleReaction = (props: {
 }) => {
   let { permissions, mutate, memberEntity } = useMutations();
   let authorized = permissions.commentAndReact;
+  let { session } = useAuth();
   let [hover, setHover] = useState(false);
   let { isLongPress, handlers } = useLongPress(() => {
     setHover(true);
@@ -246,31 +247,22 @@ export const SingleReaction = (props: {
               : "border-grey-80 bg-white"
           } ${!authorized ? "cursor-default" : ""}`}
           onClick={() => {
-            if (!memberEntity || !authorized) return;
+            if (!session.session || !authorized) return;
             if (isLongPress.current) return;
-            if (props.memberReaction)
+            if (props.memberReaction && memberEntity)
               return mutate("removeReaction", {
                 cardEntity: props.entityID,
                 memberEntity,
                 reaction: props.reaction,
               });
             let factID = ulid();
-            mutate("assertFact", [
-              {
-                entity: props.entityID,
-                factID,
-                attribute: "card/reaction",
-                value: props.reaction,
-                positions: {},
-              },
-              {
-                entity: factID,
-                factID: ulid(),
-                attribute: "reaction/author",
-                value: ref(memberEntity),
-                positions: {},
-              },
-            ]);
+            mutate("addReaction", {
+              cardEntity: props.entityID,
+              reaction: props.reaction,
+              reactionFactID: factID,
+              reactionAuthorFactID: ulid(),
+              session: session.session,
+            });
           }}
         >
           <strong>{props.reaction}</strong>{" "}
