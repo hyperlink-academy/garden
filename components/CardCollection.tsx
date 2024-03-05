@@ -23,8 +23,6 @@ import {
 } from "./DragContext";
 import { useRemoveCardFromRoomHistory } from "hooks/useUIState";
 import { useCardViewer } from "./CardViewerContext";
-import { CardActionMenu } from "./Room/CardActionMenu";
-import { useSelectedCards } from "hooks/useUIState";
 
 export const CardCollection = (props: {
   entityID: string;
@@ -34,11 +32,9 @@ export const CardCollection = (props: {
   openOnAdd?: boolean;
 }) => {
   let collectionType = db.useEntity(props.entityID, "collection/type");
-  let [selectedCards] = useSelectedCards();
 
   return (
-    <>
-      {selectedCards.length > 0 ? <CardActionMenu /> : null}
+    <div className="relative">
       <CollectionList
         editable={props.editable}
         openOnAdd={props.openOnAdd}
@@ -47,7 +43,7 @@ export const CardCollection = (props: {
         cards={props.cards}
         collectionType={collectionType?.value}
       />
-    </>
+    </div>
   );
 };
 

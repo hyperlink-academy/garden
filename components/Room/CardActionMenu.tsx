@@ -1,34 +1,46 @@
-import { CardSmall, ReactionAdd, CloseLinedTiny } from "components/Icons";
+import {
+  CardSmall,
+  ReactionAdd,
+  CloseLinedTiny,
+  PopoverArrow,
+} from "components/Icons";
 import * as Popover from "@radix-ui/react-popover";
 import { useSelectedCards } from "hooks/useUIState";
 import { CardBackgroundColors } from "src/constants";
 import { scanIndex, useMutations } from "hooks/useReplicache";
 import { AddReaction } from "components/CardView/Reactions";
 import { useSubscribe } from "hooks/useSubscribe";
+import { Divider } from "components/Layout";
 
 export const CardActionMenu = () => {
   let [selectedCards, setSelectedCards] = useSelectedCards();
   return (
-    <div className="flex flex-row items-center gap-1 pl-[24px]">
-      <div className="cardActionMenu bg-grey-90 text-grey-35 border-grey-80 flex items-center gap-2 rounded-full border px-2 py-1">
-        <div className="bg-accent-blue text-md cardActionCounter relative flex h-6 place-items-center gap-1  rounded-full pl-1 pr-2 font-bold text-white">
-          <CardSmall /> {selectedCards.length}
-        </div>
-        <div className="relative">
+    <div className="flex  flex-row  items-center gap-1">
+      <div className="cardActionMenu bg-accent-blue  flex items-center gap-2 rounded-full border px-2  text-white">
+        <div className="relative pt-[6px]">
           <ReactionPicker selectedCards={selectedCards} />
         </div>
-        <div className="relative">
+        <div className="relative pt-[2px]">
           <CardBackgroundColorPicker selectedCards={selectedCards} />
         </div>
+        <div className="h-6">
+          <Divider vertical />
+        </div>
+        <div className="flex items-center gap-1">
+          <div className="bg-accent-blue  cardActionCounter relative flex h-6 place-items-center gap-1  rounded-full  font-bold text-white">
+            <CardSmall /> {selectedCards.length}
+          </div>
+          <button
+            className="rounded-full  p-[3px] text-sm  hover:underline"
+            onClick={() => {
+              setSelectedCards([]);
+            }}
+          >
+            clear
+            {/* <CloseLinedTiny width={16} height={16} className="text-grey-55" /> */}
+          </button>
+        </div>
       </div>
-      <button
-        className="bg-background border-grey-80 hover:bg-grey-90 rounded-full border p-[3px]"
-        onClick={() => {
-          setSelectedCards([]);
-        }}
-      >
-        <CloseLinedTiny width={16} height={16} className="text-grey-55" />
-      </button>
     </div>
   );
 };
@@ -101,20 +113,21 @@ const CardBackgroundColorPicker = (props: { selectedCards: string[] }) => {
     action.end();
   };
   const gradient =
-    colors.length === 1 ? colors[0] : `conic-gradient(${colors.join(", ")})`;
+    colors.length === 1
+      ? colors[0]
+      : `conic-gradient(#FFFFFF, #CBFF5C, #FF9BE9, #8DF1FF, #FFE660, #FFFFFF)`;
 
   return (
     <ActionItem
       button={
         <button
           className={`h-5 w-5 rounded-full border hover:cursor-pointer
-           ${"border-grey-55 border-2"}`}
+           ${"border-2 border-white"}`}
           style={{ background: gradient }}
         />
       }
     >
-      <Popover.Arrow />
-      <div className="bg-grey-90 rounded-lg p-2">
+      <div className="lightBorder rounded-lg bg-white p-2">
         <div className="flex gap-2">
           {CardBackgroundColors.map((color) => {
             return (
@@ -141,8 +154,14 @@ const ActionItem = (props: {
 }) => (
   <Popover.Root>
     <Popover.Trigger>{props.button}</Popover.Trigger>
-    <Popover.Content sideOffset={8}>
-      <Popover.Arrow />
+    <Popover.Content
+      sideOffset={0}
+      arrowPadding={100000}
+      className="max-w-[240px]"
+    >
+      <Popover.Arrow asChild>
+        <PopoverArrow />
+      </Popover.Arrow>
       {props.children}
     </Popover.Content>
   </Popover.Root>

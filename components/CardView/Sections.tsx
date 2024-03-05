@@ -12,6 +12,8 @@ import { modifyString, useKeyboardHandling } from "hooks/useKeyboardHandling";
 import { CollectionType } from "components/Room";
 import { sortByPosition } from "src/position_helpers";
 import { RoomCollection } from "components/Icons";
+import { CardActionMenu } from "components/Room/CardActionMenu";
+import { useSelectedCards } from "hooks/useUIState";
 
 export const SingleTextSection = (
   props: {
@@ -281,7 +283,7 @@ export const DateSection = (props: { entityID: string }) => {
       )}
       {!authorized ? null : (
         <button
-          className="justify-self-center text-sm text-grey-55 hover:text-accent-blue"
+          className="text-grey-55 hover:text-accent-blue justify-self-center text-sm"
           onClick={() => {
             if (!date) return;
             mutate("retractFact", { id: date.id });
@@ -298,13 +300,20 @@ export const AttachedCardSection = (props: { entityID: string }) => {
   let attachedCards = db.useEntity(props.entityID, "deck/contains");
   let currentCollectionType = db.useEntity(props.entityID, "collection/type");
   let { authorized } = useMutations();
+  let [selectedCards] = useSelectedCards();
 
   return (
     <>
       {attachedCards && attachedCards.length > 0 && (
-        <div id="card-attached-card-section" className="flex flex-col gap-2">
+        <div
+          id="card-attached-card-section"
+          className="relative flex flex-col gap-2"
+        >
+          <div className="absolute -top-4 left-0 right-0 z-20 flex justify-center">
+            {selectedCards.length > 0 ? <CardActionMenu /> : null}
+          </div>
           <div className="flex flex-row justify-between">
-            <div className="flex items-center gap-1 text-sm font-bold text-grey-55">
+            <div className="text-grey-55 flex items-center gap-1 text-sm font-bold">
               <RoomCollection /> ({attachedCards.length})
             </div>
             {authorized && (
@@ -314,6 +323,7 @@ export const AttachedCardSection = (props: { entityID: string }) => {
               />
             )}
           </div>
+
           <CardCollection
             editable
             entityID={props.entityID}

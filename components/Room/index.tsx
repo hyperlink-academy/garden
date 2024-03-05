@@ -34,6 +34,7 @@ import { useRoom, useSelectedCards } from "hooks/useUIState";
 import { SingleTextSection } from "components/CardView/Sections";
 import { useCardViewer } from "components/CardViewerContext";
 import { Textarea } from "components/Textarea";
+import { CardActionMenu } from "./CardActionMenu";
 
 export const Room = () => {
   let { open } = useCardViewer();
@@ -164,24 +165,31 @@ export const Room = () => {
         filters={filters}
         setFilters={setFilters}
       />
-
       {/* per-room wrappers + components */}
       {room ? (
-        roomType?.value === "collection" ? (
-          <div className="flex grow flex-col gap-2 pb-3 pt-2">
-            <CardCollection
-              cards={cardsFiltered}
-              entityID={room}
-              attribute="desktop/contains"
-              openOnAdd
-            />
-          </div>
-        ) : (
-          <div className="relative flex flex-col">
-            <Desktop entityID={room} />
-            <div className="desktopBackground absolute h-full w-full grow" />
-          </div>
-        )
+        <>
+          {roomType?.value === "collection" ? (
+            <div className="relative flex grow flex-col gap-2 pb-3 pt-2">
+              <div className="absolute left-0 right-0 top-0 z-20 flex justify-center">
+                {selectedCards.length > 0 ? <CardActionMenu /> : null}
+              </div>
+              <CardCollection
+                cards={cardsFiltered}
+                entityID={room}
+                attribute="desktop/contains"
+                openOnAdd
+              />
+            </div>
+          ) : (
+            <div className="relative flex flex-col">
+              <Desktop entityID={room} />
+              <div className="absolute left-0 right-0 top-0 z-20 flex justify-center">
+                {selectedCards.length > 0 ? <CardActionMenu /> : null}
+              </div>
+              <div className="desktopBackground absolute h-full w-full grow" />
+            </div>
+          )}
+        </>
       ) : null}
       {authorized && (
         <div className="border-grey-80 bg-background absolute bottom-0 left-[136px] z-[2] -mb-[1px] flex h-8 w-16 items-center justify-center rounded-t-full border border-b-0 text-center">
