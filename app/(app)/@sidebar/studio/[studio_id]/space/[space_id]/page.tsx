@@ -1,5 +1,6 @@
 // SIDEBAR FOR SPACE FROM STUDIO
 
+import { SpaceSidebar } from "app/(app)/@sidebar/SpaceSidebar";
 import { getStudioPageData } from "app/(app)/studio/[studio_id]/page";
 import { SpaceSwitcher } from "app/(app)/studio/[studio_id]/space/SpaceViewerHeader";
 import { SpaceProvider } from "components/ReplicacheProvider";
@@ -20,26 +21,15 @@ export default async function SpaceInStudioSidebar(props: {
 
   return (
     <>
-      <div className="flex h-full flex-col ">
-        <div className="flex flex-row">
-          <Link
-            href={
-              session.data.user
-                ? `/s/${session.data.user.user_metadata.username}`
-                : "/"
-            }
-          >
-            h/
-          </Link>
-          {data.data.name} / {activeSpace.display_name}
-        </div>
-      </div>
-      <SpaceSwitcher spaces={spaces} />
       <SpaceProvider
         id={activeSpace.do_id}
         data={{ space_id: activeSpace.id, studio_id: undefined }}
       >
-        <Sidebar space_id={activeSpace.id} />
+        <SpaceSidebar
+          space_id={activeSpace.id}
+          do_id={activeSpace.do_id}
+          display_name={activeSpace.display_name}
+        />
       </SpaceProvider>
     </>
   );

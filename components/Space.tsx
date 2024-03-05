@@ -1,6 +1,6 @@
 "use client";
 import { CardViewer } from "components/CardViewerContext";
-import { SmallCardDragContext, useDroppableZone } from "components/DragContext";
+import { useDroppableZone } from "components/DragContext";
 import { Sidebar } from "components/SpaceLayout";
 import { useEffect, useState } from "react";
 import useWindowDimensions from "hooks/useWindowDimensions";
@@ -51,13 +51,11 @@ export const Space = (props: Props) => {
   return (
     <>
       <PresenceHandler />
-      <SmallCardDragContext>
-        {width > 640 || width === 0 ? (
-          <DesktopLayout {...props} />
-        ) : (
-          <MobileLayout {...props} />
-        )}
-      </SmallCardDragContext>
+      {width > 640 || width === 0 ? (
+        <DesktopLayout {...props} />
+      ) : (
+        <MobileLayout {...props} />
+      )}
     </>
   );
 };

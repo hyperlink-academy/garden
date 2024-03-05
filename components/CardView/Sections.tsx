@@ -15,6 +15,7 @@ import { RoomCollection } from "components/Icons";
 
 export const SingleTextSection = (
   props: {
+    fallback?: string;
     focusText?: string;
     autocompleteCardNames?: boolean;
     entityID: string;
@@ -120,7 +121,7 @@ export const SingleTextSection = (
     [action, fact?.positions, mutate, props.entityID, props.section]
   );
 
-  let value = fact?.value;
+  let value = fact?.value || props.fallback;
   if (props.focusText && props.previewOnly && fact) {
     let lines = fact?.value.split("\n");
     let line = lines?.findIndex((line) =>
@@ -281,7 +282,7 @@ export const DateSection = (props: { entityID: string }) => {
       )}
       {!authorized ? null : (
         <button
-          className="justify-self-center text-sm text-grey-55 hover:text-accent-blue"
+          className="text-grey-55 hover:text-accent-blue justify-self-center text-sm"
           onClick={() => {
             if (!date) return;
             mutate("retractFact", { id: date.id });
@@ -304,7 +305,7 @@ export const AttachedCardSection = (props: { entityID: string }) => {
       {attachedCards && attachedCards.length > 0 && (
         <div id="card-attached-card-section" className="flex flex-col gap-2">
           <div className="flex flex-row justify-between">
-            <div className="flex items-center gap-1 text-sm font-bold text-grey-55">
+            <div className="text-grey-55 flex items-center gap-1 text-sm font-bold">
               <RoomCollection /> ({attachedCards.length})
             </div>
             {authorized && (

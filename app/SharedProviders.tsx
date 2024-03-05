@@ -6,6 +6,7 @@ import { useServiceWorkerMessageChannel } from "hooks/useServiceWorkerMessageCha
 import { CallProvider } from "components/Calls/CallProvider";
 import { Session } from "@supabase/supabase-js";
 import { Analytics } from "@vercel/analytics/react";
+import { SmallCardDragContext } from "components/DragContext";
 export const SharedProviders = (props: {
   children: React.ReactNode;
   session: Session | null;
@@ -13,12 +14,16 @@ export const SharedProviders = (props: {
   useServiceWorkerMessageChannel();
   return (
     <SWRCache>
-      <Analytics />
-      <CallProvider>
-        <SmokeProvider>
-          <AuthProvider session={props.session}>{props.children}</AuthProvider>
-        </SmokeProvider>
-      </CallProvider>
+      <SmallCardDragContext>
+        <Analytics />
+        <CallProvider>
+          <SmokeProvider>
+            <AuthProvider session={props.session}>
+              {props.children}
+            </AuthProvider>
+          </SmokeProvider>
+        </CallProvider>
+      </SmallCardDragContext>
     </SWRCache>
   );
 };

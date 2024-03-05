@@ -1,4 +1,3 @@
-import { Backlinks } from "components/CardView/Backlinks";
 import { SingleReactionPreview } from "components/CardView/Reactions";
 import { SingleTextSection } from "components/CardView/Sections";
 import { useCardViewer } from "components/CardViewerContext";
@@ -13,7 +12,6 @@ import { db, useMutations } from "hooks/useReplicache";
 import { useUIState } from "hooks/useUIState";
 import { Props } from "./index";
 import { focusElement } from "src/utils";
-import { isUrl } from "src/isUrl";
 import { LinkPreviewCondensed } from "components/LinkPreview";
 
 export const BigCardBody = (
@@ -112,6 +110,7 @@ export const BigCardBody = (
                     : "transparent",
               }}
               entityID={props.entityID}
+              fallback={props.data.title?.value}
               section={props.data.member ? "member/name" : "card/title"}
               placeholder="Untitled"
               previewOnly={!editing || !!props.data.member}
@@ -156,6 +155,7 @@ export const BigCardBody = (
             >
               {!props.hideContent && (
                 <SingleTextSection
+                  fallback={props.data.content?.value}
                   autocompleteCardNames
                   focusText={props.focusText}
                   placeholder={editing ? "write something…" : ""}
