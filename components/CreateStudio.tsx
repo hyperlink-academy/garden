@@ -89,7 +89,6 @@ export function CreateStudio(props: { username: string }) {
               authToken,
               ...formState,
             });
-            console.log(studio);
             mutate();
             setLoading(false);
             if (!studio.success) return;
