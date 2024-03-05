@@ -225,7 +225,7 @@ export const MessageInput = (props: {
       {!session?.loggedIn ? (
         <Login />
       ) : !authorized ? (
-        <div className="messageNonAuth flex justify-center rounded-md bg-grey-90 p-2 text-center text-sm italic text-grey-55">
+        <div className="messageNonAuth bg-grey-90 text-grey-55 flex justify-center rounded-md p-2 text-center text-sm italic">
           Only members and studiomates can chat!
         </div>
       ) : (
@@ -251,7 +251,7 @@ export const MessageInput = (props: {
             {/* IF MESSAGE IS IN REPLY */}
             {props.reply && (
               <div className="messageInputReply -mb-2">
-                <div className="flex items-start justify-between gap-2 rounded-lg border border-grey-80  px-[6px] py-[5px] text-xs italic text-grey-55">
+                <div className="border-grey-80 text-grey-55 flex items-start justify-between gap-2 rounded-lg  border px-[6px] py-[5px] text-xs italic">
                   <div className="flex flex-col gap-[1px]">
                     <div className="font-bold"> {replyToName?.value}</div>
                     <div className="text-grey-55">{replyMessage?.content}</div>
@@ -260,7 +260,7 @@ export const MessageInput = (props: {
                     <CloseLinedTiny />
                   </button>
                 </div>
-                <div className="ml-auto mr-2 h-2 w-0 border border-grey-80" />
+                <div className="border-grey-80 ml-auto mr-2 h-2 w-0 border" />
               </div>
             )}
             {attachedCards.length > 0 && (
@@ -288,7 +288,7 @@ export const MessageInput = (props: {
             {/* ACTUAL MESSAGE INPUT */}
 
             <div className="flex w-full flex-col items-end gap-1">
-              <div className="flex w-full items-center gap-2 rounded-lg border border-grey-55 bg-white py-1 pl-2 pr-1 text-base text-grey-15">
+              <div className="border-grey-55 text-grey-15 flex w-full items-center gap-2 rounded-lg border bg-white py-1 pl-2 pr-1 text-base">
                 <AutosizeTextarea
                   onKeyDown={(e) => {
                     if (e.key === "Escape") {
@@ -331,11 +331,11 @@ const Login = () => {
   let [state, setState] = LoginOrSignupModal.useState("closed");
   return (
     <>
-      <div className="messageLogIn flex justify-center rounded-md bg-grey-90 p-2">
-        <p className=" w-full text-center text-sm italic text-grey-55">
+      <div className="messageLogIn bg-grey-90 flex justify-center rounded-md p-2">
+        <p className=" text-grey-55 w-full text-center text-sm italic">
           <span
             role="button"
-            className="font-bold text-accent-blue"
+            className="text-accent-blue font-bold"
             onClick={() => {
               setState("login");
             }}
@@ -368,7 +368,7 @@ const AttachCard = ({
       {/* decide styling of button via children */}
       <button
         onClick={() => setOpen(true)}
-        className="flex text-grey-55 hover:text-accent-blue"
+        className="text-grey-55 hover:text-accent-blue flex"
       >
         <CardAddLined />
       </button>
@@ -417,13 +417,14 @@ export const Messages = (props: {
   isRoom: boolean;
 }) => {
   let messages = db.useMessages(props.entityID);
-  let { authorized } = useMutations();
+  let { permissions } = useMutations();
+  let authorized = permissions.commentAndReact;
   if (props.isRoom === false && messages.length == 0) return null;
 
   return (
     <>
       {messages.length == 0 && authorized ? (
-        <div className="messagesEmpty mt-auto flex flex-col gap-2 px-3 py-1  text-sm italic text-grey-55 sm:px-4">
+        <div className="messagesEmpty text-grey-55 mt-auto flex flex-col gap-2 px-3  py-1 text-sm italic sm:px-4">
           <p>Welcome to the chat room!</p>
           <p>Start a conversation 🌱</p>
         </div>
@@ -460,7 +461,8 @@ const Message = (props: {
   entity?: string;
   setReply: (reply: string) => void;
 }) => {
-  let { authorized } = useMutations();
+  let { permissions } = useMutations();
+  let authorized = permissions.commentAndReact;
 
   let { session } = useAuth();
 
@@ -490,7 +492,7 @@ const Message = (props: {
         {/* MESSAGE HEADER */}
         {!props.multipleFromSameAuthor && (
           <div
-            className={`messageHeader flex w-full gap-2 text-grey-55 ${
+            className={`messageHeader text-grey-55 flex w-full gap-2 ${
               isMe && "flex-row-reverse"
             } `}
             style={{ color: memberColor?.value }}
@@ -515,18 +517,18 @@ const Message = (props: {
         {replyMessage && (
           <div className={`-mb-1 w-fit ${isMe ? "ml-6" : "mr-6"}`}>
             <div
-              className="mt-0.5 flex max-h-[118px] flex-col overflow-hidden rounded-lg border border-grey-80 px-2 py-1 text-xs"
+              className="border-grey-80 mt-0.5 flex max-h-[118px] flex-col overflow-hidden rounded-lg border px-2 py-1 text-xs"
               style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
             >
-              <div className={`font-bold italic text-grey-55`}>
+              <div className={`text-grey-55 font-bold italic`}>
                 {replyToName?.value}
               </div>
-              <div className=" italic text-grey-55">
+              <div className=" text-grey-55 italic">
                 {replyMessage?.content}
               </div>
             </div>
             <div
-              className={` mt-0 h-2 w-0 border border-grey-80 ${
+              className={` border-grey-80 mt-0 h-2 w-0 border ${
                 isMe ? "ml-auto mr-2" : "ml-2"
               } `}
             />
@@ -534,7 +536,7 @@ const Message = (props: {
         )}
         <div className={`flex items-end gap-2 ${isMe && "flex-row-reverse"}`}>
           <div
-            className={`messageContent  rounded-lg border border-grey-80 px-2 py-[5px] text-white  ${
+            className={`messageContent  border-grey-80 rounded-lg border px-2 py-[5px] text-white  ${
               attachedCards ? "w-full " : "w-fit"
             } ${!isMe && "group-hover:!bg-bg-blue"}`}
             style={{
@@ -575,7 +577,7 @@ const Message = (props: {
           {authorized ? (
             <span className="messageReplyButton mb-[1px] h-4 w-4 shrink-0 text-xs">
               <button
-                className={`hidden text-grey-55 hover:text-accent-blue group-hover:block ${
+                className={`text-grey-55 hover:text-accent-blue hidden group-hover:block ${
                   isMe && "-scale-x-100"
                 }`}
                 onClick={() => {
