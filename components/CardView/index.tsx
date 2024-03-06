@@ -385,6 +385,15 @@ const CardMoreOptionsMenu = (props: {
         <MoreOptionsTiny />
       </Menu.Button>
       <MenuContainer>
+        <MenuItem
+          onClick={() => {
+            navigator.clipboard.writeText(
+              `${document.location.protocol}//${document.location.host}${document.location.pathname}?openCard=${props.entityID}`
+            );
+          }}
+        >
+          <div className="font-bold">Copy link to card</div>
+        </MenuItem>
         <MenuItem>
           <CardBackgroundColorPicker entityID={props.entityID} />
         </MenuItem>
