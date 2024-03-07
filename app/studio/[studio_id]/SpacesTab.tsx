@@ -5,6 +5,7 @@ import {
   RoomMember,
   RoomSearch,
 } from "components/Icons";
+import { Divider } from "components/Layout";
 import { BaseSpaceCard, SpaceData } from "components/SpacesList";
 import { AddSpace } from "components/StudioPage/AddSpace";
 import { useAuth } from "hooks/useAuth";
@@ -21,12 +22,19 @@ export type Props = {
 
 export function SpaceList({ data }: Props) {
   let [search, setSearch] = useState("");
-
+  let { session } = useAuth();
+  let authorized = data.members_in_studios.find(
+    (m) => m.member === session.user?.id
+  );
   let allSpaces = data?.spaces_in_studios;
+  let yourSpaces = allSpaces.filter((s) =>
+    s.space_data?.members_in_spaces.find((m) => m.member === session.user?.id)
+  );
 
   let activeSpaces = allSpaces.filter(
     ({ space_data: s }) =>
       s &&
+      !s.members_in_spaces.find((m) => m.member === session.user?.id) &&
       !s.archived &&
       s.display_name?.toLocaleLowerCase().includes(search.toLocaleLowerCase())
   );
@@ -36,11 +44,6 @@ export function SpaceList({ data }: Props) {
       s &&
       !!s.archived &&
       s.display_name?.toLocaleLowerCase().includes(search.toLocaleLowerCase())
-  );
-
-  let { session } = useAuth();
-  let authorized = data.members_in_studios.find(
-    (m) => m.member === session.user?.id
   );
 
   if (!data) return;
@@ -71,6 +74,19 @@ export function SpaceList({ data }: Props) {
         <div className=" studioSpaceListWrapper no-scrollbar relative flex h-full w-full flex-col gap-8 overflow-y-scroll ">
           {allSpaces.length > 0 ? (
             <>
+              {yourSpaces.length > 0 && (
+                <div className="-mb-2 flex flex-col gap-8">
+                  <div>
+                    <h3>Your Spaces</h3>
+                    <List
+                      spaces={
+                        yourSpaces?.map((s) => s.space_data as SpaceData) || []
+                      }
+                    />
+                  </div>
+                  <Divider />
+                </div>
+              )}
               <List
                 spaces={
                   activeSpaces?.map((s) => s.space_data as SpaceData) || []
