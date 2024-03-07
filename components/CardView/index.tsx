@@ -10,6 +10,7 @@ import {
   ReactionAdd,
   CloseLinedTiny,
   GoBackToPageLined,
+  LinkSmall,
 } from "components/Icons";
 import { Divider, MenuContainer, MenuItem } from "components/Layout";
 import { scanIndex, db, useMutations, useSpaceID } from "hooks/useReplicache";
@@ -39,6 +40,7 @@ import { Title } from "./Title";
 import { LinkPreview } from "components/LinkPreview";
 import { useLinkPreviewManager } from "hooks/useLinkPreviewManager";
 import { useDrag } from "@use-gesture/react";
+import { useSmoker } from "components/Smoke";
 
 const borderStyles = (args: { member: boolean }) => {
   switch (true) {
@@ -369,11 +371,25 @@ const CardMoreOptionsMenu = (props: {
   let memberName = db.useEntity(props.entityID, "member/name");
   let [areYouSureCardDeletionModalOpen, setAreYouSureCardDeletionModalOpen] =
     useState(false);
+  let smoke = useSmoker();
   if (!!memberName) return null;
   if (!authorized) {
     if (!permissions.commentAndReact) return null;
     return (
-      <div className="pointer-events-auto relative pt-4">
+      <div className="pointer-events-auto relative flex flex-row gap-2 pt-4">
+        <button
+          onClick={(e) => {
+            smoke({
+              text: "copied link!",
+              position: { x: e.clientX, y: e.clientY },
+            });
+            navigator.clipboard.writeText(
+              `${document.location.protocol}//${document.location.host}${document.location.pathname}?openCard=${props.entityID}`
+            );
+          }}
+        >
+          <LinkSmall />
+        </button>
         <ReactionPicker entityID={props.entityID} />
       </div>
     );
@@ -386,7 +402,11 @@ const CardMoreOptionsMenu = (props: {
       </Menu.Button>
       <MenuContainer>
         <MenuItem
-          onClick={() => {
+          onClick={(e) => {
+            smoke({
+              text: "copied link!",
+              position: { x: e.clientX, y: e.clientY },
+            });
             navigator.clipboard.writeText(
               `${document.location.protocol}//${document.location.host}${document.location.pathname}?openCard=${props.entityID}`
             );

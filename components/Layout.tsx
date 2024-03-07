@@ -11,7 +11,7 @@ export const Divider = (props: {
     <div
       className={` border-l border-t ${
         props.dark ? `border-grey-55` : `border-grey-80`
-      } ${props.vertical ? "100vh w-[1px]" : "h-[1px] w-full"} 
+      } ${props.vertical ? "100vh w-[1px]" : "h-[1px] w-full"}
       `}
       style={{
         margin: `${props.my || 0}px ${props.mx || 0}px ${props.my || 0}px ${
@@ -29,10 +29,10 @@ export const FloatingContainer: React.FC<
     <div
       onClick={(e) => e.stopPropagation()}
       className={`
-        rounded-md border
-        border-grey-80 bg-white px-4 
+        border-grey-80 shadow-drop
+        rounded-md border bg-white
+        px-4
         py-4
-        shadow-drop
         ${props.className}
         `}
     >
@@ -115,16 +115,16 @@ export const MenuContainer: React.FC<
     >
       <Menu.Items
         className={`
-            absolute right-0 z-40 
-            flex w-max 
-            origin-top-right flex-col 
-            justify-items-end rounded-md
-            border 
-            border-grey-80 
-            bg-white 
-            py-2 
+            border-grey-80 shadow-drop absolute
+            right-0 z-40
+            flex w-max
+            origin-top-right flex-col
+            justify-items-end
+            rounded-md
+            border
+            bg-white
+            py-2
             text-right
-            shadow-drop
             ${props.className}`}
       >
         {props.children}
@@ -135,7 +135,7 @@ export const MenuContainer: React.FC<
 
 export const MenuItem: React.FC<
   React.PropsWithChildren<{
-    onClick?: () => void;
+    onClick?: (e: React.MouseEvent) => void;
     disabled?: boolean;
   }>
 > = (props) => {
@@ -151,7 +151,7 @@ export const MenuItem: React.FC<
               : ""
           }`}
           style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
-          onClick={() => props.onClick?.()}
+          onClick={(e) => props.onClick?.(e)}
           disabled={props?.disabled}
         >
           {props.children}
