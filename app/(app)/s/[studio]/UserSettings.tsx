@@ -1,15 +1,12 @@
 import { useEffect, useState } from "react";
-import { Settings } from "./Icons";
-import { ButtonPrimary, ButtonSecondary } from "./Buttons";
+import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
 import { useAuth } from "hooks/useAuth";
-import { Modal } from "./Modal";
-import { HelpAppInfo } from "./HelpCenter";
+import { HelpAppInfo } from "components/HelpCenter";
 import { supabaseBrowserClient } from "supabase/clients";
 
-export const NotificationManager = () => {
+export const UserSettings = () => {
   let supabase = supabaseBrowserClient();
   let { logout } = useAuth();
-  let [open, setOpen] = useState(false);
   let [notificationPermissionState, setNotificationPermissionState] =
     useState("default");
   let [pushPermissionState, setPushPermissionState] = useState("unavailable");
@@ -53,61 +50,24 @@ export const NotificationManager = () => {
       });
   }, [supabase]);
   return (
-    <>
-      <button className="hover:text-accent-blue" onClick={() => setOpen(true)}>
-        <Settings />
-      </button>
-      <Modal
-        open={open}
-        onClose={() => setOpen(false)}
-        header="Personal Settings"
-      >
-        {/* TODO: per-device logic! */}
-        {/* 
-        if on desktop:
-        prompt mobile install
-        can also allow enabling browser notifs
-        
-        if on mobile + app installed:
-        prompt enabling notifications
-
-        if on mobile + app NOT installed: 
-        "add the app" button, triggers modal / install flow
-        */}
-
-        {/* TODO: multiple devices?  */}
-        {/*
-        global toggle - ???
-        (grey out below list, if any)
-
-        if enabled on any devices:
-        show list of devices w/ toggle for each
-
-        if not yet enabled for this device:
-        BUTTON: enable for this device
-
-        if denied…???
-        */}
-        <div className="flex flex-col gap-4">
-          <NotificationModalContent
-            pushPermissionState={pushPermissionState}
-            notificationPermissionState={notificationPermissionState}
-            existingSubscription={existingSubscription}
-            setExistingSubscription={setExistingSubscription}
-            setPushPermissionState={setPushPermissionState}
-            setNotificationPermissionState={setNotificationPermissionState}
-          />
-          <hr className="border-grey-55" />
-          {/* <div className="lightBorder px-2 py-3"> */}
-          <ButtonSecondary
-            className="mx-auto"
-            content="Log out"
-            onClick={() => logout()}
-          />
-          {/* </div> */}
-        </div>
-      </Modal>
-    </>
+    <div className="flex flex-col gap-4">
+      <NotificationModalContent
+        pushPermissionState={pushPermissionState}
+        notificationPermissionState={notificationPermissionState}
+        existingSubscription={existingSubscription}
+        setExistingSubscription={setExistingSubscription}
+        setPushPermissionState={setPushPermissionState}
+        setNotificationPermissionState={setNotificationPermissionState}
+      />
+      <hr className="border-grey-55" />
+      {/* <div className="lightBorder px-2 py-3"> */}
+      <ButtonSecondary
+        className="mx-auto"
+        content="Log out"
+        onClick={() => logout()}
+      />
+      {/* </div> */}
+    </div>
   );
 };
 
@@ -136,9 +96,9 @@ const NotificationModalContent = ({
   )
     // This what you see in the mobile browser and in certain other desktop browsers like Arc
     return (
-      <div className="flex flex-col gap-3 text-grey-35">
+      <div className="text-grey-35 flex flex-col gap-3">
         <div className="lightBorder flex flex-col gap-4 p-4">
-          <h3 className="m-auto w-fit -rotate-2 -skew-x-6 rounded-md bg-accent-gold px-4 py-2 text-center">
+          <h3 className="bg-accent-gold m-auto w-fit -rotate-2 -skew-x-6 rounded-md px-4 py-2 text-center">
             Get the Hyperlink app!
           </h3>
           <HelpAppInfo />
@@ -154,7 +114,7 @@ const NotificationModalContent = ({
     // this is what you see if you're on most desktop browsers and you haven't enabled anything
     return (
       <>
-        <div className="lightBorder flex flex-col  justify-center gap-3 bg-grey-90 px-2 py-3 text-center text-grey-35">
+        <div className="lightBorder bg-grey-90 text-grey-35  flex flex-col justify-center gap-3 px-2 py-3 text-center">
           <div className="flex flex-col gap-1">
             <div className="font-bold">
               Push Notifications are disabled on this device
@@ -202,7 +162,7 @@ const NotificationModalContent = ({
   if (pushPermissionState === "granted" && existingSubscription)
     return (
       <>
-        <div className="lightBorder flex flex-col  justify-center gap-3 bg-bg-blue px-2 py-3 text-center text-grey-35">
+        <div className="lightBorder bg-bg-blue text-grey-35  flex flex-col justify-center gap-3 px-2 py-3 text-center">
           <div className="flex flex-col gap-1">
             <p className="font-bold">
               You&apos;ve enabled notifications on this device!

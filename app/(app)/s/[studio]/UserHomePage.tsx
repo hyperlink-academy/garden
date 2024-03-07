@@ -6,27 +6,31 @@ import { useAuth } from "hooks/useAuth";
 import { useIdentityData } from "hooks/useIdentityData";
 import { useEffect, useState } from "react";
 import { DisclosureCollapseTiny, DisclosureExpandTiny } from "components/Icons";
-import Head from "next/head";
-import { NotificationManager } from "components/NotificationManager";
 import { Divider } from "components/Layout";
 import { uuidToBase62 } from "src/uuidHelpers";
 import Link from "next/link";
 import { IdentityData } from "backend/routes/get_identity_data";
-import { useParams } from "next/dist/client/components/navigation";
-import { LoginButton } from "app/(app)/studio/[studio_id]/space/SpaceViewerHeader";
+import { useParams } from "next/navigation";
 import { useIsMobile } from "hooks/utils";
 import Image from "next/image";
 import sandboxSpot from "public/img/spotIllustration/sandbox.png";
 import mobileSandboxSpot from "public/img/spotIllustration/sandboxMobile.png";
+import { useHomeTabs } from "app/(app)/@sidebar/s/[studio]/HomeTabs";
+import { UserSettings } from "./UserSettings";
 
+type Studio = NonNullable<
+  NonNullable<
+    ReturnType<typeof useIdentityData>["data"]
+  >["members_in_studios"][0]["studios"]
+>;
 export default function UserHomePage(props: { data: IdentityData }) {
-  let { session } = useAuth();
+  let [tab] = useHomeTabs(props.data.username);
   let query = useParams<{ studio: string }>();
   let { data } = useIdentityData(query?.studio as string, props.data);
 
   if (!data) return <div>loading </div>;
 
-  let currentStudioName = query?.studio;
+  let currentStudioName = query?.studio as string;
   let studios = data?.members_in_studios.map(
     (s) => s.studios as Exclude<typeof s.studios, null>
   );
@@ -36,64 +40,63 @@ export default function UserHomePage(props: { data: IdentityData }) {
       .map((s) => s.space_data as SpaceData),
   ];
 
-  let myStudioName = session.session?.username;
   return (
     <>
-      <Head>
-        <title key="title">{currentStudioName}</title>
-      </Head>
-      <div className="flex h-full max-w-4xl flex-col gap-2">
-        <div className="flex w-full flex-row items-center justify-between gap-2">
-          <h2 className="grow">{currentStudioName}</h2>
-
-          {session?.loggedIn ? (
-            session.session?.username === currentStudioName && (
-              <NotificationManager />
-            )
-          ) : (
-            <LoginButton />
-          )}
-        </div>
-
-        {spaces.length == 0 ? (
-          session?.loggedIn && myStudioName == currentStudioName ? (
-            <>
-              {studios.length > 0 ? (
-                <Studios
-                  studios={studios}
-                  currentStudioName={currentStudioName}
-                />
-              ) : null}
-              <MyHomeEmpty
-                studioSpaceID={data.studio}
-                studioName={myStudioName as string}
-              />
-              {/* me as in the logged in user who can make spaces here  */}
-            </>
-          ) : (
-            <YourHomeEmpty
-              username={currentStudioName || ""}
-            /> /* you as in I'm viewing a homepage that's not mine-the-authed-user's */
-          )
+      <div className="flex h-full w-full max-w-4xl flex-col gap-2">
+        {tab === "Home" ? (
+          <Homepage
+            spaces={spaces}
+            studios={studios}
+            username={currentStudioName}
+            studio_do_id={data.id}
+          />
         ) : (
-          <>
-            {session?.loggedIn && myStudioName == currentStudioName && (
-              <Studios
-                studios={studios}
-                currentStudioName={currentStudioName}
-              />
-            )}
-            <Spaces
-              spaces={spaces}
-              name={currentStudioName as string}
-              id={data.studio}
-            />
-          </>
+          <UserSettings />
         )}
       </div>
     </>
   );
 }
+
+let Homepage = ({
+  spaces,
+  studios,
+  username,
+  studio_do_id,
+}: {
+  spaces: SpaceData[];
+  studios: Studio[];
+  username: string;
+  studio_do_id: string;
+}) => {
+  let { session } = useAuth();
+  let myStudioName = session.session?.username;
+  if (spaces.length === 0) {
+    if (session?.loggedIn && session.session && myStudioName == username)
+      return (
+        <>
+          {studios.length > 0 ? (
+            <Studios studios={studios} currentStudioName={username} />
+          ) : null}
+          <MyHomeEmpty
+            studioSpaceID={session.session?.studio}
+            studioName={myStudioName as string}
+          />
+          {/* me as in the logged in user who can make spaces here  */}
+        </>
+      );
+    return <YourHomeEmpty username={username} />;
+  }
+
+  return (
+    <>
+      {session?.loggedIn && myStudioName == username && (
+        <Studios studios={studios} currentStudioName={username} />
+      )}
+      <Spaces spaces={spaces} name={username as string} id={studio_do_id} />
+    </>
+  );
+};
 
 const Studios = ({
   studios,

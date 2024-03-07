@@ -1,6 +1,5 @@
 "use client";
-import styles from "styles/Landing.module.css";
-import Head from "next/head";
+import styles from "styges/Landing.module.css";
 import { ButtonLink, ButtonPrimary } from "components/Buttons";
 import { BackToHome, Send } from "components/Icons";
 import { useState } from "react";

@@ -1,12 +1,7 @@
 "use client";
 import { Props } from "app/(app)/studio/[studio_id]/StudioPage";
 import { useHasGetStartedItems } from "app/(app)/studio/[studio_id]/GettingStartedTab";
-import {
-  RoomMember,
-  RoomSettings,
-  RoomSpaces,
-  Settings as SettingsIcon,
-} from "components/Icons";
+import { RoomMember, RoomSettings, RoomSpaces } from "components/Icons";
 import { useCallback } from "react";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
@@ -21,7 +16,6 @@ export const useStudioTabsState = create(
     (set, get) => ({
       studio: {},
       setTab: (studio_id: string, tab: Tab) => {
-        console.log("yooo");
         return set({ studio: { ...get().studio, [studio_id]: { tab } } });
       },
     }),

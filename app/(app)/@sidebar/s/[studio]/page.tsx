@@ -5,8 +5,7 @@
 import Link from "next/link";
 import { useAuth } from "hooks/useAuth";
 import { Divider } from "components/Layout";
-import { RoomSettings, RoomSpaces, RoomStudios } from "components/Icons";
-import { SidebarTab } from "../../SidebarTab";
+import { HomeTabs } from "./HomeTabs";
 
 export default function UserPageSidebar(props: { params: { studio: string } }) {
   let { session } = useAuth();
@@ -25,7 +24,7 @@ export default function UserPageSidebar(props: { params: { studio: string } }) {
           </Link>
         </div>
         <div className="sidebarSpaceName shrink-0 flex-row px-3 text-lg font-bold">
-          Home
+          {props.params.studio}
         </div>
         <div className="px-3">
           <input
@@ -36,23 +35,8 @@ export default function UserPageSidebar(props: { params: { studio: string } }) {
         <div className="pb-1 pt-2">
           <Divider />
         </div>
-        <div className="flex flex-col gap-0.5 px-3">
-          <SidebarTab title="Spaces" icon=<RoomSpaces /> active={true} />
-          <SidebarTab title="Studios" icon=<RoomStudios /> active={false} />
-          {session?.session?.username === props.params.studio && (
-            <SidebarTab title="Settings" icon=<RoomSettings /> active={false} />
-          )}
-        </div>
+        <HomeTabs username={props.params.studio} />
       </div>
     </>
   );
 }
-
-const Tab = (props: { icon?: React.ReactNode; name: string }) => {
-  return (
-    <div className="flex items-center gap-1">
-      {props?.icon}
-      {props.name}
-    </div>
-  );
-};
