@@ -15,6 +15,12 @@ export default async function SpaceInUserSidebar(props: {
       data={{ space_id: result.data.id, studio_id: undefined }}
     >
       <SpaceSidebar
+        path={[
+          {
+            name: props.params.studio,
+            link: `/s/${props.params.studio}`,
+          },
+        ]}
         space_id={result.data.id}
         do_id={result.data.do_id}
         display_name={result.data?.display_name}
