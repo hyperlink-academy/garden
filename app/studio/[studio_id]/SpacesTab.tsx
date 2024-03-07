@@ -27,8 +27,11 @@ export function SpaceList({ data }: Props) {
     (m) => m.member === session.user?.id
   );
   let allSpaces = data?.spaces_in_studios;
-  let yourSpaces = allSpaces.filter((s) =>
-    s.space_data?.members_in_spaces.find((m) => m.member === session.user?.id)
+  let yourSpaces = allSpaces.filter(
+    (s) =>
+      s.space_data?.members_in_spaces.find(
+        (m) => m.member === session.user?.id
+      ) && !s.space_data?.archived
   );
 
   let activeSpaces = allSpaces.filter(
