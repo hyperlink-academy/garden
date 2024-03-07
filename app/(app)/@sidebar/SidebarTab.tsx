@@ -6,6 +6,7 @@ export const SidebarTab = (props: {
 }) => {
   return (
     <button
+      onClick={() => props.onClick?.()}
       className={`sidebarTab relative select-none rounded-md border  ${
         props.active
           ? "border-accent-blue  text-accent-blue rounded-md font-bold"

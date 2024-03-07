@@ -1,10 +1,16 @@
 "use client";
 import { Props } from "app/(app)/studio/[studio_id]/StudioPage";
 import { useHasGetStartedItems } from "app/(app)/studio/[studio_id]/GettingStartedTab";
-import { Settings as SettingsIcon } from "components/Icons";
+import {
+  RoomMember,
+  RoomSettings,
+  RoomSpaces,
+  Settings as SettingsIcon,
+} from "components/Icons";
 import { useCallback } from "react";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { SidebarTab } from "../../SidebarTab";
 
 export type Tab = "About" | "Spaces" | "Members" | "Settings" | "Get Started";
 export const useStudioTabsState = create(
@@ -50,6 +56,7 @@ export const TabsList = (
     <div className={props.className}>
       {hasGetStartedItems ? (
         <TabItem
+          icon={<div className="bg-test-pink h-4 w-4" />}
           name="Get Started"
           setTab={setTab}
           id="Get Started"
@@ -57,18 +64,21 @@ export const TabsList = (
         />
       ) : null}
       <TabItem
+        icon={<div className="bg-test-pink h-4 w-4" />}
         name="About"
         setTab={setTab}
         id="About"
         currentTab={currentTab}
       />
       <TabItem
+        icon={<RoomSpaces />}
         name="Spaces"
         setTab={setTab}
         id="Spaces"
         currentTab={currentTab}
       />
       <TabItem
+        icon={<RoomMember />}
         name="Members"
         setTab={setTab}
         id="Members"
@@ -76,7 +86,8 @@ export const TabsList = (
       />
       {props.isAdmin ? (
         <TabItem
-          name={<SettingsIcon />}
+          icon={<RoomSettings />}
+          name="Settings"
           setTab={setTab}
           id="Settings"
           currentTab={currentTab}
@@ -87,19 +98,16 @@ export const TabsList = (
 };
 
 const TabItem = (props: {
-  name: React.ReactNode;
+  name: string;
+  icon: React.ReactNode;
   id: Tab;
   currentTab: Tab;
   setTab: (t: Tab) => void;
 }) => (
-  <button
+  <SidebarTab
+    title={props.name}
+    icon={props.icon}
+    active={props.currentTab === props.id}
     onClick={() => props.setTab(props.id)}
-    className={`text-left ${
-      props.currentTab === props.id
-        ? "text-accent-blue font-bold"
-        : "text-grey-35 hover:text-accent-blue"
-    }`}
-  >
-    {props.name}
-  </button>
+  />
 );
