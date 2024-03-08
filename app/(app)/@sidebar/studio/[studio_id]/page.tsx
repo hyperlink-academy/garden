@@ -5,6 +5,7 @@ import Link from "next/link";
 import { supabaseServerClient } from "supabase/server";
 import { TabsList } from "./StudioTabs";
 import { Divider } from "components/Layout";
+import { LoginButton } from "components/LoginModal";
 
 export default async function StudioSidebar(props: {
   params: { studio_id: string };
@@ -32,6 +33,7 @@ export default async function StudioSidebar(props: {
               <div className="font-bold">/</div>
             </div>
           </Link>
+          {!session.data.user && <LoginButton small />}
         </div>
         <div className="sidebarStudioName shrink-0 flex-row px-3 text-lg font-bold">
           {data?.data.name}

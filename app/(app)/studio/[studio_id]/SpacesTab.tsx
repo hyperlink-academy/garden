@@ -49,24 +49,6 @@ export function SpaceList({ data }: Props) {
       <div className="studioSpaces flex h-full w-full flex-col gap-4">
         <div className="studioSpacesOptions flex w-full items-center justify-between gap-3  ">
           {authorized && <AddSpace id={data.id} />}
-
-          {allSpaces.length > 0 && (
-            <div className="studioSpacesSearch relative flex flex-row">
-              <RoomSearch className="text-grey-55 absolute right-2 top-[10px]" />
-              <input
-                className="h-fit w-full max-w-sm bg-white py-1 pl-2 pr-6 outline-none sm:w-64"
-                value={search}
-                onChange={(e) => setSearch(e.currentTarget.value)}
-                placeholder="search spaces…"
-                onFocus={(e) =>
-                  e.currentTarget.setSelectionRange(
-                    0,
-                    e.currentTarget.value.length
-                  )
-                }
-              />
-            </div>
-          )}
         </div>
         <div className=" studioSpaceListWrapper no-scrollbar relative flex h-full w-full flex-col gap-8 overflow-y-scroll ">
           {allSpaces.length > 0 ? (
