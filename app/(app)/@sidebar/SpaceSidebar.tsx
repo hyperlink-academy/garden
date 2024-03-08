@@ -1,6 +1,5 @@
 "use client";
 import { Divider } from "components/Layout";
-import { SpaceProvider } from "components/ReplicacheProvider";
 import { SpaceRoleBadge } from "components/Space";
 import Link from "next/link";
 import { useAuth } from "hooks/useAuth";
@@ -21,7 +20,7 @@ export function SpaceSidebar(props: {
           className="sidebarBreadcrumb text-grey-55 flex shrink-0 flex-row text-sm"
           href={session.session ? `/s/${session.session.username}` : "/"}
         >
-          <div className=" flex gap-1">
+          <div className="flex gap-1">
             <div className="font-bold">h</div>
             <div className="font-bold">/</div>
             <div>home</div>
@@ -34,9 +33,6 @@ export function SpaceSidebar(props: {
       <div className="sidebarSpaceName shrink-0 flex-row px-3 text-lg font-bold">
         {props.display_name}
       </div>
-      <div className="pb-2 pt-1">
-        <Divider />
-      </div>
       <div className="px-3">
         <input
           value={input}
@@ -46,6 +42,9 @@ export function SpaceSidebar(props: {
           placeholder="search space (ctrl/⌘ K)"
           className="false w-full px-2 py-1 text-sm outline-none"
         />
+        <div className="pb-1 pt-3">
+          <Divider />
+        </div>
       </div>
       {input === "" ? (
         <Sidebar space_id={props.space_id} />

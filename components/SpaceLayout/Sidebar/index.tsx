@@ -6,6 +6,7 @@ import { useState } from "react";
 import {
   ArrowUp,
   BellSmall,
+  RoomCalendar,
   RoomSettings,
   Settings,
   UnreadDot,
@@ -38,14 +39,13 @@ export const Sidebar = (props: {
     <div className="Sidebar text-grey-35 flex h-full w-full grow flex-col items-stretch justify-between gap-2 overflow-x-visible px-3">
       <div className="roomList no-scrollbar flex h-fit w-full flex-col gap-2 overflow-y-scroll">
         <div className="flex flex-col">
-          <div className="flex w-full flex-row items-center gap-1 py-0.5 pl-1 pr-0.5 text-left ">
-            <SpaceSettings space_id={props.space_id} />
-          </div>
+          <SpaceSettings space_id={props.space_id} />
           <UnreadsRoomButton />
-          {/* <RoomButton roomID="calendar">
+          <RoomButton roomID="calendar">
             <RoomCalendar /> Calendar
-          </RoomButton> */}
+          </RoomButton>
         </div>
+
         <Divider dashed />
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
@@ -154,15 +154,17 @@ const SpaceSettings = (props: { space_id: string }) => {
   return (
     <>
       {!authorized ? null : isOwner ? (
-        <button
-          className={`"text-grey-35 hover:border-grey-80 hover:border" relative flex w-full items-center gap-1 rounded-md border border-white px-1 py-0.5          `}
-          onClick={() => {
-            setEditModal(true);
-            setMobileSidebarOpen(false);
-          }}
-        >
-          <RoomSettings /> Settings
-        </button>
+        <div className="flex w-full flex-row items-center gap-1 py-0.5 pl-1 pr-0.5 text-left ">
+          <button
+            className={`"text-grey-35 hover:border-grey-80 hover:border" relative flex w-full items-center gap-1 rounded-md border border-white px-1 py-0.5          `}
+            onClick={() => {
+              setEditModal(true);
+              setMobileSidebarOpen(false);
+            }}
+          >
+            <RoomSettings /> Settings
+          </button>
+        </div>
       ) : (
         <MemberOptions />
       )}

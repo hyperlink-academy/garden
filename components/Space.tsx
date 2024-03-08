@@ -92,40 +92,40 @@ export const SpaceRoleBadge = (props: { space_id: string }) => {
 
   return (
     <div className="flex gap-2">
-      <div
-        className={`flex  w-fit items-center gap-2 place-self-end rounded-full border py-[2px] pl-[8px] pr-[4px] text-xs font-bold ${
-          isMember
-            ? "border-grey-80 bg-bg-blue text-grey-55 ml-2"
-            : isStudioMate
-            ? "border-grey-80 bg-grey-90 text-grey-55 "
-            : "border-grey-80 text-grey-55"
-        }`}
-      >
-        {isMember ? (
-          <InfoPopover triggerTitle="Member">
-            <p>
-              <b>You have full access!</b> Make and edit cards, comment, chat,
-              anything you want!
-            </p>
-          </InfoPopover>
-        ) : isStudioMate ? (
-          <InfoPopover triggerTitle="Studiomate">
-            <p>
-              You can <b>chat and comment on cards</b> here!
-            </p>
-            <p>
-              To make and edit cards, you need to join this Space.
-              {!spaceIsOpenInvite && " Ask a member to invite you!"}
-            </p>
-          </InfoPopover>
-        ) : (
-          <div className="flex w-max items-center">
-            <div>Guest</div>
-          </div>
-        )}
-      </div>
-
-      {!session.loggedIn && <LoginButton />}
+      {session.loggedIn ? (
+        <div
+          className={`flex  w-fit items-center gap-2 place-self-end rounded-full border py-[2px] pl-[8px] pr-[4px] text-xs font-bold ${
+            isMember
+              ? "border-grey-80 bg-bg-blue text-grey-55 ml-2"
+              : isStudioMate
+              ? "border-grey-80 bg-grey-90 text-grey-55 "
+              : "border-grey-80 text-grey-55"
+          }`}
+        >
+          {isMember ? (
+            <InfoPopover triggerTitle="Member">
+              <p>
+                <b>You have full access!</b> Make and edit cards, comment, chat,
+                anything you want!
+              </p>
+            </InfoPopover>
+          ) : isStudioMate ? (
+            <InfoPopover triggerTitle="Studiomate">
+              <p>
+                You can <b>chat and comment on cards</b> here!
+              </p>
+              <p>
+                To make and edit cards, you need to join this Space.
+                {!spaceIsOpenInvite && " Ask a member to invite you!"}
+              </p>
+            </InfoPopover>
+          ) : (
+            <div className="flex w-max items-center pl-1">Guest</div>
+          )}
+        </div>
+      ) : (
+        <LoginButton />
+      )}
 
       {!isMember && isStudioMate && spaceIsOpenInvite && (
         <ButtonSecondary
@@ -181,7 +181,7 @@ const LoginButton = () => {
       <ButtonPrimary
         content="Log In"
         onClick={() => setState("login")}
-        className="!mr-2 !py-[1px]"
+        className="!py-[1px] !text-sm"
       />
       <LoginOrSignupModal state={state} setState={setState} />
     </>
