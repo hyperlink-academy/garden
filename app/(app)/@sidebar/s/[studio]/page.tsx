@@ -6,23 +6,28 @@ import Link from "next/link";
 import { useAuth } from "hooks/useAuth";
 import { Divider } from "components/Layout";
 import { HomeTabs } from "./HomeTabs";
+import { LoginButton } from "components/LoginModal";
 
 export default function UserPageSidebar(props: { params: { studio: string } }) {
   let { session } = useAuth();
   return (
     <>
-      <div className="sidebarSpaceFromHome flex h-full flex-col items-stretch gap-1">
-        <div className="flex items-center justify-between px-3">
+      <div className="sidebarHome flex h-full flex-col items-stretch gap-1">
+        <div className="sidebarHomeBreadcrumb flex items-center justify-between px-3">
           <Link
-            href={session.session ? `/s/${session.session.username}` : "/"}
             className="sidebarBreadcrumb text-grey-55 flex shrink-0 flex-row text-sm"
+            href={session.session ? `/s/${session.session.username}` : "/"}
           >
             <div className="flex gap-1">
               <div className="font-bold">h</div>
               <div className="font-bold">/</div>
+              <div>home</div>
+              <div> / </div>
             </div>
           </Link>
+          <LoginButton small />
         </div>
+
         <div className="sidebarSpaceName shrink-0 flex-row px-3 text-lg font-bold">
           {props.params.studio}
         </div>
