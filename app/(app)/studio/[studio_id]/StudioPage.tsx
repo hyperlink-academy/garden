@@ -7,12 +7,11 @@ import { Members } from "./MemberTab";
 import { StudioSettings } from "./SettingsTab";
 import { SpaceList } from "./SpacesTab";
 import { About } from "./AboutTab";
-import { ArrowDown, GoBackToPageLined, Information } from "components/Icons";
+import { GoBackToPageLined, Information } from "components/Icons";
 import Link from "next/link";
 import { useAuth } from "hooks/useAuth";
-import useWindowDimensions from "hooks/useWindowDimensions";
 import { ButtonPrimary } from "components/Buttons";
-import { LoginOrSignupModal } from "components/LoginModal";
+import { LoginButton, LoginOrSignupModal } from "components/LoginModal";
 import * as Popover from "@radix-ui/react-popover";
 import { joinCodeLocalStorageKey } from "./join/Join";
 import { spaceAPI } from "backend/lib/api";
@@ -109,16 +108,6 @@ function Settings({ data }: Props) {
     </>
   );
 }
-
-const LoginButton = () => {
-  let [state, setState] = LoginOrSignupModal.useState("closed");
-  return (
-    <>
-      <ButtonPrimary content="Log In" onClick={() => setState("login")} />
-      <LoginOrSignupModal state={state} setState={setState} />
-    </>
-  );
-};
 
 const JoinSuccessToast = {
   text: "Yes! You've joined this Studio!",

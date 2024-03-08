@@ -28,6 +28,7 @@ import { useIsClient } from "hooks/utils";
 import * as Popover from "@radix-ui/react-popover";
 import { useSpaceData } from "hooks/useSpaceData";
 import { spaceAPI } from "backend/lib/api";
+import { LoginButton } from "./LoginModal";
 
 type Props = {
   studio?: { spaces: SpaceData[]; studioName: string; studioID: string };
@@ -124,7 +125,7 @@ export const SpaceRoleBadge = (props: { space_id: string }) => {
           )}
         </div>
       ) : (
-        <LoginButton />
+        <LoginButton small />
       )}
 
       {!isMember && isStudioMate && spaceIsOpenInvite && (
@@ -171,20 +172,6 @@ const Header = (props: { space_id: string }) => {
         </div>
       </div>
     </div>
-  );
-};
-
-const LoginButton = () => {
-  let [state, setState] = LoginOrSignupModal.useState("closed");
-  return (
-    <>
-      <ButtonPrimary
-        content="Log In"
-        onClick={() => setState("login")}
-        className="!py-[1px] !text-sm"
-      />
-      <LoginOrSignupModal state={state} setState={setState} />
-    </>
   );
 };
 
