@@ -15,14 +15,18 @@ export default function UserPageSidebar(props: { params: { studio: string } }) {
       <div className="sidebarHome flex h-full flex-col items-stretch gap-1">
         <div className="sidebarHomeBreadcrumb flex items-center justify-between px-3">
           <Link
-            className="sidebarBreadcrumb text-grey-55 flex shrink-0 flex-row text-sm"
+            className="sidebarBreadcrumb text-grey-55 flex shrink-0 flex-row items-center text-sm"
             href={session.session ? `/s/${session.session.username}` : "/"}
           >
             <div className="flex gap-1">
               <div className="font-bold">h</div>
               <div className="font-bold">/</div>
-              <div>home</div>
-              <div> / </div>
+              {session.loggedIn && (
+                <>
+                  <div>home</div>
+                  <div> / </div>
+                </>
+              )}
             </div>
           </Link>
           <LoginButton small />

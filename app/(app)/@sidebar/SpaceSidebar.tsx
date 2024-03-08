@@ -17,7 +17,7 @@ export function SpaceSidebar(props: {
     <div className="sidebarSpaceFromHome flex h-full flex-col items-stretch gap-1">
       <div className="flex items-center justify-between px-3">
         <Link
-          className="sidebarBreadcrumb text-grey-55 flex shrink-0 flex-row text-sm"
+          className="sidebarBreadcrumb text-grey-55 flex shrink-0 flex-row items-center text-sm"
           href={session.session ? `/s/${session.session.username}` : "/"}
         >
           <div className="flex gap-1">
