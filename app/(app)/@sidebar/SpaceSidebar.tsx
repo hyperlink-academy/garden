@@ -29,8 +29,8 @@ export function SpaceSidebar(props: {
               <div> / </div>
             </div>
           </Link>
-          {props.path.map((p) => (
-            <Link href={p.link}>
+          {props.path.map((p, index) => (
+            <Link href={p.link} key={index}>
               <div className="flex gap-1">
                 <div>{p.name}</div>
                 <div>/</div>
