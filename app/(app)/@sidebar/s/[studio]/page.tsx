@@ -29,7 +29,7 @@ export default function UserPageSidebar(props: { params: { studio: string } }) {
               )}
             </div>
           </Link>
-          <LoginButton small />
+          {!session.session && <LoginButton small />}
         </div>
 
         <div className="sidebarSpaceName shrink-0 flex-row px-3 text-lg font-bold">
