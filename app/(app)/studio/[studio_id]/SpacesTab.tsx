@@ -45,11 +45,14 @@ export function SpaceList({ data }: Props) {
 
   if (!data) return;
   return (
-    <div className="no-scrollbar studioSpacesWrapper mx-auto h-full overflow-y-scroll pb-6 sm:pt-10">
+    <div className="no-scrollbar studioSpacesWrapper mx-auto h-full overflow-y-scroll pb-6 sm:pt-2">
       <div className="studioSpaces flex h-full w-full flex-col gap-4">
-        <div className="studioSpacesOptions flex w-full items-center justify-between gap-3  ">
-          {authorized && <AddSpace id={data.id} />}
-        </div>
+        {authorized && (
+          <div className="studioSpacesOptions flex w-full items-center justify-between gap-3  ">
+            <AddSpace id={data.id} />
+          </div>
+        )}
+
         <div className=" studioSpaceListWrapper no-scrollbar relative flex h-full w-full flex-col gap-8 overflow-y-scroll ">
           {allSpaces.length > 0 ? (
             <>

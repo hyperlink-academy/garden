@@ -83,7 +83,7 @@ export function StudioPageContent(props: Props) {
   return (
     <div className="pwa-padding studioWrapper  flex w-full items-stretch px-3 sm:h-screen sm:px-4">
       <div className="flex w-full flex-col">
-        <StudioBanner {...props} />
+        {/* <StudioBanner {...props} /> */}
         <div
           className={`StudioContent flex w-full grow flex-col items-stretch`}
         >
