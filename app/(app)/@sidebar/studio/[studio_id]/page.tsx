@@ -18,7 +18,7 @@ export default async function StudioSidebar(props: {
 
   return (
     <>
-      <div className="sidebarStudio flex h-full flex-col items-stretch gap-1">
+      <div className="sidebarStudio flex h-full flex-col items-stretch">
         <div className="flex items-center justify-between px-3">
           <Link
             href={
@@ -37,13 +37,13 @@ export default async function StudioSidebar(props: {
         <div className="sidebarStudioName shrink-0 flex-row px-3 text-lg font-bold">
           {data?.data.name}
         </div>
-        <div className="px-3">
+        <div className="px-3 pt-2">
           <StudioRoleBadge data={data.data} isAdmin={isAdmin} />
         </div>
-        <div className="pb-2 pt-2">
+        <div className="py-3">
           <Divider />
         </div>
-        <div className="px-3">
+        <div className="px-3 pb-2">
           <input
             placeholder="search studio (ctrl/⌘ K)"
             className="false w-full px-2 py-1 text-sm outline-none"

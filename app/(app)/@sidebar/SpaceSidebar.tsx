@@ -15,7 +15,7 @@ export function SpaceSidebar(props: {
   let { input, setInput, results } = useSearch();
   let { session } = useAuth();
   return (
-    <div className="sidebarSpaceFromHome flex h-full flex-col items-stretch gap-1">
+    <div className="sidebarSpaceFromHome flex h-full flex-col items-stretch">
       <div className="flex items-center justify-between px-3">
         <div className="sidebarBreadcrumb text-grey-55 flex shrink-0 flex-row text-sm">
           <Link
@@ -38,13 +38,19 @@ export function SpaceSidebar(props: {
             </Link>
           ))}
         </div>
-        <SpaceRoleBadge space_id={props.space_id} />
       </div>
 
       <div className="sidebarSpaceName shrink-0 flex-row px-3 text-lg font-bold">
         {props.display_name}
       </div>
-      <div className="px-3">
+      <div className="px-3 pt-2">
+        <SpaceRoleBadge space_id={props.space_id} />
+      </div>
+
+      <div className="py-3">
+        <Divider />
+      </div>
+      <div className="px-3 pb-2">
         <input
           value={input}
           onChange={(e) => {
@@ -53,9 +59,6 @@ export function SpaceSidebar(props: {
           placeholder="search space (ctrl/⌘ K)"
           className="false w-full px-2 py-1 text-sm outline-none"
         />
-        <div className="pb-1 pt-3">
-          <Divider />
-        </div>
       </div>
       {input === "" ? (
         <Sidebar space_id={props.space_id} />
