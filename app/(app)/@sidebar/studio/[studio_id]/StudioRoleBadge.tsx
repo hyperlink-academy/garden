@@ -5,7 +5,7 @@ import { NonUndefined } from "@use-gesture/react";
 import { joinCodeLocalStorageKey } from "app/(app)/studio/[studio_id]/join/Join";
 import { spaceAPI } from "backend/lib/api";
 import { ButtonPrimary } from "components/Buttons";
-import { GoBackToPageLined, Information } from "components/Icons";
+import { GoBackToPageLined, InfoTiny, Information } from "components/Icons";
 import { LoginOrSignupModal, LoginButton } from "components/LoginModal";
 import { useToaster } from "components/Smoke";
 import { useAuth } from "hooks/useAuth";
@@ -22,7 +22,7 @@ export type Props = {
 };
 
 const BadgeStyles =
-  "flex w-fit items-center gap-2 place-self-end rounded-full border py-[2px] pl-[8px] pr-[4px] text-xs font-bold";
+  "flex w-fit items-center gap-1 place-self-end rounded-full border py-[2px] pl-[8px] pr-[4px] text-sm font-bold";
 
 const JoinSuccessToast = {
   text: "Yes! You've joined this Studio!",
@@ -76,60 +76,86 @@ export const StudioRoleBadge = (props: Props) => {
 
   return (
     <>
+      <LoginOrSignupModal
+        state={loginOrSignupState}
+        setState={setLoginOrSignupState}
+        redirectTo={`/studio/${uuidToBase62(props.data.id)}?join=true`}
+        onLogin={(s) => {
+          if (
+            s.authToken &&
+            !props.data.members_in_studios.find((m) => m.member === s.id)
+          ) {
+            join(s.authToken);
+          }
+        }}
+      />
       <div>
-        <div className="studioBannerInvite flex w-full items-start justify-items-center gap-0 font-bold sm:flex-row sm:items-center sm:gap-2">
+        <div className="studioRoleBadgeInvite flex w-full flex-row items-center justify-items-center gap-2 font-bold ">
           {isMember ? (
-            <div>hi</div>
+            <div className={`bg-bg-blue border-grey-80 ${BadgeStyles}`}>
+              Member
+              <InfoPopover>
+                <p>
+                  Members can <b> add new Spaces</b>, and{" "}
+                  <b>comment in Spaces </b>
+                  within the Studio.
+                </p>
+                <p>
+                  However, you need to <b>join each Space</b> to add or edit
+                  cards in them.
+                </p>
+              </InfoPopover>
+            </div>
           ) : joinCode ? (
             <>
-              <div className="mt-[4px] shrink-0 grow-0 sm:mt-0">
-                <Link
-                  className="hover:text-accent-blue "
-                  href={`/studio/${uuidToBase62(
-                    props.data.id
-                  )}/join?code=${joinCode}`}
-                >
-                  <GoBackToPageLined />
-                </Link>
-              </div>
-              <div className={`${BadgeStyles}`}>
+              <div
+                className={`border-accent-blue text-accent-blue border ${BadgeStyles}`}
+              >
                 Invited
                 <InfoPopover>
+                  <p>You&apos;ve been invited to join this Studio!</p>
                   <p>
-                    Members can <b> add new Spaces</b>, and{" "}
-                    <b>comment in Spaces </b>
+                    Members can <b> add new Spaces</b>{" "}
+                    <b>
+                      {!!!data?.allow_members_to_join_spaces ||
+                        (data.allow_members_to_join_spaces === undefined &&
+                          ", join existing Spaces,")}
+                    </b>{" "}
+                    and <b>comment on Spaces </b>
                     within the Studio.
-                  </p>
-                  <p>
-                    However, you need to <b>join each Space</b> to add or edit
-                    cards in them.
                   </p>
                 </InfoPopover>
               </div>
               {session.session ? (
                 <ButtonPrimary
                   content="Join!"
+                  className="!py-[1px] !text-sm"
                   onClick={() => {
                     join(authToken);
                   }}
                 />
               ) : (
                 <ButtonPrimary
-                  content="Signup or Login to Join!"
+                  content="Join!"
+                  className="!py-[1px] !text-sm"
                   onClick={() => setLoginOrSignupState("signup")}
                 />
               )}
             </>
-          ) : session.loggedIn ? (
-            <div className={`${BadgeStyles}`}>
-              Guest
-              <InfoPopover>
-                You&apos;ll need an invite to add Spaces or comment on Spaces
-                here.
-              </InfoPopover>
-            </div>
-          ) : null}
-          {!session.session && <LoginButton small />}
+          ) : (
+            <>
+              {" "}
+              <div
+                className={`${BadgeStyles} border-grey-80 text-grey-55 border`}
+              >
+                Guest
+                <InfoPopover>
+                  You&apos;ll need an invite to add or comment on Spaces here.
+                </InfoPopover>
+              </div>
+              {!session.session && <LoginButton small />}
+            </>
+          )}
         </div>
       </div>
     </>
@@ -141,11 +167,11 @@ const InfoPopover = (props: { children: React.ReactNode }) => {
     <Popover.Root>
       <Popover.Trigger>
         <button className="flex place-items-center ">
-          <Information />
+          <InfoTiny />
         </button>
       </Popover.Trigger>
       <Popover.Portal>
-        <Popover.Content sideOffset={2} className="z-50">
+        <Popover.Content sideOffset={8} className="z-20" collisionPadding={24}>
           <div className="lightBorder text-grey-55 flex max-w-xs flex-col gap-2 rounded-sm bg-white p-2 text-xs font-normal shadow-lg">
             {props.children}
           </div>

@@ -33,10 +33,15 @@ export default async function StudioSidebar(props: {
               <div className="font-bold">/</div>
             </div>
           </Link>
-          <StudioRoleBadge data={data.data} isAdmin={isAdmin} />
         </div>
         <div className="sidebarStudioName shrink-0 flex-row px-3 text-lg font-bold">
           {data?.data.name}
+        </div>
+        <div className="px-3">
+          <StudioRoleBadge data={data.data} isAdmin={isAdmin} />
+        </div>
+        <div className="pb-2 pt-2">
+          <Divider />
         </div>
         <div className="px-3">
           <input
@@ -44,10 +49,6 @@ export default async function StudioSidebar(props: {
             className="false w-full px-2 py-1 text-sm outline-none"
           />
         </div>
-        <div className="pb-1 pt-2">
-          <Divider />
-        </div>
-
         <TabsList
           className="StudioTabs flex flex-col gap-0.5 px-3 "
           data={data.data}
