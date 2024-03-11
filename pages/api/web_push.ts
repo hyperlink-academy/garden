@@ -6,6 +6,7 @@ import { sign } from "src/sign";
 import webpush from "web-push";
 import { createClient } from "backend/lib/supabase";
 import { HyperlinkNotification } from "worker";
+import { uuidToBase62 } from "src/uuidHelpers";
 let bodyParser = z.object({
   payload: z.string(),
   sig: z.string(),
@@ -70,7 +71,7 @@ export default async function WebPushEndpoint(
     }
     let { data } = payloadBody;
 
-    let { data: spaceMembers } = await supabase
+    let { data: spaceData } = await supabase
       .from("space_data")
       .select(
         "display_name, name, id, studios(members_in_studios(identity_data(username, studio))), owner:identity_data!space_data_owner_fkey(username), members_in_spaces(identity_data(*, push_subscriptions(*)))"
@@ -78,10 +79,10 @@ export default async function WebPushEndpoint(
       .eq("do_id", payloadBody.data.spaceID)
       .single();
 
-    if (spaceMembers) {
+    if (spaceData) {
       let members = [
-        ...spaceMembers.members_in_spaces,
-        ...spaceMembers.studios.flatMap((s) => s.members_in_studios),
+        ...spaceData.members_in_spaces,
+        ...spaceData.studios.flatMap((s) => s.members_in_studios),
       ];
       let notification: HyperlinkNotification;
       if (data.type === "new-message") {
@@ -89,8 +90,10 @@ export default async function WebPushEndpoint(
         notification = {
           type: "new-message",
           data: {
-            spaceName: spaceMembers.display_name || "Untitled Space",
-            spaceURL: `/s/${spaceMembers.owner?.username}/s/${spaceMembers.name}`,
+            spaceName: spaceData.display_name || "Untitled Space",
+            spaceURL: `/s/${spaceData.owner?.username}/s/${uuidToBase62(
+              spaceData.id
+            )}/${spaceData.display_name}`,
             senderUsername:
               members.find((f) => f.identity_data?.studio === senderStudio)
                 ?.identity_data?.username || "",
@@ -101,14 +104,14 @@ export default async function WebPushEndpoint(
         notification = {
           type: "joined-space",
           data: {
-            spaceName: spaceMembers.display_name || "Untitled Space",
-            spaceURL: `/s/${spaceMembers.owner?.username}/s/${spaceMembers.id}/${spaceMembers.display_name}`,
+            spaceName: spaceData.display_name || "Untitled Space",
+            spaceURL: `/s/${spaceData.owner?.username}/s/${spaceData.id}/${spaceData.display_name}`,
             spaceID: data.spaceID,
             newMemberUsername: data.username,
           },
         };
 
-      for (let member of spaceMembers.members_in_spaces) {
+      for (let member of spaceData.members_in_spaces) {
         if (!member.identity_data) continue;
         if (
           notification.type === "new-message" &&
