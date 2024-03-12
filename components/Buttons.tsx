@@ -104,7 +104,8 @@ ${props.className} `}
 
 export function ButtonLink(
   props: {
-    content: string;
+    small?: boolean;
+    content: string | React.ReactNode;
     onDark?: false | boolean;
     icon?: React.ReactElement;
   } & ButtonProps
