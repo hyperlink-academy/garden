@@ -3,8 +3,6 @@
 import { getStudioPageData } from "app/(app)/studio/[studio_id]/page";
 import Link from "next/link";
 import { supabaseServerClient } from "supabase/server";
-import { TabsList } from "./StudioTabs";
-import { Divider } from "components/Layout";
 import { StudioRoleBadge } from "./StudioRoleBadge";
 import { StudioSidebarContent } from "./StudioSidebar";
 
