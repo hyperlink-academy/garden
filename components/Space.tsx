@@ -15,7 +15,7 @@ import { SpaceName } from "components/SpaceLayout/Sidebar";
 import { useSpring, animated } from "@react-spring/web";
 import { createPortal } from "react-dom";
 import { useAuth } from "hooks/useAuth";
-import { ButtonSecondary } from "components/Buttons";
+import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
 import Link from "next/link";
 import { MobileSearch } from "components/Search";
 import { HelpModal } from "components/HelpCenter";
@@ -91,12 +91,12 @@ export const SpaceRoleBadge = (props: { space_id: string }) => {
   )?.studios?.allow_members_to_join_spaces;
 
   return (
-    <div className="flex gap-2">
+    <div className="flex items-center gap-2">
       {session.loggedIn ? (
         <div
-          className={`flex  w-fit items-center gap-2 place-self-end rounded-full border py-[2px] pl-[8px] pr-[4px] text-xs font-bold ${
+          className={`flex w-fit items-center gap-2 place-self-end rounded-full border py-[2px] pl-[6px] pr-[4px] text-sm font-bold ${
             isMember
-              ? "border-grey-80 bg-bg-blue text-grey-55 ml-2"
+              ? "border-grey-80 bg-bg-blue text-grey-55"
               : isStudioMate
               ? "border-grey-80 bg-grey-90 text-grey-55 "
               : "border-grey-80 text-grey-55"
@@ -120,7 +120,13 @@ export const SpaceRoleBadge = (props: { space_id: string }) => {
               </p>
             </InfoPopover>
           ) : (
-            <div className="flex w-max items-center pl-1">Guest</div>
+            <InfoPopover triggerTitle="Guest">
+              <p>
+                You&apos;re a guest here.{" "}
+                <b>You can't make any changes to this space.</b>
+              </p>
+              <p>To join, ask a member to invite you!</p>
+            </InfoPopover>
           )}
         </div>
       ) : (
@@ -128,9 +134,9 @@ export const SpaceRoleBadge = (props: { space_id: string }) => {
       )}
 
       {!isMember && isStudioMate && spaceIsOpenInvite && (
-        <ButtonSecondary
+        <ButtonPrimary
           content="Join!"
-          className="!mr-2 !bg-transparent !py-[1px]"
+          className="!py-[1px] !text-sm"
           onClick={async () => {
             if (!authToken) return;
             let data = await spaceAPI(
@@ -358,7 +364,7 @@ const InfoPopover = (props: {
         </button>
       </Popover.Trigger>
       <Popover.Portal>
-        <Popover.Content sideOffset={2} collisionPadding={16} className="z-50">
+        <Popover.Content sideOffset={8} collisionPadding={24} className="z-20">
           <div className="lightBorder text-grey-55 flex max-w-xs flex-col gap-2 rounded-sm bg-white p-2 text-xs font-normal shadow-lg">
             {props.children}
           </div>

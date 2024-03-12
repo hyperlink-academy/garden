@@ -28,7 +28,7 @@ import { useAuth } from "hooks/useAuth";
 import { useSmoker } from "components/Smoke";
 import useSWR from "swr";
 import { spaceAPI } from "backend/lib/api";
-import { ButtonPrimary, ButtonTertiary } from "components/Buttons";
+import { ButtonLink, ButtonPrimary, ButtonTertiary } from "components/Buttons";
 import { Modal } from "components/Modal";
 import { Truncate } from "components/Truncate";
 import { useSpaceData } from "hooks/useSpaceData";
@@ -59,35 +59,39 @@ export const People = (props: { space_id: string }) => {
   let offlineMembers = members.filter((f) => !uniqueSessions.has(f.entity));
 
   return (
-    <div className="peopleList no-scrollbar border-grey-80 flex h-fit flex-col overflow-y-scroll border-t  text-sm">
-      <div className="peopleOnline  mt-1 flex  flex-col ">
-        <button
-          onClick={() => {
-            if (onlineExpanded) {
-              setOnlineExpanded(false);
-              setCallExpanded(false);
-            }
-            if (!onlineExpanded) {
-              setOnlineExpanded(true);
-              setCallExpanded(true);
-            }
-          }}
-          className={` text-grey-35  hover:text-accent-blue h-[28px] gap-1  text-left text-sm  font-bold`}
-        >
-          Online {onlineExpanded === false && `(${onlineMembers.length})`}
-        </button>
-
-        {callOngoing ? (
-          <CallPanel
-            space_id={props.space_id}
-            callExpanded={callExpanded}
-            toggleCallExpanded={() => setCallExpanded(!callExpanded)}
-          />
-        ) : null}
-        {onlineExpanded ? (
-          <MembersOnline onlineMembers={onlineMembers} />
-        ) : null}
-      </div>
+    <div className="peopleList no-scrollbar border-grey-80 flex h-fit flex-col overflow-y-scroll border-t px-1 pt-1  text-sm">
+      {onlineMembers.length === 0 ? null : (
+        <div className="peopleOnline   flex flex-col">
+          <div className="flex items-center justify-between">
+            <button
+              onClick={() => {
+                if (onlineExpanded) {
+                  setOnlineExpanded(false);
+                  setCallExpanded(false);
+                }
+                if (!onlineExpanded) {
+                  setOnlineExpanded(true);
+                  setCallExpanded(true);
+                }
+              }}
+              className={` text-grey-35  hover:text-accent-blue flex  text-left text-sm font-bold`}
+            >
+              Here {onlineExpanded === false && `(${onlineMembers.length})`}
+            </button>
+            {!callOngoing && <JoinCall space_id={props.space_id} />}
+          </div>
+          {callOngoing ? (
+            <CallPanel
+              space_id={props.space_id}
+              callExpanded={callExpanded}
+              toggleCallExpanded={() => setCallExpanded(!callExpanded)}
+            />
+          ) : null}
+          {onlineExpanded ? (
+            <MembersOnline onlineMembers={onlineMembers} />
+          ) : null}
+        </div>
+      )}
       {offlineMembers.length === 0 ? null : (
         <>
           <div className="peopleOffline flex  flex-col ">
@@ -95,8 +99,7 @@ export const People = (props: { space_id: string }) => {
               onClick={() => setOfflineExpanded(!offlineExpanded)}
               className={`text-grey-55  hover:text-accent-blue h-[28px] gap-1 text-left  text-sm  font-bold`}
             >
-              Offline{" "}
-              {offlineExpanded === false && `(${offlineMembers.length})`}
+              zzz… {offlineExpanded === false && `(${offlineMembers.length})`}
             </button>
 
             {offlineExpanded ? (
@@ -110,7 +113,6 @@ export const People = (props: { space_id: string }) => {
           <InviteMember space_id={props.space_id} />
         </div>
       )}
-      {!callOngoing && <JoinCall space_id={props.space_id} />}
     </div>
   );
 };
@@ -139,11 +141,12 @@ const JoinCall = (props: { space_id: string }) => {
             }}
             content={loading ? <DotLoader /> : "Join Call!"}
             icon={<CallSmall />}
-            className={` !w-full grow `}
+            small
+            className={`flex-row-reverse `}
           />
         ) : (
-          <ButtonTertiary
-            className={` !w-full grow `}
+          <ButtonLink
+            className={`flex-row-reverse `}
             onClick={async (e) => {
               e.preventDefault();
               if (loading || inCall) return;
@@ -151,6 +154,7 @@ const JoinCall = (props: { space_id: string }) => {
               await joinCall();
               setLoading(false);
             }}
+            small
             content={
               loading ? (
                 <div className="-mt-1 flex h-[28px] items-center">
