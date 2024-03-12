@@ -29,15 +29,15 @@ export default async function StudioSidebar(props: {
             className="sidebarBreadcrumb text-grey-55 flex shrink-0 flex-row text-sm"
           >
             <div className="flex gap-1">
-              <div className="font-bold">h</div>
+              <div className="hover:text-accent-blue font-bold">h</div>
               <div className="font-bold">/</div>
             </div>
           </Link>
         </div>
-        <div className="sidebarStudioName shrink-0 flex-row px-3 text-lg font-bold">
+        <div className="sidesbarStudioName shrink-0 flex-row px-3 pt-0.5 text-lg font-bold">
           {data?.data.name}
         </div>
-        <div className="px-3 pt-2">
+        <div className="px-3 pt-3">
           <StudioRoleBadge data={data.data} isAdmin={isAdmin} />
         </div>
         <div className="py-3">

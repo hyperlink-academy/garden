@@ -16,7 +16,6 @@ export default async function SpaceInStudioSidebar(props: {
   let spaces = data.data.spaces_in_studios.map((x) => x.space_data);
   let activeSpace = spaces.find((x) => x.id === props.params?.space_id);
   let supabase = supabaseServerClient();
-  let session = await supabase.auth.getUser();
   if (!activeSpace) return <>404</>;
 
   return (

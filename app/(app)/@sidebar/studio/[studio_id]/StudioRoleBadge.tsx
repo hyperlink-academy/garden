@@ -72,8 +72,6 @@ export const StudioRoleBadge = (props: Props) => {
     if (joinOnLoad === true) join(authToken);
   }, [joinOnLoad, join, authToken]);
 
-  if (isMember) return null;
-
   return (
     <>
       <LoginOrSignupModal
@@ -92,7 +90,9 @@ export const StudioRoleBadge = (props: Props) => {
       <div>
         <div className="studioRoleBadgeInvite flex w-full flex-row items-center justify-items-center gap-2 font-bold ">
           {isMember ? (
-            <div className={`bg-bg-blue border-grey-80 ${BadgeStyles}`}>
+            <div
+              className={`bg-bg-blue border-grey-80 text-grey-55 ${BadgeStyles}`}
+            >
               Member
               <InfoPopover>
                 <p>

@@ -18,32 +18,30 @@ export function SpaceSidebar(props: {
     <div className="sidebarSpaceFromHome flex h-full flex-col items-stretch">
       <div className="flex items-center justify-between px-3">
         <div className="sidebarBreadcrumb text-grey-55 flex shrink-0 flex-row text-sm">
-          <Link
-            className="sidebarBreadcrumb text-grey-55 flex shrink-0 flex-row items-center text-sm"
-            href={session.session ? `/s/${session.session.username}` : "/"}
-          >
-            <div className="flex gap-1">
-              <div className="font-bold">h</div>
+          <div className="sidebarBreadcrumbHome text-grey-55 flex shrink-0 flex-row items-center gap-1 text-sm">
+            <Link
+              href={session.session ? `/s/${session.session.username}` : "/"}
+              className="flex gap-1"
+            >
+              <div className="hover:text-accent-blue font-bold">h</div>
               <div className="font-bold">/</div>
-              <div>home</div>
-              <div> / </div>
-            </div>
-          </Link>
-          {props.path.map((p, index) => (
-            <Link href={p.link} key={index}>
-              <div className="flex gap-1">
-                <div>{p.name}</div>
-                <div>/</div>
-              </div>
             </Link>
-          ))}
+            {props.path.map((p, index) => (
+              <Link href={p.link} key={index}>
+                <div className="SidebarBreadcrumbStudio flex gap-1">
+                  <div className="hover:text-accent-blue">{p.name}</div>
+                  <div>/</div>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
 
-      <div className="sidebarSpaceName shrink-0 flex-row px-3 text-lg font-bold">
+      <div className="sidebarSpaceName shrink-0 flex-row px-3 pt-0.5 text-lg font-bold">
         {props.display_name}
       </div>
-      <div className="px-3 pt-2">
+      <div className="px-3 pt-3">
         <SpaceRoleBadge space_id={props.space_id} />
       </div>
 

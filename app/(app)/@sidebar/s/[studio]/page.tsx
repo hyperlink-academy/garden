@@ -19,26 +19,24 @@ export default function UserPageSidebar(props: { params: { studio: string } }) {
             href={session.session ? `/s/${session.session.username}` : "/"}
           >
             <div className="flex gap-1">
-              <div className="font-bold">h</div>
+              <div className="hover:text-accent-blue font-bold">h</div>
               <div className="font-bold">/</div>
-              {session.loggedIn && (
-                <>
-                  <div>home</div>
-                  <div> / </div>
-                </>
-              )}
             </div>
           </Link>
         </div>
 
-        <div className="sidebarSpaceName shrink-0 flex-row px-3 text-lg font-bold">
-          {props.params.studio}
+        <div className="sidebarSpaceName shrink-0 flex-row px-3 pt-0.5 text-lg font-bold">
+          {props.params.studio === session.session?.username
+            ? "Home"
+            : props.params.studio}
         </div>
-        <div className="px-3 pt-2">
-          {!session.session && <LoginButton small />}{" "}
-        </div>
+        {!session.session && (
+          <div className="px-3 pb-1 pt-3">
+            <LoginButton small />
+          </div>
+        )}
 
-        <div className="py-3">
+        <div className="pb-3 pt-2">
           <Divider />
         </div>
         <div className="px-3 pb-3">
