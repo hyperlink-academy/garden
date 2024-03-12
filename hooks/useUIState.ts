@@ -1,146 +1,152 @@
 import { useCallback } from "react";
 import { sortByPosition } from "src/position_helpers";
 import { create } from "zustand";
-import { combine } from "zustand/middleware";
+import { combine, createJSONStorage, persist } from "zustand/middleware";
 import { db, useMutations, useSpaceID } from "./useReplicache";
 import { Filters } from "components/CardFilter";
 
 export let useUIState = create(
-  combine(
-    {
-      mobileSidebarOpen: false,
-      spaces: {} as {
-        [spaceID: string]: {
-          activeRoom?: string;
-          rooms: {
-            [roomID: string]: string[];
+  persist(
+    combine(
+      {
+        mobileSidebarOpen: false,
+        spaces: {} as {
+          [spaceID: string]: {
+            activeRoom?: string;
+            rooms: {
+              [roomID: string]: string[];
+            };
           };
-        };
+        },
+        roomStates: {} as {
+          [entityID: string]: {
+            filters: Filters;
+          };
+        },
+        cardStates: {} as {
+          [entityID: string]: {
+            drawer: null | "backlinks" | "chat";
+            drawerOpen: boolean;
+          };
+        },
+        chatInputStates: {} as {
+          [entityID: string]: {
+            value: string;
+            attachedCards: string[];
+          };
+        },
+        focusedCard: undefined as string | undefined,
       },
-      roomStates: {} as {
-        [entityID: string]: {
-          filters: Filters;
-        };
-      },
-      cardStates: {} as {
-        [entityID: string]: {
-          drawer: null | "backlinks" | "chat";
-          drawerOpen: boolean;
-        };
-      },
-      chatInputStates: {} as {
-        [entityID: string]: {
-          value: string;
-          attachedCards: string[];
-        };
-      },
-      focusedCard: undefined as string | undefined,
-    },
-    (set) => ({
-      setChatInputAttachedCards: (
-        entityID: string,
-        attachedCards: string[]
-      ) => {
-        set((state) => ({
-          chatInputStates: {
-            ...state.chatInputStates,
-            [entityID]: {
-              ...state.chatInputStates[entityID],
-              attachedCards,
+      (set) => ({
+        setChatInputAttachedCards: (
+          entityID: string,
+          attachedCards: string[]
+        ) => {
+          set((state) => ({
+            chatInputStates: {
+              ...state.chatInputStates,
+              [entityID]: {
+                ...state.chatInputStates[entityID],
+                attachedCards,
+              },
             },
-          },
-        }));
-      },
-      setChatInputValue: (entityID: string, value: string) => {
-        set((state) => ({
-          chatInputStates: {
-            ...state.chatInputStates,
-            [entityID]: {
-              ...state.chatInputStates[entityID],
-              value,
+          }));
+        },
+        setChatInputValue: (entityID: string, value: string) => {
+          set((state) => ({
+            chatInputStates: {
+              ...state.chatInputStates,
+              [entityID]: {
+                ...state.chatInputStates[entityID],
+                value,
+              },
             },
-          },
-        }));
-      },
-      setMobileSidebarOpen: (open?: boolean) => {
-        set((state) => ({
-          mobileSidebarOpen:
-            open === undefined ? !state.mobileSidebarOpen : open,
-        }));
-      },
-      openDrawer: (entityID: string, drawer: "backlinks" | "chat") => {
-        set((state) => ({
-          ...state,
-          cardStates: {
-            ...state.cardStates,
-            [entityID]: {
-              ...state.cardStates[entityID],
-              drawer,
-              drawerOpen: true,
+          }));
+        },
+        setMobileSidebarOpen: (open?: boolean) => {
+          set((state) => ({
+            mobileSidebarOpen:
+              open === undefined ? !state.mobileSidebarOpen : open,
+          }));
+        },
+        openDrawer: (entityID: string, drawer: "backlinks" | "chat") => {
+          set((state) => ({
+            ...state,
+            cardStates: {
+              ...state.cardStates,
+              [entityID]: {
+                ...state.cardStates[entityID],
+                drawer,
+                drawerOpen: true,
+              },
             },
-          },
-        }));
-      },
-      closeDrawer: (entityID: string) => {
-        set((state) => ({
-          ...state,
-          cardStates: {
-            ...state.cardStates,
-            [entityID]: {
-              ...state.cardStates[entityID],
-              drawerOpen: false,
+          }));
+        },
+        closeDrawer: (entityID: string) => {
+          set((state) => ({
+            ...state,
+            cardStates: {
+              ...state.cardStates,
+              [entityID]: {
+                ...state.cardStates[entityID],
+                drawerOpen: false,
+              },
             },
-          },
-        }));
-      },
-      setRoom: (spaceID: string, room: string | undefined) => {
-        set((state) => ({
-          mobileSidebarOpen: false,
-          spaces: {
-            ...state.spaces,
-            [spaceID]: {
-              ...state.spaces[spaceID],
-              activeRoom: room,
-            },
-          },
-        }));
-      },
-      setFilters: (entityID: string, filters: Filters) => {
-        set((state) => ({
-          roomStates: {
-            ...state.roomStates,
-            [entityID]: {
-              ...state.roomStates[entityID],
-              filters,
-            },
-          },
-        }));
-      },
-      closeCard: (spaceID: string, roomID: string) => {},
-      openCard: (spaceID: string, roomID: string, card: string) => {
-        set((state) => {
-          let currentCard = state.spaces[spaceID]?.rooms?.[roomID]?.[0];
-          if (currentCard === card) return state;
-          return {
+          }));
+        },
+        setRoom: (spaceID: string, room: string | undefined) => {
+          set((state) => ({
+            mobileSidebarOpen: false,
             spaces: {
               ...state.spaces,
               [spaceID]: {
                 ...state.spaces[spaceID],
-                rooms: {
-                  ...state.spaces[spaceID].rooms,
-                  [roomID]: [
-                    card,
-                    ...(state.spaces[spaceID]?.rooms?.[roomID] || []),
-                  ],
-                },
+                activeRoom: room,
               },
             },
-          };
-        });
-      },
-      setFocusedCard: (entityID: string | undefined) =>
-        set({ focusedCard: entityID }),
-    })
+          }));
+        },
+        setFilters: (entityID: string, filters: Filters) => {
+          set((state) => ({
+            roomStates: {
+              ...state.roomStates,
+              [entityID]: {
+                ...state.roomStates[entityID],
+                filters,
+              },
+            },
+          }));
+        },
+        closeCard: (spaceID: string, roomID: string) => {},
+        openCard: (spaceID: string, roomID: string, card: string) => {
+          set((state) => {
+            let currentCard = state.spaces[spaceID]?.rooms?.[roomID]?.[0];
+            if (currentCard === card) return state;
+            return {
+              spaces: {
+                ...state.spaces,
+                [spaceID]: {
+                  ...state.spaces[spaceID],
+                  rooms: {
+                    ...state.spaces[spaceID].rooms,
+                    [roomID]: [
+                      card,
+                      ...(state.spaces[spaceID]?.rooms?.[roomID] || []),
+                    ],
+                  },
+                },
+              },
+            };
+          });
+        },
+        setFocusedCard: (entityID: string | undefined) =>
+          set({ focusedCard: entityID }),
+      })
+    ),
+    {
+      name: "ui-state",
+      storage: createJSONStorage(() => window.sessionStorage),
+    }
   )
 );
 

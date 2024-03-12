@@ -10,7 +10,6 @@ export const useSpaceSyncState = () => {
   let room = useRoom();
   let spaceID = useSpaceID();
   let setRoom = useSetRoom();
-  let setRoomWithoutHistory = useUIState((s) => s.setRoom);
   let openCardWithoutHistory = useUIState((s) => s.openCard);
 
   let firstRoom = db
@@ -49,15 +48,4 @@ export const useSpaceSyncState = () => {
       })();
     }
   }, [rep, openCard, room, spaceID]);
-
-  useEffect(() => {
-    if (!spaceID) return;
-    let storedRoom = window.localStorage.getItem(`space/${spaceID}/room`);
-    if (storedRoom) setRoomWithoutHistory(spaceID, storedRoom);
-  }, [spaceID, setRoomWithoutHistory]);
-
-  useEffect(() => {
-    if (room && spaceID)
-      window.localStorage.setItem(`space/${spaceID}/room`, room);
-  }, [room, spaceID]);
 };
