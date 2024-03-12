@@ -1,23 +1,15 @@
-import { workerAPI } from "backend/lib/api";
-import { WORKER_URL } from "src/constants";
 import UserHomePage from "./UserHomePage";
-import { cache } from "react";
-
-const getData = cache((studio: string) => {
-  return workerAPI(WORKER_URL, "get_identity_data", {
-    name: studio,
-  });
-});
+import { getUserPageData } from "./getUserPageData";
 
 export async function generateMetadata(props: { params: { studio: string } }) {
-  let data = await getData(props.params.studio);
+  let data = await getUserPageData(props.params);
   return { title: data.data?.username || "404 Studio Not Found" };
 }
 
 export default async function UserStudio(props: {
   params: { studio: string };
 }) {
-  let data = await getData(props.params.studio);
+  let data = await getUserPageData(props.params);
   if (!data.success) return <div>404 - page not found!</div>;
   return <UserHomePage data={data.data} />;
 }
