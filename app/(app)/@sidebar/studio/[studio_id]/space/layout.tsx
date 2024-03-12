@@ -18,7 +18,7 @@ export default async function SpaceInUserSidebar(props: {
       path={[
         {
           name: studioData.data.name,
-          link: `/studio/${uuidToBase62(studioData.data.id)}}`,
+          link: `/studio/${uuidToBase62(studioData.data.id)}`,
         },
       ]}
     >

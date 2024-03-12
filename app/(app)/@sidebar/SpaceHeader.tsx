@@ -3,7 +3,6 @@ import { BaseSpaceCard, SpaceData } from "components/SpacesList";
 import { useAuth } from "hooks/useAuth";
 import { useParams } from "next/dist/client/components/navigation";
 import Link from "next/link";
-import { create } from "zustand";
 import { base62ToUuid, uuidToBase62 } from "src/uuidHelpers";
 import { useState } from "react";
 
@@ -23,7 +22,7 @@ export function SpaceHeader(props: {
   );
 
   return (
-    <div>
+    <div className="sidebarSpaceFromHome flex h-full flex-col items-stretch">
       <div>
         <div className="flex items-center justify-between px-3">
           <div className="sidebarBreadcrumb text-grey-55 flex shrink-0 flex-row text-sm">
@@ -51,28 +50,31 @@ export function SpaceHeader(props: {
           {activeSpace?.display_name}
         </div>
       </div>
-      {switcher ? (
-        <div className="pr-2">
-          {props.spaces.map((space) => (
-            <Link
-              key={space.id}
-              href={
-                props.context.type === "studio"
-                  ? `/studio/${uuidToBase62(props.context.id)}/space/${
-                      space.id
-                    }`
-                  : `/s/${props.context.username}/s/${uuidToBase62(space.id)}/${
-                      space.display_name
-                    }`
-              }
-            >
-              <BaseSpaceCard {...space} />
-            </Link>
-          ))}{" "}
-        </div>
-      ) : (
-        props.children
-      )}
+      <div className="no-scrollbar overflow-y-scroll">
+        {switcher ? (
+          <div className="pr-2">
+            <button onClick={() => setSwitcher(false)}>close</button>
+            {props.spaces.map((space) => (
+              <Link
+                key={space.id}
+                href={
+                  props.context.type === "studio"
+                    ? `/studio/${uuidToBase62(props.context.id)}/space/${
+                        space.id
+                      }`
+                    : `/s/${props.context.username}/s/${uuidToBase62(
+                        space.id
+                      )}/${space.display_name}`
+                }
+              >
+                <BaseSpaceCard {...space} />
+              </Link>
+            ))}{" "}
+          </div>
+        ) : (
+          props.children
+        )}
+      </div>
     </div>
   );
 }

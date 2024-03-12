@@ -6,6 +6,7 @@ import { supabaseServerClient } from "supabase/server";
 import { TabsList } from "./StudioTabs";
 import { Divider } from "components/Layout";
 import { StudioRoleBadge } from "./StudioRoleBadge";
+import { StudioSidebarContent } from "./StudioSidebar";
 
 export default async function StudioSidebar(props: {
   params: { studio_id: string };
@@ -40,20 +41,7 @@ export default async function StudioSidebar(props: {
         <div className="px-3 pt-3">
           <StudioRoleBadge data={data.data} isAdmin={isAdmin} />
         </div>
-        <div className="py-3">
-          <Divider />
-        </div>
-        <div className="px-3 pb-2">
-          <input
-            placeholder="search studio (ctrl/⌘ K)"
-            className="false w-full px-2 py-1 text-sm outline-none"
-          />
-        </div>
-        <TabsList
-          className="StudioTabs flex flex-col gap-0.5 px-3 "
-          data={data.data}
-          isAdmin={isAdmin}
-        />
+        <StudioSidebarContent data={data.data} isAdmin={isAdmin} />
       </div>
     </>
   );
