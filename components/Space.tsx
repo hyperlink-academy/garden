@@ -357,11 +357,9 @@ const InfoPopover = (props: {
 }) => {
   return (
     <Popover.Root>
-      <Popover.Trigger>
-        <button className="flex place-items-center gap-1">
-          {props.triggerTitle}
-          <InfoTiny />
-        </button>
+      <Popover.Trigger className="flex place-items-center gap-1">
+        {props.triggerTitle}
+        <InfoTiny />
       </Popover.Trigger>
       <Popover.Portal>
         <Popover.Content sideOffset={8} collisionPadding={24} className="z-20">
