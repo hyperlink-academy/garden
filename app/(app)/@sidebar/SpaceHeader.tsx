@@ -6,7 +6,7 @@ import Link from "next/link";
 import { base62ToUuid, uuidToBase62 } from "src/uuidHelpers";
 import { useState } from "react";
 import { useIdentityData } from "hooks/useIdentityData";
-import SidebarLayout from "./SidebarLayout";
+import SidebarLayout, { useSidebarState } from "./SidebarLayout";
 
 export function SpaceHeader(props: {
   children: React.ReactNode;
@@ -33,6 +33,8 @@ export function SpaceHeader(props: {
   let spaces = isUserSpace
     ? userSpaces?.members_in_spaces.map((m) => m.space_data as SpaceData)
     : props.spaces;
+
+  let { open } = useSidebarState();
 
   return (
     <SidebarLayout
@@ -61,12 +63,21 @@ export function SpaceHeader(props: {
       }
     >
       <div className="sidebarSpaceFromHome flex h-full flex-col items-stretch">
-        <div>
-          <div className="flex items-center justify-between px-3"></div>
-          <div className="sidebarSpaceName shrink-0 flex-row px-3 pt-0.5 text-lg font-bold">
+        {open ? (
+          <div>
+            <div className="flex items-center justify-between px-3"></div>
+            <div className="sidebarSpaceName shrink-0 flex-row px-3 pt-0.5 text-lg font-bold">
+              {activeSpace?.display_name}
+            </div>
+          </div>
+        ) : (
+          <div
+            className="sidebarSpaceName mx-auto h-fit w-fit shrink-0 rotate-180 flex-row font-bold "
+            style={{ writingMode: "vertical-lr" }}
+          >
             {activeSpace?.display_name}
           </div>
-        </div>
+        )}
         <div className="no-scrollbar overflow-y-scroll">
           {switcher ? (
             <div className="pr-2">
