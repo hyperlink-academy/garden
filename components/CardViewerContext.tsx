@@ -106,28 +106,32 @@ export function CardViewer(props: { space_id: string }) {
   if (!history[0] && isMobile) return null;
 
   return (
-    <div
-      ref={cardViewerRef}
-      id="cardViewerWrapper"
-      className={`cardViewerWrapper 
-          flex  h-full w-[calc(100vw-16px)] max-w-3xl
-          shrink-0 touch-pan-x        
+    <>
+      <div className="cardViewerWrapper snap-center snap-always ">
+        <div
+          ref={cardViewerRef}
+          id="cardViewerWrapper"
+          className={`cardViewerWrapper
+          flex  h-full w-[calc(100vw-44px)] max-w-3xl
+          shrink-0 touch-pan-x
           snap-center snap-always flex-col
-          items-stretch 
+          items-stretch
           focus:outline-none sm:w-[calc(100vw-32px)] md:shrink`}
-    >
-      {room && history[0] ? (
-        <CardView
-          entityID={history[0]}
-          key={history[0]}
-          onDelete={() => {
-            removeCardFromRoomHistory({ cardEntity: history[0], room });
-          }}
-        />
-      ) : (
-        <EmptyState roomType={roomType} />
-      )}
-    </div>
+        >
+          {room && history[0] ? (
+            <CardView
+              entityID={history[0]}
+              key={history[0]}
+              onDelete={() => {
+                removeCardFromRoomHistory({ cardEntity: history[0], room });
+              }}
+            />
+          ) : (
+            <EmptyState roomType={roomType} />
+          )}
+        </div>
+      </div>
+    </>
   );
 }
 
@@ -135,7 +139,7 @@ const EmptyState = (props: { roomType: string | undefined }) => {
   let isMobile = useIsMobile();
   if (isMobile) return null;
   return (
-    <div className="no-scrollbar relative flex h-full w-full max-w-3xl snap-y snap-mandatory snap-start flex-col gap-6 overflow-y-scroll rounded-lg border border-dashed border-grey-80 p-4 text-grey-35">
+    <div className="no-scrollbar border-grey-80 text-grey-35 relative flex h-full w-full max-w-3xl snap-y snap-mandatory snap-start flex-col gap-6 overflow-y-scroll rounded-lg border border-dashed p-4">
       <div className="m-auto flex flex-col gap-4 text-center">
         {props.roomType === "canvas" ? (
           <>

@@ -66,7 +66,7 @@ const DesktopLayout = (props: Props) => {
       id="space-layout"
       className=" no-scrollbar spaceDesktopLayout flex h-full w-full snap-x snap-mandatory flex-row items-stretch gap-4 overflow-y-hidden overflow-x-scroll scroll-smooth  sm:gap-4  md:overflow-x-hidden"
     >
-      <div className="spaceRoomAndSidebar flex shrink-0  snap-center snap-always flex-row  rounded-md border border-grey-90">
+      <div className="spaceRoomAndSidebar border-grey-90 flex  shrink-0 snap-center snap-always  flex-row rounded-md border">
         <Room />
       </div>
 
@@ -156,30 +156,6 @@ export const SpaceRoleBadge = (props: { space_id: string }) => {
   );
 };
 
-const Header = (props: { space_id: string }) => {
-  let { session } = useAuth();
-  return (
-    <div className="spaceHeaderInfo -mb-1 ml-2 flex min-w-0 shrink grow flex-row items-stretch gap-2 px-3 py-1 font-bold ">
-      <div className="spaceName flex w-full min-w-0 grow justify-between bg-background text-grey-35">
-        <div className="flex w-full flex-col gap-0">
-          <div className="flex flex-row items-center gap-2">
-            {session.session && (
-              <Link href={`/s/${session.session.username}`}>
-                <h4 className="text-sm text-grey-55 hover:text-accent-blue">
-                  home
-                </h4>
-              </Link>
-            )}
-          </div>
-          <div className="flex w-full flex-row items-center justify-between gap-2 bg-inherit">
-            <SpaceName truncate space_id={props.space_id} />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 const MobileLayout = (props: Props) => {
   let setSidebarOpen = useUIState((s) => s.setMobileSidebarOpen);
   let { setNodeRef: droppableRef, over } = useDroppableZone({
@@ -212,126 +188,100 @@ const MobileLayout = (props: Props) => {
   });
 
   return (
-    <div className="mobileLayout flex h-full w-full flex-col">
+    <div
+      id="space-layout"
+      className="mobileLayout no-scrollbar pwa-padding  flex h-full w-full touch-none snap-x snap-mandatory flex-row gap-2 overflow-y-hidden overflow-x-scroll overscroll-x-none scroll-smooth"
+      {...bind()}
+    >
       <div
-        id="space-layout"
-        className="mobileRoomAndCard no-scrollbar pwa-padding my-2 flex h-full touch-none snap-x snap-mandatory flex-row overflow-y-hidden overflow-x-scroll overscroll-x-none scroll-smooth"
-        {...bind()}
+        id="roomWrapper"
+        className="roomInnerWrapper no-scrollbar border-grey-90 relative flex h-full flex-shrink-0 snap-start snap-always flex-col gap-0 rounded-md border "
       >
-        <div
-          id="roomWrapper"
-          className="roomWrapper relative flex snap-start snap-always flex-row  px-2 "
-        >
-          <div
-            id="roomInnerWrapper"
-            className="roomInnerWrapper no-scrollbar relative flex h-full flex-shrink-0 flex-col gap-0 rounded-md border border-grey-90 "
-          >
-            <Room />
-          </div>
-        </div>
-
-        <div className="cardViewerWrapper snap-center snap-always ">
-          <CardViewer space_id={props.space_id} />
-        </div>
-        <div className="w-2 shrink-0 snap-start" />
-      </div>
-      <div className="mobileFooter pwa-padding-bottom flex w-full flex-row gap-2 px-2">
-        <div
-          className="sidebarTrigger flex grow flex-row gap-2 text-grey-55"
-          ref={droppableRef}
-        >
-          <button onClick={() => setSidebarOpen()}>
-            <SidebarIcon />
-          </button>
-        </div>
-        <div color="">
-          <SpaceRoleBadge space_id={props.space_id} />
-        </div>
-        <MobileSearch />
+        <Room />
       </div>
 
-      <MobileSidebar {...props} />
+      <CardViewer space_id={props.space_id} />
     </div>
   );
 };
 
-const MobileSidebar = (props: Props) => {
-  let open = useUIState((s) => s.mobileSidebarOpen);
-  let setSidebarOpen = useUIState((s) => s.setMobileSidebarOpen);
-  let { left } = useSpring({
-    left: open ? 0 : -222,
-    config: springConfig,
-  });
-  useEffect(() => {
-    document
-      .querySelector('meta[name="theme-color"]')
-      ?.setAttribute("content", open ? "#D4D0C8" : "#FFAF0");
-  }, [open]);
-  let opacity = useSpring({
-    opacity: open ? 0.2 : 0,
-  });
-  let viewheight = useViewportSize().height;
-  let { setNodeRef: droppableRef, over } = useDroppableZone({
-    type: "trigger",
-    id: "mobile-sidebar-overlay",
-    entityID: "mobile-sidebar-overlay",
-  });
+// const MobileSidebar = (props: Props) => {
+//   let open = useUIState((s) => s.mobileSidebarOpen);
+//   let setSidebarOpen = useUIState((s) => s.setMobileSidebarOpen);
+//   let { left } = useSpring({
+//     left: open ? 0 : -222,
+//     config: springConfig,
+//   });
+//   useEffect(() => {
+//     document
+//       .querySelector('meta[name="theme-color"]')
+//       ?.setAttribute("content", open ? "#D4D0C8" : "#FFAF0");
+//   }, [open]);
+//   let opacity = useSpring({
+//     opacity: open ? 0.2 : 0,
+//   });
+//   let viewheight = useViewportSize().height;
+//   let { setNodeRef: droppableRef, over } = useDroppableZone({
+//     type: "trigger",
+//     id: "mobile-sidebar-overlay",
+//     entityID: "mobile-sidebar-overlay",
+//   });
 
-  useEffect(() => {
-    if (over?.type === "room" || !over) return;
-    let timeout = window.setTimeout(() => {
-      setSidebarOpen(false);
-    }, 500);
-    return () => window.clearTimeout(timeout);
-  }, [over, setSidebarOpen]);
+//   useEffect(() => {
+//     if (over?.type === "room" || !over) return;
+//     let timeout = window.setTimeout(() => {
+//       setSidebarOpen(false);
+//     }, 500);
+//     return () => window.clearTimeout(timeout);
+//   }, [over, setSidebarOpen]);
 
-  const bindOverlay = useGesture({
-    onDrag: (data) => {
-      if (data.direction[0] < 0) {
-        setSidebarOpen(false);
-      }
-    },
-  });
+//   const bindOverlay = useGesture({
+//     onDrag: (data) => {
+//       if (data.direction[0] < 0) {
+//         setSidebarOpen(false);
+//       }
+//     },
+//   });
 
-  const bindSidebar = useGesture({
-    onDragEnd: (data) => {
-      if (
-        data.direction[0] < 0 &&
-        data.velocity[0] > 0.1 &&
-        data.velocity[1] < 0.5
-      ) {
-        setSidebarOpen(false);
-      }
-    },
-  });
+//   const bindSidebar = useGesture({
+//     onDragEnd: (data) => {
+//       if (
+//         data.direction[0] < 0 &&
+//         data.velocity[0] > 0.1 &&
+//         data.velocity[1] < 0.5
+//       ) {
+//         setSidebarOpen(false);
+//       }
+//     },
+//   });
 
-  return createPortal(
-    <>
-      {
-        <animated.div
-          {...bindOverlay()}
-          onClick={() => setSidebarOpen(false)}
-          className="fixed inset-0 z-40 touch-none bg-grey-15"
-          style={{ ...opacity, display: open ? "block" : "none" }}
-        >
-          <div className="z-40 ml-auto h-full w-2/3" ref={droppableRef} />
-        </animated.div>
-      }
-      <animated.div
-        style={{ height: viewheight, left }}
-        className="pwa-padding pwa-padding-bottom fixed top-0 z-50 ml-2 p-1 py-[2px] pl-0"
-      >
-        <div
-          className="h-full touch-none rounded-md border border-grey-90 bg-white"
-          {...bindSidebar()}
-        >
-          <Sidebar mobile studio={props.studio} space_id={props.space_id} />
-        </div>
-      </animated.div>
-    </>,
-    document.body
-  );
-};
+//   return createPortal(
+//     <>
+//       {
+//         <animated.div
+//           {...bindOverlay()}
+//           onClick={() => setSidebarOpen(false)}
+//           className="fixed inset-0 z-40 touch-none bg-grey-15"
+//           style={{ ...opacity, display: open ? "block" : "none" }}
+//         >
+//           <div className="z-40 ml-auto h-full w-2/3" ref={droppableRef} />
+//         </animated.div>
+//       }
+//       <animated.div
+//         style={{ height: viewheight, left }}
+//         className="pwa-padding pwa-padding-bottom fixed top-0 z-50 ml-2 p-1 py-[2px] pl-0"
+//       >
+//         <div
+//           className="h-full touch-none rounded-md border border-grey-90 bg-white"
+//           {...bindSidebar()}
+//         >
+//           <Sidebar mobile studio={props.studio} space_id={props.space_id} />
+//         </div>
+//       </animated.div>
+//     </>,
+//     document.body
+//   );
+// };
 
 export const HelpButton = (props: { onClick?: () => void }) => {
   let [open, setOpen] = useState(false);
@@ -342,7 +292,7 @@ export const HelpButton = (props: { onClick?: () => void }) => {
           setOpen(true);
           props.onClick?.();
         }}
-        className="mr-2 w-fit text-sm text-grey-55 hover:text-accent-blue hover:underline"
+        className="text-grey-55 hover:text-accent-blue mr-2 w-fit text-sm hover:underline"
       >
         help docs!
       </button>
@@ -363,7 +313,7 @@ const InfoPopover = (props: {
       </Popover.Trigger>
       <Popover.Portal>
         <Popover.Content sideOffset={8} collisionPadding={24} className="z-20">
-          <div className="lightBorder rounded-sm flex max-w-xs flex-col gap-2 bg-white p-2 text-xs font-normal text-grey-55 shadow-lg">
+          <div className="lightBorder text-grey-55 flex max-w-xs flex-col gap-2 rounded-sm bg-white p-2 text-xs font-normal shadow-lg">
             {props.children}
           </div>
           <Popover.Close />

@@ -3,8 +3,8 @@ export default function AppLayout(props: {
   sidebar: React.ReactNode;
 }) {
   return (
-    <div className="appLayout mx-auto flex h-full w-full flex-row justify-center gap-6 overflow-hidden ">
-      <div className="appSidebarWrapper my-2 ml-2 flex items-stretch sm:my-4 sm:ml-4">
+    <div className="appLayout mx-auto flex h-full w-full flex-row justify-center gap-3 overflow-hidden sm:gap-6">
+      <div className="appSidebarWrapper my-2 ml-2 flex w-4 items-stretch sm:my-4 sm:ml-4 sm:w-auto">
         {props.sidebar}
       </div>
 

@@ -2,6 +2,7 @@ import { animated, useSpring } from "@react-spring/web";
 import { DisclosureExpandTiny } from "components/Icons";
 import { create } from "zustand";
 import { combine } from "zustand/middleware";
+import { useIsMobile } from "hooks/utils";
 
 export const useSidebarState = create(
   combine(
@@ -20,16 +21,17 @@ export default function SidebarLayout(props: {
   children: React.ReactNode;
 }) {
   let { open, toggleSidebar } = useSidebarState((state) => state);
+  let isMobile = useIsMobile();
 
   let sidebarSpring = useSpring({
-    width: open ? 256 : 36,
+    width: open ? 256 : isMobile ? 16 : 36,
   });
   let disclosureSpring = useSpring({
     rotate: open ? 90 : -90,
   });
 
   return (
-    <div className="lightBorder flex shrink-0 flex-col overflow-hidden bg-white">
+    <div className="lightBorder z-30 flex shrink-0 flex-col overflow-hidden bg-white">
       <div className="h-full w-full overflow-x-hidden  py-3 ">
         <animated.div style={sidebarSpring}>
           <div className="sidebar flex h-full flex-col items-stretch gap-0">
