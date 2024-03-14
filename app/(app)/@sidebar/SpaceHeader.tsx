@@ -6,6 +6,7 @@ import Link from "next/link";
 import { base62ToUuid, uuidToBase62 } from "src/uuidHelpers";
 import { useState } from "react";
 import { useIdentityData } from "hooks/useIdentityData";
+import SidebarLayout from "./SidebarLayout";
 
 export function SpaceHeader(props: {
   children: React.ReactNode;
@@ -34,62 +35,66 @@ export function SpaceHeader(props: {
     : props.spaces;
 
   return (
-    <div className="sidebarSpaceFromHome flex h-full flex-col items-stretch">
-      <div>
-        <div className="flex items-center justify-between px-3">
-          <div className="sidebarBreadcrumb text-grey-55 flex shrink-0 flex-row text-sm">
-            <div className="sidebarBreadcrumbHome text-grey-55 flex shrink-0 flex-row items-center gap-1 text-sm">
-              <Link
-                href={session.session ? `/s/${session.session.username}` : "/"}
-                className="flex gap-1"
-              >
-                <div className="hover:text-accent-blue font-bold">h</div>
-                <div className="font-bold">/</div>
-              </Link>
-              {isUserSpace === false &&
-                props.path.map((p, index) => (
-                  <Link href={p.link} key={index}>
-                    <div className="SidebarBreadcrumbStudio flex gap-1">
-                      <div className="hover:text-accent-blue">{p.name}</div>
-                      <div>/</div>
-                    </div>
-                  </Link>
-                ))}
-            </div>
-            <button onClick={() => setSwitcher(!switcher)}>switch</button>
-          </div>
-        </div>
-        <div className="sidebarSpaceName shrink-0 flex-row px-3 pt-0.5 text-lg font-bold">
-          {activeSpace?.display_name}
-        </div>
-      </div>
-      <div className="no-scrollbar overflow-y-scroll">
-        {switcher ? (
-          <div className="pr-2">
-            <button onClick={() => setSwitcher(false)}>close</button>
-            {spaces
-              ?.filter((s) => !s.archived)
-              .map((space) => (
-                <Link
-                  key={space.id}
-                  href={
-                    props.context.type === "studio"
-                      ? `/studio/${uuidToBase62(props.context.id)}/space/${
-                          space.id
-                        }`
-                      : `/s/${props.context.username}/s/${uuidToBase62(
-                          space.id
-                        )}/${space.display_name}`
-                  }
-                >
-                  <BaseSpaceCard {...space} />
+    <SidebarLayout
+      breadcrumb={
+        <div className="sidebarBreadcrumb flex shrink-0 flex-row text-sm text-grey-55">
+          <div className="sidebarBreadcrumbHome flex shrink-0 flex-row items-center gap-1 text-sm text-grey-55">
+            <Link
+              href={session.session ? `/s/${session.session.username}` : "/"}
+              className="flex gap-1"
+            >
+              <div className="font-bold hover:text-accent-blue">h</div>
+              <div className="font-bold">/</div>
+            </Link>
+            {isUserSpace === false &&
+              props.path.map((p, index) => (
+                <Link href={p.link} key={index}>
+                  <div className="SidebarBreadcrumbStudio flex gap-1">
+                    <div className="hover:text-accent-blue">{p.name}</div>
+                    <div>/</div>
+                  </div>
                 </Link>
-              ))}{" "}
+              ))}
           </div>
-        ) : (
-          props.children
-        )}
+          <button onClick={() => setSwitcher(!switcher)}>switch</button>
+        </div>
+      }
+    >
+      <div className="sidebarSpaceFromHome flex h-full flex-col items-stretch">
+        <div>
+          <div className="flex items-center justify-between px-3"></div>
+          <div className="sidebarSpaceName shrink-0 flex-row px-3 pt-0.5 text-lg font-bold">
+            {activeSpace?.display_name}
+          </div>
+        </div>
+        <div className="no-scrollbar overflow-y-scroll">
+          {switcher ? (
+            <div className="pr-2">
+              <button onClick={() => setSwitcher(false)}>close</button>
+              {spaces
+                ?.filter((s) => !s.archived)
+                .map((space) => (
+                  <Link
+                    key={space.id}
+                    href={
+                      props.context.type === "studio"
+                        ? `/studio/${uuidToBase62(props.context.id)}/space/${
+                            space.id
+                          }`
+                        : `/s/${props.context.username}/s/${uuidToBase62(
+                            space.id
+                          )}/${space.display_name}`
+                    }
+                  >
+                    <BaseSpaceCard {...space} />
+                  </Link>
+                ))}{" "}
+            </div>
+          ) : (
+            props.children
+          )}
+        </div>
       </div>
-    </div>
+    </SidebarLayout>
   );
 }
