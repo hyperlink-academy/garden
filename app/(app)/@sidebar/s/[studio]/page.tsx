@@ -7,53 +7,32 @@ import { useAuth } from "hooks/useAuth";
 import { Divider } from "components/Layout";
 import { HomeTabs } from "./HomeTabs";
 import { LoginButton } from "components/LoginModal";
-import { useSidebarState } from "../../SidebarState";
-import { useSpring, animated } from "@react-spring/web";
-import { DisclosureExpandTiny } from "components/Icons";
+import SidebarLayout, { useSidebarState } from "../../SidebarLayout";
 
 export default function UserPageSidebar(props: { params: { studio: string } }) {
-  let { open, toggleSidebar } = useSidebarState((state) => state);
+  let { open } = useSidebarState((state) => state);
   let { session } = useAuth();
 
-  let sidebarSpring = useSpring({
-    width: open ? 256 : 36,
-  });
-  let disclosureSpring = useSpring({
-    rotate: open ? 90 : -90,
-  });
-
   return (
-    <animated.div style={sidebarSpring}>
-      <div className="sidebarHome flex h-full flex-col items-stretch gap-0">
-        <div className="sidebarHomeBreadcrumb flex items-center justify-between px-3">
-          {open && (
-            <Link
-              className="sidebarBreadcrumb flex shrink-0 flex-row items-center text-sm text-grey-55"
-              href={session.session ? `/s/${session.session.username}` : "/"}
-            >
-              <div className="flex gap-1">
-                <div className="font-bold hover:text-accent-blue">h</div>
-                <div className="font-bold">/</div>
-              </div>
-            </Link>
-          )}
-          <animated.div style={disclosureSpring}>
-            <button
-              className="text-grey-55 hover:text-accent-blue "
-              onClick={() => toggleSidebar()}
-            >
-              <DisclosureExpandTiny />
-            </button>
-          </animated.div>
-        </div>
-
-        {open ? (
-          <UserPageSidebarExpanded {...props} />
-        ) : (
-          <UserPageSidebarCollapsed {...props} />
-        )}
-      </div>
-    </animated.div>
+    <SidebarLayout
+      breadcrumb={
+        <Link
+          className="sidebarBreadcrumb flex shrink-0 flex-row items-center text-sm text-grey-55"
+          href={session.session ? `/s/${session.session.username}` : "/"}
+        >
+          <div className="flex gap-1">
+            <div className="font-bold hover:text-accent-blue">h</div>
+            <div className="font-bold">/</div>
+          </div>
+        </Link>
+      }
+    >
+      {open ? (
+        <UserPageSidebarExpanded {...props} />
+      ) : (
+        <UserPageSidebarCollapsed {...props} />
+      )}
+    </SidebarLayout>
   );
 }
 
@@ -93,7 +72,7 @@ const UserPageSidebarExpanded = (props: { params: { studio: string } }) => {
 const UserPageSidebarCollapsed = (props: { params: { studio: string } }) => {
   let { session } = useAuth();
   return (
-    <div className="sidebarHomeCollapsed flex flex-col justify-center pt-3">
+    <>
       <div
         className="sidebarSpaceName mx-auto h-fit w-fit shrink-0 rotate-180 flex-row font-bold "
         style={{ writingMode: "vertical-lr" }}
@@ -117,6 +96,6 @@ const UserPageSidebarCollapsed = (props: { params: { studio: string } }) => {
         className="mx-auto flex flex-col gap-2"
         collapsed={true}
       />
-    </div>
+    </>
   );
 };

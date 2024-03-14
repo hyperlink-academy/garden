@@ -6,61 +6,36 @@ import { useState } from "react";
 import Link from "next/link";
 import { BaseSpaceCard } from "components/SpacesList";
 import { uuidToBase62 } from "src/uuidHelpers";
-import { DisclosureExpandTiny } from "components/Icons";
 import { LoginButton } from "components/LoginModal";
 import { StudioRoleBadge } from "./StudioRoleBadge";
-import { useSidebarState } from "../../SidebarState";
-import { useSpring, animated } from "@react-spring/web";
 import { useAuth } from "hooks/useAuth";
+import SidebarLayout, { useSidebarState } from "../../SidebarLayout";
 
 export const StudioSidebarContent = (props: Props & { isAdmin: boolean }) => {
-  let { open, toggleSidebar } = useSidebarState((state) => state);
-
-  let sidebarSpring = useSpring({
-    width: open ? 256 : 36,
-  });
-  let disclosureSpring = useSpring({
-    rotate: open ? 90 : -90,
-  });
+  let { open } = useSidebarState((state) => state);
   let { session } = useAuth();
-
   return (
-    <>
-      <animated.div style={sidebarSpring}>
-        <div className="sidebarStudio flex h-full flex-col items-stretch">
-          <div className="flex items-center justify-between px-3">
-            {open && (
-              <Link
-                href={
-                  session.session?.username
-                    ? `/s/${session.session.username}`
-                    : "/"
-                }
-                className="sidebarBreadcrumb flex shrink-0 flex-row text-sm text-grey-55"
-              >
-                <div className="flex gap-1">
-                  <div className="font-bold hover:text-accent-blue">h</div>
-                  <div className="font-bold">/</div>
-                </div>
-              </Link>
-            )}
-            <animated.div style={disclosureSpring}>
-              <button
-                className="text-grey-55 hover:text-accent-blue "
-                onClick={() => toggleSidebar()}
-              >
-                <DisclosureExpandTiny />
-              </button>
-            </animated.div>
+    <SidebarLayout
+      breadcrumb={
+        <Link
+          href={
+            session.session?.username ? `/s/${session.session.username}` : "/"
+          }
+          className="sidebarBreadcrumb flex shrink-0 flex-row text-sm text-grey-55"
+        >
+          <div className="flex gap-1">
+            <div className="font-bold hover:text-accent-blue">h</div>
+            <div className="font-bold">/</div>
           </div>
-          {open ? (
-            <StudioSidebarExpanded {...props} />
-          ) : (
-            <StudioSidebarCollapsed {...props} />
-          )}
-        </div>
-      </animated.div>
-    </>
+        </Link>
+      }
+    >
+      {open ? (
+        <StudioSidebarExpanded {...props} />
+      ) : (
+        <StudioSidebarCollapsed {...props} />
+      )}
+    </SidebarLayout>
   );
 };
 
