@@ -5,7 +5,7 @@
 import Link from "next/link";
 import { useAuth } from "hooks/useAuth";
 import { Divider } from "components/Layout";
-import { HomeTabs } from "./HomeTabs";
+import { HomeTabs, useHomeTabs } from "./HomeTabs";
 import { LoginButton } from "components/LoginModal";
 import { useSidebarState } from "../../SidebarState";
 import { useSpring, animated } from "@react-spring/web";
@@ -15,6 +15,7 @@ import {
   RoomSettings,
   RoomStudios,
 } from "components/Icons";
+import { CollapsedSidebarTab } from "../../SidebarTab";
 
 export default function UserPageSidebar(props: { params: { studio: string } }) {
   let { open, toggleSidebar } = useSidebarState((state) => state);
@@ -33,18 +34,18 @@ export default function UserPageSidebar(props: { params: { studio: string } }) {
         <div className="sidebarHomeBreadcrumb flex items-center justify-between px-3">
           {open && (
             <Link
-              className="sidebarBreadcrumb text-grey-55 flex shrink-0 flex-row items-center text-sm"
+              className="sidebarBreadcrumb flex shrink-0 flex-row items-center text-sm text-grey-55"
               href={session.session ? `/s/${session.session.username}` : "/"}
             >
               <div className="flex gap-1">
-                <div className="hover:text-accent-blue font-bold">h</div>
+                <div className="font-bold hover:text-accent-blue">h</div>
                 <div className="font-bold">/</div>
               </div>
             </Link>
           )}
           <animated.div style={disclosureSpring}>
             <button
-              className="hover:text-accent-blue text-grey-55 "
+              className="text-grey-55 hover:text-accent-blue "
               onClick={() => toggleSidebar()}
             >
               <DisclosureExpandTiny />
@@ -93,6 +94,7 @@ const UserPageSidebarExpanded = (props: { params: { studio: string } }) => {
 
 const UserPageSidebarCollapsed = (props: { params: { studio: string } }) => {
   let { session } = useAuth();
+  let [tab, setTab] = useHomeTabs(props.params.studio);
 
   return (
     <div className="sidebarHomeCollapsed flex flex-col justify-center pt-3">
@@ -114,15 +116,18 @@ const UserPageSidebarCollapsed = (props: { params: { studio: string } }) => {
         <Divider />
       </div>
       <div className=" mx-auto flex flex-col gap-2">
-        <div className="hover:border-grey-80 shrink-0 rounded-md border border-transparent p-1">
-          <RoomSearch />
-        </div>
-        <div className=" border-accent-blue bg-accent-blue shrink-0 rounded-md border p-1  text-white">
-          <RoomStudios />
-        </div>
-        <div className="hover:border-grey-80 shrink-0 rounded-md border border-transparent p-1">
-          <RoomSettings />
-        </div>
+        <CollapsedSidebarTab
+          icon=<RoomStudios />
+          active={tab === "Home"}
+          onClick={() => setTab("Home")}
+        />
+        {session?.session?.username === props.params.studio && (
+          <CollapsedSidebarTab
+            icon=<RoomSettings />
+            active={tab === "Settings"}
+            onClick={() => setTab("Settings")}
+          />
+        )}
       </div>
     </div>
   );
