@@ -26,6 +26,8 @@ import { generateKeyBetween } from "src/fractional-indexing";
 import { SingleTextSection } from "components/CardView/Sections";
 import { useIsActiveRoom, useRoom, useSetRoom } from "hooks/useUIState";
 import { Form, SubmitButton } from "components/Form";
+import { useIsMobile } from "hooks/utils";
+import { useSidebarState } from "app/(app)/@sidebar/SidebarLayout";
 
 export const EditRoomModal = (props: {
   open: boolean;
@@ -55,7 +57,7 @@ export const EditRoomModal = (props: {
   return (
     <Modal open={props.open} onClose={props.onClose} header="Room Settings">
       <form
-        className="editRoomModal flex flex-col gap-3 text-grey-35"
+        className="editRoomModal text-grey-35 flex flex-col gap-3"
         onSubmit={async () => {
           if (!currentRoomName || !props.room) return;
           await mutate("updateFact", {
@@ -90,7 +92,7 @@ export const EditRoomModal = (props: {
           <div className="editRoomDescription flex flex-col gap-1">
             <p className="font-bold">Description</p>
             <Textarea
-              className="box-border w-full rounded-md border border-grey-55 p-2"
+              className="border-grey-55 box-border w-full rounded-md border p-2"
               value={descriptionState}
               maxLength={500}
               placeholder={
@@ -106,7 +108,7 @@ export const EditRoomModal = (props: {
 
           <Divider />
           <div className="lightBorder flex flex-col gap-2 p-3 text-center ">
-            <p className="text-sm text-grey-55">
+            <p className="text-grey-55 text-sm">
               Don&apos;t worry, deleting this room won&apos;t delete the cards
               inside of it!
             </p>
@@ -184,6 +186,8 @@ export const RoomListItem = (props: {
   let setRoom = useSetRoom();
   let { memberEntity, authorized } = useMutations();
   let roomType = db.useEntity(props.roomEntity, "room/type");
+  let isMobile = useIsMobile();
+  let { setSidebar } = useSidebarState();
 
   let unreadCount = useSubscribe(
     async (tx) => {
@@ -218,8 +222,8 @@ export const RoomListItem = (props: {
     <div
       className={`relative select-none rounded-md border  ${
         isActiveRoom || props.isOver
-          ? "rounded-md  border-accent-blue font-bold text-accent-blue"
-          : " border-transparent text-grey-35 hover:border-grey-80"
+          ? "border-accent-blue  text-accent-blue rounded-md font-bold"
+          : " text-grey-35 hover:border-grey-80 border-transparent"
       }`}
     >
       {/* buttom = name + either edit button OR room type icon */}
@@ -229,6 +233,8 @@ export const RoomListItem = (props: {
           isActiveRoom ? "font-bold" : ""
         }`}
         onClick={(e) => {
+          e.stopPropagation();
+
           if (e.detail === 2 && authorized) {
             props.setEditing(true);
             return;
@@ -243,11 +249,14 @@ export const RoomListItem = (props: {
           // don't trigger 'onRoomChange' if room already active (may be trying to setRoomEditOpen instead)
           if (isActiveRoom) return;
 
+          if (isMobile) {
+            setSidebar(false);
+          }
           setRoom(props.roomEntity);
         }}
       >
         <div
-          className={` roomListItemIcon mt-[4px] h-4 w-4 shrink-0 
+          className={` roomListItemIcon mt-[4px] h-4 w-4 shrink-0
              ${
                isActiveRoom || props.isOver
                  ? "text-accent-blue"
@@ -339,7 +348,7 @@ const PresenceDots = (props: { entityID: string }) => {
           })}
         </div>
       ) : (
-        <div className=" italics hrink-0 my-auto flex h-max max-h-6 w-4 grow-0 items-start justify-center overflow-visible  whitespace-nowrap text-sm font-normal text-grey-55 ">
+        <div className=" italics hrink-0 text-grey-55 my-auto flex h-max max-h-6 w-4 grow-0 items-start justify-center  overflow-visible whitespace-nowrap text-sm font-normal ">
           {present.length}
         </div>
       )}

@@ -1,3 +1,6 @@
+import { useIsMobile } from "hooks/utils";
+import { useSidebarState } from "./SidebarLayout";
+
 export const SidebarTab = (props: {
   collapsed: boolean;
   title: string;
@@ -5,14 +8,20 @@ export const SidebarTab = (props: {
   active: boolean;
   onClick?: () => void;
 }) => {
+  let isMobile = useIsMobile();
+  let { setSidebar } = useSidebarState();
+
   if (props.collapsed)
     return (
       <button
-        onClick={() => {
+        onClick={(e) => {
           props.onClick?.();
+          e.stopPropagation();
         }}
-        className={`shrink-0 rounded-md border border-transparent p-1 hover:border-grey-80 ${
-          props.active ? "border-accent-blue bg-accent-blue text-white" : ""
+        className={` shrink-0 rounded-md border border-transparent p-1 ${
+          props.active
+            ? "border-accent-blue bg-accent-blue text-white"
+            : "hover:border-grey-80"
         }`}
       >
         {props.icon}
@@ -20,11 +29,18 @@ export const SidebarTab = (props: {
     );
   return (
     <button
-      onClick={() => props.onClick?.()}
+      onClick={(e) => {
+        props.onClick?.();
+        e.stopPropagation();
+
+        if (isMobile) {
+          setSidebar(false);
+        }
+      }}
       className={`sidebarTab relative select-none rounded-md border  ${
         props.active
-          ? "rounded-md  border-accent-blue font-bold text-accent-blue"
-          : " border-transparent text-grey-35 hover:border-grey-80"
+          ? "border-accent-blue  text-accent-blue rounded-md font-bold"
+          : " text-grey-35 hover:border-grey-80 border-transparent"
       }`}
     >
       <div

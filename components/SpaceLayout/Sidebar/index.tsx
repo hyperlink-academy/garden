@@ -33,7 +33,6 @@ export const Sidebar = (props: {
   studio?: { spaces: SpaceData[]; studioName: string; studioID: string };
 }) => {
   let [roomEditOpen, setRoomEditOpen] = useState(false);
-  let setMobileSidebarOpen = useUIState((s) => s.setMobileSidebarOpen);
 
   return (
     <div className="Sidebar text-grey-35 flex h-full w-full grow flex-col items-stretch justify-between gap-2 overflow-x-visible px-3">

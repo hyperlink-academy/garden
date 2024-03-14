@@ -20,7 +20,7 @@ export default function SidebarLayout(props: {
   breadcrumb: React.ReactNode;
   children: React.ReactNode;
 }) {
-  let { open, toggleSidebar } = useSidebarState((state) => state);
+  let { open, toggleSidebar, setSidebar } = useSidebarState((state) => state);
   let isMobile = useIsMobile();
 
   let sidebarSpring = useSpring({
@@ -31,8 +31,13 @@ export default function SidebarLayout(props: {
   });
 
   return (
-    <div className="lightBorder z-30 flex shrink-0 flex-col overflow-hidden bg-white">
-      <div className="h-full w-full overflow-x-hidden  py-3 ">
+    <button
+      className={`lightBorder z-30 flex shrink-0 flex-col overflow-hidden bg-white text-left ${
+        open && "cursor-default"
+      }`}
+      onClick={() => setSidebar(true)}
+    >
+      <div className="no-scrollbar h-full w-full overflow-x-hidden  py-3 ">
         <animated.div style={sidebarSpring}>
           <div className="sidebar flex h-full flex-col items-stretch gap-0">
             <div className="flex items-center justify-between px-3">
@@ -40,7 +45,10 @@ export default function SidebarLayout(props: {
               <animated.div style={disclosureSpring}>
                 <button
                   className="text-grey-55 hover:text-accent-blue "
-                  onClick={() => toggleSidebar()}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleSidebar();
+                  }}
                 >
                   <DisclosureExpandTiny />
                 </button>
@@ -49,13 +57,13 @@ export default function SidebarLayout(props: {
             {open ? (
               <div className="w-64">{props.children}</div>
             ) : (
-              <div className="sidebarHomeCollapsed flex w-max flex-col justify-center px-1 pt-3">
+              <div className="sidebarCollapsed flex w-max flex-col justify-center px-1 pt-3">
                 {props.children}
               </div>
             )}
           </div>
         </animated.div>
       </div>
-    </div>
+    </button>
   );
 }
