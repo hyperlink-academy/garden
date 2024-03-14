@@ -66,7 +66,7 @@ const DesktopLayout = (props: Props) => {
       id="space-layout"
       className=" no-scrollbar spaceDesktopLayout flex h-full w-full snap-x snap-mandatory flex-row items-stretch gap-4 overflow-y-hidden overflow-x-scroll scroll-smooth  sm:gap-4  md:overflow-x-hidden"
     >
-      <div className="spaceRoomAndSidebar border-grey-90 flex  shrink-0 snap-center snap-always  flex-row rounded-md border">
+      <div className="spaceRoomAndSidebar flex shrink-0  snap-center snap-always flex-row  rounded-md border border-grey-90">
         <Room />
       </div>
 
@@ -123,7 +123,7 @@ export const SpaceRoleBadge = (props: { space_id: string }) => {
             <InfoPopover triggerTitle="Guest">
               <p>
                 You&apos;re a guest here.{" "}
-                <b>You can't make any changes to this space.</b>
+                <b>You can&apos;t make any changes to this space.</b>
               </p>
               <p>To join, ask a member to invite you!</p>
             </InfoPopover>
@@ -160,12 +160,12 @@ const Header = (props: { space_id: string }) => {
   let { session } = useAuth();
   return (
     <div className="spaceHeaderInfo -mb-1 ml-2 flex min-w-0 shrink grow flex-row items-stretch gap-2 px-3 py-1 font-bold ">
-      <div className="spaceName bg-background text-grey-35 flex w-full min-w-0 grow justify-between">
+      <div className="spaceName flex w-full min-w-0 grow justify-between bg-background text-grey-35">
         <div className="flex w-full flex-col gap-0">
           <div className="flex flex-row items-center gap-2">
             {session.session && (
               <Link href={`/s/${session.session.username}`}>
-                <h4 className="text-grey-55 hover:text-accent-blue text-sm">
+                <h4 className="text-sm text-grey-55 hover:text-accent-blue">
                   home
                 </h4>
               </Link>
@@ -224,7 +224,7 @@ const MobileLayout = (props: Props) => {
         >
           <div
             id="roomInnerWrapper"
-            className="roomInnerWrapper no-scrollbar border-grey-90 relative flex h-full flex-shrink-0 flex-col gap-0 rounded-md border "
+            className="roomInnerWrapper no-scrollbar relative flex h-full flex-shrink-0 flex-col gap-0 rounded-md border border-grey-90 "
           >
             <Room />
           </div>
@@ -237,7 +237,7 @@ const MobileLayout = (props: Props) => {
       </div>
       <div className="mobileFooter pwa-padding-bottom flex w-full flex-row gap-2 px-2">
         <div
-          className="sidebarTrigger text-grey-55 flex grow flex-row gap-2"
+          className="sidebarTrigger flex grow flex-row gap-2 text-grey-55"
           ref={droppableRef}
         >
           <button onClick={() => setSidebarOpen()}>
@@ -311,7 +311,7 @@ const MobileSidebar = (props: Props) => {
         <animated.div
           {...bindOverlay()}
           onClick={() => setSidebarOpen(false)}
-          className="bg-grey-15 fixed inset-0 z-40 touch-none"
+          className="fixed inset-0 z-40 touch-none bg-grey-15"
           style={{ ...opacity, display: open ? "block" : "none" }}
         >
           <div className="z-40 ml-auto h-full w-2/3" ref={droppableRef} />
@@ -322,7 +322,7 @@ const MobileSidebar = (props: Props) => {
         className="pwa-padding pwa-padding-bottom fixed top-0 z-50 ml-2 p-1 py-[2px] pl-0"
       >
         <div
-          className="border-grey-90 h-full touch-none rounded-md border bg-white"
+          className="h-full touch-none rounded-md border border-grey-90 bg-white"
           {...bindSidebar()}
         >
           <Sidebar mobile studio={props.studio} space_id={props.space_id} />
@@ -342,7 +342,7 @@ export const HelpButton = (props: { onClick?: () => void }) => {
           setOpen(true);
           props.onClick?.();
         }}
-        className="text-grey-55 hover:text-accent-blue mr-2 w-fit text-sm hover:underline"
+        className="mr-2 w-fit text-sm text-grey-55 hover:text-accent-blue hover:underline"
       >
         help docs!
       </button>
@@ -363,7 +363,7 @@ const InfoPopover = (props: {
       </Popover.Trigger>
       <Popover.Portal>
         <Popover.Content sideOffset={8} collisionPadding={24} className="z-20">
-          <div className="lightBorder text-grey-55 flex max-w-xs flex-col gap-2 rounded-sm bg-white p-2 text-xs font-normal shadow-lg">
+          <div className="lightBorder rounded-sm flex max-w-xs flex-col gap-2 bg-white p-2 text-xs font-normal text-grey-55 shadow-lg">
             {props.children}
           </div>
           <Popover.Close />
