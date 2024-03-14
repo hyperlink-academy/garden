@@ -6,14 +6,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { BaseSpaceCard } from "components/SpacesList";
 import { uuidToBase62 } from "src/uuidHelpers";
-import {
-  RoomSearch,
-  RoomStudios,
-  RoomSettings,
-  DisclosureExpandTiny,
-  RoomSpaces,
-  RoomMember,
-} from "components/Icons";
+import { DisclosureExpandTiny } from "components/Icons";
 import { LoginButton } from "components/LoginModal";
 import { StudioRoleBadge } from "./StudioRoleBadge";
 import { useSidebarState } from "../../SidebarState";
@@ -43,17 +36,17 @@ export const StudioSidebarContent = (props: Props & { isAdmin: boolean }) => {
                     ? `/s/${session.session.username}`
                     : "/"
                 }
-                className="sidebarBreadcrumb text-grey-55 flex shrink-0 flex-row text-sm"
+                className="sidebarBreadcrumb flex shrink-0 flex-row text-sm text-grey-55"
               >
                 <div className="flex gap-1">
-                  <div className="hover:text-accent-blue font-bold">h</div>
+                  <div className="font-bold hover:text-accent-blue">h</div>
                   <div className="font-bold">/</div>
                 </div>
               </Link>
             )}
             <animated.div style={disclosureSpring}>
               <button
-                className="hover:text-accent-blue text-grey-55 "
+                className="text-grey-55 hover:text-accent-blue "
                 onClick={() => toggleSidebar()}
               >
                 <DisclosureExpandTiny />
@@ -99,6 +92,7 @@ const StudioSidebarExpanded = (
       </div>
       {spaceSearchInput === "" ? (
         <TabsList
+          collapsed={false}
           className="StudioTabs flex flex-col gap-0.5 px-3 "
           {...props}
         />
@@ -112,6 +106,7 @@ const StudioSidebarExpanded = (
             )
             .map((space) => (
               <Link
+                key={space.space_id}
                 href={`/studio/${uuidToBase62(
                   props.data.id
                 )}/space/${uuidToBase62(space.space_data.id)}`}
@@ -148,20 +143,11 @@ const StudioSidebarCollapsed = (
       <div className="mx-1 pb-2 pt-3">
         <Divider />
       </div>
-      <div className=" mx-auto flex flex-col gap-2">
-        <div className="hover:border-grey-80 shrink-0 rounded-md border border-transparent p-1">
-          <RoomSearch />
-        </div>
-        <div className="hover:border-grey-80 shrink-0 rounded-md border border-transparent p-1">
-          <div className="bg-test-pink h-4 w-4" />
-        </div>
-        <div className=" border-accent-blue bg-accent-blue shrink-0 rounded-md border p-1  text-white">
-          <RoomSpaces />
-        </div>
-        <div className="hover:border-grey-80 shrink-0 rounded-md border border-transparent p-1">
-          <RoomMember />
-        </div>
-      </div>
+      <TabsList
+        collapsed={true}
+        className=" mx-auto flex flex-col gap-2"
+        {...props}
+      />
     </div>
   );
 };

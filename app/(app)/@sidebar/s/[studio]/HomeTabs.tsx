@@ -38,12 +38,17 @@ export const useHomeTabs = (username: string) => {
   return [tab, setTab] as const;
 };
 
-export const HomeTabs = (props: { username: string }) => {
+export const HomeTabs = (props: {
+  username: string;
+  className: string;
+  collapsed: boolean;
+}) => {
   let { session } = useAuth();
   let [tab, setTab] = useHomeTabs(props.username);
   return (
-    <div className="flex flex-col gap-0.5 px-3">
+    <div className={props.className}>
       <SidebarTab
+        collapsed={props.collapsed}
         title="Home"
         icon=<RoomStudios />
         active={tab === "Home"}
@@ -51,6 +56,7 @@ export const HomeTabs = (props: { username: string }) => {
       />
       {session?.session?.username === props.username && (
         <SidebarTab
+          collapsed={props.collapsed}
           title="Settings"
           icon=<RoomSettings />
           active={tab === "Settings"}

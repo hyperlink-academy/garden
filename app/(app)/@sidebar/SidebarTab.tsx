@@ -1,9 +1,23 @@
 export const SidebarTab = (props: {
+  collapsed: boolean;
   title: string;
   icon: React.ReactNode;
   active: boolean;
   onClick?: () => void;
 }) => {
+  if (props.collapsed)
+    return (
+      <button
+        onClick={() => {
+          props.onClick?.();
+        }}
+        className={`shrink-0 rounded-md border border-transparent p-1 hover:border-grey-80 ${
+          props.active ? "border-accent-blue bg-accent-blue text-white" : ""
+        }`}
+      >
+        {props.icon}
+      </button>
+    );
   return (
     <button
       onClick={() => props.onClick?.()}
@@ -25,22 +39,3 @@ export const SidebarTab = (props: {
     </button>
   );
 };
-
-export function CollapsedSidebarTab(props: {
-  icon: React.ReactNode;
-  active: boolean;
-  onClick?: () => void;
-}) {
-  return (
-    <button
-      onClick={() => {
-        props.onClick?.();
-      }}
-      className={`shrink-0 rounded-md border border-transparent p-1 hover:border-grey-80 ${
-        props.active ? "border-accent-blue bg-accent-blue text-white" : ""
-      }`}
-    >
-      {props.icon}
-    </button>
-  );
-}

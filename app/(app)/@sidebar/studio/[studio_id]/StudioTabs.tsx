@@ -42,6 +42,7 @@ export const TabsList = (
   props: Props & {
     isAdmin: boolean;
     className: string;
+    collapsed: boolean;
   }
 ) => {
   let hasGetStartedItems = useHasGetStartedItems(props);
@@ -50,7 +51,8 @@ export const TabsList = (
     <div className={props.className}>
       {hasGetStartedItems ? (
         <TabItem
-          icon={<div className="bg-test-pink h-4 w-4" />}
+          collapsed={props.collapsed}
+          icon={<div className="h-4 w-4 bg-test-pink" />}
           name="Get Started"
           setTab={setTab}
           id="Get Started"
@@ -58,13 +60,15 @@ export const TabsList = (
         />
       ) : null}
       <TabItem
-        icon={<div className="bg-test-pink h-4 w-4" />}
+        collapsed={props.collapsed}
+        icon={<div className="h-4 w-4 bg-test-pink" />}
         name="About"
         setTab={setTab}
         id="About"
         currentTab={currentTab}
       />
       <TabItem
+        collapsed={props.collapsed}
         icon={<RoomSpaces />}
         name="Spaces"
         setTab={setTab}
@@ -72,6 +76,7 @@ export const TabsList = (
         currentTab={currentTab}
       />
       <TabItem
+        collapsed={props.collapsed}
         icon={<RoomMember />}
         name="Members"
         setTab={setTab}
@@ -80,6 +85,7 @@ export const TabsList = (
       />
       {props.isAdmin ? (
         <TabItem
+          collapsed={props.collapsed}
           icon={<RoomSettings />}
           name="Settings"
           setTab={setTab}
@@ -96,9 +102,11 @@ const TabItem = (props: {
   icon: React.ReactNode;
   id: Tab;
   currentTab: Tab;
+  collapsed: boolean;
   setTab: (t: Tab) => void;
 }) => (
   <SidebarTab
+    collapsed={props.collapsed}
     title={props.name}
     icon={props.icon}
     active={props.currentTab === props.id}

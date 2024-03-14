@@ -5,17 +5,11 @@
 import Link from "next/link";
 import { useAuth } from "hooks/useAuth";
 import { Divider } from "components/Layout";
-import { HomeTabs, useHomeTabs } from "./HomeTabs";
+import { HomeTabs } from "./HomeTabs";
 import { LoginButton } from "components/LoginModal";
 import { useSidebarState } from "../../SidebarState";
 import { useSpring, animated } from "@react-spring/web";
-import {
-  DisclosureExpandTiny,
-  RoomSearch,
-  RoomSettings,
-  RoomStudios,
-} from "components/Icons";
-import { CollapsedSidebarTab } from "../../SidebarTab";
+import { DisclosureExpandTiny } from "components/Icons";
 
 export default function UserPageSidebar(props: { params: { studio: string } }) {
   let { open, toggleSidebar } = useSidebarState((state) => state);
@@ -87,15 +81,17 @@ const UserPageSidebarExpanded = (props: { params: { studio: string } }) => {
           className="false w-full px-2 py-1 text-sm outline-none"
         />
       </div>
-      <HomeTabs username={props.params.studio} />
+      <HomeTabs
+        username={props.params.studio}
+        className="flex flex-col gap-0.5 px-3"
+        collapsed={false}
+      />
     </>
   );
 };
 
 const UserPageSidebarCollapsed = (props: { params: { studio: string } }) => {
   let { session } = useAuth();
-  let [tab, setTab] = useHomeTabs(props.params.studio);
-
   return (
     <div className="sidebarHomeCollapsed flex flex-col justify-center pt-3">
       <div
@@ -115,20 +111,12 @@ const UserPageSidebarCollapsed = (props: { params: { studio: string } }) => {
       <div className="mx-1 pb-2 pt-3">
         <Divider />
       </div>
-      <div className=" mx-auto flex flex-col gap-2">
-        <CollapsedSidebarTab
-          icon=<RoomStudios />
-          active={tab === "Home"}
-          onClick={() => setTab("Home")}
-        />
-        {session?.session?.username === props.params.studio && (
-          <CollapsedSidebarTab
-            icon=<RoomSettings />
-            active={tab === "Settings"}
-            onClick={() => setTab("Settings")}
-          />
-        )}
-      </div>
+
+      <HomeTabs
+        username={props.params.studio}
+        className="mx-auto flex flex-col gap-2"
+        collapsed={true}
+      />
     </div>
   );
 };
