@@ -223,31 +223,6 @@ export const CardContent = (props: {
     "member/name"
   )?.value;
 
-  useDrag(
-    (data) => {
-      let target = data.event.currentTarget as HTMLElement;
-      if (
-        target &&
-        target.scrollTop >= target.scrollHeight - target.clientHeight - 1 &&
-        data.direction[1] < 0 &&
-        data.distance[1] > 8 &&
-        data.distance[0] < 8
-      ) {
-        useUIState.getState().openDrawer(props.entityID, drawer || "chat");
-      }
-      if (
-        target &&
-        target.scrollTop === 0 &&
-        data.direction[1] > 0 &&
-        data.distance[1] > 8 &&
-        data.distance[0] < 8
-      ) {
-        useUIState.getState().closeDrawer(props.entityID);
-      }
-    },
-    { target: ref, pointer: { keys: false } }
-  );
-
   return (
     <>
       {/* START CARD CONTENT */}
@@ -283,7 +258,7 @@ export const CardContent = (props: {
           >
             {/* NB: keep wrapper for spacing with CardMoreOptionsMenu even if no cardCreatorName */}
 
-            <div className="text-grey-55 flex flex-row gap-2">
+            <div className="flex flex-row gap-2 text-grey-55">
               <CardMoreOptionsMenu
                 onDelete={props.onDelete}
                 entityID={props.entityID}
@@ -320,7 +295,7 @@ export const CardContent = (props: {
           <ImageSection entityID={props.entityID} />
 
           <AttachedCardSection entityID={props.entityID} />
-          <div className=" text-grey-55 h-[28px]  gap-2 text-sm italic">
+          <div className=" h-[28px] gap-2  text-sm italic text-grey-55">
             created by {cardCreatorName}
           </div>
         </div>
@@ -345,7 +320,7 @@ const BackButton = () => {
   let { authorized } = useMutations();
   return (
     <button
-      className={`border-grey-90  text-grey-55 pointer-events-auto flex h-min w-fit items-center gap-1 rounded-full border bg-white p-1 shadow ${
+      className={`pointer-events-auto  flex h-min w-fit items-center gap-1 rounded-full border border-grey-90 bg-white p-1 text-grey-55 shadow ${
         !authorized ? "" : "mt-3"
       }`}
       onClick={() => {
@@ -423,7 +398,7 @@ const CardMoreOptionsMenu = (props: {
             setAreYouSureCardDeletionModalOpen(true);
           }}
         >
-          <p className="text-accent-red font-bold">Delete Card</p>
+          <p className="font-bold text-accent-red">Delete Card</p>
           <div className="text-accent-red">
             <Delete />
           </div>
@@ -448,7 +423,7 @@ const AreYouSureCardDeletionModal = (props: {
   let { mutate, action } = useMutations();
   return (
     <Modal open={props.open} onClose={props.onClose}>
-      <div className="text-grey-35 flex flex-col gap-3">
+      <div className="flex flex-col gap-3 text-grey-35">
         <div className="modal flex flex-col gap-3">
           <h4>Are you sure?</h4>
           <p className="text-sm">
@@ -517,8 +492,8 @@ const CardBackgroundColorPicker = (props: { entityID: string }) => {
               className={`h-5 w-5 rounded-full border hover:cursor-pointer
                ${
                  cardBackgroundColor === color
-                   ? "border-grey-55 border-2"
-                   : "border-grey-80 border-1 hover:border-2"
+                   ? "border-2 border-grey-55"
+                   : "border-1 border-grey-80 hover:border-2"
                }`}
               style={{ backgroundColor: color }}
               onClick={() => {
@@ -569,12 +544,12 @@ const ScheduledDate = (props: {
   return (
     <div
       id="card-date"
-      className="text-grey-55 flex place-items-center gap-2 text-sm italic"
+      className="flex place-items-center gap-2 text-sm italic text-grey-55"
     >
       {props.dateEditing ? (
         <>
           <input
-            className="border-grey-80 text-grey-55 px-1 py-[2px]"
+            className="border-grey-80 px-1 py-[2px] text-grey-55"
             onBlur={() => props.closeDateEditing()}
             onChange={(e) => {
               setDateInputValue(e.currentTarget.value);
@@ -594,7 +569,7 @@ const ScheduledDate = (props: {
           />
 
           <button
-            className="text-grey-55 hover:text-accent-blue justify-self-center text-sm"
+            className="justify-self-center text-sm text-grey-55 hover:text-accent-blue"
             onClick={() => {
               if (props.date) {
                 mutate("retractFact", { id: props.date.id });
@@ -611,7 +586,7 @@ const ScheduledDate = (props: {
       ) : date ? (
         authorized ? (
           <button
-            className="text-grey-55 hover:text-accent-blue -ml-[5px] border border-transparent px-1 py-[3px] text-sm italic underline"
+            className="-ml-[5px] border border-transparent px-1 py-[3px] text-sm italic text-grey-55 underline hover:text-accent-blue"
             onClick={() => {
               props.openDateEditing();
             }}
@@ -619,7 +594,7 @@ const ScheduledDate = (props: {
             {date.month} {date.day}, {date.year}
           </button>
         ) : (
-          <div className="text-grey-55 -ml-[4px] px-1 py-1 text-sm">
+          <div className="-ml-[4px] px-1 py-1 text-sm text-grey-55">
             {date.month} {date.day}, {date.year}
           </div>
         )
@@ -678,7 +653,7 @@ export const SectionAdder = (props: {
 
   if (!authorized) return null;
   return (
-    <div className="border-grey-90 text-grey-55 pointer-events-auto flex w-fit items-center gap-1 rounded-full border bg-white px-4 py-2 shadow">
+    <div className="pointer-events-auto flex w-fit items-center gap-1 rounded-full border border-grey-90 bg-white px-4 py-2 text-grey-55 shadow">
       {/* IMAGE ADDER */}
       <MakeImage entity={props.entityID}>
         <div className={`${toggledOffStyle} `}>
@@ -745,7 +720,7 @@ const ReactionPicker = (props: { entityID: string }) => {
           className={`${toggledOffStyle} ${
             !reactionPickerOpen
               ? ""
-              : "border-accent-blue text-accent-blue rounded-md border p-0.5"
+              : "rounded-md border border-accent-blue p-0.5 text-accent-blue"
           }`}
         >
           <ReactionAdd />
