@@ -143,19 +143,22 @@ export function OpenSidebarOnSwipe(props: {
 }) {
   let { active } = useDndContext();
   let { setSidebar } = useSidebarState();
-  let bind = useGesture({
-    onDrag: (data) => {
-      if (
-        (data.currentTarget as HTMLElement)?.scrollLeft === 0 &&
-        data.direction[0] > 0 &&
-        data.distance[0] > 8 &&
-        data.distance[1] < 8
-      ) {
-        if (active?.data) return;
-        setSidebar(true);
-      }
+  let bind = useGesture(
+    {
+      onDrag: (data) => {
+        if (
+          (data.currentTarget as HTMLElement)?.scrollLeft === 0 &&
+          data.direction[0] > 0 &&
+          data.distance[0] > 8 &&
+          data.distance[1] < 8
+        ) {
+          if (active?.data) return;
+          setSidebar(true);
+        }
+      },
     },
-  });
+    { drag: { pointer: { keys: false } } }
+  );
   return (
     <div className={props.className} {...bind()}>
       {props.children}
