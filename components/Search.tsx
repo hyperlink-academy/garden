@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { CardPreview, PlaceholderNewCard } from "./CardPreview";
 import * as Popover from "@radix-ui/react-popover";
 import { useCardPreviewData } from "hooks/CardPreviewData";
-import { useIsElementOrChildFocused } from "hooks/utils";
+import { useIsElementOrChildFocused, useIsMobile } from "hooks/utils";
 import { useDraggableCard, useDroppableZone } from "./DragContext";
 import { CloseLinedTiny, Question, RoomSearch, SearchSmall } from "./Icons";
 import { animated, useSpring } from "@react-spring/web";
@@ -17,6 +17,7 @@ import { Divider } from "./Layout";
 import { useCurrentOpenCard, useOpenCard, useRoom } from "hooks/useUIState";
 import { sortByPosition } from "src/position_helpers";
 import { generateKeyBetween } from "src/fractional-indexing";
+import { useSidebarState } from "app/(app)/@sidebar/SidebarLayout";
 
 export const useSearch = () => {
   let [input, setInput] = useState("");
@@ -84,7 +85,7 @@ export function Search() {
             onOpenAutoFocus={(e) => e.preventDefault()}
             className={`no-scrollbar relative z-0 flex max-h-80 flex-col gap-1 overflow-x-scroll rounded-md border text-sm ${
               open
-                ? " border-grey-90 shadow-drop bg-white"
+                ? " border-grey-90 bg-white shadow-drop"
                 : "border-transparent"
             }`}
             style={{ width: "var(--radix-popper-anchor-width)" }}
@@ -94,7 +95,7 @@ export function Search() {
                 open && " bg-white"
               } `}
             >
-              <RoomSearch className={`text-grey-55 absolute right-4 top-4`} />
+              <RoomSearch className={`absolute right-4 top-4 text-grey-55`} />
               <input
                 ref={inputRef}
                 tabIndex={-1}
@@ -244,7 +245,7 @@ export function Search() {
                 }
               />
               {open && (
-                <div className="text-grey-55 flex flex-col">
+                <div className="flex flex-col text-grey-55">
                   <div className="flex w-full items-start justify-between py-2 text-xs">
                     {shortcutHelpOpen ? (
                       <div className="flex flex-col gap-1 italic">
@@ -345,7 +346,7 @@ export const SearchResults = (props: {
 
 const KeyboardKey = (props: { children: React.ReactNode }) => {
   return (
-    <code className=" border-grey-80 bg-background text-grey-55 flex h-4 w-fit min-w-[16px] justify-center rounded-md border px-1 text-center text-[10px] not-italic ">
+    <code className=" flex h-4 w-fit min-w-[16px] justify-center rounded-md border border-grey-80 bg-background px-1 text-center text-[10px] not-italic text-grey-55 ">
       {props.children}
     </code>
   );
@@ -353,7 +354,7 @@ const KeyboardKey = (props: { children: React.ReactNode }) => {
 
 const UnicodeKeyboardKey = (props: { children: React.ReactNode }) => {
   return (
-    <code className=" border-grey-80 bg-background text-grey-55 flex h-4 w-fit min-w-[16px] justify-center rounded-md border text-center font-sans text-[10px] not-italic ">
+    <code className=" flex h-4 w-fit min-w-[16px] justify-center rounded-md border border-grey-80 bg-background text-center font-sans text-[10px] not-italic text-grey-55 ">
       <div className="-mt-[1px]"> {props.children}</div>
     </code>
   );
@@ -473,7 +474,7 @@ export const MobileSearch = () => {
   return (
     <>
       <button
-        className="mobileSearchTrigger border-grey-55 flex h-8 w-8 items-center justify-center rounded-md border"
+        className="mobileSearchTrigger flex h-8 w-8 items-center justify-center rounded-md border border-grey-55"
         onClick={() => {
           setState("open");
           inputRef.current?.focus();
@@ -487,7 +488,7 @@ export const MobileSearch = () => {
           <animated.div
             {...bindOverlay()}
             onClick={() => setState("normal")}
-            className="mobileSearchOverlay bg-grey-15 fixed inset-0 z-50"
+            className="mobileSearchOverlay fixed inset-0 z-50 bg-grey-15"
             style={opacity}
           />
           <div
@@ -500,12 +501,12 @@ export const MobileSearch = () => {
       <animated.div className="fixed left-0 z-50 w-full px-2" style={style}>
         <div
           style={{ height: viewportHeight * 0.5 }}
-          className="mobileSearchDrawer no-scrollbar border-grey-90 relative z-0  flex w-full flex-col gap-2 overflow-y-scroll rounded-md border border-b-0 bg-white pt-2"
+          className="mobileSearchDrawer no-scrollbar relative z-0 flex  w-full flex-col gap-2 overflow-y-scroll rounded-md border border-b-0 border-grey-90 bg-white pt-2"
           ref={refCombined}
         >
           <div className="mobileSearchInput sticky top-0 z-10 flex flex-row justify-between gap-2 px-2">
             <div className="relative w-full">
-              <RoomSearch className="text-grey-55 absolute right-2 top-2" />
+              <RoomSearch className="absolute right-2 top-2 text-grey-55" />
               <input
                 className={`w-full py-1 pl-2 pr-7  outline-none`}
                 onKeyDown={(e) => {

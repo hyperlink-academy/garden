@@ -8,7 +8,6 @@ import {
   RoomChat,
   RoomCollection,
   RoomSearch,
-  SearchSmall,
 } from "components/Icons";
 import { db } from "hooks/useReplicache";
 import { sortByPosition } from "src/position_helpers";
