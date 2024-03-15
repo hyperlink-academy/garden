@@ -3,6 +3,7 @@ import { DisclosureExpandTiny } from "components/Icons";
 import { create } from "zustand";
 import { combine } from "zustand/middleware";
 import { useIsMobile } from "hooks/utils";
+import { useEffect, useState } from "react";
 
 export const useSidebarState = create(
   combine(
@@ -22,6 +23,10 @@ export default function SidebarLayout(props: {
 }) {
   let { open, toggleSidebar, setSidebar } = useSidebarState((state) => state);
   let isMobile = useIsMobile();
+  let [render, setRender] = useState(false);
+  useEffect(() => {
+    setRender(true);
+  }, []);
 
   let sidebarSpring = useSpring({
     width: open ? 256 : isMobile ? 16 : 36,
@@ -29,6 +34,7 @@ export default function SidebarLayout(props: {
   let disclosureSpring = useSpring({
     rotate: open ? 90 : -90,
   });
+  if (!render) return;
 
   return (
     <button
