@@ -9,7 +9,7 @@ export default function AppLayout(props: {
       <div className="appSidebarWrapper sticky left-0 top-0 z-50 flex w-4 items-stretch bg-transparent py-2 pl-2 sm:w-auto">
         {props.sidebar}
       </div>
-      <div className="appContentWrapper flex py-2 pr-2 sm:py-4">
+      <div className="appContentWrapper no-scrollbar flex w-full overflow-y-scroll py-2 pr-2 sm:py-2">
         {props.children}
       </div>
     </OpenSidebarOnSwipe>

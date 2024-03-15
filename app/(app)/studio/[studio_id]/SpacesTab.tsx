@@ -45,34 +45,30 @@ export function SpaceList({ data }: Props) {
 
   if (!data) return;
   return (
-    <div className="no-scrollbar studioSpacesWrapper mx-auto h-full overflow-y-scroll pb-6 sm:pt-2">
-      <div className="studioSpaces flex h-full w-full flex-col gap-4">
-        {authorized && (
-          <div className="studioSpacesOptions flex w-full items-center justify-between gap-3  ">
-            <AddSpace id={data.id} />
-          </div>
-        )}
+    <div className="studioSpaces my-3 flex h-full w-full max-w-4xl flex-col gap-4 sm:my-0">
+      {authorized && (
+        <div className="studioSpacesOptions flex w-full items-center justify-between gap-3  ">
+          <AddSpace id={data.id} />
+        </div>
+      )}
 
-        <div className=" studioSpaceListWrapper no-scrollbar relative flex h-full w-full flex-col gap-8 overflow-y-scroll ">
-          {allSpaces.length > 0 ? (
-            <>
-              <List
+      <div className=" studioSpaceListWrapper relative flex h-full w-full flex-col gap-8">
+        {allSpaces.length > 0 ? (
+          <>
+            <List
+              spaces={activeSpaces?.map((s) => s.space_data as SpaceData) || []}
+            />
+            {archivedSpaces.length > 0 && (
+              <HistoryList
                 spaces={
-                  activeSpaces?.map((s) => s.space_data as SpaceData) || []
+                  archivedSpaces?.map((s) => s.space_data as SpaceData) || []
                 }
               />
-              {archivedSpaces.length > 0 && (
-                <HistoryList
-                  spaces={
-                    archivedSpaces?.map((s) => s.space_data as SpaceData) || []
-                  }
-                />
-              )}
-            </>
-          ) : (
-            <EmptyStudio />
-          )}
-        </div>
+            )}
+          </>
+        ) : (
+          <EmptyStudio />
+        )}
       </div>
     </div>
   );

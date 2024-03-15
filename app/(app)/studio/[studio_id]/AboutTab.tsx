@@ -16,10 +16,10 @@ export function About(props: { isAdmin: boolean }) {
   let authorized = props.isAdmin;
   let spaceID = useSpaceID();
   return (
-    <div className="mx-auto h-full max-w-2xl  pb-6 sm:pt-6">
+    <div className="h-full w-full max-w-3xl ">
       <div className="relative h-full">
         {!image && authorized && (
-          <div className="border-grey-80 text-accent-blue absolute right-3 top-3 z-10 flex items-center gap-2 rounded-md border bg-white p-1 sm:-top-4">
+          <div className="border-grey-80 text-accent-blue absolute right-3 top-3 z-10 flex items-center gap-2 rounded-md border bg-white p-1">
             <AddImage
               onUpload={(imageID) => {
                 if (!home) return;
@@ -35,7 +35,7 @@ export function About(props: { isAdmin: boolean }) {
             </AddImage>
           </div>
         )}
-        <div className="no-scrollbar border-grey-80 flex h-full flex-col gap-2 overflow-scroll rounded-lg border bg-white p-4 text-lg">
+        <div className="no-scrollbar border-grey-80 flex h-full flex-col gap-2 overflow-scroll rounded-lg border bg-white p-3 sm:p-4 sm:text-lg">
           {image && (
             <div className="relative pb-2">
               <img

@@ -31,7 +31,7 @@ export function StudioSettings(props: { id: string }) {
     });
   }, [data]);
   return (
-    <div className="settingsWrapper no-scrollbar mx-auto flex h-full max-w-2xl flex-col gap-8 overflow-y-scroll pb-8 sm:pt-7">
+    <div className="settingsWrapper flex h-fit max-w-2xl flex-col gap-8 ">
       <form
         className="flex flex-col gap-3"
         onSubmit={async (e) => {
@@ -121,7 +121,7 @@ const StudioNameForm = ({
               }));
             }}
           />
-          <div className="text-xs italic text-grey-55">
+          <div className="text-grey-55 text-xs italic">
             {formState.name.length}/64
           </div>
         </div>
@@ -141,7 +141,7 @@ const OpenSpacesForm = ({
     <div className=" flex flex-col gap-4">
       <div className="flex flex-col gap-2">
         <h4>Open Spaces</h4>
-        <div className="flex flex-col gap-2 text-sm text-grey-35">
+        <div className="text-grey-35 flex flex-col gap-2 text-sm">
           <p>
             Studio members can comment and chat in Spaces in the Studio, but{" "}
             <b>cannot make or edit cards</b> in them unless they join each
@@ -223,13 +223,13 @@ const GetStartedForm = () => {
       <div className="settingsGetStarted lightBorder flex flex-col gap-4 p-3">
         <div className="flex flex-col gap-2">
           <h4>Get Started</h4>
-          <p className="text-sm text-grey-35">
+          <p className="text-grey-35 text-sm">
             If you enable this,{" "}
             <b>new members will see a &quot;Get Started&quot; tab </b>
             when they join. Add an onboarding checklist so new members know
             where to start!
           </p>
-          <p className="text-sm text-grey-35">
+          <p className="text-grey-35 text-sm">
             The tab will be visible until all items are checked off.
           </p>
         </div>
@@ -251,7 +251,7 @@ const GetStartedForm = () => {
               >
                 <div className="grow">{item.value}</div>
                 <button
-                  className="pt-1 text-grey-55 hover:text-accent-blue"
+                  className="text-grey-55 hover:text-accent-blue pt-1"
                   onClick={() => {
                     setGetStartedItems((s) => {
                       let newItems = [...s];
@@ -284,7 +284,7 @@ const GetStartedForm = () => {
                 }}
               />
               <button
-                className="pr-1 text-accent-blue"
+                className="text-accent-blue pr-1"
                 onClick={(e) => {
                   e.preventDefault();
                   if (getStartedInput !== "") {

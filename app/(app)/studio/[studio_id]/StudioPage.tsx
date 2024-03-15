@@ -2,23 +2,12 @@
 
 import { NonUndefined } from "@use-gesture/react";
 import { useStudioData } from "hooks/useStudioData";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Members } from "./MemberTab";
 import { StudioSettings } from "./SettingsTab";
 import { SpaceList } from "./SpacesTab";
 import { About } from "./AboutTab";
-import { GoBackToPageLined, Information } from "components/Icons";
-import Link from "next/link";
 import { useAuth } from "hooks/useAuth";
-import { ButtonPrimary } from "components/Buttons";
-import { LoginButton, LoginOrSignupModal } from "components/LoginModal";
-import * as Popover from "@radix-ui/react-popover";
-import { joinCodeLocalStorageKey } from "./join/Join";
-import { spaceAPI } from "backend/lib/api";
-import { WORKER_URL } from "src/constants";
-import { useSearchParams } from "next/navigation";
-import { useToaster } from "components/Smoke";
-import { uuidToBase62 } from "src/uuidHelpers";
 
 import { GetStartedTab, useHasGetStartedItems } from "./GettingStartedTab";
 import { useStudioTabs } from "app/(app)/@sidebar/studio/[studio_id]/StudioTabs";
@@ -81,21 +70,17 @@ export function StudioPageContent(props: Props) {
   }, []);
   if (!isClient) return null;
   return (
-    <div className="pwa-padding studioWrapper  flex w-full items-stretch px-3 sm:h-screen sm:px-4">
-      <div className="flex w-full flex-col">
-        <div
-          className={`StudioContent flex w-full grow flex-col items-stretch`}
-        >
-          <div className="no-scrollbar h-full w-full overflow-y-scroll">
-            <TabPanels
-              data={data || props.data}
-              isAdmin={props.isAdmin}
-              setTab={setTab}
-              currentTab={currentTab}
-            />
-          </div>
-        </div>
-      </div>
+    <div
+      className={`pwa-padding studioWrapper w-full flex-col items-stretch pl-1 sm:pl-0 ${
+        currentTab === "About" ? "h-full" : "h-fit"
+      }`}
+    >
+      <TabPanels
+        data={data || props.data}
+        isAdmin={props.isAdmin}
+        setTab={setTab}
+        currentTab={currentTab}
+      />
     </div>
   );
 }

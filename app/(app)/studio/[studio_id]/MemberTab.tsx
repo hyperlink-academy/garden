@@ -25,67 +25,63 @@ export function Members({ data, isAdmin }: Props) {
   );
 
   return (
-    <div className="mx-auto  h-full max-w-md  ">
-      <div className="flex flex-col gap-4 pb-6 sm:pt-8">
-        {isAdmin && (
-          <InviteModal welcomeMessage={data.welcome_message} id={data.id} />
-        )}
-        {/* your studio member card */}
-        {session.session && authorized && (
-          <div className="flex flex-col gap-2">
-            <div className="text-grey-55 text-sm italic">
-              click your bio to edit it!
-            </div>
-
-            <MemberCardWithBio
-              spaces={data.spaces_in_studios
-                .filter(
-                  (space) =>
-                    !space.space_data.archived &&
-                    space.space_data.members_in_spaces.find(
-                      (member) => member.member === session.user?.id
-                    )
-                )
-                .map((space) => space.space_data)}
-              memberName={session.session?.username}
-              memberStudio={session.session?.studio}
-            />
-          </div>
-        )}
-        {/* divider, only if you + others are studio members */}
-        {session.session &&
-          authorized &&
-          data?.members_in_studios.length > 1 && (
-            <div className="py-4">
-              <Divider />
-            </div>
-          )}
-        {/* other studio members */}
+    <div className="flex h-fit max-w-md flex-col gap-4">
+      {isAdmin && (
+        <InviteModal welcomeMessage={data.welcome_message} id={data.id} />
+      )}
+      {/* your studio member card */}
+      {session.session && authorized && (
         <div className="flex flex-col gap-2">
-          {data?.members_in_studios
-            .filter(
-              (member) =>
-                member.identity_data?.username !== session.session?.username
-            )
-            .map((m) =>
-              !m.identity_data ? null : (
-                <MemberCardWithBio
-                  spaces={data.spaces_in_studios
-                    .filter(
-                      (space) =>
-                        !space.space_data.archived &&
-                        space.space_data.members_in_spaces.find(
-                          (member) => member.member === m.member
-                        )
-                    )
-                    .map((space) => space.space_data)}
-                  key={m.member}
-                  memberName={m.identity_data?.username || ""}
-                  memberStudio={m.identity_data.studio}
-                />
+          <div className="text-grey-55 text-sm italic">
+            click your bio to edit it!
+          </div>
+
+          <MemberCardWithBio
+            spaces={data.spaces_in_studios
+              .filter(
+                (space) =>
+                  !space.space_data.archived &&
+                  space.space_data.members_in_spaces.find(
+                    (member) => member.member === session.user?.id
+                  )
               )
-            )}
+              .map((space) => space.space_data)}
+            memberName={session.session?.username}
+            memberStudio={session.session?.studio}
+          />
         </div>
+      )}
+      {/* divider, only if you + others are studio members */}
+      {session.session && authorized && data?.members_in_studios.length > 1 && (
+        <div className="py-2">
+          <Divider />
+        </div>
+      )}
+      {/* other studio members */}
+      <div className="flex flex-col gap-2">
+        {data?.members_in_studios
+          .filter(
+            (member) =>
+              member.identity_data?.username !== session.session?.username
+          )
+          .map((m) =>
+            !m.identity_data ? null : (
+              <MemberCardWithBio
+                spaces={data.spaces_in_studios
+                  .filter(
+                    (space) =>
+                      !space.space_data.archived &&
+                      space.space_data.members_in_spaces.find(
+                        (member) => member.member === m.member
+                      )
+                  )
+                  .map((space) => space.space_data)}
+                key={m.member}
+                memberName={m.identity_data?.username || ""}
+                memberStudio={m.identity_data.studio}
+              />
+            )
+          )}
       </div>
     </div>
   );

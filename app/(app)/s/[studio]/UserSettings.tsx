@@ -3,6 +3,7 @@ import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
 import { useAuth } from "hooks/useAuth";
 import { HelpAppInfo } from "components/HelpCenter";
 import { supabaseBrowserClient } from "supabase/clients";
+import { Divider } from "components/Layout";
 
 export const UserSettings = () => {
   let supabase = supabaseBrowserClient();
@@ -50,7 +51,7 @@ export const UserSettings = () => {
       });
   }, [supabase]);
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex max-w-2xl flex-col gap-4">
       <NotificationModalContent
         pushPermissionState={pushPermissionState}
         notificationPermissionState={notificationPermissionState}
@@ -59,8 +60,7 @@ export const UserSettings = () => {
         setPushPermissionState={setPushPermissionState}
         setNotificationPermissionState={setNotificationPermissionState}
       />
-      <hr className="border-grey-55" />
-      {/* <div className="lightBorder px-2 py-3"> */}
+      <Divider />
       <ButtonSecondary
         className="mx-auto"
         content="Log out"

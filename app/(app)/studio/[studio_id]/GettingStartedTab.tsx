@@ -51,7 +51,7 @@ export function GetStartedTab(props: { setTab: (t: Tabs) => void }) {
   );
 
   return (
-    <div className="mx-auto flex h-full max-w-2xl flex-col gap-4 pb-6 sm:pt-11">
+    <div className=" my-3 flex h-full max-w-2xl flex-col gap-4 sm:my-0">
       <h4 className="text-grey-35">
         Welcome! Complete the following to get set up in this Studio:
       </h4>
