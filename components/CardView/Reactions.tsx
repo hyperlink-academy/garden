@@ -76,7 +76,11 @@ export const AddReaction = (props: {
   entityID: string;
   onSelect?: () => void;
 }) => {
-  let { mutate, permissions } = useMutations();
+  let {
+    mutate,
+    permissions,
+    authorized: fullMemberPermissions,
+  } = useMutations();
   let { session } = useAuth();
   let authorized = permissions.commentAndReact;
   let reactions = db.useAttribute("space/reaction");
@@ -112,12 +116,14 @@ export const AddReaction = (props: {
           ))}
       </div>
       <Divider />
-      <button
-        className="reactionPickerSettings text-grey-55 hover:text-accent-blue disabled:hover:text-grey-55 place-self-end text-sm italic"
-        onClick={() => setReactionEditOpen(true)}
-      >
-        add / remove
-      </button>
+      {fullMemberPermissions && (
+        <button
+          className="reactionPickerSettings place-self-end text-sm italic text-grey-55 hover:text-accent-blue disabled:hover:text-grey-55"
+          onClick={() => setReactionEditOpen(true)}
+        >
+          add / remove
+        </button>
+      )}
       <EditReactions
         reactionEditOpen={reactionEditOpen}
         onClose={() => setReactionEditOpen(false)}
