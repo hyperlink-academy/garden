@@ -21,10 +21,10 @@ export const StudioSidebarContent = (props: Props & { isAdmin: boolean }) => {
           href={
             session.session?.username ? `/s/${session.session.username}` : "/"
           }
-          className="sidebarBreadcrumb text-grey-55 flex shrink-0 flex-row text-sm"
+          className="sidebarBreadcrumb flex shrink-0 flex-row text-sm text-grey-55"
         >
           <div className="flex gap-1">
-            <div className="hover:text-accent-blue font-bold">h</div>
+            <div className="font-bold hover:text-accent-blue">h</div>
             <div className="font-bold">/</div>
           </div>
         </Link>
@@ -82,9 +82,9 @@ const StudioSidebarExpanded = (
             .map((space) => (
               <Link
                 key={space.space_id}
-                href={`/studio/${uuidToBase62(
-                  props.data.id
-                )}/space/${uuidToBase62(space.space_data.id)}`}
+                href={`/studio/${uuidToBase62(props.data.id)}/space/${
+                  space.space_data.id
+                }`}
               >
                 <BaseSpaceCard {...space.space_data} />{" "}
               </Link>
