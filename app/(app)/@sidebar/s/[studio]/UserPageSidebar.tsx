@@ -88,7 +88,7 @@ const UserPageSidebarExpanded = (props: {
           .map((space) => (
             <Link
               key={space.id}
-              href={`/s/${props.params.studio}/s/${uuidToBase62(space.id)}/${
+              href={`/s/${space.owner.username}/s/${uuidToBase62(space.id)}/${
                 space.display_name
               }`}
             >
