@@ -114,11 +114,11 @@ export function CardViewer(props: { space_id: string }) {
           ref={cardViewerRef}
           id="cardViewerWrapper"
           className={`cardViewerWrapper
-          flex  h-full w-[calc(100vw-44px)] max-w-3xl
+          flex  h-full w-[calc(100vw-60px)] max-w-3xl
           shrink-0 touch-pan-x
           snap-center snap-always flex-col
           items-stretch
-          focus:outline-none sm:w-[calc(100vw-32px)] md:shrink`}
+          focus:outline-none sm:w-[calc(100vw-48px)] md:shrink`}
         >
           {room && history[0] ? (
             <CardView
