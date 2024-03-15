@@ -15,7 +15,7 @@ export const parseLine = (
     if (input.slice(position, position + startToken.length) === startToken) {
       let end = input.indexOf(endToken, position + endToken.length);
       if (end === -1) {
-        end = input.length;
+        return;
       }
       key++;
       output.push(input.slice(lastTokenPosition, position));
