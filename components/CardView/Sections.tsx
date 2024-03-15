@@ -196,10 +196,9 @@ export const SingleTextSection = (
             e.preventDefault();
             let cursorStart = e.currentTarget.selectionStart;
             let cursorEnd = e.currentTarget.selectionEnd;
-            if (cursorStart !== cursorEnd) return;
             let value = e.currentTarget.value;
             let newValue =
-              value.slice(0, cursorStart) + "\n" + value.slice(cursorStart);
+              value.slice(0, cursorStart) + "\n" + value.slice(cursorEnd);
             await updateValue(newValue, cursorStart + 1, cursorStart + 1);
 
             setTimeout(
