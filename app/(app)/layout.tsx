@@ -3,12 +3,11 @@ export default function AppLayout(props: {
   sidebar: React.ReactNode;
 }) {
   return (
-    <div className="appLayout mx-auto flex h-full w-full flex-row justify-center gap-3 overflow-hidden sm:gap-6">
-      <div className="appSidebarWrapper my-2 ml-2 flex w-4 items-stretch sm:my-4 sm:ml-4 sm:w-auto">
+    <div className="appLayout mx-auto flex h-full w-full flex-row gap-4 overflow-y-scroll">
+      <div className="appSidebarWrapper sticky left-0 top-0 z-50 flex w-4 items-stretch bg-transparent py-2 pl-2 sm:w-auto">
         {props.sidebar}
       </div>
-
-      <div className="appContentWrapper no-scrollbar mr-2 flex w-full max-w-[1120px] items-stretch overflow-y-scroll py-2 sm:mr-4 sm:py-4">
+      <div className="appContentWrapper flex py-2 pr-2 sm:py-4">
         {props.children}
       </div>
     </div>
