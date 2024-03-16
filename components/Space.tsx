@@ -1,26 +1,15 @@
 "use client";
 import { CardViewer } from "components/CardViewerContext";
-import { useDroppableZone } from "components/DragContext";
-import { Sidebar } from "components/SpaceLayout";
 import { useEffect, useState } from "react";
 import useWindowDimensions from "hooks/useWindowDimensions";
 import { Room } from "components/Room";
-import { useUIState } from "hooks/useUIState";
 import { PresenceHandler } from "components/PresenceHandler";
 import { useSpaceSyncState } from "hooks/useSpaceSyncState";
-import { WORKER_URL, springConfig } from "src/constants";
-import { useViewportSize } from "hooks/useViewportSize";
-import { InfoTiny, SidebarIcon } from "components/Icons";
-import { SpaceName } from "components/SpaceLayout/Sidebar";
-import { useSpring, animated } from "@react-spring/web";
-import { createPortal } from "react-dom";
+import { WORKER_URL } from "src/constants";
+import { InfoTiny } from "components/Icons";
 import { useAuth } from "hooks/useAuth";
-import { ButtonPrimary, ButtonSecondary } from "components/Buttons";
-import Link from "next/link";
-import { MobileSearch } from "components/Search";
+import { ButtonPrimary } from "components/Buttons";
 import { HelpModal } from "components/HelpCenter";
-import { useGesture } from "@use-gesture/react";
-import { useDndContext } from "@dnd-kit/core";
 import { useSpaceShortcuts } from "hooks/useSpaceShortcuts";
 import { SpaceData } from "components/SpacesList";
 import { useIsClient } from "hooks/utils";
@@ -35,8 +24,6 @@ type Props = {
 };
 
 export const Space = (props: Props) => {
-  let isClient = useIsClient();
-  const { width } = useWindowDimensions();
   useSpaceSyncState();
   useSpaceShortcuts();
 
@@ -47,31 +34,14 @@ export const Space = (props: Props) => {
     });
   }, []);
 
-  if (!isClient) return null;
   return (
     <>
       <PresenceHandler />
-      {width > 640 || width === 0 ? (
-        <DesktopLayout {...props} />
-      ) : (
-        <MobileLayout {...props} />
-      )}
-    </>
-  );
-};
-
-const DesktopLayout = (props: Props) => {
-  return (
-    <div
-      id="space-layout"
-      className=" no-scrollbar spaceDesktopLayout flex h-full w-full snap-x snap-mandatory flex-row items-stretch gap-4 overflow-y-hidden overflow-x-scroll scroll-smooth  sm:gap-4  md:overflow-x-hidden"
-    >
-      <div className="spaceRoomAndSidebar border-grey-90 flex  shrink-0 snap-center snap-always  flex-row rounded-md border">
+      <div className="spaceRoomAndSidebar relative flex shrink-0  snap-center snap-always flex-row  rounded-md border border-grey-90">
         <Room />
       </div>
-
       <CardViewer space_id={props.space_id} />
-    </div>
+    </>
   );
 };
 
@@ -156,133 +126,6 @@ export const SpaceRoleBadge = (props: { space_id: string }) => {
   );
 };
 
-const MobileLayout = (props: Props) => {
-  let setSidebarOpen = useUIState((s) => s.setMobileSidebarOpen);
-  let { setNodeRef: droppableRef, over } = useDroppableZone({
-    type: "trigger",
-    id: "mobile-sidebar-button",
-    entityID: "mobile-sidebar-button",
-  });
-
-  useEffect(() => {
-    if (over?.type === "room" || !over) return;
-    let timeout = window.setTimeout(() => {
-      setSidebarOpen(true);
-    }, 500);
-    return () => window.clearTimeout(timeout);
-  }, [over, setSidebarOpen]);
-
-  let { active } = useDndContext();
-  let bind = useGesture({
-    onDrag: (data) => {
-      if (
-        (data.currentTarget as HTMLElement)?.scrollLeft === 0 &&
-        data.direction[0] > 0 &&
-        data.distance[0] > 8 &&
-        data.distance[1] < 8
-      ) {
-        if (active?.data) return;
-        setSidebarOpen(true);
-      }
-    },
-  });
-
-  return (
-    <div
-      id="space-layout"
-      className="mobileLayout no-scrollbar pwa-padding  flex h-full w-full touch-none snap-x snap-mandatory flex-row gap-2 overflow-y-hidden overflow-x-scroll overscroll-x-none scroll-smooth"
-      {...bind()}
-    >
-      <div
-        id="roomWrapper"
-        className="roomInnerWrapper no-scrollbar border-grey-90 relative flex h-full flex-shrink-0 snap-start snap-always flex-col gap-0 rounded-md border "
-      >
-        <Room />
-      </div>
-
-      <CardViewer space_id={props.space_id} />
-    </div>
-  );
-};
-
-// const MobileSidebar = (props: Props) => {
-//   let open = useUIState((s) => s.mobileSidebarOpen);
-//   let setSidebarOpen = useUIState((s) => s.setMobileSidebarOpen);
-//   let { left } = useSpring({
-//     left: open ? 0 : -222,
-//     config: springConfig,
-//   });
-//   useEffect(() => {
-//     document
-//       .querySelector('meta[name="theme-color"]')
-//       ?.setAttribute("content", open ? "#D4D0C8" : "#FFAF0");
-//   }, [open]);
-//   let opacity = useSpring({
-//     opacity: open ? 0.2 : 0,
-//   });
-//   let viewheight = useViewportSize().height;
-//   let { setNodeRef: droppableRef, over } = useDroppableZone({
-//     type: "trigger",
-//     id: "mobile-sidebar-overlay",
-//     entityID: "mobile-sidebar-overlay",
-//   });
-
-//   useEffect(() => {
-//     if (over?.type === "room" || !over) return;
-//     let timeout = window.setTimeout(() => {
-//       setSidebarOpen(false);
-//     }, 500);
-//     return () => window.clearTimeout(timeout);
-//   }, [over, setSidebarOpen]);
-
-//   const bindOverlay = useGesture({
-//     onDrag: (data) => {
-//       if (data.direction[0] < 0) {
-//         setSidebarOpen(false);
-//       }
-//     },
-//   });
-
-//   const bindSidebar = useGesture({
-//     onDragEnd: (data) => {
-//       if (
-//         data.direction[0] < 0 &&
-//         data.velocity[0] > 0.1 &&
-//         data.velocity[1] < 0.5
-//       ) {
-//         setSidebarOpen(false);
-//       }
-//     },
-//   });
-
-//   return createPortal(
-//     <>
-//       {
-//         <animated.div
-//           {...bindOverlay()}
-//           onClick={() => setSidebarOpen(false)}
-//           className="fixed inset-0 z-40 touch-none bg-grey-15"
-//           style={{ ...opacity, display: open ? "block" : "none" }}
-//         >
-//           <div className="z-40 ml-auto h-full w-2/3" ref={droppableRef} />
-//         </animated.div>
-//       }
-//       <animated.div
-//         style={{ height: viewheight, left }}
-//         className="pwa-padding pwa-padding-bottom fixed top-0 z-50 ml-2 p-1 py-[2px] pl-0"
-//       >
-//         <div
-//           className="h-full touch-none rounded-md border border-grey-90 bg-white"
-//           {...bindSidebar()}
-//         >
-//           <Sidebar mobile studio={props.studio} space_id={props.space_id} />
-//         </div>
-//       </animated.div>
-//     </>,
-//     document.body
-//   );
-// };
-
 export const HelpButton = (props: { onClick?: () => void }) => {
   let [open, setOpen] = useState(false);
   return (
@@ -292,7 +135,7 @@ export const HelpButton = (props: { onClick?: () => void }) => {
           setOpen(true);
           props.onClick?.();
         }}
-        className="text-grey-55 hover:text-accent-blue mr-2 w-fit text-sm hover:underline"
+        className="mr-2 w-fit text-sm text-grey-55 hover:text-accent-blue hover:underline"
       >
         help docs!
       </button>
@@ -313,7 +156,7 @@ const InfoPopover = (props: {
       </Popover.Trigger>
       <Popover.Portal>
         <Popover.Content sideOffset={8} collisionPadding={24} className="z-20">
-          <div className="lightBorder text-grey-55 flex max-w-xs flex-col gap-2 rounded-sm bg-white p-2 text-xs font-normal shadow-lg">
+          <div className="lightBorder rounded-sm flex max-w-xs flex-col gap-2 bg-white p-2 text-xs font-normal text-grey-55 shadow-lg">
             {props.children}
           </div>
           <Popover.Close />

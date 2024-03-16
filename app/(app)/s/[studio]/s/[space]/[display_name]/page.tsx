@@ -1,5 +1,4 @@
 import { SpaceProvider } from "components/ReplicacheProvider";
-import { PageHeightContainer } from "components/PageHeightContainer";
 import { Space } from "components/Space";
 import { SpacePageStudioPresenceHandler } from "app/(app)/studio/[studio_id]/space/StudioPresenceHandler";
 import { UpdateSpaceNameURL } from "./updateDisplayName";
@@ -28,9 +27,7 @@ export default async function SpacePage(props: {
         id={result.data.do_id}
         data={{ space_id: result.data.id, studio_id: undefined }}
       >
-        <PageHeightContainer>
-          <Space space_id={result.data.id} />
-        </PageHeightContainer>
+        <Space space_id={result.data.id} />
       </SpaceProvider>
       <SpacePageStudioPresenceHandler space={result.data} />
     </>

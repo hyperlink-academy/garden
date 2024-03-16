@@ -1,6 +1,5 @@
 import { base62ToUuid } from "src/uuidHelpers";
 import { SpaceViewer } from "./SpaceViewer";
-import { PageHeightContainer } from "components/PageHeightContainer";
 import { StudioPresenceHandler } from "./StudioPresenceHandler";
 import { getStudioPageData } from "../page";
 export const fetchCache = "force-no-store";
@@ -17,7 +16,7 @@ export default async function StudioSpaceLayout(props: {
   let spaces = data.data.spaces_in_studios.map((x) => x.space_data);
 
   return (
-    <PageHeightContainer>
+    <>
       <StudioPresenceHandler
         spaces={spaces}
         studio_do_id={data.data.do_id}
@@ -28,6 +27,6 @@ export default async function StudioSpaceLayout(props: {
         spaces={spaces}
         studioID={data.data.id}
       />
-    </PageHeightContainer>
+    </>
   );
 }

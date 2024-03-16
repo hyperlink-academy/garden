@@ -92,7 +92,7 @@ export function CardViewer(props: { space_id: string }) {
     () => {
       setTimeout(() => {
         document
-          .getElementById("space-layout")
+          .getElementById("appLayout")
           ?.scrollTo({ behavior: "smooth", left: 5000 });
       }, 50);
     },
@@ -139,7 +139,7 @@ const EmptyState = (props: { roomType: string | undefined }) => {
   let isMobile = useIsMobile();
   if (isMobile) return null;
   return (
-    <div className="no-scrollbar border-grey-80 text-grey-35 relative flex h-full w-full max-w-3xl snap-y snap-mandatory snap-start flex-col gap-6 overflow-y-scroll rounded-lg border border-dashed p-4">
+    <div className="no-scrollbar relative flex h-full w-full max-w-3xl snap-y snap-mandatory snap-start flex-col gap-6 overflow-y-scroll rounded-lg border border-dashed border-grey-80 p-4 text-grey-35">
       <div className="m-auto flex flex-col gap-4 text-center">
         {props.roomType === "canvas" ? (
           <>
