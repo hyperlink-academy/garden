@@ -9,6 +9,7 @@ import { WORKER_URL } from "src/constants";
 import { InfoTiny } from "components/Icons";
 import { useAuth } from "hooks/useAuth";
 import { ButtonPrimary } from "components/Buttons";
+import Link from "next/link";
 import { HelpModal } from "components/HelpCenter";
 import { useSpaceShortcuts } from "hooks/useSpaceShortcuts";
 import { SpaceData } from "components/SpacesList";
@@ -37,7 +38,7 @@ export const Space = (props: Props) => {
   return (
     <>
       <PresenceHandler />
-      <div className="spaceRoomAndSidebar relative flex shrink-0  snap-center snap-always flex-row  rounded-md border border-grey-90">
+      <div className="spaceRoomAndSidebar border-grey-90 relative flex  shrink-0 snap-center snap-always  flex-row rounded-md border">
         <Room />
       </div>
       <CardViewer space_id={props.space_id} />
@@ -135,7 +136,7 @@ export const HelpButton = (props: { onClick?: () => void }) => {
           setOpen(true);
           props.onClick?.();
         }}
-        className="mr-2 w-fit text-sm text-grey-55 hover:text-accent-blue hover:underline"
+        className="text-grey-55 hover:text-accent-blue mr-2 w-fit text-sm hover:underline"
       >
         help docs!
       </button>
@@ -155,8 +156,8 @@ const InfoPopover = (props: {
         <InfoTiny />
       </Popover.Trigger>
       <Popover.Portal>
-        <Popover.Content sideOffset={8} collisionPadding={24} className="z-20">
-          <div className="lightBorder rounded-sm flex max-w-xs flex-col gap-2 bg-white p-2 text-xs font-normal text-grey-55 shadow-lg">
+        <Popover.Content sideOffset={8} collisionPadding={24} className="z-50">
+          <div className="lightBorder text-grey-55 flex max-w-xs flex-col gap-2 rounded-sm bg-white p-2 text-xs font-normal shadow-lg">
             {props.children}
           </div>
           <Popover.Close />

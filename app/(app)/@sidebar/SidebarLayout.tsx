@@ -91,7 +91,7 @@ export default function SidebarLayout(props: {
         <animated.div
           {...bindOverlay()}
           onClick={() => setSidebar(false)}
-          className="fixed inset-0 z-40 touch-none bg-grey-15"
+          className="bg-grey-15 fixed inset-0 z-40 touch-none"
           style={{ ...sidebarOverlaySpring, display: open ? "block" : "none" }}
         >
           <div className="z-40 ml-auto h-full w-2/3" ref={droppableRef} />
@@ -100,7 +100,7 @@ export default function SidebarLayout(props: {
       <div
         {...bindSidebar()}
         ref={setNodeRef}
-        className={`lightBorder z-50 flex shrink-0 flex-col overflow-hidden  text-left ${
+        className={`sidebarWrapper lightBorder no-scrollbar relative  z-40 flex shrink-0 items-stretch overflow-x-hidden overflow-y-scroll pt-3  text-left ${
           open && "cursor-default"
         } ${isMobile && !open ? "bg-accent-blue" : "bg-white"}`}
         onClick={() => setSidebar(true)}

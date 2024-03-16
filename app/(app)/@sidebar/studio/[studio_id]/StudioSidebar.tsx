@@ -21,10 +21,10 @@ export const StudioSidebarContent = (props: Props & { isAdmin: boolean }) => {
           href={
             session.session?.username ? `/s/${session.session.username}` : "/"
           }
-          className="sidebarBreadcrumb flex shrink-0 flex-row text-sm text-grey-55"
+          className="sidebarBreadcrumb text-grey-55 flex shrink-0 flex-row text-sm"
         >
           <div className="flex gap-1">
-            <div className="font-bold hover:text-accent-blue">h</div>
+            <div className="hover:text-accent-blue font-bold">h</div>
             <div className="font-bold">/</div>
           </div>
         </Link>
