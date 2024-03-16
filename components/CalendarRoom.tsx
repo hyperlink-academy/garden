@@ -6,7 +6,6 @@ import { FindOrCreate, useAllItems } from "./FindOrCreateEntity";
 import { CardSearch } from "./Icons";
 import { Divider } from "./Layout";
 import { useSpaceData } from "hooks/useSpaceData";
-import { RoomWrapper } from "./RoomLayout";
 
 export function CalendarRoom() {
   let { authorized } = useMutations();
@@ -33,82 +32,83 @@ export function CalendarRoom() {
   }
 
   return (
-    <RoomWrapper>
-      <div className="calendarCardList flex h-full flex-col gap-4">
-        {days.length > 0 ? (
-          days
-            .sort((a, b) => (a > b ? 0 : -1))
-            .map((d, index, days) => {
-              let dateParts = Intl.DateTimeFormat("en", {
-                timeZone: "UTC",
-                month: "short",
-                day: "numeric",
-                weekday: "short",
-              }).formatToParts(new Date(d));
+    <div className="calendarRoom no-scrollbar mx-2 mt-0 flex h-full w-[302px] flex-col items-stretch gap-4 overflow-x-hidden overflow-y-scroll text-sm sm:m-4  sm:mt-0 ">
+      {days.length > 0 ? (
+        days
+          .sort((a, b) => (a > b ? 0 : -1))
+          .map((d, index, days) => {
+            let dateParts = Intl.DateTimeFormat("en", {
+              timeZone: "UTC",
+              month: "short",
+              day: "numeric",
+              weekday: "short",
+            }).formatToParts(new Date(d));
 
-              let month = dateParts.find((f) => f.type === "month");
-              let day = dateParts.find((f) => f.type === "day");
-              let weekday = dateParts.find((f) => f.type === "weekday");
-              return (
-                <>
-                  <div key={index}>
-                    <div className="calendarItem flex flex-row gap-3" key={d}>
-                      <div className="flex h-fit flex-col gap-0.5 rounded-md bg-grey-35 pb-0.5 text-center text-sm text-grey-55">
-                        <div className="calendarDateBox -gap-1 flex h-fit w-fit flex-col rounded-md border border-grey-55 bg-white py-1 px-2">
-                          <span>{month?.value}</span>
-                          <span className="text-lg font-bold text-grey-35">
-                            {day?.value}
-                          </span>{" "}
-                        </div>
-                        <span className="font-bold text-white">
-                          {weekday?.value}
-                        </span>
+            let month = dateParts.find((f) => f.type === "month");
+            let day = dateParts.find((f) => f.type === "day");
+            let weekday = dateParts.find((f) => f.type === "weekday");
+            return (
+              <>
+                <div key={index}>
+                  <div
+                    className="calendarItem flex flex-row gap-3 first:mt-2 last:mb-2"
+                    key={d}
+                  >
+                    <div className="bg-grey-35 text-grey-55 flex h-fit flex-col gap-0.5 rounded-md pb-0.5 text-center text-sm">
+                      <div className="calendarDateBox -gap-1 border-grey-55 flex h-fit w-fit flex-col rounded-md border bg-white px-2 py-1">
+                        <span>{month?.value}</span>
+                        <span className="text-grey-35 text-lg font-bold">
+                          {day?.value}
+                        </span>{" "}
                       </div>
-                      <div className="calendarCards flex h-full w-full flex-col gap-2">
-                        {!datesWithCards[d] ? (
-                          <div className="calendarEmpty flex h-full flex-col place-items-end text-center text-sm italic text-grey-55">
-                            <div className="flex grow place-items-end">
-                              <p>no scheduled cards</p>
-                            </div>
+                      <span className="font-bold text-white">
+                        {weekday?.value}
+                      </span>
+                    </div>
+                    <div className="calendarCards flex h-full w-full flex-col gap-2">
+                      {!datesWithCards[d] ? (
+                        <div className="calendarEmpty text-grey-55 flex h-full flex-col place-items-end text-center text-sm italic">
+                          <div className="flex grow place-items-end">
+                            <p>no scheduled cards</p>
                           </div>
-                        ) : (
-                          <>
-                            {datesWithCards[d]?.map((card) => (
-                              <div key={card.entity} className="h-fit">
-                                <CardPreviewWithData
-                                  entityID={card.entity}
-                                  key={card.entity}
-                                  size="big"
-                                  hideContent
-                                />
-                              </div>
-                            ))}
-                          </>
-                        )}
-                        <AddCardToCalendar day={d} />
-                      </div>
+                        </div>
+                      ) : (
+                        <>
+                          {datesWithCards[d]?.map((card) => (
+                            <div key={card.entity} className="h-fit">
+                              <CardPreviewWithData
+                                entityID={card.entity}
+                                key={card.entity}
+                                size="big"
+                                hideContent
+                              />
+                            </div>
+                          ))}
+                        </>
+                      )}
+                      <AddCardToCalendar day={d} />
                     </div>
                   </div>
-                  {index + 1 === days.length ? null : <Divider />}
-                </>
-              );
-            })
-        ) : authorized ? (
-          <div className="flex flex-col gap-4 italic text-grey-35">
-            <p>Schedule cards on the calendar 📅</p>
-            <p>To get started, set start & end dates for the space!</p>
-          </div>
-        ) : (
-          // empty calendar - non-auth view
-          <div className="flex flex-col gap-4 italic text-grey-35">
-            <p>
-              This Space is not yet scheduled — once dates are set, its calendar
-              will show here 📅 ✨
-            </p>
-          </div>
-        )}
-      </div>
-    </RoomWrapper>
+                </div>
+                {index + 1 === days.length ? null : <Divider />}
+              </>
+            );
+          })
+      ) : authorized ? (
+        <div className="text-grey-35 flex flex-col gap-4 italic">
+          <p>Schedule cards on the calendar 📅</p>
+          <p>To get started, set start & end dates for the space!</p>
+        </div>
+      ) : (
+        // empty calendar - non-auth view
+        <div className="text-grey-35 flex flex-col gap-4 italic">
+          <p>
+            This Space is not yet scheduled — once dates are set, its calendar
+            will show here 📅 ✨
+          </p>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -168,7 +168,7 @@ const AddCardToCalendar = (props: { day: string }) => {
   let { authorized, mutate, memberEntity, action } = useMutations();
   if (!authorized) return null;
   return (
-    <div className="flex shrink-0 place-items-center gap-2 place-self-end text-sm text-grey-55">
+    <div className="text-grey-55 flex shrink-0 place-items-center gap-2 place-self-end text-sm">
       <button
         onClick={async () => {
           if (!memberEntity) return;
@@ -191,9 +191,9 @@ const AddCardToCalendar = (props: { day: string }) => {
           action.end();
         }}
       >
-        <p className="font-bold hover:text-accent-blue">create new</p>
+        <p className="hover:text-accent-blue font-bold">create new</p>
       </button>
-      <div className="h-4 w-[1px] border-l border-dashed text-grey-80" />
+      <div className="text-grey-80 h-4 w-[1px] border-l border-dashed" />
       <AddAttachedCard day={props.day}>
         <div className="hover:text-accent-blue">
           <CardSearch />
