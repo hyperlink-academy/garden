@@ -48,7 +48,7 @@ export const Room = () => {
   if (room === "unreads") return <UnreadsRoom />;
   if (roomType?.value === "chat")
     return (
-      <div className="flex h-full w-[336px]">
+      <div className="flex h-full w-fit">
         <DiscussionRoom entityID={room} isRoom />
       </div>
     );
@@ -151,7 +151,7 @@ export const Room = () => {
         action.end();
       }}
       ref={ref}
-      className="no-scrollbar mx-[6px] mb-2 mt-0 flex h-full w-[302px] flex-col items-stretch   overflow-x-hidden overflow-y-scroll text-sm sm:m-4 sm:mt-0"
+      className="no-scrollbar mx-2 mb-2 mt-0 flex h-full w-[302px] flex-col items-stretch   overflow-x-hidden overflow-y-scroll text-sm sm:m-4 sm:mt-0"
     >
       <RoomHeader
         totalCount={total}

@@ -5,11 +5,11 @@ export default function AppLayout(props: {
   sidebar: React.ReactNode;
 }) {
   return (
-    <OpenSidebarOnSwipe className="appLayout mx-auto flex h-full w-full flex-row gap-4 overflow-y-scroll">
-      <div className="appSidebarWrapper sticky left-0 top-0 z-50 flex w-4 items-stretch bg-transparent py-2 pl-2 sm:w-auto">
+    <OpenSidebarOnSwipe className="appLayout  flex h-full w-full flex-row gap-2 overflow-y-scroll  px-2 sm:gap-4 sm:px-8 ">
+      <div className="appSidebarWrapper sticky left-0 top-0 z-50 flex items-stretch bg-transparent py-2 sm:w-auto sm:py-4">
         {props.sidebar}
       </div>
-      <div className="appContentWrapper no-scrollbar flex w-full overflow-y-scroll py-2 pr-2 sm:py-2">
+      <div className="appContentWrapper no-scrollbar flex w-full overflow-y-scroll py-2 sm:py-4">
         {props.children}
       </div>
     </OpenSidebarOnSwipe>

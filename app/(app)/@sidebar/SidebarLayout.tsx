@@ -76,7 +76,7 @@ export default function SidebarLayout(props: {
   });
 
   let sidebarSpring = useSpring({
-    width: open ? 256 : isMobile ? 16 : 36,
+    width: open ? 256 : isMobile ? 12 : 36,
   });
   let disclosureSpring = useSpring({
     rotate: open ? 90 : -90,
@@ -91,7 +91,7 @@ export default function SidebarLayout(props: {
         <animated.div
           {...bindOverlay()}
           onClick={() => setSidebar(false)}
-          className="fixed inset-0 z-40 touch-none bg-grey-15"
+          className="bg-grey-15 fixed inset-0 z-40 touch-none"
           style={{ ...sidebarOverlaySpring, display: open ? "block" : "none" }}
         >
           <div className="z-40 ml-auto h-full w-2/3" ref={droppableRef} />
@@ -100,9 +100,9 @@ export default function SidebarLayout(props: {
       <div
         {...bindSidebar()}
         ref={setNodeRef}
-        className={`lightBorder z-50 flex shrink-0 flex-col overflow-hidden bg-white text-left ${
+        className={`lightBorder z-50 flex shrink-0 flex-col overflow-hidden  text-left ${
           open && "cursor-default"
-        }`}
+        } ${isMobile && !open ? "bg-accent-blue" : "bg-white"}`}
         onClick={() => setSidebar(true)}
       >
         <div className="no-scrollbar h-full w-full overflow-x-hidden  py-3 ">
@@ -124,10 +124,12 @@ export default function SidebarLayout(props: {
               </div>
               {open ? (
                 <div className="w-64">{props.children}</div>
-              ) : (
+              ) : !isMobile ? (
                 <div className="sidebarCollapsed flex w-max flex-col justify-center px-1 pt-3">
                   {props.children}
                 </div>
+              ) : (
+                <div className="sidebarMobileCollapsed  w-3"></div>
               )}
             </div>
           </animated.div>
