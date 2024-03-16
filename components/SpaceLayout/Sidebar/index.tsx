@@ -35,34 +35,25 @@ export const Sidebar = (props: {
   let [roomEditOpen, setRoomEditOpen] = useState(false);
 
   return (
-    <div className="Sidebar text-grey-35 flex h-full w-full grow flex-col items-stretch justify-between gap-2 overflow-x-visible px-3">
-      <div className="roomList no-scrollbar flex h-fit w-full flex-col gap-2 overflow-y-scroll">
-        <div className="flex flex-col">
-          <SpaceSettings space_id={props.space_id} />
-          <UnreadsRoomButton />
-          <RoomButton roomID="calendar">
-            <RoomCalendar /> Calendar
-          </RoomButton>
-        </div>
-
-        <Divider dashed />
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col gap-2">
-            <SharedRoomList setRoomEditOpen={() => setRoomEditOpen(true)} />
-          </div>
-        </div>
-        <EditRoomModalWithRoom
-          open={roomEditOpen}
-          onClose={() => setRoomEditOpen(false)}
-        />
-
-        {/* shared; operates on current room */}
+    <div className="roomList text-grey-35 flex h-fit min-h-0 w-full grow flex-col gap-2 px-3 pb-3">
+      <div className="flex flex-col">
+        <SpaceSettings space_id={props.space_id} />
+        <UnreadsRoomButton />
+        <RoomButton roomID="calendar">
+          <RoomCalendar /> Calendar
+        </RoomButton>
       </div>
 
-      {/* wrapper so both items (people + nav) display at end on mobile */}
-      <div className="flex max-h-[50%] flex-col gap-2">
-        <People space_id={props.space_id} />
+      <Divider dashed />
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
+          <SharedRoomList setRoomEditOpen={() => setRoomEditOpen(true)} />
+        </div>
       </div>
+      <EditRoomModalWithRoom
+        open={roomEditOpen}
+        onClose={() => setRoomEditOpen(false)}
+      />
     </div>
   );
 };

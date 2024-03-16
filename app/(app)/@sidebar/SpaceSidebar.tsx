@@ -14,6 +14,7 @@ import { sortByPosition } from "src/position_helpers";
 import { useSidebarState } from "./SidebarLayout";
 import { SidebarTab } from "./SidebarTab";
 import { useRoom, useSetRoom } from "hooks/useUIState";
+import { People } from "components/SpaceLayout/Sidebar/People";
 
 export function SpaceSidebar(props: {
   display_name: string | null;
@@ -24,34 +25,42 @@ export function SpaceSidebar(props: {
   let { open } = useSidebarState();
   if (!open) return <CollapsedSpaceSidebar />;
   return (
-    <div className="sidebarSpaceFromHome flex h-full flex-col items-stretch">
-      <div className="px-3 pt-3">
-        <SpaceRoleBadge space_id={props.space_id} />
-      </div>
+    <div className="flex h-full flex-col">
+      <div className="sidebarSpaceContent flex h-full min-h-0 shrink grow flex-col ">
+        <div className="sidebarRolebadgeWrapper shrink-0 px-3 pt-3">
+          <SpaceRoleBadge space_id={props.space_id} />
+        </div>
 
-      <div className="py-3">
-        <Divider />
+        <div className="divider shrink-0 py-3">
+          <Divider />
+        </div>
+        <div className="sidebarSearchWrapper px-3 pb-2">
+          <input
+            id="sidebar-search"
+            value={input}
+            onChange={(e) => {
+              setInput(e.target.value);
+            }}
+            placeholder="search space (ctrl/⌘ K)"
+            className="sidebarSearch w-full px-2 py-1 text-sm outline-none"
+          />
+        </div>
+        {input === "" ? (
+          <Sidebar space_id={props.space_id} />
+        ) : (
+          <SearchResults
+            results={results}
+            onClick={() => {}}
+            suggestionIndex={0}
+          />
+        )}
       </div>
-      <div className="px-3 pb-2">
-        <input
-          id="sidebar-search"
-          value={input}
-          onChange={(e) => {
-            setInput(e.target.value);
-          }}
-          placeholder="search space (ctrl/⌘ K)"
-          className="false w-full px-2 py-1 text-sm outline-none"
-        />
+      <div className="sidebarPeoplePanel sticky bottom-0 h-fit max-h-[40%] shrink-0 overflow-y-scroll bg-white px-3 pb-3 ">
+        <div className="divider pb-1 ">
+          <Divider />
+        </div>
+        <People space_id={props.space_id} />
       </div>
-      {input === "" ? (
-        <Sidebar space_id={props.space_id} />
-      ) : (
-        <SearchResults
-          results={results}
-          onClick={() => {}}
-          suggestionIndex={0}
-        />
-      )}
     </div>
   );
 }

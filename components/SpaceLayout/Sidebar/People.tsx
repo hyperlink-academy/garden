@@ -59,7 +59,7 @@ export const People = (props: { space_id: string }) => {
   let offlineMembers = members.filter((f) => !uniqueSessions.has(f.entity));
 
   return (
-    <div className="peopleList no-scrollbar border-grey-80 flex h-fit flex-col overflow-y-scroll border-t px-1 pt-1  text-sm">
+    <div className="peopleList no-scrollbar flex h-fit flex-col overflow-y-scroll px-1  text-sm">
       {onlineMembers.length === 0 ? null : (
         <div className="peopleOnline   flex flex-col">
           <div className="flex items-center justify-between">
@@ -108,11 +108,7 @@ export const People = (props: { space_id: string }) => {
           </div>
         </>
       )}
-      {authorized && (
-        <div className="mb-2">
-          <InviteMember space_id={props.space_id} />
-        </div>
-      )}
+      {authorized && <InviteMember space_id={props.space_id} />}
     </div>
   );
 };

@@ -39,13 +39,13 @@ export function SpaceHeader(props: {
   return (
     <SidebarLayout
       breadcrumb={
-        <div className="sidebarBreadcrumb flex shrink-0 flex-row text-sm text-grey-55">
-          <div className="sidebarBreadcrumbHome flex shrink-0 flex-row items-center gap-1 text-sm text-grey-55">
+        <div className="sidebarBreadcrumb text-grey-55 flex shrink-0 flex-row text-sm">
+          <div className="sidebarBreadcrumbHome text-grey-55 flex shrink-0 flex-row items-center gap-1 text-sm">
             <Link
               href={session.session ? `/s/${session.session.username}` : "/"}
               className="flex gap-1"
             >
-              <div className="font-bold hover:text-accent-blue">h</div>
+              <div className="hover:text-accent-blue font-bold">h</div>
               <div className="font-bold">/</div>
             </Link>
             {isUserSpace === false &&
@@ -78,7 +78,7 @@ export function SpaceHeader(props: {
             {activeSpace?.display_name}
           </div>
         )}
-        <div className="no-scrollbar overflow-y-scroll">
+        <div className="sidebarContent grow">
           {switcher ? (
             <div className="pr-2">
               <button onClick={() => setSwitcher(false)}>close</button>

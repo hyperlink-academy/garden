@@ -3,7 +3,7 @@ import { animated, useSpring } from "@react-spring/web";
 import { DisclosureExpandTiny } from "components/Icons";
 import { create } from "zustand";
 import { combine } from "zustand/middleware";
-import { useIsMobile } from "hooks/utils";
+import { useIsClient, useIsMobile } from "hooks/utils";
 import { useEffect, useState } from "react";
 import { useDroppableZone } from "components/DragContext";
 import { useGesture } from "@use-gesture/react";
@@ -47,6 +47,8 @@ export default function SidebarLayout(props: {
     entityID: "mobile-sidebar-overlay",
   });
 
+  let isClient = useIsClient();
+
   useEffect(() => {
     if (overOverlay?.type === "room" || !overOverlay) return;
     let timeout = window.setTimeout(() => {
@@ -84,10 +86,10 @@ export default function SidebarLayout(props: {
   let sidebarOverlaySpring = useSpring({
     opacity: open ? 0.2 : 0,
   });
-
+  if (!isClient) return;
   return (
     <>
-      {isMobile && (
+      {isMobile && open && (
         <animated.div
           {...bindOverlay()}
           onClick={() => setSidebar(false)}
@@ -100,40 +102,39 @@ export default function SidebarLayout(props: {
       <div
         {...bindSidebar()}
         ref={setNodeRef}
-        className={`lightBorder z-50 flex shrink-0 flex-col overflow-hidden  text-left ${
+        className={`sidebarWrapper lightBorder no-scrollbar relative  z-50 flex shrink-0 items-stretch overflow-x-hidden overflow-y-scroll pt-3  text-left ${
           open && "cursor-default"
         } ${isMobile && !open ? "bg-accent-blue" : "bg-white"}`}
         onClick={() => setSidebar(true)}
       >
-        <div className="no-scrollbar h-full w-full overflow-x-hidden  py-3 ">
-          <animated.div style={sidebarSpring}>
-            <div className="sidebar flex h-full flex-col items-stretch gap-0">
-              <div className="flex items-center justify-between px-3">
-                {open && props.breadcrumb}
-                <animated.div style={disclosureSpring}>
-                  <button
-                    className="text-grey-55 hover:text-accent-blue "
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleSidebar();
-                    }}
-                  >
-                    <DisclosureExpandTiny />
-                  </button>
-                </animated.div>
-              </div>
-              {open ? (
-                <div className="w-64">{props.children}</div>
-              ) : !isMobile ? (
-                <div className="sidebarCollapsed flex w-max flex-col justify-center px-1 pt-3">
-                  {props.children}
-                </div>
-              ) : (
-                <div className="sidebarMobileCollapsed  w-3"></div>
-              )}
+        <animated.div
+          style={sidebarSpring}
+          className="sidebar flex h-full min-h-0  flex-col gap-0"
+        >
+          <div className="sidebarHeader flex items-center justify-between px-3">
+            {open && props.breadcrumb}
+            <animated.div style={disclosureSpring}>
+              <button
+                className="text-grey-55 hover:text-accent-blue "
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleSidebar();
+                }}
+              >
+                <DisclosureExpandTiny />
+              </button>
+            </animated.div>
+          </div>
+          {open ? (
+            <div className="h-full w-64">{props.children}</div>
+          ) : !isMobile ? (
+            <div className="sidebarCollapsed flex w-max flex-col justify-center px-1 pt-3">
+              {props.children}
             </div>
-          </animated.div>
-        </div>
+          ) : (
+            <div className="sidebarMobileCollapsed  w-3"></div>
+          )}
+        </animated.div>
       </div>
     </>
   );
