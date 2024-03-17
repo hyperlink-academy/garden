@@ -6,7 +6,7 @@ import { Room } from "components/Room";
 import { PresenceHandler } from "components/PresenceHandler";
 import { useSpaceSyncState } from "hooks/useSpaceSyncState";
 import { WORKER_URL } from "src/constants";
-import { InfoTiny } from "components/Icons";
+import { Help, InfoTiny, Information, Settings } from "components/Icons";
 import { useAuth } from "hooks/useAuth";
 import { ButtonPrimary } from "components/Buttons";
 import Link from "next/link";
@@ -136,9 +136,9 @@ export const HelpButton = (props: { onClick?: () => void }) => {
           setOpen(true);
           props.onClick?.();
         }}
-        className="text-grey-55 hover:text-accent-blue mr-2 w-fit text-sm hover:underline"
+        className="text-grey-55 hover:text-accent-blue"
       >
-        help docs!
+        <Help />
       </button>
       <HelpModal open={open} onClose={() => setOpen(false)} />
     </>

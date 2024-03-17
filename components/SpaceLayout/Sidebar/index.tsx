@@ -4,7 +4,6 @@ import { db, useMutations, useSpaceID } from "hooks/useReplicache";
 import * as Popover from "@radix-ui/react-popover";
 import { useState } from "react";
 import {
-  ArrowUp,
   BellSmall,
   RoomCalendar,
   RoomSettings,
@@ -12,11 +11,10 @@ import {
   UnreadDot,
 } from "../../Icons";
 import { EditSpaceModal } from "components/CreateSpace";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { EditRoomModal } from "./RoomListLayout";
 import { SharedRoomList } from "./SharedRoomList";
 import { useSpaceData } from "hooks/useSpaceData";
-import { People } from "./People";
 import { DotLoader } from "components/DotLoader";
 import { useIsActiveRoom, useRoom, useSetRoom } from "hooks/useUIState";
 import { ModalSubmitButton, Modal } from "components/Modal";
@@ -37,7 +35,6 @@ export const Sidebar = (props: {
   return (
     <div className="roomList text-grey-35 mb-3 flex h-fit min-h-0 w-full grow flex-col gap-2 px-3">
       <div className="flex flex-col">
-        <SpaceSettings space_id={props.space_id} />
         <UnreadsRoomButton />
         <RoomButton roomID="calendar">
           <RoomCalendar /> Calendar

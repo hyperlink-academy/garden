@@ -375,7 +375,7 @@ export function RoomHeader(props: {
   return (
     <>
       <div
-        className="roomHeader bg-background sticky top-0 z-20 pt-3"
+        className="roomHeader bg-background sticky top-0 z-[15] pt-3"
         ref={titleRef}
       >
         <div className="roomTitle flex justify-between">

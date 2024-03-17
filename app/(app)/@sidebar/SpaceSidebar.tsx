@@ -1,6 +1,6 @@
 "use client";
 import { Divider } from "components/Layout";
-import { SpaceRoleBadge } from "components/Space";
+import { HelpButton, SpaceRoleBadge } from "components/Space";
 import { Sidebar } from "components/SpaceLayout";
 import { SearchResults, useSearch } from "components/Search";
 import {
@@ -9,14 +9,24 @@ import {
   RoomCollection,
   RoomMember,
   RoomSearch,
+  Settings,
 } from "components/Icons";
-import { db } from "hooks/useReplicache";
+import { db, useMutations, useSpaceID } from "hooks/useReplicache";
 import { sortByPosition } from "src/position_helpers";
 import { useSidebarState } from "./SidebarLayout";
 import { SidebarTab } from "./SidebarTab";
-import { useRoom, useSetRoom } from "hooks/useUIState";
+import { useRoom, useSetRoom, useUIState } from "hooks/useUIState";
 import { People } from "components/SpaceLayout/Sidebar/People";
 import { useSpaceData } from "hooks/useSpaceData";
+import { EditSpaceModal } from "components/CreateSpace";
+import { useAuth } from "hooks/useAuth";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import * as Popover from "@radix-ui/react-popover";
+import { workerAPI } from "backend/lib/api";
+import { DotLoader } from "components/DotLoader";
+import { Modal, ModalSubmitButton } from "components/Modal";
+import { WORKER_URL } from "src/constants";
 
 export function SpaceSidebar(props: {
   display_name: string | null;
@@ -29,10 +39,15 @@ export function SpaceSidebar(props: {
   return (
     <div className="flex h-full flex-col">
       <div className="sidebarSpaceContent flex h-full min-h-0 shrink grow flex-col ">
-        <div className="sidebarRolebadgeWrapper shrink-0 px-3 pt-3">
-          <SpaceRoleBadge space_id={props.space_id} />
+        <div className="flex items-center justify-between px-3 pt-3">
+          <div className="sidebarRolebadgeWrapper shrink-0">
+            <SpaceRoleBadge space_id={props.space_id} />
+          </div>
+          <div className="flex gap-1">
+            <HelpButton />
+            <SpaceSettings space_id={props.space_id} />
+          </div>
         </div>
-
         <div className="divider shrink-0 py-3">
           <Divider />
         </div>
@@ -149,5 +164,103 @@ const RoomButton = (props: { entityID: string }) => {
         )
       }
     />
+  );
+};
+
+const SpaceSettings = (props: { space_id: string }) => {
+  let spaceID = useSpaceID();
+  let { authorized } = useMutations();
+  let { data } = useSpaceData(props);
+  let router = useRouter();
+  let { session } = useAuth();
+
+  let setMobileSidebarOpen = useUIState((s) => s.setMobileSidebarOpen);
+  let isOwner =
+    session.session && session.session.username === data?.owner.username;
+  let [editModal, setEditModal] = useState(false);
+
+  return (
+    <>
+      {!authorized ? null : isOwner ? (
+        <button
+          className={`text-grey-55 hover:text-accent-blue`}
+          onClick={() => {
+            setEditModal(true);
+            setMobileSidebarOpen(false);
+          }}
+        >
+          <Settings />
+        </button>
+      ) : (
+        <MemberOptions />
+      )}
+
+      <EditSpaceModal
+        space_id={props.space_id}
+        open={editModal}
+        onDelete={() => {
+          if (!session.session) return;
+          router.push(`/s/${session.session.username}`);
+        }}
+        onClose={() => setEditModal(false)}
+        spaceID={spaceID}
+      />
+    </>
+  );
+};
+
+const MemberOptions = () => {
+  const [leaveModalOpen, setLeaveModalOpen] = useState(false);
+  let { authToken, session } = useAuth();
+  let spaceID = useSpaceID();
+  let router = useRouter();
+  let [loading, setLoading] = useState(false);
+
+  return (
+    <>
+      <Popover.Root>
+        <Popover.Trigger className="hover:text-accent-blue text-grey-55">
+          <Settings />
+        </Popover.Trigger>
+        <Popover.Portal>
+          <Popover.Content
+            className="border-grey-80 z-50 flex max-w-xs flex-col gap-2 rounded-md border bg-white py-2 drop-shadow-md"
+            sideOffset={4}
+          >
+            <button
+              className="text-accent-red hover:bg-bg-blue px-2 font-bold"
+              onClick={() => setLeaveModalOpen(true)}
+            >
+              Leave space
+            </button>
+          </Popover.Content>
+        </Popover.Portal>
+      </Popover.Root>
+      <Modal
+        header="Are You Sure?"
+        open={leaveModalOpen}
+        onClose={() => setLeaveModalOpen(false)}
+      >
+        You&apos;ll no longer be able to edit this Space, and it will be removed
+        from your homepage.
+        <ModalSubmitButton
+          destructive
+          content={loading ? "" : "Leave Space"}
+          icon={loading ? <DotLoader /> : undefined}
+          onClose={() => setLeaveModalOpen(false)}
+          onSubmit={async () => {
+            if (!spaceID || !authToken || !session) return;
+            setLoading(true);
+            await workerAPI(WORKER_URL, "leave_space", {
+              authToken,
+              type: "space",
+              do_id: spaceID,
+            });
+            router.push("/s/" + session.session?.username);
+            setLoading(false);
+          }}
+        />
+      </Modal>
+    </>
   );
 };

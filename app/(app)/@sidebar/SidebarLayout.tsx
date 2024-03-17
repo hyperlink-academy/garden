@@ -94,10 +94,10 @@ export default function SidebarLayout(props: {
         <animated.div
           {...bindOverlay()}
           onClick={() => setSidebar(false)}
-          className="bg-grey-15 fixed inset-0 z-40 touch-none"
+          className="bg-grey-15 fixed inset-0 z-20 touch-none"
           style={{ ...sidebarOverlaySpring, display: open ? "block" : "none" }}
         >
-          <div className="z-40 ml-auto h-full w-2/3" ref={droppableRef} />
+          <div className="z-20 ml-auto h-full w-2/3" ref={droppableRef} />
         </animated.div>
       )}
       <div
@@ -105,7 +105,7 @@ export default function SidebarLayout(props: {
         ref={setNodeRef}
         className={`sidebarWrapper lightBorder no-scrollbar relative  z-50 flex shrink-0 items-stretch overflow-x-hidden overflow-y-scroll text-left ${
           open && "cursor-default"
-        } ${isMobile && !open ? "bg-accent-blue" : "bg-white"}`}
+        } ${isMobile && !open ? "bg-bg-blue" : "bg-white"}`}
         onClick={() => setSidebar(true)}
       >
         <animated.div
@@ -113,28 +113,33 @@ export default function SidebarLayout(props: {
           className="no-scrollbar h-full w-full overflow-x-hidden"
         >
           <div className="sidebar flex h-full flex-col items-stretch gap-0">
-            <div className="flex items-center justify-between px-3 pt-3">
-              {open && props.breadcrumb}
-              <animated.div style={disclosureSpring}>
-                <button
-                  className="text-grey-55 hover:text-accent-blue "
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleSidebar();
-                  }}
-                >
-                  <DisclosureExpandTiny />
-                </button>
-              </animated.div>
-            </div>
+            {!isMobile && (
+              <div className="flex items-center justify-between px-3 pt-3">
+                {open && props.breadcrumb}
+                <animated.div style={disclosureSpring}>
+                  <button
+                    className="text-grey-55 hover:text-accent-blue "
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleSidebar();
+                    }}
+                  >
+                    <DisclosureExpandTiny />
+                  </button>
+                </animated.div>
+              </div>
+            )}
+
             {open ? (
               <div className="h-full w-64">{props.children}</div>
             ) : !isMobile ? (
-              <div className="sidebarCollapsed mx-auto flex h-full w-max flex-col justify-center pt-3">
+              <div className="sidebarCollapsed mx-auto flex h-full w-max flex-col pt-3">
                 {props.children}
               </div>
             ) : (
-              <div className="sidebarMobileCollapsed  w-3"></div>
+              <div className="sidebarMobileCollapsed  text-grey-55 mt-1 flex w-3 origin-center -rotate-90">
+                <DisclosureExpandTiny />
+              </div>
             )}
           </div>
         </animated.div>
