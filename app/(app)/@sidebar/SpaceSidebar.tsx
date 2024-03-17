@@ -7,6 +7,7 @@ import {
   RoomCanvas,
   RoomChat,
   RoomCollection,
+  RoomMember,
   RoomSearch,
 } from "components/Icons";
 import { db } from "hooks/useReplicache";
@@ -15,6 +16,7 @@ import { useSidebarState } from "./SidebarLayout";
 import { SidebarTab } from "./SidebarTab";
 import { useRoom, useSetRoom } from "hooks/useUIState";
 import { People } from "components/SpaceLayout/Sidebar/People";
+import { useSpaceData } from "hooks/useSpaceData";
 
 export function SpaceSidebar(props: {
   display_name: string | null;
@@ -23,7 +25,7 @@ export function SpaceSidebar(props: {
 }) {
   let { input, setInput, results } = useSearch();
   let { open } = useSidebarState();
-  if (!open) return <CollapsedSpaceSidebar />;
+  if (!open) return <CollapsedSpaceSidebar space_id={props.space_id} />;
   return (
     <div className="flex h-full flex-col">
       <div className="sidebarSpaceContent flex h-full min-h-0 shrink grow flex-col ">
@@ -65,11 +67,31 @@ export function SpaceSidebar(props: {
   );
 }
 
-export const CollapsedSpaceSidebar = () => {
+export const CollapsedSpaceSidebar = (props: { space_id: string }) => {
   let rooms = db.useAttribute("room/name").sort(sortByPosition("roomList"));
   let { setSidebar } = useSidebarState();
+
+  let spaceData = useSpaceData(props);
+
+  let members = db
+    .useAttribute("member/name")
+    .filter((m) =>
+      spaceData?.data?.members_in_spaces.find(
+        (f) => f.identity_data?.username === m.value
+      )
+    );
+  let activeSessions = db
+    .useAttribute("presence/client-member")
+    .map((m) => m.value.value);
+  let uniqueSessions = new Set(activeSessions);
+
+  let membersOnline = members.filter((f) => uniqueSessions.has(f.entity));
+
+  let membersInCall = db.useAttribute("presence/in-call");
+  console.log(membersInCall);
+
   return (
-    <div className="flex flex-col gap-2 pt-2">
+    <div className="text-accent-blue flex h-full flex-col pt-2">
       <SidebarTab
         icon={<RoomSearch />}
         title="Search"
@@ -82,9 +104,25 @@ export const CollapsedSpaceSidebar = () => {
           }, 50);
         }}
       />
-      {rooms.map((r) => (
-        <RoomButton key={r.entity} entityID={r.entity} />
-      ))}
+      <div className="text-grey-55 flex grow flex-col gap-2 pb-3">
+        {rooms.map((r) => (
+          <RoomButton key={r.entity} entityID={r.entity} />
+        ))}
+      </div>
+      {membersOnline.length > 0 && (
+        <div
+          className={`collapsedSidebarPeople sticky bottom-0 mx-auto flex w-full flex-col place-items-center gap-1 rounded-md bg-white pb-3  text-center font-bold `}
+        >
+          <Divider />
+          <div
+            className={` rounded-md p-1 pt-2 text-white ${
+              membersInCall.length === 0 ? "bg-accent-blue" : "bg-grey-55"
+            }`}
+          >
+            <RoomMember /> {membersOnline.length}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

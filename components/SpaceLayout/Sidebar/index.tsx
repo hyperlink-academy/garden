@@ -35,7 +35,7 @@ export const Sidebar = (props: {
   let [roomEditOpen, setRoomEditOpen] = useState(false);
 
   return (
-    <div className="roomList text-grey-35 flex h-fit min-h-0 w-full grow flex-col gap-2 px-3 pb-3">
+    <div className="roomList text-grey-35 mb-3 flex h-fit min-h-0 w-full grow flex-col gap-2 px-3">
       <div className="flex flex-col">
         <SpaceSettings space_id={props.space_id} />
         <UnreadsRoomButton />
