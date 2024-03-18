@@ -7,10 +7,11 @@ import { useAuth } from "hooks/useAuth";
 import { Divider } from "components/Layout";
 import { HomeTabs } from "./HomeTabs";
 import { LoginButton } from "components/LoginModal";
-import SidebarLayout, { useSidebarState } from "../../SidebarLayout";
+import SidebarLayout from "../../SidebarLayout";
 import { useState } from "react";
 import { BaseSpaceCard, SpaceData } from "components/SpacesList";
 import { uuidToBase62 } from "src/uuidHelpers";
+import { useSidebarState } from "../../SidebarState";
 
 export function UserPageSidebar(props: {
   params: { studio: string };

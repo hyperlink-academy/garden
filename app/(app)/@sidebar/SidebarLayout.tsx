@@ -1,25 +1,12 @@
 "use client";
 import { animated, useSpring } from "@react-spring/web";
 import { DisclosureExpandTiny } from "components/Icons";
-import { create } from "zustand";
-import { combine } from "zustand/middleware";
 import { useIsClient, useIsMobile } from "hooks/utils";
 import { useEffect } from "react";
 import { useDroppableZone } from "components/DragContext";
 import { useGesture } from "@use-gesture/react";
 import { useDndContext } from "@dnd-kit/core";
-
-export const useSidebarState = create(
-  combine(
-    {
-      open: false,
-    },
-    (set) => ({
-      toggleSidebar: () => set((oldState) => ({ open: !oldState.open })),
-      setSidebar: (open: boolean) => set(() => ({ open: open })),
-    })
-  )
-);
+import { useSidebarState } from "./SidebarState";
 
 export default function SidebarLayout(props: {
   breadcrumb: React.ReactNode;

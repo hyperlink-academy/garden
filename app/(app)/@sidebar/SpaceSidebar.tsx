@@ -13,7 +13,6 @@ import {
 } from "components/Icons";
 import { db, useMutations, useSpaceID } from "hooks/useReplicache";
 import { sortByPosition } from "src/position_helpers";
-import { useSidebarState } from "./SidebarLayout";
 import { SidebarTab } from "./SidebarTab";
 import { useRoom, useSetRoom, useUIState } from "hooks/useUIState";
 import { People } from "components/SpaceLayout/Sidebar/People";
@@ -27,6 +26,7 @@ import { workerAPI } from "backend/lib/api";
 import { DotLoader } from "components/DotLoader";
 import { Modal, ModalSubmitButton } from "components/Modal";
 import { WORKER_URL } from "src/constants";
+import { useSidebarState } from "./SidebarState";
 
 export function SpaceSidebar(props: {
   display_name: string | null;

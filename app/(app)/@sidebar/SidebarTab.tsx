@@ -1,5 +1,5 @@
 import { useIsMobile } from "hooks/utils";
-import { useSidebarState } from "./SidebarLayout";
+import { useSidebarState } from "./SidebarState";
 
 export const SidebarTab = (props: {
   collapsed: boolean;

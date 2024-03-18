@@ -27,7 +27,7 @@ import { SingleTextSection } from "components/CardView/Sections";
 import { useIsActiveRoom, useRoom, useSetRoom } from "hooks/useUIState";
 import { Form, SubmitButton } from "components/Form";
 import { useIsMobile } from "hooks/utils";
-import { useSidebarState } from "app/(app)/@sidebar/SidebarLayout";
+import { useSidebarState } from "app/(app)/@sidebar/SidebarState";
 
 export const EditRoomModal = (props: {
   open: boolean;
@@ -57,7 +57,7 @@ export const EditRoomModal = (props: {
   return (
     <Modal open={props.open} onClose={props.onClose} header="Room Settings">
       <form
-        className="editRoomModal text-grey-35 flex flex-col gap-3"
+        className="editRoomModal flex flex-col gap-3 text-grey-35"
         onSubmit={async () => {
           if (!currentRoomName || !props.room) return;
           await mutate("updateFact", {
@@ -92,7 +92,7 @@ export const EditRoomModal = (props: {
           <div className="editRoomDescription flex flex-col gap-1">
             <p className="font-bold">Description</p>
             <Textarea
-              className="border-grey-55 box-border w-full rounded-md border p-2"
+              className="box-border w-full rounded-md border border-grey-55 p-2"
               value={descriptionState}
               maxLength={500}
               placeholder={
@@ -108,7 +108,7 @@ export const EditRoomModal = (props: {
 
           <Divider />
           <div className="lightBorder flex flex-col gap-2 p-3 text-center ">
-            <p className="text-grey-55 text-sm">
+            <p className="text-sm text-grey-55">
               Don&apos;t worry, deleting this room won&apos;t delete the cards
               inside of it!
             </p>
@@ -222,8 +222,8 @@ export const RoomListItem = (props: {
     <div
       className={`relative select-none rounded-md border  ${
         isActiveRoom || props.isOver
-          ? "border-accent-blue  text-accent-blue rounded-md font-bold"
-          : " text-grey-35 hover:border-grey-80 border-transparent"
+          ? "rounded-md  border-accent-blue font-bold text-accent-blue"
+          : " border-transparent text-grey-35 hover:border-grey-80"
       }`}
     >
       {/* buttom = name + either edit button OR room type icon */}
@@ -348,7 +348,7 @@ const PresenceDots = (props: { entityID: string }) => {
           })}
         </div>
       ) : (
-        <div className=" italics hrink-0 text-grey-55 my-auto flex h-max max-h-6 w-4 grow-0 items-start justify-center  overflow-visible whitespace-nowrap text-sm font-normal ">
+        <div className=" italics hrink-0 my-auto flex h-max max-h-6 w-4 grow-0 items-start justify-center overflow-visible  whitespace-nowrap text-sm font-normal text-grey-55 ">
           {present.length}
         </div>
       )}

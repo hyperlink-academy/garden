@@ -6,7 +6,8 @@ import Link from "next/link";
 import { base62ToUuid, uuidToBase62 } from "src/uuidHelpers";
 import { useState } from "react";
 import { useIdentityData } from "hooks/useIdentityData";
-import SidebarLayout, { useSidebarState } from "./SidebarLayout";
+import SidebarLayout from "./SidebarLayout";
+import { useSidebarState } from "./SidebarState";
 
 export function SpaceHeader(props: {
   children: React.ReactNode;
@@ -92,7 +93,7 @@ export function SpaceHeader(props: {
                         ? `/studio/${uuidToBase62(props.context.id)}/space/${
                             space.id
                           }`
-                        : `/s/${props.context.username}/s/${uuidToBase62(
+                        : `/s/${space.owner.username}/s/${uuidToBase62(
                             space.id
                           )}/${space.display_name}`
                     }

@@ -9,7 +9,8 @@ import { uuidToBase62 } from "src/uuidHelpers";
 import { LoginButton } from "components/LoginModal";
 import { StudioRoleBadge } from "./StudioRoleBadge";
 import { useAuth } from "hooks/useAuth";
-import SidebarLayout, { useSidebarState } from "../../SidebarLayout";
+import SidebarLayout from "../../SidebarLayout";
+import { useSidebarState } from "../../SidebarState";
 
 export const StudioSidebarContent = (props: Props & { isAdmin: boolean }) => {
   let { open } = useSidebarState((state) => state);
@@ -21,10 +22,10 @@ export const StudioSidebarContent = (props: Props & { isAdmin: boolean }) => {
           href={
             session.session?.username ? `/s/${session.session.username}` : "/"
           }
-          className="sidebarBreadcrumb text-grey-55 flex shrink-0 flex-row text-sm"
+          className="sidebarBreadcrumb flex shrink-0 flex-row text-sm text-grey-55"
         >
           <div className="flex gap-1">
-            <div className="hover:text-accent-blue font-bold">h</div>
+            <div className="font-bold hover:text-accent-blue">h</div>
             <div className="font-bold">/</div>
           </div>
         </Link>
