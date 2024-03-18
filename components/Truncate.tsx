@@ -42,7 +42,7 @@ export function Truncate(props: {
       )}
       {scrollWidth > clientWidth &&
         scrollLeft + clientWidth < scrollWidth - 5 && (
-          <div className=" absolute -right-[1px] bottom-[2px] bg-inherit pl-0.5">
+          <div className="absolute -right-[1px] bottom-0 bg-inherit pl-0.5">
             …
           </div>
         )}

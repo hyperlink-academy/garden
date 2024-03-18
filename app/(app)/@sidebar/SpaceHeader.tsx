@@ -8,6 +8,7 @@ import { useState } from "react";
 import { useIdentityData } from "hooks/useIdentityData";
 import SidebarLayout from "./SidebarLayout";
 import { useSidebarState } from "./SidebarState";
+import { Truncate } from "components/Truncate";
 
 export function SpaceHeader(props: {
   children: React.ReactNode;
@@ -53,7 +54,11 @@ export function SpaceHeader(props: {
               props.path.map((p, index) => (
                 <Link href={p.link} key={index}>
                   <div className="SidebarBreadcrumbStudio flex gap-1">
-                    <div className="hover:text-accent-blue">{p.name}</div>
+                    <div className="hover:text-accent-blue max-w-[12ch] min-w-0">
+                      <Truncate className="w-full max-w-none overflow-hidden bg-white">
+                        {p.name}
+                      </Truncate>
+                    </div>
                     <div>/</div>
                   </div>
                 </Link>
