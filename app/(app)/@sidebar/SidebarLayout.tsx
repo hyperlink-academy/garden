@@ -6,9 +6,11 @@ import { useEffect } from "react";
 import { useDroppableZone } from "components/DragContext";
 import { useGesture } from "@use-gesture/react";
 import { useSidebarState } from "./SidebarState";
+import { Divider } from "components/Layout";
 
 export default function SidebarLayout(props: {
   breadcrumb: React.ReactNode;
+  header: React.ReactNode;
   children: React.ReactNode;
 }) {
   let isClient = useIsClient();
@@ -98,30 +100,41 @@ export default function SidebarLayout(props: {
           style={sidebarSpring}
           className="no-scrollbar h-full w-full overflow-x-hidden"
         >
-          <div className="sidebar flex h-full flex-col items-stretch gap-0">
-            {isMobile && !open ? (
-              <div className="sidebarMobileCollapsed  text-grey-55 mt-1 flex w-3 origin-center -rotate-90">
-                <DisclosureExpandTiny />
-              </div>
-            ) : (
-              <div className="flex items-center justify-between px-3 pt-3">
-                {open && props.breadcrumb}
-                <animated.div style={disclosureSpring}>
-                  <button
-                    className="text-grey-55 hover:text-accent-blue "
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleSidebar();
-                    }}
-                  >
-                    <DisclosureExpandTiny />
-                  </button>
-                </animated.div>
-              </div>
-            )}
+          <div className="sidebar flex h-full flex-col items-stretch gap-0 relative overflow-y-scroll">
+            <div className="top-0 sticky bg-white z-10">
+              {isMobile && !open ? (
+                <div className="sidebarMobileCollapsed  text-grey-55 mt-1 flex w-3 origin-center -rotate-90">
+                  <DisclosureExpandTiny />
+                </div>
+              ) : (
+                <div className="flex items-center justify-between px-3 pt-3">
+                  {open && props.breadcrumb}
+                  <animated.div style={disclosureSpring}>
+                    <button
+                      className="text-grey-55 hover:text-accent-blue "
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleSidebar();
+                      }}
+                    >
+                      <DisclosureExpandTiny />
+                    </button>
+                  </animated.div>
+                </div>
+              )}
+
+              {open && (
+                <>
+                  {props.header}
+                  <div className="divider shrink-0 pt-3">
+                    <Divider />
+                  </div>
+                </>
+              )}
+            </div>
 
             {open ? (
-              <div className="h-full w-64">{props.children}</div>
+              <div className="h-full w-64 pt-3">{props.children}</div>
             ) : !isMobile ? (
               <div className="sidebarCollapsed mx-auto flex h-full w-max flex-col pt-3">
                 {props.children}

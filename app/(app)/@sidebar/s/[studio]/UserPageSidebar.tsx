@@ -33,6 +33,20 @@ export function UserPageSidebar(props: {
           </div>
         </Link>
       }
+      header={
+        <>
+          <div className="sidebarSpaceName shrink-0 flex-row px-3 pt-0.5 text-lg font-bold">
+            {props.params.studio === session.session?.username
+              ? "Home"
+              : props.params.studio}
+          </div>
+          {!session.session && (
+            <div className="px-3 pb-1 pt-3">
+              <LoginButton small />
+            </div>
+          )}
+        </>
+      }
     >
       {open ? (
         <UserPageSidebarExpanded {...props} />
@@ -47,24 +61,9 @@ const UserPageSidebarExpanded = (props: {
   params: { studio: string };
   spaces: SpaceData[];
 }) => {
-  let { session } = useAuth();
   let [search, setSearch] = useState("");
   return (
     <>
-      <div className="sidebarSpaceName shrink-0 flex-row px-3 pt-0.5 text-lg font-bold">
-        {props.params.studio === session.session?.username
-          ? "Home"
-          : props.params.studio}
-      </div>
-      {!session.session && (
-        <div className="px-3 pb-1 pt-3">
-          <LoginButton small />
-        </div>
-      )}
-
-      <div className="pb-3 pt-2">
-        <Divider />
-      </div>
       <div className="px-3 pb-3">
         <input
           value={search}

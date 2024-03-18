@@ -113,33 +113,36 @@ export function SmallSpaceCard(props: Parameters<typeof SpaceCard>[0]) {
     (f) => f.user === session.user?.id
   )?.unreads;
   return (
-    <div className="smallSpaceCard relative flex min-h-[82px] w-full">
-      <div className="ml-8 mt-6 w-full">
+    <div className="group relative pl-3 pt-4 w-full">
+      <div className="group flex w-full lightBorder flex-col pl-6 p-2">
         <div
-          className="smallSpaceCardContent lightBorder flex w-full shrink-0 grow flex-col gap-0 bg-white py-2 pl-10 pr-3"
+          className="flex justify-between gap-4"
           style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
         >
-          <div className="flex justify-between gap-2">
-            {/* this may never show 'space deleted' but here same as big space card in case */}
-            <div
-              className={`font-bold ${
-                !data?.display_name ? "italic text-grey-55" : ""
-              }`}
-            >
-              {data?.display_name || "space deleted"}
-            </div>
+          <div
+            className={
+              !data?.display_name ? "italic text-grey-55" : " font-bold"
+            }
+          >
+            {data?.display_name || "space deleted"}
           </div>
         </div>
-      </div>
-      <div className="smallSpaceCardIcon absolute left-0 top-0">
-        <DoorImage
-          small
-          width="64"
-          display_name={data?.display_name}
-          image={data?.image}
-          default_space_image={data?.default_space_image}
-          glow={!!unreads && unreads > 0}
-        />
+        <div className=" flex items-center gap-1 place-self-end text-sm italic text-grey-55">
+          <RoomMember />
+          {data.owner.username}{" "}
+          {data.members_in_spaces?.length > 1 && (
+            <div>+ {data.members_in_spaces?.length - 1}</div>
+          )}
+        </div>
+        <div className="absolute left-0 top-0">
+          <DoorImage
+            width="32"
+            display_name={data?.display_name}
+            image={data?.image}
+            default_space_image={data?.default_space_image}
+            glow={!!unreads && unreads > 0}
+          />
+        </div>
       </div>
     </div>
   );

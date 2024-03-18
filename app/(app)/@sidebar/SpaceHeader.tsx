@@ -1,19 +1,24 @@
 "use client";
-import {
-  BaseSpaceCard,
-  SmallSpaceCard,
-  SpaceData,
-} from "components/SpacesList";
+import { CloseLinedTiny, Settings, Switch } from "components/Icons";
+import { HelpButton, SpaceRoleBadge } from "components/Space";
+import { SmallSpaceCard, SpaceData } from "components/SpacesList";
+import { Truncate } from "components/Truncate";
 import { useAuth } from "hooks/useAuth";
-import { useParams } from "next/dist/client/components/navigation";
-import Link from "next/link";
-import { base62ToUuid, uuidToBase62 } from "src/uuidHelpers";
-import { useState } from "react";
 import { useIdentityData } from "hooks/useIdentityData";
+import { useMutations, useSpaceID } from "hooks/useReplicache";
+import { useSpaceData } from "hooks/useSpaceData";
+import { useParams, useRouter } from "next/dist/client/components/navigation";
+import Link from "next/link";
+import { useState } from "react";
+import { base62ToUuid, uuidToBase62 } from "src/uuidHelpers";
 import SidebarLayout from "./SidebarLayout";
 import { useSidebarState } from "./SidebarState";
-import { Truncate } from "components/Truncate";
-import { Switch } from "components/Icons";
+import { EditSpaceModal } from "components/CreateSpace";
+import * as Popover from "@radix-ui/react-popover";
+import { Modal, ModalSubmitButton } from "components/Modal";
+import { DotLoader } from "components/DotLoader";
+import { workerAPI } from "backend/lib/api";
+import { WORKER_URL } from "src/constants";
 
 export function SpaceHeader(props: {
   children: React.ReactNode;
@@ -73,20 +78,29 @@ export function SpaceHeader(props: {
             className="ml-0.5 h-fit rounded-[2px] px-0.5 pb-[1px] hover:bg-accent-blue hover:text-white"
             onClick={() => setSwitcher(!switcher)}
           >
-            <Switch />
+            {!switcher ? <Switch /> : <CloseLinedTiny />}
           </button>
+        </div>
+      }
+      header={
+        <div className="flex flex-col">
+          <div className="sidebarSpaceName shrink-0 flex-row px-3 pt-0.5 text-lg font-bold">
+            {activeSpace?.display_name}
+          </div>
+          <div className="flex items-center justify-between px-3 pt-3">
+            <div className="sidebarRolebadgeWrapper shrink-0">
+              {activeSpace && <SpaceRoleBadge space_id={activeSpace.id} />}
+            </div>
+            <div className="flex gap-1">
+              <HelpButton />
+              {activeSpace && <SpaceSettings space_id={activeSpace.id} />}
+            </div>
+          </div>
         </div>
       }
     >
       <div className="sidebarSpaceFromHome flex h-full flex-col items-stretch">
-        {open ? (
-          <div>
-            <div className="flex items-center justify-between px-3"></div>
-            <div className="sidebarSpaceName shrink-0 flex-row px-3 pt-0.5 text-lg font-bold">
-              {activeSpace?.display_name}
-            </div>
-          </div>
-        ) : (
+        {open ? null : (
           <div
             className="sidebarSpaceName mx-auto h-fit w-fit shrink-0 rotate-180 flex-row font-bold "
             style={{ writingMode: "vertical-lr" }}
@@ -95,9 +109,8 @@ export function SpaceHeader(props: {
           </div>
         )}
         <div className="sidebarContent grow">
-          {switcher ? (
-            <div className="pr-2">
-              <button onClick={() => setSwitcher(false)}>close</button>
+          {switcher && open ? (
+            <div className="pl-2 pr-3 flex flex-col gap-3">
               {spaces
                 ?.filter((s) => !s.archived)
                 .map((space) => (
@@ -125,3 +138,99 @@ export function SpaceHeader(props: {
     </SidebarLayout>
   );
 }
+
+const SpaceSettings = (props: { space_id: string }) => {
+  let spaceID = useSpaceID();
+  let { authorized } = useMutations();
+  let { data } = useSpaceData(props);
+  let router = useRouter();
+  let { session } = useAuth();
+
+  let isOwner =
+    session.session && session.session.username === data?.owner.username;
+  let [editModal, setEditModal] = useState(false);
+
+  return (
+    <>
+      {!authorized ? null : isOwner ? (
+        <button
+          className={`text-grey-55 hover:text-accent-blue`}
+          onClick={() => {
+            setEditModal(true);
+          }}
+        >
+          <Settings />
+        </button>
+      ) : (
+        <MemberOptions />
+      )}
+
+      <EditSpaceModal
+        space_id={props.space_id}
+        open={editModal}
+        onDelete={() => {
+          if (!session.session) return;
+          router.push(`/s/${session.session.username}`);
+        }}
+        onClose={() => setEditModal(false)}
+        spaceID={spaceID}
+      />
+    </>
+  );
+};
+
+const MemberOptions = () => {
+  const [leaveModalOpen, setLeaveModalOpen] = useState(false);
+  let { authToken, session } = useAuth();
+  let spaceID = useSpaceID();
+  let router = useRouter();
+  let [loading, setLoading] = useState(false);
+
+  return (
+    <>
+      <Popover.Root>
+        <Popover.Trigger className="hover:text-accent-blue text-grey-55">
+          <Settings />
+        </Popover.Trigger>
+        <Popover.Portal>
+          <Popover.Content
+            className="border-grey-80 z-50 flex max-w-xs flex-col gap-2 rounded-md border bg-white py-2 drop-shadow-md"
+            sideOffset={4}
+          >
+            <button
+              className="text-accent-red hover:bg-bg-blue px-2 font-bold"
+              onClick={() => setLeaveModalOpen(true)}
+            >
+              Leave space
+            </button>
+          </Popover.Content>
+        </Popover.Portal>
+      </Popover.Root>
+      <Modal
+        header="Are You Sure?"
+        open={leaveModalOpen}
+        onClose={() => setLeaveModalOpen(false)}
+      >
+        You&apos;ll no longer be able to edit this Space, and it will be removed
+        from your homepage.
+        <ModalSubmitButton
+          destructive
+          content={loading ? "" : "Leave Space"}
+          icon={loading ? <DotLoader /> : undefined}
+          onClose={() => setLeaveModalOpen(false)}
+          onSubmit={async () => {
+            if (!spaceID || !authToken || !session) return;
+            setLoading(true);
+            await workerAPI(WORKER_URL, "leave_space", {
+              authToken,
+              type: "space",
+              do_id: spaceID,
+            });
+            router.push("/s/" + session.session?.username);
+            setLoading(false);
+          }}
+        />
+      </Modal>
+    </>
+  );
+};

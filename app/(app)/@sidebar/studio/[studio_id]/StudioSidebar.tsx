@@ -30,6 +30,16 @@ export const StudioSidebarContent = (props: Props & { isAdmin: boolean }) => {
           </div>
         </Link>
       }
+      header={
+        <>
+          <div className="sidesbarStudioName shrink-0 flex-row px-3 pt-0.5 text-lg font-bold">
+            {props.data.name}
+          </div>
+          <div className="px-3 pt-3">
+            <StudioRoleBadge data={props.data} isAdmin={props.isAdmin} />
+          </div>
+        </>
+      }
     >
       {open ? (
         <StudioSidebarExpanded {...props} />
@@ -49,15 +59,6 @@ const StudioSidebarExpanded = (
 
   return (
     <>
-      <div className="sidesbarStudioName shrink-0 flex-row px-3 pt-0.5 text-lg font-bold">
-        {props.data.name}
-      </div>
-      <div className="px-3 pt-3">
-        <StudioRoleBadge data={props.data} isAdmin={props.isAdmin} />
-      </div>
-      <div className="py-3">
-        <Divider />
-      </div>
       <div className="px-3 pb-2">
         <input
           value={spaceSearchInput}
@@ -111,12 +112,7 @@ const StudioSidebarCollapsed = (
         {props.data.name}
       </div>
 
-      {!session.session && (
-        <div className="px-3 pb-1 pt-3">
-          <LoginButton small />
-        </div>
-      )}
-      <div className="mx-1 pb-2 pt-3">
+      <div className="pb-2 pt-3">
         <Divider />
       </div>
       <TabsList
