@@ -102,7 +102,6 @@ const StudioSidebarCollapsed = (
     isAdmin: boolean;
   }
 ) => {
-  let { session } = useAuth();
   return (
     <div className="sidebarHomeCollapsed flex flex-col justify-center">
       <div

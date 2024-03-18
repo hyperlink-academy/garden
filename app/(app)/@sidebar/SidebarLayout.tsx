@@ -91,7 +91,7 @@ export default function SidebarLayout(props: {
       <div
         {...bindSidebar()}
         ref={setNodeRef}
-        className={`sidebarWrapper lightBorder no-scrollbar relative  z-50 flex shrink-0 items-stretch overflow-x-hidden overflow-y-scroll text-left ${
+        className={`sidebarWrapper lightBorder no-scrollbar relative  z-50 flex shrink-0 overflow-x-hidden overflow-y-scroll text-left ${
           open && "cursor-default"
         } ${isMobile && !open ? "bg-bg-blue" : "bg-white"}`}
         onClick={() => setSidebar(true)}
@@ -100,8 +100,8 @@ export default function SidebarLayout(props: {
           style={sidebarSpring}
           className="no-scrollbar h-full w-full overflow-x-hidden"
         >
-          <div className="sidebar flex h-full flex-col items-stretch gap-0 relative overflow-y-scroll">
-            <div className="top-0 sticky bg-white z-10">
+          <div className="sidebar flex h-full flex-col items-stretch gap-0 relative overflow-y-scroll w-full justify-items-start justify-start">
+            <div className={`top-0 sticky bg-white z-10 ${open ? "w-64" : ""}`}>
               {isMobile && !open ? (
                 <div className="sidebarMobileCollapsed  text-grey-55 mt-1 flex w-3 origin-center -rotate-90">
                   <DisclosureExpandTiny />
@@ -136,7 +136,7 @@ export default function SidebarLayout(props: {
             {open ? (
               <div className="h-full w-64 pt-3">{props.children}</div>
             ) : !isMobile ? (
-              <div className="sidebarCollapsed mx-auto flex h-full w-max flex-col pt-3">
+              <div className="sidebarCollapsed px-1 flex h-full w-max flex-col pt-3">
                 {props.children}
               </div>
             ) : null}

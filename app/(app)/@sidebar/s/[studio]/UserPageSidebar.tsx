@@ -108,11 +108,6 @@ const UserPageSidebarCollapsed = (props: { params: { studio: string } }) => {
         className="sidebarSpaceName mx-auto h-fit w-fit shrink-0 rotate-180 flex-row font-bold "
         style={{ writingMode: "vertical-lr" }}
       >
-        {!session.session && (
-          <div className="px-3 pb-1 pt-3">
-            <LoginButton small />
-          </div>
-        )}
         {props.params.studio === session.session?.username
           ? "Home"
           : props.params.studio}
@@ -124,7 +119,7 @@ const UserPageSidebarCollapsed = (props: { params: { studio: string } }) => {
 
       <HomeTabs
         username={props.params.studio}
-        className="mx-auto flex flex-col gap-1"
+        className="mx-auto flex flex-col gap-1 text-grey-55"
         collapsed={true}
       />
     </>
