@@ -9,6 +9,7 @@ import { useIdentityData } from "hooks/useIdentityData";
 import SidebarLayout from "./SidebarLayout";
 import { useSidebarState } from "./SidebarState";
 import { Truncate } from "components/Truncate";
+import { Switch } from "components/Icons";
 
 export function SpaceHeader(props: {
   children: React.ReactNode;
@@ -41,20 +42,20 @@ export function SpaceHeader(props: {
   return (
     <SidebarLayout
       breadcrumb={
-        <div className="sidebarBreadcrumb text-grey-55 flex shrink-0 flex-row text-sm">
-          <div className="sidebarBreadcrumbHome text-grey-55 flex shrink-0 flex-row items-center gap-1 text-sm">
+        <div className="sidebarBreadcrumb flex shrink-0 flex-row items-center text-sm text-grey-55">
+          <div className="sidebarBreadcrumbHome flex shrink-0 flex-row items-center gap-1 text-sm text-grey-55">
             <Link
               href={session.session ? `/s/${session.session.username}` : "/"}
               className="flex gap-1"
             >
-              <div className="hover:text-accent-blue font-bold">h</div>
+              <div className="font-bold hover:text-accent-blue">h</div>
               <div className="font-bold">/</div>
             </Link>
             {isUserSpace === false &&
               props.path.map((p, index) => (
                 <Link href={p.link} key={index}>
                   <div className="SidebarBreadcrumbStudio flex gap-1">
-                    <div className="hover:text-accent-blue max-w-[12ch] min-w-0">
+                    <div className="min-w-0 max-w-[16ch] hover:text-accent-blue">
                       <Truncate className="w-full max-w-none overflow-hidden bg-white">
                         {p.name}
                       </Truncate>
@@ -64,7 +65,12 @@ export function SpaceHeader(props: {
                 </Link>
               ))}
           </div>
-          <button onClick={() => setSwitcher(!switcher)}>switch</button>
+          <button
+            className="ml-0.5 h-fit rounded-[2px] px-0.5 pb-[1px] hover:bg-accent-blue hover:text-white"
+            onClick={() => setSwitcher(!switcher)}
+          >
+            <Switch />
+          </button>
         </div>
       }
     >
