@@ -31,6 +31,9 @@ export const DiscussionRoom = (props: {
   let { permissions } = useMutations();
 
   let authorized = permissions.commentAndReact;
+
+  let [reply, setReply] = useState<string | null>(null);
+
   return (
     // trying this w/ ~same wrapper as other rooms
     <div
@@ -52,13 +55,19 @@ export const DiscussionRoom = (props: {
           authorized ? "pb-[64px]" : "pb-[88px]"
         }`}
       >
-        <Messages entityID={props.entityID} isRoom={props.isRoom} />
+        <Messages
+          entityID={props.entityID}
+          isRoom={props.isRoom}
+          setReply={setReply}
+        />
       </MessageWindow>
       <div className="discussionInputWrapper absolute bottom-3 right-0 w-full ">
         <MessageInput
           entityID={props.entityID}
           allowReact={props.allowReact}
           isRoom={props.isRoom}
+          reply={reply}
+          setReply={setReply}
         />
       </div>
     </div>
@@ -155,6 +164,8 @@ export const MessageInput = (props: {
   entityID: string;
   allowReact?: boolean;
   isRoom: boolean;
+  reply: string | null;
+  setReply: (reply: string) => void;
   onSend?: () => void;
 }) => {
   let setChatInput = useUIState((s) => s.setChatInput);
@@ -411,7 +422,11 @@ const AttachCard = ({
   );
 };
 
-export const Messages = (props: { entityID: string; isRoom: boolean }) => {
+export const Messages = (props: {
+  entityID: string;
+  isRoom: boolean;
+  setReply: (reply: string) => void;
+}) => {
   let messages = db.useMessages(props.entityID);
   let { permissions } = useMutations();
   let authorized = permissions.commentAndReact;
