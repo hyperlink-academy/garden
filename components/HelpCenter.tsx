@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { Fragment, useEffect, useState } from "react";
 import { CloseLinedTiny, Settings } from "./Icons";
 import { ModalFixedHeight } from "./Layout";
+import { isAppleDevice } from "@react-aria/utils";
 
 export const HelpModal = (props: { open: boolean; onClose: () => void }) => {
   return (
@@ -208,9 +209,9 @@ const HelpHandbook = () => {
 const HelpShortcuts = () => {
   return (
     <div className="flex flex-col gap-4">
-      <p>
+      {/* <p>
         An evolving list of shortcuts you may find helpful in using Hyperlink!
-      </p>
+      </p> */}
 
       <h4>text editing</h4>
       <ul className="flex list-disc flex-col gap-1 pl-4 sm:pl-8">
@@ -223,13 +224,13 @@ const HelpShortcuts = () => {
         </li>
         <li>
           wrap in <TextString>*</TextString> or{" "}
-          <KeyboardKey>ctrl/cmd</KeyboardKey> + <KeyboardKey>i</KeyboardKey> for
-          italic
+          <UnicodeKeyboardKey>{isAppleDevice() ? "⌘" : "⌃"}</UnicodeKeyboardKey>{" "}
+          + <KeyboardKey>i</KeyboardKey> for italic
         </li>
         <li>
           wrap in <TextString>**</TextString> or{" "}
-          <KeyboardKey>ctrl/cmd</KeyboardKey> + <KeyboardKey>b</KeyboardKey> for
-          bold
+          <UnicodeKeyboardKey>{isAppleDevice() ? "⌘" : "⌃"}</UnicodeKeyboardKey>{" "}
+          + <KeyboardKey>b</KeyboardKey> for bold
         </li>
         <li>
           wrap in <TextString>==</TextString> for highlight
@@ -248,27 +249,31 @@ const HelpShortcuts = () => {
       <h4>chat & comments</h4>
       <ul className="flex list-disc flex-col gap-1 pl-4 sm:pl-8">
         <li>
-          <KeyboardKey>enter</KeyboardKey> to send a message
+          <UnicodeKeyboardKey>⏎</UnicodeKeyboardKey> to send a message
         </li>
         <li>
-          <KeyboardKey>shift</KeyboardKey> + <KeyboardKey>enter</KeyboardKey>{" "}
-          for a line break
+          <UnicodeKeyboardKey>⇧</UnicodeKeyboardKey> +{" "}
+          <UnicodeKeyboardKey>⏎</UnicodeKeyboardKey> for a line break
         </li>
       </ul>
 
       <h4>rooms & cards</h4>
       <ul className="flex list-disc flex-col gap-1 pl-4 sm:pl-8">
         <li>
-          <KeyboardKey>alt</KeyboardKey> + <KeyboardKey>↑</KeyboardKey> and{" "}
-          <KeyboardKey>↓</KeyboardKey> to switch rooms
+          <UnicodeKeyboardKey>⌥</UnicodeKeyboardKey> +{" "}
+          <UnicodeKeyboardKey>↑</UnicodeKeyboardKey> and{" "}
+          <UnicodeKeyboardKey>↓</UnicodeKeyboardKey> to switch rooms
         </li>
         <li>
-          <KeyboardKey>shift</KeyboardKey> + <KeyboardKey>↑</KeyboardKey> and{" "}
-          <KeyboardKey>↓</KeyboardKey> to navigate between cards in a room
+          <UnicodeKeyboardKey>⇧</UnicodeKeyboardKey> +{" "}
+          <UnicodeKeyboardKey>↑</UnicodeKeyboardKey> and{" "}
+          <UnicodeKeyboardKey>↓</UnicodeKeyboardKey> to navigate between cards
+          in a room
         </li>
         <li>
-          <i>canvas</i>: <KeyboardKey>ctrl/cmd</KeyboardKey> + click for new
-          card
+          <i>canvas</i>:{" "}
+          <UnicodeKeyboardKey>{isAppleDevice() ? "⌘" : "⌃"}</UnicodeKeyboardKey>{" "}
+          + click for new card
         </li>
         <li>
           <i>collection</i>: drag to reorder cards
@@ -280,12 +285,13 @@ const HelpShortcuts = () => {
       <h4>general</h4>
       <ul className="flex list-disc flex-col gap-1 pl-4 sm:pl-8">
         <li>
-          <KeyboardKey>ctrl/cmd</KeyboardKey> + <KeyboardKey>z</KeyboardKey> to
-          undo
+          <UnicodeKeyboardKey>{isAppleDevice() ? "⌘" : "⌃"}</UnicodeKeyboardKey>{" "}
+          + <KeyboardKey>z</KeyboardKey> to undo
         </li>
         <li>
-          <KeyboardKey>ctrl/cmd</KeyboardKey> + <KeyboardKey>shift</KeyboardKey>{" "}
-          + <KeyboardKey>z</KeyboardKey> = redo
+          <UnicodeKeyboardKey>{isAppleDevice() ? "⌘" : "⌃"}</UnicodeKeyboardKey>{" "}
+          + <UnicodeKeyboardKey>⇧</UnicodeKeyboardKey> +{" "}
+          <KeyboardKey>z</KeyboardKey> = redo
         </li>
       </ul>
     </div>
@@ -376,7 +382,7 @@ export const HelpAppInfo = () => {
 
 const TextString = (props: { children: React.ReactNode }) => {
   return (
-    <code className="rounded-md border border-grey-80 bg-grey-90 px-[4px] py-[4px] text-xs">
+    <code className="rounded-md border border-grey-80 bg-grey-90 p-1 text-xs">
       {props.children}
     </code>
   );
@@ -384,8 +390,18 @@ const TextString = (props: { children: React.ReactNode }) => {
 
 const KeyboardKey = (props: { children: React.ReactNode }) => {
   return (
-    <code className="rounded-md bg-grey-35 px-[6px] py-[4px] text-xs text-white shadow shadow-accent-gold">
+    <code className="rounded-md border border-grey-80 bg-background p-1 text-xs text-grey-55">
       {props.children}
     </code>
+  );
+};
+
+const UnicodeKeyboardKey = (props: { children: React.ReactNode }) => {
+  return (
+    <span>
+      <code className="rounded-md border border-grey-80 bg-background p-1 font-sans text-xs text-grey-55">
+        {props.children}
+      </code>
+    </span>
   );
 };

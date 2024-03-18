@@ -17,6 +17,7 @@ import { Divider } from "./Layout";
 import { useCurrentOpenCard, useOpenCard, useRoom } from "hooks/useUIState";
 import { sortByPosition } from "src/position_helpers";
 import { generateKeyBetween } from "src/fractional-indexing";
+import { isAppleDevice } from "@react-aria/utils";
 
 let useSearch = () => {
   let [input, setInput] = useState("");
@@ -235,7 +236,7 @@ export function Search() {
                 className={`w-full px-2 py-1 outline-none ${
                   open && "bg-white"
                 }`}
-                placeholder="search cards (ctrl/⌘ K)"
+                placeholder={`search cards (${isAppleDevice() ? "⌘" : "⌃"}-K)`}
                 onFocus={(e) =>
                   e.currentTarget.setSelectionRange(
                     0,
@@ -258,7 +259,9 @@ export function Search() {
                         </div>
                         <div className="flex gap-2">
                           <div className="flex gap-0.5">
-                            <KeyboardKey>ctrl</KeyboardKey>
+                            <UnicodeKeyboardKey>
+                              {isAppleDevice() ? "⌘" : "⌃"}
+                            </UnicodeKeyboardKey>
                             <UnicodeKeyboardKey>⏎</UnicodeKeyboardKey>
                           </div>
                           place in current room
@@ -266,7 +269,9 @@ export function Search() {
                         <div className="flex gap-2">
                           <div className="flex gap-0.5">
                             <UnicodeKeyboardKey>⇧</UnicodeKeyboardKey>
-                            <KeyboardKey>ctrl</KeyboardKey>
+                            <UnicodeKeyboardKey>
+                              {isAppleDevice() ? "⌘" : "⌃"}
+                            </UnicodeKeyboardKey>
                             <UnicodeKeyboardKey>⏎</UnicodeKeyboardKey>
                           </div>
                           place on current card
@@ -343,18 +348,20 @@ let SearchResults = (props: {
   );
 };
 
+// a lil more padding - now unused
 const KeyboardKey = (props: { children: React.ReactNode }) => {
   return (
-    <code className=" flex h-4 w-fit min-w-[16px] justify-center rounded-md border border-grey-80 bg-background px-1 text-center text-[10px] not-italic text-grey-55 ">
+    <code className="flex h-4 w-fit min-w-[16px] justify-center rounded-md border border-grey-80 bg-background px-1 text-center text-[10px] not-italic text-grey-55">
       {props.children}
     </code>
   );
 };
 
+// less padding
 const UnicodeKeyboardKey = (props: { children: React.ReactNode }) => {
   return (
-    <code className=" flex h-4 w-fit min-w-[16px] justify-center rounded-md border border-grey-80 bg-background text-center font-sans text-[10px] not-italic text-grey-55 ">
-      <div className="-mt-[1px]"> {props.children}</div>
+    <code className="flex h-4 w-fit min-w-[16px] justify-center rounded-md border border-grey-80 bg-background text-center font-sans text-[10px] not-italic text-grey-55">
+      {props.children}
     </code>
   );
 };
