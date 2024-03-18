@@ -30,7 +30,7 @@ export function Members({ data, isAdmin }: Props) {
         {isAdmin && (
           <>
             <InviteModal welcomeMessage={data.welcome_message} id={data.id} />
-            <div>
+            {/* <div>
               <p>email everyone:</p>
               <button>email!</button>
               <p>
@@ -40,7 +40,7 @@ export function Members({ data, isAdmin }: Props) {
                   </div>
                 ))}
               </p>
-            </div>
+            </div> */}
           </>
         )}
         {/* your studio member card */}
