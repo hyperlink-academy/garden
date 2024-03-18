@@ -1,5 +1,9 @@
 "use client";
-import { BaseSpaceCard, SpaceData } from "components/SpacesList";
+import {
+  BaseSpaceCard,
+  SmallSpaceCard,
+  SpaceData,
+} from "components/SpacesList";
 import { useAuth } from "hooks/useAuth";
 import { useParams } from "next/dist/client/components/navigation";
 import Link from "next/link";
@@ -109,7 +113,7 @@ export function SpaceHeader(props: {
                           )}/${space.display_name}`
                     }
                   >
-                    <BaseSpaceCard {...space} />
+                    <SmallSpaceCard {...space} />
                   </Link>
                 ))}{" "}
             </div>
