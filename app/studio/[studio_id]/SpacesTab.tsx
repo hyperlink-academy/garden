@@ -88,7 +88,7 @@ export function SpaceList({ data }: Props) {
                       }
                     />
                   </div>
-                  <Divider />
+                  {yourSpaces.length !== allSpaces.length && <Divider />}
                 </div>
               )}
               <List
