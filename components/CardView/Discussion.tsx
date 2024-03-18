@@ -228,7 +228,7 @@ export const MessageInput = (props: {
       {!session?.loggedIn ? (
         <Login />
       ) : !authorized ? (
-        <div className="messageNonAuth flex justify-center rounded-md bg-grey-90 p-2 text-center text-sm italic text-grey-55">
+        <div className="messageNonAuth mx-0 flex justify-center rounded-md bg-grey-90 p-2 text-center text-sm italic text-grey-55 group-[.spaceRoomWrapper]:mx-4">
           Only members and studiomates can chat!
         </div>
       ) : (
@@ -342,7 +342,7 @@ const Login = () => {
   let [state, setState] = LoginOrSignupModal.useState("closed");
   return (
     <>
-      <div className="messageLogIn flex justify-center rounded-md bg-grey-90 p-2">
+      <div className="messageLogIn mx-0 flex justify-center rounded-md bg-grey-90 p-2 group-[.spaceRoomWrapper]:mx-4">
         <p className=" w-full text-center text-sm italic text-grey-55">
           <span
             role="button"
