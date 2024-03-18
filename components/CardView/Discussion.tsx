@@ -254,7 +254,10 @@ export const MessageInput = (props: {
             {/* IF MESSAGE IS IN REPLY */}
             {reply && (
               <div className="messageInputReply -mb-2">
-                <div className="flex items-start justify-between gap-2 rounded-lg border border-grey-80  px-[6px] py-[5px] text-xs italic text-grey-55">
+                <div
+                  className="flex items-start justify-between gap-2 rounded-lg border border-grey-80  px-[6px] py-[5px] text-xs italic text-grey-55"
+                  style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
+                >
                   <div className="flex flex-col gap-[1px]">
                     <div className="font-bold"> {replyToName?.value}</div>
                     <div className="text-grey-55">{replyMessage?.content}</div>
@@ -582,6 +585,7 @@ const Message = (props: {
                   style={{
                     whiteSpace: "pre-wrap",
                   }}
+                  messageIsMe={isMe}
                 />
               </div>
             </div>
