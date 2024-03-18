@@ -117,7 +117,7 @@ export function CardViewer(props: { space_id: string }) {
           shrink-0 touch-pan-x
           snap-center snap-always flex-col
           items-stretch
-          focus:outline-none sm:w-[calc(100vw-48px)] md:shrink`}
+          focus:outline-none sm:w-[calc(100vw-128px)] md:shrink`}
       >
         {room && history[0] ? (
           <CardView

@@ -19,6 +19,3 @@ export default function AppLayout(props: {
     </PageHeightContainer>
   );
 }
-
-//the max width of the app content is determined by the widest width page we have, space.
-//max width = card: 3xl(768px) flexgap: gap-4(16px) + roomWidth: 336px = 1120px
