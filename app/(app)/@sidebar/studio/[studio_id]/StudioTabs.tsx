@@ -1,7 +1,13 @@
 "use client";
 import { Props } from "app/(app)/studio/[studio_id]/StudioPage";
 import { useHasGetStartedItems } from "app/(app)/studio/[studio_id]/GettingStartedTab";
-import { RoomMember, RoomSettings, RoomSpaces } from "components/Icons";
+import {
+  RoomAbout,
+  RoomGetStarted,
+  RoomMember,
+  RoomSettings,
+  RoomSpaces,
+} from "components/Icons";
 import { useCallback } from "react";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
@@ -52,7 +58,7 @@ export const TabsList = (
       {hasGetStartedItems ? (
         <TabItem
           collapsed={props.collapsed}
-          icon={<div className="h-4 w-4 bg-test-pink" />}
+          icon={<RoomGetStarted />}
           name="Get Started"
           setTab={setTab}
           id="Get Started"
@@ -61,7 +67,7 @@ export const TabsList = (
       ) : null}
       <TabItem
         collapsed={props.collapsed}
-        icon={<div className="h-4 w-4 bg-test-pink" />}
+        icon={<RoomAbout />}
         name="About"
         setTab={setTab}
         id="About"
