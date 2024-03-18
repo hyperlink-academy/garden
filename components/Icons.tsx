@@ -1132,7 +1132,7 @@ export const CollectionPreviewTiny = (props: Props) => {
   );
 };
 
-export const DisclosureExpandTiny = () => {
+export const DisclosureExpandTiny = (props: Props) => {
   return (
     <svg
       width="16"
@@ -1140,6 +1140,7 @@ export const DisclosureExpandTiny = () => {
       viewBox="0 0 16 16"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      {...props}
     >
       <path
         fillRule="evenodd"

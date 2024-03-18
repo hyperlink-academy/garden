@@ -100,7 +100,11 @@ export default function SidebarLayout(props: {
           className="no-scrollbar h-full w-full overflow-x-hidden"
         >
           <div className="sidebar flex h-full flex-col items-stretch gap-0">
-            {!isMobile && (
+            {isMobile && !open ? (
+              <div className="sidebarMobileCollapsed  text-grey-55 mt-1 flex w-3 origin-center -rotate-90">
+                <DisclosureExpandTiny />
+              </div>
+            ) : (
               <div className="flex items-center justify-between px-3 pt-3">
                 {open && props.breadcrumb}
                 <animated.div style={disclosureSpring}>
@@ -123,11 +127,7 @@ export default function SidebarLayout(props: {
               <div className="sidebarCollapsed mx-auto flex h-full w-max flex-col pt-3">
                 {props.children}
               </div>
-            ) : (
-              <div className="sidebarMobileCollapsed  text-grey-55 mt-1 flex w-3 origin-center -rotate-90">
-                <DisclosureExpandTiny />
-              </div>
-            )}
+            ) : null}
           </div>
         </animated.div>
       </div>
