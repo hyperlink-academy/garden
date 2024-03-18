@@ -62,6 +62,7 @@ export function SpaceSidebar(props: {
             className="sidebarSearch w-full px-2 py-1 text-sm outline-none"
           />
         </div>
+
         {input === "" ? (
           <Sidebar space_id={props.space_id} />
         ) : (
@@ -106,7 +107,11 @@ export const CollapsedSpaceSidebar = (props: { space_id: string }) => {
   console.log(membersInCall);
 
   return (
-    <div className="text-accent-blue flex h-full flex-col pt-2">
+    <div className="flex h-full flex-col gap-1 text-accent-blue">
+      <div className="w-full pb-1 pt-3">
+        <Divider />
+      </div>
+
       <SidebarTab
         icon={<RoomSearch />}
         title="Search"
@@ -119,7 +124,7 @@ export const CollapsedSpaceSidebar = (props: { space_id: string }) => {
           }, 50);
         }}
       />
-      <div className="text-grey-55 flex grow flex-col gap-2 pb-3">
+      <div className="z-50 flex grow flex-col gap-1 pb-3 text-grey-55">
         {rooms.map((r) => (
           <RoomButton key={r.entity} entityID={r.entity} />
         ))}
@@ -219,16 +224,16 @@ const MemberOptions = () => {
   return (
     <>
       <Popover.Root>
-        <Popover.Trigger className="hover:text-accent-blue text-grey-55">
+        <Popover.Trigger className="text-grey-55 hover:text-accent-blue">
           <Settings />
         </Popover.Trigger>
         <Popover.Portal>
           <Popover.Content
-            className="border-grey-80 z-50 flex max-w-xs flex-col gap-2 rounded-md border bg-white py-2 drop-shadow-md"
+            className="z-50 flex max-w-xs flex-col gap-2 rounded-md border border-grey-80 bg-white py-2 drop-shadow-md"
             sideOffset={4}
           >
             <button
-              className="text-accent-red hover:bg-bg-blue px-2 font-bold"
+              className="px-2 font-bold text-accent-red hover:bg-bg-blue"
               onClick={() => setLeaveModalOpen(true)}
             >
               Leave space

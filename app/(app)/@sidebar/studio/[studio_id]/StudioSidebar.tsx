@@ -121,7 +121,7 @@ const StudioSidebarCollapsed = (
       </div>
       <TabsList
         collapsed={true}
-        className=" mx-auto flex flex-col gap-2"
+        className=" mx-auto flex flex-col gap-1 text-grey-55"
         {...props}
       />
     </div>
