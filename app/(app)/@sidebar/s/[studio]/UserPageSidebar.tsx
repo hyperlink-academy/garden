@@ -83,22 +83,24 @@ const UserPageSidebarExpanded = (props: {
           collapsed={false}
         />
       ) : (
-        props.spaces
-          .filter((space) =>
-            space.display_name
-              ?.toLocaleLowerCase()
-              .includes(search.toLocaleLowerCase())
-          )
-          .map((space) => (
-            <Link
-              key={space.id}
-              href={`/s/${space.owner.username}/s/${uuidToBase62(space.id)}/${
-                space.display_name
-              }`}
-            >
-              <SmallSpaceCard {...space} />
-            </Link>
-          ))
+        <div className="flex flex-col gap-2 pr-2">
+          {props.spaces
+            .filter((space) =>
+              space.display_name
+                ?.toLocaleLowerCase()
+                .includes(search.toLocaleLowerCase())
+            )
+            .map((space) => (
+              <Link
+                key={space.id}
+                href={`/s/${space.owner.username}/s/${uuidToBase62(space.id)}/${
+                  space.display_name
+                }`}
+              >
+                <SmallSpaceCard {...space} />
+              </Link>
+            ))}
+        </div>
       )}
     </>
   );

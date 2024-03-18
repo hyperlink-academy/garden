@@ -74,7 +74,7 @@ const StudioSidebarExpanded = (
           {...props}
         />
       ) : (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 pr-2">
           {props.data.spaces_in_studios
             .filter((space) =>
               space.space_data.display_name
