@@ -4,7 +4,7 @@ import { TabsList } from "./StudioTabs";
 import { Props } from "app/(app)/studio/[studio_id]/StudioPage";
 import { useState } from "react";
 import Link from "next/link";
-import { BaseSpaceCard } from "components/SpacesList";
+import { BaseSpaceCard, SmallSpaceCard } from "components/SpacesList";
 import { uuidToBase62 } from "src/uuidHelpers";
 import { LoginButton } from "components/LoginModal";
 import { StudioRoleBadge } from "./StudioRoleBadge";
@@ -88,7 +88,7 @@ const StudioSidebarExpanded = (
                   space.space_data.id
                 }`}
               >
-                <BaseSpaceCard {...space.space_data} />{" "}
+                <SmallSpaceCard {...space.space_data} />
               </Link>
             ))}
         </div>

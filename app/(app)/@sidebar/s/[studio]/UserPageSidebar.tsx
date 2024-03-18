@@ -9,7 +9,11 @@ import { HomeTabs } from "./HomeTabs";
 import { LoginButton } from "components/LoginModal";
 import SidebarLayout from "../../SidebarLayout";
 import { useState } from "react";
-import { BaseSpaceCard, SpaceData } from "components/SpacesList";
+import {
+  BaseSpaceCard,
+  SmallSpaceCard,
+  SpaceData,
+} from "components/SpacesList";
 import { uuidToBase62 } from "src/uuidHelpers";
 import { useSidebarState } from "../../SidebarState";
 
@@ -92,7 +96,7 @@ const UserPageSidebarExpanded = (props: {
                 space.display_name
               }`}
             >
-              <BaseSpaceCard {...space} />{" "}
+              <SmallSpaceCard {...space} />
             </Link>
           ))
       )}
