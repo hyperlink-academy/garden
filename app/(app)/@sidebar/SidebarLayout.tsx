@@ -91,7 +91,7 @@ export default function SidebarLayout(props: {
       <div
         {...bindSidebar()}
         ref={setNodeRef}
-        className={`sidebarWrapper lightBorder no-scrollbar relative  z-50 flex shrink-0 overflow-x-hidden overflow-y-scroll text-left ${
+        className={`sidebarWrapper touch-none lightBorder no-scrollbar relative  z-50 flex shrink-0 overflow-x-hidden overflow-y-scroll text-left ${
           open && "cursor-default"
         } ${isMobile && !open ? "bg-bg-blue" : "bg-white"}`}
         onClick={() => setSidebar(true)}
