@@ -5,11 +5,13 @@ import {
   RoomMember,
   RoomSearch,
 } from "components/Icons";
+import { Divider } from "components/Layout";
 import { BaseSpaceCard, SpaceData } from "components/SpacesList";
 import { AddSpace } from "components/StudioPage/AddSpace";
 import { useAuth } from "hooks/useAuth";
-import { db } from "hooks/useReplicache";
+import { db, scanIndex, useMutations } from "hooks/useReplicache";
 import { useStudioData } from "hooks/useStudioData";
+import { useSubscribe } from "hooks/useSubscribe";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
@@ -20,7 +22,14 @@ export type Props = {
 };
 
 export function SpaceList({ data }: Props) {
+  let { authorized } = useMutations();
   let allSpaces = data?.spaces_in_studios;
+  let yourSpaces = allSpaces.filter(
+    (s) =>
+      s.space_data?.members_in_spaces.find(
+        (m) => m.member === session.user?.id
+      ) && !s.space_data?.archived
+  );
 
   let activeSpaces = allSpaces
     .filter(({ space_data: s }) => s && !s.archived)
@@ -36,11 +45,6 @@ export function SpaceList({ data }: Props) {
     ({ space_data: s }) => s && !!s.archived
   );
 
-  let { session } = useAuth();
-  let authorized = data.members_in_studios.find(
-    (m) => m.member === session.user?.id
-  );
-
   if (!data) return;
   return (
     <div className="studioSpaces my-3 flex h-full w-full max-w-4xl flex-col gap-4 sm:my-0">
@@ -50,9 +54,22 @@ export function SpaceList({ data }: Props) {
         </div>
       )}
 
-      <div className=" studioSpaceListWrapper relative flex h-full w-full flex-col gap-8">
+      <div className=" studioSpaceListWrapper no-scrollbar relative flex h-full w-full flex-col gap-8 overflow-y-scroll ">
         {allSpaces.length > 0 ? (
           <>
+            {yourSpaces.length > 0 && (
+              <div className="-mb-2 flex flex-col gap-8">
+                <div>
+                  <h3>Your Spaces</h3>
+                  <List
+                    spaces={
+                      yourSpaces?.map((s) => s.space_data as SpaceData) || []
+                    }
+                  />
+                </div>
+                <Divider />
+              </div>
+            )}
             <List
               spaces={activeSpaces?.map((s) => s.space_data as SpaceData) || []}
             />
@@ -74,13 +91,40 @@ export function SpaceList({ data }: Props) {
 
 const List = (props: { spaces: Array<SpaceData> }) => {
   let params = useParams<{ studio_id: string }>();
-  let peopleInSpaces = db.useAttribute("presence/in-space");
+  let peopleInSpaces = useSubscribe(
+    async (tx) => {
+      let presenceInSpaces = await scanIndex(tx).aev("presence/in-space");
+      return Promise.all(
+        presenceInSpaces.map(async (p) => {
+          let member = await scanIndex(tx).eav(
+            p.entity,
+            "presence/client-member"
+          );
+          return { ...p, member };
+        })
+      );
+    },
+    [],
+    [],
+    ""
+  );
 
   return (
     <div className="studioSpaceList w-full ">
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3">
         {props.spaces.map((space) => {
-          let presences = peopleInSpaces.filter((p) => p.value === space.do_id);
+          let presences = peopleInSpaces
+            .filter((p) => p.value === space.do_id)
+            .reduce((acc, p) => {
+              if (
+                !acc.find(
+                  (f) =>
+                    f.member && f.member.value.value === p.member?.value.value
+                )
+              )
+                acc.push(p);
+              return acc;
+            }, [] as typeof peopleInSpaces);
           return (
             <div className="relative" key={space.id}>
               <div className="absolute right-2 top-1">
@@ -88,7 +132,7 @@ const List = (props: { spaces: Array<SpaceData> }) => {
                   <SpacePresence entityID={p.entity} key={p.entity} />
                 ))}
                 {presences.length < 5 ? null : (
-                  <div className=" bg-accent-blue mt-1 flex items-center gap-0.5 rounded-t-md px-[6px]  pb-2 pt-0.5 text-xs font-bold text-white">
+                  <div className=" mt-1 flex items-center gap-0.5 rounded-t-md bg-accent-blue px-[6px]  pb-2 pt-0.5 text-xs font-bold text-white">
                     + {presences.length - 4}
                     <span>
                       <RoomMember />
@@ -135,7 +179,7 @@ const HistoryList = (props: { spaces: Array<SpaceData> }) => {
       {spacesHistory.length > 0 ? (
         <div className="myStudioCompleted">
           <button
-            className={`hover:text-accent-blue flex items-center gap-2 ${
+            className={`flex items-center gap-2 hover:text-accent-blue ${
               showHistory ? "text-grey-15" : "text-grey-55"
             }`}
             onClick={() => {
@@ -175,7 +219,7 @@ const HistoryList = (props: { spaces: Array<SpaceData> }) => {
 
 const EmptyStudio = () => {
   return (
-    <div className="lightBorder bg-bg-blue flex h-fit flex-col gap-4 p-4">
+    <div className="lightBorder flex h-fit flex-col gap-4 bg-bg-blue p-4">
       <h3>⚠️ under construction ⚠️</h3>
       <p>This Studio does not yet contain any Spaces!</p>
     </div>

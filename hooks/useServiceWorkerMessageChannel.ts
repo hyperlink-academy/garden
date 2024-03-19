@@ -22,5 +22,5 @@ export const useServiceWorkerMessageChannel = () => {
     return () => {
       messageChannel.port1.close();
     };
-  }, []);
+  }, [router]);
 };

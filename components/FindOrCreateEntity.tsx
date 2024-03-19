@@ -1,17 +1,19 @@
 import { Combobox, Dialog, Transition } from "@headlessui/react";
 import { db } from "hooks/useReplicache";
 import { useEffect, useRef, useState } from "react";
-import { boolean } from "zod";
 import { ButtonPrimary } from "./Buttons";
 import {
   AddSmall,
   CardSmall,
   Checkmark,
   CloseFilledTiny,
+  CloseLinedTiny,
   Member,
 } from "./Icons";
 import { Divider } from "./Layout";
 import { useLongPress } from "hooks/useLongPress";
+import { theme } from "tailwind.config";
+let { colors } = theme;
 
 // Can I adapt this to work for section names as well?
 // They are a single select
@@ -22,7 +24,11 @@ import { useLongPress } from "hooks/useLongPress";
 // Selected = things that are already included in the list you are adding to
 // Added = things that you clicked after opening the modal. These aren't added yet, but will be once you hit submit.
 
-type Item = { display: string; entity: string; icon?: React.ReactElement };
+type Item = {
+  display: string;
+  entity: string;
+  icon?: React.ReactElement;
+};
 type AddedItem =
   | { entity: string; type: "existing" }
   | { name: string; type: "create"; cardType: "card" };
@@ -112,13 +118,13 @@ export const FindOrCreate = (props: {
           }}
           as="div"
           className={`
-              relative
-              z-10 mx-auto mb-20
-              mt-10
-              flex 
-              h-fit max-h-[calc(100vh-160px)] w-[calc(100vw-2.5rem)]
-              max-w-md flex-col items-stretch 
-              rounded-md border border-grey-80 bg-white shadow-drop
+              border-grey-80
+              shadow-drop relative z-10
+              mx-auto
+              mb-20
+              mt-10 flex h-fit
+              max-h-[calc(100vh-160px)] w-[calc(100vw-2.5rem)] max-w-md
+              flex-col items-stretch rounded-md border bg-white
               `}
         >
           {({ activeOption }) => (
@@ -147,68 +153,39 @@ export const FindOrCreate = (props: {
               {/* if isMultiselect = true, take all the stuff in the added[] and display it at the top, with a submit button. If not, show nothing! */}
               {isMultiSelect.current === false ? (
                 <div className="mx-3 mb-2 mt-2">
-                  <span className="hidden text-sm italic text-grey-55 sm:block">
+                  <span className="text-grey-55 hidden text-sm italic sm:block">
                     SHIFT + click to select multiple cards!
                   </span>
-                  <span className="text-sm italic text-grey-55 sm:hidden">
+                  <span className="text-grey-55 text-sm italic sm:hidden">
                     longpress to select multiple cards!
                   </span>
                 </div>
               ) : (
                 <div className="addedList mx-3 mb-3 mt-2 flex flex-col gap-2">
                   {addedItemsList === false ? null : (
-                    <ul className="lightBorder no-scrollbar flex flex-col gap-2 bg-bg-blue p-3">
+                    <ul className="lightBorder no-scrollbar bg-bg-blue flex flex-col gap-2 p-2">
                       {added.length === 0 ? (
-                        <div className="italic text-grey-55">
+                        <div className="text-grey-55 italic">
                           no cards selected yet!
                         </div>
                       ) : (
                         added.map((addedItem, index) => (
-                          <li
+                          <AddedListItem
                             key={index}
-                            className="addedListItem grid grid-cols-[max-content_auto_max-content] gap-2"
-                          >
-                            <div className="pt-[1px]">
-                              {addedItem.type === "create" ? (
-                                <CardSmall />
-                              ) : (
-                                props.items.find(
-                                  (item) =>
-                                    addedItem.type === "existing" &&
-                                    item.entity === addedItem.entity
-                                )?.icon
-                              )}
-                            </div>
-                            <div>
-                              {addedItem.type === "create" &&
-                              addedItem.name !== ""
-                                ? addedItem.name
-                                : addedItem.type === "create" &&
-                                  addedItem.name === ""
-                                ? "New Untitled Card"
-                                : props.items.find(
-                                    (item) =>
-                                      addedItem.type === "existing" &&
-                                      item.entity === addedItem.entity
-                                  )?.display}
-                            </div>
-                            <button
-                              className=""
-                              onClick={() => {
-                                added.splice(added.indexOf(addedItem), 1);
-                                setAdded([...added]);
-                              }}
-                            >
-                              <CloseFilledTiny />
-                            </button>
-                          </li>
+                            addedItem={addedItem}
+                            items={items}
+                            onClick={() => {
+                              added.splice(added.indexOf(addedItem), 1);
+                              setAdded([...added]);
+                            }}
+                          />
                         ))
                       )}
                     </ul>
                   )}
                   <div className="addedListActions grid grid-cols-[auto_max-content] items-center">
                     <button
-                      className="text-left text-grey-55 hover:text-accent-blue"
+                      className="text-grey-55 hover:text-accent-blue text-left"
                       onClick={() => {
                         setAddedItemsList(!addedItemsList);
                       }}
@@ -230,7 +207,7 @@ export const FindOrCreate = (props: {
               <Divider />
               <Combobox.Options
                 static
-                className="flex h-min w-full flex-col gap-2 overflow-y-auto pb-2 pt-2"
+                className="flex h-min w-full flex-col gap-0 overflow-y-auto pb-2 pt-2"
               >
                 {!input && !props.allowBlank ? null : (
                   <CreateButton
@@ -299,6 +276,64 @@ export const FindOrCreate = (props: {
   );
 };
 
+const AddedListItem = (props: {
+  addedItem: AddedItem;
+  items: Item[];
+  onClick: () => void;
+}) => {
+  let entityID =
+    props.addedItem.type === "existing" ? props.addedItem.entity : null;
+  let cardBackgroundColor = db.useEntity(
+    entityID,
+    "card/background-color"
+  )?.value;
+  return (
+    <li
+      style={{
+        backgroundColor:
+          cardBackgroundColor !== "#FFFFFF"
+            ? cardBackgroundColor
+            : "transparent",
+        border:
+          cardBackgroundColor === "#FFFFFF"
+            ? "none"
+            : `1px solid ${colors["grey-90"]}`,
+      }}
+      className="addedListItem grid grid-cols-[max-content_auto_max-content] gap-2 rounded-md px-1 py-0.5"
+    >
+      <div className="pt-[1px]">
+        {props.addedItem.type === "create" ? (
+          <CardSmall />
+        ) : (
+          props.items.find(
+            (item) =>
+              props.addedItem.type === "existing" &&
+              item.entity === props.addedItem.entity
+          )?.icon
+        )}
+      </div>
+      <div>
+        {props.addedItem.type === "create" && props.addedItem.name !== ""
+          ? props.addedItem.name
+          : props.addedItem.type === "create" && props.addedItem.name === ""
+          ? "New Untitled Card"
+          : props.items.find(
+              (item) =>
+                props.addedItem.type === "existing" &&
+                item.entity === props.addedItem.entity
+            )?.display}
+      </div>
+      <button
+        className="text-grey-55"
+        onClick={() => {
+          props.onClick();
+        }}
+      >
+        <CloseLinedTiny />
+      </button>
+    </li>
+  );
+};
 const CreateButton = (props: {
   value: string;
   activeOption?: string;
@@ -330,11 +365,11 @@ const CreateButton = (props: {
             >
               {!props.inputExists || props.value === "" ? (
                 <div
-                  className={`flex w-full
-                          flex-grow cursor-pointer 
-                          flex-row justify-between py-1
-                          font-bold
-                          text-accent-blue`}
+                  className={`text-accent-blue flex
+                          w-full flex-grow
+                          cursor-pointer flex-row justify-between
+                          p-1
+                          font-bold`}
                 >
                   <div className="flex flex-row gap-2">
                     <AddSmall />
@@ -347,9 +382,9 @@ const CreateButton = (props: {
                 </div>
               ) : (
                 <div
-                  className={`grid w-full
-                          grid-cols-[min-content_auto] gap-2 
-                          py-1 font-bold text-grey-55`}
+                  className={`text-grey-55 grid
+                          w-full grid-cols-[min-content_auto]
+                          gap-2 p-1 font-bold`}
                 >
                   <AddSmall />
                   <div>{`"${props.value}"`} already exists</div>
@@ -372,6 +407,8 @@ const SearchResult = (
   }
 ) => {
   let value: AddedItem = { type: "existing", entity: props.entity };
+  let cardBackgroundColor =
+    db.useEntity(props.entity, "card/background-color")?.value || "#FFFFFF";
   return (
     <Combobox.Option key={props.entity} value={value} disabled={props.disabled}>
       {({ active }) => {
@@ -389,21 +426,31 @@ const SearchResult = (
               `}
             </style>
             <div
-              className={`searchResult grid select-none grid-cols-[min-content_auto_min-content] gap-2 ${
+              style={{
+                backgroundColor:
+                  cardBackgroundColor === "#FFFFFF"
+                    ? "transparent"
+                    : cardBackgroundColor,
+                border:
+                  cardBackgroundColor === "#FFFFFF"
+                    ? "none"
+                    : `1px solid ${colors["grey-90"]}`,
+              }}
+              className={`searchResult  my-[2px] grid select-none grid-cols-[min-content_auto_min-content] gap-2 rounded-md  px-1 py-0.5 ${
                 props.disabled
-                  ? "cursor-default text-grey-80"
+                  ? "text-grey-80 cursor-default"
                   : "cursor-pointer"
               }`}
             >
               <div className="searchResultIcon mt-[1px]">{props.icon}</div>
               <div className="searchResultName">{props.display}</div>
               {props.disabled ? (
-                <Checkmark className="searchReultSelectedCheck mt-[5px] justify-self-end text-grey-90" />
+                <Checkmark className="searchReultSelectedCheck text-grey-90 mt-[5px] justify-self-end" />
               ) : props.added ? (
-                <Checkmark className="searchResultAddedCheck mt-[5px] text-accent-blue" />
+                <Checkmark className="searchResultAddedCheck text-accent-blue mt-[5px]" />
               ) : (
                 <div
-                  className="searchResultEmptyCheck mt-[5px] h-4 w-4 rounded-full border border-dashed text-grey-55 hover:border-2 hover:text-accent-blue sm:hidden"
+                  className="searchResultEmptyCheck text-grey-55 hover:text-accent-blue mt-[5px] h-4 w-4 rounded-full border border-dashed hover:border-2 sm:hidden"
                   onClick={() => props.setMultiSelect()}
                 />
               )}
@@ -439,7 +486,7 @@ const SearchItem: React.FC<
         }
       }}
       {...handlers}
-      className={`w-full px-3 py-0.5 ${props.className || ""} ${
+      className={`w-full px-2 py-0.5 ${props.className || ""} ${
         props.active ? "bg-bg-blue" : ""
       }`}
     >
@@ -452,7 +499,6 @@ export const useAllItems = (open: boolean) => {
   let titles = db
     .useAttribute(open ? "card/title" : null)
     .filter((f) => !!f.value);
-  let members = db.useAttribute("member/name");
   return titles
     .map((t) => {
       return {
@@ -461,14 +507,5 @@ export const useAllItems = (open: boolean) => {
         icon: <CardSmall />,
       };
     })
-    .concat(
-      members.map((m) => {
-        return {
-          entity: m.entity,
-          display: m.value,
-          icon: <Member />,
-        };
-      })
-    )
     .reverse();
 };

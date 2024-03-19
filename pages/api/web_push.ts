@@ -6,6 +6,7 @@ import { sign } from "src/sign";
 import webpush from "web-push";
 import { createClient } from "backend/lib/supabase";
 import { HyperlinkNotification } from "worker";
+import { uuidToBase62 } from "src/uuidHelpers";
 let bodyParser = z.object({
   payload: z.string(),
   sig: z.string(),
@@ -41,7 +42,10 @@ let supabase = createClient({
   SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL as string,
 });
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
+export default async function WebPushEndpoint(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   try {
     let body = bodyParser.safeParse(req.body);
     console.log(body);
@@ -67,27 +71,32 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     }
     let { data } = payloadBody;
 
-    let { data: spaceMembers } = await supabase
+    let { data: spaceData } = await supabase
       .from("space_data")
       .select(
-        "display_name, name, owner:identity_data!space_data_owner_fkey(username), members_in_spaces(identity_data(*, push_subscriptions(*)))"
+        "display_name, name, id, studios(members_in_studios(identity_data(username, studio))), owner:identity_data!space_data_owner_fkey(username), members_in_spaces(identity_data(*, push_subscriptions(*)))"
       )
       .eq("do_id", payloadBody.data.spaceID)
       .single();
 
-    if (spaceMembers) {
+    if (spaceData) {
+      let members = [
+        ...spaceData.members_in_spaces,
+        ...spaceData.studios.flatMap((s) => s.members_in_studios),
+      ];
       let notification: HyperlinkNotification;
       if (data.type === "new-message") {
         let senderStudio = data.senderStudio;
         notification = {
           type: "new-message",
           data: {
-            spaceName: spaceMembers.display_name || "Untitled Space",
-            spaceURL: `/s/${spaceMembers.owner?.username}/s/${spaceMembers.name}`,
+            spaceName: spaceData.display_name || "Untitled Space",
+            spaceURL: `/s/${spaceData.owner?.username}/s/${uuidToBase62(
+              spaceData.id
+            )}/${spaceData.display_name}`,
             senderUsername:
-              spaceMembers.members_in_spaces.find(
-                (f) => f.identity_data?.studio === senderStudio
-              )?.identity_data?.username || "",
+              members.find((f) => f.identity_data?.studio === senderStudio)
+                ?.identity_data?.username || "",
             ...data,
           },
         };
@@ -95,14 +104,14 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         notification = {
           type: "joined-space",
           data: {
-            spaceName: spaceMembers.display_name || "Untitled Space",
-            spaceURL: `/s/${spaceMembers.owner?.username}/s/${spaceMembers.name}`,
+            spaceName: spaceData.display_name || "Untitled Space",
+            spaceURL: `/s/${spaceData.owner?.username}/s/${spaceData.id}/${spaceData.display_name}`,
             spaceID: data.spaceID,
             newMemberUsername: data.username,
           },
         };
 
-      for (let member of spaceMembers.members_in_spaces) {
+      for (let member of spaceData.members_in_spaces) {
         if (!member.identity_data) continue;
         if (
           notification.type === "new-message" &&
@@ -133,7 +142,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     res.status(400);
     return;
   }
-};
+}
 
 export const signNode = (input: string, secret: string) => {
   const hmac = crypto.createHmac("sha256", secret);

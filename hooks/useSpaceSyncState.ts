@@ -13,7 +13,7 @@ export const useSpaceSyncState = () => {
 
   let openCard = query?.get("openCard");
   useEffect(() => {
-    if (openCard) {
+    if (openCard && room && spaceID && rep) {
       (async () => {
         let entityID = openCard as string;
         if (!room || !spaceID || !rep) return;

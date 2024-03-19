@@ -11,12 +11,10 @@ export const Divider = (props: {
 }) => {
   return (
     <div
-      className={` border-l border-t ${
-        props.dark ? `border-grey-55` : `border-grey-80`
-      } ${props.vertical ? "100vh w-[1px]" : "h-[1px] w-full"} ${
-        props.dashed ? "border-dashed" : ""
-      }
-
+      className={`border-l border-t
+        ${props.dark ? `border-grey-55` : `border-grey-80`}
+        ${props.vertical ? "100vh w-[1px]" : "h-[1px] w-full"}
+        ${props.dashed ? "border-dashed" : ""}
       `}
       style={{
         margin: `${props.my || 0}px ${props.mx || 0}px ${props.my || 0}px ${
@@ -140,7 +138,7 @@ export const MenuContainer: React.FC<
 
 export const MenuItem: React.FC<
   React.PropsWithChildren<{
-    onClick?: () => void;
+    onClick?: (e: React.MouseEvent) => void;
     disabled?: boolean;
   }>
 > = (props) => {
@@ -156,7 +154,7 @@ export const MenuItem: React.FC<
               : ""
           } `}
           style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
-          onClick={() => props.onClick?.()}
+          onClick={(e) => props.onClick?.(e)}
           disabled={props?.disabled}
         >
           {props.children}

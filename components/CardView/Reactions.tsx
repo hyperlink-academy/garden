@@ -4,13 +4,16 @@ import { Divider } from "components/Layout";
 import { Modal } from "components/Modal";
 import { useSmoker } from "components/Smoke";
 import { ref } from "data/Facts";
+import { useAuth } from "hooks/useAuth";
+import { useLongPress } from "hooks/useLongPress";
 import { useReactions } from "hooks/useReactions";
 import { db, useMutations } from "hooks/useReplicache";
 import { useState } from "react";
 import { ulid } from "src/ulid";
 
 export const Reactions = (props: { entityID: string }) => {
-  let { authorized } = useMutations();
+  let { permissions } = useMutations();
+  let authorized = permissions.commentAndReact;
   let [reactionPickerOpen, setReactionPickerOpen] = useState(false);
 
   let reactions = useReactions(props.entityID);
@@ -73,13 +76,19 @@ export const AddReaction = (props: {
   entityID: string;
   onSelect?: () => void;
 }) => {
-  let { authorized, mutate, memberEntity } = useMutations();
+  let {
+    mutate,
+    permissions,
+    authorized: fullMemberPermissions,
+  } = useMutations();
+  let { session } = useAuth();
+  let authorized = permissions.commentAndReact;
   let reactions = db.useAttribute("space/reaction");
   let [reactionEditOpen, setReactionEditOpen] = useState(false);
 
   if (!authorized) return null;
   return (
-    <div className="reactionPicker flex flex-col gap-1 rounded-md border border-grey-80 bg-white px-3 py-2">
+    <div className="reactionPicker border-grey-80 flex flex-col gap-1 rounded-md border bg-white px-3 py-2">
       <div className="reactionOptions flex w-full flex-wrap gap-x-4 gap-y-2">
         {reactions
           .filter((f) => !!f.value) // strip empty strings
@@ -91,12 +100,12 @@ export const AddReaction = (props: {
               key={r.id}
               className="font-bold"
               onClick={async () => {
-                if (!memberEntity) return;
+                if (!session.session || !authorized) return;
                 await mutate("addReaction", {
                   reaction: r.value,
                   reactionFactID: ulid(),
                   reactionAuthorFactID: ulid(),
-                  memberEntity,
+                  session: session.session,
                   cardEntity: props.entityID,
                 });
                 props.onSelect ? props.onSelect() : null;
@@ -107,12 +116,14 @@ export const AddReaction = (props: {
           ))}
       </div>
       <Divider />
-      <button
-        className="reactionPickerSettings place-self-end text-sm italic text-grey-55 hover:text-accent-blue disabled:hover:text-grey-55"
-        onClick={() => setReactionEditOpen(true)}
-      >
-        add / remove
-      </button>
+      {fullMemberPermissions && (
+        <button
+          className="reactionPickerSettings place-self-end text-sm italic text-grey-55 hover:text-accent-blue disabled:hover:text-grey-55"
+          onClick={() => setReactionEditOpen(true)}
+        >
+          add / remove
+        </button>
+      )}
       <EditReactions
         reactionEditOpen={reactionEditOpen}
         onClose={() => setReactionEditOpen(false)}
@@ -142,8 +153,8 @@ export const EditReactions = (props: {
     >
       <div className="flex flex-col gap-2">
         <div className="flex flex-col gap-0">
-          <div className="font-bold text-grey-35">Add New</div>
-          <div className="text-sm text-grey-35">
+          <div className="text-grey-35 font-bold">Add New</div>
+          <div className="text-grey-35 text-sm">
             You can use up to four characters of emojis, text, or even unicode!
           </div>
         </div>
@@ -158,7 +169,7 @@ export const EditReactions = (props: {
             }}
           />
           <button
-            className="shrink-0 text-accent-blue"
+            className="text-accent-blue shrink-0"
             onClick={async (e: React.MouseEvent) => {
               if (!memberEntity) return;
               if (reactions.map((r) => r.value).includes(newReaction)) {
@@ -187,7 +198,7 @@ export const EditReactions = (props: {
         <div className="my-2">
           <Divider />
         </div>
-        <div className="font-bold text-grey-35">Edit Existing</div>
+        <div className="text-grey-35 font-bold">Edit Existing</div>
 
         <div className="mx-auto flex max-h-[440px] flex-wrap place-items-center gap-2 place-self-center overflow-scroll">
           {reactions
@@ -199,7 +210,7 @@ export const EditReactions = (props: {
               <div key={r.value} className="lightBorder w-20 p-1 text-center">
                 <h4>{r.value} </h4>
                 <button
-                  className="text-sm italic text-grey-55 hover:text-accent-blue"
+                  className="text-grey-55 hover:text-accent-blue text-sm italic"
                   onClick={async () => {
                     await mutate("retractFact", { id: r.id });
                   }}
@@ -215,45 +226,61 @@ export const EditReactions = (props: {
 };
 
 export const SingleReaction = (props: {
+  members: string[];
   entityID: string;
   reaction: string;
   count: number;
   memberReaction: string | null;
 }) => {
-  let { authorized, mutate, memberEntity } = useMutations();
+  let { permissions, mutate, memberEntity } = useMutations();
+  let authorized = permissions.commentAndReact;
+  let { session } = useAuth();
+  let [hover, setHover] = useState(false);
+  let { isLongPress, handlers } = useLongPress(() => {
+    setHover(true);
+  });
   return (
-    <button
-      className={`text-md flex items-center gap-2 rounded-md border px-2 py-0.5 ${
-        props.memberReaction
-          ? "border-accent-blue bg-bg-blue"
-          : "border-grey-80 bg-white"
-      } ${!authorized ? "cursor-default" : ""}`}
-      onClick={() => {
-        if (!memberEntity || !authorized) return;
-        if (props.memberReaction)
-          return mutate("retractFact", { id: props.memberReaction });
-        let factID = ulid();
-        mutate("assertFact", [
-          {
-            entity: props.entityID,
-            factID,
-            attribute: "card/reaction",
-            value: props.reaction,
-            positions: {},
-          },
-          {
-            entity: factID,
-            factID: ulid(),
-            attribute: "reaction/author",
-            value: ref(memberEntity),
-            positions: {},
-          },
-        ]);
-      }}
-    >
-      <strong>{props.reaction}</strong>{" "}
-      <span className="text-sm text-grey-55">{props.count}</span>
-    </button>
+    <Popover.Root open={hover}>
+      <Popover.Anchor>
+        <button
+          onPointerUp={() => setHover(false)}
+          {...handlers}
+          onMouseEnter={() => setHover(true)}
+          onMouseLeave={() => setHover(false)}
+          className={`text-md flex items-center gap-2 rounded-md border px-2 py-0.5 ${
+            props.memberReaction
+              ? "border-accent-blue bg-bg-blue"
+              : "border-grey-80 bg-white"
+          } ${!authorized ? "cursor-default" : ""}`}
+          onClick={() => {
+            if (!session.session || !authorized) return;
+            if (isLongPress.current) return;
+            if (props.memberReaction && memberEntity)
+              return mutate("removeReaction", {
+                cardEntity: props.entityID,
+                memberEntity,
+                reaction: props.reaction,
+              });
+            let factID = ulid();
+            mutate("addReaction", {
+              cardEntity: props.entityID,
+              reaction: props.reaction,
+              reactionFactID: factID,
+              reactionAuthorFactID: ulid(),
+              session: session.session,
+            });
+          }}
+        >
+          <strong>{props.reaction}</strong>{" "}
+          <span className="text-grey-55 text-sm">{props.count}</span>
+        </button>
+      </Popover.Anchor>
+      <Popover.Content sideOffset={4}>
+        <div className="text-grey-55 lightBorder rounded-md bg-white px-2 py-1 text-xs">
+          {props.members.join(", ")}
+        </div>
+      </Popover.Content>
+    </Popover.Root>
   );
 };
 
@@ -273,7 +300,7 @@ export const SingleReactionPreview = (props: {
     >
       <strong>{props.reaction}</strong>
       {props.count && (
-        <span className="text-xs text-grey-55">{props.count}</span>
+        <span className="text-grey-55 text-xs">{props.count}</span>
       )}
     </div>
   );

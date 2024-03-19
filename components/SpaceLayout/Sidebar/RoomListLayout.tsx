@@ -396,10 +396,10 @@ export const DraggableRoomListItem = (props: {
             })
           ).sort(sortByPosition("eav"));
 
-          let newIndex = 0;
+          let newIndex = siblings.length;
           let position = generateKeyBetween(
-            siblings[newIndex]?.positions.eav || null,
-            siblings[newIndex + 1]?.positions.eav || null
+            siblings[newIndex - 1]?.positions.eav || null,
+            siblings[newIndex]?.positions.eav || null
           );
 
           await mutate("retractFact", { id: data.id });

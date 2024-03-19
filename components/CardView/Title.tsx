@@ -59,14 +59,21 @@ export const Title = (props: { entityID: string }) => {
             e.preventDefault();
             complete(matchingTitles[selectedAutocomplete]?.entity);
           }
-          if (e.key === "ArrowDown" || (e.ctrlKey && e.key === "j")) {
+          if (matchingTitles.length === 0) return;
+          if (
+            (e.key === "ArrowDown" && !(e.ctrlKey || e.metaKey)) ||
+            (e.ctrlKey && e.key === "j")
+          ) {
             e.preventDefault();
             setSelectedAutocomplete((s) =>
               Math.min(s + 1, matchingTitles.length - 1)
             );
           }
 
-          if (e.key === "ArrowUp" || (e.ctrlKey && e.key === "k")) {
+          if (
+            (e.key === "ArrowUp" && !(e.ctrlKey || e.metaKey)) ||
+            (e.ctrlKey && e.key === "k")
+          ) {
             setSelectedAutocomplete((s) => Math.max(s - 1, 0));
             e.preventDefault();
           }

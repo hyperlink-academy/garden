@@ -36,8 +36,45 @@ export let useUIState = create(
           };
         },
         focusedCard: undefined as string | undefined,
+        roomStates: {} as {
+          [entityID: string]: {
+            filters: Filters;
+          };
+        },
+        cardStates: {} as {
+          [entityID: string]: {
+            drawer: null | "backlinks" | "chat";
+            drawerOpen: boolean;
+          };
+        },
+        chatInputStates: {} as {
+          [entityID: string]: {
+            value: string;
+            attachedCards: string[];
+            reply?: string | null;
+          };
+        },
+        focusedCard: undefined as string | undefined,
       },
       (set) => ({
+        setChatInput: (
+          entityID: string,
+          data: {
+            value?: string;
+            attachedCards?: string[];
+            reply?: string | null;
+          }
+        ) => {
+          set((state) => ({
+            chatInputStates: {
+              ...state.chatInputStates,
+              [entityID]: {
+                ...state.chatInputStates[entityID],
+                ...data,
+              },
+            },
+          }));
+        },
         setChatInputAttachedCards: (
           entityID: string,
           attachedCards: string[]

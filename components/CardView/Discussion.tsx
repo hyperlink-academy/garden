@@ -24,7 +24,6 @@ export const DiscussionRoom = (props: {
   isRoom: boolean;
 }) => {
   useMarkRead(props.entityID, true);
-  let [reply, setReply] = useState<string | null>(null);
   let room = useRoom();
   let { reactions, filters, setFilters, cardsFiltered, total } =
     useFilteredCards(room, "desktop/contains");
@@ -53,19 +52,13 @@ export const DiscussionRoom = (props: {
           authorized ? "pb-[64px]" : "pb-[88px]"
         }`}
       >
-        <Messages
-          entityID={props.entityID}
-          setReply={setReply}
-          isRoom={props.isRoom}
-        />
+        <Messages entityID={props.entityID} isRoom={props.isRoom} />
       </MessageWindow>
       <div className="discussionInputWrapper absolute bottom-0 right-0 w-full ">
         <MessageInput
           entityID={props.entityID}
           allowReact={props.allowReact}
           isRoom={props.isRoom}
-          reply={reply}
-          setReply={setReply}
         />
       </div>
     </div>
@@ -162,22 +155,19 @@ export const MessageInput = (props: {
   entityID: string;
   allowReact?: boolean;
   isRoom: boolean;
-  reply: string | null;
-  setReply: (reply: string | null) => void;
   onSend?: () => void;
 }) => {
-  let value = useUIState((s) => s.chatInputStates[props.entityID]?.value || "");
-  let attachedCards = useUIState(
-    (s) => s.chatInputStates[props.entityID]?.attachedCards || []
-  );
-  let setValue = useUIState((s) => s.setChatInputValue);
-  let setAttachedCards = useUIState((s) => s.setChatInputAttachedCards);
+  let setChatInput = useUIState((s) => s.setChatInput);
+  let chatState = useUIState((s) => s.chatInputStates[props.entityID]);
+  let value = chatState?.value || "";
+  let attachedCards = chatState?.attachedCards || [];
+  let reply = chatState?.reply || null;
   let { mutate, permissions } = useMutations();
   let { session } = useAuth();
 
   let authorized = permissions.commentAndReact;
 
-  let replyMessage = db.useMessageByID(props.reply);
+  let replyMessage = db.useMessageByID(reply);
   let replyToName = db.useEntity(replyMessage?.sender || null, "member/name");
   let cardBackgroundColor =
     db.useEntity(props.entityID, "card/background-color")?.value || "#FFFFFF";
@@ -187,7 +177,7 @@ export const MessageInput = (props: {
       id: ulid(),
       topic: props.entityID,
       ts: Date.now().toString(),
-      replyTo: props.reply,
+      replyTo: reply,
       content: value || "",
     };
     if (attachedCards.length > 0) {
@@ -208,9 +198,11 @@ export const MessageInput = (props: {
       discussion: props.entityID,
       message,
     });
-    setValue(props.entityID, "");
-    setAttachedCards(props.entityID, []);
-    props.setReply(null);
+    setChatInput(props.entityID, {
+      value: "",
+      attachedCards: [],
+      reply: null,
+    });
     if (props.onSend) {
       props.onSend();
     }
@@ -243,20 +235,25 @@ export const MessageInput = (props: {
             <AttachCard
               attachedCards={attachedCards}
               setAttachedCards={(cards) =>
-                setAttachedCards(props.entityID, cards)
+                setChatInput(props.entityID, { attachedCards: cards })
               }
             />
           </div>
           <div className={`messageInput flex w-full flex-col gap-2`}>
             {/* IF MESSAGE IS IN REPLY */}
-            {props.reply && (
+            {reply && (
               <div className="messageInputReply -mb-2">
                 <div className="border-grey-80 text-grey-55 flex items-start justify-between gap-2 rounded-lg  border px-2 py-[5px] text-xs italic">
                   <div className="flex flex-col gap-[1px]">
                     <div className="font-bold"> {replyToName?.value}</div>
                     <div className="text-grey-55">{replyMessage?.content}</div>
                   </div>
-                  <button className="" onClick={() => props.setReply(null)}>
+                  <button
+                    className=""
+                    onClick={() =>
+                      setChatInput(props.entityID, { reply: null })
+                    }
+                  >
                     <CloseLinedTiny />
                   </button>
                 </div>
@@ -274,10 +271,11 @@ export const MessageInput = (props: {
                         hideContent={true}
                         key={card}
                         onDelete={() =>
-                          setAttachedCards(
-                            props.entityID,
-                            attachedCards.filter((c) => c !== card)
-                          )
+                          setChatInput(props.entityID, {
+                            attachedCards: attachedCards.filter(
+                              (c) => c !== card
+                            ),
+                          })
                         }
                       />
                     </div>
@@ -300,7 +298,9 @@ export const MessageInput = (props: {
                     }
                   }}
                   value={value}
-                  onChange={(e) => setValue(props.entityID, e.target.value)}
+                  onChange={(e) =>
+                    setChatInput(props.entityID, { value: e.target.value })
+                  }
                   placeholder=""
                   className="w-full grow text-sm"
                   id="messageInput"
@@ -411,13 +411,11 @@ const AttachCard = ({
   );
 };
 
-export const Messages = (props: {
-  entityID: string;
-  setReply: (reply: string) => void;
-  isRoom: boolean;
-}) => {
+export const Messages = (props: { entityID: string; isRoom: boolean }) => {
   let messages = db.useMessages(props.entityID);
-  let { authorized } = useMutations();
+  let { permissions } = useMutations();
+  let authorized = permissions.commentAndReact;
+  let setChatInput = useUIState((s) => s.setChatInput);
   if (props.isRoom === false && messages.length == 0) return null;
 
   return (
@@ -443,7 +441,7 @@ export const Messages = (props: {
           id={m.id}
           entity={m.entity}
           reply={m.replyTo}
-          setReply={props.setReply}
+          setReply={(r) => setChatInput(props.entityID, { reply: r })}
         />
       ))}
     </>
@@ -460,7 +458,8 @@ const Message = (props: {
   entity?: string;
   setReply: (reply: string) => void;
 }) => {
-  let { authorized } = useMutations();
+  let { permissions } = useMutations();
+  let authorized = permissions.commentAndReact;
 
   let { session } = useAuth();
 

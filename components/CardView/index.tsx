@@ -10,6 +10,7 @@ import {
   ReactionAdd,
   CloseLinedTiny,
   GoBackToPageLined,
+  LinkSmall,
 } from "components/Icons";
 import { Divider, MenuContainer, MenuItem } from "components/Layout";
 import { scanIndex, db, useMutations, useSpaceID } from "hooks/useReplicache";
@@ -39,6 +40,7 @@ import { Title } from "./Title";
 import { LinkPreview } from "components/LinkPreview";
 import { useLinkPreviewManager } from "hooks/useLinkPreviewManager";
 import { useDrag } from "@use-gesture/react";
+import { useSmoker } from "components/Smoke";
 
 const borderStyles = (args: { member: boolean }) => {
   switch (true) {
@@ -221,31 +223,6 @@ export const CardContent = (props: {
     "member/name"
   )?.value;
 
-  useDrag(
-    (data) => {
-      let target = data.event.currentTarget as HTMLElement;
-      if (
-        target &&
-        target.scrollTop >= target.scrollHeight - target.clientHeight - 1 &&
-        data.direction[1] < 0 &&
-        data.distance[1] > 8 &&
-        data.distance[0] < 8
-      ) {
-        useUIState.getState().openDrawer(props.entityID, drawer || "chat");
-      }
-      if (
-        target &&
-        target.scrollTop === 0 &&
-        data.direction[1] > 0 &&
-        data.distance[1] > 8 &&
-        data.distance[0] < 8
-      ) {
-        useUIState.getState().closeDrawer(props.entityID);
-      }
-    },
-    { target: ref, pointer: { keys: false } }
-  );
-
   return (
     <>
       {/* START CARD CONTENT */}
@@ -365,12 +342,33 @@ const CardMoreOptionsMenu = (props: {
   referenceFactID?: string;
   onDelete?: () => void;
 }) => {
-  let { authorized } = useMutations();
+  let { authorized, permissions } = useMutations();
   let memberName = db.useEntity(props.entityID, "member/name");
   let [areYouSureCardDeletionModalOpen, setAreYouSureCardDeletionModalOpen] =
     useState(false);
+  let smoke = useSmoker();
   if (!!memberName) return null;
-  if (!authorized) return null;
+  if (!authorized) {
+    if (!permissions.commentAndReact) return null;
+    return (
+      <div className="pointer-events-auto relative flex flex-row gap-2 pt-4">
+        <button
+          onClick={(e) => {
+            smoke({
+              text: "copied link!",
+              position: { x: e.clientX, y: e.clientY },
+            });
+            navigator.clipboard.writeText(
+              `${document.location.protocol}//${document.location.host}${document.location.pathname}?openCard=${props.entityID}`
+            );
+          }}
+        >
+          <LinkSmall />
+        </button>
+        <ReactionPicker entityID={props.entityID} />
+      </div>
+    );
+  }
 
   return (
     <Menu as="div" className="pointer-events-auto relative">
@@ -378,6 +376,19 @@ const CardMoreOptionsMenu = (props: {
         <MoreOptionsTiny />
       </Menu.Button>
       <MenuContainer>
+        <MenuItem
+          onClick={(e) => {
+            smoke({
+              text: "copied link!",
+              position: { x: e.clientX, y: e.clientY },
+            });
+            navigator.clipboard.writeText(
+              `${document.location.protocol}//${document.location.host}${document.location.pathname}?openCard=${props.entityID}`
+            );
+          }}
+        >
+          <div className="font-bold">Copy link to card</div>
+        </MenuItem>
         <MenuItem>
           <CardBackgroundColorPicker entityID={props.entityID} />
         </MenuItem>
@@ -627,21 +638,18 @@ const DefaultTextSection = (props: { entityID: string }) => {
   );
 };
 
+let toggledOffStyle =
+  "rounded-md border p-0.5 hover:border-accent-blue hover:text-accent-blue border-transparent";
+let toggledOnStyle =
+  "rounded-md border p-0.5 hover:border-accent-blue hover:text-accent-blue border-grey-90 bg-bg-blue text-grey-80";
+
 export const SectionAdder = (props: {
   entityID: string;
   dateEditing: boolean;
-
   setDateEditing: () => void;
 }) => {
   let { authorized } = useMutations();
   let date = db.useEntity(props.entityID, "card/date");
-
-  let [reactionPickerOpen, setReactionPickerOpen] = useState(false);
-
-  let toggledOffStyle =
-    "rounded-md border p-0.5 hover:border-accent-blue hover:text-accent-blue border-transparent";
-  let toggledOnStyle =
-    "rounded-md border p-0.5 hover:border-accent-blue hover:text-accent-blue border-grey-90 bg-bg-blue text-grey-80";
 
   if (!authorized) return null;
   return (
@@ -696,37 +704,44 @@ export const SectionAdder = (props: {
       <div className="h-full w-[2px] px-2">
         <Divider vertical />
       </div>
-      <Popover.Root
-        onOpenChange={() => setReactionPickerOpen(!reactionPickerOpen)}
-      >
-        <Popover.Trigger className="flex items-center" asChild>
-          <button
-            className={`${toggledOffStyle} ${
-              !reactionPickerOpen
-                ? ""
-                : "rounded-md border border-accent-blue p-0.5 text-accent-blue"
-            }`}
-          >
-            <ReactionAdd />
-          </button>
-        </Popover.Trigger>
-        <Popover.Portal>
-          <Popover.Content
-            sideOffset={16}
-            collisionPadding={{ right: 20 }}
-            className="-mt-[1px] max-w-[298px]"
-          >
-            <AddReaction
-              entityID={props.entityID}
-              onSelect={() =>
-                document
-                  .getElementById("card-reactions")
-                  ?.scrollIntoView({ block: "center", behavior: "smooth" })
-              }
-            />
-          </Popover.Content>
-        </Popover.Portal>
-      </Popover.Root>
+      <ReactionPicker entityID={props.entityID} />
     </div>
+  );
+};
+
+const ReactionPicker = (props: { entityID: string }) => {
+  let [reactionPickerOpen, setReactionPickerOpen] = useState(false);
+  return (
+    <Popover.Root
+      onOpenChange={() => setReactionPickerOpen(!reactionPickerOpen)}
+    >
+      <Popover.Trigger className="flex items-center" asChild>
+        <button
+          className={`${toggledOffStyle} ${
+            !reactionPickerOpen
+              ? ""
+              : "rounded-md border border-accent-blue p-0.5 text-accent-blue"
+          }`}
+        >
+          <ReactionAdd />
+        </button>
+      </Popover.Trigger>
+      <Popover.Portal>
+        <Popover.Content
+          sideOffset={16}
+          collisionPadding={{ right: 20 }}
+          className="-mt-[1px] max-w-[298px]"
+        >
+          <AddReaction
+            entityID={props.entityID}
+            onSelect={() =>
+              document
+                .getElementById("card-reactions")
+                ?.scrollIntoView({ block: "center", behavior: "smooth" })
+            }
+          />
+        </Popover.Content>
+      </Popover.Portal>
+    </Popover.Root>
   );
 };

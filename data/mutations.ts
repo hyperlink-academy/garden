@@ -440,13 +440,14 @@ const addReaction: Mutation<{
   reactionFactID: string;
   reactionAuthorFactID: string;
   reaction: string;
-  memberEntity: string;
+  session: { username: string; studio: string };
 }> = async (args, ctx) => {
   let reactions = await ctx.scanIndex.eav(args.cardEntity, "card/reaction");
+  let memberEntity = await getOrCreateMemberEntity(args.session, ctx);
   for (let reaction of reactions) {
     let author = await ctx.scanIndex.eav(reaction.id, "reaction/author");
     if (
-      author?.value.value === args.memberEntity &&
+      author?.value.value === memberEntity &&
       reaction.value === args.reaction
     )
       return;
@@ -462,9 +463,25 @@ const addReaction: Mutation<{
     entity: args.reactionFactID,
     factID: args.reactionAuthorFactID,
     attribute: "reaction/author",
-    value: ref(args.memberEntity),
+    value: ref(memberEntity),
     positions: {},
   });
+};
+
+const removeReaction: Mutation<{
+  memberEntity: string;
+  cardEntity: string;
+  reaction: string;
+}> = async (args, ctx) => {
+  let allReactions = await ctx.scanIndex.eav(args.cardEntity, "card/reaction");
+  let reactions = allReactions.filter((r) => r.value === args.reaction);
+  for (let reaction of reactions) {
+    let author = await ctx.scanIndex.eav(reaction.id, "reaction/author");
+    if (author?.value.value === args.memberEntity) {
+      await ctx.retractFact(author.id);
+      await ctx.retractFact(reaction.id);
+    }
+  }
 };
 
 const markRead: Mutation<{
@@ -585,6 +602,7 @@ export const Mutations = {
   removeCardFromDesktopOrCollection,
   addCardToDesktop,
   addReaction,
+  removeReaction,
   initializeClient,
   setClientInCall,
   createRoom,
@@ -595,4 +613,5 @@ export const StudioMatePermissions: Array<keyof typeof Mutations> = [
   "replyToDiscussion",
   "markRead",
   "addReaction",
+  "removeReaction",
 ];

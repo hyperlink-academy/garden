@@ -54,11 +54,12 @@ export const markUnread = async (
         });
 
       let unreads = await calculateUnreads(memberEntity, ctx);
-      upserts.push({
-        user: members[i].id,
-        space_id: data.id,
-        unreads,
-      });
+      if (!upserts.find((f) => f.user === members[i].id))
+        upserts.push({
+          user: members[i].id,
+          space_id: data.id,
+          unreads,
+        });
     }
     await supabase.from("user_space_unreads").upsert(upserts);
   });

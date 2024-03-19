@@ -82,12 +82,15 @@ export function CreateStudio(props: { username: string }) {
         <form
           className="flex flex-col gap-4"
           onSubmit={async (e) => {
+            e.preventDefault();
             if (!authToken) return;
+            setLoading(true);
             let studio = await workerAPI(WORKER_URL, "create_studio", {
               authToken,
               ...formState,
             });
             mutate();
+            setLoading(false);
             if (!studio.success) return;
             setOpen(false);
             setFormState({

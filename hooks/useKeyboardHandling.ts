@@ -173,7 +173,7 @@ export const useKeyboardHandling = (deps: {
             e.preventDefault();
             if (e.shiftKey) {
               if (currentLine[0] === "-") break;
-              transact((text) => text.delete(lineIndex + 1, 2), -2);
+              transact((text) => text.delete(lineIndex + 1, 1), -1);
             } else {
               let previousLine = value
                 .slice(0, lineIndex)
@@ -182,7 +182,7 @@ export const useKeyboardHandling = (deps: {
                 ?.match(/^(\s*)/);
               if (!previousLine || previousLine[0].length < match[1].length)
                 return;
-              transact((text) => text.insert(lineIndex + 1, "  "));
+              transact((text) => text.insert(lineIndex + 1, "	"));
             }
           }
 

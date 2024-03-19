@@ -18,6 +18,7 @@ import * as Popover from "@radix-ui/react-popover";
 import { useSpaceData } from "hooks/useSpaceData";
 import { spaceAPI } from "backend/lib/api";
 import { LoginButton } from "./LoginModal";
+import { useToaster } from "./Smoke";
 
 type Props = {
   studio?: { spaces: SpaceData[]; studioName: string; studioID: string };
@@ -49,6 +50,8 @@ export const Space = (props: Props) => {
 export const SpaceRoleBadge = (props: { space_id: string }) => {
   let { session, authToken } = useAuth();
   let { data: spaceData, mutate } = useSpaceData(props);
+  let toaster = useToaster();
+
   let isMember = spaceData?.members_in_spaces.find(
     (m) => m.member === session.user?.id
   );
@@ -120,6 +123,11 @@ export const SpaceRoleBadge = (props: { space_id: string }) => {
               }
             );
             if (data.success) mutate();
+            toaster({
+              type: "success",
+              text: "Woo! You joined this Space!",
+              icon: null,
+            });
           }}
         />
       )}

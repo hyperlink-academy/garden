@@ -29,7 +29,6 @@ export const get_studio_data_route = makeRoute({
     if (msg.id) query = query.eq("id", msg.id);
     else query = query.eq("do_id", msg.do_id);
     let { data } = await query.single();
-    console.log(data);
     if (data) {
       return {
         data: {
