@@ -26,10 +26,11 @@ export function HomePage() {
         <div className="flex justify-between px-4 py-2">
           {/* notes */}
           <div>
-            {/* <ButtonLink content="notes (hyperlink blog)" /> */}
             <a
               href="https://notes.hyperlink.academy"
               className="mx-auto flex items-center justify-center gap-2 hover:text-accent-blue"
+              target="_blank"
+              rel="noopener noreferrer"
             >
               <span>
                 <strong>notes</strong> <em>(our blog)</em>
@@ -92,7 +93,7 @@ export function HomePage() {
         {/* main content - inner wrapper */}
         <div className="m-auto mb-8 flex max-w-6xl flex-col gap-8">
           {/* title: hyperlink academy */}
-          <div className="my-8 -rotate-3 bg-accent-gold px-8 py-32">
+          <div className="my-8 -rotate-3 rounded-md bg-accent-gold px-8 py-32">
             <div className="rotate-3">
               <div className="flex flex-col gap-8">
                 {/* title and tagline */}
@@ -100,29 +101,18 @@ export function HomePage() {
                   <h1>hyperlink academy</h1>
                   <h2>a set of tools for collaborative creative projects</h2>
                 </div>
-                {/* newsletter form */}
-                {/* <div className="m-auto flex max-w-lg flex-col gap-4 rounded-md bg-background p-8 text-center">
-                  <h3>drop your email & stay in the loop!</h3>
-                  <p className="text-sm">
-                    hear from us 1–2x / month about new features & experiments;
-                    we&apos;ll never spam or share your email
-                  </p>
-                  <div className="m-auto flex w-fit gap-2">
-                    <input placeholder="email"></input>
-                    <ButtonPrimary content="Sign up!" />
-                  </div>
-                </div> */}
               </div>
             </div>
           </div>
 
           {/* internet clubs */}
-          <div className="flex flex-col gap-8">
+          <div className="flex flex-col gap-8 rounded-md bg-bg-red p-8">
             <div className={`${textFormat}`}>
-              <h2 className="text-center">Internet Clubs</h2>
-              <div className="top-[96px] -mb-[56px] w-fit rotate-3 rounded-md bg-accent-red p-2 text-white">
+              <div className="relative left-[440px] top-[32px] w-fit rotate-3 rounded-md bg-accent-red p-2 text-white">
                 in progress!
               </div>
+              <h2 className="text-center">Internet Clubs</h2>
+
               <p>
                 We&apos;re playing with{" "}
                 <strong>a new kind of internet club</strong> — communities of
@@ -187,49 +177,49 @@ export function HomePage() {
 
             <h3 className="mb-8 text-center">The Features</h3>
             <div className="grid grid-cols-3 gap-8">
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2 rounded-md bg-white p-4">
                 <p>
                   <strong>Invites</strong>
                 </p>
                 <p>Invite people to join Spaces and Studios</p>
               </div>
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2 rounded-md bg-white p-4">
                 <p>
                   <strong>Discussion</strong>
                 </p>
                 <p>Chat channels and comments on any card</p>
               </div>
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2 rounded-md bg-white p-4">
                 <p>
                   <strong>Audio Calls</strong>
                 </p>
                 <p>Talk together directly in a Space</p>
               </div>
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2 rounded-md bg-white p-4">
                 <p>
                   <strong>Backlinks</strong>
                 </p>
                 <p>See anywhere a card is referenced</p>
               </div>
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2 rounded-md bg-white p-4">
                 <p>
                   <strong>Calendar</strong>
                 </p>
                 <p>Assign dates to cards; view and track past and future</p>
               </div>
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2 rounded-md bg-white p-4">
                 <p>
                   <strong>Links</strong>
                 </p>
                 <p>Attach cards or add inline wiki-style references</p>
               </div>
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2 rounded-md bg-white p-4">
                 <p>
                   <strong>Multiplayer Presence</strong>
                 </p>
                 <p>See when others are there with you — and where</p>
               </div>
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2 rounded-md bg-white p-4">
                 <p>
                   <strong>Push Notifications</strong>
                 </p>
@@ -243,7 +233,7 @@ export function HomePage() {
           {/* e.g. "read more about our vision here…" */}
 
           {/* notes on pricing */}
-          <div className={`${textFormat}`}>
+          <div className={`${textFormat} rounded-md bg-grey-90 p-8`}>
             <h2>Preliminary notes on pricing</h2>
             {/* Hyperlink is FREE! ... for now */}
 
@@ -281,8 +271,8 @@ export function HomePage() {
               <div className="flex -rotate-6 flex-col gap-4 rounded-md bg-bg-gold p-4 text-sm">
                 <h3>School / Org</h3>
                 <p>
-                  For larger communities cost might scale based on org size &
-                  include things like:
+                  For larger communities cost might scale with size, with extras
+                  like:
                 </p>
                 <ul className="ml-4 list-disc">
                   <li>Admin tools</li>
@@ -292,11 +282,10 @@ export function HomePage() {
               </div>
             </div>
 
-            {/* <p>
-              We'd love to hear your thoughts on this, especially if there are
-              things not mentioned above that'd make you excited to pay for
-              Hyperlink.
-            </p> */}
+            <p>
+              We&apos;d love to hear your thoughts, especially if there are
+              things that&apos;d make you excited to pay for Hyperlink.
+            </p>
 
             <p>
               If you run a community, school, or institution interested in a
@@ -313,29 +302,15 @@ export function HomePage() {
 
           {/* get started! */}
           <div className="m-auto flex flex-col gap-8">
-            {/* <div className="flex gap-4">
-              <div>
-                <h2>Studios</h2>
-                <p>a group homepage for a club, cohort, or team</p>
-                <ButtonLink content="see a studio" />
-              </div>
-              <div>
-                <h2>Spaces</h2>
-                <p>a shared workspace for a project or gathering</p>
-                <ButtonLink content="see a space" />
-              </div>
-            </div> */}
-
-            {/* <div className="flex flex-col items-center text-center">
-              <ButtonPrimary content="Create your Hyperlink Homepage!" />
-            </div> */}
-
             <div className="flex flex-col items-center p-8 text-center">
-              <h2>Let&apos;s get started!</h2>
-              <div className="my-8 -rotate-3 bg-accent-gold px-16 py-16">
+              {/* <h2>Let&apos;s get started!</h2> */}
+              <div className="my-4 -rotate-3 bg-accent-gold px-16 py-16">
                 <div className="rotate-3">
-                  {/* <p>to make your own…</p> */}
-                  <ButtonPrimary content="Sign up & try Hyperlink!" />
+                  <div className="flex flex-col items-center gap-4">
+                    <h2>Let&apos;s get started!</h2>
+                    <p>Join to make Spaces & Studios</p>
+                    <ButtonPrimary content="Sign up for Hyperlink!" />
+                  </div>
                 </div>
               </div>
             </div>
@@ -353,16 +328,17 @@ export function HomePage() {
               </div>
             </div>
 
-            {/* <p className="text-lg">
-              We&apos;d love to answer any questions & hear more about how you
-              imagine using Hyperlink —{" "}
-              <a
-                href="mailto:contact@hyperlink.academy"
-                className="text-accent-blue"
-              >
-                send us a note ✨🌱
-              </a>
-            </p> */}
+            <div className="text-center">
+              <p className="text-lg">
+                Questions?{" "}
+                <a
+                  href="mailto:contact@hyperlink.academy"
+                  className="text-accent-blue"
+                >
+                  Send us a note ✨🌱
+                </a>
+              </p>
+            </div>
           </div>
 
           {/* end main content wrapper  */}
