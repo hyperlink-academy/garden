@@ -331,7 +331,7 @@ export function HomePage() {
             </div> */}
 
             <div className="flex flex-col items-center p-8 text-center">
-              <h2>Let's get started!</h2>
+              <h2>Let&apos;s get started!</h2>
               <div className="my-8 -rotate-3 bg-accent-gold px-16 py-16">
                 <div className="rotate-3">
                   {/* <p>to make your own…</p> */}
