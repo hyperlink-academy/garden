@@ -20,22 +20,20 @@ export type Props = {
 };
 
 export function SpaceList({ data }: Props) {
-  let [search, setSearch] = useState("");
-
   let allSpaces = data?.spaces_in_studios;
 
-  let activeSpaces = allSpaces.filter(
-    ({ space_data: s }) =>
-      s &&
-      !s.archived &&
-      s.display_name?.toLocaleLowerCase().includes(search.toLocaleLowerCase())
-  );
-
+  let activeSpaces = allSpaces
+    .filter(({ space_data: s }) => s && !s.archived)
+    .sort(({ space_data: a }, { space_data: b }) => {
+      if (!a.display_name || !b.display_name) {
+        if (a.display_name) return -1;
+        if (b.display_name) return 1;
+        return 0;
+      }
+      return a.display_name.localeCompare(b.display_name);
+    });
   let archivedSpaces = allSpaces.filter(
-    ({ space_data: s }) =>
-      s &&
-      !!s.archived &&
-      s.display_name?.toLocaleLowerCase().includes(search.toLocaleLowerCase())
+    ({ space_data: s }) => s && !!s.archived
   );
 
   let { session } = useAuth();

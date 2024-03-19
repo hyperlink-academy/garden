@@ -81,6 +81,14 @@ const StudioSidebarExpanded = (
                 .toLocaleLowerCase()
                 .includes(spaceSearchInput.toLocaleLowerCase())
             )
+            .sort(({ space_data: a }, { space_data: b }) => {
+              if (!a.display_name || !b.display_name) {
+                if (a.display_name) return -1;
+                if (b.display_name) return 1;
+                return 0;
+              }
+              return a.display_name.localeCompare(b.display_name);
+            })
             .map((space) => (
               <Link
                 key={space.space_id}
