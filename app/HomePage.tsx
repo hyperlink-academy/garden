@@ -2,7 +2,22 @@
 import styles from "styles/Landing.module.css";
 import Head from "next/head";
 import { ButtonLink, ButtonPrimary } from "components/Buttons";
-import { BackToHome, Send } from "components/Icons";
+import {
+  BackToHome,
+  BellSmall,
+  CalendarMedium,
+  CallSmall,
+  CardMedium,
+  CardSearch,
+  ChatSmall,
+  LinkSmall,
+  MemberAdd,
+  RoomCalendar,
+  Rooms,
+  SearchOrCommand,
+  SectionLinkedCard,
+  Send,
+} from "components/Icons";
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -215,55 +230,60 @@ export function HomePage() {
             </div>
 
             <h3 className="mb-8 text-center">The Features</h3>
-            <div className="grid grid-cols-3 gap-8">
-              <div className="flex flex-col gap-2 rounded-md bg-white p-4">
-                <p>
-                  <strong>Invites</strong>
-                </p>
-                <p>Invite people to join Spaces and Studios</p>
-              </div>
-              <div className="flex flex-col gap-2 rounded-md bg-white p-4">
-                <p>
-                  <strong>Discussion</strong>
-                </p>
-                <p>Chat channels and comments on any card</p>
-              </div>
-              <div className="flex flex-col gap-2 rounded-md bg-white p-4">
-                <p>
-                  <strong>Audio Calls</strong>
-                </p>
-                <p>Talk together directly in a Space</p>
-              </div>
-              <div className="flex flex-col gap-2 rounded-md bg-white p-4">
-                <p>
-                  <strong>Backlinks</strong>
-                </p>
-                <p>See anywhere a card is referenced</p>
-              </div>
-              <div className="flex flex-col gap-2 rounded-md bg-white p-4">
-                <p>
-                  <strong>Calendar</strong>
-                </p>
-                <p>Assign dates to cards; view and track past and future</p>
-              </div>
-              <div className="flex flex-col gap-2 rounded-md bg-white p-4">
-                <p>
-                  <strong>Links</strong>
-                </p>
-                <p>Attach cards or add inline wiki-style references</p>
-              </div>
-              <div className="flex flex-col gap-2 rounded-md bg-white p-4">
-                <p>
-                  <strong>Multiplayer Presence</strong>
-                </p>
-                <p>See when others are there with you — and where</p>
-              </div>
-              <div className="flex flex-col gap-2 rounded-md bg-white p-4">
-                <p>
-                  <strong>Push Notifications</strong>
-                </p>
-                <p>When you add the web app on mobile!</p>
-              </div>
+            {/* <div className="grid grid-cols-3 gap-8"> */}
+            <div className="flex flex-wrap justify-center gap-8">
+              <FeatureListItem
+                name="Invites"
+                description="Invite people to join Spaces and Studios"
+                icon={<MemberAdd />}
+              />
+              <FeatureListItem
+                name="Discussion"
+                description="Global chat rooms; comments on any card"
+                icon={<ChatSmall />}
+              />
+              <FeatureListItem
+                name="Calendar"
+                description="Assign dates to cards; view things past and future"
+                icon={<CalendarMedium />}
+              />
+              <FeatureListItem
+                name="Links"
+                description="Attach cards or link them inline, wiki-style"
+                // icon={<LinkSmall />}
+                icon={<SectionLinkedCard />}
+              />
+              <FeatureListItem
+                name="Backlinks"
+                description="See anywhere a card is referenced in a Space"
+                icon={<SearchOrCommand />}
+              />
+              <FeatureListItem
+                name="Audio Calls"
+                description="Work and talk together directly in a Space"
+                icon={<CallSmall />}
+              />
+              <FeatureListItem
+                name="Multiplayer Presence"
+                description="See when others are in a Space — and where"
+                icon={<Rooms />}
+              />
+              <FeatureListItem
+                name="Push Notifications"
+                description="When you add the web app on mobile!"
+                icon={<BellSmall />}
+              />
+
+              {/* other fun icons to add?! */}
+              {/* BackToHome - ??? */}
+              {/* CardMedium - USE FOR CARDS */}
+              {/* CardSearch - GLOBAL SEARCH? */}
+              {/* Edit - FOR CARDS / MEDIA? */}
+              {/* Email - FOR DIGESTS… */}
+              {/* Note - ??? */}
+              {/* ReactionAdd - CHAT + REACTIONS */}
+              {/* SectionImageAdd - IMAGE SUPPORT */}
+              {/* TitleToggle - RICH TEXT MAYBE? */}
             </div>
           </div>
 
@@ -403,3 +423,19 @@ export function HomePage() {
     </>
   );
 }
+
+const FeatureListItem = (props: {
+  name: string;
+  description: string;
+  icon: React.ReactElement;
+}) => {
+  return (
+    <div className="flex w-72 flex-col items-center gap-2 rounded-md border border-grey-80 bg-white p-4 shadow-md">
+      {props.icon}
+      <p>
+        <strong>{props.name}</strong>
+      </p>
+      <p>{props.description}</p>
+    </div>
+  );
+};
