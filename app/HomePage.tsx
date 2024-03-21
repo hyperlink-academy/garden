@@ -1,24 +1,16 @@
 "use client";
-import styles from "styles/Landing.module.css";
-import Head from "next/head";
 import { ButtonLink, ButtonPrimary } from "components/Buttons";
 import {
   BackToHome,
   BellSmall,
   CalendarMedium,
   CallSmall,
-  CardMedium,
-  CardSearch,
   ChatSmall,
-  LinkSmall,
   MemberAdd,
-  RoomCalendar,
   Rooms,
   SearchOrCommand,
   SectionLinkedCard,
-  Send,
 } from "components/Icons";
-import { useState } from "react";
 import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
 import { useAuth } from "hooks/useAuth";
@@ -151,12 +143,9 @@ export function HomePage() {
               </p>
             </div>
 
-            {/* <h3 className="text-center">Current Clubs</h3> */}
             <p className="text-center text-lg italic">
               ✨ explore our current clubs! ✨
             </p>
-            {/* <div className="grid grid-cols-3 gap-4"> */}
-            {/* flex-wrap */}
             <div className="flex place-content-center items-end gap-4">
               <StudioItem
                 name="Handmade March"
@@ -212,7 +201,6 @@ export function HomePage() {
           <div>
             <div className="py-8">
               <h3 className="mb-8 text-center">The Pieces</h3>
-              {/* <div className="text-center">PIECES GO HERE!</div> */}
               <div className="bg-bg-blue p-4">
                 <p className="text-lg">
                   <strong>studios</strong>
@@ -250,7 +238,6 @@ export function HomePage() {
             </div>
 
             <h3 className="mb-8 text-center">The Features</h3>
-            {/* <div className="grid grid-cols-3 gap-8"> */}
             <div className="flex flex-wrap justify-center gap-8">
               <FeatureListItem
                 name="Invites"
@@ -293,35 +280,16 @@ export function HomePage() {
                 description="When you add the web app on mobile!"
                 icon={<BellSmall />}
               />
-
-              {/* other fun icons to add?! */}
-              {/* BackToHome - ??? */}
-              {/* CardMedium - USE FOR CARDS */}
-              {/* CardSearch - GLOBAL SEARCH? */}
-              {/* Edit - FOR CARDS / MEDIA? */}
-              {/* Email - FOR DIGESTS… */}
-              {/* Note - ??? */}
-              {/* ReactionAdd - CHAT + REACTIONS */}
-              {/* SectionImageAdd - IMAGE SUPPORT */}
-              {/* TitleToggle - RICH TEXT MAYBE? */}
             </div>
           </div>
 
           {/* get started! */}
           <div className="m-auto flex flex-col gap-8">
             <div className="flex flex-col items-center p-8 text-center">
-              {/* <h2>Let&apos;s get started!</h2> */}
               <div className="my-4 -rotate-3 bg-accent-gold px-16 py-16">
                 <div className="rotate-3">
                   <div className="flex flex-col items-center gap-4">
-                    {/* simplified - signup button only (if we bypass homepage for logged in users) */}
-                    {/* <ButtonPrimary
-                      content="Sign up for Hyperlink!"
-                      onClick={() => setLoginOrSignupState("signup")}
-                    /> */}
-
                     {/* login / signup links */}
-                    {/* <div className="flex flex-row gap-2 self-center"> */}
                     {!session?.loggedIn ? (
                       <>
                         <h2>Let&apos;s get started!</h2>
@@ -345,14 +313,7 @@ export function HomePage() {
                       <>
                         <h2>Let&apos;s get started!</h2>
                         <p>You&apos;re already logged in ☀️</p>
-                        <Link
-                          href={`/s/${session.session.username}`}
-                          // className="mx-auto flex items-center justify-center gap-2 hover:text-accent-blue"
-                        >
-                          {/* <BackToHome />
-                            <span>
-                              <strong>visit my homepage</strong>
-                            </span> */}
+                        <Link href={`/s/${session.session.username}`}>
                           <ButtonPrimary
                             content="visit my homepage"
                             icon={<BackToHome />}
@@ -364,10 +325,6 @@ export function HomePage() {
                         <h2>Let&apos;s get started!</h2>
                         <p>You&apos;re already logged in ☀️</p>
                         <Link href={`/setup`}>
-                          {/* <BackToHome />
-                          <span>
-                            <strong>finish account setup!</strong>
-                          </span> */}
                           <ButtonPrimary
                             content="finish account setup"
                             icon={<BackToHome />}
@@ -375,7 +332,6 @@ export function HomePage() {
                         </Link>
                       </>
                     )}
-                    {/* </div> */}
                   </div>
                 </div>
               </div>
@@ -389,22 +345,31 @@ export function HomePage() {
                 we&apos;ll never spam or share your email
               </p>
               <div className="m-auto flex w-fit gap-2">
-                <input placeholder="email"></input>
-                <ButtonPrimary content="Subscribe!" />
+                <form
+                  action="https://buttondown.email/api/emails/embed-subscribe/hyperlink"
+                  method="post"
+                  target="popupwindow"
+                  onSubmit={async () => {
+                    window.open(
+                      "https://buttondown.email/hyperlink",
+                      "popupwindow"
+                    );
+                  }}
+                  className="embeddable-buttondown-form m-auto flex w-fit gap-2"
+                >
+                  <input
+                    type="email"
+                    name="email"
+                    id="bd-email"
+                    placeholder="email"
+                    required
+                  />
+                  <div className="grid justify-items-end text-right">
+                    <ButtonPrimary content="Subscribe!" type="submit" />
+                  </div>
+                </form>
               </div>
             </div>
-
-            {/* <div className="text-center">
-              <p className="text-lg">
-                Questions?{" "}
-                <a
-                  href="mailto:contact@hyperlink.academy"
-                  className="text-accent-blue"
-                >
-                  Send us a note ✨🌱
-                </a>
-              </p>
-            </div> */}
           </div>
 
           {/* end main content wrapper  */}
