@@ -1,8 +1,6 @@
 import { db } from "hooks/useReplicache";
-import { useRef, useState } from "react";
 import { Backlinks } from "./Backlinks";
 import {
-  DiscussionRoom,
   MessageInput,
   MessageWindow,
   Messages,
