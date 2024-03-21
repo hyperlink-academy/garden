@@ -25,7 +25,7 @@ export function HomePage() {
       <div className="sticky top-0 z-10 bg-background">
         <div className="flex justify-between px-4 py-2">
           {/* notes */}
-          <div>
+          <div className="flex gap-2">
             <a
               href="https://notes.hyperlink.academy"
               className="mx-auto flex items-center justify-center gap-2 hover:text-accent-blue"
@@ -36,6 +36,15 @@ export function HomePage() {
                 <strong>notes</strong> <em>(our blog)</em>
               </span>
             </a>
+            <span className="text-grey-80">|</span>
+            <Link
+              href="/docs"
+              className="mx-auto flex items-center justify-center gap-2 hover:text-accent-blue"
+            >
+              <span>
+                <strong>docs</strong>
+              </span>
+            </Link>
           </div>
           {/* login / signup links */}
           <div className="flex flex-row gap-2 self-center">
@@ -119,7 +128,7 @@ export function HomePage() {
                 practice where we make and explore things together.
               </p>
               <p>
-                In these clubs, we work async in Spaces, explore and chat about
+                In each club we work async in Spaces, explore and chat about
                 each other&apos;s work, and share updates with a group digest.
               </p>
             </div>
@@ -138,9 +147,15 @@ export function HomePage() {
             </div>
 
             <div className={`${textFormat} items-center text-center`}>
-              <h3>Want to start one of your own?</h3>
+              <h3>Want to start a club of your own?</h3>
               <p>We&apos;ll help with ideas, setup, and tech support!</p>
-              <ButtonPrimary content="Propose a Club" />
+              <Link
+                href="https://hyperlink.academy/forms/propose-club"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <ButtonPrimary content="Propose a Club" />
+              </Link>
             </div>
           </div>
 
@@ -163,13 +178,37 @@ export function HomePage() {
             <div className="py-8">
               <h3 className="mb-8 text-center">The Pieces</h3>
               {/* <div className="text-center">PIECES GO HERE!</div> */}
-              <div className="h-96 bg-bg-blue p-4">
-                studios
-                <div className="h-72 w-2/3 bg-bg-gold p-4">
-                  spaces
-                  <div className="h-48 w-2/3 bg-bg-red p-4">
-                    rooms
-                    <div className="h-32 w-2/3 bg-white p-4">cards</div>
+              <div className="bg-bg-blue p-4">
+                <p className="text-lg">
+                  <strong>studios</strong>
+                </p>
+                <p>
+                  homes for groups working together — like clubs, cohorts, or
+                  teams
+                </p>
+                <div className="m-4 w-2/3 bg-bg-gold p-4">
+                  <p className="text-lg">
+                    <strong>spaces</strong>
+                  </p>
+                  <p>
+                    collaborative workspaces — for projects, gatherings, or
+                    explorations
+                  </p>
+                  <div className="m-4 w-2/3 bg-bg-red p-4">
+                    <p className="text-lg">
+                      <strong>rooms</strong>
+                    </p>
+                    <p>
+                      organize your work — collections, canvases, and chat rooms
+                    </p>
+                    <div className="m-4 w-2/3 bg-white p-4">
+                      <p className="text-lg">
+                        <strong>cards</strong>
+                      </p>
+                      <p>
+                        modular documents — collect text, images, chat & more
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -307,9 +346,68 @@ export function HomePage() {
               <div className="my-4 -rotate-3 bg-accent-gold px-16 py-16">
                 <div className="rotate-3">
                   <div className="flex flex-col items-center gap-4">
-                    <h2>Let&apos;s get started!</h2>
-                    <p>Join to make Spaces & Studios</p>
-                    <ButtonPrimary content="Sign up for Hyperlink!" />
+                    {/* simplified - signup button only (if we bypass homepage for logged in users) */}
+                    {/* <ButtonPrimary
+                      content="Sign up for Hyperlink!"
+                      onClick={() => setLoginOrSignupState("signup")}
+                    /> */}
+
+                    {/* login / signup links */}
+                    {/* <div className="flex flex-row gap-2 self-center"> */}
+                    {!session?.loggedIn ? (
+                      <>
+                        <h2>Let&apos;s get started!</h2>
+                        <p>Join to make Spaces & Studios</p>
+                        <p>⬇️ ↓ ⬇ ⤵️ ↯ ⏬ ⇣</p>
+                        <ButtonPrimary
+                          content="Sign up for Hyperlink!"
+                          onClick={() => setLoginOrSignupState("signup")}
+                        />
+                        <LoginOrSignupModal
+                          state={loginOrSignupState}
+                          setState={setLoginOrSignupState}
+                          onLogin={(s) =>
+                            s.username
+                              ? router.push(`/s/${s.username}`)
+                              : router.push("/setup")
+                          }
+                        />
+                      </>
+                    ) : session.session?.username ? (
+                      <>
+                        <h2>Let&apos;s get started!</h2>
+                        <p>You&apos;re already logged in ☀️</p>
+                        <Link
+                          href={`/s/${session.session.username}`}
+                          // className="mx-auto flex items-center justify-center gap-2 hover:text-accent-blue"
+                        >
+                          {/* <BackToHome />
+                            <span>
+                              <strong>visit my homepage</strong>
+                            </span> */}
+                          <ButtonPrimary
+                            content="visit my homepage"
+                            icon={<BackToHome />}
+                          />
+                        </Link>
+                      </>
+                    ) : (
+                      <>
+                        <h2>Let&apos;s get started!</h2>
+                        <p>You&apos;re already logged in ☀️</p>
+                        <Link href={`/setup`}>
+                          {/* <BackToHome />
+                          <span>
+                            <strong>finish account setup!</strong>
+                          </span> */}
+                          <ButtonPrimary
+                            content="finish account setup"
+                            icon={<BackToHome />}
+                          />
+                        </Link>
+                      </>
+                    )}
+                    {/* </div> */}
                   </div>
                 </div>
               </div>
@@ -328,7 +426,7 @@ export function HomePage() {
               </div>
             </div>
 
-            <div className="text-center">
+            {/* <div className="text-center">
               <p className="text-lg">
                 Questions?{" "}
                 <a
@@ -338,7 +436,7 @@ export function HomePage() {
                   Send us a note ✨🌱
                 </a>
               </p>
-            </div>
+            </div> */}
           </div>
 
           {/* end main content wrapper  */}
@@ -351,14 +449,28 @@ export function HomePage() {
 
       <Divider />
 
-      <div className="flex flex-row gap-2 px-4 py-2 text-sm italic text-grey-55">
-        <Link href="/privacy" className="hover:text-accent-blue">
-          privacy policy
-        </Link>{" "}
-        |{" "}
-        <Link href="/terms" className="hover:text-accent-blue">
-          terms
-        </Link>
+      <div className="flex flex-row justify-between gap-4">
+        <div className="flex flex-row gap-2 px-4 py-2 text-sm text-grey-55">
+          <Link href="/privacy" className="hover:text-accent-blue">
+            privacy policy
+          </Link>{" "}
+          <span className="text-grey-80">|</span>{" "}
+          <Link href="/terms" className="hover:text-accent-blue">
+            terms
+          </Link>
+        </div>
+        <div className="px-4 py-2 text-sm text-grey-55">
+          <p className="">
+            Questions?{" "}
+            <a
+              href="mailto:contact@hyperlink.academy"
+              className="text-accent-blue hover:text-grey-55"
+            >
+              Send us a note
+            </a>{" "}
+            ✨🌱
+          </p>
+        </div>
       </div>
     </>
   );
