@@ -33,24 +33,6 @@ export let useUIState = create(
           [entityID: string]: {
             value: string;
             attachedCards: string[];
-          };
-        },
-        focusedCard: undefined as string | undefined,
-        roomStates: {} as {
-          [entityID: string]: {
-            filters: Filters;
-          };
-        },
-        cardStates: {} as {
-          [entityID: string]: {
-            drawer: null | "backlinks" | "chat";
-            drawerOpen: boolean;
-          };
-        },
-        chatInputStates: {} as {
-          [entityID: string]: {
-            value: string;
-            attachedCards: string[];
             reply?: string | null;
           };
         },

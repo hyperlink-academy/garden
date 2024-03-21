@@ -23,6 +23,7 @@ export type Props = {
 
 export function SpaceList({ data }: Props) {
   let { authorized } = useMutations();
+  let { session } = useAuth();
   let allSpaces = data?.spaces_in_studios;
   let yourSpaces = allSpaces.filter(
     (s) =>
