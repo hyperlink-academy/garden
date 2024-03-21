@@ -19,12 +19,15 @@ import {
   Send,
 } from "components/Icons";
 import { useState } from "react";
-import Image from "next/image";
+import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
 import { useAuth } from "hooks/useAuth";
 import { useRouter } from "next/navigation";
 import { LoginOrSignupModal } from "components/LoginModal";
 import { Divider } from "components/Layout";
+import studioImgHandmadeMarch from "public/landing/studio-handmade-march.png";
+import studioImgInternetHomesteading from "public/landing/studio-internet-homesteading.png";
+import studioImgPedagogicalParents from "public/landing/studio-pedagogical-parents.png";
 
 export function HomePage() {
   let textFormat = "mx-auto w-full flex max-w-2xl flex-col gap-4";
@@ -148,17 +151,34 @@ export function HomePage() {
               </p>
             </div>
 
-            <h3 className="text-center">Current Clubs</h3>
-            <div className="grid grid-cols-3 gap-4">
-              <div className="flex h-48 place-content-center items-center rounded-md bg-bg-blue">
-                <h3>Handmade March</h3>
-              </div>
-              <div className="flex h-48 place-content-center items-center rounded-md bg-bg-blue">
-                <h3>Internet Homesteading</h3>
-              </div>
-              <div className="flex h-48 place-content-center items-center rounded-md bg-bg-blue">
-                <h3>Pedagogical Parents</h3>
-              </div>
+            {/* <h3 className="text-center">Current Clubs</h3> */}
+            <p className="text-center text-lg italic">
+              ✨ explore our current clubs! ✨
+            </p>
+            {/* <div className="grid grid-cols-3 gap-4"> */}
+            {/* flex-wrap */}
+            <div className="flex place-content-center items-end gap-4">
+              <StudioItem
+                name="Handmade March"
+                description="making things by hand every day"
+                image={studioImgHandmadeMarch}
+                alt="a handmade pufferfish stamp, on the front of an abstract golden building"
+                url="https://hyperlink.academy/studio/2QUkzDt56DYB7B0RS10mTL"
+              />
+              <StudioItem
+                name="Internet Homesteading"
+                description="building personal websites"
+                image={studioImgInternetHomesteading}
+                alt="pixel art of tree, path, and home on a hilltop, on the front of an abstract red building"
+                url="https://hyperlink.academy/studio/46boxeFl9XacS39o1hwpJ8"
+              />
+              <StudioItem
+                name="Pedagogical Parents"
+                description="reading books about learning"
+                image={studioImgPedagogicalParents}
+                alt="diptych of book covers, on the front of an abstract blue building"
+                url="https://hyperlink.academy/studio/4lO7UZsrSbMZUN7zEt7I4q"
+              />
             </div>
 
             <div className={`${textFormat} items-center text-center`}>
@@ -423,6 +443,27 @@ export function HomePage() {
     </>
   );
 }
+
+const StudioItem = (props: {
+  name: string;
+  description: string;
+  image: StaticImageData;
+  alt: string;
+  url: string;
+}) => {
+  return (
+    <Link href={props.url} className="">
+      {/* max-w-xs */}
+      <div className="flex flex-col items-center gap-4 rounded-md border border-grey-80 bg-white p-4 text-center transition-all hover:scale-[1.02] hover:shadow-md">
+        <div className="flex flex-col gap-2">
+          <h4>{props.name}</h4>
+          <p className="text-sm italic">{props.description}</p>
+        </div>
+        <Image src={props.image} alt={props.alt} />
+      </div>
+    </Link>
+  );
+};
 
 const FeatureListItem = (props: {
   name: string;
