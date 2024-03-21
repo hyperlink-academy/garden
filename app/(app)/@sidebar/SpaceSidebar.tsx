@@ -10,6 +10,7 @@ import {
   RoomMember,
   RoomSearch,
   Settings,
+  UnreadDot,
 } from "components/Icons";
 import { db, useMutations, useSpaceID } from "hooks/useReplicache";
 import { sortByPosition } from "src/position_helpers";
@@ -27,6 +28,7 @@ import { DotLoader } from "components/DotLoader";
 import { Modal, ModalSubmitButton } from "components/Modal";
 import { WORKER_URL } from "src/constants";
 import { useSidebarState } from "./SidebarState";
+import { useRoomUnreads } from "components/SpaceLayout/Sidebar/RoomListLayout";
 
 export function SpaceSidebar(props: {
   display_name: string | null;
@@ -139,23 +141,31 @@ const RoomButton = (props: { entityID: string }) => {
   let roomType = db.useEntity(props.entityID, "room/type");
   let setRoom = useSetRoom();
   let room = useRoom();
+  let unreads = useRoomUnreads(props.entityID);
   return (
-    <SidebarTab
-      title=""
-      active={room === props.entityID}
-      collapsed
-      onClick={() => {
-        setRoom(props.entityID);
-      }}
-      icon={
-        roomType?.value === "canvas" ? (
-          <RoomCanvas />
-        ) : roomType?.value === "chat" ? (
-          <RoomChat />
-        ) : (
-          <RoomCollection />
-        )
-      }
-    />
+    <div className="relative">
+      <SidebarTab
+        title=""
+        active={room === props.entityID}
+        collapsed
+        onClick={() => {
+          setRoom(props.entityID);
+        }}
+        icon={
+          roomType?.value === "canvas" ? (
+            <RoomCanvas />
+          ) : roomType?.value === "chat" ? (
+            <RoomChat />
+          ) : (
+            <RoomCollection />
+          )
+        }
+      />
+      {unreads && (
+        <div className="absolute left-0 top-1">
+          <UnreadDot />
+        </div>
+      )}
+    </div>
   );
 };

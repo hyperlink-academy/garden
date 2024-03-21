@@ -174,31 +174,18 @@ const AreYouSureRoomDeletionModal = (props: {
   );
 };
 
-export const RoomListItem = (props: {
-  children: React.ReactNode;
-  editing: boolean;
-  setEditing: (editing: boolean) => void;
-  roomEntity: string;
-  setRoomEditOpen?: () => void;
-  isOver?: boolean;
-}) => {
-  let isActiveRoom = useIsActiveRoom(props.roomEntity);
-  let setRoom = useSetRoom();
-  let { memberEntity, authorized } = useMutations();
-  let roomType = db.useEntity(props.roomEntity, "room/type");
-  let isMobile = useIsMobile();
-  let { setSidebar } = useSidebarState();
-
+export const useRoomUnreads = (roomEntity: string) => {
+  let { memberEntity } = useMutations();
   let unreadCount = useSubscribe(
     async (tx) => {
       if (!memberEntity) return false;
       let unread = (
-        await scanIndex(tx).eav(props.roomEntity, "discussion/unread-by")
+        await scanIndex(tx).eav(roomEntity, "discussion/unread-by")
       ).find((f) => f.value.value === memberEntity);
 
       if (unread) return true;
       // NB - currently collections also use 'desktop/contains'
-      let cards = await scanIndex(tx).eav(props.roomEntity, "desktop/contains");
+      let cards = await scanIndex(tx).eav(roomEntity, "desktop/contains");
       for (let card of cards) {
         let unread = (
           await scanIndex(tx).eav(card.value.value, "card/unread-by")
@@ -215,8 +202,27 @@ export const RoomListItem = (props: {
     },
     false,
     [memberEntity],
-    `${props.roomEntity}/unreadCount`
+    `${roomEntity}/unreadCount`
   );
+  return unreadCount;
+};
+
+export const RoomListItem = (props: {
+  children: React.ReactNode;
+  editing: boolean;
+  setEditing: (editing: boolean) => void;
+  roomEntity: string;
+  setRoomEditOpen?: () => void;
+  isOver?: boolean;
+}) => {
+  let isActiveRoom = useIsActiveRoom(props.roomEntity);
+  let setRoom = useSetRoom();
+  let { memberEntity, authorized } = useMutations();
+  let roomType = db.useEntity(props.roomEntity, "room/type");
+  let isMobile = useIsMobile();
+  let { setSidebar } = useSidebarState();
+
+  let unreadCount = useRoomUnreads(props.roomEntity);
 
   return (
     <div
