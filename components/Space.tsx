@@ -39,7 +39,7 @@ export const Space = (props: Props) => {
   return (
     <>
       <PresenceHandler />
-      <div className="spaceRoomAndSidebar border-grey-90 relative flex  shrink-0 snap-center snap-always  flex-row rounded-md border">
+      <div className="spaceRoomAndSidebar relative flex shrink-0  snap-center snap-always flex-row  rounded-md border border-grey-90">
         <Room />
       </div>
       <CardViewer space_id={props.space_id} />
@@ -165,7 +165,7 @@ const InfoPopover = (props: {
       </Popover.Trigger>
       <Popover.Portal>
         <Popover.Content sideOffset={8} collisionPadding={24} className="z-50">
-          <div className="lightBorder text-grey-55 flex max-w-xs flex-col gap-2 rounded-sm bg-white p-2 text-xs font-normal shadow-lg">
+          <div className="lightBorder rounded-sm flex max-w-xs flex-col gap-2 bg-white p-2 text-xs font-normal text-grey-55 shadow-lg">
             {props.children}
           </div>
           <Popover.Close />

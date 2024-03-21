@@ -1,8 +1,6 @@
 import { db } from "hooks/useReplicache";
-import { useRef, useState } from "react";
 import { Backlinks } from "./Backlinks";
 import {
-  DiscussionRoom,
   MessageInput,
   MessageWindow,
   Messages,
@@ -20,7 +18,6 @@ export const CardViewDrawer = (props: {
 }) => {
   let drawer = useUIState((s) => s.cardStates[props.entityID]?.drawer);
   let viewportHeight = useViewportSize().height;
-  let [reply, setReply] = useState<string | null>(null);
 
   let [measure, { height }] = useMeasure();
   let drawerSpring = useSpring({
@@ -52,7 +49,6 @@ export const CardViewDrawer = (props: {
               <DiscussionContent
                 entityID={props.entityID}
                 open={props.drawerOpen}
-                setReply={setReply}
               />
             ) : (
               <Backlinks entityID={props.entityID} />
@@ -71,8 +67,6 @@ export const CardViewDrawer = (props: {
             entityID={props.entityID}
             allowReact={true}
             isRoom={false}
-            reply={reply}
-            setReply={setReply}
             onSend={() =>
               useUIState.getState().openDrawer(props.entityID, "chat")
             }
@@ -83,20 +77,12 @@ export const CardViewDrawer = (props: {
   );
 };
 
-const DiscussionContent = (props: {
-  entityID: string;
-  open: boolean;
-  setReply: (reply: string) => void;
-}) => {
+const DiscussionContent = (props: { entityID: string; open: boolean }) => {
   useMarkRead(props.entityID, props.open);
   return (
     <>
-      <div className="flex flex-col">
-        <Messages
-          entityID={props.entityID}
-          isRoom={false}
-          setReply={props.setReply}
-        />
+      <div className="-mx-3 flex flex-col sm:-mx-4">
+        <Messages entityID={props.entityID} isRoom={false} />
       </div>
     </>
   );

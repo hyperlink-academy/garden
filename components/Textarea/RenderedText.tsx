@@ -18,6 +18,7 @@ export const RenderedText = forwardRef<
     renderLinks?: boolean;
     entityID?: string;
     placeholder?: string;
+    messageIsMe?: boolean;
   } & JSX.IntrinsicElements["pre"]
 >((props, elRef) => {
   let { open } = useCardViewer();
@@ -68,7 +69,12 @@ export const RenderedText = forwardRef<
 
   return (
     <Linkify
-      options={{ className: "text-accent-blue underline", target: "_blank" }}
+      options={{
+        className: `${
+          props.messageIsMe ? "text-accent-gold" : "text-accent-blue"
+        } underline`,
+        target: "_blank",
+      }}
     >
       <pre
         role="link"

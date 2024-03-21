@@ -13,6 +13,7 @@ import { Divider } from "./Layout";
 import { useCurrentOpenCard, useRoom } from "hooks/useUIState";
 import { sortByPosition } from "src/position_helpers";
 import { generateKeyBetween } from "src/fractional-indexing";
+import { isAppleDevice } from "@react-aria/utils";
 
 export const useSearch = () => {
   let [input, setInput] = useState("");
@@ -80,7 +81,7 @@ export function Search() {
             onOpenAutoFocus={(e) => e.preventDefault()}
             className={`no-scrollbar relative z-0 flex max-h-80 flex-col gap-1 overflow-x-scroll rounded-md border text-sm ${
               open
-                ? " border-grey-90 shadow-drop bg-white"
+                ? " border-grey-90 bg-white shadow-drop"
                 : "border-transparent"
             }`}
             style={{ width: "var(--radix-popper-anchor-width)" }}
@@ -90,7 +91,7 @@ export function Search() {
                 open && " bg-white"
               } `}
             >
-              <RoomSearch className={`text-grey-55 absolute right-4 top-4`} />
+              <RoomSearch className={`absolute right-4 top-4 text-grey-55`} />
               <input
                 ref={inputRef}
                 tabIndex={-1}
@@ -231,7 +232,7 @@ export function Search() {
                 className={`w-full px-2 py-1 outline-none ${
                   open && "bg-white"
                 }`}
-                placeholder="search cards (ctrl/⌘ K)"
+                placeholder={`search cards (${isAppleDevice() ? "⌘" : "⌃"}-K)`}
                 onFocus={(e) =>
                   e.currentTarget.setSelectionRange(
                     0,
@@ -240,7 +241,7 @@ export function Search() {
                 }
               />
               {open && (
-                <div className="text-grey-55 flex flex-col">
+                <div className="flex flex-col text-grey-55">
                   <div className="flex w-full items-start justify-between py-2 text-xs">
                     {shortcutHelpOpen ? (
                       <div className="flex flex-col gap-1 italic">
@@ -254,7 +255,9 @@ export function Search() {
                         </div>
                         <div className="flex gap-2">
                           <div className="flex gap-0.5">
-                            <KeyboardKey>ctrl</KeyboardKey>
+                            <UnicodeKeyboardKey>
+                              {isAppleDevice() ? "⌘" : "⌃"}
+                            </UnicodeKeyboardKey>
                             <UnicodeKeyboardKey>⏎</UnicodeKeyboardKey>
                           </div>
                           place in current room
@@ -262,7 +265,9 @@ export function Search() {
                         <div className="flex gap-2">
                           <div className="flex gap-0.5">
                             <UnicodeKeyboardKey>⇧</UnicodeKeyboardKey>
-                            <KeyboardKey>ctrl</KeyboardKey>
+                            <UnicodeKeyboardKey>
+                              {isAppleDevice() ? "⌘" : "⌃"}
+                            </UnicodeKeyboardKey>
                             <UnicodeKeyboardKey>⏎</UnicodeKeyboardKey>
                           </div>
                           place on current card
@@ -339,18 +344,20 @@ export const SearchResults = (props: {
   );
 };
 
+// a lil more padding - now unused
 const KeyboardKey = (props: { children: React.ReactNode }) => {
   return (
-    <code className=" border-grey-80 bg-background text-grey-55 flex h-4 w-fit min-w-[16px] justify-center rounded-md border px-1 text-center text-[10px] not-italic ">
+    <code className="flex h-4 w-fit min-w-[16px] justify-center rounded-md border border-grey-80 bg-background px-1 text-center text-[10px] not-italic text-grey-55">
       {props.children}
     </code>
   );
 };
 
+// less padding
 const UnicodeKeyboardKey = (props: { children: React.ReactNode }) => {
   return (
-    <code className=" border-grey-80 bg-background text-grey-55 flex h-4 w-fit min-w-[16px] justify-center rounded-md border text-center font-sans text-[10px] not-italic ">
-      <div className="-mt-[1px]"> {props.children}</div>
+    <code className="flex h-4 w-fit min-w-[16px] justify-center rounded-md border border-grey-80 bg-background text-center font-sans text-[10px] not-italic text-grey-55">
+      {props.children}
     </code>
   );
 };
