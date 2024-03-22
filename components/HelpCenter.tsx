@@ -525,7 +525,7 @@ const HelpRoadmap = () => {
         </a>
         !
       </p>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-1">
         <h3>Active</h3>
         <p className="italic">currently in progress</p>
       </div>
@@ -549,7 +549,7 @@ const HelpRoadmap = () => {
           </p>
         </HelpDisclosure>
       </HelpDisclosureSection>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-1">
         <h3>Planned</h3>
         <p className="italic">happening soon, with high likelihood</p>
       </div>
@@ -736,7 +736,7 @@ const HelpDisclosure = (props: { children: React.ReactNode; name: string }) => {
       {({ open }) => (
         <>
           <Disclosure.Button className="flex w-full items-center justify-between gap-2 rounded-md bg-bg-gold px-4 py-2 text-left hover:bg-grey-90 focus:outline-none focus-visible:ring focus-visible:ring-accent-blue">
-            <span>{props.name}</span>
+            <span className="font-bold">{props.name}</span>
             {open ? <DisclosureExpandTiny /> : <DisclosureCollapseTiny />}
           </Disclosure.Button>
           <Disclosure.Panel className="rounded-md px-4 py-2 pb-2 pt-4">
