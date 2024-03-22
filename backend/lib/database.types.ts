@@ -91,16 +91,19 @@ export interface Database {
           id: string
           studio: string
           username: string
+          where_did_you_find_us: string | null
         }
         Insert: {
           id: string
           studio: string
           username: string
+          where_did_you_find_us?: string | null
         }
         Update: {
           id?: string
           studio?: string
           username?: string
+          where_did_you_find_us?: string | null
         }
         Relationships: [
           {
