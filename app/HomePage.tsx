@@ -6,6 +6,7 @@ import {
   CalendarMedium,
   CallSmall,
   ChatSmall,
+  GoToPageLined,
   MemberAdd,
   Rooms,
   SearchOrCommand,
@@ -251,7 +252,7 @@ export function HomePage() {
               />
               <FeatureListItem
                 name="Calendar"
-                description="Assign dates to cards; view things past and future"
+                description="Add dates to cards; view things past and future"
                 icon={<CalendarMedium />}
               />
               <FeatureListItem
@@ -417,16 +418,23 @@ const StudioItem = (props: {
   url: string;
 }) => {
   return (
-    <Link href={props.url} className="">
-      {/* max-w-xs */}
-      <div className="flex flex-col items-center gap-4 rounded-md border border-grey-80 bg-white p-4 text-center transition-all hover:scale-[1.02] hover:shadow-md">
-        <div className="flex flex-col gap-2">
-          <h4>{props.name}</h4>
-          <p className="text-sm italic">{props.description}</p>
-        </div>
-        <Image src={props.image} alt={props.alt} />
+    // <Link href={props.url} className="">
+    // DISABLED: transition-all hover:scale-[1.02] hover:shadow-md
+    <div className="flex flex-col items-center gap-4 rounded-md border border-grey-80 bg-white p-4 text-center">
+      <div className="flex flex-col gap-2">
+        <h4>{props.name}</h4>
+        <p className="text-sm italic">{props.description}</p>
       </div>
-    </Link>
+      <Image src={props.image} alt={props.alt} />
+      <Link
+        href={props.url}
+        className="flex items-center gap-2 text-accent-blue"
+      >
+        <ButtonLink content="check it out" />
+        <GoToPageLined />
+      </Link>
+    </div>
+    // </Link>
   );
 };
 
@@ -436,7 +444,7 @@ const FeatureListItem = (props: {
   icon: React.ReactElement;
 }) => {
   return (
-    <div className="flex w-72 flex-col items-center gap-2 rounded-md border border-grey-80 bg-white p-4 shadow-md">
+    <div className="flex w-64 flex-col items-center gap-2 rounded-md border border-grey-80 bg-white p-4 text-center shadow-md">
       {props.icon}
       <p>
         <strong>{props.name}</strong>
