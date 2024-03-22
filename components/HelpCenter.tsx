@@ -11,6 +11,7 @@ import {
 import { ModalFixedHeight } from "./Layout";
 import { isAppleDevice } from "@react-aria/utils";
 import { Disclosure } from "@headlessui/react";
+import Link from "next/link";
 
 export const HelpModal = (props: { open: boolean; onClose: () => void }) => {
   return (
@@ -175,62 +176,172 @@ export const HelpDocs = () => {
 const HelpHandbook = () => {
   return (
     <div className="flex flex-col gap-4">
-      <p>
+      <p className="text-lg">
         Welcome! Hyperlink is a place to do meaningful things — creative
         projects; book clubs; learning groups — together on the internet.
       </p>
-      <DividerTiny />
-      <p>
-        Activity on Hyperlink happens in <strong>Spaces</strong> — small worlds
-        for shared work.
+      <p className="text-lg">
+        This very short guide explains how the app works.
       </p>
-      <p>In a Space, you can:</p>
-      <ul className="flex list-disc flex-col gap-1 pl-4 sm:pl-8">
-        <li className="marker:text-accent-blue">
-          Make <strong>cards</strong> for meaningful things, like ideas, tasks,
-          and questions
-        </li>
-        <li className="marker:text-accent-red">
-          Organize & work with cards in <strong>rooms</strong>
-        </li>
-        <li className="marker:text-accent-gold">
-          Talk together with <strong>chats</strong> & <strong>comments</strong>
-        </li>
-      </ul>
-      <DividerTiny />
-      <p>
-        The magic multiplies when you invite others to join & explore with you:
-      </p>
-      <ul className="flex list-disc flex-col gap-1 pl-4 sm:pl-8">
-        <li className="marker:text-accent-blue">
-          <strong>notifications</strong>, for pings on Space activity
-        </li>
-        <li className="marker:text-accent-red">
-          <strong>unreads</strong>, to see what&apos;s new in one place
-        </li>
-        <li className="marker:text-accent-gold">
-          <strong>live presence</strong>, to see where others are in the Space
-        </li>
-        <li className="marker:text-accent-blue">
-          <strong>audio calls</strong>, to hang & explore together
-        </li>
-      </ul>
-      <p>
-        To get started, <strong>make a Space</strong> and{" "}
-        <strong>invite a friend</strong> to jam, riff, play…
-      </p>
-      <p>
-        And repeat! Over time your Spaces on Hyperlink form an ecosystem:
-        seedlings, active projects, archives, communities of collaborators.
-      </p>
-      <p>
+      <p className="text-lg">
         Questions? Suggestions?{" "}
-        <a href="mailto:contact@hyperlink.academy" className="text-accent-blue">
+        <a
+          href="mailto:contact@hyperlink.academy"
+          className="font-bold text-accent-blue"
+        >
           Email us
         </a>{" "}
         any time :)
       </p>
-      <p>—The Hyperlink Team</p>
+      <HelpDisclosureSection>
+        <HelpDisclosure name="10 second TL;DR">
+          <p>The core pieces of Hyperlink:</p>
+          <ul className="flex list-disc flex-col gap-1 pl-4 sm:pl-8">
+            <li>
+              make <strong>Spaces</strong> for projects and invite others to
+              collaborate
+            </li>
+            <li>
+              make <strong>cards</strong> for important things, and organize
+              Themes in <strong>rooms</strong>
+            </li>
+            <li>
+              use <strong>Studios</strong> for groups to collect many spaces
+            </li>
+          </ul>
+        </HelpDisclosure>
+        <HelpDisclosure name="Spaces">
+          <p>
+            Spaces are collaborative workspaces — a mix of notes, chat, and
+            project management.
+          </p>
+          {/* great for projects, gatherings, or explorations */}
+          <p>
+            You can make Spaces just for yourself, and invite others to join
+            them.
+          </p>
+          <p>Spaces can live in multiple Studios — see below!</p>
+          <p>
+            Over time your Spaces on Hyperlink form an ecosystem: seedlings,
+            active projects, archives, communities of collaborators.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Studios">
+          <p>
+            Studios are places for groups — like clubs, cohorts, or teams — to
+            work together and share many Spaces.
+          </p>
+          <ul className="flex list-disc flex-col gap-1 pl-4 sm:pl-8">
+            <li>Schools might use Spaces for different classes or cohorts</li>
+            <li>
+              Clubs might use Spaces for each participant&apos;s creative
+              projects
+            </li>
+            <li>
+              Team might work on lots of projects together in different Spaces
+            </li>
+          </ul>
+
+          <p>Studio creators can configure an About page and a few settings.</p>
+          <p>
+            Studio members can add Spaces, and comment / react on other Spaces
+            in the Studio.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Rooms">
+          <p>Rooms help you stay organized within a Space.</p>
+          <ul className="flex list-disc flex-col gap-1 pl-4 sm:pl-8">
+            <li>Collection and canvas rooms: to arrange and work with cards</li>
+            <li>Chat rooms: like channels in Slack or Discord (more below!)</li>
+            <li>
+              Search, Unreads, and Calendar: special rooms that can&apos;t be
+              edited
+            </li>
+          </ul>
+          <p>
+            You can create as many rooms as you like, and rename / reorder them
+            in the sidebar.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Cards">
+          <p>
+            Cards represent meaningful things in a Space, like ideas, tasks, and
+            questions.
+          </p>
+          <p>
+            They&apos;re like little modular documents — each card has a title,
+            text area, and chat section by default, and you can add images,
+            reactions, and links to other cards.
+          </p>
+          <p>
+            You can attach cards, or reference them inline, wiki-style; you can
+            also see other places that reference a card in backlinks.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Membership & Permissions">
+          <p>Creators of a Space or Studio can invite other people to join!</p>
+          <ul className="flex list-disc flex-col gap-1 pl-4 sm:pl-8">
+            <li>
+              Spaces: all members can create and edit cards, and invite others;
+              only the creator can delete a Space
+            </li>
+            <li>
+              Studios: members can add Spaces, and comment / react in other
+              Spaces; only the creator can edit About and Settings, and delete
+              the Studio
+            </li>
+          </ul>
+        </HelpDisclosure>
+        <HelpDisclosure name="Chat">
+          <p>
+            Hyperlink is all about collaboration — doing things and talking
+            about them; sharing and encouraging each other.
+          </p>
+          <p>There are two ways to use chat in Hyperlink:</p>
+          <ul className="flex list-disc flex-col gap-1 pl-4 sm:pl-8">
+            <li>
+              Chat rooms show in the sidebar, and are like general channels for
+              a Space to share
+            </li>
+            <li>
+              Cards each have their own section for chat, for specific
+              conversations or comments about anything
+            </li>
+          </ul>
+        </HelpDisclosure>
+        <HelpDisclosure name="Notifications">
+          <p>
+            New things in your Spaces that you haven&apos;t yet seen appear with
+            a glowing border.
+          </p>
+          <p>
+            This bubbles up, so new cards will glow, as well as rooms
+            they&apos;re in, and Spaces from your homepage or Studios
+            they&apos;re in.
+          </p>
+          <p>
+            You can also get push notifications with our web app; see{" "}
+            <Link href="/docs?tab=app" className="font-bold text-accent-blue">
+              Get the App
+            </Link>
+            !
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Collaboration">
+          <p>
+            Hyperlink has some special features when you&apos;re in a Space
+            together with others!
+          </p>
+          <p>
+            Multiplayer presence: see who else is in a Space with you, and what
+            cards they&apos;re on.
+          </p>
+          <p>
+            Audio calls: hang and talk together with others in a Space (one call
+            per Space)
+          </p>
+        </HelpDisclosure>
+      </HelpDisclosureSection>
     </div>
   );
 };
@@ -399,7 +510,10 @@ const HelpRoadmap = () => {
       <h2>Features</h2>
       <p>
         What we&apos;re working on! To view what we&apos;ve shipped, see our{" "}
-        <strong>changelog</strong>.
+        <Link href="/docs?tab=changelog" className="font-bold text-accent-blue">
+          Changelog
+        </Link>
+        .
       </p>
       <p>
         If you have thoughts on what we should prioritize,{" "}
