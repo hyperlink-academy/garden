@@ -300,15 +300,6 @@ export function HomePage() {
                           content="Sign up for Hyperlink!"
                           onClick={() => setLoginOrSignupState("signup")}
                         />
-                        <LoginOrSignupModal
-                          state={loginOrSignupState}
-                          setState={setLoginOrSignupState}
-                          onLogin={(s) =>
-                            s.username
-                              ? router.push(`/s/${s.username}`)
-                              : router.push("/setup")
-                          }
-                        />
                       </>
                     ) : session.session?.username ? (
                       <>
