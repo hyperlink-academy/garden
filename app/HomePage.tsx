@@ -23,7 +23,6 @@ import studioImgInternetHomesteading from "public/landing/studio-internet-homest
 import studioImgPedagogicalParents from "public/landing/studio-pedagogical-parents.png";
 
 export function HomePage() {
-  let textFormat = "mx-auto w-full flex max-w-2xl flex-col gap-4";
   let [loginOrSignupState, setLoginOrSignupState] =
     LoginOrSignupModal.useState("closed");
 
@@ -109,45 +108,50 @@ export function HomePage() {
       </div>
 
       {/* landing page wrapper  */}
-      <div className="landing px-4 py-4 md:px-8 md:py-8">
+      <div className="landing">
         {/* main content - inner wrapper */}
-        <div className="m-auto mb-8 flex max-w-6xl flex-col gap-8">
+        <div className="m-auto  flex flex-col">
           {/* title: hyperlink academy */}
-          <div className="my-8 -rotate-3 rounded-md bg-accent-gold px-8 py-32">
-            <div className="rotate-3">
-              <div className="flex flex-col gap-8">
-                {/* title and tagline */}
-                <div className="flex flex-col gap-4 text-center">
-                  <h1>hyperlink academy</h1>
-                  <h2>a set of tools for collaborative creative projects</h2>
-                </div>
+          <div className="w-screen bg-bg-blue pb-32 pt-12 ">
+            <div className="relative mx-auto flex w-fit flex-col gap-8">
+              {/* title and tagline */}
+              <div className="pl-20">
+                <Image
+                  src="/img/landing/hero.png"
+                  alt="hyperlink academy logo"
+                  width={800}
+                  height={400}
+                />
               </div>
+              <h1 className="absolute top-[520px] gap-4 italic text-accent-blue">
+                a set of tools for <br /> collaborative creative projects
+              </h1>
             </div>
           </div>
 
           {/* internet clubs */}
-          <div className="flex flex-col gap-8 rounded-md bg-bg-red p-8">
-            <div className={`${textFormat}`}>
-              <div className="relative left-[440px] top-[32px] w-fit rotate-3 rounded-md bg-accent-red p-2 text-white">
-                in progress!
-              </div>
+          <div className="relative m-[8px] mx-auto -mt-12 flex max-w-3xl flex-col gap-8 border border-grey-80 bg-white p-8 text-lg">
+            <div className="absolute -right-[32px] -top-[16px] w-max rotate-3 rounded-md bg-accent-red p-2 font-bold text-white">
+              in progress!
+            </div>
+            <div className={`flex max-w-prose flex-col gap-3`}>
               <h2 className="text-center">Internet Clubs</h2>
 
-              <p>
+              <p className="text-center">
                 We&apos;re playing with{" "}
                 <strong>a new kind of internet club</strong> — communities of
                 practice where we make and explore things together.
               </p>
-              <p>
+              <p className="text-center">
                 In each club we work async in Spaces, explore and chat about
                 each other&apos;s work, and share updates with a group digest.
               </p>
             </div>
 
-            <p className="text-center text-lg italic">
+            <p className="text-center text-lg font-bold italic">
               ✨ explore our current clubs! ✨
             </p>
-            <div className="flex place-content-center items-end gap-4">
+            <div className="grid w-full grid-cols-3 gap-4">
               <StudioItem
                 name="Handmade March"
                 description="making things by hand every day"
@@ -171,7 +175,7 @@ export function HomePage() {
               />
             </div>
 
-            <div className={`${textFormat} items-center text-center`}>
+            <div className={`flex flex-col items-center gap-3 text-center`}>
               <h3>Want to start a club of your own?</h3>
               <p>We&apos;ll help with ideas, setup, and tech support!</p>
               <Link
@@ -185,102 +189,159 @@ export function HomePage() {
           </div>
 
           {/* what is hyperlink */}
-          <h2 className="text-center">What is Hyperlink</h2>
-          <div className={`${textFormat}`}>
-            <p className="text-[1.4rem]">
-              Hyperlink is a place to do ambitious creative projects with
-              friends, partners, and co-conspirators.
-            </p>
-            <p>
-              Use it as a shared notebook, a place for conversation, and a tool
-              for coordination. There&apos;s no better tool for creating,
-              collecting, and sharing group work and artifacts.
-            </p>
-          </div>
-
-          {/* pieces and features */}
-          <div>
-            <div className="py-8">
-              <h3 className="mb-8 text-center">The Pieces</h3>
-              <div className="bg-bg-blue p-4">
-                <p className="text-lg">
-                  <strong>studios</strong>
-                </p>
-                <p>
+          <div className="whatIsHyperlink mt-[120px]">
+            <div
+              className={`mx-auto flex max-w-prose flex-col gap-3 text-center text-lg`}
+            >
+              <p className="text-xl font-bold">
+                Hyperlink is a place to do ambitious creative projects with
+                friends, partners, and co-conspirators.
+              </p>
+              <p>
+                Use it as a shared notebook, a place for conversation, and a
+                tool for coordination. Hyperlink is for creating, collecting,
+                and sharing the work and artifacts of a collective.
+              </p>
+            </div>
+            <div className="relative mx-auto mt-16 w-max">
+              <Image
+                src="/img/landing/studios.png"
+                alt="a cute little drawing of some funky buildings in a neighborhood"
+                width={600}
+                height={400}
+              />
+              <Image
+                src="/img/landing/arrow.png"
+                alt="a cute little drawing of some funky buildings in a neighborhood"
+                width={100}
+                height={100}
+                className="absolute -bottom-[125px] right-[250px]"
+              />
+              <div className="absolute -top-[16px] right-[50px] w-[320px] text-center">
+                <h4 className="text-grey-35">Studios!</h4>
+                <p className="text-sm text-grey-55">
                   homes for groups working together — like clubs, cohorts, or
                   teams
                 </p>
-                <div className="m-4 w-2/3 bg-bg-gold p-4">
-                  <p className="text-lg">
-                    <strong>spaces</strong>
-                  </p>
-                  <p>
-                    collaborative workspaces — for projects, gatherings, or
-                    explorations
-                  </p>
-                  <div className="m-4 w-2/3 bg-bg-red p-4">
-                    <p className="text-lg">
-                      <strong>rooms</strong>
-                    </p>
-                    <p>
-                      organize your work — collections, canvases, and chat rooms
-                    </p>
-                    <div className="m-4 w-2/3 bg-white p-4">
-                      <p className="text-lg">
-                        <strong>cards</strong>
-                      </p>
-                      <p>
-                        modular documents — collect text, images, chat & more
-                      </p>
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
 
-            <h3 className="mb-8 text-center">The Features</h3>
-            <div className="flex flex-wrap justify-center gap-8">
-              <FeatureListItem
-                name="Invites"
-                description="Invite people to join Spaces and Studios"
-                icon={<MemberAdd />}
+            <div className="relative mx-auto mt-12 w-fit pr-[340px]">
+              <Image
+                src="/img/landing/spaces.png"
+                alt="a cute little drawing of some funky buildings in a neighborhood"
+                width={300}
+                height={100}
               />
-              <FeatureListItem
-                name="Discussion"
-                description="Global chat rooms; comments on any card"
-                icon={<ChatSmall />}
-              />
-              <FeatureListItem
-                name="Calendar"
-                description="Add dates to cards; view things past and future"
-                icon={<CalendarMedium />}
-              />
-              <FeatureListItem
-                name="Links"
-                description="Attach cards or link them inline, wiki-style"
-                // icon={<LinkSmall />}
-                icon={<SectionLinkedCard />}
-              />
-              <FeatureListItem
-                name="Backlinks"
-                description="See anywhere a card is referenced in a Space"
-                icon={<SearchOrCommand />}
-              />
-              <FeatureListItem
-                name="Audio Calls"
-                description="Work and talk together directly in a Space"
-                icon={<CallSmall />}
-              />
-              <FeatureListItem
-                name="Multiplayer Presence"
-                description="See when others are in a Space — and where"
-                icon={<Rooms />}
-              />
-              <FeatureListItem
-                name="Push Notifications"
-                description="When you add the web app on mobile!"
-                icon={<BellSmall />}
-              />
+              <div className="absolute right-[80px] top-[250px] w-[240px] text-center">
+                <h4 className="text-grey-35">Spaces</h4>
+                <p className="text-sm text-grey-55">
+                  homes for groups working together — like clubs, cohorts, or
+                  teams
+                </p>
+              </div>
+              <div className="absolute right-[80px] top-[350px] w-[240px] text-center">
+                <h4 className="text-grey-35">Rooms</h4>
+                <p className="text-sm text-grey-55">
+                  homes for groups working together — like clubs, cohorts, or
+                  teams
+                </p>
+              </div>
+              <div className="absolute right-[80px] top-[450px] w-[240px] text-center">
+                <h4 className="text-grey-35">Cards</h4>
+                <p className="text-sm text-grey-55">
+                  homes for groups working together — like clubs, cohorts, or
+                  teams
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <div className="py-8">
+                {/* <div className="bg-bg-blue p-4">
+                  <p className="text-lg">
+                    <strong>studios</strong>
+                  </p>
+                  <p>
+                    homes for groups working together — like clubs, cohorts, or
+                    teams
+                  </p>
+                  <div className="m-4 w-2/3 bg-bg-gold p-4">
+                    <p className="text-lg">
+                      <strong>spaces</strong>
+                    </p>
+                    <p>
+                      collaborative workspaces — for projects, gatherings, or
+                      explorations
+                    </p>
+                    <div className="m-4 w-2/3 bg-bg-red p-4">
+                      <p className="text-lg">
+                        <strong>rooms</strong>
+                      </p>
+                      <p>
+                        organize your work — collections, canvases, and chat
+                        rooms
+                      </p>
+                      <div className="m-4 w-2/3 bg-white p-4">
+                        <p className="text-lg">
+                          <strong>cards</strong>
+                        </p>
+                        <p>
+                          modular documents — collect text, images, chat & more
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div> */}
+              </div>
+              <div className="features mx-auto max-w-4xl">
+                <h4 className="mb-8 text-center">
+                  and tools to help you get it done...
+                </h4>
+                <div className="flex flex-wrap justify-center gap-8">
+                  <FeatureListItem
+                    name="Invites"
+                    description="Invite people to join Spaces and Studios"
+                    icon={<MemberAdd />}
+                  />
+                  <FeatureListItem
+                    name="Discussion"
+                    description="Global chat rooms; comments on any card"
+                    icon={<ChatSmall />}
+                  />
+                  <FeatureListItem
+                    name="Calendar"
+                    description="Add dates to cards; view things past and future"
+                    icon={<CalendarMedium />}
+                  />
+                  <FeatureListItem
+                    name="Links"
+                    description="Attach cards or link them inline, wiki-style"
+                    // icon={<LinkSmall />}
+                    icon={<SectionLinkedCard />}
+                  />
+                  <FeatureListItem
+                    name="Backlinks"
+                    description="See anywhere a card is referenced in a Space"
+                    icon={<SearchOrCommand />}
+                  />
+                  <FeatureListItem
+                    name="Audio Calls"
+                    description="Work and talk together directly in a Space"
+                    icon={<CallSmall />}
+                  />
+                  <FeatureListItem
+                    name="Multiplayer Presence"
+                    description="See when others are in a Space — and where"
+                    icon={<Rooms />}
+                  />
+                  <FeatureListItem
+                    name="Push Notifications"
+                    description="When you add the web app on mobile!"
+                    icon={<BellSmall />}
+                  />
+                </div>
+              </div>
             </div>
           </div>
 
@@ -411,12 +472,17 @@ const StudioItem = (props: {
   return (
     // <Link href={props.url} className="">
     // DISABLED: transition-all hover:scale-[1.02] hover:shadow-md
-    <div className="flex flex-col items-center gap-4 rounded-md border border-grey-80 bg-white p-4 text-center">
-      <div className="flex flex-col gap-2">
+    <div className="relative flex flex-col rounded-md border border-grey-80 bg-white p-3">
+      <div className="flex flex-col">
         <h4>{props.name}</h4>
         <p className="text-sm italic">{props.description}</p>
       </div>
-      <Image src={props.image} alt={props.alt} />
+      <Image
+        src={props.image}
+        alt={props.alt}
+        width={160}
+        className="absolute -bottom-[24px] -left-[32px]"
+      />
       <Link
         href={props.url}
         className="flex items-center gap-2 text-accent-blue"
@@ -435,7 +501,7 @@ const FeatureListItem = (props: {
   icon: React.ReactElement;
 }) => {
   return (
-    <div className="flex w-64 flex-col items-center gap-2 rounded-md border border-grey-80 bg-white p-4 text-center shadow-md">
+    <div className=" flex w-48 flex-col items-center  p-4 text-center">
       {props.icon}
       <p>
         <strong>{props.name}</strong>
