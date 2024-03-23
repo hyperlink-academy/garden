@@ -102,7 +102,7 @@ export default function SidebarLayout(props: {
           className="no-scrollbar h-full w-full overflow-x-hidden"
         >
           <div className="sidebar relative flex h-full w-full flex-col items-stretch justify-start justify-items-start gap-0 overflow-y-scroll">
-            <div className={`sticky top-0 z-10 bg-white ${open ? "w-64" : ""}`}>
+            <div className={`sticky top-0 z-10 ${open ? "w-64" : ""}`}>
               {
                 <div className="flex items-center justify-between px-3 pt-3">
                   {open && props.breadcrumb}
