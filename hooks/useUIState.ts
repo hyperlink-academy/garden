@@ -147,7 +147,7 @@ export let useUIState = create(
                 [spaceID]: {
                   ...state.spaces[spaceID],
                   rooms: {
-                    ...state.spaces[spaceID].rooms,
+                    ...state.spaces[spaceID]?.rooms,
                     [roomID]: [
                       card,
                       ...(state.spaces[spaceID]?.rooms?.[roomID] || []),
@@ -212,11 +212,10 @@ export const useOpenCard = () => {
   let { action } = useMutations();
   let openCard = useUIState((state) => state.openCard);
   let closeCard = useUIState((state) => state.closeCard);
+  let room = useRoom();
   return useCallback(
     (entityID: string) => {
       if (!spaceID) return;
-
-      let room = useUIState.getState().spaces[spaceID]?.activeRoom;
 
       if (!room) return;
       openCard(spaceID, room, entityID);
@@ -229,7 +228,7 @@ export const useOpenCard = () => {
         },
       });
     },
-    [spaceID, action, closeCard, openCard]
+    [spaceID, action, closeCard, openCard, room]
   );
 };
 
