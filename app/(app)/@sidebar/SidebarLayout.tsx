@@ -15,6 +15,7 @@ export default function SidebarLayout(props: {
 }) {
   let isClient = useIsClient();
   let { open, toggleSidebar, setSidebar } = useSidebarState((state) => state);
+
   let isMobile = useIsMobile();
   let { setNodeRef, over } = useDroppableZone({
     type: "trigger",
@@ -65,7 +66,7 @@ export default function SidebarLayout(props: {
   });
 
   let sidebarSpring = useSpring({
-    width: open ? 256 : isMobile ? 12 : 36,
+    width: isMobile || open ? 256 : 36,
   });
   let disclosureSpring = useSpring({
     rotate: open ? 90 : -90,
@@ -82,7 +83,7 @@ export default function SidebarLayout(props: {
         <animated.div
           {...bindOverlay()}
           onClick={() => setSidebar(false)}
-          className="bg-grey-15 fixed inset-0 z-20 touch-none"
+          className="fixed inset-0 z-20 touch-none bg-grey-15"
           style={{ ...sidebarOverlaySpring, display: open ? "block" : "none" }}
         >
           <div className="z-20 ml-auto h-full w-2/3" ref={droppableRef} />
@@ -91,22 +92,18 @@ export default function SidebarLayout(props: {
       <div
         {...bindSidebar()}
         ref={setNodeRef}
-        className={`sidebarWrapper touch-none lightBorder no-scrollbar relative  z-50 flex shrink-0 overflow-x-hidden overflow-y-scroll text-left ${
+        className={`sidebarWrapper lightBorder no-scrollbar relative z-50  flex shrink-0 touch-none overflow-x-hidden overflow-y-scroll text-left ${
           open && "cursor-default"
-        } ${isMobile && !open ? "bg-bg-blue" : "bg-white"}`}
+        } ${isMobile || open ? "bg-white" : "bg-bg-blue"}`}
         onClick={() => setSidebar(true)}
       >
         <animated.div
           style={sidebarSpring}
           className="no-scrollbar h-full w-full overflow-x-hidden"
         >
-          <div className="sidebar flex h-full flex-col items-stretch gap-0 relative overflow-y-scroll w-full justify-items-start justify-start">
-            <div className={`top-0 sticky bg-white z-10 ${open ? "w-64" : ""}`}>
-              {isMobile && !open ? (
-                <div className="sidebarMobileCollapsed  text-grey-55 mt-1 flex w-3 origin-center -rotate-90">
-                  <DisclosureExpandTiny />
-                </div>
-              ) : (
+          <div className="sidebar relative flex h-full w-full flex-col items-stretch justify-start justify-items-start gap-0 overflow-y-scroll">
+            <div className={`sticky top-0 z-10 bg-white ${open ? "w-64" : ""}`}>
+              {
                 <div className="flex items-center justify-between px-3 pt-3">
                   {open && props.breadcrumb}
                   <animated.div style={disclosureSpring}>
@@ -121,7 +118,7 @@ export default function SidebarLayout(props: {
                     </button>
                   </animated.div>
                 </div>
-              )}
+              }
 
               {open && (
                 <>
@@ -133,13 +130,13 @@ export default function SidebarLayout(props: {
               )}
             </div>
 
-            {open ? (
+            {open || isMobile ? (
               <div className="h-full w-64 pt-3">{props.children}</div>
-            ) : !isMobile ? (
-              <div className="sidebarCollapsed px-1 flex h-full w-max flex-col pt-3">
+            ) : (
+              <div className="sidebarCollapsed flex h-full w-max flex-col px-1 pt-3">
                 {props.children}
               </div>
-            ) : null}
+            )}
           </div>
         </animated.div>
       </div>

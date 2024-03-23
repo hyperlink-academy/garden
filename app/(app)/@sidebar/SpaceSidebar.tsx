@@ -1,6 +1,5 @@
 "use client";
 import { Divider } from "components/Layout";
-import { HelpButton, SpaceRoleBadge } from "components/Space";
 import { Sidebar } from "components/SpaceLayout";
 import { SearchResults, useSearch } from "components/Search";
 import {
@@ -12,23 +11,19 @@ import {
   Settings,
   UnreadDot,
 } from "components/Icons";
-import { db, useMutations, useSpaceID } from "hooks/useReplicache";
+import { db } from "hooks/useReplicache";
 import { sortByPosition } from "src/position_helpers";
 import { SidebarTab } from "./SidebarTab";
-import { useRoom, useSetRoom, useUIState } from "hooks/useUIState";
+import { useRoom, useSetRoom } from "hooks/useUIState";
 import { People } from "components/SpaceLayout/Sidebar/People";
 import { useSpaceData } from "hooks/useSpaceData";
-import { EditSpaceModal } from "components/CreateSpace";
-import { useAuth } from "hooks/useAuth";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 import * as Popover from "@radix-ui/react-popover";
-import { workerAPI } from "backend/lib/api";
 import { DotLoader } from "components/DotLoader";
 import { Modal, ModalSubmitButton } from "components/Modal";
 import { WORKER_URL } from "src/constants";
 import { useSidebarState } from "./SidebarState";
 import { useRoomUnreads } from "components/SpaceLayout/Sidebar/RoomListLayout";
+import { useIsMobile } from "hooks/utils";
 
 export function SpaceSidebar(props: {
   display_name: string | null;
@@ -37,7 +32,9 @@ export function SpaceSidebar(props: {
 }) {
   let { input, setInput, results } = useSearch();
   let { open } = useSidebarState();
-  if (!open) return <CollapsedSpaceSidebar space_id={props.space_id} />;
+  let isMobile = useIsMobile();
+  if (!open && !isMobile)
+    return <CollapsedSpaceSidebar space_id={props.space_id} />;
   return (
     <div className="flex h-full flex-col">
       <div className="sidebarSpaceContent flex h-full min-h-0 shrink grow flex-col ">

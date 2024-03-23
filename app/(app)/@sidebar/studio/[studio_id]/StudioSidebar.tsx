@@ -4,16 +4,17 @@ import { TabsList } from "./StudioTabs";
 import { Props } from "app/(app)/studio/[studio_id]/StudioPage";
 import { useState } from "react";
 import Link from "next/link";
-import { BaseSpaceCard, SmallSpaceCard } from "components/SpacesList";
+import { SmallSpaceCard } from "components/SpacesList";
 import { uuidToBase62 } from "src/uuidHelpers";
-import { LoginButton } from "components/LoginModal";
 import { StudioRoleBadge } from "./StudioRoleBadge";
 import { useAuth } from "hooks/useAuth";
 import SidebarLayout from "../../SidebarLayout";
 import { useSidebarState } from "../../SidebarState";
+import { useIsMobile } from "hooks/utils";
 
 export const StudioSidebarContent = (props: Props & { isAdmin: boolean }) => {
   let { open } = useSidebarState((state) => state);
+  let isMobile = useIsMobile();
   let { session } = useAuth();
   return (
     <SidebarLayout
@@ -41,7 +42,7 @@ export const StudioSidebarContent = (props: Props & { isAdmin: boolean }) => {
         </>
       }
     >
-      {open ? (
+      {open || isMobile ? (
         <StudioSidebarExpanded {...props} />
       ) : (
         <StudioSidebarCollapsed {...props} />

@@ -16,12 +16,14 @@ import {
 } from "components/SpacesList";
 import { uuidToBase62 } from "src/uuidHelpers";
 import { useSidebarState } from "../../SidebarState";
+import { useIsMobile } from "hooks/utils";
 
 export function UserPageSidebar(props: {
   params: { studio: string };
   spaces: SpaceData[];
 }) {
   let { open } = useSidebarState((state) => state);
+  let isMobile = useIsMobile();
   let { session } = useAuth();
 
   return (
@@ -52,7 +54,7 @@ export function UserPageSidebar(props: {
         </>
       }
     >
-      {open ? (
+      {open || isMobile ? (
         <UserPageSidebarExpanded {...props} />
       ) : (
         <UserPageSidebarCollapsed {...props} />
