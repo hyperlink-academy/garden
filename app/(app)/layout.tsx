@@ -20,7 +20,7 @@ export default function AppLayout(props: {
     return (
       <LayoutWrapper
         id="appLayout"
-        className="flex h-full w-full snap-x snap-mandatory scroll-pl-4 flex-col overflow-x-scroll overflow-y-scroll px-2 pt-8 sm:gap-4 sm:px-8 "
+        className="flex h-full w-full snap-x snap-mandatory scroll-pl-4 flex-col overflow-x-scroll overflow-y-scroll px-2 pt-6 sm:gap-4 sm:px-8 "
       >
         <div className="fixed left-0 top-0 z-30 flex w-full flex-row border-b border-grey-80 bg-background align-middle">
           <button

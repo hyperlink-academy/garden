@@ -99,13 +99,17 @@ export default function SidebarLayout(props: {
       >
         <animated.div
           style={sidebarSpring}
-          className="no-scrollbar h-full w-full overflow-x-hidden"
+          className="no-scrollbar h-full w-full overflow-x-hidden bg-inherit"
         >
-          <div className="sidebar relative flex h-full w-full flex-col items-stretch justify-start justify-items-start gap-0 overflow-y-scroll">
-            <div className={`sticky top-0 z-10 ${open ? "w-64" : ""}`}>
+          <div className="sidebar relative flex h-full w-full flex-col items-stretch justify-start justify-items-start gap-0 overflow-y-scroll bg-inherit">
+            <div
+              className={`sticky top-0 z-10 bg-inherit ${
+                open || isMobile ? "w-64" : ""
+              }`}
+            >
               {
                 <div className="flex items-center justify-between px-3 pt-3">
-                  {open && props.breadcrumb}
+                  {(open || isMobile) && props.breadcrumb}
                   <animated.div style={disclosureSpring}>
                     <button
                       className="text-grey-55 hover:text-accent-blue "
@@ -120,7 +124,7 @@ export default function SidebarLayout(props: {
                 </div>
               }
 
-              {open && (
+              {(open || isMobile) && (
                 <>
                   {props.header}
                   <div className="divider shrink-0 pt-3">

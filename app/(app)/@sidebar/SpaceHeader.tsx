@@ -19,6 +19,7 @@ import { Modal, ModalSubmitButton } from "components/Modal";
 import { DotLoader } from "components/DotLoader";
 import { workerAPI } from "backend/lib/api";
 import { WORKER_URL } from "src/constants";
+import { useIsMobile } from "hooks/utils";
 
 export function SpaceHeader(props: {
   children: React.ReactNode;
@@ -28,6 +29,7 @@ export function SpaceHeader(props: {
 }) {
   let [switcher, setSwitcher] = useState(false);
   let { session } = useAuth();
+  let isMobile = useIsMobile();
   let params = useParams();
   let { data: userSpaces } = useIdentityData(session.session?.username);
   let activeSpace = props.spaces.find((s) =>
@@ -100,7 +102,7 @@ export function SpaceHeader(props: {
       }
     >
       <div className="sidebarSpaceFromHome flex h-full flex-col items-stretch">
-        {open ? null : (
+        {open || isMobile ? null : (
           <div
             className="sidebarSpaceName mx-auto h-fit w-fit shrink-0 rotate-180 flex-row font-bold "
             style={{ writingMode: "vertical-lr" }}
@@ -110,7 +112,7 @@ export function SpaceHeader(props: {
         )}
         <div className="sidebarContent grow">
           {switcher && open ? (
-            <div className="pl-2 pr-3 flex flex-col gap-3">
+            <div className="flex flex-col gap-3 pl-2 pr-3">
               {spaces
                 ?.filter((s) => !s.archived)
                 .map((space) => (
@@ -189,16 +191,16 @@ const MemberOptions = () => {
   return (
     <>
       <Popover.Root>
-        <Popover.Trigger className="hover:text-accent-blue text-grey-55">
+        <Popover.Trigger className="text-grey-55 hover:text-accent-blue">
           <Settings />
         </Popover.Trigger>
         <Popover.Portal>
           <Popover.Content
-            className="border-grey-80 z-50 flex max-w-xs flex-col gap-2 rounded-md border bg-white py-2 drop-shadow-md"
+            className="z-50 flex max-w-xs flex-col gap-2 rounded-md border border-grey-80 bg-white py-2 drop-shadow-md"
             sideOffset={4}
           >
             <button
-              className="text-accent-red hover:bg-bg-blue px-2 font-bold"
+              className="px-2 font-bold text-accent-red hover:bg-bg-blue"
               onClick={() => setLeaveModalOpen(true)}
             >
               Leave space
