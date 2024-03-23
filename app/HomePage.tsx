@@ -20,12 +20,14 @@ import { LoginOrSignupModal } from "components/LoginModal";
 import { Divider } from "components/Layout";
 import { useState } from "react";
 import { Modal } from "components/Modal";
+import { useIsMobile } from "hooks/utils";
 
 export function HomePage() {
   let [loginOrSignupState, setLoginOrSignupState] =
     LoginOrSignupModal.useState("closed");
   let [subscribeModal, setSubscribeModal] = useState(false);
 
+  let isMobile = useIsMobile();
   let { session } = useAuth();
   let router = useRouter();
 
@@ -33,7 +35,7 @@ export function HomePage() {
     <div className="relative">
       {/* sticky header */}
       <div className="sticky top-0 z-10 bg-background">
-        <div className="flex items-center justify-between px-4 pb-1 pt-2">
+        <div className="flex items-center justify-between px-2 pb-1 pt-2 sm:px-4">
           {/* notes */}
           <div className="flex gap-2">
             <a
@@ -110,10 +112,10 @@ export function HomePage() {
         {/* main content - inner wrapper */}
         <div className="m-auto  flex flex-col">
           {/* title: hyperlink academy */}
-          <div className="w-screen bg-bg-blue pb-32 pt-12 ">
+          <div className="w-screen bg-bg-blue pb-32 pt-8 sm:pt-12 ">
             <div className="relative mx-auto flex w-fit flex-col gap-8">
               {/* title and tagline */}
-              <div className="pl-20">
+              <div className="pl-8 pr-4 sm:pl-24">
                 <Image
                   src="/img/landing/hero.png"
                   alt="hyperlink academy logo"
@@ -121,13 +123,13 @@ export function HomePage() {
                   height={400}
                 />
               </div>
-              <div className="mx-8 -mt-[120px] flex flex-col gap-3">
+              <div className="mx-4 -mt-[120px] flex flex-col gap-3 sm:mx-8">
                 <h1 className=" italic text-accent-blue">
                   a set of tools for <br /> collaborative creative projects
                 </h1>
-                <div className="flex items-center gap-4">
+                <div className="flex w-full items-center gap-4">
                   <ButtonPrimary
-                    className="!px-4 !py-1 !text-xl"
+                    className="!px-2 !py-1 !text-lg sm:!px-4 sm:!py-1 sm:!text-xl"
                     content="Sign Up!"
                     onClick={() => setLoginOrSignupState("signup")}
                   />
@@ -153,8 +155,8 @@ export function HomePage() {
 
           {/* internet clubs */}
           <div className="mx-auto">
-            <div className="relative m-[8px] mx-8 -mt-12 flex max-w-3xl flex-col gap-8 border border-grey-80 bg-white p-8 text-lg">
-              <div className="absolute -right-[32px] -top-[16px] w-max rotate-3 rounded-md bg-accent-red p-2 font-bold text-white">
+            <div className="relative m-[8px] mx-4 -mt-12 flex max-w-3xl flex-col gap-8 border border-grey-80 bg-white p-4 pt-6 sm:mx-8 sm:p-8 sm:pt-8 sm:text-lg">
+              <div className="absolute -top-[16px] right-[8px] w-max rotate-3 rounded-md bg-accent-red p-1 text-sm font-bold text-white sm:-right-[32px] sm:p-2 sm:text-base">
                 in progress!
               </div>
               <div
@@ -172,7 +174,7 @@ export function HomePage() {
                   each other&apos;s work, and share updates with a group digest.
                 </p>
                 <a
-                  className="flex items-center justify-center gap-1 text-base text-accent-blue hover:underline"
+                  className="flex items-center justify-center gap-1 text-sm text-accent-blue hover:underline sm:text-base"
                   href={"https://notes.hyperlink.academy/note/internet-clubs"}
                 >
                   read more about the clubs
@@ -180,7 +182,7 @@ export function HomePage() {
                 </a>
               </div>
 
-              <p className="text-center text-lg font-bold italic">
+              <p className="text-center font-bold italic sm:text-lg">
                 ✨ explore our current clubs! ✨
               </p>
               <div className="mb-6 flex w-full flex-col-reverse  gap-9 pr-8 md:flex-row-reverse">
@@ -230,13 +232,13 @@ export function HomePage() {
           </div>
 
           {/* what is hyperlink */}
-          <div className="whatIsHyperlink mt-[120px]">
+          <div className="whatIsHyperlink mt-[80px] sm:mt-[120px]">
             <div
-              className={`mx-auto flex max-w-[720px] flex-col gap-3 text-center text-lg`}
+              className={`mx-auto flex max-w-[800px] flex-col gap-3 px-4 text-center sm:text-lg`}
             >
-              <p className="text-xl font-bold">
-                Hyperlink is a place for ambitious creative projects <br />
-                with friends, partners, and co-conspirators.
+              <p className="text-lg font-bold sm:text-xl">
+                Hyperlink is a place for ambitious creative projects with
+                friends, partners, and co-conspirators.
               </p>
               <p className="text-grey-35">
                 Use it as a shared notebook, a place for conversation, and a
@@ -248,57 +250,58 @@ export function HomePage() {
               <Image
                 src="/img/landing/studios.png"
                 alt="a cute little drawing of some funky buildings in a neighborhood"
-                width={600}
-                height={400}
+                width={isMobile ? 300 : 600}
+                height={0}
+                className={isMobile ? "pl-8" : ""}
               />
               <Image
                 src="/img/landing/arrow.png"
-                alt="a cute little drawing of some funky buildings in a neighborhood"
-                width={100}
+                alt="an arrow leading from one of the earlier funky buildings to a diagram of what's inside it"
+                width={isMobile ? 80 : 100}
                 height={100}
-                className="absolute -bottom-[125px] right-[250px]"
+                className="absolute -bottom-[125px] right-[125px] sm:right-[250px]"
               />
-              <div className="absolute -top-[16px] right-[50px] w-[320px] text-center">
-                <h4 className="text-grey-35">Studios!</h4>
-                <p className="text-sm text-grey-55">
+              <div className="absolute -top-12 right-[0px] w-[200px] text-center sm:-top-[16px] sm:right-[50px] sm:w-[320px]">
+                <h4 className="text-base text-grey-35 sm:text-lg">Studios!</h4>
+                <p className="text-xs text-grey-55 sm:text-sm">
                   homes and galleries for groups working together — like clubs,
                   cohorts, or teams
                 </p>
               </div>
             </div>
 
-            <div className="relative mx-auto mt-12 w-fit pr-[340px]">
+            <div className="relative mx-auto mt-12  pr-[200px] sm:pr-[340px]">
               <Image
                 src="/img/landing/spaces.png"
                 alt="a 0-90 axonometric drawing of a building with three floors, a bunch of rooms and overflowing creative work inside"
                 width={300}
                 height={100}
               />
-              <div className="absolute right-[80px] top-[250px] w-[240px] text-center">
-                <h4 className="text-grey-35">Spaces</h4>
-                <p className="text-sm text-grey-55">
+              <div className="absolute right-[20px] top-[100px] w-[180px] text-left sm:w-[240px] sm:text-center">
+                <h4 className="text-base text-grey-35 sm:text-lg">Spaces</h4>
+                <p className="text-xs text-grey-55 sm:text-sm">
                   workspaces — projects, gatherings, or explorations
                 </p>
               </div>
-              <div className="absolute right-[80px] top-[350px] w-[240px] text-center">
-                <h4 className="text-grey-35">Rooms</h4>
-                <p className="text-sm text-grey-55">
+              <div className="absolute right-[20px] top-[180px] w-[180px]  text-left sm:w-[240px] sm:text-center">
+                <h4 className="text-base text-grey-35 sm:text-lg">Rooms</h4>
+                <p className="text-xs text-grey-55 sm:text-sm">
                   to organize your work — collections, canvases, and chat
                 </p>
               </div>
-              <div className="absolute right-[80px] top-[450px] w-[240px] text-center">
-                <h4 className="text-grey-35">Cards</h4>
-                <p className="text-sm text-grey-55">
+              <div className="absolute right-[20px] top-[260px] w-[180px] text-left sm:w-[240px] sm:text-center">
+                <h4 className="text-base text-grey-35 sm:text-lg">Cards</h4>
+                <p className="text-xs text-grey-55 sm:text-sm">
                   the work itself — documents, text, images, comments & more
                 </p>
               </div>
             </div>
 
-            <div className="features mx-auto mt-[64px] max-w-4xl">
+            <div className="features mx-auto mt-[64px] max-w-4xl px-2">
               <h4 className="mb-4 text-center">
                 And other tools for getting it done
               </h4>
-              <div className="flex flex-wrap justify-center gap-4">
+              <div className="flex flex-wrap justify-center gap-2 sm:gap-4">
                 <FeatureListItem
                   name="Invites"
                   description="Invite people to join Spaces and Studios"
@@ -343,13 +346,13 @@ export function HomePage() {
               </div>
             </div>
           </div>
-          <div className="mx-auto py-12 text-accent-gold">
+          <div className="mx-auto py-8 text-accent-gold sm:py-12">
             <FancyDivider />
           </div>
           {/* get started! */}
           <div className="m-auto flex flex-col text-grey-35">
-            <div className="flex flex-col items-center p-8 text-center">
-              <div className="my-4 -rotate-3 rounded-lg bg-accent-gold px-16 py-10">
+            <div className="flex flex-col items-center px-6 py-3 text-center sm:p-8">
+              <div className="my-4 -rotate-3 rounded-lg bg-accent-gold px-6 py-10 sm:px-16">
                 <div className="rotate-3">
                   <div className="flex flex-col items-center gap-4">
                     {/* login / signup links */}
@@ -390,13 +393,13 @@ export function HomePage() {
             </div>
 
             {/* newsletter form */}
-            <div className="m-auto flex max-w-lg flex-col gap-4 rounded-md bg-background pb-12 text-center">
+            <div className="m-auto flex max-w-lg flex-col gap-4 rounded-md bg-background px-4 pb-12 text-center">
               <h3>Or, drop your email & stay in the loop</h3>
               <p className="text-sm">
                 We send updates 1–2x / month about new features & experiments;
                 we&apos;ll never spam or share your email
               </p>
-              <div className="m-auto flex w-fit gap-2">
+              <div className="mx-auto flex gap-2">
                 <form
                   action="https://buttondown.email/api/emails/embed-subscribe/hyperlink"
                   method="post"
@@ -407,7 +410,7 @@ export function HomePage() {
                       "popupwindow"
                     );
                   }}
-                  className="embeddable-buttondown-form m-auto flex h-9 w-fit gap-2"
+                  className="embeddable-buttondown-form  flex h-9 gap-1"
                 >
                   <input
                     type="email"
@@ -416,9 +419,7 @@ export function HomePage() {
                     placeholder="email"
                     required
                   />
-                  <div className="grid justify-items-end text-right">
-                    <ButtonSecondary content="Subscribe!" type="submit" />
-                  </div>
+                  <ButtonSecondary content="Subscribe!" type="submit" />
                 </form>
               </div>
             </div>
@@ -434,19 +435,19 @@ export function HomePage() {
 
       <Divider />
 
-      <div className="flex flex-row justify-between gap-4">
-        <div className="flex flex-row gap-2 px-4 py-2 text-sm text-grey-55">
-          <Link href="/privacy" className="hover:text-accent-blue">
+      <div className="flex  flex-row justify-between gap-4">
+        <div className="flex flex-col gap-1 px-4 py-2 text-sm text-grey-55 sm:flex-row sm:gap-2">
+          <Link href="/privacy" className=" w-max hover:text-accent-blue">
             privacy policy
           </Link>{" "}
-          <span className="text-grey-80">|</span>{" "}
+          {!isMobile ? <span className="text-grey-80">|</span> : null}
           <Link href="/terms" className="hover:text-accent-blue">
             terms
           </Link>
         </div>
-        <div className="px-4 py-2 text-sm text-grey-55">
+        <div className="px-4 py-2 text-right text-sm text-grey-55">
           <p className="">
-            Questions?{" "}
+            Questions? {isMobile ? <br /> : null}
             <a
               href="mailto:contact@hyperlink.academy"
               className="text-accent-blue hover:text-grey-55"
@@ -501,7 +502,7 @@ const FeatureListItem = (props: {
   icon: React.ReactElement;
 }) => {
   return (
-    <div className=" flex w-48 flex-col items-center  p-4 text-center text-grey-35">
+    <div className=" flex w-48 flex-col items-center p-2  text-center text-grey-35 sm:p-4">
       {props.icon}
       <p className="text-grey-35">
         <strong>{props.name}</strong>
@@ -549,20 +550,39 @@ const SubscribeModal = (props: { open: boolean; onClose: () => void }) => {
 };
 
 const FancyDivider = () => {
-  return (
-    <svg
-      width="560"
-      height="32"
-      viewBox="0 0 560 32"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M4 16C4 16 13.4644 4.00001 23.6839 4.00001C33.9034 4.00001 43.3678 16 43.3678 16C43.3678 16 52.8322 28 63.0517 28C73.2712 28 82.7356 16 82.7356 16C82.7356 16 92.2 4 102.419 4C112.639 4 122.103 16 122.103 16C122.103 16 131.569 28 141.788 28C152.007 28 161.472 16 161.472 16M318.948 16C318.948 16 328.413 4.00001 338.632 4.00001C348.851 4.00001 358.316 16 358.316 16C358.316 16 367.78 28 378 28C388.219 28 397.684 16 397.684 16C397.684 16 407.148 4 417.368 4C427.587 4 437.051 16 437.051 16C437.051 16 446.517 28 456.736 28C466.956 28 476.42 16 476.42 16M161.474 16C161.474 16 170.938 4.00001 181.158 4.00001C191.377 4.00001 200.842 16 200.842 16C200.842 16 210.306 28 220.526 28C230.745 28 240.21 16 240.21 16C240.21 16 249.674 4 259.894 4C270.113 4 279.577 16 279.577 16C279.577 16 289.043 28 299.262 28C309.482 28 318.946 16 318.946 16M476.422 16C476.422 16 485.887 4.00001 496.106 4.00001C506.326 4.00001 515.79 16 515.79 16C515.79 16 525.254 28 535.474 28C545.693 28 555.158 16 555.158 16"
-        stroke="currentColor"
-        stroke-width="8"
-        stroke-linecap="round"
-      />
-    </svg>
-  );
+  let isMobile = useIsMobile();
+  if (isMobile) {
+    return (
+      <svg
+        width="219"
+        height="30"
+        viewBox="0 0 219 30"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M215.001 4C205.895 4 197.463 14.692 197.463 14.692C197.463 14.692 189.03 25.3839 179.924 25.3839C170.819 25.3839 162.386 14.692 162.386 14.692C162.386 14.692 153.953 4.00001 144.848 4.00001C135.742 4.00001 127.309 14.692 127.309 14.692M4.53906 4.00001C13.6446 4.00001 22.0773 14.692 22.0773 14.692C22.0773 14.692 30.5101 25.3839 39.6156 25.3839C48.7211 25.3839 57.1539 14.692 57.1539 14.692C57.1539 14.692 65.5866 4 74.6921 4C83.7976 4 92.2304 14.692 92.2304 14.692C92.2304 14.692 100.664 25.3839 109.769 25.3839C118.875 25.3839 127.308 14.6919 127.308 14.6919"
+          stroke="currentColor"
+          stroke-width="8"
+          stroke-linecap="round"
+        />
+      </svg>
+    );
+  } else
+    return (
+      <svg
+        width="560"
+        height="32"
+        viewBox="0 0 560 32"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M4 16C4 16 13.4644 4.00001 23.6839 4.00001C33.9034 4.00001 43.3678 16 43.3678 16C43.3678 16 52.8322 28 63.0517 28C73.2712 28 82.7356 16 82.7356 16C82.7356 16 92.2 4 102.419 4C112.639 4 122.103 16 122.103 16C122.103 16 131.569 28 141.788 28C152.007 28 161.472 16 161.472 16M318.948 16C318.948 16 328.413 4.00001 338.632 4.00001C348.851 4.00001 358.316 16 358.316 16C358.316 16 367.78 28 378 28C388.219 28 397.684 16 397.684 16C397.684 16 407.148 4 417.368 4C427.587 4 437.051 16 437.051 16C437.051 16 446.517 28 456.736 28C466.956 28 476.42 16 476.42 16M161.474 16C161.474 16 170.938 4.00001 181.158 4.00001C191.377 4.00001 200.842 16 200.842 16C200.842 16 210.306 28 220.526 28C230.745 28 240.21 16 240.21 16C240.21 16 249.674 4 259.894 4C270.113 4 279.577 16 279.577 16C279.577 16 289.043 28 299.262 28C309.482 28 318.946 16 318.946 16M476.422 16C476.422 16 485.887 4.00001 496.106 4.00001C506.326 4.00001 515.79 16 515.79 16C515.79 16 525.254 28 535.474 28C545.693 28 555.158 16 555.158 16"
+          stroke="currentColor"
+          stroke-width="8"
+          stroke-linecap="round"
+        />
+      </svg>
+    );
 };
