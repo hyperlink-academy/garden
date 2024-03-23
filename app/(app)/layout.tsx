@@ -3,6 +3,7 @@ import { useIsClient, useIsMobile } from "hooks/utils";
 import { LayoutWrapper } from "./LayoutWrapper";
 import { useSidebarState } from "./@sidebar/SidebarState";
 import { animated, useSpring } from "@react-spring/web";
+import { DisclosureExpandTiny } from "components/Icons";
 
 export default function AppLayout(props: {
   children: React.ReactNode;
@@ -12,7 +13,7 @@ export default function AppLayout(props: {
   let isClient = useIsClient();
   let isMobile = useIsMobile();
   let mobileSidebarSpring = useSpring({
-    left: open ? 0 : -256,
+    left: open ? 0 : -258,
   });
   if (!isClient) return null;
   if (isMobile)
@@ -21,13 +22,14 @@ export default function AppLayout(props: {
         id="appLayout"
         className="flex h-full w-full snap-x snap-mandatory scroll-pl-4 flex-col overflow-x-scroll overflow-y-scroll px-2 pt-8 sm:gap-4 sm:px-8 "
       >
-        <div className="fixed top-1">
+        <div className="fixed left-0 top-0 z-30 flex w-full flex-row border-b border-grey-80 bg-background align-middle">
           <button
+            className="-rotate-90 text-grey-55"
             onClick={() => {
               useSidebarState.getState().toggleSidebar();
             }}
           >
-            tog
+            <DisclosureExpandTiny />
           </button>
         </div>
         <div className="appContentWrapper flex h-full flex-row gap-4 px-2 py-2 sm:gap-4">
