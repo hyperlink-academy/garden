@@ -523,8 +523,8 @@ const SubscribeModal = (props: { open: boolean; onClose: () => void }) => {
         Drop your email, we&apos;ll keep you in the loop!
       </p>
       <p>
-        We email 1-2 a month about new features, experiments, and plans. We'll
-        never spam or share your email
+        We email 1-2 a month about new features, experiments, and plans.
+        We&apos;ll never spam or share your email
       </p>
       <form
         action="https://buttondown.email/api/emails/embed-subscribe/hyperlink"
