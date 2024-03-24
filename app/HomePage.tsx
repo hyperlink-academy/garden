@@ -248,6 +248,20 @@ export function HomePage() {
               </p>
             </div>
             <div className="relative mx-auto mt-16 w-max">
+              {!isMobile ? (
+                <>
+                  <div className="CONE absolute left-[25px] top-[40px] h-[270px] w-[100px] bg-test-pink opacity-50"></div>
+                  <div className="HOUSE absolute left-[190px] top-[270px] h-[145px] w-[132px] bg-test-pink opacity-50"></div>
+                  <div className="ZIG absolute left-[320px] top-[160px] h-[140px] w-[132px] rotate-[33deg] bg-test-pink opacity-50"></div>
+                </>
+              ) : (
+                <>
+                  <div className="CONE absolute left-[45px] top-[18px] h-[120px] w-[50px] bg-test-pink opacity-50"></div>
+                  <div className="HOUSE absolute left-[118px] top-[120px] h-[65px] w-[58px] bg-test-pink opacity-50"></div>
+                  <div className="ZIG absolute left-[175px] top-[70px] h-[60px] w-[60px] rotate-[33deg] bg-test-pink opacity-50"></div>
+                </>
+              )}
+
               <Image
                 src="/img/landing/studios.png"
                 alt="a cute little drawing of some funky buildings in a neighborhood"
