@@ -21,6 +21,7 @@ import { Divider } from "components/Layout";
 import { useState } from "react";
 import { Modal } from "components/Modal";
 import { useIsMobile } from "hooks/utils";
+import { createPortal } from "react-dom";
 
 export function HomePage() {
   let [loginOrSignupState, setLoginOrSignupState] =
@@ -515,7 +516,8 @@ const FeatureListItem = (props: {
 };
 
 const SubscribeModal = (props: { open: boolean; onClose: () => void }) => {
-  return (
+  if (!open) return null;
+  return createPortal(
     <Modal
       open={props.open}
       onClose={() => props.onClose()}
@@ -547,7 +549,8 @@ const SubscribeModal = (props: { open: boolean; onClose: () => void }) => {
         />
         <ButtonPrimary content="Subscribe!" type="submit" />
       </form>
-    </Modal>
+    </Modal>,
+    document.body
   );
 };
 
