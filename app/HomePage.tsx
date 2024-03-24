@@ -33,7 +33,7 @@ export function HomePage() {
   let router = useRouter();
 
   return (
-    <div className="relative">
+    <div className="relative overflow-x-hidden">
       {/* sticky header */}
       <div className="sticky top-0 z-10 bg-background">
         <div className="flex items-center justify-between px-2 pb-1 pt-2 sm:px-4">
@@ -250,31 +250,55 @@ export function HomePage() {
             <div className="relative mx-auto mt-16 w-max">
               {!isMobile ? (
                 <>
-                  <div className="CONE absolute left-[25px] top-[40px] h-[270px] w-[100px] bg-test-pink opacity-50"></div>
-                  <div className="HOUSE absolute left-[190px] top-[270px] h-[145px] w-[132px] bg-test-pink opacity-50"></div>
-                  <div className="ZIG absolute left-[320px] top-[160px] h-[140px] w-[132px] rotate-[33deg] bg-test-pink opacity-50"></div>
+                  <a
+                    target="_blank"
+                    href="https://hyperlink.academy/studio/2UKAvohEV3v8ytaQosojP6"
+                    className="CONE absolute left-[25px] top-[40px] h-[270px] w-[100px]"
+                  />
+                  <a
+                    target="_blank"
+                    href="https://hyperlink.academy/studio/6ejN4eHGFWBB3zwhvwlMQG"
+                    className="HOUSE absolute left-[190px] top-[270px] h-[145px] w-[132px]"
+                  />
+                  <a
+                    target="_blank"
+                    href="https://hyperlink.academy/studio/2nI3wyEhba7QfVfSs6dX0d"
+                    className="ZIG absolute left-[320px] top-[160px] h-[140px] w-[132px] rotate-[33deg]"
+                  />
                 </>
               ) : (
                 <>
-                  <div className="CONE absolute left-[45px] top-[18px] h-[120px] w-[50px] bg-test-pink opacity-50"></div>
-                  <div className="HOUSE absolute left-[118px] top-[120px] h-[65px] w-[58px] bg-test-pink opacity-50"></div>
-                  <div className="ZIG absolute left-[175px] top-[70px] h-[60px] w-[60px] rotate-[33deg] bg-test-pink opacity-50"></div>
+                  <a
+                    target="_blank"
+                    href="https://hyperlink.academy/studio/2UKAvohEV3v8ytaQosojP6"
+                    className="CONE absolute left-[45px] top-[18px] h-[120px] w-[50px]"
+                  />
+                  <a
+                    target="_blank"
+                    href="https://hyperlink.academy/studio/6ejN4eHGFWBB3zwhvwlMQG"
+                    className="HOUSE absolute left-[118px] top-[120px] h-[65px] w-[58px]"
+                  />
+                  <a
+                    target="_blank"
+                    href="https://hyperlink.academy/studio/2nI3wyEhba7QfVfSs6dX0d"
+                    className="ZIG absolute left-[175px] top-[70px] h-[60px] w-[60px] rotate-[33deg]"
+                  />
                 </>
               )}
 
               <Image
                 src="/img/landing/studios.png"
                 alt="a cute little drawing of some funky buildings in a neighborhood"
-                width={isMobile ? 300 : 600}
+                width={isMobile ? 320 : 600}
                 height={0}
                 className={isMobile ? "pl-8" : ""}
               />
               <Image
                 src="/img/landing/arrow.png"
                 alt="an arrow leading from one of the earlier funky buildings to a diagram of what's inside it"
-                width={isMobile ? 80 : 100}
+                width={isMobile ? 70 : 100}
                 height={100}
-                className="absolute -bottom-[125px] right-[125px] sm:right-[250px]"
+                className="absolute -bottom-[125px] right-[80px] sm:right-[250px]"
               />
               <div className="absolute -top-12 right-[0px] w-[200px] text-center sm:-top-[16px] sm:right-[50px] sm:w-[320px]">
                 <h4 className="text-base text-grey-35 sm:text-lg">Studios!</h4>
@@ -285,34 +309,34 @@ export function HomePage() {
               </div>
             </div>
 
-            <div className="relative mx-auto mt-12 w-max  pr-[200px] sm:pr-[340px]">
+            <div className="relative mx-auto mt-12 w-max  pr-[232px] sm:pr-[340px]">
               <Image
                 src="/img/landing/spaces.png"
                 alt="a 0-90 axonometric drawing of a building with three floors, a bunch of rooms and overflowing creative work inside"
-                width={400}
+                width={isMobile ? 200 : 400}
                 height={100}
               />
-              <div className="absolute right-[85px] top-[280px] w-[180px] text-left sm:w-[240px] ">
-                <h4 className="text-base text-grey-35 sm:text-lg">Spaces</h4>
+              <div className="absolute right-[60px] top-[100px] w-[160px] text-left sm:right-[85px] sm:top-[280px] sm:w-[240px] ">
+                <h4 className="text-sm text-grey-35 sm:text-lg">Spaces</h4>
                 <p className="text-xs text-grey-55 sm:text-sm">
                   workspaces — projects, gatherings, or explorations
                 </p>
               </div>
-              <div className="absolute right-[85px] top-[420px] w-[180px]  text-left sm:w-[240px]">
-                <h4 className="text-base text-grey-35 sm:text-lg">Rooms</h4>
+              <div className="absolute right-[60px] top-[180px] w-[160px] text-left sm:right-[85px] sm:top-[420px] sm:w-[240px]">
+                <h4 className=" text-sm text-grey-35 sm:text-lg">Rooms</h4>
                 <p className="text-xs text-grey-55 sm:text-sm">
                   to organize your work — collections, canvases, and chat
                 </p>
               </div>
-              <div className="absolute right-[85px] top-[525px] w-[180px] text-left sm:w-[240px]">
-                <h4 className="text-base text-grey-35 sm:text-lg">Cards</h4>
+              <div className="absolute right-[60px] top-[260px] w-[160px] text-left sm:right-[85px] sm:top-[525px] sm:w-[240px] ">
+                <h4 className="text-sm text-grey-35 sm:text-lg">Cards</h4>
                 <p className="text-xs text-grey-55 sm:text-sm">
                   the work itself — documents, text, images, comments & more
                 </p>
               </div>
             </div>
 
-            <div className="features mx-auto mt-[64px] max-w-4xl px-2">
+            <div className="features mx-auto mt-[80px] max-w-4xl px-2 sm:mt-[64px]">
               <h4 className="mb-4 text-center">
                 And other tools for getting it done
               </h4>
@@ -530,7 +554,7 @@ const FeatureListItem = (props: {
 };
 
 const SubscribeModal = (props: { open: boolean; onClose: () => void }) => {
-  if (!open) return null;
+  if (!props.open) return null;
   return createPortal(
     <Modal
       open={props.open}
