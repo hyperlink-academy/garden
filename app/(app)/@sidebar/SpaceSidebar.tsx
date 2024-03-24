@@ -21,7 +21,7 @@ import * as Popover from "@radix-ui/react-popover";
 import { DotLoader } from "components/DotLoader";
 import { Modal, ModalSubmitButton } from "components/Modal";
 import { WORKER_URL } from "src/constants";
-import { useSidebarState } from "./SidebarState";
+import { useSetSidebarTitle, useSidebarState } from "./SidebarState";
 import { useRoomUnreads } from "components/SpaceLayout/Sidebar/RoomListLayout";
 import { useIsMobile } from "hooks/utils";
 
@@ -30,6 +30,7 @@ export function SpaceSidebar(props: {
   space_id: string;
   do_id: string;
 }) {
+  useSetSidebarTitle(() => props.display_name, [props.display_name]);
   let { input, setInput, results } = useSearch();
   let { open } = useSidebarState();
   let isMobile = useIsMobile();

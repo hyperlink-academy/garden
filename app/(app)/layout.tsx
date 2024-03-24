@@ -9,7 +9,7 @@ export default function AppLayout(props: {
   children: React.ReactNode;
   sidebar: React.ReactNode;
 }) {
-  let { open } = useSidebarState();
+  let { open, title } = useSidebarState();
   let isClient = useIsClient();
   let isMobile = useIsMobile();
   let mobileSidebarSpring = useSpring({
@@ -22,7 +22,7 @@ export default function AppLayout(props: {
         id="appLayout"
         className="flex h-full w-full snap-x snap-mandatory scroll-pl-4 flex-col overflow-x-scroll overflow-y-scroll px-2 pt-6 sm:gap-4 sm:px-8 "
       >
-        <div className="fixed left-0 top-0 z-30 flex w-full flex-row border-b border-grey-80 bg-background align-middle">
+        <div className="fixed left-0 top-0 z-30 flex w-full flex-row justify-between border-b border-grey-80 bg-background align-middle">
           <button
             className="-rotate-90 text-grey-55"
             onClick={() => {
@@ -31,6 +31,8 @@ export default function AppLayout(props: {
           >
             <DisclosureExpandTiny />
           </button>
+          <div className="text-sm ">{title}</div>
+          <div />
         </div>
         <div className="appContentWrapper flex h-full flex-row gap-4 px-2 py-2 sm:gap-4">
           {props.children}
