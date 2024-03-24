@@ -33,7 +33,7 @@ export function HomePage() {
   let router = useRouter();
 
   return (
-    <div className="relative overflow-x-hidden">
+    <div className="relative overflow-x-clip">
       {/* sticky header */}
       <div className="sticky top-0 z-10 bg-background">
         <div className="flex items-center justify-between px-2 pb-1 pt-2 sm:px-4">
@@ -126,7 +126,7 @@ export function HomePage() {
               </div>
               <div className="mx-4 -mt-[120px] flex flex-col gap-3 sm:mx-8">
                 <h1 className=" italic text-accent-blue">
-                  a set of tools for <br /> collaborative creative projects
+                  a place for <br /> collaborative creative projects
                 </h1>
                 <div className="flex w-full items-center gap-4">
                   <ButtonPrimary
