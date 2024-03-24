@@ -270,26 +270,26 @@ export function HomePage() {
               </div>
             </div>
 
-            <div className="relative mx-auto mt-12  pr-[200px] sm:pr-[340px]">
+            <div className="relative mx-auto mt-12 w-max  pr-[200px] sm:pr-[340px]">
               <Image
                 src="/img/landing/spaces.png"
                 alt="a 0-90 axonometric drawing of a building with three floors, a bunch of rooms and overflowing creative work inside"
-                width={300}
+                width={400}
                 height={100}
               />
-              <div className="absolute right-[20px] top-[100px] w-[180px] text-left sm:w-[240px] sm:text-center">
+              <div className="absolute right-[85px] top-[280px] w-[180px] text-left sm:w-[240px] ">
                 <h4 className="text-base text-grey-35 sm:text-lg">Spaces</h4>
                 <p className="text-xs text-grey-55 sm:text-sm">
                   workspaces — projects, gatherings, or explorations
                 </p>
               </div>
-              <div className="absolute right-[20px] top-[180px] w-[180px]  text-left sm:w-[240px] sm:text-center">
+              <div className="absolute right-[85px] top-[420px] w-[180px]  text-left sm:w-[240px]">
                 <h4 className="text-base text-grey-35 sm:text-lg">Rooms</h4>
                 <p className="text-xs text-grey-55 sm:text-sm">
                   to organize your work — collections, canvases, and chat
                 </p>
               </div>
-              <div className="absolute right-[20px] top-[260px] w-[180px] text-left sm:w-[240px] sm:text-center">
+              <div className="absolute right-[85px] top-[525px] w-[180px] text-left sm:w-[240px]">
                 <h4 className="text-base text-grey-35 sm:text-lg">Cards</h4>
                 <p className="text-xs text-grey-55 sm:text-sm">
                   the work itself — documents, text, images, comments & more
@@ -502,12 +502,14 @@ const FeatureListItem = (props: {
   icon: React.ReactElement;
 }) => {
   return (
-    <div className=" flex w-48 flex-col items-center p-2  text-center text-grey-35 sm:p-4">
+    <div className=" flex w-48 flex-col items-center gap-2 p-2  text-center text-grey-35 sm:p-4">
       {props.icon}
-      <p className="text-grey-35">
-        <strong>{props.name}</strong>
-      </p>
-      <p className="text-grey-55">{props.description}</p>
+      <div>
+        <p className="text-grey-35">
+          <strong>{props.name}</strong>
+        </p>
+        <p className="text-grey-55">{props.description}</p>
+      </div>
     </div>
   );
 };
