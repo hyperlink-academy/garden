@@ -614,7 +614,84 @@ const HelpRoadmap = () => {
 const HelpChangelog = () => {
   return (
     <div className="flex flex-col gap-4">
-      <p>TBD, changelog coming soon!</p>
+      {/* <p>TBD, changelog coming soon!</p> */}
+
+      {/* LAST UPDATED: 3.25.24 */}
+
+      <p>
+        Here's what's new…and how the Hyperlink app has evolved since way back!
+      </p>
+      <p>
+        To view what we&apos;re working on now (and soon), see our{" "}
+        <Link href="/docs?tab=roadmap" className="font-bold text-accent-blue">
+          Roadmap
+        </Link>
+        .
+      </p>
+
+      <HelpDisclosureSection>
+        <HelpDisclosure name="Deeplinking to cards" date="2024-03-06">
+          <p>
+            Copy a link to any card — useful for sharing direct links to cards
+            with friends or collaborators.
+          </p>
+          <p>
+            We're using this now in weekly club email digests, linking to recent
+            activity. We think it'll be useful for sharing in Discord, group
+            chats, newsletters, and more.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Studiomates can add reactions" date="2024-02-28">
+          <p>
+            Members of a Studio can add reactions to Studiomates' Spaces in that
+            same studio, and see who reacted on hover.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure
+          name="Studio join flow and settings improvements"
+          date="2024-02-23"
+        >
+          <p>
+            People invited to a Studio can now browse the Studio and join from a
+            banner at the top of the page.
+          </p>
+          <p>
+            We also added a couple settings for Studio creators: add an optional
+            "getting started" section, and allow members to join any Space in
+            the Studio.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Card background color" date="2024-02-05">
+          <p>
+            You can now pick from a handful of background colors in the card
+            options menu — useful for loose organizing or highlighting cards!
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Studio presence" date="2024-01-20">
+          <p>
+            From the Studio homepage, see when others are in Spaces in the
+            Studio.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Multiple images on cards" date="2024-01-20">
+          <p>
+            Images sections on cards now support multiple images — you can
+            upload or copy in as many images as you like, and view them in a
+            gallery.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Pretty link previews" date="2024-01-20">
+          <p>
+            When you paste in a URL as a card title or content area, we now
+            (when available) render a preview of the link including title and
+            thumbnail.
+          </p>
+        </HelpDisclosure>
+      </HelpDisclosureSection>
+
+      <p className="text-center">
+        <em>TBD: planning to backfill this list with older changes</em>
+      </p>
     </div>
   );
 };
@@ -727,7 +804,11 @@ const HelpDisclosureSection = (props: { children: React.ReactNode }) => {
   );
 };
 
-const HelpDisclosure = (props: { children: React.ReactNode; name: string }) => {
+const HelpDisclosure = (props: {
+  children: React.ReactNode;
+  name: string;
+  date?: string;
+}) => {
   return (
     <Disclosure
       as="div"
@@ -736,7 +817,16 @@ const HelpDisclosure = (props: { children: React.ReactNode; name: string }) => {
       {({ open }) => (
         <>
           <Disclosure.Button className="flex w-full items-center justify-between gap-2 rounded-md bg-bg-gold px-4 py-2 text-left hover:bg-grey-90 focus:outline-none focus-visible:ring focus-visible:ring-accent-blue">
-            <span className="font-bold">{props.name}</span>
+            <div className="flex w-full justify-between gap-2">
+              <span className="font-bold">{props.name}</span>
+              {props?.date ? (
+                <span className="rounded-md bg-white px-2 py-1 text-xs">
+                  {props.date}
+                </span>
+              ) : (
+                ""
+              )}
+            </div>
             {open ? <DisclosureExpandTiny /> : <DisclosureCollapseTiny />}
           </Disclosure.Button>
           <Disclosure.Panel className="rounded-md px-4 py-2 pb-2 pt-4">
