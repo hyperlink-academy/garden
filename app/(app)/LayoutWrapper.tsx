@@ -5,6 +5,7 @@ import { animated, useSpring } from "@react-spring/web";
 import { useViewportDifference } from "hooks/useViewportSize";
 import { useSidebarState } from "./@sidebar/SidebarState";
 import { useGesture } from "@use-gesture/react";
+import { useEffect } from "react";
 export function LayoutWrapper(props: {
   id: string;
   children: React.ReactNode;
@@ -16,7 +17,7 @@ export function LayoutWrapper(props: {
     height: viewheight,
   });
   let { active } = useDndContext();
-  let { setSidebar } = useSidebarState();
+  let { setSidebar, toggleSidebar } = useSidebarState();
   let bind = useGesture(
     {
       onDrag: (data) => {
@@ -33,6 +34,14 @@ export function LayoutWrapper(props: {
     },
     { drag: { pointer: { keys: false } } }
   );
+  useEffect(() => {
+    let listener = (e: KeyboardEvent) => {
+      if (e.key === "/" && (e.metaKey || e.ctrlKey)) toggleSidebar();
+    };
+    window.addEventListener("keydown", listener);
+    return () => window.removeEventListener("keydown", listener);
+  }, [toggleSidebar]);
+
   return (
     <animated.div
       id={props.id}
