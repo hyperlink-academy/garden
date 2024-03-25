@@ -143,18 +143,20 @@ export function SpaceHeader(props: {
 
 const SpaceSettings = (props: { space_id: string }) => {
   let spaceID = useSpaceID();
-  let { authorized } = useMutations();
   let { data } = useSpaceData(props);
   let router = useRouter();
   let { session } = useAuth();
 
   let isOwner =
     session.session && session.session.username === data?.owner.username;
+  let isMember =
+    session.user &&
+    data?.members_in_spaces.find((m) => m.member === session.user?.id);
   let [editModal, setEditModal] = useState(false);
 
   return (
     <>
-      {!authorized ? null : isOwner ? (
+      {isOwner ? (
         <button
           className={`text-grey-55 hover:text-accent-blue`}
           onClick={() => {
@@ -163,9 +165,9 @@ const SpaceSettings = (props: { space_id: string }) => {
         >
           <Settings />
         </button>
-      ) : (
+      ) : isMember ? (
         <MemberOptions />
-      )}
+      ) : null}
 
       <EditSpaceModal
         space_id={props.space_id}
