@@ -176,14 +176,12 @@ export const HelpDocs = () => {
 const HelpHandbook = () => {
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-lg">
+      <p>
         Welcome! Hyperlink is a place to do meaningful things — creative
         projects; book clubs; learning groups — together on the internet.
       </p>
-      <p className="text-lg">
-        This very short guide explains how the app works.
-      </p>
-      <p className="text-lg">
+      <p>This short guide explains how the app works.</p>
+      <p>
         Questions? Suggestions?{" "}
         <a
           href="mailto:contact@hyperlink.academy"
@@ -798,7 +796,7 @@ const UnicodeKeyboardKey = (props: { children: React.ReactNode }) => {
 
 const HelpDisclosureSection = (props: { children: React.ReactNode }) => {
   return (
-    <div className="flex w-full flex-col items-start gap-0 rounded-md bg-white p-2">
+    <div className="flex w-full flex-col items-start gap-2 rounded-md ">
       {props.children}
     </div>
   );
@@ -810,26 +808,33 @@ const HelpDisclosure = (props: {
   date?: string;
 }) => {
   return (
-    <Disclosure
-      as="div"
-      className="flex w-full flex-col gap-2 rounded-md bg-white p-2"
-    >
+    <Disclosure as="div" className="flex w-full flex-col gap-0">
       {({ open }) => (
         <>
-          <Disclosure.Button className="flex w-full items-center justify-between gap-2 rounded-md bg-bg-gold px-4 py-2 text-left hover:bg-grey-90 focus:outline-none focus-visible:ring focus-visible:ring-accent-blue">
-            <div className="flex w-full justify-between gap-2">
-              <span className="font-bold">{props.name}</span>
-              {props?.date ? (
-                <span className="rounded-md bg-white px-2 py-1 text-xs">
+          <Disclosure.Button
+            className={`flex w-full items-center justify-between gap-2 border-grey-80 bg-bg-gold px-4 py-2 text-left hover:bg-grey-90 focus:outline-none focus-visible:ring focus-visible:ring-accent-blue ${
+              open
+                ? "rounded-t-md border-l border-r border-t"
+                : "rounded-md border"
+            }`}
+          >
+            <div className="flex w-full flex-col justify-between gap-0">
+              {props?.date && (
+                <span className="w-fit text-xs italic text-grey-55">
                   {props.date}
                 </span>
-              ) : (
-                ""
               )}
+              <span className="font-bold">{props.name}</span>
             </div>
-            {open ? <DisclosureExpandTiny /> : <DisclosureCollapseTiny />}
+            {!open ? <DisclosureExpandTiny /> : <DisclosureCollapseTiny />}
           </Disclosure.Button>
-          <Disclosure.Panel className="rounded-md px-4 py-2 pb-2 pt-4">
+          <Disclosure.Panel
+            className={`border-grey-80 bg-white px-4 py-2 pb-4 pt-4 ${
+              open
+                ? "rounded-b-md border-b border-l border-r"
+                : "rounded-md border"
+            }`}
+          >
             <div className="flex flex-col gap-4">{props.children}</div>
           </Disclosure.Panel>
         </>
