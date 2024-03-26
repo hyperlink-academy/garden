@@ -21,6 +21,10 @@ export function SidebarSearchInput(props: {
         id="sidebar-search"
         value={props.value}
         onKeyDown={(e) => {
+          if (e.key === "Escape") {
+            props.onChange("");
+            e.currentTarget.blur();
+          }
           if (e.key === "Enter") props.onEnter(e);
           if (
             (e.key === "j" && (e.metaKey || e.ctrlKey)) ||
