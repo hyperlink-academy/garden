@@ -1,28 +1,12 @@
 "use client";
-import { useAuth } from "hooks/useAuth";
-import { db, useMutations, useSpaceID } from "hooks/useReplicache";
-import * as Popover from "@radix-ui/react-popover";
+import { db, useMutations } from "hooks/useReplicache";
 import { useState } from "react";
-import {
-  BellSmall,
-  RoomCalendar,
-  RoomSettings,
-  Settings,
-  UnreadDot,
-} from "../../Icons";
-import { EditSpaceModal } from "components/CreateSpace";
-import { useRouter } from "next/navigation";
+import { BellSmall, RoomCalendar, UnreadDot } from "../../Icons";
 import { EditRoomModal } from "./RoomListLayout";
 import { SharedRoomList } from "./SharedRoomList";
 import { useSpaceData } from "hooks/useSpaceData";
-import { DotLoader } from "components/DotLoader";
 import { useIsActiveRoom, useRoom, useSetRoom } from "hooks/useUIState";
-import { ModalSubmitButton, Modal } from "components/Modal";
-import { useUIState } from "hooks/useUIState";
 import { Truncate } from "components/Truncate";
-import { SpaceData } from "components/SpacesList";
-import { workerAPI } from "backend/lib/api";
-import { WORKER_URL } from "src/constants";
 import { Divider } from "components/Layout";
 import { useIsMobile } from "hooks/utils";
 import { useSidebarState } from "app/(app)/@sidebar/SidebarState";

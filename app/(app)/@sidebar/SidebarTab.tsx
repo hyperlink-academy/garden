@@ -39,8 +39,8 @@ export const SidebarTab = (props: {
       }}
       className={`sidebarTab relative select-none rounded-md border  ${
         props.active
-          ? "border-accent-blue  text-accent-blue rounded-md font-bold"
-          : " text-grey-35 hover:border-grey-80 border-transparent"
+          ? "rounded-md  border-accent-blue font-bold text-accent-blue"
+          : " border-transparent text-grey-35 hover:border-grey-80"
       }`}
     >
       <div
