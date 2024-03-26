@@ -2,6 +2,8 @@
 import { Divider } from "components/Layout";
 import { Sidebar } from "components/SpaceLayout";
 import {
+  BellSmall,
+  RoomCalendar,
   RoomCanvas,
   RoomChat,
   RoomCollection,
@@ -9,7 +11,7 @@ import {
   RoomSearch,
   UnreadDot,
 } from "components/Icons";
-import { db } from "hooks/useReplicache";
+import { db, useMutations } from "hooks/useReplicache";
 import { sortByPosition } from "src/position_helpers";
 import { SidebarTab } from "../SidebarTab";
 import { useRoom, useSetRoom } from "hooks/useUIState";
@@ -21,6 +23,7 @@ import { useIsMobile } from "hooks/utils";
 import { useState } from "react";
 import { SearchResults } from "../SidebarSearch";
 import { CardSearchResult, SpaceSearch, useSearch } from "./SpaceSidebarSearch";
+import { UnreadsRoom } from "components/UnreadsRoom";
 
 export function SpaceSidebar(props: {
   display_name: string | null;
@@ -72,6 +75,8 @@ export function SpaceSidebar(props: {
 
 export const CollapsedSpaceSidebar = (props: { space_id: string }) => {
   let rooms = db.useAttribute("room/name").sort(sortByPosition("roomList"));
+  let setRoom = useSetRoom();
+  let room = useRoom();
   let { setSidebar } = useSidebarState();
 
   let spaceData = useSpaceData(props);
@@ -94,7 +99,7 @@ export const CollapsedSpaceSidebar = (props: { space_id: string }) => {
   console.log(membersInCall);
 
   return (
-    <div className="flex h-full flex-col gap-1 text-accent-blue">
+    <div className="flex h-full flex-col gap-1">
       <div className="w-full pb-1 pt-3">
         <Divider />
       </div>
@@ -113,6 +118,18 @@ export const CollapsedSpaceSidebar = (props: { space_id: string }) => {
           }, 500);
         }}
       />
+      <CollapsedUnreadRoom />
+      <SidebarTab
+        active={room === "calendar"}
+        onClick={() => setRoom("calendar")}
+        title=""
+        collapsed
+        icon={<RoomCalendar />}
+      />
+
+      <div className="w-full pb-1 pt-3">
+        <Divider />
+      </div>
       <div className="z-50 flex grow flex-col gap-1 pb-3 text-grey-55">
         {rooms.map((r) => (
           <RoomButton key={r.entity} entityID={r.entity} />
@@ -136,6 +153,39 @@ export const CollapsedSpaceSidebar = (props: { space_id: string }) => {
         </div>
       )}
     </div>
+  );
+};
+
+const CollapsedUnreadRoom = () => {
+  let { memberEntity } = useMutations();
+  let unreadCards = db.useReference(memberEntity, "card/unread-by");
+  let unreadDiscussions = db.useReference(memberEntity, "discussion/unread-by");
+  let setRoom = useSetRoom();
+  let room = useRoom();
+  let chatRooms = db
+    .useAttribute("room/type")
+    .filter((room) => room.value === "chat");
+  if (!memberEntity) return;
+  return (
+    <SidebarTab
+      active={room === "unreads"}
+      onClick={() => setRoom("unreads")}
+      title=""
+      collapsed
+      icon={
+        <div className="relative">
+          {unreadCards?.length > 0 ||
+          unreadDiscussions?.filter(
+            (unread) => !chatRooms.find((room) => room.entity === unread.entity)
+          ).length > 0 ? (
+            <div className="absolute left-0 top-1">
+              <UnreadDot />
+            </div>
+          ) : null}
+          <BellSmall />
+        </div>
+      }
+    />
   );
 };
 
