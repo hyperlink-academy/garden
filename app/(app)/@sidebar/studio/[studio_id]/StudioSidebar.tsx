@@ -11,6 +11,8 @@ import { useAuth } from "hooks/useAuth";
 import SidebarLayout from "../../SidebarLayout";
 import { useSidebarState } from "../../SidebarState";
 import { useIsMobile } from "hooks/utils";
+import { SearchResults, SidebarSearchInput } from "../../SidebarSearch";
+import { useRouter } from "next/navigation";
 
 export const StudioSidebarContent = (props: Props & { isAdmin: boolean }) => {
   let { open } = useSidebarState((state) => state);
@@ -57,15 +59,43 @@ const StudioSidebarExpanded = (
   }
 ) => {
   let [spaceSearchInput, setSpaceSearchInput] = useState("");
+  let [selectedItemIndex, setSelectedItemIndex] = useState(0);
+  let spaces = props.data.spaces_in_studios
+    .filter((space) =>
+      space.space_data.display_name
+        .toLocaleLowerCase()
+        .includes(spaceSearchInput.toLocaleLowerCase())
+    )
+    .sort(({ space_data: a }, { space_data: b }) => {
+      if (!a.display_name || !b.display_name) {
+        if (a.display_name) return -1;
+        if (b.display_name) return 1;
+        return 0;
+      }
+      return a.display_name.localeCompare(b.display_name);
+    });
+  let router = useRouter();
 
   return (
     <>
       <div className="px-3 pb-2">
-        <input
+        <SidebarSearchInput
+          resultsLength={spaces.length}
+          selectedItemIndex={selectedItemIndex}
+          onEnter={() => {
+            let item = spaces[selectedItemIndex];
+            if (item) {
+              router.push(
+                `/studio/${uuidToBase62(props.data.id)}/space/${
+                  item.space_data.id
+                }`
+              );
+            }
+          }}
+          setSelectectedItemIndex={setSelectedItemIndex}
           value={spaceSearchInput}
-          onChange={(e) => setSpaceSearchInput(e.target.value)}
+          onChange={(e) => setSpaceSearchInput(e)}
           placeholder="search studio (ctrl/⌘ K)"
-          className="false w-full px-2 py-1 text-sm outline-none"
         />
       </div>
       {spaceSearchInput === "" ? (
@@ -75,32 +105,21 @@ const StudioSidebarExpanded = (
           {...props}
         />
       ) : (
-        <div className="flex flex-col gap-2 pr-2">
-          {props.data.spaces_in_studios
-            .filter((space) =>
-              space.space_data.display_name
-                .toLocaleLowerCase()
-                .includes(spaceSearchInput.toLocaleLowerCase())
-            )
-            .sort(({ space_data: a }, { space_data: b }) => {
-              if (!a.display_name || !b.display_name) {
-                if (a.display_name) return -1;
-                if (b.display_name) return 1;
-                return 0;
-              }
-              return a.display_name.localeCompare(b.display_name);
-            })
-            .map((space) => (
-              <Link
-                key={space.space_id}
-                href={`/studio/${uuidToBase62(props.data.id)}/space/${
-                  space.space_data.id
-                }`}
-              >
-                <SmallSpaceCard {...space.space_data} />
-              </Link>
-            ))}
-        </div>
+        <SearchResults
+          results={spaces}
+          getKey={(space) => space.space_id}
+          selectedItemIndex={selectedItemIndex}
+          renderResult={(space) => (
+            <Link
+              key={space.space_id}
+              href={`/studio/${uuidToBase62(props.data.id)}/space/${
+                space.space_data.id
+              }`}
+            >
+              <SmallSpaceCard {...space.space_data} />
+            </Link>
+          )}
+        />
       )}
     </>
   );

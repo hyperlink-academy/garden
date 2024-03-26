@@ -13,6 +13,8 @@ import { SmallSpaceCard, SpaceData } from "components/SpacesList";
 import { uuidToBase62 } from "src/uuidHelpers";
 import { useSidebarState } from "../../SidebarState";
 import { useIsMobile } from "hooks/utils";
+import { SearchResults, SidebarSearchInput } from "../../SidebarSearch";
+import { useRouter } from "next/navigation";
 
 export function UserPageSidebar(props: {
   params: { studio: string };
@@ -64,14 +66,41 @@ const UserPageSidebarExpanded = (props: {
   spaces: SpaceData[];
 }) => {
   let [search, setSearch] = useState("");
+  let [selectedItemIndex, setSelectedItemIndex] = useState(0);
+  let results = props.spaces
+    .filter((space) =>
+      space.display_name
+        ?.toLocaleLowerCase()
+        .includes(search.toLocaleLowerCase())
+    )
+    .sort((a, b) => {
+      if (!a.display_name || !b.display_name) {
+        if (a.display_name) return -1;
+        if (b.display_name) return 1;
+        return 0;
+      }
+      return a.display_name.localeCompare(b.display_name);
+    });
+  let router = useRouter();
   return (
     <>
       <div className="px-3 pb-3">
-        <input
+        <SidebarSearchInput
+          onEnter={() => {
+            let space = results[selectedItemIndex];
+            if (space)
+              router.push(
+                `/s/${space.owner.username}/s/${uuidToBase62(space.id)}/${
+                  space.display_name
+                }`
+              );
+          }}
+          selectedItemIndex={selectedItemIndex}
+          setSelectectedItemIndex={setSelectedItemIndex}
+          resultsLength={results.length}
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => setSearch(e)}
           placeholder="search home (ctrl/⌘ K)"
-          className="false w-full px-2 py-1 text-sm outline-none"
         />
       </div>
       {search === "" ? (
@@ -81,32 +110,21 @@ const UserPageSidebarExpanded = (props: {
           collapsed={false}
         />
       ) : (
-        <div className="flex flex-col gap-2 pr-2">
-          {props.spaces
-            .filter((space) =>
-              space.display_name
-                ?.toLocaleLowerCase()
-                .includes(search.toLocaleLowerCase())
-            )
-            .sort((a, b) => {
-              if (!a.display_name || !b.display_name) {
-                if (a.display_name) return -1;
-                if (b.display_name) return 1;
-                return 0;
-              }
-              return a.display_name.localeCompare(b.display_name);
-            })
-            .map((space) => (
-              <Link
-                key={space.id}
-                href={`/s/${space.owner.username}/s/${uuidToBase62(space.id)}/${
-                  space.display_name
-                }`}
-              >
-                <SmallSpaceCard {...space} />
-              </Link>
-            ))}
-        </div>
+        <SearchResults
+          results={results}
+          selectedItemIndex={selectedItemIndex}
+          getKey={(space) => space.id}
+          renderResult={(space) => (
+            <Link
+              key={space.id}
+              href={`/s/${space.owner.username}/s/${uuidToBase62(space.id)}/${
+                space.display_name
+              }`}
+            >
+              <SmallSpaceCard {...space} />
+            </Link>
+          )}
+        />
       )}
     </>
   );

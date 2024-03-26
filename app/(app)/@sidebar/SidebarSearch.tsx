@@ -51,7 +51,7 @@ export function SearchResults<T>(props: {
   renderResult: (r: T) => React.ReactNode;
 }) {
   return (
-    <div>
+    <div className="flex flex-col gap-2 pr-2">
       {props.results.map((r, index) => (
         <SearchItem
           key={props.getKey(r)}
