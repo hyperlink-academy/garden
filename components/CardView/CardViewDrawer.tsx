@@ -81,7 +81,7 @@ const DiscussionContent = (props: { entityID: string; open: boolean }) => {
   useMarkRead(props.entityID, props.open);
   return (
     <>
-      <div className="-mx-3 flex flex-col sm:-mx-4">
+      <div className="flex flex-col">
         <Messages entityID={props.entityID} isRoom={false} />
       </div>
     </>
