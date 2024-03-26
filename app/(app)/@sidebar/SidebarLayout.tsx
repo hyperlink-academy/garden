@@ -120,7 +120,7 @@ export default function SidebarLayout(props: {
               }`}
             >
               {
-                <div className="flex items-center justify-between px-3 pt-3">
+                <div className="flex items-center justify-between px-3 pt-2">
                   {(open || isMobile) && props.breadcrumb}
                   <animated.div style={disclosureSpring}>
                     <button

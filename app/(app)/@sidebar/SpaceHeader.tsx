@@ -112,7 +112,18 @@ export function SpaceHeader(props: {
         )}
         <div className="sidebarContent grow">
           {switcher && open ? (
-            <div className="flex flex-col gap-3 pl-2 pr-3">
+            <div className="flex flex-col gap-3 pl-2 pr-3 ">
+              <div className="flex items-center justify-between font-bold text-grey-55 ">
+                <div className="text-sm italic ">Other Studio Spaces</div>
+                <button
+                  className="hover:text-accent-blue"
+                  onClick={() => {
+                    setSwitcher(false);
+                  }}
+                >
+                  <CloseLinedTiny />
+                </button>
+              </div>
               {spaces
                 ?.filter((s) => !s.archived)
                 .sort((a, b) => {

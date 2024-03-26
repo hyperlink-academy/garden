@@ -90,7 +90,7 @@ function SearchItem(props: { children: React.ReactNode; selected: boolean }) {
       ref={ref}
       className={`${
         props.selected ? " bg-bg-blue" : ""
-      } px-l py-1 pr-3 hover:bg-bg-blue`}
+      }  px-3 py-1 hover:bg-bg-blue`}
     >
       {props.children}
     </div>
