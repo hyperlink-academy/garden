@@ -50,7 +50,7 @@ export function SpaceSidebar(props: {
         </div>
 
         {input === "" ? (
-          <Sidebar space_id={props.space_id} />
+          <Sidebar />
         ) : (
           <SearchResults
             getKey={(r) => r.entity}
@@ -107,8 +107,10 @@ export const CollapsedSpaceSidebar = (props: { space_id: string }) => {
         onClick={() => {
           setSidebar(true);
           setTimeout(() => {
-            document.getElementById("sidebar-search")?.focus();
-          }, 50);
+            document
+              .getElementById("sidebar-search")
+              ?.focus({ preventScroll: true });
+          }, 500);
         }}
       />
       <div className="z-50 flex grow flex-col gap-1 pb-3 text-grey-55">
