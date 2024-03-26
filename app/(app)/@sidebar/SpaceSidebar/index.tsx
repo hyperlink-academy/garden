@@ -1,29 +1,26 @@
 "use client";
 import { Divider } from "components/Layout";
 import { Sidebar } from "components/SpaceLayout";
-import { SearchResults, useSearch } from "components/Search";
 import {
   RoomCanvas,
   RoomChat,
   RoomCollection,
   RoomMember,
   RoomSearch,
-  Settings,
   UnreadDot,
 } from "components/Icons";
 import { db } from "hooks/useReplicache";
 import { sortByPosition } from "src/position_helpers";
-import { SidebarTab } from "./SidebarTab";
+import { SidebarTab } from "../SidebarTab";
 import { useRoom, useSetRoom } from "hooks/useUIState";
 import { People } from "components/SpaceLayout/Sidebar/People";
 import { useSpaceData } from "hooks/useSpaceData";
-import * as Popover from "@radix-ui/react-popover";
-import { DotLoader } from "components/DotLoader";
-import { Modal, ModalSubmitButton } from "components/Modal";
-import { WORKER_URL } from "src/constants";
-import { useSetSidebarTitle, useSidebarState } from "./SidebarState";
+import { useSetSidebarTitle, useSidebarState } from "../SidebarState";
 import { useRoomUnreads } from "components/SpaceLayout/Sidebar/RoomListLayout";
 import { useIsMobile } from "hooks/utils";
+import { useState } from "react";
+import { SearchResults } from "../SidebarSearch";
+import { CardSearchResult, SpaceSearch, useSearch } from "./SpaceSidebarSearch";
 
 export function SpaceSidebar(props: {
   display_name: string | null;
@@ -31,7 +28,9 @@ export function SpaceSidebar(props: {
   do_id: string;
 }) {
   useSetSidebarTitle(() => props.display_name, [props.display_name]);
-  let { input, setInput, results } = useSearch();
+
+  let { input, setInput, results, exactMatch } = useSearch();
+  let [selectedItemIndex, setSelectedItemIndex] = useState(0);
   let { open } = useSidebarState();
   let isMobile = useIsMobile();
   if (!open && !isMobile)
@@ -40,14 +39,13 @@ export function SpaceSidebar(props: {
     <div className="flex h-full flex-col">
       <div className="sidebarSpaceContent flex h-full min-h-0 shrink grow flex-col ">
         <div className="sidebarSearchWrapper px-3 pb-2">
-          <input
-            id="sidebar-search"
-            value={input}
-            onChange={(e) => {
-              setInput(e.target.value);
-            }}
-            placeholder="search space (ctrl/⌘ K)"
-            className="sidebarSearch w-full px-2 py-1 text-sm outline-none"
+          <SpaceSearch
+            setInput={setInput}
+            exactMatch={exactMatch}
+            results={results}
+            selectedItemIndex={selectedItemIndex}
+            setSelectedItemIndex={setSelectedItemIndex}
+            input={input}
           />
         </div>
 
@@ -55,9 +53,10 @@ export function SpaceSidebar(props: {
           <Sidebar space_id={props.space_id} />
         ) : (
           <SearchResults
+            getKey={(r) => r.entity}
+            renderResult={(r) => <CardSearchResult entityID={r.entity} />}
             results={results}
-            onClick={() => {}}
-            suggestionIndex={0}
+            selectedItemIndex={selectedItemIndex}
           />
         )}
       </div>
@@ -119,7 +118,10 @@ export const CollapsedSpaceSidebar = (props: { space_id: string }) => {
       </div>
       {membersOnline.length > 0 && (
         <div
-          className={`collapsedSidebarPeople sticky bottom-0 mx-auto flex w-full flex-col place-items-center gap-1 rounded-md bg-white pb-3  text-center font-bold `}
+          className={`collapsedSidebarPeople
+            sticky bottom-0 mx-auto flex w-full flex-col
+            place-items-center gap-1 rounded-md bg-white pb-3
+            text-center font-bold `}
         >
           <Divider />
           <div

@@ -74,6 +74,18 @@ export default function SidebarLayout(props: {
   let sidebarOverlaySpring = useSpring({
     opacity: open ? 0.2 : 0,
   });
+  useEffect(() => {
+    let listener = (e: KeyboardEvent) => {
+      if (e.key === "k" && (e.ctrlKey || e.metaKey)) {
+        setSidebar(true);
+        setTimeout(() => {
+          document.getElementById("sidebar-search")?.focus();
+        }, 10);
+      }
+    };
+    document.addEventListener("keydown", listener);
+    return () => document.removeEventListener("keydown", listener);
+  }, [setSidebar]);
 
   if (!isClient) return;
 

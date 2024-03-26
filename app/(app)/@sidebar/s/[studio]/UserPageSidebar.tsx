@@ -9,11 +9,7 @@ import { HomeTabs } from "./HomeTabs";
 import { LoginButton } from "components/LoginModal";
 import SidebarLayout from "../../SidebarLayout";
 import { useState } from "react";
-import {
-  BaseSpaceCard,
-  SmallSpaceCard,
-  SpaceData,
-} from "components/SpacesList";
+import { SmallSpaceCard, SpaceData } from "components/SpacesList";
 import { uuidToBase62 } from "src/uuidHelpers";
 import { useSidebarState } from "../../SidebarState";
 import { useIsMobile } from "hooks/utils";
