@@ -18,6 +18,7 @@ export function SidebarSearchInput(props: {
   return (
     <div className="relative w-full">
       <input
+        placeholder={props.placeholder}
         id="sidebar-search"
         value={props.value}
         onKeyDown={(e) => {
@@ -66,7 +67,7 @@ export function SearchResults<T>(props: {
   renderResult: (r: T) => React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-0.5">
       {props.results.map((r, index) => (
         <SearchItem
           key={props.getKey(r)}
@@ -87,7 +88,9 @@ function SearchItem(props: { children: React.ReactNode; selected: boolean }) {
   return (
     <div
       ref={ref}
-      className={`${props.selected ? " bg-bg-blue" : ""} px-2 py-1`}
+      className={`${
+        props.selected ? " bg-bg-blue" : ""
+      } px-l py-1 pr-3 hover:bg-bg-blue`}
     >
       {props.children}
     </div>
