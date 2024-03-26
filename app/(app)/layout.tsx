@@ -5,6 +5,8 @@ import { useSidebarState } from "./@sidebar/SidebarState";
 import { animated, useSpring } from "@react-spring/web";
 import { DisclosureExpandTiny } from "components/Icons";
 import { Truncate } from "components/Truncate";
+import { useAuth } from "hooks/useAuth";
+import { LoginButton, LoginOrSignupModal } from "components/LoginModal";
 
 export default function AppLayout(props: {
   children: React.ReactNode;
@@ -13,6 +15,7 @@ export default function AppLayout(props: {
   let { open, title } = useSidebarState();
   let isClient = useIsClient();
   let isMobile = useIsMobile();
+  let { session } = useAuth();
   let mobileSidebarSpring = useSpring({
     left: open ? 0 : -262,
   });
@@ -24,7 +27,7 @@ export default function AppLayout(props: {
         className="no-scrollbar pwa-padding flex h-full w-full touch-none snap-x snap-mandatory scroll-pl-4 flex-col overflow-x-scroll overflow-y-scroll px-2  sm:gap-4 sm:px-8 "
       >
         <div className="mobileHeaderWrapper sticky left-0 right-0 top-0 z-30 w-full pt-2">
-          <div className="mobileHeader flex w-full gap-2 rounded-md border border-grey-90 bg-background p-1 pr-3 ">
+          <div className="mobileHeader flex w-full gap-2 rounded-md border border-grey-90 bg-background p-1">
             <button
               className="mobileHeaderToggle shrink-0 -rotate-90 rounded-full text-grey-55"
               onClick={() => {
@@ -33,9 +36,12 @@ export default function AppLayout(props: {
             >
               <DisclosureExpandTiny />
             </button>
-            <div className="MobileHeaderTitle w-full min-w-0 grow text-center text-sm text-grey-80">
-              <Truncate className=" bg-background">{title}</Truncate>
+            <div className="MobileHeaderTitle w-full min-w-0 grow text-center text-sm text-grey-55">
+              <Truncate className=" bg-background">
+                {title === session?.session?.username ? "home" : title}
+              </Truncate>
             </div>
+            {!session.loggedIn ? <LoginButton small /> : <div />}
           </div>
         </div>
         <div className="appContentWrapper no-scrollbar flex h-full w-fit flex-row gap-4 pb-2 pt-2 sm:gap-4">
