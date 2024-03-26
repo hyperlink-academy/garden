@@ -42,7 +42,7 @@ export default function UserHomePage(props: { data: IdentityData }) {
 
   return (
     <>
-      <div className="my-3 flex h-fit min-w-[calc(100vw-128px)] max-w-4xl flex-col gap-2 sm:my-0">
+      <div className="my-3 flex h-fit min-w-[min(calc(100vw-128px),56rem)] max-w-4xl flex-col gap-2 sm:my-0">
         {tab === "Home" ? (
           <Homepage
             spaces={spaces}
