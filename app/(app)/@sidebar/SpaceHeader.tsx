@@ -115,6 +115,14 @@ export function SpaceHeader(props: {
             <div className="flex flex-col gap-3 pl-2 pr-3">
               {spaces
                 ?.filter((s) => !s.archived)
+                .sort((a, b) => {
+                  if (!a.lastUpdated || !b.lastUpdated) {
+                    if (a.lastUpdated) return -1;
+                    if (b.lastUpdated) return 1;
+                    return 0;
+                  }
+                  return a.lastUpdated > b.lastUpdated ? -1 : 1;
+                })
                 .map((space) => (
                   <Link
                     key={space.id}
