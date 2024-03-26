@@ -1,3 +1,4 @@
+import { CloseLinedTiny } from "components/Icons";
 import { useEffect, useRef, useState } from "react";
 
 export function useSearchState() {
@@ -15,32 +16,42 @@ export function SidebarSearchInput(props: {
   placeholder?: string;
 }) {
   return (
-    <input
-      id="sidebar-search"
-      value={props.value}
-      onKeyDown={(e) => {
-        if (e.key === "Enter") props.onEnter(e);
-        if (
-          (e.key === "j" && (e.metaKey || e.ctrlKey)) ||
-          e.key === "ArrowDown"
-        ) {
-          e.preventDefault();
-          if (props.selectedItemIndex < props.resultsLength)
-            props.setSelectectedItemIndex((s) => s + 1);
-        }
+    <div className="relative w-full">
+      <input
+        id="sidebar-search"
+        value={props.value}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") props.onEnter(e);
+          if (
+            (e.key === "j" && (e.metaKey || e.ctrlKey)) ||
+            e.key === "ArrowDown"
+          ) {
+            e.preventDefault();
+            if (props.selectedItemIndex < props.resultsLength)
+              props.setSelectectedItemIndex((s) => s + 1);
+          }
 
-        if (
-          (e.key === "k" && (e.metaKey || e.ctrlKey)) ||
-          e.key === "ArrowUp"
-        ) {
-          e.preventDefault();
-          if (props.selectedItemIndex > 0)
-            props.setSelectectedItemIndex((s) => s - 1);
-        }
-      }}
-      onChange={(e) => props.onChange(e.target.value)}
-      className="sidebarSearch w-full px-2 py-1 text-sm outline-none"
-    />
+          if (
+            (e.key === "k" && (e.metaKey || e.ctrlKey)) ||
+            e.key === "ArrowUp"
+          ) {
+            e.preventDefault();
+            if (props.selectedItemIndex > 0)
+              props.setSelectectedItemIndex((s) => s - 1);
+          }
+        }}
+        onChange={(e) => props.onChange(e.target.value)}
+        className="sidebarSearch w-full px-2 py-1 text-sm outline-none"
+      />
+      {props.value && (
+        <button
+          className="absolute right-2 top-2 text-grey-80"
+          onClick={() => props.onChange("")}
+        >
+          <CloseLinedTiny />
+        </button>
+      )}
+    </div>
   );
 }
 
