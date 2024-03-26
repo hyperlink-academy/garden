@@ -38,7 +38,7 @@ export default function AppLayout(props: {
             </div>
           </div>
         </div>
-        <div className="appContentWrapper no-scrollbar flex h-full flex-row gap-4 pb-2 pt-2 sm:gap-4">
+        <div className="appContentWrapper no-scrollbar flex h-full w-fit flex-row gap-4 pb-2 pt-2 sm:gap-4">
           {props.children}
         </div>
         <animated.div
