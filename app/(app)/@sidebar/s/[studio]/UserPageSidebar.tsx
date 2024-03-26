@@ -11,7 +11,7 @@ import SidebarLayout from "../../SidebarLayout";
 import { useState } from "react";
 import { SmallSpaceCard, SpaceData } from "components/SpacesList";
 import { uuidToBase62 } from "src/uuidHelpers";
-import { useSidebarState } from "../../SidebarState";
+import { useSetSidebarTitle, useSidebarState } from "../../SidebarState";
 import { useIsMobile } from "hooks/utils";
 import { SearchResults, SidebarSearchInput } from "../../SidebarSearch";
 import { useRouter } from "next/navigation";
@@ -23,6 +23,8 @@ export function UserPageSidebar(props: {
   let { open } = useSidebarState((state) => state);
   let isMobile = useIsMobile();
   let { session } = useAuth();
+
+  useSetSidebarTitle(() => props.params.studio, [props.params.studio]);
 
   return (
     <SidebarLayout

@@ -9,7 +9,7 @@ import { uuidToBase62 } from "src/uuidHelpers";
 import { StudioRoleBadge } from "./StudioRoleBadge";
 import { useAuth } from "hooks/useAuth";
 import SidebarLayout from "../../SidebarLayout";
-import { useSidebarState } from "../../SidebarState";
+import { useSidebarState, useSetSidebarTitle } from "../../SidebarState";
 import { useIsMobile } from "hooks/utils";
 import { SearchResults, SidebarSearchInput } from "../../SidebarSearch";
 import { useRouter } from "next/navigation";
@@ -18,6 +18,8 @@ export const StudioSidebarContent = (props: Props & { isAdmin: boolean }) => {
   let { open } = useSidebarState((state) => state);
   let isMobile = useIsMobile();
   let { session } = useAuth();
+  useSetSidebarTitle(() => props.data.name, [props.data.name]);
+
   return (
     <SidebarLayout
       breadcrumb={

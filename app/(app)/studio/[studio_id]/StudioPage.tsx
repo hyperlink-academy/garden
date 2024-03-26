@@ -71,7 +71,7 @@ export function StudioPageContent(props: Props) {
   if (!isClient) return null;
   return (
     <div
-      className={`pwa-padding studioWrapper min-w-[min(calc(100vw-128px),56rem)] max-w-4xl flex-col items-stretch pl-1 sm:pl-0 ${
+      className={`pwa-padding studioWrapper min-w-[min(calc(100vw-128px),56rem)] max-w-4xl flex-col  items-stretch sm:mt-2  sm:pl-0 ${
         currentTab === "About" ? "h-full" : "h-fit"
       }`}
     >
