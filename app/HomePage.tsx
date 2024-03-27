@@ -36,7 +36,7 @@ export function HomePage() {
     <div className="relative overflow-x-clip">
       {/* sticky header */}
       <div className="sticky top-0 z-10 bg-background">
-        <div className="flex items-center justify-between px-2 pb-1 pt-2 sm:px-4">
+        <div className="flex items-center justify-between px-2 py-2 sm:px-4">
           {/* notes */}
           <div className="flex gap-2">
             <a
@@ -178,7 +178,7 @@ export function HomePage() {
                   className="flex items-center justify-center gap-1 text-sm text-accent-blue hover:underline sm:text-base"
                   href={"https://notes.hyperlink.academy/note/internet-clubs"}
                 >
-                  read more about the clubs
+                  read more about internet clubs
                   <GoToPageLined />
                 </a>
               </div>
@@ -212,15 +212,14 @@ export function HomePage() {
 
               <div
                 style={{}}
-                className="my-4 flex flex-col items-center gap-4 bg-[url('../public/img/landing/funAccent.svg')] bg-contain bg-center bg-no-repeat p-10 text-center"
+                className="my-4 flex flex-col items-center gap-4 bg-[url('../public/img/landing/funAccent.svg')] bg-contain bg-center bg-no-repeat p-16 text-center"
               >
-                <div className="flex flex-col gap-0 text-grey-35">
+                <div className="flex flex-col gap-0 rounded-md bg-white p-4 text-grey-35">
                   <h4>Want to start a club of your own?</h4>
                   <p className="text-base text-grey-55">
                     We&apos;ll help with ideas, setup, and tech support!
                   </p>
                 </div>
-
                 <Link
                   href="https://hyperlink.academy/forms/propose-club"
                   target="_blank"
@@ -301,7 +300,7 @@ export function HomePage() {
                 className="absolute -bottom-[125px] right-[80px] sm:right-[250px]"
               />
               <div className="absolute -top-12 right-[0px] w-[200px] text-center sm:-top-[16px] sm:right-[50px] sm:w-[320px]">
-                <h4 className="text-base text-grey-35 sm:text-lg">Studios!</h4>
+                <h4 className="text-base text-grey-35 sm:text-lg">Studios</h4>
                 <p className="text-xs text-grey-55 sm:text-sm">
                   homes and galleries for groups working together — like clubs,
                   cohorts, or teams
@@ -338,7 +337,7 @@ export function HomePage() {
 
             <div className="features mx-auto mt-[80px] max-w-4xl px-2 sm:mt-[64px]">
               <h4 className="mb-4 text-center">
-                And other tools for getting it done
+                …and plenty of tools for getting it done!
               </h4>
               <div className="flex flex-wrap justify-center gap-2 sm:gap-4">
                 <FeatureListItem
@@ -519,7 +518,7 @@ const StudioItem = (props: {
 
       <Link
         href={props.url}
-        className="flex items-center gap-2 text-sm text-accent-blue"
+        className="flex items-center gap-2 text-sm text-accent-blue hover:underline"
       >
         <ButtonLink content="browse" />
         <GoToPageLined />
@@ -541,9 +540,9 @@ const FeatureListItem = (props: {
   icon: React.ReactElement;
 }) => {
   return (
-    <div className=" flex w-48 flex-col items-center gap-2 p-2  text-center text-grey-35 sm:p-4">
+    <div className="flex w-64 flex-col items-center gap-2 p-2 text-center text-grey-35 sm:p-4">
       {props.icon}
-      <div>
+      <div className="flex flex-col gap-1">
         <p className="text-grey-35">
           <strong>{props.name}</strong>
         </p>
@@ -559,14 +558,14 @@ const SubscribeModal = (props: { open: boolean; onClose: () => void }) => {
     <Modal
       open={props.open}
       onClose={() => props.onClose()}
-      header="Subscribe to the Newsletter"
+      header="Subscribe to our Newsletter"
     >
       <p className="font-bold">
         Drop your email, we&apos;ll keep you in the loop!
       </p>
       <p>
-        We email 1-2 a month about new features, experiments, and plans.
-        We&apos;ll never spam or share your email
+        We send updates 1–2x / month about new features & experiments;
+        we&apos;ll never spam or share your email
       </p>
       <form
         action="https://buttondown.email/api/emails/embed-subscribe/hyperlink"
