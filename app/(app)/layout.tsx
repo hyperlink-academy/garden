@@ -1,58 +1,24 @@
 "use client";
 import { useIsClient, useIsMobile } from "hooks/utils";
 import { LayoutWrapper } from "./LayoutWrapper";
-import { useSidebarState } from "./@sidebar/SidebarState";
-import { animated, useSpring } from "@react-spring/web";
-import { DisclosureExpandTiny } from "components/Icons";
-import { Truncate } from "components/Truncate";
-import { useAuth } from "hooks/useAuth";
-import { LoginButton, LoginOrSignupModal } from "components/LoginModal";
 
 export default function AppLayout(props: {
   children: React.ReactNode;
   sidebar: React.ReactNode;
 }) {
-  let { open, title } = useSidebarState();
   let isClient = useIsClient();
   let isMobile = useIsMobile();
-  let { session } = useAuth();
-  let mobileSidebarSpring = useSpring({
-    left: open ? 0 : -262,
-  });
   if (!isClient) return null;
   if (isMobile)
     return (
       <LayoutWrapper
         id="appLayout"
-        className="pwa-padding no-scrollbar mt-10 flex h-full w-full snap-x snap-mandatory scroll-pl-4 flex-col overflow-x-scroll overflow-y-scroll  p-3 px-2 sm:gap-4 sm:px-8"
+        className="no-scrollbar flex h-full w-full snap-x snap-mandatory scroll-pl-4 flex-col overflow-x-scroll overflow-y-scroll  px-2 pt-10 "
       >
-        <div className="mobileHeaderWrapper pwa-padding fixed left-0 top-0 z-30 w-full bg-background">
-          <div className="mobileHeader flex w-full gap-2 border-b border-grey-90 bg-background p-1 px-2">
-            <button
-              className="mobileHeaderToggle shrink-0 -rotate-90 rounded-full text-grey-55"
-              onClick={() => {
-                useSidebarState.getState().toggleSidebar();
-              }}
-            >
-              <DisclosureExpandTiny />
-            </button>
-            <div className="MobileHeaderTitle w-full min-w-0 grow text-center text-sm text-grey-55">
-              <Truncate className=" bg-background">
-                {title === session?.session?.username ? "home" : title}
-              </Truncate>
-            </div>
-            {!session.loggedIn ? <LoginButton small /> : <div />}
-          </div>
-        </div>
+        {props.sidebar}
         <div className="appContentWrapper no-scrollbar flex h-full w-fit flex-row gap-4 pb-2 pt-2 sm:gap-4">
           {props.children}
         </div>
-        <animated.div
-          style={mobileSidebarSpring}
-          className={`pwa-padding pwa-padding-bottom fixed top-0 z-30 flex h-full py-1 pl-1`}
-        >
-          {props.sidebar}
-        </animated.div>
       </LayoutWrapper>
     );
 

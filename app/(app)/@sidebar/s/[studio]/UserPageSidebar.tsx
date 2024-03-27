@@ -11,8 +11,6 @@ import SidebarLayout from "../../SidebarLayout";
 import { useState } from "react";
 import { SmallSpaceCard, SpaceData } from "components/SpacesList";
 import { uuidToBase62 } from "src/uuidHelpers";
-import { useSetSidebarTitle, useSidebarState } from "../../SidebarState";
-import { useIsMobile } from "hooks/utils";
 import { SearchResults, SidebarSearchInput } from "../../SidebarSearch";
 import { useRouter } from "next/navigation";
 
@@ -20,25 +18,14 @@ export function UserPageSidebar(props: {
   params: { studio: string };
   spaces: SpaceData[];
 }) {
-  let { open } = useSidebarState((state) => state);
-  let isMobile = useIsMobile();
   let { session } = useAuth();
-
-  useSetSidebarTitle(() => props.params.studio, [props.params.studio]);
 
   return (
     <SidebarLayout
-      breadcrumb={
-        <Link
-          className="sidebarBreadcrumb flex shrink-0 flex-row items-center text-sm text-grey-55"
-          href={session.session ? `/s/${session.session.username}` : "/"}
-        >
-          <div className="flex gap-1">
-            <div className="font-bold hover:text-accent-blue">h</div>
-            <div className="font-bold">/</div>
-          </div>
-        </Link>
-      }
+      openContent={<UserPageSidebarExpanded {...props} />}
+      collapsedContent={<UserPageSidebarCollapsed {...props} />}
+      headerContent={<UserPageHeader {...props} />}
+      breadcrumb={null}
       header={
         <>
           <div className="sidebarSpaceName shrink-0 flex-row px-3 pt-0.5 text-lg font-bold">
@@ -53,13 +40,7 @@ export function UserPageSidebar(props: {
           )}
         </>
       }
-    >
-      {open || isMobile ? (
-        <UserPageSidebarExpanded {...props} />
-      ) : (
-        <UserPageSidebarCollapsed {...props} />
-      )}
-    </SidebarLayout>
+    />
   );
 }
 
@@ -128,6 +109,29 @@ const UserPageSidebarExpanded = (props: {
           )}
         />
       )}
+    </>
+  );
+};
+
+const UserPageHeader = (props: { params: { studio: string } }) => {
+  let { session } = useAuth();
+  return (
+    <>
+      <div className="sidebarSpaceName mx-auto h-fit w-fit shrink-0 flex-row font-bold ">
+        {props.params.studio === session.session?.username
+          ? "Home"
+          : props.params.studio}
+      </div>
+
+      <div className="pb-2 pt-3">
+        <Divider />
+      </div>
+
+      <HomeTabs
+        username={props.params.studio}
+        className="mx-auto flex flex-row gap-1 text-grey-55"
+        collapsed={true}
+      />
     </>
   );
 };

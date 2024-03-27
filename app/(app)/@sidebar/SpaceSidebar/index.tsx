@@ -17,27 +17,18 @@ import { SidebarTab } from "../SidebarTab";
 import { useRoom, useSetRoom } from "hooks/useUIState";
 import { People } from "components/SpaceLayout/Sidebar/People";
 import { useSpaceData } from "hooks/useSpaceData";
-import { useSetSidebarTitle, useSidebarState } from "../SidebarState";
+import { useSidebarState } from "../SidebarState";
 import { useRoomUnreads } from "components/SpaceLayout/Sidebar/RoomListLayout";
-import { useIsMobile } from "hooks/utils";
 import { useState } from "react";
 import { SearchResults } from "../SidebarSearch";
 import { CardSearchResult, SpaceSearch, useSearch } from "./SpaceSidebarSearch";
-import { UnreadsRoom } from "components/UnreadsRoom";
 
 export function SpaceSidebar(props: {
   display_name: string | null;
   space_id: string;
-  do_id: string;
 }) {
-  useSetSidebarTitle(() => props.display_name, [props.display_name]);
-
   let { input, setInput, results, exactMatch } = useSearch();
   let [selectedItemIndex, setSelectedItemIndex] = useState(0);
-  let { open } = useSidebarState();
-  let isMobile = useIsMobile();
-  if (!open && !isMobile)
-    return <CollapsedSpaceSidebar space_id={props.space_id} />;
   return (
     <div className="flex h-full flex-col">
       <div className="sidebarSpaceContent flex h-full min-h-0 shrink grow flex-col ">
@@ -73,7 +64,7 @@ export function SpaceSidebar(props: {
   );
 }
 
-export const CollapsedSpaceSidebar = (props: { space_id: string }) => {
+export const SpaceMobileHeader = (props: { space_id: string }) => {
   let rooms = db.useAttribute("room/name").sort(sortByPosition("roomList"));
   let setRoom = useSetRoom();
   let room = useRoom();
@@ -99,7 +90,82 @@ export const CollapsedSpaceSidebar = (props: { space_id: string }) => {
   console.log(membersInCall);
 
   return (
-    <div className="flex h-full flex-col gap-1">
+    <div className={`flex h-full flex-row gap-1`}>
+      <SidebarTab
+        icon={<RoomSearch />}
+        title="Search"
+        collapsed
+        active={false}
+        onClick={() => {
+          setSidebar(true);
+          setTimeout(() => {
+            document
+              .getElementById("sidebar-search")
+              ?.focus({ preventScroll: true });
+          }, 500);
+        }}
+      />
+      <CollapsedUnreadRoom />
+      <SidebarTab
+        active={room === "calendar"}
+        onClick={() => setRoom("calendar")}
+        title=""
+        collapsed
+        icon={<RoomCalendar />}
+      />
+
+      <div className={`flex grow flex-row gap-1 text-grey-55`}>
+        {rooms.map((r) => (
+          <RoomButton key={r.entity} entityID={r.entity} />
+        ))}
+      </div>
+      {membersOnline.length > 0 && (
+        <div
+          className={`sticky right-0 z-10 flex flex-row items-center gap-1 rounded-md px-1 text-xs text-white ${
+            membersInCall.length === 0 ? "bg-accent-blue" : "bg-grey-55"
+          }`}
+        >
+          <RoomMember /> {membersOnline.length}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export const CollapsedSpaceSidebar = (props: {
+  space_id: string;
+  horizontal?: boolean;
+}) => {
+  let rooms = db.useAttribute("room/name").sort(sortByPosition("roomList"));
+  let setRoom = useSetRoom();
+  let room = useRoom();
+  let { setSidebar } = useSidebarState();
+
+  let spaceData = useSpaceData(props);
+
+  let members = db
+    .useAttribute("member/name")
+    .filter((m) =>
+      spaceData?.data?.members_in_spaces.find(
+        (f) => f.identity_data?.username === m.value
+      )
+    );
+  let activeSessions = db
+    .useAttribute("presence/client-member")
+    .map((m) => m.value.value);
+  let uniqueSessions = new Set(activeSessions);
+
+  let membersOnline = members.filter((f) => uniqueSessions.has(f.entity));
+
+  let membersInCall = db.useAttribute("presence/in-call");
+  console.log(membersInCall);
+
+  return (
+    <div
+      className={`flex h-full ${
+        props.horizontal ? "flex-row" : "flex-col"
+      } gap-1`}
+    >
       <div className="w-full pb-1 pt-3">
         <Divider />
       </div>
@@ -130,7 +196,11 @@ export const CollapsedSpaceSidebar = (props: { space_id: string }) => {
       <div className="w-full pb-1 pt-3">
         <Divider />
       </div>
-      <div className="z-50 flex grow flex-col gap-1 pb-3 text-grey-55">
+      <div
+        className={`
+        ${props.horizontal ? "flex-row" : "flex-col pb-3"}
+        z-50 flex grow gap-1 text-grey-55`}
+      >
         {rooms.map((r) => (
           <RoomButton key={r.entity} entityID={r.entity} />
         ))}
@@ -138,7 +208,8 @@ export const CollapsedSpaceSidebar = (props: { space_id: string }) => {
       {membersOnline.length > 0 && (
         <div
           className={`collapsedSidebarPeople
-            sticky bottom-0 mx-auto flex w-full flex-col
+            sticky bottom-0 mx-auto flex w-full
+            ${props.horizontal ? "flex-row" : "flex-col"}
             place-items-center gap-1 rounded-md bg-white pb-3
             text-center font-bold `}
         >

@@ -7,34 +7,18 @@ import Link from "next/link";
 import { SmallSpaceCard } from "components/SpacesList";
 import { uuidToBase62 } from "src/uuidHelpers";
 import { StudioRoleBadge } from "./StudioRoleBadge";
-import { useAuth } from "hooks/useAuth";
 import SidebarLayout from "../../SidebarLayout";
-import { useSidebarState, useSetSidebarTitle } from "../../SidebarState";
-import { useIsMobile } from "hooks/utils";
 import { SearchResults, SidebarSearchInput } from "../../SidebarSearch";
 import { useRouter } from "next/navigation";
+import { MobileHeaderTitle } from "../../MobileHeaderTitle";
 
 export const StudioSidebarContent = (props: Props & { isAdmin: boolean }) => {
-  let { open } = useSidebarState((state) => state);
-  let isMobile = useIsMobile();
-  let { session } = useAuth();
-  useSetSidebarTitle(() => props.data.name, [props.data.name]);
-
   return (
     <SidebarLayout
-      breadcrumb={
-        <Link
-          href={
-            session.session?.username ? `/s/${session.session.username}` : "/"
-          }
-          className="sidebarBreadcrumb flex shrink-0 flex-row text-sm text-grey-55"
-        >
-          <div className="flex gap-1">
-            <div className="font-bold hover:text-accent-blue">h</div>
-            <div className="font-bold">/</div>
-          </div>
-        </Link>
-      }
+      headerContent={<StudioMobileHeader {...props} />}
+      openContent={<StudioSidebarExpanded {...props} />}
+      collapsedContent={<StudioSidebarCollapsed {...props} />}
+      breadcrumb={null}
       header={
         <>
           <div className="sidesbarStudioName shrink-0 flex-row px-3 pt-0.5 text-lg font-bold">
@@ -45,13 +29,7 @@ export const StudioSidebarContent = (props: Props & { isAdmin: boolean }) => {
           </div>
         </>
       }
-    >
-      {open || isMobile ? (
-        <StudioSidebarExpanded {...props} />
-      ) : (
-        <StudioSidebarCollapsed {...props} />
-      )}
-    </SidebarLayout>
+    />
   );
 };
 
@@ -124,6 +102,24 @@ const StudioSidebarExpanded = (
         />
       )}
     </>
+  );
+};
+
+const StudioMobileHeader = (
+  props: Props & {
+    isAdmin: boolean;
+  }
+) => {
+  return (
+    <div className="sidebarHomeCollapsed flex flex-row justify-center">
+      <MobileHeaderTitle title={props.data.name} />
+
+      <TabsList
+        collapsed={true}
+        className=" mx-auto flex flex-row gap-2 text-grey-55"
+        {...props}
+      />
+    </div>
   );
 };
 

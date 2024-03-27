@@ -21,8 +21,6 @@ export default async function SpaceInUserSidebar(props: {
           link: `/studio/${uuidToBase62(studioData.data.id)}`,
         },
       ]}
-    >
-      {props.children}
-    </SpaceHeader>
+    />
   );
 }

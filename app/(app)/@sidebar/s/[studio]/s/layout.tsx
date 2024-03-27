@@ -20,8 +20,6 @@ export default async function SpaceInUserSidebar(props: {
           link: `/s/${props.params.studio}`,
         },
       ]}
-    >
-      {props.children}
-    </SpaceHeader>
+    />
   );
 }
