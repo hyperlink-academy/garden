@@ -239,7 +239,7 @@ textarea {
 }
 
 .pwa-padding {
-  padding-top: env(safe-area-inset-top) !important;
+  padding-top: max(env(safe-area-inset-top), 8px) !important;
 }
 
 .pwa-padding-bottom {
