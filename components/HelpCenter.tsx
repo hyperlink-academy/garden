@@ -627,26 +627,20 @@ const HelpChangelog = () => {
         {/* LAST UPDATED: 3.25.24 */}
 
         {/* copy this section at the top to add a new items! */}
-        {/* optional params: TK */}
+        {/* optional (boolean) props: important, deprecated, meta */}
         {/* 
         <HelpDisclosure name="" date="">
           <p></p>
         </HelpDisclosure>
         */}
 
-        <HelpDisclosure name="Important TEST" date="1989-03-31" important>
-          <p>Testing the important tag!</p>
-        </HelpDisclosure>
+        {/* 2024 changes */}
 
-        <HelpDisclosure name="Deprecated TEST" date="1989-03-31" deprecated>
-          <p>Testing the deprecated tag!</p>
-        </HelpDisclosure>
-
-        <HelpDisclosure name="Meta TEST" date="1989-03-31" meta>
-          <p>Testing the meta tag!</p>
-        </HelpDisclosure>
-
-        <HelpDisclosure name="Landing page refresh" date="2024-03-24">
+        <HelpDisclosure
+          name="Refresh homepage to focus on clubs"
+          date="2024-03-24"
+          meta
+        >
           <p>
             We updated our landing page to be cleaner, snazzier, and emphasize
             our current focus on interent clubs.
@@ -745,6 +739,152 @@ const HelpChangelog = () => {
             We aim to improve this further with a fully block-based card editor.
           </p>
         </HelpDisclosure>
+        <HelpDisclosure name="Improved chat styling" date="2024-01-18">
+          <p>
+            We did a pass to improve chat styling, making it a bit more fun, and
+            (more importantly) making it more clear who is who!
+          </p>
+          <p>
+            Making conversations more colorful — both chat rooms and comments on
+            cards reflect your per-Space member color and more clearly
+            distinguish between others' messages and yours.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Rotating images" date="2024-01-13">
+          <p>
+            You can now rotate images after uploading them! A small but welcome
+            change, particularly when uploading photos directly from mobile.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure
+          name="Studiomate commenting"
+          date="2024-01-09"
+          important
+        >
+          <p>
+            Studiomates — that is, other members of a Studio you're in — can now
+            comment in other Spaces in a Studio. This works both for chat rooms
+            and card comments.
+          </p>
+          <p>
+            We find this useful for sharing feedback on others' projects, where
+            it's nice to keep the set of actual creators / participants distinct
+            as the members of a given Space, but let anyone else in the Studio
+            share thoughts, encouragement, etc.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Studio custom welcome message" date="2024-01-02">
+          <p>
+            Studio creators can now customize a welcome message that shows on
+            the invite page.
+          </p>
+          <p>
+            This way, when you send people the invite link, they can see a bit
+            more context right away on what the Studio's about and what it means
+            to join.
+          </p>
+        </HelpDisclosure>
+
+        {/* 2023 changes */}
+
+        <HelpDisclosure name="New Studio page" date="2023-12-19" important>
+          <p>
+            A complete revamp of Studios, which we initially launched several
+            months back!
+          </p>
+          <p>
+            We simplified Studios to focus on the people (Members list) and
+            activity (Spaces list) in the Studio, and added an "About" page to
+            add more info both for current members and public visitors
+            interested in learning more.
+          </p>
+          <p>
+            We removed the previous "Posts" functionality, which was a bit
+            convoluted, but we're thinking about ways to add back in ways to
+            chat and announce things on a Studio level.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Global search" date="2023-11-30" important>
+          <p>
+            We replaced the old search room with a new global search bar,
+            accessible from everywhere in a Space.
+          </p>
+          <p>
+            A couple nice things this does better: you can now search for cards
+            and drag them directly from search results into a room or another
+            card, and you can navigate with keyboard shortcuts to search and
+            place cards!
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Improved onboarding" date="2023-11-21">
+          <p>
+            Improved the overall Hyperlink new user onboarding flow, with
+            restyle modals, custom illustrations, simpler flows, and a nicer
+            empty state for your homepage.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Autocomplete card titles" date="2023-10-30">
+          <p>
+            When you create a blank card, entering a title now also searches
+            existing card titles, so you can add an existing card this way.
+          </p>
+          <p>
+            For example in a canvas: double click to add card, search title,
+            arrows to select and enter (instead of previously: open
+            find-or-create, then either add blank card *or* search for existing
+            cards).
+          </p>
+          {/* NB: kinda think we could unship this…or at least bring back find-or-create in canvas! */}
+        </HelpDisclosure>
+        <HelpDisclosure name="Retool dashboard" date="2023-10-26" meta>
+          <p>
+            We set up a basic dashboard so that we can get more insight into
+            who's using the app and what they're doing.
+          </p>
+          <p>
+            This includes new users, recently created Spaces, and other
+            activity…fun to more easily explore new things people are trying on
+            Hyperlink!
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Image pasting" date="2023-10-23">
+          <p>
+            Making it easier to add images — we now handle pasting images
+            directly into canvases and collections as well as directly in cards.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Room presence" date="2023-09-12">
+          <p>
+            Extending presence in Spaces to now show what rooms people are in,
+            as well as what cards. You'll now see small colored dots in the
+            sidebar room list, in rooms where people are active, and then when
+            you navigate to that room you can find exactly what card each person
+            is on.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="New backlinks and back button" date="2023-09-07">
+          <p>
+            Moved the backlinks section to a tabbed section alongside card
+            comments in a pop-up drawer, sticky at the bottom of the card.
+          </p>
+          <p>
+            Cards now look a bit cleaner by default, and have both comments and
+            backlinks just one tap away.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="README card in new Spaces" date="2023-09-06">
+          <p>
+            A default "README" card in new Spaces, with some quick instructions
+            on how to use the app and things to try to get started.
+          </p>
+          {/* NB: this might be something we should remove eventually */}
+        </HelpDisclosure>
+
+        {/* 
+        <HelpDisclosure name="" date="">
+          <p></p>
+        </HelpDisclosure>
+        */}
       </HelpDisclosureSection>
     </div>
   );
