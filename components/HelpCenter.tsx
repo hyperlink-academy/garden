@@ -879,6 +879,332 @@ const HelpChangelog = () => {
           </p>
           {/* NB: this might be something we should remove eventually */}
         </HelpDisclosure>
+        <HelpDisclosure name="Unreads room" date="2023-09-04" important>
+          <p>
+            View all your unread cards and messages in one place — a special new
+            "unreads" room in each Space!
+          </p>
+          <p>
+            Anything you haven't yet seen will now not only glow, but show in
+            this room until you read it; it will then disappear the next time
+            you re-open the unreads room.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Default rooms in Spaces" date="2023-09-01">
+          <p>
+            New Spaces now have one of each room by default — Canvas,
+            Collection, and Chat — to make the different room types more
+            discoverable.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Presence on cards" date="2023-08-29" important>
+          <p>
+            Along with seeing who's in a Space from the members list in the
+            sidebar, you can now see what card each person is on, with little
+            colorful name tags for each member.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure
+          name="Audio calls in Spaces"
+          date="2023-08-29"
+          important
+        >
+          <p>You can now start and join audio calls directly within a Space!</p>
+          <p>
+            One per Space, from the sidebar — you can even see who's in a call,
+            and what card each person is on.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="More Markdown support" date="2023-08-22">
+          <p>
+            For a while now we've supported a basic subset of Markdown syntax in
+            cards — bold, italic, h1 and h2.
+          </p>
+          <p>
+            Now, a few more: highlight, strikethrough, inline code, and
+            blockquote.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Push notifications" date="2023-08-11" important>
+          <p>
+            A welcome new addition, particularly useful for the Hyperlink PWA:
+            push notifications!
+          </p>
+          <p>
+            You can now install the app and enable notifications directly on
+            your mobile device (something only recently made possible on iOS).
+            This goes a long way toward making Hyperlink feel more app-like on
+            mobile, and much easier to keep tabs on activity in Spaces.
+          </p>
+          <p>To start, notifications are for new messages only.</p>
+        </HelpDisclosure>
+        <HelpDisclosure name="New tabbed help center" date="2023-07-31">
+          <p>
+            In-app docs, a help center that you can view from anywhere within a
+            Space. To start, this includes a basic welcome message / handbook,
+            and a list of handy keyboard shortcuts.
+          </p>
+          <p>This is also available on a standalone page (/docs)</p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Improved join pages" date="2023-07-12">
+          <p>
+            Refactored the "join" pages prospective members see when invited, to
+            be consistent for both Spaces and Studios.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Members list in Studios" date="2023-07-11">
+          <p>
+            Added a "members" tab on the Studio page, so you can see a list of
+            everyone who's a part of the Studio.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Posts in Studios" date="2023-06-29" deprecated>
+          <p>
+            Trying out a way to make "posts" to a Studio, a sort of bulletin
+            board for announcements, new Spaces, and more.
+          </p>
+          <p>
+            As part of this, you can highlight cards from within a Space to
+            share them one level up, directly to the studio, and others in the
+            Studio can react and comment on them.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure
+          name="Studios, a new homepage for groups"
+          date="2023-06-16"
+          important
+        >
+          <p>
+            Starting on a new construct we're calling <em>Studios</em>! Not to
+            be confused with earlier on when we called a user's homepage their
+            studio (e.g. "brendan's studio") — now we just call that "home".
+          </p>
+          <p>
+            Studios are a place for teams, cohorts, or other groups to work
+            together over time across many Spaces.
+          </p>
+          <p>
+            With this initial release you can create, delete, edit, and join
+            Studios.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Inline card links" date="2023-04-30">
+          <p>
+            Link to other cards inline, wiki-style, from within the card content
+            area. Use double bracket syntax — `[[like this]]` — to link to any
+            other card in a Space, and search for existing cards to link.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure
+          name="New landing page for beta signups"
+          date="2023-04-28"
+          meta
+          deprecated
+        >
+          <p>
+            We updated the hyperlink.academy landing page, moving from
+            invite-only closed alpha to a more open beta where anyone can sign
+            up!
+          </p>
+          <p>
+            The main changes: show more clearly what the app does and how it
+            works, and a add a clear CTA to create an account.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Room descriptions" date="2023-04-20">
+          <p>
+            Added an option to specify a description at the top of a room, just
+            beneath the room name.
+          </p>
+          <p>
+            This is useful for adding some context, like the current purpose of
+            a room, or instructions for how to use it.
+          </p>
+          <p>Contributors: Juan Jose Fernandez</p>
+        </HelpDisclosure>
+        <HelpDisclosure
+          name="Filtering collections by reaction"
+          date="2023-04-17"
+        >
+          <p>
+            Building on the reactions, or "reactags" feature, it is now possible
+            to filter a collection by reaction.
+          </p>
+          <p>
+            We find this useful for collections that serve as to do lists — you
+            can tag things like "WIP" or your initials to claim them, or ✅ to
+            mark things complete, and filter combinations (things with multiple
+            tags), as well as both things with a given tag and things without a
+            tag (exclusion).
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Chat rooms" date="2023-04-11" important>
+          <p>
+            A special new type of room! Just for chat! You can now have a room
+            as chat channel right in the sidebar, for Space-wide chat and
+            conversations…as many as you like, a la Slack or Discord (but
+            cozier, of course).
+          </p>
+          <p>
+            And a couple other chat improvements: we simplified from multiple
+            discussions to one single-threaded chat per card, and made it
+            possible to reply to particular messages and attach cards to
+            messages in chat.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Migrate to Supabase" date="2023-03-29" meta>
+          <p>
+            New database, who dis? This doesn't change how we store the data
+            inside a Space (i.e. rooms and cards), but is a big migration with
+            how we store all other data across the app, for things like user
+            authentication and Space membership.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Unreads on homepages" date="2023-03-09">
+          <p>
+            Bubble up unread notifications to people's homepages, by showing the
+            Space "door" preview with a glowing outline, so you can see at a
+            glance which of your Spaces have new activity.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Search room" date="2023-03-08" deprecated>
+          <p>
+            A basic search room, listing all cards in the Space, where you can
+            search to filter.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Reactions on cards" date="2023-03-06" important>
+          <p>
+            A way to add custom reactions (or "reactags", as we dubbed them) to
+            cards. Each can have up to four characters, perfect for emoji or
+            e.g. simple initials or acronyms.
+          </p>
+          <p>
+            These serve double duty, as both emoji reaction as you're used to in
+            Slack, Discord, etc. *and* as a simple way to tag cards. Spaces have
+            a default set of reactions, which you can customize.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Space progress bar" date="2023-02-22" deprecated>
+          <p>
+            Added a progress bar to Space headers, based on start and end dates
+            (if specified) to show how much progress has elapsed.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Collection views" date="2023-02-22">
+          <p>
+            A way to toggle between multiple views of cards in a collection:
+            small row (title-only), large row (card content), and grid (of
+            thumnail-sized cards; this latter view has since been removed).
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure
+          name="Discussions on cards"
+          date="2023-02-20"
+          deprecated
+        >
+          <p>
+            Added a "discussions" area on every card, where you can create
+            multiple threads, or nested discussions, on the card.
+          </p>
+          <p>
+            Also extended unread indicators to show not only new cards, but new
+            discussions / messages on cards.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="New room types" date="2023-02-14" important>
+          <p>
+            We removed prompt rooms, and added "collection" as a distinct room
+            type — a reorderable list of cards, to complement the existing more
+            freeform spatial "canvas" room.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="PWA groundwork" date="2023-02-09">
+          <p>
+            Laying the foundations for making Hyperlink work nicely as a
+            progressive web app, or PWA, or "that thing where you add a website
+            to the home screen of your phone"!
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Internal app events" date="2023-02-07" meta>
+          <p>
+            Added some internal 'events' in the app to track when basic things
+            happen, like when someone joins a Space, or creates a card.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Unread cards in rooms" date="2023-02-02">
+          <p>
+            Unread indicators for rooms (starting with member rooms), so you can
+            see from the sidebar list where there are new cards.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure
+          name="Multiselect and drag cards"
+          date="2023-01-30"
+          deprecated
+        >
+          <p>
+            A way to long press cards to enter selection mode, and select many
+            at once to move them around on the canvas.
+          </p>
+          <p>(Since deprecated…but working on bringing it back!)</p>
+          <p>Contributors: Azlen Elza</p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Calendar room" date="2023-01-26" important>
+          <p>
+            Add dates to cards, and view all "scheduled" cards in one place, in
+            a simple calendar room.
+          </p>
+          <p>
+            This is useful for future things — deadlines; due dates — as well as
+            keeping track of things you do in a log, day by day.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Random prompts" date="2023-01-26" deprecated>
+          <p>
+            Testing an idea for prompts, with a special type of room and a
+            button that allows you to draw cards.
+          </p>
+          <p>
+            We tried two types, randomly drawing prompts from a collection, and
+            daily prompts where you draw cards with today's date.
+          </p>
+          <p>
+            The idea here: a mechanic for designating certain cards as important
+            or as source material, and "drawing" them to use in particular ways
+            — inspiration, assignments, and so on.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Multiple rooms" date="2023-01-24" important>
+          <p>
+            A big change in Space organization possibilities — you can now
+            create multiple rooms! As many as you like!
+          </p>
+          <p>
+            You can make many rooms and access them in the sidebar…useful to
+            have different collections, rooms for each member to work in, rooms
+            per phase of a project, etc.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Big code cleanup!" date="2023-01-20" meta>
+          <p>
+            Sometimes it's not about what you add, but what you take away. We
+            decided to start the year by cleaning up (read: deleting) a bunch of
+            code that was little-used and/or a pain to maintain.
+          </p>
+          <p>
+            This included: our older implementation of per-Space chat,
+            highlights, bots and GraphQL, and card sections.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Undo support" date="2023-01-19">
+          <p>
+            Added support for undo, and implemented in various places in the
+            app, like card creation and text editing. Making it easier to do
+            things and change your mind in Hyperlink since…well, since 1.19.23!
+          </p>
+          <p>Contributors: Azlen Elza</p>
+        </HelpDisclosure>
 
         {/* 
         <HelpDisclosure name="" date="">
