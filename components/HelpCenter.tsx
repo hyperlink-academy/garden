@@ -612,10 +612,6 @@ const HelpRoadmap = () => {
 const HelpChangelog = () => {
   return (
     <div className="flex flex-col gap-4">
-      {/* <p>TBD, changelog coming soon!</p> */}
-
-      {/* LAST UPDATED: 3.25.24 */}
-
       <p>
         Here's what's new…and how the Hyperlink app has evolved since way back!
       </p>
@@ -628,6 +624,49 @@ const HelpChangelog = () => {
       </p>
 
       <HelpDisclosureSection>
+        {/* LAST UPDATED: 3.25.24 */}
+
+        {/* copy this section at the top to add a new items! */}
+        {/* optional params: TK */}
+        {/* 
+        <HelpDisclosure name="" date="">
+          <p></p>
+        </HelpDisclosure>
+        */}
+
+        <HelpDisclosure name="Important TEST" date="1989-03-31" important>
+          <p>Testing the important tag!</p>
+        </HelpDisclosure>
+
+        <HelpDisclosure name="Deprecated TEST" date="1989-03-31" deprecated>
+          <p>Testing the deprecated tag!</p>
+        </HelpDisclosure>
+
+        <HelpDisclosure name="Meta TEST" date="1989-03-31" meta>
+          <p>Testing the meta tag!</p>
+        </HelpDisclosure>
+
+        <HelpDisclosure name="Landing page refresh" date="2024-03-24">
+          <p>
+            We updated our landing page to be cleaner, snazzier, and emphasize
+            our current focus on interent clubs.
+          </p>
+          <p>It also includes…</p>
+          <ul className="flex list-disc flex-col gap-1 pl-4 sm:pl-8">
+            <li>
+              New header with links to our writing (blog) and docs (help center)
+              and log in / signup buttons
+            </li>
+            <li>
+              More clear illustrations of how Studios, Spaces, rooms, and cards
+              fit together, plus a list of other features
+            </li>
+            <li>
+              Last but not least, a sweet new isometric{" "}
+              <em>hyperlink academy</em> hero image!
+            </li>
+          </ul>
+        </HelpDisclosure>
         <HelpDisclosure name="Deeplinking to cards" date="2024-03-06">
           <p>
             Copy a link to any card — useful for sharing direct links to cards
@@ -641,8 +680,13 @@ const HelpChangelog = () => {
         </HelpDisclosure>
         <HelpDisclosure name="Studiomates can add reactions" date="2024-02-28">
           <p>
-            Members of a Studio can add reactions to Studiomates' Spaces in that
-            same studio, and see who reacted on hover.
+            Extending Studiomate permissions, where previously Studiomates could
+            comment / chat in other Spaces in their Studios…
+          </p>
+          <p>
+            Members of a Studio now can calso add reactions to Studiomates'
+            Spaces, and see who reacted on hover — nice for adding a quick ❤️ or
+            🙌!
           </p>
         </HelpDisclosure>
         <HelpDisclosure
@@ -662,34 +706,46 @@ const HelpChangelog = () => {
         <HelpDisclosure name="Card background color" date="2024-02-05">
           <p>
             You can now pick from a handful of background colors in the card
-            options menu — useful for loose organizing or highlighting cards!
+            options menu, a la colorful pastel sticky notes.
+          </p>
+          <p>
+            Useful for organizing or highlighting cards — or whatever temporary
+            bespoke taxonomical flights of fancy strike you on a given day!
           </p>
         </HelpDisclosure>
         <HelpDisclosure name="Studio presence" date="2024-01-20">
           <p>
-            From the Studio homepage, see when others are in Spaces in the
-            Studio.
+            From a Studio homepage, see presence tags on Space preview images
+            when others are in Spaces in the Studio.
           </p>
         </HelpDisclosure>
         <HelpDisclosure name="Multiple images on cards" date="2024-01-20">
           <p>
-            Images sections on cards now support multiple images — you can
-            upload or copy in as many images as you like, and view them in a
-            gallery.
+            Requested by many! Our previous constraint of one image per card is
+            no more.
+          </p>
+          <p>
+            Image sections on cards now support multiple images — you can upload
+            (or copy-paste in) as many images as you like onto a card, and view
+            them in a gallery.
           </p>
         </HelpDisclosure>
         <HelpDisclosure name="Pretty link previews" date="2024-01-20">
           <p>
-            When you paste in a URL as a card title or content area, we now
-            (when available) render a preview of the link including title and
-            thumbnail.
+            When you paste in a URL to a card's title or content area, we now
+            (when available) render a nice preview of the link, including title
+            and thumbnail.
+          </p>
+          <p>
+            This makes it nicer to view collections of lots of links – less{" "}
+            <em>https://www.blahblahblah/lengthypath?randomstuff=here</em> and
+            more <em>actual page title and preview image</em>.
+          </p>
+          <p>
+            We aim to improve this further with a fully block-based card editor.
           </p>
         </HelpDisclosure>
       </HelpDisclosureSection>
-
-      <p className="text-center">
-        <em>TBD: planning to backfill this list with older changes</em>
-      </p>
     </div>
   );
 };
@@ -806,6 +862,9 @@ const HelpDisclosure = (props: {
   children: React.ReactNode;
   name: string;
   date?: string;
+  important?: boolean;
+  deprecated?: boolean;
+  meta?: boolean;
 }) => {
   return (
     <Disclosure as="div" className="flex w-full flex-col gap-0">
@@ -818,11 +877,33 @@ const HelpDisclosure = (props: {
                 : "rounded-md border"
             }`}
           >
-            <div className="flex w-full flex-col justify-between gap-0">
-              {props?.date && (
-                <span className="w-fit text-xs italic text-grey-55">
-                  {props.date}
-                </span>
+            <div className="flex w-full flex-col justify-between gap-1">
+              {(props?.date ||
+                props.important ||
+                props.deprecated ||
+                props.meta) && (
+                <div className="flex w-fit items-center gap-2">
+                  {props?.date && (
+                    <span className="w-fit text-xs italic text-grey-55">
+                      {props.date}
+                    </span>
+                  )}
+                  {props.important && (
+                    <span className="lightBorder bg-accent-gold px-2 py-0.5 text-xs">
+                      important
+                    </span>
+                  )}
+                  {props.deprecated && (
+                    <span className="lightBorder bg-grey-80 px-2 py-0.5 text-xs">
+                      deprecated
+                    </span>
+                  )}
+                  {props.meta && (
+                    <span className="lightBorder bg-bg-blue px-2 py-0.5 text-xs">
+                      meta
+                    </span>
+                  )}
+                </div>
               )}
               <span className="font-bold">{props.name}</span>
             </div>
