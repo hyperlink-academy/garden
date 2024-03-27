@@ -25,7 +25,7 @@ export const SharedRoomList = (props: { setRoomEditOpen: () => void }) => {
 
   return (
     <div className="flex flex-col gap-0.5">
-      <ul className="sidebarSharedRoomList flex flex-col gap-0.5">
+      <div className="sidebarSharedRoomList flex flex-col gap-0.5">
         {rooms
           .filter((f) => f.value !== "prompts")
           .map((room) => {
@@ -42,7 +42,7 @@ export const SharedRoomList = (props: { setRoomEditOpen: () => void }) => {
             );
           })}
         <CreateRoom />
-      </ul>
+      </div>
     </div>
   );
 };

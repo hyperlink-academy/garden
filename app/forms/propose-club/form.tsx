@@ -63,7 +63,7 @@ export function ProposeClubForm() {
           Studios as group homepage, and email to share regular activity.
         </p>
         <p>These clubs are…</p>
-        <ul className="flex list-disc flex-col gap-1 pl-4 sm:pl-8">
+        <ul>
           <li>places for learning & parallel play</li>
           <li>communities of projects with a shared theme</li>
           <li>mostly async + knit together with periodic updates</li>
@@ -78,7 +78,7 @@ export function ProposeClubForm() {
           </a>
           ; the key parts are:
         </p>
-        <ul className="flex list-disc flex-col gap-1 pl-4 sm:pl-8">
+        <ul>
           <li>participants make Spaces where they share regular updates</li>
           <li>you email the group a digest of activity, on a chosen cadence</li>
         </ul>

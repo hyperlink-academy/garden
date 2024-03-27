@@ -105,6 +105,21 @@ textarea {
   @apply box-border !important;
 }
 
+ul,
+ol {
+  @apply flex;
+  @apply flex-col;
+  @apply gap-1;
+  @apply pl-4;
+  @apply sm:pl-8;
+}
+ul {
+  @apply list-disc;
+}
+ol {
+  @apply list-decimal;
+}
+
 ::placeholder {
   @apply !text-grey-80;
   @apply italic;

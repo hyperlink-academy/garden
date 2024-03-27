@@ -339,9 +339,8 @@ const MyHomeEmpty = (props: { studioSpaceID: string; studioName: string }) => {
           You can use Spaces to share notes and chats, plans and progress logs,
           collections, to do lists, and more.
         </p>
-        {/* <div className="flex flex-col gap-1"> */}
         <p className="font-bold">For example:</p>
-        <ul className="list-inside list-disc ">
+        <ul>
           <li>
             coordinate{" "}
             <Link
@@ -379,15 +378,6 @@ const MyHomeEmpty = (props: { studioSpaceID: string; studioName: string }) => {
             </Link>
           </li>
         </ul>
-        {/* <p className="mx-auto max-w-sm rounded-md border border-dashed border-grey-55 p-2 text-sm italic text-grey-55">
-          ^these are all real spaces; they may be a bit messy, but they&apos;re
-          authentic!
-        </p> */}
-        {/* <p>
-          Like any place that&apos;s both a cozy spot to hang and a focused zone
-          to get things done…Spaces are even better with friends :)
-        </p> */}
-        {/* </div> */}
         <div className="lightBorder mt-4 flex flex-col gap-2 bg-bg-blue p-4 text-center">
           <h4>{"Let's get started!"}</h4>
           <div className="m-auto">
@@ -397,10 +387,6 @@ const MyHomeEmpty = (props: { studioSpaceID: string; studioName: string }) => {
             />
           </div>
         </div>
-
-        {/* <hr className="m-auto my-4 w-16 border-dashed border-grey-80" />
-
-      <HelpExampleSpaces /> */}
       </div>
     </div>
   );

@@ -194,7 +194,7 @@ const HelpHandbook = () => {
       <HelpDisclosureSection>
         <HelpDisclosure name="10 second TL;DR">
           <p>The core pieces of Hyperlink:</p>
-          <ul className="flex list-disc flex-col gap-1 pl-4 sm:pl-8">
+          <ul>
             <li>
               make <strong>Spaces</strong> for projects and invite others to
               collaborate
@@ -229,7 +229,7 @@ const HelpHandbook = () => {
             Studios are places for groups — like clubs, cohorts, or teams — to
             work together and share many Spaces.
           </p>
-          <ul className="flex list-disc flex-col gap-1 pl-4 sm:pl-8">
+          <ul>
             <li>Schools might use Spaces for different classes or cohorts</li>
             <li>
               Clubs might use Spaces for each participant&apos;s creative
@@ -248,7 +248,7 @@ const HelpHandbook = () => {
         </HelpDisclosure>
         <HelpDisclosure name="Rooms">
           <p>Rooms help you stay organized within a Space.</p>
-          <ul className="flex list-disc flex-col gap-1 pl-4 sm:pl-8">
+          <ul>
             <li>Collection and canvas rooms: to arrange and work with cards</li>
             <li>Chat rooms: like channels in Slack or Discord (more below!)</li>
             <li>
@@ -278,7 +278,7 @@ const HelpHandbook = () => {
         </HelpDisclosure>
         <HelpDisclosure name="Membership & Permissions">
           <p>Creators of a Space or Studio can invite other people to join!</p>
-          <ul className="flex list-disc flex-col gap-1 pl-4 sm:pl-8">
+          <ul>
             <li>
               Spaces: all members can create and edit cards, and invite others;
               only the creator can delete a Space
@@ -296,7 +296,7 @@ const HelpHandbook = () => {
             about them; sharing and encouraging each other.
           </p>
           <p>There are two ways to use chat in Hyperlink:</p>
-          <ul className="flex list-disc flex-col gap-1 pl-4 sm:pl-8">
+          <ul>
             <li>
               Chat rooms show in the sidebar, and are like general channels for
               a Space to share
@@ -352,7 +352,7 @@ const HelpShortcuts = () => {
       </p> */}
 
       <h4>text editing</h4>
-      <ul className="flex list-disc flex-col gap-1 pl-4 sm:pl-8">
+      <ul>
         <li>
           start a line with <TextString>#</TextString> or{" "}
           <TextString>##</TextString> for headers
@@ -385,7 +385,7 @@ const HelpShortcuts = () => {
       </ul>
 
       <h4>chat & comments</h4>
-      <ul className="flex list-disc flex-col gap-1 pl-4 sm:pl-8">
+      <ul>
         <li>
           <UnicodeKeyboardKey>⏎</UnicodeKeyboardKey> to send a message
         </li>
@@ -396,7 +396,7 @@ const HelpShortcuts = () => {
       </ul>
 
       <h4>rooms & cards</h4>
-      <ul className="flex list-disc flex-col gap-1 pl-4 sm:pl-8">
+      <ul>
         <li>
           <UnicodeKeyboardKey>⌥</UnicodeKeyboardKey> +{" "}
           <UnicodeKeyboardKey>↑</UnicodeKeyboardKey> and{" "}
@@ -421,7 +421,7 @@ const HelpShortcuts = () => {
       </ul>
 
       <h4>general</h4>
-      <ul className="flex list-disc flex-col gap-1 pl-4 sm:pl-8">
+      <ul>
         <li>
           <UnicodeKeyboardKey>{isAppleDevice() ? "⌘" : "⌃"}</UnicodeKeyboardKey>{" "}
           + <KeyboardKey>z</KeyboardKey> to undo
@@ -452,7 +452,7 @@ const HelpRoadmap = () => {
             bring groups of people together for creative work and learning.
           </p>
           <p>Some things this might include:</p>
-          <ul className="flex list-disc flex-col gap-1 pl-4 sm:pl-8">
+          <ul>
             <li>
               More ways of representing key info: rich text, multimedia cards,
               etc.
@@ -483,7 +483,7 @@ const HelpRoadmap = () => {
             independent internet-native schools to organize their activity.
           </p>
           <p>This might include:</p>
-          <ul className="flex list-disc flex-col gap-1 pl-4 sm:pl-8">
+          <ul>
             <li>
               Composable structure with Spaces and Studios reflecting more
               complex hierarchies e.g. of cohorts, departments, and schools
@@ -652,7 +652,7 @@ const HelpChangelog = () => {
             our current focus on interent clubs.
           </p>
           <p>It also includes…</p>
-          <ul className="flex list-disc flex-col gap-1 pl-4 sm:pl-8">
+          <ul>
             <li>
               New header with links to our writing (blog) and docs (help center)
               and log in / signup buttons
@@ -802,7 +802,7 @@ export const HelpAppInfo = () => {
         activity.
       </p>
       <h4>First, grab your phone 📱</h4>
-      <ol className="flex list-decimal flex-col gap-1 pl-8">
+      <ol>
         <li>Open hyperlink.academy in your browser</li>
         <li>
           Tap the Share icon (iOS / Safari) or three dot menu (Android / Chrome)
