@@ -24,9 +24,9 @@ export default function AppLayout(props: {
     return (
       <LayoutWrapper
         id="appLayout"
-        className="pwa-padding no-scrollbar flex h-full w-full touch-none snap-x snap-mandatory scroll-pl-4 flex-col overflow-x-scroll overflow-y-scroll px-2  pt-10 sm:gap-4 sm:px-8"
+        className="pwa-padding no-scrollbar mt-10 flex h-full w-full snap-x snap-mandatory scroll-pl-4 flex-col overflow-x-scroll overflow-y-scroll  p-3 px-2 sm:gap-4 sm:px-8"
       >
-        <div className="mobileHeaderWrapper fixed left-0 top-0 z-30 w-full px-2 pt-2">
+        <div className="mobileHeaderWrapper pwa-padding fixed left-0 top-0 z-30 mt-2 w-full px-2">
           <div className="mobileHeader flex w-full gap-2 rounded-md border border-grey-90 bg-background p-1">
             <button
               className="mobileHeaderToggle shrink-0 -rotate-90 rounded-full text-grey-55"
