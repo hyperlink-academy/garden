@@ -111,7 +111,7 @@ const StudioMobileHeader = (
   }
 ) => {
   return (
-    <div className="sidebarHomeCollapsed flex flex-row justify-center">
+    <div className="sidebarHomeCollapsed flex flex-row justify-center gap-2">
       <MobileHeaderTitle title={props.data.name} />
 
       <TabsList

@@ -128,7 +128,7 @@ export default function SidebarLayout(props: {
         )}
         <animated.div
           style={mobileSidebarSpring}
-          className={`fixed top-0 z-30 flex h-full py-1 pl-1`}
+          className={`pwa-padding pwa-padding-bottom fixed top-0 z-30 flex h-full py-1 pl-1`}
         >
           <div
             {...bindSidebar()}

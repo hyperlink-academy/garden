@@ -35,6 +35,7 @@ export function SpaceHeader(props: {
   let [switcher, setSwitcher] = useState(false);
   let { session } = useAuth();
   let params = useParams();
+  let { setSidebar } = useSidebarState();
   let { data: userSpaces } = useIdentityData(session.session?.username);
   let activeSpace = props.spaces.find((s) =>
     props.context.type === "user"
@@ -75,7 +76,15 @@ export function SpaceHeader(props: {
             <div className="sidebarBreadcrumbHome flex shrink-0 flex-row items-center gap-1 text-sm text-grey-55">
               {isUserSpace === false &&
                 props.path.map((p, index) => (
-                  <Link href={p.link} key={index}>
+                  <Link
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSidebar(false);
+                      setSwitcher(false);
+                    }}
+                    href={p.link}
+                    key={index}
+                  >
                     <div className="SidebarBreadcrumbStudio flex gap-1">
                       <div className="min-w-0 max-w-[16ch] hover:text-accent-blue">
                         <Truncate className="w-full max-w-none overflow-hidden bg-white">

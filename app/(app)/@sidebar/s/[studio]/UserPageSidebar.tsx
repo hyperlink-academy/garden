@@ -123,10 +123,6 @@ const UserPageHeader = (props: { params: { studio: string } }) => {
           : props.params.studio}
       </div>
 
-      <div className="pb-2 pt-3">
-        <Divider />
-      </div>
-
       <HomeTabs
         username={props.params.studio}
         className="mx-auto flex flex-row gap-1 text-grey-55"
