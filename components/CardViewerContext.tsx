@@ -12,6 +12,7 @@ import { CardView } from "./CardView";
 import { focusElement } from "src/utils";
 import { useIsMobile } from "hooks/utils";
 import { useAuth } from "hooks/useAuth";
+import { useSidebarState } from "app/(app)/@sidebar/SidebarState";
 
 export const useCardViewer = () => {
   let spaceID = useSpaceID();
@@ -104,6 +105,7 @@ export function CardViewer(props: { space_id: string }) {
   }, []);
   let removeCardFromRoomHistory = useRemoveCardFromRoomHistory();
   let isMobile = useIsMobile();
+  let { open } = useSidebarState();
   if (!render) return null;
   if (!history[0] && isMobile) return null;
 
@@ -117,7 +119,10 @@ export function CardViewer(props: { space_id: string }) {
           shrink-0 touch-pan-x
           snap-center snap-always flex-col
           items-stretch
-          focus:outline-none sm:w-[calc(100vw-128px)] md:shrink`}
+          focus:outline-none
+          sm:w-[calc(100vw-100px)] ${
+            !open ? "md:w-[calc(100vw-448px)]" : "md:w-[calc(100vw-670px)]"
+          } md:shrink`}
       >
         {room && history[0] ? (
           <CardView
