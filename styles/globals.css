@@ -243,7 +243,7 @@ textarea {
 }
 
 .pwa-padding-bottom {
-  padding-bottom: env(safe-area-inset-bottom) !important;
+  padding-bottom: max(env(safe-area-inset-bottom), 8px) !important;
 }
 
 .pwa-margin {
