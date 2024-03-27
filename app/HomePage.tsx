@@ -122,6 +122,7 @@ export function HomePage() {
                   alt="hyperlink academy logo"
                   width={800}
                   height={400}
+                  priority
                 />
               </div>
               <div className="mx-4 -mt-[120px] flex flex-col gap-3 sm:mx-8">
@@ -249,37 +250,43 @@ export function HomePage() {
             <div className="relative mx-auto mt-16 w-max">
               {!isMobile ? (
                 <>
+                  {/* rabbitholeathon */}
                   <a
                     target="_blank"
-                    href="https://hyperlink.academy/studio/2UKAvohEV3v8ytaQosojP6"
+                    href="https://hyperlink.academy/studio/3949e8c5-1d77-46f0-bb58-37756d4510f7"
                     className="CONE absolute left-[25px] top-[40px] h-[270px] w-[100px]"
                   />
+                  {/* spec-fi sandwich club */}
+                  <a
+                    target="_blank"
+                    href="https://hyperlink.academy/studio/2dcc1b60-9c0a-4029-9f38-8593a0d582a6"
+                    className="HOUSE absolute left-[190px] top-[270px] h-[145px] w-[132px]"
+                  />
+                  {/* feb 2024 links */}
                   <a
                     target="_blank"
                     href="https://hyperlink.academy/studio/6ejN4eHGFWBB3zwhvwlMQG"
-                    className="HOUSE absolute left-[190px] top-[270px] h-[145px] w-[132px]"
-                  />
-                  <a
-                    target="_blank"
-                    href="https://hyperlink.academy/studio/2nI3wyEhba7QfVfSs6dX0d"
                     className="ZIG absolute left-[320px] top-[160px] h-[140px] w-[132px] rotate-[33deg]"
                   />
                 </>
               ) : (
                 <>
+                  {/* rabbitholeathon */}
                   <a
                     target="_blank"
-                    href="https://hyperlink.academy/studio/2UKAvohEV3v8ytaQosojP6"
+                    href="https://hyperlink.academy/studio/3949e8c5-1d77-46f0-bb58-37756d4510f7"
                     className="CONE absolute left-[45px] top-[18px] h-[120px] w-[50px]"
                   />
+                  {/* spec-fi sandwich club */}
+                  <a
+                    target="_blank"
+                    href="https://hyperlink.academy/studio/2dcc1b60-9c0a-4029-9f38-8593a0d582a6"
+                    className="HOUSE absolute left-[118px] top-[120px] h-[65px] w-[58px]"
+                  />
+                  {/* feb 2024 links */}
                   <a
                     target="_blank"
                     href="https://hyperlink.academy/studio/6ejN4eHGFWBB3zwhvwlMQG"
-                    className="HOUSE absolute left-[118px] top-[120px] h-[65px] w-[58px]"
-                  />
-                  <a
-                    target="_blank"
-                    href="https://hyperlink.academy/studio/2nI3wyEhba7QfVfSs6dX0d"
                     className="ZIG absolute left-[175px] top-[70px] h-[60px] w-[60px] rotate-[33deg]"
                   />
                 </>
@@ -622,8 +629,8 @@ const FancyDivider = () => {
         <path
           d="M4 16C4 16 13.4644 4.00001 23.6839 4.00001C33.9034 4.00001 43.3678 16 43.3678 16C43.3678 16 52.8322 28 63.0517 28C73.2712 28 82.7356 16 82.7356 16C82.7356 16 92.2 4 102.419 4C112.639 4 122.103 16 122.103 16C122.103 16 131.569 28 141.788 28C152.007 28 161.472 16 161.472 16M318.948 16C318.948 16 328.413 4.00001 338.632 4.00001C348.851 4.00001 358.316 16 358.316 16C358.316 16 367.78 28 378 28C388.219 28 397.684 16 397.684 16C397.684 16 407.148 4 417.368 4C427.587 4 437.051 16 437.051 16C437.051 16 446.517 28 456.736 28C466.956 28 476.42 16 476.42 16M161.474 16C161.474 16 170.938 4.00001 181.158 4.00001C191.377 4.00001 200.842 16 200.842 16C200.842 16 210.306 28 220.526 28C230.745 28 240.21 16 240.21 16C240.21 16 249.674 4 259.894 4C270.113 4 279.577 16 279.577 16C279.577 16 289.043 28 299.262 28C309.482 28 318.946 16 318.946 16M476.422 16C476.422 16 485.887 4.00001 496.106 4.00001C506.326 4.00001 515.79 16 515.79 16C515.79 16 525.254 28 535.474 28C545.693 28 555.158 16 555.158 16"
           stroke="currentColor"
-          stroke-width="8"
-          stroke-linecap="round"
+          strokeWidth="8"
+          strokeLinecap="round"
         />
       </svg>
     );
