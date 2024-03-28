@@ -607,10 +607,17 @@ const DefaultTextSection = (props: { entityID: string }) => {
   let { authToken } = useAuth();
   let { authorized, mutate } = useMutations();
   let spaceID = useSpaceID();
+
+  let cardBackgroundColor =
+    db.useEntity(props.entityID, "card/background-color")?.value || "white";
+
   return (
     <SingleTextSection
       autocompleteCardNames
       id="default-text-section"
+      style={{
+        backgroundColor: cardBackgroundColor,
+      }}
       onPaste={async (e) => {
         if (!authToken || !spaceID) return;
         let data = await getAndUploadFile(
