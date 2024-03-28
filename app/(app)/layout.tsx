@@ -15,20 +15,16 @@ export default function AppLayout(props: {
     return (
       <LayoutWrapper
         id="heightWrapper"
-        className="no-scrollbar relative flex h-[calc(100%+env(safe-area-inset-top))] "
+        className="no-scrollbar relative flex h-[calc(100%+env(safe-area-inset-top))] pt-10"
       >
         {props.sidebar}
         <SideScrollSidebarHandler
-          className="no-scrollbar pwa-padding gverflow-y-scroll h-full w-full snap-x snap-mandatory overflow-x-scroll pb-8"
+          className="no-scrollbar pwa-padding h-full w-full snap-x snap-mandatory overflow-x-scroll overflow-y-scroll"
           id="appLayout"
         >
           <div
-            className={`appContentWrapper no-scrollbar flex h-full w-fit flex-row gap-4 px-2 pt-2 sm:gap-4
-            ${
-              difference === 0
-                ? "pb-[calc(max(env(safe-area-inset-bottom),8px)+8px)]"
-                : "pb-2 "
-            }
+            className={`appContentWrapper no-scrollbar flex h-full w-fit flex-row gap-4 px-2 sm:gap-4
+              ${difference === 0 ? "pwa-padding-bottom" : ""}
             `}
           >
             {props.children}

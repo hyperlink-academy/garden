@@ -94,17 +94,14 @@ export default function SidebarLayout(props: {
     document.addEventListener("keydown", listener);
     return () => document.removeEventListener("keydown", listener);
   }, [setSidebar]);
-  let difference = useViewportDifference();
 
   if (!isClient) return;
   if (isMobile)
     return (
       <>
-        <div className="mobileHeaderWrapper absolute bottom-0 left-0 z-30 w-full bg-background">
+        <div className="mobileHeaderWrapper absolute left-0 top-0 z-30 w-full bg-background">
           <div
-            className={`mobileHeader flex w-full gap-2 border-t border-grey-90 bg-background px-2 pt-1 ${
-              difference === 0 ? "pwa-padding-bottom" : "pb-1"
-            }`}
+            className={`mobileHeader flex w-full gap-2 border-b border-grey-90 bg-background px-2 pb-1 ${"pwa-padding"}`}
           >
             <div className="no-scrollbar relative flex flex-row gap-2 overflow-x-scroll">
               <button
