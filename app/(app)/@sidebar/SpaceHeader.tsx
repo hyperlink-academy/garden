@@ -50,8 +50,32 @@ export function SpaceHeader(props: {
   )
     isUserSpace = true;
   let spaces = isUserSpace
-    ? userSpaces?.members_in_spaces.map((m) => m.space_data as SpaceData)
-    : props.spaces;
+    ? userSpaces?.members_in_spaces
+        .map((m) => m.space_data as SpaceData)
+        .sort((a, b) => {
+          if (!a.lastUpdated || !b.lastUpdated) {
+            if (a.lastUpdated) return -1;
+            if (b.lastUpdated) return 1;
+            return 0;
+          }
+          return a.lastUpdated > b.lastUpdated ? -1 : 1;
+        })
+    : props.spaces.sort((a, b) => {
+        if (props.context.type === "user") {
+          if (!a.lastUpdated || !b.lastUpdated) {
+            if (a.lastUpdated) return -1;
+            if (b.lastUpdated) return 1;
+            return 0;
+          }
+          return a.lastUpdated > b.lastUpdated ? -1 : 1;
+        }
+        if (!a.display_name || !b.display_name) {
+          if (a.display_name) return -1;
+          if (b.display_name) return 1;
+          return 0;
+        }
+        return a.display_name.localeCompare(b.display_name);
+      });
   if (!spaces || !activeSpace) return null;
 
   return (
