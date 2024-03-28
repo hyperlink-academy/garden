@@ -649,6 +649,29 @@ const HelpChangelog = () => {
         {/* 2024 changes */}
 
         <HelpDisclosure
+          name="New Handbook, Roadmap, Changelog"
+          date="2024-03-27"
+          meta
+        >
+          <p>Revamped our docs! Three main areas:</p>
+          <ul>
+            <li>
+              Handbook: more structured quick-start guide to the various parts
+              of the app and how they fit together
+            </li>
+            <li>
+              Roadmap: what we're working on now and soon; useful for us to
+              plan, prioritize, and telegraph our intentions as we talk with
+              others about what's possible with Hyperlink
+            </li>
+            <li>
+              Changelog: how the app has evolved, in ways major and minor, over
+              the two years since we started building it! This one makes 94
+              entries and nearly 6,000 words…riveting reading :)
+            </li>
+          </ul>
+        </HelpDisclosure>
+        <HelpDisclosure
           name="Refresh homepage to focus on clubs"
           date="2024-03-24"
           meta
