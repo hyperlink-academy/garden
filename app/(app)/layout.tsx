@@ -19,11 +19,11 @@ export default function AppLayout(props: {
       >
         {props.sidebar}
         <SideScrollSidebarHandler
-          className="no-scrollbar pwa-padding h-full w-full snap-x snap-mandatory overflow-x-scroll overflow-y-scroll px-2 pb-8"
+          className="no-scrollbar pwa-padding h-full w-full snap-x snap-mandatory overflow-x-scroll overflow-y-scroll pb-8"
           id="appLayout"
         >
           <div
-            className={`appContentWrapper no-scrollbar  flex h-full w-fit flex-row gap-4 pt-2 sm:gap-4
+            className={`appContentWrapper no-scrollbar flex h-full w-fit flex-row gap-4 px-2 pt-2 sm:gap-4
             ${
               difference === 0
                 ? "pb-[calc(max(env(safe-area-inset-bottom),8px)+8px)]"
@@ -40,7 +40,7 @@ export default function AppLayout(props: {
   return (
     <LayoutWrapper
       id="appLayout"
-      className="flex h-full w-full snap-x snap-mandatory scroll-pl-4 flex-row overflow-x-scroll overflow-y-scroll px-2 sm:gap-4 sm:px-4"
+      className="pwa-padding flex h-full w-full snap-x snap-mandatory scroll-pl-4 flex-row overflow-x-scroll overflow-y-scroll px-2 sm:gap-4 sm:px-4"
     >
       <div className="appSidebarWrapper sticky left-0 top-0 z-40 flex items-stretch bg-transparent py-2 sm:w-auto">
         {props.sidebar}
