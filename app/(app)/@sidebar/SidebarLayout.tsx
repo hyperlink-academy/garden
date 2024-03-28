@@ -98,8 +98,8 @@ export default function SidebarLayout(props: {
   if (isMobile)
     return (
       <>
-        <div className="mobileHeaderWrapper pwa-padding fixed left-0 top-0 z-30 w-full bg-background">
-          <div className="mobileHeader flex w-full gap-2 border-b border-grey-90 bg-background px-2 pb-1">
+        <div className="mobileHeaderWrapper pwa-padding-bottom fixed bottom-0 left-0 z-30 w-full bg-background">
+          <div className="mobileHeader flex w-full gap-2 border-t border-grey-90 bg-background px-2 pt-1">
             <div className="no-scrollbar relative flex flex-row gap-2 overflow-x-scroll">
               <button
                 className="mobileHeaderToggle sticky left-0 -rotate-90 rounded-full bg-background text-grey-55"
