@@ -1205,12 +1205,597 @@ const HelpChangelog = () => {
           </p>
           <p>Contributors: Azlen Elza</p>
         </HelpDisclosure>
-
-        {/* 
-        <HelpDisclosure name="" date="">
-          <p></p>
+        <HelpDisclosure
+          name="Inbox / feed-style Highlights"
+          date="2022-12-05"
+          deprecated
+        >
+          <p>
+            Continuing to iterate on Highlights; since viewing one at a time
+            made it tricky to see the surrounding context, we're trying more of
+            a scrollable feed where you can browse all highlighted cards more
+            quickly + open individual cards to view details and reply.
+          </p>
         </HelpDisclosure>
-        */}
+        <HelpDisclosure
+          name="Simplifying decks and linked cards"
+          date="2022-11-30"
+        >
+          <p>
+            Essentially getting rid of the notion of "decks" as a separate
+            construct for now, to make it easy to add linked cards to *any* card
+            by default.
+          </p>
+          <p>
+            We think it still might be useful for a card that's primarily a deck
+            / collection to be visually special somehow, but saving that for
+            later.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure
+          name="New backlinks above card title"
+          date="2022-11-29"
+          deprecated
+        >
+          <p>
+            Trying to make backlinks feel more useful in the context of
+            interlinked cards that reply to one another. Particularly for
+            Highlights, where we'd like it to be easy to reply with linked cards
+            and easily see the context of a card — what it's responding to. So,
+            backlinks are now a bit more front and center, and indicate more
+            clearly that a card may be in some way a response to another card.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure
+          name="One card at a time highlights with replies"
+          date="2022-11-28"
+          deprecated
+        >
+          <p>
+            Iterating now how highlighted cards are displayed, and how you can
+            interact with them.
+          </p>
+          <p>
+            We tried a new viewer that's more of a card stack where you see one
+            highlighted card at a time, and can add a reply via linked card.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure
+          name="Auto-highlighting experiment"
+          date="2022-11-11"
+          deprecated
+        >
+          <p>
+            Instead of manually highlighting each card, we're trying how it
+            feels to highlight all new cards in a Space.
+          </p>
+          <p>
+            Not sure if this is too far to the other extreme, but we're
+            imagining it working nicely in a future where we have different card
+            types, and could toggle whether certain types of cards are
+            automatically highlighted.
+          </p>
+          <p>
+            For now, we think it's an improvement to at least make sure you
+            don't miss anything new in collaborative Spaces.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure
+          name="New Space header and desktop background"
+          date="2022-11-09"
+        >
+          <p>
+            Reworking the overall nav for a Space, and some small adjustments to
+            improve Desktop, e.g. a nice grid background. Also, automatically
+            grow and shrink Desktop height to match contents.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure
+          name="Space completed state and archive"
+          date="2022-11-01"
+        >
+          <p>
+            Added a simple way to mark a Space as archived / completed, from
+            Space settings.
+          </p>
+          <p>
+            When you do this, any completed Spaces will be viewable in the
+            "history" page linked from your main homepage.
+          </p>
+          <p>
+            We're aiming to focus more on short to medium term scoped Spaces for
+            specific projects and activities, so this is a start to making it
+            feel like Spaces are cheap to create and can be archived so as not
+            to clutter your Studio…eventually may add start and end dates as
+            well.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure
+          name="Highlights in Spaces"
+          date="2022-09-21"
+          deprecated
+        >
+          <p>
+            Our take on a (not-quite-)notifications system, influenced by
+            Instagram-style "stories" and game dynamics.
+          </p>
+          <p>
+            You can highlight any card, attach a note, and it'll show up for
+            other participants in a highlights carousel.
+          </p>
+          <p>
+            The highlights carousel (icon at the top right of main desktop)
+            shows all highlights from the past 24 hours, and marks them as
+            "read" once you see them. The icon will glow when you have unread
+            highlights.
+          </p>
+          <p>
+            Possible enhancements include improving the highlights carousel and
+            options like scheduling highlights for the future.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure
+          name="Desktop (canvas) as Space homepage"
+          date="2022-09-21"
+          important
+        >
+          <p>
+            Rethinking the Space homepage as less of a simple list and more of a
+            shared canvas.
+          </p>
+          <p>
+            You can add and organize cards, open them in a viewer alongside the
+            desktop, and make it easier to browse and stay oriented as you
+            navigate.
+          </p>
+          <p>Small but useful features include:</p>
+          <ul>
+            <li>double click to find and create cards</li>
+            <li>basic gesture support (pinch to resize and rotate)</li>
+            <li>drag cards on top of others to make / add to decks</li>
+            <li>ability to remove cards</li>
+          </ul>
+          <p>Things we're thinking about to build on this:</p>
+          <ul>
+            <li>multiple desktops, e.g. as nested workspaces</li>
+            <li>a way to edit custom card styles</li>
+            <li>simpler and more dynamic canvas resizing</li>
+          </ul>
+        </HelpDisclosure>
+        <HelpDisclosure name="Chat cards" date="2022-09-20" deprecated>
+          <p>
+            Chats are now cards! You can create any number of chats, and link
+            them anywhere.
+          </p>
+          <p>
+            This makes chat a lot more flexible / modular — you can add directly
+            to the desktop or link them to other cards and use e.g. as comments
+            sections, linked threads, feedback, logs…
+          </p>
+          <p>
+            Chat cards do *not* have backlinks (references) or a way to add
+            other sections, at least for now.
+          </p>
+          <p>
+            NB: with the combination of new desktop, chat cards, and highlights,
+            we're removing the previous "activities" feature that was basically
+            just a deck + chat. Might resurface in some future form!
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure
+          name="New card stack (linked card section)"
+          date="2022-09-14"
+        >
+          <p>
+            Some changes to how cards appear as collections on deck cards and
+            linked sections generally.
+          </p>
+          <p>
+            Cards now show in a vertical stack, and you can click any card to
+            open an inline, editable preview. You can also toggle to expand or
+            collapse and view the full text content of each card (still must
+            open to view additional sections). You can now add cards to the
+            front or back of a deck.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="New card viewer" date="2022-09-07" important>
+          <p>
+            Alongside the desktop, we made a new way to open cards, mainly aimed
+            at less confusing navigation.
+          </p>
+          <p>
+            We tried a couple variations on this, opening cards in a series of
+            horizontal panes vs. a two-panel modal vs. a simple stack.
+          </p>
+          <p>
+            For now we ended up with a basic in-place history stack. The desktop
+            serves as a left sidebar, and cards open on the right. When you open
+            a new card, it replaces the current one but keeps a stack with your
+            history so you can easily navigate back.
+          </p>
+          <p>
+            Also: search bar to open any card or create new ones; long press to
+            clear the entire history.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Deleting Spaces" date="2022-08-02">
+          <p>
+            It is now possible to entirely delete a Space…useful for disposing
+            of test Spaces or other clutter.
+          </p>
+          <p>Still to do: editing Space names; archiving Spaces.</p>
+        </HelpDisclosure>
+        <HelpDisclosure
+          name="Experiment: card style customization sections"
+          date="2022-08-01"
+          deprecated
+        >
+          <p>
+            Another small easter egg experiment, exploring possibilties for
+            using custom section data in cards to add custom per-card styling.
+            Right now we've hardcoded a few section names that, when detected on
+            a card, inject some additional styles.
+          </p>
+          <p>
+            You can add the following sections to any card to edit its text,
+            background, and border:
+          </p>
+          <ul>
+            <li>hyperlink_text_color</li>
+            <li>hyperlink_bg_color</li>
+            <li>hyperlink_border_color</li>
+            <li>hyperlink_border_width</li>
+          </ul>
+          <p>
+            Note: please treat this as a temporary prototype, subject to change
+            as we continue exploring this constellation of features around
+            customizable display and card sections!
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure
+          name="Prototyping bots + Space API"
+          date="2022-07-29"
+          deprecated
+        >
+          <p>
+            After talking for a while about ideas for interactive bots, we
+            finally got enough of a prototype in place for a weekend "Bot Jam"
+            with a couple friends.
+          </p>
+          <p>
+            Bots, on Hyperlink, are external apps that can interact with a Space
+            via chat interface, responding to messages and even creating /
+            editing data in a a space.
+          </p>
+          <p>
+            The basic architecture uses bots hosted on Replit that listen for
+            mentions of themselves in chat, a per-space GraphQL API, and a
+            simple API for bots to send mutations back to a Space.
+          </p>
+          <p>
+            We'll work on documenting this better; for now you can take a look
+            at the Bot Jam Space and hit us up with any questions!
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure
+          name="Generate signup codes and start onboarding!"
+          date="2022-07-27"
+          important
+        >
+          <p>
+            A big milestone: we can finally invite other people to create
+            accounts on Hyperlink! While in alpha, we're still invite-only on a
+            global level, so we made a simple way to generate invite links that
+            allow account creation.
+          </p>
+          <p>
+            Note: this means that while you can copy and share the invite link
+            for any of your Spaces, for the time being only people we've already
+            invited to make Hyperlink accounts will be able to join. If you'd
+            like to invite a friend / collaborator, please reach out, we'll be
+            opening up more invites soon!
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Experiment: footer 'home' item" date="2022-07-22">
+          <p>
+            Trying a quick experiment here as sort of a hidden easter egg UI
+            exploration — a way to add a "home" deck that displays as pinned to
+            the nav bar of a Space.
+          </p>
+          <p>
+            To enable this, simply create a deck named "Home" in your space, and
+            it will show up as in the nav, displaying the contents of that deck
+            on a top-level page.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Custom Space door images" date="2022-07-21">
+          <p>
+            An important step towards greater customization and personality for
+            Spaces! This allows uploading any image as the background to a
+            Space's door/portal from your Studio (where previously you could
+            select from among four default images).
+          </p>
+          <p>
+            We've had fun playing with <a href="https://museo.app/">Museo</a> to
+            find open access museum images to represent different spaces.
+          </p>
+          <p>
+            Note that this works both per-space *and* per-person — that is, you
+            and I can add a different custom image for the same space.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure
+          name="Redesigned landing page"
+          date="2022-07-19"
+          meta
+          deprecated
+        >
+          <p>
+            We redesigned our landing page, and also migrated the app itself
+            from our testing domain (hyperlink.garden) back to the original
+            hyperlink.academy
+          </p>
+          <p>
+            For reference: the old app is archived at{" "}
+            <a href="https://year-one.hyperlink.academy/">
+              https://year-one.hyperlink.academy/
+            </a>
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Testing infrastructure" date="2022-07-08" meta>
+          <p>
+            Nothing to see here, just some behind the scenes work to make our
+            infrastructure more stable and less likely to break things when we
+            push changes and perform database migrations :)
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure
+          name="Images and link previews on small cards"
+          date="2022-07-07"
+        >
+          <p>
+            First step to rendering card previews based on their contents. We
+            extended the small card list to show a clickable external link icon
+            for any cards where the main content section just contains a URL,
+            and also render an image preview for any card that has an uploaded
+            image.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure
+          name="Activities in Spaces"
+          date="2022-06-27"
+          deprecated
+        >
+          <p>
+            Something we've been thinking about for a while: how to make online
+            tools / spaces not only good for collection and conversation, but
+            sites for action?
+          </p>
+          <p>
+            Lots of ideas bouncing around, but to start with something simple we
+            added the concept of "activities" as a mix of chat + active "hand"
+            of cards. In practice activities are kind of a special type of deck,
+            and we've also made a top-level page listing activities, where you
+            can create and mark them as complete.
+          </p>
+          <p>
+            We're playing with how this can be useful to represent workspaces,
+            contexts, sessions, and more. A prototype that we plan to extend
+            further!
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Images on cards" date="2022-06-20">
+          <p>
+            We really wanted to support images in cards, and took a first step
+            to making that possible, supporting a single default image that can
+            be uploaded per card!
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure
+          name="New nav bar in Spaces"
+          date="2022-06-14"
+          deprecated
+        >
+          <p>
+            We improved the footer nav bar, making it more of a floating row
+            with better icon placement and spacing. Simple tweaks, but important
+            iteration, laying some groundwork for making it easier to add
+            additional top-level pages of the app, and later (still to do!)
+            explore customizing the nav.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="New logo / favicon" date="2022-06-03" meta>
+          <p>
+            Visual refresh! A couple iterations on the Hyperlink iconography,
+            evolving from the simple "h" to a stack of tri-color cards.
+          </p>
+          <p>
+            Not reflected in a single log item, but more noteworthy in
+            aggregate: we've also developed a whole new set of playful custom
+            icons used throughout the app.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Richer text areas" date="2022-05-28">
+          <p>
+            We swapped out the super minimal text field with a text area that
+            differentiates from editing and display mode, allowing us to add
+            things like hyperlink rendering (very important!) and a simple
+            subset of other markdown-like enhancements like bolded headings.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Link to cards in chat" date="2022-05-06">
+          <p>
+            We wanted to try melding the main two parts of the apps, cards and
+            chat, and a simple start was to allow linking any cards from your
+            space as an attachment to chat messages. This makes it easy to point
+            to any number of the "things" you're talking about for easy
+            reference.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Card carousel" date="2022-05-03" deprecated>
+          <p>
+            This adds a missing piece between the small card list and the large
+            card view: a way to navigate between a set of cards, in a carousel
+            view.
+          </p>
+          <p>
+            The basic left / right navigation is a particularly nice swipe
+            gesture on mobile, and makes it fun to browse decks and linked card
+            sections (which are, behind the scenes, functionally the same
+            thing!)
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure
+          name="Default door images and frame"
+          date="2022-04-28"
+          important
+        >
+          <p>
+            A fun addition: adding a nice visual representation of each space on
+            your studio. We played around with a few designs and landed on a
+            simple orthographic perspective door / window / portal for now.
+            Celine made some hand-painted backgrounds so even the defaults have
+            vibes for days :)
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Member cards" date="2022-04-27" deprecated>
+          <p>
+            With people able to create and later join multiple Spaces, we had
+            the notion of "membership" in a Space, but had yet to make this
+            visible in the Space itself, so we decided to represent members as a
+            special type of card.
+          </p>
+          <p>
+            We like the idea of a nametag / membership card, and this lets you
+            have a different card for each space you're in (so you can have e.g.
+            separate bios in your book club and blogging spaces).
+          </p>
+          <p>
+            (NB: we later removed this from Spaces, but it made its way back in
+            Studios!)
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure
+          name="Unread state for messages"
+          date="2022-04-26"
+          important
+        >
+          <p>
+            To make the chat a bit more useful, we added a simple version of
+            unreads / notifications. Basically just tracking how many new
+            messages you haven't seen yet, and showing a little red notification
+            dot in the nav footer as well as on your Studio page.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure
+          name="Minimal per-Space chat"
+          date="2022-04-22"
+          important
+        >
+          <p>
+            With the core app scaffolding in place — basic cards and decks — we
+            began prototyping social / collaborative elements in spaces,
+            starting with a very simple chat. And we mean simple! At first: one
+            chat per space, text only, a minimal stream for posting messages /
+            updates.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Basic backlinks" date="2022-04-20" important>
+          <p>
+            Important for navigability between cards: once we have sections that
+            can link to other cards, it's super useful to see where a card is
+            linked from, since it can be linked in any number of decks and other
+            cards.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure
+          name="Card page and sections"
+          date="2022-04-18"
+          deprecated
+        >
+          <p>
+            Building out the actual main card view (expanded full-size card) to
+            allow for editing content + adding flexible data via "sections".
+          </p>
+          <p>
+            By default, cards have a title and text area, but the ability to add
+            any number of additional sections is what makes them powerful. Our
+            data model is build around making cards, as entities that can
+            represent just about anything within a Space, really flexible and
+            extensible.
+          </p>
+          <p>
+            (NB: sections have since been removed, but may return in spirit with
+            a future block-based card editor…)
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Draggable small card list" date="2022-04-07">
+          <p>
+            Improving the list of small cards that show in a deck (and later, in
+            linked sections on cards), to allow drag and drop reordering.
+          </p>
+          <p>
+            Trying to play with the card metaphor as a way to have structured
+            data *and* make it fun and tactile to interact with, adopting at
+            least some simple affordances of physical cards (still plenty more
+            to explore here!)
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure
+          name="Simple footer and deck list"
+          date="2022-04-06"
+          deprecated
+        >
+          <p>
+            Adding some of the scaffolding for navigation: decks, as a top-level
+            way to create collections of cards, and a footer for navigating
+            between different parts of the app + back to your Studio.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure
+          name="Find and create cards"
+          date="2022-04-04"
+          important
+        >
+          <p>
+            Making it possible to both create new cards, and add existing cards
+            to a list. We've since iterated but started with a simple search
+            dialog where you can create a card if it doesn't exist.
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure
+          name="Creating and joining Spaces"
+          date="2022-04-03"
+          important
+        >
+          <p>
+            Structurally, after going back and forth quite a bit, we went with
+            the basic model of "Spaces" as self-contained learning environments
+            (each its own database and set of participants) and "Studios" as a
+            kind of personal homepage container, where you create / navigate to
+            your various Spaces.
+          </p>
+          <p>
+            Along with this, we also set up some basic stuff with user accounts
+            so that it's possible to join Spaces.
+          </p>
+          <p>
+            (NB: Studios later evolves into something different; here it refers
+            to user homepages!)
+          </p>
+        </HelpDisclosure>
+        <HelpDisclosure name="Initial commit!" date="2022-03-21" important>
+          <p>
+            Setting up some of the basic infrastructure to build on e.g. data
+            model and overall architecture.
+          </p>
+          <p>
+            Actually based on a previous quick and dirty test Jared did
+            (intentional throwaway) to validate some of our ideas and
+            assumptions, but this marks the foundations of the "real" app,
+            starting with basic cards!
+          </p>
+        </HelpDisclosure>
       </HelpDisclosureSection>
     </div>
   );
