@@ -215,10 +215,10 @@ const AddCardButton = (props: {
       firstCardTitle?.value === "HYPERLINK README 📖✨📖 click here! 🌱");
 
   return (
-    <div className="border-grey-80 bg-background absolute bottom-0 left-[136px] z-[2] -mb-[1px] flex h-8 w-16 items-center justify-center rounded-t-full border border-b-0 text-center">
+    <div className="absolute bottom-0 left-[136px] z-[2] -mb-[1px] flex h-8 w-16 items-center justify-center rounded-t-full border border-b-0 border-grey-80 bg-background text-center">
       {showHelp && (
         <div className="absolute bottom-10 flex flex-col place-items-center">
-          <div className=" bg-accent-blue w-max rounded-md px-2 py-1 text-center text-sm font-bold text-white">
+          <div className=" w-max rounded-md bg-accent-blue px-2 py-1 text-center text-sm font-bold text-white">
             Drag to add a card!
           </div>
           <svg
@@ -322,7 +322,7 @@ const AddCardButton = (props: {
         }}
         className={`${
           props.total === 0 ? "text-accent-blue" : "text-grey-55"
-        } hover:text-accent-blue relative outline-none`}
+        } relative outline-none hover:text-accent-blue`}
       >
         <div className="-mt-2 ml-1">
           <CardAddLarge />
@@ -375,12 +375,12 @@ export function RoomHeader(props: {
   return (
     <>
       <div
-        className="roomHeader bg-background sticky top-0 z-[15] pt-3"
+        className="roomHeader sticky top-0 z-[15] bg-background pt-3"
         ref={titleRef}
       >
         <div className="roomTitle flex justify-between">
           <button
-            className={` text-grey-35 text-left text-lg font-bold `}
+            className={` text-left text-lg font-bold text-grey-35 `}
             onClick={(e) => {
               if (authorized) {
                 setNameEditing(true);
@@ -414,7 +414,7 @@ export function RoomHeader(props: {
           </button>
 
           {authorized && (
-            <div className="roomOptionsWrapper text-grey-35 mt-[1px] flex items-start gap-1">
+            <div className="roomOptionsWrapper mt-[1px] flex items-start gap-1 text-grey-35">
               {scrolledTop ? (
                 <div className="w-4" />
               ) : (
@@ -438,7 +438,7 @@ export function RoomHeader(props: {
       </div>
 
       <div
-        className={`roomDescriptionAndFilter bg-background z-10 ${
+        className={`roomDescriptionAndFilter z-10 bg-background ${
           descriptionOpen ? "sticky" : ""
         }`}
         style={{ top: `${titleHeight}px` }}
@@ -454,7 +454,7 @@ export function RoomHeader(props: {
         />
       </div>
       <div
-        className="roomDivider bg-background sticky z-10 mb-3 pt-2"
+        className="roomDivider sticky z-10 mb-3 bg-background pt-2"
         style={
           descriptionOpen
             ? { top: `calc(${titleHeight}px + ${descriptionHeight}px)` }
@@ -488,7 +488,7 @@ const RoomDescription = (props: {
       <div id="roomDescription" className="flex flex-col gap-1 ">
         {roomDescription?.value && (
           <button
-            className={`text-grey-35 flex flex-col pt-1 text-left text-base`}
+            className={`flex flex-col pt-1 text-left text-base text-grey-35`}
             onClick={(e) => {
               if (authorized) {
                 setDescriptionEditing(true);
@@ -520,13 +520,13 @@ const RoomDescription = (props: {
           <div className="flex flex-col gap-1 pt-1">
             <div className="roomCollectionOptions flex justify-between text-sm">
               <div className="roomCountAndFilter flex gap-2">
-                <div className="roomCardCount text-grey-35 flex items-center gap-1 text-sm font-bold">
+                <div className="roomCardCount flex items-center gap-1 text-sm font-bold text-grey-35">
                   <RoomCollection className="shrink-0" />
                   {props.totalCount === props.filteredCount
                     ? props.totalCount
                     : `${props.filteredCount}/${props.totalCount}`}{" "}
                 </div>
-                <div className="text-grey-55 my-0.5 border-l-[1px]" />
+                <div className="my-0.5 border-l-[1px] text-grey-55" />
                 <button
                   className={`text-grey-55 ${
                     props.filters.length === 0 ? " " : "font-bold "
@@ -561,7 +561,7 @@ function RoomOptions(props: { entityID: string | null }) {
     <>
       <button
         onClick={() => setIsRoomEditOpen(true)}
-        className={` hover:border-accent-blue hover:text-accent-blue flex rounded-md border border-transparent px-[2px] py-[4px] align-top`}
+        className={` flex rounded-md border border-transparent px-[2px] py-[4px] align-top hover:border-accent-blue hover:text-accent-blue`}
       >
         <MoreOptionsTiny />
       </button>

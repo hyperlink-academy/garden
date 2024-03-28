@@ -13,7 +13,7 @@ export default function AppLayout(props: {
     return (
       <LayoutWrapper
         id="appLayout"
-        className="no-scrollbar flex h-[calc(100%+env(safe-area-inset-top))] w-full snap-x snap-mandatory scroll-pl-4 flex-col  overflow-x-scroll overflow-y-scroll px-2 pt-[calc(env(safe-area-inset-top)+32px)] "
+        className="no-scrollbar pwa-padding-bottom flex h-[calc(100%+env(safe-area-inset-top))] w-full snap-x snap-mandatory flex-col overflow-x-scroll overflow-y-scroll px-2 pt-[calc(max(16px,env(safe-area-inset-top))+32px)]"
       >
         {props.sidebar}
         <div className="appContentWrapper no-scrollbar flex h-full w-fit flex-row gap-4 pb-2 pt-2 sm:gap-4">
