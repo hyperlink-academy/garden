@@ -19,7 +19,7 @@ export default function AppLayout(props: {
       >
         {props.sidebar}
         <SideScrollSidebarHandler
-          className="no-scrollbar pwa-padding h-full w-full snap-x snap-mandatory overflow-x-scroll overflow-y-scroll pb-8"
+          className="no-scrollbar pwa-padding gverflow-y-scroll h-full w-full snap-x snap-mandatory overflow-x-scroll pb-8"
           id="appLayout"
         >
           <div
@@ -38,16 +38,18 @@ export default function AppLayout(props: {
     );
 
   return (
-    <LayoutWrapper
-      id="appLayout"
-      className="pwa-padding flex h-full w-full snap-x snap-mandatory scroll-pl-4 flex-row overflow-x-scroll overflow-y-scroll px-2 sm:gap-4 sm:px-4"
-    >
-      <div className="appSidebarWrapper sticky left-0 top-0 z-40 flex items-stretch bg-transparent py-2 sm:w-auto">
-        {props.sidebar}
-      </div>
-      <div className="appContentWrapper flex h-full flex-row gap-4 px-2 py-2 sm:gap-4">
-        {props.children}
-      </div>
+    <LayoutWrapper id="heightWrapper" className="pwa-padding">
+      <SideScrollSidebarHandler
+        id="appLayout"
+        className="flex h-full w-full snap-x snap-mandatory scroll-pl-4 flex-row overflow-x-scroll overflow-y-scroll px-4 sm:gap-4"
+      >
+        <div className="appSidebarWrapper sticky left-0 top-0 z-40 flex items-stretch bg-transparent py-2 sm:w-auto">
+          {props.sidebar}
+        </div>
+        <div className="appContentWrapper flex h-full flex-row gap-4 px-2 py-2 sm:gap-4">
+          {props.children}
+        </div>
+      </SideScrollSidebarHandler>
     </LayoutWrapper>
   );
 }
