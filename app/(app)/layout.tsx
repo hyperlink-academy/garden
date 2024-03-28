@@ -26,7 +26,7 @@ export default function AppLayout(props: {
             className={`appContentWrapper no-scrollbar  flex h-full w-fit flex-row gap-4 pt-2 sm:gap-4
             ${
               difference === 0
-                ? "pb-[calc(env(safe-area-inset-bottom)+8px)]"
+                ? "pb-[calc(max(env(safe-area-inset-bottom),8px)+8px)]"
                 : "pb-2 "
             }
             `}

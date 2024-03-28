@@ -247,7 +247,7 @@ textarea {
 }
 
 .footer-padding {
-  padding-bottom: calc(env(safe-area-inset-bottom) + 32px);
+  padding-bottom: calc(max(env(safe-area-inset-bottom), 8px) + 32px);
 }
 
 .pwa-margin {

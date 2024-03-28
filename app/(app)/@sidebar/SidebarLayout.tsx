@@ -103,7 +103,7 @@ export default function SidebarLayout(props: {
         <div className="mobileHeaderWrapper absolute bottom-0 left-0 z-30 w-full bg-background">
           <div
             className={`mobileHeader flex w-full gap-2 border-t border-grey-90 bg-background px-2 pt-1 ${
-              difference === 0 ? "pwa-padding-bottom" : ""
+              difference === 0 ? "pwa-padding-bottom" : "pb-1"
             }`}
           >
             <div className="no-scrollbar relative flex flex-row gap-2 overflow-x-scroll">
