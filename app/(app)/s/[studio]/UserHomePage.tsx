@@ -42,7 +42,9 @@ export default function UserHomePage(props: { data: IdentityData }) {
 
   return (
     <>
-      <div className="footer-padding flex h-fit min-w-[min(calc(100vw-128px),56rem)] max-w-4xl flex-col gap-2 py-2 sm:my-0">
+      <div
+        className={`footer-padding flex h-fit max-w-4xl flex-col gap-2 py-2 sm:my-0`}
+      >
         {tab === "Home" ? (
           <Homepage
             spaces={spaces}
