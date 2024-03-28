@@ -6,6 +6,7 @@ import {
   CloseLinedTiny,
   DisclosureCollapseTiny,
   DisclosureExpandTiny,
+  ExternalLink,
   Settings,
 } from "./Icons";
 import { ModalFixedHeight } from "./Layout";
@@ -16,8 +17,19 @@ import Link from "next/link";
 export const HelpModal = (props: { open: boolean; onClose: () => void }) => {
   return (
     <ModalFixedHeight open={props.open} onClose={props.onClose}>
-      <div className="jusify-between flex items-center">
-        <h3 className="m-auto grow">Help Docs</h3>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <h3 className="m-auto grow">Help Docs</h3>
+          <a
+            href="/docs"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-sm hover:text-accent-blue"
+          >
+            {/* <span>open in tab</span> */}
+            <ExternalLink />
+          </a>
+        </div>
         <button
           onClick={() => props.onClose()}
           className="shrink-0 grow-0 text-grey-55 hover:text-accent-blue"
