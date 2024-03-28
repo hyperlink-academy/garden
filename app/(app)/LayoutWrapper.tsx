@@ -6,6 +6,8 @@ import { useViewportDifference } from "hooks/useViewportSize";
 import { useSidebarState } from "./@sidebar/SidebarState";
 import { useGesture } from "@use-gesture/react";
 import { useEffect } from "react";
+import { usePreventScroll } from "@react-aria/overlays";
+
 export function LayoutWrapper(props: {
   id: string;
   children: React.ReactNode;
@@ -16,6 +18,24 @@ export function LayoutWrapper(props: {
   let heightSpring = useSpring({
     height: viewheight,
   });
+
+  usePreventScroll();
+  return (
+    <animated.div
+      id={props.id}
+      style={!isIOS ? undefined : difference === 0 ? undefined : heightSpring}
+      className={props.className}
+    >
+      {props.children}
+    </animated.div>
+  );
+}
+
+export function SideScrollSidebarHandler(props: {
+  className: string;
+  children: React.ReactNode;
+  id: string;
+}) {
   let { active } = useDndContext();
   let { setSidebar, toggleSidebar } = useSidebarState();
   let bind = useGesture(
@@ -41,21 +61,9 @@ export function LayoutWrapper(props: {
     window.addEventListener("keydown", listener);
     return () => window.removeEventListener("keydown", listener);
   }, [toggleSidebar]);
-
   return (
-    <animated.div
-      id={props.id}
-      style={
-        isIOS()
-          ? difference > 10
-            ? heightSpring
-            : undefined
-          : { height: "100%" }
-      }
-      className={props.className}
-      {...bind()}
-    >
+    <div id={props.id} className={props.className} {...bind()}>
       {props.children}
-    </animated.div>
+    </div>
   );
 }

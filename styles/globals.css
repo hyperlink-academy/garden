@@ -246,6 +246,10 @@ textarea {
   padding-bottom: max(env(safe-area-inset-bottom), 8px) !important;
 }
 
+.footer-padding {
+  padding-bottom: calc(env(safe-area-inset-bottom) + 32px);
+}
+
 .pwa-margin {
   margin-top: env(safe-area-inset-top) !important;
 }
@@ -259,4 +263,26 @@ textarea {
 
 .safari-pwa-height {
   height: 100lvh !important;
+}
+:root {
+  --sat: env(safe-area-inset-top);
+  --sar: env(safe-area-inset-right);
+  --sab: env(safe-area-inset-bottom);
+  --sal: env(safe-area-inset-left);
+}
+
+@keyframes blink_input_opacity_to_prevent_scrolling_when_focus {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+input:focus {
+  animation: blink_input_opacity_to_prevent_scrolling_when_focus 0.01s;
+}
+textarea:focus {
+  animation: blink_input_opacity_to_prevent_scrolling_when_focus 0.01s;
 }

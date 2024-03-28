@@ -1,6 +1,7 @@
 "use client";
 import { useIsClient, useIsMobile } from "hooks/utils";
-import { LayoutWrapper } from "./LayoutWrapper";
+import { LayoutWrapper, SideScrollSidebarHandler } from "./LayoutWrapper";
+import { useViewportDifference } from "hooks/useViewportSize";
 
 export default function AppLayout(props: {
   children: React.ReactNode;
@@ -8,17 +9,31 @@ export default function AppLayout(props: {
 }) {
   let isClient = useIsClient();
   let isMobile = useIsMobile();
+  let difference = useViewportDifference();
   if (!isClient) return null;
   if (isMobile)
     return (
       <LayoutWrapper
-        id="appLayout"
-        className="no-scrollbar flex h-[calc(100%+env(safe-area-inset-top))] w-full snap-x snap-mandatory flex-col overflow-x-scroll overflow-y-scroll px-2 pb-[calc(max(16px,env(safe-area-inset-top))+32px)]"
+        id="heightWrapper"
+        className="no-scrollbar relative flex h-[calc(100%+env(safe-area-inset-top))] "
       >
         {props.sidebar}
-        <div className="appContentWrapper no-scrollbar flex h-full w-fit flex-row gap-4 pb-2 pt-2 sm:gap-4">
-          {props.children}
-        </div>
+        <SideScrollSidebarHandler
+          className="no-scrollbar pwa-padding h-full w-full snap-x snap-mandatory overflow-x-scroll overflow-y-scroll px-2 pb-8"
+          id="appLayout"
+        >
+          <div
+            className={`appContentWrapper no-scrollbar  flex h-full w-fit flex-row gap-4 pt-2 sm:gap-4
+            ${
+              difference === 0
+                ? "pb-[calc(env(safe-area-inset-bottom)+8px)]"
+                : "pb-2 "
+            }
+            `}
+          >
+            {props.children}
+          </div>
+        </SideScrollSidebarHandler>
       </LayoutWrapper>
     );
 

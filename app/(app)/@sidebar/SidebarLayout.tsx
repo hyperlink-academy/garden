@@ -9,6 +9,7 @@ import { useSidebarState } from "./SidebarState";
 import { Divider } from "components/Layout";
 import { useAuth } from "hooks/useAuth";
 import Link from "next/link";
+import { useViewportDifference } from "hooks/useViewportSize";
 
 export default function SidebarLayout(props: {
   breadcrumb: React.ReactNode;
@@ -93,13 +94,18 @@ export default function SidebarLayout(props: {
     document.addEventListener("keydown", listener);
     return () => document.removeEventListener("keydown", listener);
   }, [setSidebar]);
+  let difference = useViewportDifference();
 
   if (!isClient) return;
   if (isMobile)
     return (
       <>
-        <div className="mobileHeaderWrapper pwa-padding-bottom fixed bottom-0 left-0 z-30 w-full bg-background">
-          <div className="mobileHeader flex w-full gap-2 border-t border-grey-90 bg-background px-2 pt-1">
+        <div className="mobileHeaderWrapper absolute bottom-0 left-0 z-30 w-full bg-background">
+          <div
+            className={`mobileHeader flex w-full gap-2 border-t border-grey-90 bg-background px-2 pt-1 ${
+              difference === 0 ? "pwa-padding-bottom" : ""
+            }`}
+          >
             <div className="no-scrollbar relative flex flex-row gap-2 overflow-x-scroll">
               <button
                 className="mobileHeaderToggle sticky left-0 -rotate-90 rounded-full bg-background text-grey-55"
@@ -117,7 +123,7 @@ export default function SidebarLayout(props: {
           <animated.div
             {...bindOverlay()}
             onClick={() => setSidebar(false)}
-            className="fixed inset-0 z-30 touch-none bg-grey-15"
+            className="absolute inset-0 z-30 touch-none bg-grey-15"
             style={{
               ...sidebarOverlaySpring,
               display: open ? "block" : "none",
@@ -128,7 +134,7 @@ export default function SidebarLayout(props: {
         )}
         <animated.div
           style={mobileSidebarSpring}
-          className={`pwa-padding pwa-padding-bottom fixed top-0 z-30 flex h-full py-1 pl-1`}
+          className={`pwa-padding pwa-padding-bottom absolute top-0 z-30 flex h-full py-1 pl-1`}
         >
           <div
             {...bindSidebar()}
