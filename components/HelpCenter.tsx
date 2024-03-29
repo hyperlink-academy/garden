@@ -363,7 +363,7 @@ const HelpShortcuts = () => {
         An evolving list of shortcuts you may find helpful in using Hyperlink!
       </p> */}
 
-      <h4>text editing</h4>
+      <h3>Text editing</h3>
       <ul>
         <li>
           start a line with <TextString>#</TextString> or{" "}
@@ -396,7 +396,7 @@ const HelpShortcuts = () => {
         </li>
       </ul>
 
-      <h4>chat & comments</h4>
+      <h3>Chat & comments</h3>
       <ul>
         <li>
           <UnicodeKeyboardKey>⏎</UnicodeKeyboardKey> to send a message
@@ -407,7 +407,7 @@ const HelpShortcuts = () => {
         </li>
       </ul>
 
-      <h4>rooms & cards</h4>
+      <h3>Rooms & cards</h3>
       <ul>
         <li>
           <UnicodeKeyboardKey>⌥</UnicodeKeyboardKey> +{" "}
@@ -432,8 +432,12 @@ const HelpShortcuts = () => {
         <li>drag a card onto another to add it as a linked card</li>
       </ul>
 
-      <h4>general</h4>
+      <h3>General</h3>
       <ul>
+        <li>
+          <UnicodeKeyboardKey>{isAppleDevice() ? "⌘" : "⌃"}</UnicodeKeyboardKey>{" "}
+          + <KeyboardKey>/</KeyboardKey> to toggle expanded sidebar
+        </li>
         <li>
           <UnicodeKeyboardKey>{isAppleDevice() ? "⌘" : "⌃"}</UnicodeKeyboardKey>{" "}
           + <KeyboardKey>z</KeyboardKey> to undo
@@ -441,7 +445,7 @@ const HelpShortcuts = () => {
         <li>
           <UnicodeKeyboardKey>{isAppleDevice() ? "⌘" : "⌃"}</UnicodeKeyboardKey>{" "}
           + <UnicodeKeyboardKey>⇧</UnicodeKeyboardKey> +{" "}
-          <KeyboardKey>z</KeyboardKey> = redo
+          <KeyboardKey>z</KeyboardKey> to redo
         </li>
       </ul>
     </div>
@@ -647,6 +651,30 @@ const HelpChangelog = () => {
         */}
 
         {/* 2024 changes */}
+
+        <HelpDisclosure
+          name="Global sidebar / nav refactor"
+          date="2024-03-28"
+          important
+        >
+          <p>
+            A new sidebar that unifies nav across the app, making it easier to
+            move between Rooms, Spaces, Studios, and your homepage — which
+            is…just about everywhere you might find yourself in Hyperlink!
+          </p>
+          <p>
+            This was a surprisingly big feature, involving heaps of refactoring
+            and touching almost all parts of the UI. In the process, we fixed a
+            number of bugs and finnicky layout issues, like jankiness with
+            resizing when using the iOS mobile keyboard. Also some fun keyboard
+            shortcuts…try ctrl/cmd + / to expand and collapse the sidebar :)
+          </p>
+          <p>
+            The end result is nicer and more more consistent navigation
+            throughout the app — and a place to add global notifications, which
+            we'll be working on more soon.
+          </p>
+        </HelpDisclosure>
 
         <HelpDisclosure
           name="New Handbook, Roadmap, Changelog"
