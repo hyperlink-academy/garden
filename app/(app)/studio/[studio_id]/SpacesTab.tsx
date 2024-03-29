@@ -25,12 +25,6 @@ export function SpaceList({ data }: Props) {
   let { authorized } = useMutations();
   let { session } = useAuth();
   let allSpaces = data?.spaces_in_studios;
-  let yourSpaces = allSpaces.filter(
-    (s) =>
-      s.space_data?.members_in_spaces.find(
-        (m) => m.member === session.user?.id
-      ) && !s.space_data?.archived
-  );
 
   let activeSpaces = allSpaces
     .filter(({ space_data: s }) => s && !s.archived)
@@ -58,19 +52,6 @@ export function SpaceList({ data }: Props) {
       <div className=" studioSpaceListWrapper no-scrollbar relative flex h-full w-full flex-col gap-8 overflow-y-scroll ">
         {allSpaces.length > 0 ? (
           <>
-            {yourSpaces.length > 0 && (
-              <div className="-mb-2 flex flex-col gap-8">
-                <div>
-                  <h3>Your Spaces</h3>
-                  <List
-                    spaces={
-                      yourSpaces?.map((s) => s.space_data as SpaceData) || []
-                    }
-                  />
-                </div>
-                <Divider />
-              </div>
-            )}
             <List
               spaces={activeSpaces?.map((s) => s.space_data as SpaceData) || []}
             />
