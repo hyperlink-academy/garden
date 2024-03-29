@@ -228,9 +228,14 @@ export default function SidebarLayout(props: {
 
 function Breadcrumbs(props: { breadcrumb: React.ReactNode }) {
   let { session } = useAuth();
+  let { setSidebar } = useSidebarState();
   return (
     <div className="flex flex-row gap-1">
       <Link
+        onClick={(e) => {
+          e.stopPropagation();
+          setSidebar(false);
+        }}
         className="sidebarBreadcrumb flex shrink-0 flex-row items-center text-sm text-grey-55"
         href={session.session ? `/s/${session.session.username}` : "/"}
       >
