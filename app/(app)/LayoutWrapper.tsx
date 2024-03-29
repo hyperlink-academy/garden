@@ -1,7 +1,6 @@
 "use client";
 import { useDndContext } from "@dnd-kit/core";
 import { isIOS, useViewportSize } from "@react-aria/utils";
-import { animated, useSpring } from "@react-spring/web";
 import { useViewportDifference } from "hooks/useViewportSize";
 import { useSidebarState } from "./@sidebar/SidebarState";
 import { useGesture } from "@use-gesture/react";
@@ -15,19 +14,22 @@ export function LayoutWrapper(props: {
 }) {
   let viewheight = useViewportSize().height;
   let difference = useViewportDifference();
-  let heightSpring = useSpring({
-    height: viewheight,
-  });
 
   usePreventScroll();
   return (
-    <animated.div
+    <div
       id={props.id}
-      style={!isIOS ? undefined : difference === 0 ? undefined : heightSpring}
+      style={
+        !isIOS()
+          ? undefined
+          : difference === 0
+          ? undefined
+          : { height: viewheight }
+      }
       className={props.className}
     >
       {props.children}
-    </animated.div>
+    </div>
   );
 }
 

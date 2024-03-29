@@ -24,7 +24,7 @@ export default function AppLayout(props: {
         >
           <div
             className={`appContentWrapper no-scrollbar flex h-full w-fit flex-row gap-4 px-2 sm:gap-4
-              ${difference === 0 ? "pwa-padding-bottom" : ""}
+              ${difference === 0 ? "pwa-padding-bottom" : "pb-1"}
             `}
           >
             {props.children}
