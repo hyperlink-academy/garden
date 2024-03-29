@@ -1,480 +1,638 @@
 "use client";
 import styles from "styles/Landing.module.css";
-import { ButtonLink, ButtonPrimary } from "components/Buttons";
-import { BackToHome, Send } from "components/Icons";
-import { useState } from "react";
+import { ButtonLink, ButtonPrimary, ButtonSecondary } from "components/Buttons";
+import {
+  BackToHome,
+  BellSmall,
+  CalendarMedium,
+  CallSmall,
+  ChatSmall,
+  GoToPageLined,
+  MemberAdd,
+  Rooms,
+  SearchOrCommand,
+  SectionLinkedCard,
+} from "components/Icons";
 import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "hooks/useAuth";
 import { useRouter } from "next/navigation";
 import { LoginOrSignupModal } from "components/LoginModal";
+import { Divider } from "components/Layout";
+import { useState } from "react";
+import { Modal } from "components/Modal";
+import { useIsMobile } from "hooks/utils";
+import { createPortal } from "react-dom";
 
 export function HomePage() {
-  let textFormat = "mx-auto w-full flex max-w-2xl flex-col gap-4";
   let [loginOrSignupState, setLoginOrSignupState] =
     LoginOrSignupModal.useState("closed");
+  let [subscribeModal, setSubscribeModal] = useState(false);
 
+  let isMobile = useIsMobile();
   let { session } = useAuth();
   let router = useRouter();
 
   return (
-    <>
-      <div className="landing px-4 py-4 md:px-8 md:py-8">
-        {/* main content - inner wrapper */}
-        <div className="m-auto mb-8 flex max-w-6xl flex-col gap-8">
-          {/* title */}
-          <div className="landingTitle flex flex-col justify-center gap-8 text-center ">
-            {/* hyperlink */}
-            <div className="flex flex-col">
-              <div className="border-accent-red z-10 -mb-[12px] flex w-3/4 rounded-md border-[12px] p-2 text-sm sm:-mb-[24px] sm:w-1/2 sm:border-[24px] sm:p-4 sm:text-base md:w-1/3">
-                <div className="m-auto flex gap-2 self-center">
-                  <span>
-                    <em>hello! welcome to…</em>
-                  </span>
-                </div>
-              </div>
-              <div className="border-accent-gold w-11/12 self-center rounded-md border-x-[24px] border-y-[24px] p-4 sm:border-x-[96px] sm:border-y-[48px] sm:p-8">
-                <h1 className="plexSerifBoldItalic text-2xl sm:text-[3rem] md:text-7xl">
-                  Hyperlink Academy
-                </h1>
-              </div>
-              <div className="border-accent-blue z-10 -mt-[12px] flex w-4/5 self-end rounded-md border-[12px] p-2 text-sm sm:-mt-[24px] sm:w-1/2 sm:border-[24px] sm:p-4 sm:text-base md:w-1/3">
-                {/* login / signup links */}
-                <div className="m-auto flex flex-row gap-2 self-center">
-                  {!session?.loggedIn ? (
-                    <>
-                      <ButtonLink
-                        content="sign up"
-                        onClick={() => setLoginOrSignupState("signup")}
-                      />
-                      <span>
-                        <em>or</em>
-                      </span>
-                      <ButtonLink
-                        content="log in"
-                        onClick={() => setLoginOrSignupState("login")}
-                      />
-                      <LoginOrSignupModal
-                        state={loginOrSignupState}
-                        setState={setLoginOrSignupState}
-                        onLogin={(s) =>
-                          s.username
-                            ? router.push(`/s/${s.username}`)
-                            : router.push("/setup")
-                        }
-                      />
-                    </>
-                  ) : session.session?.username ? (
-                    <Link
-                      href={`/s/${session.session.username}`}
-                      className="hover:text-accent-blue mx-auto flex items-center justify-center gap-2"
-                    >
-                      <BackToHome />
-                      <span>
-                        <strong>visit my homepage</strong>
-                      </span>
-                    </Link>
-                  ) : (
-                    <Link
-                      href={`/setup`}
-                      className="hover:text-accent-blue mx-auto flex items-center justify-center gap-2"
-                    >
-                      <BackToHome />
-                      <span>
-                        <strong>finish account setup!</strong>
-                      </span>
-                    </Link>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-          {/* what is hyperlink */}
-          <div className={`landingWhatIsHyperlink text-center ${textFormat}`}>
-            <h2 className="text-xl sm:text-3xl">What is Hyperlink?</h2>
-            <p className="text-lg">
-              It&apos;s where we make <strong>Spaces</strong> to make things
-              happen — places to do meaningful work with close collaborators.
-            </p>
-            <div className="my-4 flex flex-col gap-4 sm:flex-row">
-              <div className="flex w-3/4 flex-col gap-2 self-center rounded-md border bg-white p-2 sm:w-1/3 sm:gap-4 sm:p-4">
-                <h3>intimate groups</h3>
-                <Image
-                  src="/landing/Chairs.png"
-                  alt=""
-                  width={128}
-                  height={128}
-                  className="w-1/2 self-center sm:w-full"
-                  style={{ imageRendering: "pixelated" }}
-                />
-                <p className="text-sm italic">
-                  run a book club or writing circle
-                </p>
-              </div>
-              <div className="flex w-3/4 flex-col gap-2 self-center rounded-md border bg-white p-2 sm:w-1/3 sm:gap-4 sm:p-4">
-                <h3>creative collaboration</h3>
-                <Image
-                  src="/landing/Notes.png"
-                  alt=""
-                  width={128}
-                  height={128}
-                  className="w-1/2 self-center sm:w-full"
-                  style={{ imageRendering: "pixelated" }}
-                />
-                <p className="text-sm italic">
-                  start and finish projects with friends
-                </p>
-              </div>
-              <div className="flex w-3/4 flex-col gap-2 self-center rounded-md border bg-white p-2 sm:w-1/3 sm:gap-4 sm:p-4">
-                <h3>shared worlds</h3>
-                <Image
-                  src="/landing/Plants.png"
-                  alt=""
-                  width={128}
-                  height={128}
-                  className="w-1/2 self-center sm:w-full"
-                  style={{ imageRendering: "pixelated" }}
-                />
-                <p className="text-sm italic">
-                  space to explore and experiment together
-                </p>
-              </div>
-            </div>
-          </div>
-          <DividerSmall />
-          {/* hyperlink in action */}
-          <div className={`hyperlinkInAction ${textFormat} text-center`}>
-            <div className="mb-4 flex flex-col gap-4">
-              <h2 className="text-xl sm:text-2xl">What does it look like?</h2>
+    <div className="relative overflow-x-clip">
+      {/* sticky header */}
+      <div className="sticky top-0 z-10 bg-background">
+        <div className="flex items-center justify-between px-2 py-2 sm:px-4">
+          {/* notes */}
+          <div className="flex gap-2">
+            <a
+              href="https://notes.hyperlink.academy"
+              className="mx-auto text-accent-blue"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <span>
-                <em>click each item for a preview!</em>
+                <strong>writing</strong>
               </span>
-            </div>
-            {/* hyperlink demo layout */}
-            <div className="demoWrapper mb-16 mt-48 scale-100">
-              <Features />
-              {/* disclosure section - all features + one video panel */}
-              <div className="my-8 flex h-96 w-full rounded-md border-2 shadow-lg">
-                {/* rooms */}
-                <div className="flex h-full w-[calc(25%-8px)] flex-col gap-2 rounded-md border-r bg-white p-2 sm:w-[calc(25%-16px)] sm:p-4">
-                  <div className="bg-grey-90 h-4 w-[75%] rounded-md"></div>
-                  <hr className="border-grey-80 my-2" />
-                  <div className="bg-grey-90 h-4 rounded-md"></div>
-                  <div className="bg-accent-blue h-4 rounded-md"></div>
-                  <div className="bg-grey-90 h-4 rounded-md"></div>
-                  <div className="bg-grey-90 h-4 rounded-md"></div>
-                  <hr className="border-grey-80 my-2" />
-                  <div className="bg-bg-blue h-4 rounded-md"></div>
-                  <div className="bg-bg-red h-4 rounded-md"></div>
-                  <div className="bg-bg-gold h-4 rounded-md"></div>
-                </div>
-                {/* canvas */}
-                <div className="m-2 h-[calc(100%-16px)] w-[calc(30%-8px)] sm:m-4 sm:h-[calc(100%-32px)] sm:w-[calc(30%-16px)]">
-                  <div className="relative h-12 w-16 rounded-md border bg-white sm:h-14 sm:w-20"></div>
-                  <div className="unreadCardGlow relative left-6 top-4 h-12 w-16 -rotate-6 rounded-md border bg-white sm:left-10 sm:h-14 sm:w-20"></div>
-                  <div className="relative left-3 top-8 h-12 w-16 rotate-3 rounded-md border bg-white sm:h-14 sm:w-20"></div>
-                  <div className="unreadCardGlow relative left-2 top-14 h-12 w-16 rounded-md border bg-white sm:h-14 sm:w-20"></div>
-                  <div className="relative left-8 top-12 h-12 w-16 rotate-3 rounded-md border bg-white sm:left-12 sm:top-8 sm:h-14 sm:w-20"></div>
-                </div>
-                {/* open card */}
-                <div className="m-2 flex h-[calc(100%-16px)] w-[calc(45%-16px)] flex-col justify-between gap-4 rounded-md border bg-white p-4 sm:m-4 sm:h-[calc(100%-32px)]">
-                  <div className="flex flex-col gap-4">
-                    <div className="bg-grey-90 h-6 w-[50%] rounded-md"></div>
-                    <div className="flex h-fit flex-col gap-1">
-                      <div className="bg-grey-90 h-4 rounded-md"></div>
-                      <div className="bg-grey-90 h-4 rounded-md"></div>
-                      <div className="bg-grey-90 h-4 rounded-md"></div>
-                      <div className="bg-grey-90 h-4 rounded-md"></div>
-                    </div>
-                  </div>
-                  <div className="flex w-full flex-row items-center gap-2">
-                    <div className="text-grey-80 flex h-fit w-full flex-col gap-1 rounded-md border bg-white p-2 text-left text-sm">
-                      <div className="bg-grey-90 h-4 w-full rounded-md"></div>
-                      <div className="bg-grey-90 h-4 w-[80%] rounded-md"></div>
-                    </div>
-                    <div className="text-accent-blue self-end">
-                      <Send />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            {/* even more features */}
-            <div className="m-auto mt-12 flex flex-col gap-2 rounded-md border bg-white p-4 text-left">
-              <h3 className="text-center">and lots more!</h3>
-              <ul className="ml-4 list-disc text-sm sm:text-base">
-                <li>
-                  <strong>calendar</strong>: plan & log the things you do
-                </li>
-                <li>
-                  <strong>search</strong>: easily find any card
-                </li>
-                <li>
-                  <strong>reactags</strong>: a fun way to label things
-                </li>
-                <li>
-                  <strong>notifications</strong>: see new cards & discussions
-                </li>
-              </ul>
-            </div>
+            </a>
+            <span className="text-grey-80">|</span>
+            <Link
+              href="/docs"
+              className="mx-auto flex items-center justify-center gap-2 text-accent-blue"
+            >
+              <span>
+                <strong>docs</strong>
+              </span>
+            </Link>
           </div>
-          <DividerSmall />
-          {/* get started CTA! */}
-          <div className={`getStarted text-center ${textFormat}`}>
-            <h2 className="pb-4 text-xl leading-loose sm:text-3xl sm:leading-[3rem]">
-              <span className="text-lg sm:text-xl">Set up your new</span>
-              <br />
-              <span className="border-accent-blue rounded-md border-b-4 px-2 py-1">
-                Studio
-              </span>
-              {""}•{""}
-              <span className="border-accent-gold rounded-md border-b-4 px-2 py-1">
-                Lab
-              </span>
-              {""}•
-              <span className="border-accent-red rounded-md border-b-4 px-2 py-1">
-                Campus
-              </span>
-            </h2>
-            <div className="my-4 flex scale-125 self-center">
-              {/* NB: opens same modal as above - just an extra button here! */}
-              <ButtonPrimary
-                content="create your account!"
-                onClick={() => setLoginOrSignupState("signup")}
-              />
-            </div>
-
-            <p className="text-lg">
-              We&apos;d love to answer any questions & hear more about how you
-              imagine using Hyperlink —{" "}
-              <a
-                href="mailto:contact@hyperlink.academy"
-                className="text-accent-blue"
-              >
-                send us a note ✨🌱
-              </a>
-            </p>
-          </div>
-          <DividerSmall />
-        </div>
-        {/* about hyperlink wrapper */}
-        <div className="bg-bg-blue -mx-4 -mb-4 px-4 py-8 sm:-mx-8 sm:-mb-8 sm:px-8">
-          {/* who and why */}
-          <div className={`whoAndWhy1 text-center ${textFormat}`}>
-            <h2 className="text-xl sm:text-2xl">About Hyperlink</h2>
-            <p>
-              We&apos;re a small team —{" "}
-              <a className="text-accent-blue" href="https://awarm.space/">
-                Jared
-              </a>
-              ,{" "}
-              <a className="text-accent-blue" href="https://celinepark.design/">
-                Celine
-              </a>
-              ,{" "}
-              <a
-                className="text-accent-blue"
-                href="https://www.brendanschlagel.com/"
-              >
-                Brendan
-              </a>{" "}
-              — supported by great investors, collaborators, co-explorers &
-              friends.
-            </p>
-            <p>Here&apos;s our path so far:</p>
-          </div>
-          {/* hyperlink history */}
-          <div
-            className={`whoAndWhy2 mb-32 mt-4 items-center text-center ${textFormat}`}
-          >
-            <div className="relative right-4 top-6 flex w-64 rotate-6 flex-col gap-2 rounded-md border bg-white p-4 sm:right-16">
-              <p className="bg-accent-gold m-auto w-fit rounded-full px-3 py-1 text-xs italic">
-                2020–2021
-              </p>
-              <h3 className="text-base">Hyperlink Academy 1.0</h3>
-              <p className="text-sm">
-                an indie internet course platform for seriously effective
-                learning
-              </p>
-              <button className="m-auto w-fit rounded-md border bg-[white] p-2 text-sm text-black hover:bg-[black] hover:text-[white]">
-                <a href="https://year-one.hyperlink.academy/">
-                  hyperlink archive →
-                </a>
-              </button>
-            </div>
-            <div className="relative left-4 top-8 flex w-64 -rotate-3 flex-col gap-2 rounded-md border bg-white p-4 sm:left-16">
-              <p className="bg-accent-gold m-auto w-fit rounded-full px-3 py-1 text-xs italic">
-                2020–present
-              </p>
-              <h3 className="text-base">Hypotenuse</h3>
-              <p className="text-sm">
-                our newsletter on learning futures & the process of building
-                hyperlink
-              </p>
-              <button className="text-accent-blue hover:bg-accent-blue m-auto w-fit rounded-md border bg-[white] p-2 text-sm hover:text-white">
-                <a href="https://year-one.hyperlink.academy/">
-                  subscribe here →
-                </a>
-              </button>
-            </div>
-            <div className="relative right-2 top-12 flex w-64 rotate-2 flex-col gap-2 rounded-md border bg-white p-4">
-              <p className="bg-accent-gold m-auto w-fit rounded-full px-3 py-1 text-xs italic">
-                2021
-              </p>
-              <h3 className="text-base">Hyperspace</h3>
-              <p className="text-sm">
-                collaborative digital garden and text-based playground
-              </p>
-            </div>
-            <div className="relative left-6 top-16 flex w-64 -rotate-3 flex-col gap-2 rounded-md border bg-white p-4 sm:left-20">
-              <p className="bg-accent-gold m-auto w-fit rounded-full px-3 py-1 text-xs italic">
-                2022–2023
-              </p>
-              <h3 className="text-base">
-                [interlude] — a whole lotta thinking…
-              </h3>
-              <p className="text-sm">
-                research, prototyping, exploring new directions for what we want
-                to build
-              </p>
-            </div>
-            <div className="relative top-24 flex w-64 flex-col gap-2 rounded-md border bg-white p-4">
-              <p className="bg-accent-gold m-auto w-fit rounded-full px-3 py-1 text-xs italic">
-                2023
-              </p>
-              <h3 className="text-base">Hyperlink Academy 2.0</h3>
-              <p className="text-sm">
-                a place to play and learn with friends; spaces for doing
-                meaningful things together
-              </p>
-              <hr className="border-grey-80 m-auto my-2 w-[25px]" />
-              <p className="text-sm">intrigued? to try Hyperlink…</p>
-              <div className="my-0 flex self-center">
-                {/* NB: opens same modal as above - just an extra button here! */}
+          {/* login / signup links */}
+          <div className="flex flex-row gap-2 self-center">
+            {!session?.loggedIn ? (
+              <>
+                <ButtonSecondary
+                  content="log in"
+                  onClick={() => setLoginOrSignupState("login")}
+                />
                 <ButtonPrimary
-                  content="create your account!"
+                  content="sign up"
                   onClick={() => setLoginOrSignupState("signup")}
                 />
+
+                <LoginOrSignupModal
+                  state={loginOrSignupState}
+                  setState={setLoginOrSignupState}
+                  onLogin={(s) =>
+                    s.username
+                      ? router.push(`/s/${s.username}`)
+                      : router.push("/setup")
+                  }
+                />
+              </>
+            ) : session.session?.username ? (
+              <Link
+                href={`/s/${session.session.username}`}
+                className="mx-auto flex items-center justify-center gap-2 hover:text-accent-blue"
+              >
+                <BackToHome />
+                <span>
+                  <strong>visit my homepage</strong>
+                </span>
+              </Link>
+            ) : (
+              <Link
+                href={`/setup`}
+                className="mx-auto flex items-center justify-center gap-2 hover:text-accent-blue"
+              >
+                <BackToHome />
+                <span>
+                  <strong>finish account setup!</strong>
+                </span>
+              </Link>
+            )}
+          </div>
+        </div>
+        <Divider />
+      </div>
+
+      {/* landing page wrapper  */}
+      <div className="landing">
+        {/* main content - inner wrapper */}
+        <div className="m-auto  flex flex-col">
+          {/* title: hyperlink academy */}
+          <div className="w-screen bg-bg-blue pb-32 pt-8 sm:pt-12 ">
+            <div className="relative mx-auto flex w-fit flex-col gap-8">
+              {/* title and tagline */}
+              <div className="pl-8 pr-4 sm:pl-24">
+                <Image
+                  src="/img/landing/hero.png"
+                  alt="hyperlink academy logo"
+                  width={800}
+                  height={400}
+                  priority
+                />
+              </div>
+              <div className="mx-4 -mt-[120px] flex flex-col gap-3 sm:mx-8">
+                <h1 className=" italic text-accent-blue">
+                  a place for <br /> collaborative creative projects
+                </h1>
+                <div className="flex w-full items-center gap-4">
+                  <ButtonPrimary
+                    className="!px-2 !py-1 !text-lg sm:!px-4 sm:!py-1 sm:!text-xl"
+                    content="Sign Up!"
+                    onClick={() => setLoginOrSignupState("signup")}
+                  />
+                  <p className="text-lg text-grey-55">
+                    or get the{" "}
+                    <span>
+                      <button
+                        onClick={() => setSubscribeModal(true)}
+                        className="text-accent-blue hover:underline"
+                      >
+                        newsletter
+                      </button>
+                      <SubscribeModal
+                        open={subscribeModal}
+                        onClose={() => setSubscribeModal(false)}
+                      />
+                    </span>
+                  </p>
+                </div>
               </div>
             </div>
           </div>
-          <Image
-            src="/landing/creator-landing-cover.png"
-            alt=""
-            width={754}
-            height={574}
-            className="m-auto"
-            style={{ imageRendering: "pixelated" }}
-          />
+
+          {/* internet clubs */}
+          <div className="mx-auto">
+            <div className="relative m-[8px] mx-4 -mt-12 flex max-w-3xl flex-col gap-8 border border-grey-80 bg-white p-4 pt-6 sm:mx-8 sm:p-8 sm:pt-8 sm:text-lg">
+              <div className="absolute -top-[16px] right-[8px] w-max rotate-3 rounded-md bg-accent-red p-1 text-sm font-bold text-white sm:-right-[32px] sm:p-2 sm:text-base">
+                in progress!
+              </div>
+              <div
+                className={`flex max-w-2xl flex-col gap-3 text-center text-grey-35`}
+              >
+                <h2 className="text-grey-15">Internet Clubs</h2>
+
+                <p>
+                  We&apos;re playing with{" "}
+                  <strong>a new kind of internet club</strong> — communities of
+                  practice where we make and explore things together.
+                </p>
+                <p>
+                  In each club we work async in Spaces, explore and chat about
+                  each other&apos;s work, and share updates with a group digest.
+                </p>
+                <a
+                  className="flex items-center justify-center gap-1 text-sm text-accent-blue hover:underline sm:text-base"
+                  href={"https://notes.hyperlink.academy/note/internet-clubs"}
+                >
+                  read more about internet clubs
+                  <GoToPageLined />
+                </a>
+              </div>
+
+              <p className="text-center font-bold italic sm:text-lg">
+                ✨ explore our current clubs! ✨
+              </p>
+              <div className="mb-6 flex w-full flex-col-reverse  gap-9 pr-8 md:flex-row-reverse">
+                <StudioItem
+                  name="Pedagogical Parents"
+                  description="reading books about learning"
+                  image="/img/landing/pedagogical.png"
+                  alt="diptych of book covers, on the front of an abstract blue building"
+                  url="https://hyperlink.academy/studio/4lO7UZsrSbMZUN7zEt7I4q"
+                />
+                <StudioItem
+                  name="Internet Homesteading"
+                  description="building personal websites"
+                  image="/img/landing/internet.png"
+                  alt="pixel art of tree, path, and home on a hilltop, on the front of an abstract red building"
+                  url="https://hyperlink.academy/studio/46boxeFl9XacS39o1hwpJ8"
+                />
+                <StudioItem
+                  name="Handmade March"
+                  description="making things by hand every day"
+                  image="/img/landing/handmade.png"
+                  alt="a handmade pufferfish stamp, on the front of an abstract golden building"
+                  url="https://hyperlink.academy/studio/2QUkzDt56DYB7B0RS10mTL"
+                />
+              </div>
+
+              <div
+                style={{}}
+                className="my-4 flex flex-col items-center gap-4 bg-[url('../public/img/landing/funAccent.svg')] bg-contain bg-center bg-no-repeat p-16 text-center"
+              >
+                <div className="flex flex-col gap-0 rounded-md bg-white p-4 text-grey-35">
+                  <h4>Want to start a club of your own?</h4>
+                  <p className="text-base text-grey-55">
+                    We&apos;ll help with ideas, setup, and tech support!
+                  </p>
+                </div>
+                <Link
+                  href="https://hyperlink.academy/forms/propose-club"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <ButtonSecondary content="Propose a Club" />
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* what is hyperlink */}
+          <div className="whatIsHyperlink mt-[80px] sm:mt-[120px]">
+            <div
+              className={`mx-auto flex max-w-[800px] flex-col gap-3 px-4 text-center sm:text-lg`}
+            >
+              <p className="text-lg font-bold sm:text-xl">
+                Hyperlink is a place for ambitious creative projects with
+                friends, partners, and co-conspirators.
+              </p>
+              <p className="text-grey-35">
+                Use it as a shared notebook, a place for conversation, and a
+                tool for coordination. Hyperlink is for creating, collecting,
+                and sharing the work and artifacts of a collective.
+              </p>
+            </div>
+            <div className="relative mx-auto mt-16 w-max">
+              {!isMobile ? (
+                <>
+                  {/* rabbitholeathon */}
+                  <a
+                    target="_blank"
+                    href="https://hyperlink.academy/studio/3949e8c5-1d77-46f0-bb58-37756d4510f7"
+                    className="CONE absolute left-[25px] top-[40px] h-[270px] w-[100px]"
+                  />
+                  {/* spec-fi sandwich club */}
+                  <a
+                    target="_blank"
+                    href="https://hyperlink.academy/studio/2dcc1b60-9c0a-4029-9f38-8593a0d582a6"
+                    className="HOUSE absolute left-[190px] top-[270px] h-[145px] w-[132px]"
+                  />
+                  {/* feb 2024 links */}
+                  <a
+                    target="_blank"
+                    href="https://hyperlink.academy/studio/6ejN4eHGFWBB3zwhvwlMQG"
+                    className="ZIG absolute left-[320px] top-[160px] h-[140px] w-[132px] rotate-[33deg]"
+                  />
+                </>
+              ) : (
+                <>
+                  {/* rabbitholeathon */}
+                  <a
+                    target="_blank"
+                    href="https://hyperlink.academy/studio/3949e8c5-1d77-46f0-bb58-37756d4510f7"
+                    className="CONE absolute left-[45px] top-[18px] h-[120px] w-[50px]"
+                  />
+                  {/* spec-fi sandwich club */}
+                  <a
+                    target="_blank"
+                    href="https://hyperlink.academy/studio/2dcc1b60-9c0a-4029-9f38-8593a0d582a6"
+                    className="HOUSE absolute left-[118px] top-[120px] h-[65px] w-[58px]"
+                  />
+                  {/* feb 2024 links */}
+                  <a
+                    target="_blank"
+                    href="https://hyperlink.academy/studio/6ejN4eHGFWBB3zwhvwlMQG"
+                    className="ZIG absolute left-[175px] top-[70px] h-[60px] w-[60px] rotate-[33deg]"
+                  />
+                </>
+              )}
+
+              <Image
+                src="/img/landing/studios.png"
+                alt="a cute little drawing of some funky buildings in a neighborhood"
+                width={isMobile ? 320 : 600}
+                height={0}
+                className={isMobile ? "pl-8" : ""}
+              />
+              <Image
+                src="/img/landing/arrow.png"
+                alt="an arrow leading from one of the earlier funky buildings to a diagram of what's inside it"
+                width={isMobile ? 70 : 100}
+                height={100}
+                className="absolute -bottom-[125px] right-[80px] sm:right-[250px]"
+              />
+              <div className="absolute -top-12 right-[0px] w-[200px] text-center sm:-top-[16px] sm:right-[50px] sm:w-[320px]">
+                <h4 className="text-base text-grey-35 sm:text-lg">Studios</h4>
+                <p className="text-xs text-grey-55 sm:text-sm">
+                  homes and galleries for groups working together — like clubs,
+                  cohorts, or teams
+                </p>
+              </div>
+            </div>
+
+            <div className="relative mx-auto mt-12 w-max  pr-[232px] sm:pr-[340px]">
+              <Image
+                src="/img/landing/spaces.png"
+                alt="a 0-90 axonometric drawing of a building with three floors, a bunch of rooms and overflowing creative work inside"
+                width={isMobile ? 200 : 400}
+                height={100}
+              />
+              <div className="absolute right-[60px] top-[100px] w-[160px] text-left sm:right-[85px] sm:top-[280px] sm:w-[240px] ">
+                <h4 className="text-sm text-grey-35 sm:text-lg">Spaces</h4>
+                <p className="text-xs text-grey-55 sm:text-sm">
+                  workspaces — projects, gatherings, or explorations
+                </p>
+              </div>
+              <div className="absolute right-[60px] top-[180px] w-[160px] text-left sm:right-[85px] sm:top-[420px] sm:w-[240px]">
+                <h4 className=" text-sm text-grey-35 sm:text-lg">Rooms</h4>
+                <p className="text-xs text-grey-55 sm:text-sm">
+                  to organize your work — collections, canvases, and chat
+                </p>
+              </div>
+              <div className="absolute right-[60px] top-[260px] w-[160px] text-left sm:right-[85px] sm:top-[525px] sm:w-[240px] ">
+                <h4 className="text-sm text-grey-35 sm:text-lg">Cards</h4>
+                <p className="text-xs text-grey-55 sm:text-sm">
+                  the work itself — documents, text, images, comments & more
+                </p>
+              </div>
+            </div>
+
+            <div className="features mx-auto mt-[80px] max-w-4xl px-2 sm:mt-[64px]">
+              <h4 className="mb-4 text-center">
+                …and plenty of tools for getting it done!
+              </h4>
+              <div className="flex flex-wrap justify-center gap-2 sm:gap-4">
+                <FeatureListItem
+                  name="Invites"
+                  description="Invite people to join Spaces and Studios"
+                  icon={<MemberAdd />}
+                />
+                <FeatureListItem
+                  name="Discussion"
+                  description="Global chat rooms; comments on any card"
+                  icon={<ChatSmall />}
+                />
+                <FeatureListItem
+                  name="Calendar"
+                  description="Add dates to cards; view things past and future"
+                  icon={<CalendarMedium />}
+                />
+                <FeatureListItem
+                  name="Links"
+                  description="Attach cards or link them inline, wiki-style"
+                  // icon={<LinkSmall />}
+                  icon={<SectionLinkedCard />}
+                />
+                <FeatureListItem
+                  name="Backlinks"
+                  description="See anywhere a card is referenced in a Space"
+                  icon={<SearchOrCommand />}
+                />
+                <FeatureListItem
+                  name="Audio Calls"
+                  description="Work and talk together directly in a Space"
+                  icon={<CallSmall />}
+                />
+                <FeatureListItem
+                  name="Multiplayer Presence"
+                  description="See when others are in a Space — and where"
+                  icon={<Rooms />}
+                />
+                <FeatureListItem
+                  name="Push Notifications"
+                  description="When you add the web app on mobile!"
+                  icon={<BellSmall />}
+                />
+              </div>
+            </div>
+          </div>
+          <div className="mx-auto py-8 text-accent-gold sm:py-12">
+            <FancyDivider />
+          </div>
+          {/* get started! */}
+          <div className="m-auto flex flex-col text-grey-35">
+            <div className="flex flex-col items-center px-6 py-3 text-center sm:p-8">
+              <div className="my-4 -rotate-3 rounded-lg bg-accent-gold px-6 py-10 sm:px-16">
+                <div className="rotate-3">
+                  <div className="flex flex-col items-center gap-4">
+                    {/* login / signup links */}
+                    {!session?.loggedIn ? (
+                      <>
+                        <h2>Let&apos;s get started!</h2>
+                        <ButtonPrimary
+                          content="Sign up for Hyperlink!"
+                          onClick={() => setLoginOrSignupState("signup")}
+                        />
+                      </>
+                    ) : session.session?.username ? (
+                      <>
+                        <h2>Let&apos;s get started!</h2>
+                        <p>You&apos;re already logged in ☀️</p>
+                        <Link href={`/s/${session.session.username}`}>
+                          <ButtonPrimary
+                            content="visit my homepage"
+                            icon={<BackToHome />}
+                          />
+                        </Link>
+                      </>
+                    ) : (
+                      <>
+                        <h2>Let&apos;s get started!</h2>
+                        <p>You&apos;re already logged in ☀️</p>
+                        <Link href={`/setup`}>
+                          <ButtonPrimary
+                            content="finish account setup"
+                            icon={<BackToHome />}
+                          />
+                        </Link>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* newsletter form */}
+            <div className="m-auto flex max-w-lg flex-col gap-4 rounded-md bg-background px-4 pb-12 text-center">
+              <h3>Or, drop your email & stay in the loop</h3>
+              <p className="text-sm">
+                We send updates 1–2x / month about new features & experiments;
+                we&apos;ll never spam or share your email
+              </p>
+              <div className="mx-auto flex gap-2">
+                <form
+                  action="https://buttondown.email/api/emails/embed-subscribe/hyperlink"
+                  method="post"
+                  target="popupwindow"
+                  onSubmit={async () => {
+                    window.open(
+                      "https://buttondown.email/hyperlink",
+                      "popupwindow"
+                    );
+                  }}
+                  className="embeddable-buttondown-form  flex h-9 gap-1"
+                >
+                  <input
+                    type="email"
+                    name="email"
+                    id="bd-email"
+                    placeholder="email"
+                    required
+                  />
+                  <ButtonSecondary content="Subscribe!" type="submit" />
+                </form>
+              </div>
+            </div>
+          </div>
+
+          {/* end main content wrapper  */}
         </div>
+
         {/* END LANDING WRAPPER */}
       </div>
-      <hr className=" border-grey-80" />
-      <div className="text-grey-55 flex flex-row gap-2 px-2 text-sm italic">
-        <Link href="/privacy" className="hover:text-accent-blue">
-          privacy policy
-        </Link>{" "}
-        |{" "}
-        <Link href="/terms" className="hover:text-accent-blue">
-          terms
-        </Link>
+
+      {/* FOOTER */}
+
+      <Divider />
+
+      <div className="flex  flex-row justify-between gap-4">
+        <div className="flex flex-col gap-1 px-4 py-2 text-sm text-grey-55 sm:flex-row sm:gap-2">
+          <Link href="/privacy" className=" w-max hover:text-accent-blue">
+            privacy policy
+          </Link>{" "}
+          {!isMobile ? <span className="text-grey-80">|</span> : null}
+          <Link href="/terms" className="hover:text-accent-blue">
+            terms
+          </Link>
+        </div>
+        <div className="px-4 py-2 text-right text-sm text-grey-55">
+          <p className="">
+            Questions? {isMobile ? <br /> : null}
+            <a
+              href="mailto:contact@hyperlink.academy"
+              className="text-accent-blue hover:text-grey-55"
+            >
+              Send us a note
+            </a>{" "}
+            ✨🌱
+          </p>
+        </div>
       </div>
-    </>
+    </div>
   );
 }
 
-const Features = () => {
-  let [activeVideo, setActiveVideo] = useState("");
+const StudioItem = (props: {
+  name: string;
+  description: string;
+  image: string;
+  alt: string;
+  url: string;
+}) => {
   return (
-    <div>
-      <Feature
-        name="Spaces"
-        setActiveVideo={() => {
-          setActiveVideo(activeVideo === "spaces" ? "" : "spaces");
-        }}
-        description="containers for structured social activity"
-        buttonClass={`${styles.cardAnimation0} hover:bg-[#fffaff]`}
-        positionClass="absolute right-[0] left-[0] top-[-185px] z-50"
+    <div className="relative flex basis-1/3 flex-col rounded-md border border-grey-80 bg-white p-3 pb-2">
+      <div className="flex h-full flex-col">
+        <p className="font-bold text-grey-35">{props.name}</p>
+        <p className="grow pb-2 text-sm italic text-grey-55">
+          {props.description}
+        </p>
+      </div>
+
+      <Link
+        href={props.url}
+        className="flex items-center gap-2 text-sm text-accent-blue hover:underline"
+      >
+        <ButtonLink content="browse" />
+        <GoToPageLined />
+      </Link>
+      <Image
+        src={props.image}
+        alt={props.alt}
+        width={132}
+        height={160}
+        className="absolute -bottom-[24px] -right-[32px]"
       />
-      <Feature
-        name="Cards"
-        setActiveVideo={() => {
-          setActiveVideo(activeVideo === "cards" ? "" : "cards");
-        }}
-        description="represent meaningful things—questions, tasks, ideas…"
-        buttonClass={`${styles.cardAnimation1} hover:bg-[#fffdf8]`}
-        positionClass="absolute right-[0px] top-[-100px] z-50"
-      />
-      <Feature
-        name="Rooms"
-        setActiveVideo={() => {
-          setActiveVideo(activeVideo === "rooms" ? "" : "rooms");
-        }}
-        description="organize & work with things"
-        buttonClass={`${styles.cardAnimation2} hover:bg-[#fff9f9]`}
-        positionClass="absolute left-[8px] sm:left-[-20px] top-[-20px] z-50"
-      />
-      <Feature
-        name="Discussions"
-        setActiveVideo={() => {
-          setActiveVideo(activeVideo === "discussions" ? "" : "discussions");
-        }}
-        description="talk about things in focused contexts"
-        buttonClass={`${styles.cardAnimation3} hover:bg-[#f9f9fd]`}
-        positionClass="absolute right-[20px] bottom-[-28px] z-50"
-      />
-      <Feature
-        name="Members"
-        setActiveVideo={() => {
-          setActiveVideo(activeVideo === "members" ? "" : "members");
-        }}
-        description="invite friends to join"
-        buttonClass={`${styles.cardAnimation4} hover:bg-[#fafffa]`}
-        positionClass="absolute left-2 sm:left-0 bottom-[-88px] z-50"
-      />
-      {activeVideo && (
-        <div className="absolute bottom-0 left-0 right-0 top-0 z-50 m-auto flex h-fit w-[90%] flex-col items-center gap-2 rounded-md border shadow-lg">
-          <video
-            key={activeVideo}
-            className="rounded-md shadow-lg"
-            autoPlay
-            loop
-            muted
-            playsInline
-          >
-            <source src={`/video/${activeVideo}.webm`} type="video/webm" />
-            <source src={`/video/${activeVideo}.mp4`} type="video/mp4" />
-          </video>
-        </div>
-      )}
     </div>
   );
 };
 
-const DividerSmall = () => (
-  <div className="bg-accent-gold m-auto my-2 rounded-md p-2 sm:my-4 sm:p-4">
-    <div className="bg-accent-red rounded-md p-2 sm:p-4">
-      <div className="bg-accent-blue rounded-md p-1 sm:p-2"></div>
-    </div>
-  </div>
-);
-
-const Feature = (props: {
+const FeatureListItem = (props: {
   name: string;
   description: string;
-  buttonClass: string;
-  positionClass: string;
-  setActiveVideo: () => void;
-}) => (
-  <div className={props.positionClass}>
-    <button
-      className={`${props.buttonClass} w-56 rounded-md border bg-white p-2 text-sm`}
-      onClick={() => props.setActiveVideo()}
+  icon: React.ReactElement;
+}) => {
+  return (
+    <div className="flex w-64 flex-col items-center gap-2 p-2 text-center text-grey-35 sm:p-4">
+      {props.icon}
+      <div className="flex flex-col gap-1">
+        <p className="text-grey-35">
+          <strong>{props.name}</strong>
+        </p>
+        <p className="text-grey-55">{props.description}</p>
+      </div>
+    </div>
+  );
+};
+
+const SubscribeModal = (props: { open: boolean; onClose: () => void }) => {
+  if (!props.open) return null;
+  return createPortal(
+    <Modal
+      open={props.open}
+      onClose={() => props.onClose()}
+      header="Subscribe to our Newsletter"
     >
-      <p>
-        <strong>{props.name}</strong>
+      <p className="font-bold">
+        Drop your email, we&apos;ll keep you in the loop!
       </p>
-      <p>{props.description}</p>
-    </button>
-  </div>
-);
+      <p>
+        We send updates 1–2x / month about new features & experiments;
+        we&apos;ll never spam or share your email
+      </p>
+      <form
+        action="https://buttondown.email/api/emails/embed-subscribe/hyperlink"
+        method="post"
+        target="popupwindow"
+        onSubmit={async () => {
+          window.open("https://buttondown.email/hyperlink", "popupwindow");
+        }}
+        className="embeddable-buttondown-form  flex h-9 w-full gap-2"
+      >
+        <input
+          className="grow"
+          type="email"
+          name="email"
+          id="bd-email"
+          placeholder="email"
+          required
+        />
+        <ButtonPrimary content="Subscribe!" type="submit" />
+      </form>
+    </Modal>,
+    document.body
+  );
+};
+
+const FancyDivider = () => {
+  let isMobile = useIsMobile();
+  if (isMobile) {
+    return (
+      <svg
+        width="219"
+        height="30"
+        viewBox="0 0 219 30"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M215.001 4C205.895 4 197.463 14.692 197.463 14.692C197.463 14.692 189.03 25.3839 179.924 25.3839C170.819 25.3839 162.386 14.692 162.386 14.692C162.386 14.692 153.953 4.00001 144.848 4.00001C135.742 4.00001 127.309 14.692 127.309 14.692M4.53906 4.00001C13.6446 4.00001 22.0773 14.692 22.0773 14.692C22.0773 14.692 30.5101 25.3839 39.6156 25.3839C48.7211 25.3839 57.1539 14.692 57.1539 14.692C57.1539 14.692 65.5866 4 74.6921 4C83.7976 4 92.2304 14.692 92.2304 14.692C92.2304 14.692 100.664 25.3839 109.769 25.3839C118.875 25.3839 127.308 14.6919 127.308 14.6919"
+          stroke="currentColor"
+          strokeWidth="8"
+          strokeLinecap="round"
+        />
+      </svg>
+    );
+  } else
+    return (
+      <svg
+        width="560"
+        height="32"
+        viewBox="0 0 560 32"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M4 16C4 16 13.4644 4.00001 23.6839 4.00001C33.9034 4.00001 43.3678 16 43.3678 16C43.3678 16 52.8322 28 63.0517 28C73.2712 28 82.7356 16 82.7356 16C82.7356 16 92.2 4 102.419 4C112.639 4 122.103 16 122.103 16C122.103 16 131.569 28 141.788 28C152.007 28 161.472 16 161.472 16M318.948 16C318.948 16 328.413 4.00001 338.632 4.00001C348.851 4.00001 358.316 16 358.316 16C358.316 16 367.78 28 378 28C388.219 28 397.684 16 397.684 16C397.684 16 407.148 4 417.368 4C427.587 4 437.051 16 437.051 16C437.051 16 446.517 28 456.736 28C466.956 28 476.42 16 476.42 16M161.474 16C161.474 16 170.938 4.00001 181.158 4.00001C191.377 4.00001 200.842 16 200.842 16C200.842 16 210.306 28 220.526 28C230.745 28 240.21 16 240.21 16C240.21 16 249.674 4 259.894 4C270.113 4 279.577 16 279.577 16C279.577 16 289.043 28 299.262 28C309.482 28 318.946 16 318.946 16M476.422 16C476.422 16 485.887 4.00001 496.106 4.00001C506.326 4.00001 515.79 16 515.79 16C515.79 16 525.254 28 535.474 28C545.693 28 555.158 16 555.158 16"
+          stroke="currentColor"
+          strokeWidth="8"
+          strokeLinecap="round"
+        />
+      </svg>
+    );
+};

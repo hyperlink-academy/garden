@@ -21,6 +21,7 @@ export function SignupPageForm() {
   >("valid");
   let [data, setData] = useState({
     username: "",
+    where_did_you_find_us: "",
   });
 
   useDebouncedEffect(
@@ -50,6 +51,7 @@ export function SignupPageForm() {
     setStatus("loading");
     let res = await workerAPI(WORKER_URL, "signup", {
       username: data.username,
+      where_did_you_find_us: data.where_did_you_find_us,
       tokens,
     });
     if (!res.success) {
@@ -134,6 +136,30 @@ export function SignupPageForm() {
                     Sorry, that username is not available!
                   </p>
                 ) : null}
+              </div>
+            </label>
+
+            {/* where did you find us? */}
+            <label className="grid-flow-rows grid gap-2 font-bold">
+              <div className="flex flex-col gap-1">
+                Where&apos;d you find us?
+                <p className="text-sm font-normal text-grey-55">
+                  optional, but super helpful!
+                </p>
+              </div>
+              <div className="flex flex-col gap-1">
+                <input
+                  className="font-normal"
+                  type="text"
+                  title="Where did you find us?"
+                  value={data.where_did_you_find_us}
+                  onChange={(e) =>
+                    setData({
+                      ...data,
+                      where_did_you_find_us: e.currentTarget.value,
+                    })
+                  }
+                />
               </div>
             </label>
           </div>

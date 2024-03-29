@@ -31,7 +31,7 @@ export const Autocomplete = (props: {
           onOpenAutoFocus={(e) => e.preventDefault()}
           className="z-10 max-h-32 w-64 overflow-y-scroll rounded-md border border-grey-80 bg-white py-0 text-grey-35"
         >
-          <ul className="text-sm">
+          <ul className="list-none p-0 text-sm">
             {props.suggestions.map((result, index) => {
               return (
                 <ListItem

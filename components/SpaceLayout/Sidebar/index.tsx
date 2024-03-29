@@ -1,7 +1,7 @@
 "use client";
 import { db, useMutations } from "hooks/useReplicache";
 import { useState } from "react";
-import { BellSmall, RoomCalendar, UnreadDot } from "../../Icons";
+import { BellTiny, RoomCalendar, UnreadDot } from "../../Icons";
 import { EditRoomModal } from "./RoomListLayout";
 import { SharedRoomList } from "./SharedRoomList";
 import { useSpaceData } from "hooks/useSpaceData";
@@ -66,7 +66,7 @@ const UnreadsRoomButton = () => {
           <UnreadDot />
         </div>
       ) : null}
-      <BellSmall /> Unreads
+      <BellTiny /> Unreads
     </RoomButton>
   );
 };

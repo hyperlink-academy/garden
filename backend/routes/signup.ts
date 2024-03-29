@@ -7,6 +7,7 @@ export const SignupRoute = makeRoute({
   route: "signup",
   input: z.object({
     username: z.string().min(3),
+    where_did_you_find_us: z.string().optional(),
     tokens: z.object({ access_token: z.string(), refresh_token: z.string() }),
   }),
   handler: async (msg, env: Bindings) => {
@@ -46,6 +47,7 @@ export const SignupRoute = makeRoute({
       id: session.user.id,
       studio: newSpaceID.toString(),
       username,
+      where_did_you_find_us: msg.where_did_you_find_us,
     });
 
     if (error)

@@ -118,13 +118,13 @@ export const FindOrCreate = (props: {
           }}
           as="div"
           className={`
-              border-grey-80
-              shadow-drop relative z-10
-              mx-auto
-              mb-20
-              mt-10 flex h-fit
-              max-h-[calc(100vh-160px)] w-[calc(100vw-2.5rem)] max-w-md
-              flex-col items-stretch rounded-md border bg-white
+              relative
+              z-10 mx-auto mb-20
+              mt-10
+              flex
+              h-fit max-h-[calc(100vh-160px)] w-[calc(100vw-2.5rem)]
+              max-w-md flex-col items-stretch
+              rounded-md border border-grey-80 bg-white shadow-drop
               `}
         >
           {({ activeOption }) => (
@@ -153,19 +153,19 @@ export const FindOrCreate = (props: {
               {/* if isMultiselect = true, take all the stuff in the added[] and display it at the top, with a submit button. If not, show nothing! */}
               {isMultiSelect.current === false ? (
                 <div className="mx-3 mb-2 mt-2">
-                  <span className="text-grey-55 hidden text-sm italic sm:block">
+                  <span className="hidden text-sm italic text-grey-55 sm:block">
                     SHIFT + click to select multiple cards!
                   </span>
-                  <span className="text-grey-55 text-sm italic sm:hidden">
+                  <span className="text-sm italic text-grey-55 sm:hidden">
                     longpress to select multiple cards!
                   </span>
                 </div>
               ) : (
                 <div className="addedList mx-3 mb-3 mt-2 flex flex-col gap-2">
                   {addedItemsList === false ? null : (
-                    <ul className="lightBorder no-scrollbar bg-bg-blue flex flex-col gap-2 p-2">
+                    <div className="lightBorder no-scrollbar flex flex-col gap-2 bg-bg-blue p-2">
                       {added.length === 0 ? (
-                        <div className="text-grey-55 italic">
+                        <div className="italic text-grey-55">
                           no cards selected yet!
                         </div>
                       ) : (
@@ -181,11 +181,11 @@ export const FindOrCreate = (props: {
                           />
                         ))
                       )}
-                    </ul>
+                    </div>
                   )}
                   <div className="addedListActions grid grid-cols-[auto_max-content] items-center">
                     <button
-                      className="text-grey-55 hover:text-accent-blue text-left"
+                      className="text-left text-grey-55 hover:text-accent-blue"
                       onClick={() => {
                         setAddedItemsList(!addedItemsList);
                       }}
@@ -207,7 +207,7 @@ export const FindOrCreate = (props: {
               <Divider />
               <Combobox.Options
                 static
-                className="flex h-min w-full flex-col gap-0 overflow-y-auto pb-2 pt-2"
+                className="flex h-min w-full list-none flex-col gap-0 overflow-y-auto px-0 pb-2 pt-2"
               >
                 {!input && !props.allowBlank ? null : (
                   <CreateButton
@@ -365,11 +365,11 @@ const CreateButton = (props: {
             >
               {!props.inputExists || props.value === "" ? (
                 <div
-                  className={`text-accent-blue flex
-                          w-full flex-grow
-                          cursor-pointer flex-row justify-between
-                          p-1
-                          font-bold`}
+                  className={`flex w-full
+                          flex-grow cursor-pointer
+                          flex-row justify-between p-1
+                          font-bold
+                          text-accent-blue`}
                 >
                   <div className="flex flex-row gap-2">
                     <AddSmall />
@@ -382,9 +382,9 @@ const CreateButton = (props: {
                 </div>
               ) : (
                 <div
-                  className={`text-grey-55 grid
-                          w-full grid-cols-[min-content_auto]
-                          gap-2 p-1 font-bold`}
+                  className={`grid w-full
+                          grid-cols-[min-content_auto] gap-2
+                          p-1 font-bold text-grey-55`}
                 >
                   <AddSmall />
                   <div>{`"${props.value}"`} already exists</div>
@@ -438,19 +438,19 @@ const SearchResult = (
               }}
               className={`searchResult  my-[2px] grid select-none grid-cols-[min-content_auto_min-content] gap-2 rounded-md  px-1 py-0.5 ${
                 props.disabled
-                  ? "text-grey-80 cursor-default"
+                  ? "cursor-default text-grey-80"
                   : "cursor-pointer"
               }`}
             >
               <div className="searchResultIcon mt-[1px]">{props.icon}</div>
               <div className="searchResultName">{props.display}</div>
               {props.disabled ? (
-                <Checkmark className="searchReultSelectedCheck text-grey-90 mt-[5px] justify-self-end" />
+                <Checkmark className="searchReultSelectedCheck mt-[5px] justify-self-end text-grey-90" />
               ) : props.added ? (
-                <Checkmark className="searchResultAddedCheck text-accent-blue mt-[5px]" />
+                <Checkmark className="searchResultAddedCheck mt-[5px] text-accent-blue" />
               ) : (
                 <div
-                  className="searchResultEmptyCheck text-grey-55 hover:text-accent-blue mt-[5px] h-4 w-4 rounded-full border border-dashed hover:border-2 sm:hidden"
+                  className="searchResultEmptyCheck mt-[5px] h-4 w-4 rounded-full border border-dashed text-grey-55 hover:border-2 hover:text-accent-blue sm:hidden"
                   onClick={() => props.setMultiSelect()}
                 />
               )}
