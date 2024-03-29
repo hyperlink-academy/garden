@@ -2,7 +2,7 @@
 import { Divider } from "components/Layout";
 import { Sidebar } from "components/SpaceLayout";
 import {
-  BellSmall,
+  BellTiny,
   RoomCalendar,
   RoomCanvas,
   RoomChat,
@@ -253,7 +253,7 @@ const CollapsedUnreadRoom = () => {
               <UnreadDot />
             </div>
           ) : null}
-          <BellSmall />
+          <BellTiny />
         </div>
       }
     />
