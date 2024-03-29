@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import { sortByPosition } from "src/position_helpers";
 import { db, scanIndex, useMutations, useSpaceID } from "./useReplicache";
 import { useRoom, useSetRoom, useUIState } from "./useUIState";
 import { useSearchParams } from "next/navigation";
@@ -10,19 +9,7 @@ export const useSpaceSyncState = () => {
   let room = useRoom();
   let spaceID = useSpaceID();
   let setRoom = useSetRoom();
-  let setRoomWithoutHistory = useUIState((s) => s.setRoom);
   let openCardWithoutHistory = useUIState((s) => s.openCard);
-
-  let firstRoom = db
-    .useAttribute("room/name")
-    .sort(sortByPosition("roomList"))[0]?.entity;
-  let r = useUIState((state) =>
-    spaceID ? state.spaces[spaceID]?.activeRoom : null
-  );
-
-  useEffect(() => {
-    if (!r && firstRoom) setRoom(firstRoom);
-  }, [r, firstRoom, setRoom]);
 
   let openCard = query?.get("openCard");
   useEffect(() => {
@@ -49,15 +36,4 @@ export const useSpaceSyncState = () => {
       })();
     }
   }, [rep, openCard, room, spaceID, openCardWithoutHistory, setRoom]);
-
-  useEffect(() => {
-    if (!spaceID) return;
-    let storedRoom = window.localStorage.getItem(`space/${spaceID}/room`);
-    if (storedRoom) setRoomWithoutHistory(spaceID, storedRoom);
-  }, [spaceID, setRoomWithoutHistory]);
-
-  useEffect(() => {
-    if (room && spaceID)
-      window.localStorage.setItem(`space/${spaceID}/room`, room);
-  }, [room, spaceID]);
 };

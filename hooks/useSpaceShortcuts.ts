@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useOpenCard, useRoom, useSetRoom, useUIState } from "./useUIState";
 import { db, scanIndex, useMutations, useSpaceID } from "./useReplicache";
 import { sortByPosition } from "src/position_helpers";
@@ -13,7 +13,15 @@ export function useSpaceShortcuts() {
 export function useRoomShortcuts() {
   let currentRoom = useRoom();
   let setRoom = useSetRoom();
-  let rooms = db.useAttribute("room/name").sort(sortByPosition("roomList"));
+  let spaceRooms = db
+    .useAttribute("room/name")
+    .sort(sortByPosition("roomList"));
+  let { memberEntity } = useMutations();
+  let rooms = useMemo(() => {
+    let allRooms = [{ entity: "calendar" }, ...spaceRooms];
+    if (memberEntity) allRooms.unshift({ entity: "unreads" });
+    return allRooms;
+  }, [spaceRooms, memberEntity]);
   useEffect(() => {
     let listener = (e: KeyboardEvent) => {
       if (

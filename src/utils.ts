@@ -47,7 +47,7 @@ export function focusElement(element: () => HTMLElement | null) {
   }
 
   setTimeout(() => {
-    element()?.focus();
+    element()?.focus({ preventScroll: true });
     fakeInput?.remove();
-  }, 50);
+  }, 500);
 }

@@ -10,7 +10,6 @@ import {
 } from "./Icons";
 import { Divider } from "./Layout";
 import { useSpaceData } from "hooks/useSpaceData";
-import { RoomWrapper } from "./RoomLayout";
 import { Disclosure } from "@headlessui/react";
 
 export function CalendarRoom() {
@@ -51,94 +50,76 @@ export function CalendarRoom() {
   let daysFuture = days.filter((d) => d > nextWeekString);
 
   return (
-    <RoomWrapper>
-      <div className="calendarCardList flex flex-col gap-2">
-        {daysPast.length > 0 && (
-          <Disclosure as="div" className="flex w-full flex-col gap-4">
-            {({ open }) => (
-              <>
-                <Disclosure.Button
-                  className={`flex w-full items-center justify-between gap-2 text-left focus:outline-none focus-visible:ring focus-visible:ring-accent-blue`}
-                >
-                  <h3>Past</h3>
-                  {!open ? (
-                    <DisclosureExpandTiny />
-                  ) : (
-                    <DisclosureCollapseTiny />
-                  )}
-                </Disclosure.Button>
-                <Disclosure.Panel>
-                  <div className="calendarItemWrapper flex flex-col gap-4">
-                    <CalendarList
-                      days={daysPast}
-                      datesWithCards={datesWithCards}
-                    />
-                  </div>
-                </Disclosure.Panel>
-              </>
-            )}
-          </Disclosure>
-        )}
+    <div className="calendarRoom no-scrollbar mx-2 mt-0 flex h-full w-[302px] flex-col items-stretch gap-2 overflow-x-hidden overflow-y-scroll text-sm sm:m-4  sm:mt-0 ">
+      {daysPast.length > 0 && (
+        <Disclosure as="div" className="flex w-full flex-col gap-4">
+          {({ open }) => (
+            <>
+              <Disclosure.Button
+                className={`flex w-full items-center justify-between gap-2 text-left focus:outline-none focus-visible:ring focus-visible:ring-accent-blue`}
+              >
+                <h3>Past</h3>
+                {!open ? <DisclosureExpandTiny /> : <DisclosureCollapseTiny />}
+              </Disclosure.Button>
+              <Disclosure.Panel>
+                <div className="calendarItemWrapper flex flex-col gap-4">
+                  <CalendarList
+                    days={daysPast}
+                    datesWithCards={datesWithCards}
+                  />
+                </div>
+              </Disclosure.Panel>
+            </>
+          )}
+        </Disclosure>
+      )}
 
-        {daysThisWeek.length > 0 && (
-          <Disclosure
-            as="div"
-            defaultOpen
-            className="flex w-full flex-col gap-4"
-          >
-            {({ open }) => (
-              <>
-                <Disclosure.Button
-                  className={`flex w-full items-center justify-between gap-2 text-left focus:outline-none focus-visible:ring focus-visible:ring-accent-blue`}
-                >
-                  <h3>This Week</h3>
-                  {!open ? (
-                    <DisclosureExpandTiny />
-                  ) : (
-                    <DisclosureCollapseTiny />
-                  )}
-                </Disclosure.Button>
-                <Disclosure.Panel>
-                  <div className="calendarItemWrapper flex flex-col gap-4">
-                    <CalendarList
-                      days={daysThisWeek}
-                      datesWithCards={datesWithCards}
-                    />
-                  </div>
-                </Disclosure.Panel>
-              </>
-            )}
-          </Disclosure>
-        )}
+      {daysThisWeek.length > 0 && (
+        <Disclosure as="div" defaultOpen className="flex w-full flex-col gap-4">
+          {({ open }) => (
+            <>
+              <Disclosure.Button
+                className={`flex w-full items-center justify-between gap-2 text-left focus:outline-none focus-visible:ring focus-visible:ring-accent-blue`}
+              >
+                <h3>This Week</h3>
+                {!open ? <DisclosureExpandTiny /> : <DisclosureCollapseTiny />}
+              </Disclosure.Button>
+              <Disclosure.Panel>
+                <div className="calendarItemWrapper flex flex-col gap-4">
+                  <CalendarList
+                    days={daysThisWeek}
+                    datesWithCards={datesWithCards}
+                  />
+                </div>
+              </Disclosure.Panel>
+            </>
+          )}
+        </Disclosure>
+      )}
 
-        {daysFuture.length > 0 && (
-          <Disclosure as="div" className="flex w-full flex-col gap-4">
-            {({ open }) => (
-              <>
-                <Disclosure.Button
-                  className={`flex w-full items-center justify-between gap-2 text-left focus:outline-none focus-visible:ring focus-visible:ring-accent-blue`}
-                >
-                  <h3>Future</h3>
-                  {!open ? (
-                    <DisclosureExpandTiny />
-                  ) : (
-                    <DisclosureCollapseTiny />
-                  )}
-                </Disclosure.Button>
-                <Disclosure.Panel>
-                  <div className="calendarItemWrapper flex flex-col gap-4">
-                    <CalendarList
-                      days={daysFuture}
-                      datesWithCards={datesWithCards}
-                    />
-                  </div>
-                </Disclosure.Panel>
-              </>
-            )}
-          </Disclosure>
-        )}
-      </div>
-    </RoomWrapper>
+      {daysFuture.length > 0 && (
+        <Disclosure as="div" className="flex w-full flex-col gap-4">
+          {({ open }) => (
+            <>
+              <Disclosure.Button
+                className={`flex w-full items-center justify-between gap-2 text-left focus:outline-none focus-visible:ring focus-visible:ring-accent-blue`}
+              >
+                <h3>Future</h3>
+                {!open ? <DisclosureExpandTiny /> : <DisclosureCollapseTiny />}
+              </Disclosure.Button>
+              <Disclosure.Panel>
+                <div className="calendarItemWrapper flex flex-col gap-4">
+                  <CalendarList
+                    days={daysFuture}
+                    datesWithCards={datesWithCards}
+                  />
+                </div>
+              </Disclosure.Panel>
+            </>
+          )}
+        </Disclosure>
+      )}
+    </div>
   );
 }
 

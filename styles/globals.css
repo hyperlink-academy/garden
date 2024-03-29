@@ -254,11 +254,15 @@ ol {
 }
 
 .pwa-padding {
-  padding-top: env(safe-area-inset-top) !important;
+  padding-top: max(env(safe-area-inset-top), 8px) !important;
 }
 
 .pwa-padding-bottom {
-  padding-bottom: env(safe-area-inset-bottom) !important;
+  padding-bottom: max(env(safe-area-inset-bottom), 8px) !important;
+}
+
+.footer-padding {
+  padding-bottom: calc(max(env(safe-area-inset-bottom), 8px) + 32px);
 }
 
 .pwa-margin {
@@ -274,4 +278,26 @@ ol {
 
 .safari-pwa-height {
   height: 100lvh !important;
+}
+:root {
+  --sat: env(safe-area-inset-top);
+  --sar: env(safe-area-inset-right);
+  --sab: env(safe-area-inset-bottom);
+  --sal: env(safe-area-inset-left);
+}
+
+@keyframes blink_input_opacity_to_prevent_scrolling_when_focus {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+input:focus {
+  animation: blink_input_opacity_to_prevent_scrolling_when_focus 0.01s;
+}
+textarea:focus {
+  animation: blink_input_opacity_to_prevent_scrolling_when_focus 0.01s;
 }

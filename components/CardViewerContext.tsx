@@ -12,6 +12,7 @@ import { CardView } from "./CardView";
 import { focusElement } from "src/utils";
 import { useIsMobile } from "hooks/utils";
 import { useAuth } from "hooks/useAuth";
+import { useSidebarState } from "app/(app)/@sidebar/SidebarState";
 
 export const useCardViewer = () => {
   let spaceID = useSpaceID();
@@ -90,9 +91,11 @@ export function CardViewer(props: { space_id: string }) {
   useAppEventListener(
     "cardviewer.open-card",
     () => {
-      document
-        .getElementById("space-layout")
-        ?.scrollTo({ behavior: "smooth", left: 5000 });
+      setTimeout(() => {
+        document
+          .getElementById("appLayout")
+          ?.scrollTo({ behavior: "smooth", left: 5000 });
+      }, 50);
     },
     []
   );
@@ -102,32 +105,38 @@ export function CardViewer(props: { space_id: string }) {
   }, []);
   let removeCardFromRoomHistory = useRemoveCardFromRoomHistory();
   let isMobile = useIsMobile();
+  let { open } = useSidebarState();
   if (!render) return null;
   if (!history[0] && isMobile) return null;
 
   return (
-    <div
-      ref={cardViewerRef}
-      id="cardViewerWrapper"
-      className={`cardViewerWrapper 
+    <>
+      <div
+        ref={cardViewerRef}
+        id="cardViewerWrapper"
+        className={`cardViewerWrapper
           flex  h-full w-[calc(100vw-16px)] max-w-3xl
-          shrink-0 touch-pan-x        
+          shrink-0 touch-pan-x
           snap-center snap-always flex-col
-          items-stretch 
-          focus:outline-none sm:w-[calc(100vw-32px)] md:shrink`}
-    >
-      {room && history[0] ? (
-        <CardView
-          entityID={history[0]}
-          key={history[0]}
-          onDelete={() => {
-            removeCardFromRoomHistory({ cardEntity: history[0], room });
-          }}
-        />
-      ) : (
-        <EmptyState roomType={roomType} />
-      )}
-    </div>
+          items-stretch
+          focus:outline-none
+          sm:w-[calc(100vw-100px)] ${
+            !open ? "md:w-[calc(100vw-448px)]" : "md:w-[calc(100vw-670px)]"
+          } md:shrink`}
+      >
+        {room && history[0] ? (
+          <CardView
+            entityID={history[0]}
+            key={history[0]}
+            onDelete={() => {
+              removeCardFromRoomHistory({ cardEntity: history[0], room });
+            }}
+          />
+        ) : (
+          <EmptyState roomType={roomType} />
+        )}
+      </div>
+    </>
   );
 }
 

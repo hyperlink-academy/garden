@@ -1,3 +1,4 @@
+"use client";
 import { Dialog, Menu, Transition } from "@headlessui/react";
 import React, { Fragment } from "react";
 
@@ -6,17 +7,19 @@ export const Divider = (props: {
   vertical?: boolean;
   mx?: number;
   my?: number;
+  dashed?: boolean;
 }) => {
   return (
     <div
-      className={` border-l border-t ${
-        props.dark ? `border-grey-55` : `border-grey-80`
-      } ${props.vertical ? "100vh w-[1px]" : "h-[1px] w-full"}
+      className={`border-l border-t
+        ${props.dark ? `border-grey-55` : `border-grey-80`}
+        ${props.vertical ? "100vh w-[1px]" : "h-[1px] w-full"}
+        ${props.dashed ? "border-dashed" : ""}
       `}
       style={{
         margin: `${props.my || 0}px ${props.mx || 0}px ${props.my || 0}px ${
           props.mx || 0
-        }px`,
+        } px`,
       }}
     ></div>
   );
@@ -58,10 +61,10 @@ export const ModalFixedHeight: React.FC<
       <Dialog.Overlay className={props.dark ? "dark-overlay" : "overlay"} />
       <FloatingContainer
         className={`
-              fixed left-1/2 top-1/2 grid h-[calc(100%-32px)] w-[calc(100%-32px)] ${
-                props.width ? props.width : "max-w-md"
-              } -translate-x-1/2 -translate-y-1/2 grid-flow-row content-start gap-4 overflow-auto
-              `}
+          fixed left-1/2 top-1/2 grid h-[calc(100%-32px)] w-[calc(100%-32px)] ${
+            props.width ? props.width : "max-w-md"
+          } -translate-x-1/2 -translate-y-1/2 grid-flow-row content-start gap-4 overflow-auto
+        `}
       >
         {props.children}
       </FloatingContainer>
@@ -83,16 +86,16 @@ export const LightBoxModal: React.FC<
         // override default FloatingContainer border and padding!
         // also change to max-w + w-max, better for narrow images
         className={`
-              fixed left-1/2 top-1/2 grid max-h-[calc(100%-100px)]
-              w-max
-              max-w-[calc(100%-50px)]
-              -translate-x-1/2
-              -translate-y-1/2 grid-flow-row
-              gap-4
-              overflow-auto
-              border-none
-              px-0 py-0
-              `}
+          fixed left-1/2 top-1/2 grid max-h-[calc(100%-100px)]
+          w-max
+          max-w-[calc(100%-50px)]
+          -translate-x-1/2
+          -translate-y-1/2 grid-flow-row
+          gap-4
+          overflow-auto
+          border-none
+          px-0 py-0
+          `}
       >
         {props.children}
       </FloatingContainer>
@@ -115,17 +118,17 @@ export const MenuContainer: React.FC<
     >
       <Menu.Items
         className={`
-            border-grey-80 shadow-drop absolute
-            right-0 z-40
-            flex w-max
-            origin-top-right flex-col
-            justify-items-end
-            rounded-md
-            border
-            bg-white
-            py-2
-            text-right
-            ${props.className}`}
+        border-grey-80 shadow-drop absolute
+        right-0 z-40
+        flex w-max
+        origin-top-right flex-col
+        justify-items-end
+        rounded-md
+        border
+        bg-white
+        py-2
+        text-right
+        ${props.className}`}
       >
         {props.children}
       </Menu.Items>
@@ -149,7 +152,7 @@ export const MenuItem: React.FC<
             props?.disabled
               ? "text-grey-80 line-through hover:bg-transparent"
               : ""
-          }`}
+          } `}
           style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
           onClick={(e) => props.onClick?.(e)}
           disabled={props?.disabled}

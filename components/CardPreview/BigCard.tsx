@@ -1,4 +1,3 @@
-import { Backlinks } from "components/CardView/Backlinks";
 import { SingleReactionPreview } from "components/CardView/Reactions";
 import { SingleTextSection } from "components/CardView/Sections";
 import { useCardViewer } from "components/CardViewerContext";
@@ -13,7 +12,6 @@ import { db, useMutations } from "hooks/useReplicache";
 import { useUIState } from "hooks/useUIState";
 import { Props } from "./index";
 import { focusElement } from "src/utils";
-import { isUrl } from "src/isUrl";
 import { LinkPreviewCondensed } from "components/LinkPreview";
 
 export const BigCardBody = (
@@ -57,6 +55,7 @@ export const BigCardBody = (
       }} //no tailwind equiv - need for long titles to wrap
       onClick={(e) => {
         // if card is clicked (and its not in edit mode), open that card in cardView.
+        console.log("yo?");
         if (editing) return;
         if (e.defaultPrevented) return;
         open({ entityID: props.entityID });
@@ -112,6 +111,7 @@ export const BigCardBody = (
                     : "transparent",
               }}
               entityID={props.entityID}
+              fallback={props.data.title?.value}
               section={props.data.member ? "member/name" : "card/title"}
               placeholder="Untitled"
               previewOnly={!editing || !!props.data.member}
@@ -150,12 +150,13 @@ export const BigCardBody = (
                 props.data.isMember &&
                 !props.hideContent &&
                 props.data.content?.value
-                  ? "text-accent-red rounded-md bg-white pt-2"
+                  ? "rounded-md bg-white pt-2 text-accent-red"
                   : ""
               }`}
             >
               {!props.hideContent && (
                 <SingleTextSection
+                  fallback={props.data.content?.value}
                   autocompleteCardNames
                   focusText={props.focusText}
                   placeholder={editing ? "write something…" : ""}
@@ -197,7 +198,7 @@ export const BigCardBody = (
                 className={`cardPreviewComments relative rounded-md border ${
                   props.unreadDiscussions
                     ? "unreadCardGlow text-accent-blue hover:bg-accent-blue hover:text-background"
-                    : "text-grey-55 hover:border-accent-blue hover:bg-bg-blue hover:text-accent-blue border-transparent"
+                    : "border-transparent text-grey-55 hover:border-accent-blue hover:bg-bg-blue hover:text-accent-blue"
                 } `}
                 onClick={() => {
                   if (!props.entityID) return;
@@ -239,7 +240,7 @@ export const BigCardBody = (
                         );
                       })}
                     {props.data.reactions.length > 3 ? (
-                      <span className="text-grey-55 px-1 py-0.5 text-xs">
+                      <span className="px-1 py-0.5 text-xs text-grey-55">
                         {`+${props.data.reactions.length - 3}`}
                       </span>
                     ) : (
@@ -287,7 +288,7 @@ export const BigCardBody = (
                     style={{
                       backgroundColor: cardBackgroundColor,
                     }}
-                    className="cardPreviewRemove text-grey-80 hover:text-accent-blue h-fit rounded-md p-0.5"
+                    className="cardPreviewRemove h-fit rounded-md p-0.5 text-grey-80 hover:text-accent-blue"
                     onClick={(e) => {
                       e.stopPropagation();
                       props.onDelete?.();

@@ -327,7 +327,7 @@ const BackButton = () => {
         closeCard();
         if (history.length < 2) {
           document
-            .getElementById("space-layout")
+            .getElementById("appLayout")
             ?.scrollTo({ behavior: "smooth", left: 0 });
         }
       }}

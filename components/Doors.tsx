@@ -150,12 +150,12 @@ const SoftGlowFilter = (
     {/* <!-- Thicken out the original shape --> */}
     <feMorphology
       operator="dilate"
-      radius="4"
+      radius="2"
       in="SourceAlpha"
       result="thicken"
     />
     {/* <!-- Use a gaussian blur to create the soft blurriness of the glow --> */}
-    <feGaussianBlur in="thicken" stdDeviation="16" result="blurred" />
+    <feGaussianBlur in="thicken" stdDeviation="6" result="blurred" />
     {/* <!-- Change the colour --> */}
     <feFlood floodColor="#ffd700" result="glowColor" />
     {/* <!-- Color in the glows --> */}

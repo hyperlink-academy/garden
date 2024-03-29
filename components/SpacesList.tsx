@@ -58,8 +58,6 @@ export const SpaceCard = (
 
 export const BaseSpaceCard = (props: Parameters<typeof SpaceCard>[0]) => {
   let { session } = useAuth();
-  let { authorized } = useMutations();
-  let now = getCurrentDate();
 
   let data = props;
   let unreads = data?.user_space_unreads?.find(
@@ -107,3 +105,45 @@ export const BaseSpaceCard = (props: Parameters<typeof SpaceCard>[0]) => {
     </div>
   );
 };
+
+export function SmallSpaceCard(props: Parameters<typeof SpaceCard>[0]) {
+  let data = props;
+  let { session } = useAuth();
+  let unreads = data?.user_space_unreads?.find(
+    (f) => f.user === session.user?.id
+  )?.unreads;
+  return (
+    <div className="group relative pl-3 pt-4 w-full">
+      <div className="group flex w-full lightBorder flex-col pl-6 p-2">
+        <div
+          className="flex justify-between gap-4"
+          style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
+        >
+          <div
+            className={
+              !data?.display_name ? "italic text-grey-55" : " font-bold"
+            }
+          >
+            {data?.display_name || "space deleted"}
+          </div>
+        </div>
+        <div className=" flex items-center gap-1 place-self-end text-sm italic text-grey-55">
+          <RoomMember />
+          {data.owner.username}{" "}
+          {data.members_in_spaces?.length > 1 && (
+            <div>+ {data.members_in_spaces?.length - 1}</div>
+          )}
+        </div>
+        <div className="absolute left-0 top-0">
+          <DoorImage
+            width="32"
+            display_name={data?.display_name}
+            image={data?.image}
+            default_space_image={data?.default_space_image}
+            glow={!!unreads && unreads > 0}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}

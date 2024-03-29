@@ -15,6 +15,20 @@ import signupSpotIllo from "public/img/spotIllustration/signup.png";
 import loginSpotIllo from "public/img/spotIllustration/login.png";
 import checkMailSpotIllo from "public/img/spotIllustration/checkMail.png";
 
+export const LoginButton = (props: { small?: boolean }) => {
+  let [state, setState] = LoginOrSignupModal.useState("closed");
+  return (
+    <>
+      <ButtonPrimary
+        content="Log In"
+        className={`${props.small && "!py-[1px] !text-sm"}`}
+        onClick={() => setState("login")}
+      />
+      <LoginOrSignupModal state={state} setState={setState} />
+    </>
+  );
+};
+
 export const LoginOrSignupModal = (props: {
   state: "login" | "signup" | "closed";
   setState: (s: "login" | "signup" | "closed") => void;

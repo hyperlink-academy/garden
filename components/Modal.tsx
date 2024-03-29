@@ -40,15 +40,15 @@ export const Modal: React.FC<
         no-scrollbar
         pwa-margin
         pwa-margin-bottom
+        text-grey-35
         fixed
-        left-1/2    
-        z-40 h-max 
-        w-[calc(100%-32px)] 
-        bg-white text-grey-35
-        ${props.width ? props.width : "max-w-md"} 
-        flex 
-        flex-col  gap-3 overflow-y-scroll rounded-md border border-grey-80
-        px-3 py-4 shadow-drop sm:p-4
+        left-1/2 z-40
+        h-max
+        w-[calc(100%-32px)] bg-white
+        ${props.width ? props.width : "max-w-md"}
+        border-grey-80
+        shadow-drop  flex flex-col gap-3 overflow-y-scroll rounded-md
+        border px-3 py-4 sm:p-4
         `}
       >
         {!props.header && props.noCloseButton ? null : (
@@ -56,7 +56,7 @@ export const Modal: React.FC<
             <h3 className="grow">{props.header && props.header}</h3>
             {!props.noCloseButton && (
               <button
-                className="shrink0 grow-0 text-grey-55 hover:text-accent-blue"
+                className="shrink0 text-grey-55 hover:text-accent-blue grow-0"
                 onClick={() => props.onClose()}
               >
                 <CloseLinedTiny />

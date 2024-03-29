@@ -35,10 +35,10 @@ export const DiscussionRoom = (props: {
   return (
     // trying this w/ ~same wrapper as other rooms
     <div
-      className="no-scrollbar flex h-full w-[336px] flex-col items-stretch overflow-x-hidden overflow-y-scroll text-sm "
+      className="no-scrollbar mx-2 mb-2  mt-0 flex h-full  w-[302px] flex-col items-stretch overflow-x-hidden overflow-y-scroll text-sm sm:m-4 sm:mt-0 "
       id="room-wrapper"
     >
-      <div className="discussionRoomHeaderWrapper -mb-3 px-3 sm:px-4">
+      <div className="discussionRoomHeaderWrapper -mb-3">
         <RoomHeader
           totalCount={total}
           filteredCount={cardsFiltered.length}
@@ -55,7 +55,7 @@ export const DiscussionRoom = (props: {
       >
         <Messages entityID={props.entityID} isRoom={props.isRoom} />
       </MessageWindow>
-      <div className="discussionInputWrapper absolute bottom-3 right-0 w-full ">
+      <div className="discussionInputWrapper absolute bottom-0 right-0 w-full ">
         <MessageInput
           entityID={props.entityID}
           allowReact={props.allowReact}
@@ -218,7 +218,7 @@ export const MessageInput = (props: {
       {!session?.loggedIn ? (
         <Login />
       ) : !authorized ? (
-        <div className="messageNonAuth mx-0 flex justify-center rounded-md bg-grey-90 p-2 text-center text-sm italic text-grey-55 group-[.spaceRoomWrapper]:mx-4">
+        <div className="messageNonAuth flex justify-center rounded-md bg-grey-90 p-2 text-center text-sm italic text-grey-55">
           Only members and studiomates can chat!
         </div>
       ) : (
@@ -229,7 +229,7 @@ export const MessageInput = (props: {
               : cardBackgroundColor,
           }}
           className={`flex items-end gap-1 ${
-            props.isRoom ? "px-3 sm:px-4" : ""
+            props.isRoom ? "rounded-lg px-2 pb-3 pt-1 sm:px-4" : ""
           } `}
         >
           <div className="shrink-0 pb-1">
@@ -244,10 +244,7 @@ export const MessageInput = (props: {
             {/* IF MESSAGE IS IN REPLY */}
             {reply && (
               <div className="messageInputReply -mb-2">
-                <div
-                  className="flex items-start justify-between gap-2 rounded-lg border border-grey-80  px-[6px] py-[5px] text-xs italic text-grey-55"
-                  style={{ wordBreak: "break-word" }} //no tailwind equiv - need for long titles to wrap
-                >
+                <div className="flex items-start justify-between gap-2 rounded-lg border border-grey-80  px-2 py-[5px] text-xs italic text-grey-55">
                   <div className="flex flex-col gap-[1px]">
                     <div className="font-bold"> {replyToName?.value}</div>
                     <div className="text-grey-55">{replyMessage?.content}</div>
@@ -425,7 +422,7 @@ export const Messages = (props: { entityID: string; isRoom: boolean }) => {
   return (
     <>
       {messages.length == 0 && authorized ? (
-        <div className="messagesEmpty mt-auto flex flex-col gap-2 px-3 py-1  text-sm italic text-grey-55 sm:px-4">
+        <div className="messagesEmpty mt-auto flex flex-col gap-2 py-1  text-sm italic text-grey-55 ">
           <p>Welcome to the chat room!</p>
           <p>Start a conversation 🌱</p>
         </div>
@@ -480,7 +477,7 @@ const Message = (props: {
   );
   return (
     <div
-      className={`group mx-3 flex items-end gap-1 first:mt-auto sm:mx-4 ${
+      className={`group  flex items-end gap-1 first:mt-auto ${
         !props.multipleFromSameAuthor ? "pt-4" : "pt-1"
       } ${isMe && "flex-row-reverse"}`}
     >

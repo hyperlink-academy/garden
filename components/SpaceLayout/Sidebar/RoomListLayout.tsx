@@ -26,6 +26,8 @@ import { generateKeyBetween } from "src/fractional-indexing";
 import { SingleTextSection } from "components/CardView/Sections";
 import { useIsActiveRoom, useRoom, useSetRoom } from "hooks/useUIState";
 import { Form, SubmitButton } from "components/Form";
+import { useIsMobile } from "hooks/utils";
+import { useSidebarState } from "app/(app)/@sidebar/SidebarState";
 
 export const EditRoomModal = (props: {
   open: boolean;
@@ -172,29 +174,18 @@ const AreYouSureRoomDeletionModal = (props: {
   );
 };
 
-export const RoomListItem = (props: {
-  children: React.ReactNode;
-  editing: boolean;
-  setEditing: (editing: boolean) => void;
-  roomEntity: string;
-  setRoomEditOpen?: () => void;
-  isOver?: boolean;
-}) => {
-  let isActiveRoom = useIsActiveRoom(props.roomEntity);
-  let setRoom = useSetRoom();
-  let { memberEntity, authorized } = useMutations();
-  let roomType = db.useEntity(props.roomEntity, "room/type");
-
+export const useRoomUnreads = (roomEntity: string) => {
+  let { memberEntity } = useMutations();
   let unreadCount = useSubscribe(
     async (tx) => {
       if (!memberEntity) return false;
       let unread = (
-        await scanIndex(tx).eav(props.roomEntity, "discussion/unread-by")
+        await scanIndex(tx).eav(roomEntity, "discussion/unread-by")
       ).find((f) => f.value.value === memberEntity);
 
       if (unread) return true;
       // NB - currently collections also use 'desktop/contains'
-      let cards = await scanIndex(tx).eav(props.roomEntity, "desktop/contains");
+      let cards = await scanIndex(tx).eav(roomEntity, "desktop/contains");
       for (let card of cards) {
         let unread = (
           await scanIndex(tx).eav(card.value.value, "card/unread-by")
@@ -211,8 +202,27 @@ export const RoomListItem = (props: {
     },
     false,
     [memberEntity],
-    `${props.roomEntity}/unreadCount`
+    `${roomEntity}/unreadCount`
   );
+  return unreadCount;
+};
+
+export const RoomListItem = (props: {
+  children: React.ReactNode;
+  editing: boolean;
+  setEditing: (editing: boolean) => void;
+  roomEntity: string;
+  setRoomEditOpen?: () => void;
+  isOver?: boolean;
+}) => {
+  let isActiveRoom = useIsActiveRoom(props.roomEntity);
+  let setRoom = useSetRoom();
+  let { memberEntity, authorized } = useMutations();
+  let roomType = db.useEntity(props.roomEntity, "room/type");
+  let isMobile = useIsMobile();
+  let { setSidebar } = useSidebarState();
+
+  let unreadCount = useRoomUnreads(props.roomEntity);
 
   return (
     <div
@@ -229,6 +239,8 @@ export const RoomListItem = (props: {
           isActiveRoom ? "font-bold" : ""
         }`}
         onClick={(e) => {
+          e.stopPropagation();
+
           if (e.detail === 2 && authorized) {
             props.setEditing(true);
             return;
@@ -243,11 +255,14 @@ export const RoomListItem = (props: {
           // don't trigger 'onRoomChange' if room already active (may be trying to setRoomEditOpen instead)
           if (isActiveRoom) return;
 
+          if (isMobile) {
+            setSidebar(false);
+          }
           setRoom(props.roomEntity);
         }}
       >
         <div
-          className={` roomListItemIcon mt-[4px] h-4 w-4 shrink-0 
+          className={` roomListItemIcon mt-[4px] h-4 w-4 shrink-0
              ${
                isActiveRoom || props.isOver
                  ? "text-accent-blue"
