@@ -42,7 +42,7 @@ export default function AppLayout(props: {
         <div className="appSidebarWrapper sticky left-0 top-0 z-40 flex items-stretch bg-transparent py-2 sm:w-auto">
           {props.sidebar}
         </div>
-        <div className="appContentWrapper flex h-full flex-row gap-4 px-2 py-2 sm:gap-4">
+        <div className="appContentWrapper flex h-full flex-row gap-4 px-0 py-2 sm:gap-4">
           {props.children}
         </div>
       </SideScrollSidebarHandler>
