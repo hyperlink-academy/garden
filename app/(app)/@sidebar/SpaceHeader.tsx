@@ -204,14 +204,6 @@ export const OpenSidebar = ({
             </div>
             {spaces
               ?.filter((s) => !s.archived)
-              .sort((a, b) => {
-                if (!a.lastUpdated || !b.lastUpdated) {
-                  if (a.lastUpdated) return -1;
-                  if (b.lastUpdated) return 1;
-                  return 0;
-                }
-                return a.lastUpdated > b.lastUpdated ? -1 : 1;
-              })
               .map((space) => (
                 <Link
                   onClick={(e) => {
