@@ -26,6 +26,7 @@ import {
 } from "./SpaceSidebar";
 import { SpaceProvider } from "components/ReplicacheProvider";
 import { MobileHeaderTitle } from "./MobileHeaderTitle";
+import { useIsMobile } from "hooks/utils";
 
 export function SpaceHeader(props: {
   context: { type: "user"; username: string } | { type: "studio"; id: string };
@@ -33,6 +34,7 @@ export function SpaceHeader(props: {
   path: Array<{ name: string; link: string }>;
 }) {
   let [switcher, setSwitcher] = useState(false);
+  let isMobile = useIsMobile();
   let { session } = useAuth();
   let params = useParams();
   let { setSidebar } = useSidebarState();
@@ -103,7 +105,7 @@ export function SpaceHeader(props: {
                   <Link
                     onClick={(e) => {
                       e.stopPropagation();
-                      setSidebar(false);
+                      if (isMobile) setSidebar(false);
                       setSwitcher(false);
                     }}
                     href={p.link}
