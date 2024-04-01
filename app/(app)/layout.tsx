@@ -3,6 +3,8 @@ import { useIsClient, useIsMobile } from "hooks/utils";
 import { LayoutWrapper, SideScrollSidebarHandler } from "./LayoutWrapper";
 import { useViewportDifference } from "hooks/useViewportSize";
 
+export const fetchCache = "force-no-store";
+
 export default function AppLayout(props: {
   children: React.ReactNode;
   sidebar: React.ReactNode;
