@@ -33,6 +33,7 @@ export function makeAPIClient<R extends Routes<any>>(
     let result = await fetcher(`${path}/${basePath}/${route}`, {
       body: JSON.stringify(data),
       method: "POST",
+      cache: "no-store",
       headers: { "Content-type": "application/json" },
     });
     return result.json() as Promise<
