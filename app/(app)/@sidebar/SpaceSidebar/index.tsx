@@ -225,7 +225,7 @@ export const CollapsedSpaceSidebar = (props: {
           <Divider />
           <div
             className={` rounded-md p-1 pt-2 text-white ${
-              membersInCall.length === 0 ? "bg-accent-blue" : "bg-grey-55"
+              membersInCall.length === 0 ? "bg-grey-55" : "bg-accent-blue"
             }`}
           >
             <RoomMember /> {membersOnline.length}
