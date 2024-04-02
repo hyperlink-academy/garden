@@ -68,6 +68,7 @@ export const SpaceMobileHeader = (props: { space_id: string }) => {
   let rooms = db.useAttribute("room/name").sort(sortByPosition("roomList"));
   let setRoom = useSetRoom();
   let room = useRoom();
+  let { memberEntity } = useMutations();
   let { setSidebar } = useSidebarState();
 
   let spaceData = useSpaceData(props);
@@ -84,13 +85,14 @@ export const SpaceMobileHeader = (props: { space_id: string }) => {
     .map((m) => m.value.value);
   let uniqueSessions = new Set(activeSessions);
 
-  let membersOnline = members.filter((f) => uniqueSessions.has(f.entity));
+  let membersOnline = members.filter(
+    (f) => uniqueSessions.has(f.entity) && f.entity !== memberEntity
+  );
 
   let membersInCall = db.useAttribute("presence/in-call");
-  console.log(membersInCall);
 
   return (
-    <div className={`flex h-full flex-row gap-1`}>
+    <div className={`flex h-full flex-row gap-1 text-grey-35`}>
       <SidebarTab
         icon={<RoomSearch />}
         title="Search"
@@ -113,16 +115,20 @@ export const SpaceMobileHeader = (props: { space_id: string }) => {
         collapsed
         icon={<RoomCalendar />}
       />
-
-      <div className={`flex grow flex-row gap-1 text-grey-55`}>
+      <div className="px-1">
+        <Divider dashed vertical />
+      </div>
+      <div className={`flex grow flex-row gap-1 `}>
         {rooms.map((r) => (
           <RoomButton key={r.entity} entityID={r.entity} />
         ))}
       </div>
       {membersOnline.length > 0 && (
         <div
-          className={`sticky right-0 z-10 flex flex-row items-center gap-1 rounded-md px-1 text-xs text-white ${
-            membersInCall.length === 0 ? "bg-accent-blue" : "bg-grey-55"
+          className={`sticky right-0 z-10 flex flex-row items-center gap-1 border-l pl-1 pr-2  text-sm font-bold ${
+            membersInCall.length === 0
+              ? "border-accent-blue bg-background text-accent-blue"
+              : "border-grey-80 bg-background text-grey-55"
           }`}
         >
           <RoomMember /> {membersOnline.length}
@@ -140,6 +146,7 @@ export const CollapsedSpaceSidebar = (props: {
   let setRoom = useSetRoom();
   let room = useRoom();
   let { setSidebar } = useSidebarState();
+  let { memberEntity } = useMutations();
 
   let spaceData = useSpaceData(props);
 
@@ -155,18 +162,20 @@ export const CollapsedSpaceSidebar = (props: {
     .map((m) => m.value.value);
   let uniqueSessions = new Set(activeSessions);
 
-  let membersOnline = members.filter((f) => uniqueSessions.has(f.entity));
+  let membersOnline = members.filter(
+    (f) => uniqueSessions.has(f.entity) && f.entity !== memberEntity
+  );
 
   let membersInCall = db.useAttribute("presence/in-call");
   console.log(membersInCall);
 
   return (
     <div
-      className={`flex h-full ${
+      className={`flex h-full text-grey-35 ${
         props.horizontal ? "flex-row" : "flex-col"
       } gap-1`}
     >
-      <div className="w-full pb-1 pt-3">
+      <div className="w-full pb-1 pt-3 ">
         <Divider />
       </div>
 
@@ -193,13 +202,13 @@ export const CollapsedSpaceSidebar = (props: {
         icon={<RoomCalendar />}
       />
 
-      <div className="w-full pb-1 pt-3">
-        <Divider />
+      <div className="w-full py-1">
+        <Divider dashed />
       </div>
       <div
         className={`
         ${props.horizontal ? "flex-row" : "flex-col pb-3"}
-        z-50 flex grow gap-1 text-grey-55`}
+        z-50 flex grow gap-1 `}
       >
         {rooms.map((r) => (
           <RoomButton key={r.entity} entityID={r.entity} />
@@ -210,7 +219,7 @@ export const CollapsedSpaceSidebar = (props: {
           className={`collapsedSidebarPeople
             sticky bottom-0 mx-auto flex w-full
             ${props.horizontal ? "flex-row" : "flex-col"}
-            place-items-center gap-1 rounded-md bg-white pb-3
+            place-items-center gap-2 rounded-md pb-2
             text-center font-bold `}
         >
           <Divider />

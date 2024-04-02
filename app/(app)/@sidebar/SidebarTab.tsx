@@ -6,6 +6,7 @@ export const SidebarTab = (props: {
   title: string;
   icon: React.ReactNode;
   active: boolean;
+  className?: string;
   onClick?: () => void;
 }) => {
   let isMobile = useIsMobile();
@@ -22,7 +23,7 @@ export const SidebarTab = (props: {
           props.active
             ? "border-accent-blue bg-accent-blue text-white"
             : "hover:border-grey-80"
-        }`}
+        } ${props.className}`}
       >
         {props.icon}
       </button>

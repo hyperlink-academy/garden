@@ -111,12 +111,12 @@ const StudioMobileHeader = (
   }
 ) => {
   return (
-    <div className="sidebarHomeCollapsed flex flex-row justify-center gap-2">
+    <div className="sidebarStudioMobile flex flex-row justify-center gap-4">
       <MobileHeaderTitle title={props.data.name} />
 
       <TabsList
         collapsed={true}
-        className=" mx-auto flex flex-row gap-2 text-grey-55"
+        className=" mx-auto flex flex-row gap-1 text-grey-35"
         {...props}
       />
     </div>
@@ -129,7 +129,7 @@ const StudioSidebarCollapsed = (
   }
 ) => {
   return (
-    <div className="sidebarHomeCollapsed flex flex-col justify-center">
+    <div className="sidebarStudioCollapsed flex flex-col justify-center">
       <div
         className="sidebarSpaceName mx-auto h-fit w-fit shrink-0 rotate-180 flex-row font-bold "
         style={{ writingMode: "vertical-lr" }}
@@ -142,7 +142,7 @@ const StudioSidebarCollapsed = (
       </div>
       <TabsList
         collapsed={true}
-        className=" mx-auto flex flex-col gap-1 text-grey-55"
+        className=" mx-auto flex flex-col gap-1 text-grey-35"
         {...props}
       />
     </div>

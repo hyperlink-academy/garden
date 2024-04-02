@@ -13,7 +13,7 @@ export const Divider = (props: {
     <div
       className={`border-l border-t
         ${props.dark ? `border-grey-55` : `border-grey-80`}
-        ${props.vertical ? "100vh w-[1px]" : "h-[1px] w-full"}
+        ${props.vertical ? "h-full w-[1px]" : "h-[1px] w-full"}
         ${props.dashed ? "border-dashed" : ""}
       `}
       style={{
@@ -32,10 +32,10 @@ export const FloatingContainer: React.FC<
     <div
       onClick={(e) => e.stopPropagation()}
       className={`
-        border-grey-80 shadow-drop
-        rounded-md border bg-white
-        px-4
+        rounded-md border
+        border-grey-80 bg-white px-4
         py-4
+        shadow-drop
         ${props.className}
         `}
     >
@@ -118,16 +118,16 @@ export const MenuContainer: React.FC<
     >
       <Menu.Items
         className={`
-        border-grey-80 shadow-drop absolute
-        right-0 z-40
+        absolute right-0 z-40
         flex w-max
         origin-top-right flex-col
-        justify-items-end
-        rounded-md
+        justify-items-end rounded-md
         border
+        border-grey-80
         bg-white
         py-2
         text-right
+        shadow-drop
         ${props.className}`}
       >
         {props.children}

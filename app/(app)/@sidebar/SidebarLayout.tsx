@@ -101,16 +101,16 @@ export default function SidebarLayout(props: {
       <>
         <div className="mobileHeaderWrapper absolute left-0 top-0 z-30 w-full bg-background">
           <div
-            className={`mobileHeader flex w-full gap-2 border-b border-grey-90 bg-background px-2 pb-1 ${"pwa-padding"}`}
+            className={`mobileHeader w-full border-b border-grey-90 bg-background px-2 pb-1 ${"pwa-padding"}`}
           >
-            <div className="no-scrollbar relative flex flex-row gap-2 overflow-x-scroll">
+            <div className="no-scrollbar relative flex flex-row gap-1 overflow-x-scroll">
               <button
-                className="mobileHeaderToggle sticky left-0 -rotate-90 rounded-full bg-background text-grey-55"
+                className="mobileHeaderToggle sticky left-0 z-20 shrink-0 bg-background  pr-1 text-grey-55"
                 onClick={() => {
                   useSidebarState.getState().toggleSidebar();
                 }}
               >
-                <DisclosureExpandTiny />
+                <DisclosureExpandTiny className="-rotate-90 " />
               </button>
               {props.headerContent}
             </div>

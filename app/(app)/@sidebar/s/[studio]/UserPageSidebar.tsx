@@ -116,8 +116,8 @@ const UserPageSidebarExpanded = (props: {
 const UserPageHeader = (props: { params: { studio: string } }) => {
   let { session } = useAuth();
   return (
-    <>
-      <div className="sidebarSpaceName mx-auto h-fit w-fit shrink-0 flex-row font-bold ">
+    <div className="flex gap-3">
+      <div className="sidebarHomeSpaceName h-fit flex-row font-bold ">
         {props.params.studio === session.session?.username
           ? "Home"
           : props.params.studio}
@@ -125,10 +125,10 @@ const UserPageHeader = (props: { params: { studio: string } }) => {
 
       <HomeTabs
         username={props.params.studio}
-        className="mx-auto flex flex-row gap-1 text-grey-55"
+        className="sidebarHomeTabs flex flex-row gap-1 text-grey-55"
         collapsed={true}
       />
-    </>
+    </div>
   );
 };
 
@@ -151,7 +151,7 @@ const UserPageSidebarCollapsed = (props: { params: { studio: string } }) => {
 
       <HomeTabs
         username={props.params.studio}
-        className="mx-auto flex flex-col gap-1 text-grey-55"
+        className="mx-auto flex flex-col gap-1 text-grey-35"
         collapsed={true}
       />
     </>
