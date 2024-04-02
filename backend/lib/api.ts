@@ -85,7 +85,10 @@ export const makeRouter = <Env extends {}>(routes: Routes<Env>) => {
           console.log(e);
           status = 500;
           result = {
-            data: { error: "An error occured while handling this request" },
+            data: {
+              error: "An error occured while handling this request",
+              errorText: (e as Error).toString(),
+            },
           };
           break;
         }
