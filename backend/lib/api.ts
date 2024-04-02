@@ -4,7 +4,7 @@ import { ZodObject, ZodRawShape, ZodUnion, z } from "zod";
 
 type UnwrapPromise<T> = T extends Promise<infer U> ? U : T;
 
-export const workerAPI = makeAPIClient<WorkerRoutes>("api");
+export const workerAPI = makeAPIClient<WorkerRoutes>("api", undefined, true);
 export const internalWorkerAPI = (env: { SELF_WORKER: Fetcher }) =>
   makeAPIClient<WorkerRoutes>(
     "api",
@@ -21,7 +21,8 @@ export type ExtractResponse<
 > = UnwrapPromise<ReturnType<T["handler"]>>["data"];
 export function makeAPIClient<R extends Routes<any>>(
   basePath: string,
-  f?: Fetcher["fetch"]
+  f?: Fetcher["fetch"],
+  cache?: boolean
 ) {
   let fetcher: Fetcher["fetch"] = fetch;
   if (f) fetcher = f;
@@ -33,7 +34,7 @@ export function makeAPIClient<R extends Routes<any>>(
     let result = await fetcher(`${path}/${basePath}/${route}`, {
       body: JSON.stringify(data),
       method: "POST",
-      cache: "no-store",
+      cache: cache ? "no-store" : undefined,
       headers: { "Content-type": "application/json" },
     });
     return result.json() as Promise<
