@@ -127,8 +127,8 @@ export const SpaceMobileHeader = (props: { space_id: string }) => {
         <div
           className={`sticky right-0 z-10 flex flex-row items-center gap-1 border-l pl-1 pr-2  text-sm font-bold ${
             membersInCall.length === 0
-              ? "border-accent-blue bg-background text-accent-blue"
-              : "border-grey-80 bg-background text-grey-55"
+              ? "border-grey-80 bg-background text-grey-55"
+              : "border-accent-blue bg-background text-accent-blue"
           }`}
         >
           <RoomMember /> {membersOnline.length}
