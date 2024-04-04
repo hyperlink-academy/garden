@@ -41,7 +41,8 @@ export function SpaceHeader(props: {
   let { data: userSpaces } = useIdentityData(session.session?.username);
   let activeSpace = props.spaces.find((s) =>
     props.context.type === "user"
-      ? s.id === base62ToUuid(params?.space as string)
+      ? s.id === base62ToUuid(params?.space as string) ||
+        s.id === (params?.space as string)
       : s.id === params?.space_id
   );
   let isUserSpace = false;
