@@ -10,6 +10,7 @@ import { sortByPosition } from "src/position_helpers";
 import { generateKeyBetween } from "src/fractional-indexing";
 import { Fact } from "data/Facts";
 import { SidebarSearchInput } from "app/(app)/@sidebar/SidebarSearch";
+import { isAppleDevice } from "@react-aria/utils";
 
 export const useSearch = () => {
   let [input, setInput] = useState("");
@@ -155,7 +156,7 @@ export const SpaceSearch = ({
       onChange={(value) => {
         setInput(value);
       }}
-      placeholder="search space (ctrl/⌘ K)"
+      placeholder={`search space (${isAppleDevice() ? "⌘" : "⌃"}-K)`}
     />
   );
 };
