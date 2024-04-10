@@ -19,7 +19,7 @@ export const Divider = (props: {
       style={{
         margin: `${props.my || 0}px ${props.mx || 0}px ${props.my || 0}px ${
           props.mx || 0
-        } px`,
+        }px`,
       }}
     ></div>
   );
