@@ -114,7 +114,29 @@ export const ImageLightbox = (props: {
       open={props.lightBoxOpen}
       onClose={() => props.setLightBoxClosed()}
     >
-      <div className="flex flex-col gap-1">
+      <div
+        className="flex flex-col gap-1"
+        onKeyDown={(e) => {
+          if (e.key === "ArrowLeft") {
+            props.setSelectedImage(
+              images[
+                currentImageIndex === 0
+                  ? images.length - 1
+                  : currentImageIndex - 1
+              ]
+            );
+          }
+          if (e.key === "ArrowRight") {
+            props.setSelectedImage(
+              images[
+                currentImageIndex === images.length - 1
+                  ? 0
+                  : currentImageIndex + 1
+              ]
+            );
+          }
+        }}
+      >
         <div className="flex items-center justify-between ">
           <button
             className="text-grey-55 hover:text-accent-blue bg-white-90  rounded-full bg-white p-1"
