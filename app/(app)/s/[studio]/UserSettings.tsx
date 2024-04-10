@@ -4,10 +4,12 @@ import { useAuth } from "hooks/useAuth";
 import { HelpAppInfo } from "components/HelpCenter";
 import { supabaseBrowserClient } from "supabase/clients";
 import { Divider } from "components/Layout";
+import { useRouter } from "next/navigation";
 
 export const UserSettings = () => {
   let supabase = supabaseBrowserClient();
   let { logout } = useAuth();
+  const router = useRouter();
   let [notificationPermissionState, setNotificationPermissionState] =
     useState("default");
   let [pushPermissionState, setPushPermissionState] = useState("unavailable");
@@ -64,7 +66,10 @@ export const UserSettings = () => {
       <ButtonSecondary
         className="mx-auto"
         content="Log out"
-        onClick={() => logout()}
+        onClick={() => {
+          logout();
+          router.push("/");
+        }}
       />
       {/* </div> */}
     </div>
