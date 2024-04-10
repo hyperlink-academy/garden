@@ -111,29 +111,48 @@ export function CardViewer(props: { space_id: string }) {
 
   return (
     <>
-      <div
-        ref={cardViewerRef}
-        id="cardViewerWrapper"
-        className={`cardViewerWrapper
-          flex  h-full w-[calc(100vw-16px)] max-w-3xl
-          shrink-0 touch-pan-x
-          snap-center snap-always flex-col
-          items-stretch
-          focus:outline-none
-          sm:w-[calc(100vw-100px)] ${
-            !open ? "md:w-[calc(100vw-448px)]" : "md:w-[calc(100vw-670px)]"
-          } md:shrink`}
-      >
-        {room && history[0] ? (
-          <CardView
-            entityID={history[0]}
-            key={history[0]}
-            onDelete={() => {
-              removeCardFromRoomHistory({ cardEntity: history[0], room });
-            }}
-          />
+      <div className="h-full flex flex-row gap-3">
+        {history[0] ? (
+          history.map((c) => {
+            return (
+              <div
+                key={c}
+                id="cardViewerWrapper"
+                className={`cardViewerWrapper
+                  flex  h-full w-[calc(100vw-16px)] max-w-3xl
+                  shrink-0 touch-pan-x
+                  snap-center snap-always flex-col
+                  items-stretch
+                  focus:outline-none
+                  sm:w-[calc(100vw-100px)] ${
+                    !open
+                      ? "md:w-[calc(100vw-448px)]"
+                      : "md:w-[calc(100vw-670px)]"
+                  } md:shrink`}
+              >
+                <CardView
+                  entityID={c}
+                  onDelete={() => {
+                    removeCardFromRoomHistory({ cardEntity: c, room });
+                  }}
+                />
+              </div>
+            );
+          })
         ) : (
-          <EmptyState roomType={roomType} />
+          <div
+            className={`cardViewerWrapper
+              flex  h-full w-[calc(100vw-16px)] max-w-3xl
+              shrink-0 touch-pan-x
+              snap-center snap-always flex-col
+              items-stretch
+              focus:outline-none
+              sm:w-[calc(100vw-100px)] ${
+                !open ? "md:w-[calc(100vw-448px)]" : "md:w-[calc(100vw-670px)]"
+              } md:shrink`}
+          >
+            <EmptyState roomType={roomType} />
+          </div>
         )}
       </div>
     </>

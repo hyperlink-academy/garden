@@ -291,10 +291,10 @@ export const useCloseCard = () => {
   let spaceID = useSpaceID();
   let { action } = useMutations();
   let openCard = useUIState((state) => state.openCard);
+  let room = useRoom();
 
   return useCallback(() => {
     if (!spaceID) return;
-    let room = useUIState.getState().spaces[spaceID]?.activeRoom;
     if (!room) return;
 
     let closeCard = (spaceID: string, room: string) => {
@@ -322,7 +322,7 @@ export const useCloseCard = () => {
         closeCard(spaceID as string, room as string);
       },
     });
-  }, [spaceID, action, openCard]);
+  }, [spaceID, action, openCard, room]);
 };
 
 export const useCurrentOpenCard = () => {
