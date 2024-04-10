@@ -36,7 +36,7 @@ export function HomePage() {
   return (
     <div className="homepageWrapper relative overflow-x-clip pwa-margin pwa-margin-bottom">
       {/* sticky header */}
-      <div className="sticky top-0 z-10 bg-background">
+      <div className="sticky top-0 z-10 bg-background pwa-margin">
         <div className="flex items-center justify-between px-2 py-2 sm:px-4">
           {/* notes */}
           <div className="flex gap-2">
@@ -481,7 +481,7 @@ export function HomePage() {
 
       <Divider />
 
-      <div className="flex  flex-row justify-between gap-4">
+      <div className="flex flex-row justify-between gap-4 pwa-margin-bottom">
         <div className="flex flex-col gap-1 px-4 py-2 text-sm text-grey-55 sm:flex-row sm:gap-2">
           <Link href="/privacy" className=" w-max hover:text-accent-blue">
             privacy policy
