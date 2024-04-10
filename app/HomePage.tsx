@@ -34,7 +34,7 @@ export function HomePage() {
   let router = useRouter();
 
   return (
-    <div className="relative overflow-x-clip">
+    <div className="homepageWrapper relative overflow-x-clip pwa-margin pwa-margin-bottom">
       {/* sticky header */}
       <div className="sticky top-0 z-10 bg-background">
         <div className="flex items-center justify-between px-2 py-2 sm:px-4">
