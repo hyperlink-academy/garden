@@ -1,9 +1,9 @@
-import { db, scanIndex, useMutations } from "hooks/useReplicache";
+import { db, useMutations } from "hooks/useReplicache";
 import { SingleTextSection } from "./Sections";
 import { useCallback, useState } from "react";
-import { useOpenCard } from "hooks/useUIState";
 import * as Popover from "@radix-ui/react-popover";
 import { CardSmall } from "components/Icons";
+import { useCardViewer } from "components/CardViewerContext";
 
 export const Title = (props: { entityID: string }) => {
   let { authorized, mutate, action } = useMutations();
@@ -22,7 +22,7 @@ export const Title = (props: { entityID: string }) => {
   );
   let [focused, setFocused] = useState(false);
   let [selectedAutocomplete, setSelectedAutocomplete] = useState(0);
-  let openCard = useOpenCard();
+  let { open } = useCardViewer();
   let complete = useCallback(
     async (selectedCard?: string) => {
       if (selectedCard) {
@@ -33,7 +33,7 @@ export const Title = (props: { entityID: string }) => {
           currentCard: props.entityID,
           newCard,
         });
-        openCard(newCard);
+        open({ entityID: newCard, parent: props.entityID });
 
         action.end();
         setTimeout(() => {
@@ -44,7 +44,7 @@ export const Title = (props: { entityID: string }) => {
       let element = document.getElementById("default-text-section");
       element?.focus();
     },
-    [props.entityID, action, mutate, openCard]
+    [props.entityID, action, mutate, open]
   );
 
   return (

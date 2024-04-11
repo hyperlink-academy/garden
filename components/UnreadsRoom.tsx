@@ -156,6 +156,7 @@ export const UnreadsRoom = () => {
                 })
                 .map((unread) => (
                   <CardPreviewWithData
+                    parent={null}
                     hideContent={listType === "list"}
                     key={unread.id}
                     entityID={unread.entity}

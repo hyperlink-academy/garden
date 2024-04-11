@@ -32,7 +32,12 @@ export const useSpaceSyncState = () => {
           scanIndex(tx).vae(entityID, "desktop/contains")
         );
         if (parent) setRoom(parent[0]?.entity);
-        openCardWithoutHistory(spaceID, parent[0]?.entity || room, entityID);
+        openCardWithoutHistory({
+          spaceID,
+          roomID: parent[0]?.entity || room,
+          card: entityID,
+          parent: null,
+        });
       })();
     }
   }, [rep, openCard, room, spaceID, openCardWithoutHistory, setRoom]);

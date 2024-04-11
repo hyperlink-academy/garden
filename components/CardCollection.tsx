@@ -22,7 +22,6 @@ import {
   useDroppableZone,
 } from "./DragContext";
 import { useRemoveCardFromRoomHistory, useUIState } from "hooks/useUIState";
-import { useDebouncedValue } from "hooks/useDebouncedValue";
 import { useCardViewer } from "./CardViewerContext";
 
 export const CardCollection = (props: {
@@ -193,6 +192,7 @@ const DraggableCard = (props: {
                   editable={props.editable}
                   entityID={over.entityID}
                   size={"big"}
+                  parent={props.parent}
                   hideContent={props.hideContent}
                 />
               </div>
@@ -207,6 +207,7 @@ const DraggableCard = (props: {
         {isOverSomethingElse ? null : (
           <div className="grow-0">
             <CardPreview
+              parent={props.parent}
               data={data}
               entityID={props.entityID}
               size="big"
@@ -283,7 +284,7 @@ export const useOnDragEndCollection = (props: {
               title: "",
               memberEntity,
             });
-            open({ entityID: entityID, focus: "title" });
+            open({ entityID: entityID, parent: props.parent, focus: "title" });
           }
           break;
         }
@@ -306,7 +307,7 @@ export const useOnDragEndCollection = (props: {
               memberEntity,
             });
           }
-          open({ entityID: entityID, focus: "title" });
+          open({ entityID: entityID, parent: props.parent, focus: "title" });
 
           break;
         }
@@ -320,7 +321,11 @@ export const useOnDragEndCollection = (props: {
               eav: position,
             },
           });
-          open({ entityID: data.entityID, focus: "title" });
+          open({
+            entityID: data.entityID,
+            parent: props.parent,
+            focus: "title",
+          });
 
           break;
         }

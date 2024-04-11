@@ -85,6 +85,7 @@ export const Backlinks = (props: { entityID: string }) => {
           return (
             <div key={c.id}>
               <CardPreviewWithData
+                parent={props.entityID}
                 key={c.id}
                 hideContent
                 factID={c.id}
@@ -100,6 +101,7 @@ export const Backlinks = (props: { entityID: string }) => {
         {inlineBacklinks.map((c) => {
           return (
             <CardPreviewWithData
+              parent={props.entityID}
               focusText={title ? `[[${title.value}]]` : undefined}
               key={c.id}
               factID={c.id}
@@ -114,10 +116,11 @@ export const Backlinks = (props: { entityID: string }) => {
               key={c.id}
               id={c.id}
               onClick={() => {
-                open({ entityID: c.topic });
+                open({ entityID: c.topic, parent: props.entityID });
               }}
             >
               <CardPreviewWithData
+                parent={props.entityID}
                 entityID={c.topic}
                 size={"big"}
                 hideContent

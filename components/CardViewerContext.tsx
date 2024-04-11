@@ -15,13 +15,15 @@ import { useAuth } from "hooks/useAuth";
 import { useSidebarState } from "app/(app)/@sidebar/SidebarState";
 
 export const useCardViewer = () => {
-  let spaceID = useSpaceID();
   let openCard = useOpenCard();
 
   let open = useCallback(
-    (args: { entityID: string; focus?: "title" | "content" }) => {
-      if (!spaceID) return;
-      openCard(args.entityID);
+    (args: {
+      entityID: string;
+      focus?: "title" | "content";
+      parent: string | null;
+    }) => {
+      openCard({ card: args.entityID, parent: args.parent });
       publishAppEvent("cardviewer.open-card", args);
       if (args.focus) {
         focusElement(() =>
@@ -31,7 +33,7 @@ export const useCardViewer = () => {
         );
       }
     },
-    [spaceID, openCard]
+    [openCard]
   );
   return {
     open,

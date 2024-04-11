@@ -55,6 +55,7 @@ export function JoinSpace({ space_id }: { space_id: string }) {
                   className={`memberCardBorder relative h-[94px] w-[160px] grow`}
                 >
                   <BaseSmallCard
+                    parent={null}
                     isMember
                     memberName={session.session?.username}
                     content=""

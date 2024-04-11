@@ -1,9 +1,10 @@
 import { useEffect, useMemo } from "react";
-import { useOpenCard, useRoom, useSetRoom, useUIState } from "./useUIState";
+import { useRoom, useSetRoom, useUIState } from "./useUIState";
 import { db, scanIndex, useMutations, useSpaceID } from "./useReplicache";
 import { sortByPosition } from "src/position_helpers";
 import { ReadTransaction } from "replicache";
 import { Filters } from "components/CardFilter";
+import { useCardViewer } from "components/CardViewerContext";
 
 export function useSpaceShortcuts() {
   useRoomShortcuts();
@@ -56,7 +57,7 @@ export function useRoomShortcuts() {
 export function useCardShortcuts() {
   let currentRoom = useRoom();
   let spaceID = useSpaceID();
-  let openCard = useOpenCard();
+  let { open } = useCardViewer();
   let { rep } = useMutations();
   let filters = useUIState((s) => s.roomStates[currentRoom]?.filters) || [];
 
@@ -91,11 +92,17 @@ export function useCardShortcuts() {
           (r) => r.value.value === currentCard
         );
         if (!currentCard || currentIndex === -1) {
-          openCard(sortedCards[sortedCards.length - 1].value.value);
+          open({
+            entityID: sortedCards[sortedCards.length - 1].value.value,
+            parent: null,
+          });
           return;
         }
         if (currentIndex > 0) {
-          openCard(sortedCards[currentIndex - 1].value.value);
+          open({
+            entityID: sortedCards[currentIndex - 1].value.value,
+            parent: null,
+          });
         }
       }
       if (e.key === "ArrowDown" && e.shiftKey) {
@@ -113,12 +120,15 @@ export function useCardShortcuts() {
           (r) => r.value.value === currentCard
         );
         if (!currentCard || currentIndex === -1) {
-          openCard(sortedCards[0]?.value.value);
+          open({ entityID: sortedCards[0]?.value.value, parent: null });
           return;
         }
         if (currentIndex === -1) return;
         if (currentIndex < sortedCards.length - 1) {
-          openCard(sortedCards[currentIndex + 1].value.value);
+          open({
+            entityID: sortedCards[currentIndex + 1].value.value,
+            parent: null,
+          });
         }
       }
     };
@@ -126,7 +136,7 @@ export function useCardShortcuts() {
     return () => {
       window.removeEventListener("keydown", listener);
     };
-  }, [currentRoom, rep, openCard, filters]);
+  }, [currentRoom, rep, open, filters]);
 }
 
 const getSortedCards = async (

@@ -58,7 +58,7 @@ export const BigCardBody = (
         console.log("yo?");
         if (editing) return;
         if (e.defaultPrevented) return;
-        open({ entityID: props.entityID });
+        open({ entityID: props.entityID, parent: props.parent });
       }}
     >
       {/* Big Card Preview Content Wrapper */}
@@ -202,7 +202,7 @@ export const BigCardBody = (
                 } `}
                 onClick={() => {
                   if (!props.entityID) return;
-                  open({ entityID: props.entityID });
+                  open({ entityID: props.entityID, parent: props.parent });
                   useUIState.getState().openDrawer(props.entityID, "chat");
                   setTimeout(() => {
                     document.getElementById("messageInput")?.focus();

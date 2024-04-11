@@ -145,7 +145,7 @@ export const Room = () => {
               behavior: "smooth",
             });
           }
-          open({ entityID: newCard, focus: "title" });
+          open({ entityID: newCard, focus: "title", parent: null });
         }
 
         action.end();
@@ -316,7 +316,7 @@ const AddCardButton = (props: {
             title: "",
             memberEntity,
           });
-          open({ entityID: newEntity, focus: "title" });
+          open({ entityID: newEntity, focus: "title", parent: null });
 
           //open the card
         }}

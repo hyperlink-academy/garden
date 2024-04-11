@@ -145,7 +145,7 @@ export const SpaceSearch = ({
             });
           }
         } else {
-          openCard({ entityID, focus: "content" });
+          openCard({ entityID, focus: "content", parent: null });
         }
       }}
       selectedItemIndex={selectedItemIndex}
@@ -184,7 +184,7 @@ const NewCard = (props: { title: string; onClick: () => void }) => {
           memberEntity,
         });
         props.onClick();
-        open({ entityID, focus: "content" });
+        open({ entityID, focus: "content", parent: null });
       }}
       className={`touch-none ${isDragging ? `opacity-60` : ""}`}
     >
@@ -221,6 +221,7 @@ export const CardSearchResult = (props: {
   return (
     <div ref={setNodeRef} className={`${isDragging ? ` opacity-60` : ""}`}>
       <CardPreview
+        parent={null}
         onClick={props.onClick}
         data={data}
         entityID={props.entityID}

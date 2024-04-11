@@ -39,6 +39,7 @@ const borderStyles = (args: { isMember: boolean }) => {
 
 export type Props = {
   size: "big" | "small";
+  parent: string | null;
   onRotateDrag?: (da: number) => void;
   onDelete?: () => void;
   onClick?: () => void;
@@ -61,7 +62,6 @@ export type Props = {
   data: CardPreviewData;
 };
 
-const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 export const CardPreview = (
   props: {
     entityID: string;
@@ -205,9 +205,9 @@ export const HoverControls = (
       style={{}}
       className={`
       cardPreviewWrapper
-      relative 
+      relative
       ${props.size === "small" ? "h-[6rem] w-[160px]" : "h-full w-full"}
-      group grid  
+      group grid
       grid-cols-[auto_min-content]
       ${props.outerControls ? "gap-1" : ""}
       `}

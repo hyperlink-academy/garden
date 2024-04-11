@@ -1,4 +1,4 @@
-import { db, useMutations, useSpaceID } from "hooks/useReplicache";
+import { db, useMutations } from "hooks/useReplicache";
 import { useState } from "react";
 import { ulid } from "src/ulid";
 import { CardPreviewWithData } from "./CardPreview";
@@ -9,13 +9,9 @@ import {
   DisclosureExpandTiny,
 } from "./Icons";
 import { Divider } from "./Layout";
-import { useSpaceData } from "hooks/useSpaceData";
 import { Disclosure } from "@headlessui/react";
 
 export function CalendarRoom() {
-  let { authorized } = useMutations();
-  let spaceID = useSpaceID();
-
   // get all dates with cards and create 'days' array of dates in ISOString form (e.g. "2024-12-06")
   let datesWithCards = db.useTimeAttribute("card/date").reduce((acc, card) => {
     let key = card.value.value;
@@ -165,6 +161,7 @@ const CalendarList = (props: {
                     {props.datesWithCards[d]?.map((card) => (
                       <div key={card.entity} className="h-fit">
                         <CardPreviewWithData
+                          parent={null}
                           entityID={card.entity}
                           key={card.entity}
                           size="big"

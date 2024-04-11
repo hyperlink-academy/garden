@@ -267,6 +267,7 @@ export const MessageInput = (props: {
                   return (
                     <div key={card} className="w-full">
                       <CardPreviewWithData
+                        parent={props.entityID}
                         entityID={card}
                         size="big"
                         hideContent={true}
@@ -429,6 +430,7 @@ export const Messages = (props: { entityID: string; isRoom: boolean }) => {
       ) : null}
       {[...messages].map((m, index, reversedMessages) => (
         <Message
+          discussion={props.entityID}
           multipleFromSameAuthor={
             index > 0 &&
             m.sender === reversedMessages[index - 1]?.sender &&
@@ -450,6 +452,7 @@ export const Messages = (props: { entityID: string; isRoom: boolean }) => {
 };
 
 const Message = (props: {
+  discussion: string;
   multipleFromSameAuthor: boolean;
   content: string;
   author: string;
@@ -553,6 +556,7 @@ const Message = (props: {
                 {attachedCards?.map((c) => (
                   <div key={c.id} className="w-full">
                     <CardPreviewWithData
+                      parent={props.discussion}
                       entityID={c.value.value}
                       size="big"
                       hideContent={true}

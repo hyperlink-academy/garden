@@ -14,7 +14,6 @@ import {
 } from "react";
 import { CardPreview } from "./CardPreview";
 import { ulid } from "src/ulid";
-import { FindOrCreate, useAllItems } from "./FindOrCreateEntity";
 import { useSubscribe } from "replicache-react";
 import { useCardViewer } from "./CardViewerContext";
 import { useDraggableCard, useDroppableZone } from "./DragContext";
@@ -24,7 +23,6 @@ import { useAuth } from "hooks/useAuth";
 import { getAndUploadFile } from "src/getAndUploadFile";
 import { useCardPreviewData } from "hooks/CardPreviewData";
 import { useRemoveCardFromRoomHistory } from "hooks/useUIState";
-import { create } from "components/CardStack";
 
 const GRID_SIZE = 8;
 const snap = (x: number) => Math.round(x / GRID_SIZE) * GRID_SIZE;
@@ -39,9 +37,6 @@ export const Desktop = (props: { entityID: string }) => {
   let rep = useContext(ReplicacheContext);
   let spaceID = useSpaceID();
   let [draggingHeight, setDraggingHeight] = useState(0);
-  let [createCard, setCreateCard] = useState<null | { x: number; y: number }>(
-    null
-  );
   let { setNodeRef, rect: droppableRect } = useDroppableZone({
     type: "dropzone",
     id: props.entityID,
@@ -87,7 +82,7 @@ export const Desktop = (props: { entityID: string }) => {
             title: "",
             memberEntity,
           });
-          open({ entityID: entityID, focus: "title" });
+          open({ entityID: entityID, focus: "title", parent: props.entityID });
           break;
         }
         case "new-search-card": {
@@ -111,7 +106,7 @@ export const Desktop = (props: { entityID: string }) => {
             memberEntity,
           });
 
-          open({ entityID: entityID, focus: "title" });
+          open({ entityID: entityID, focus: "title", parent: props.entityID });
           break;
         }
         case "search-card": {
@@ -125,7 +120,11 @@ export const Desktop = (props: { entityID: string }) => {
               size: "small",
             },
           });
-          open({ entityID: data.entityID, focus: "title" });
+          open({
+            entityID: data.entityID,
+            focus: "title",
+            parent: props.entityID,
+          });
 
           break;
         }
@@ -198,7 +197,7 @@ export const Desktop = (props: { entityID: string }) => {
               memberEntity,
             });
 
-            open({ entityID: entity, focus: "title" });
+            open({ entityID: entity, focus: "title", parent: props.entityID });
 
             action.end();
           }

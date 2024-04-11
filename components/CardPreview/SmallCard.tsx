@@ -67,7 +67,8 @@ export const BaseSmallCard = (
     <div
       {...listenersAndAttributes}
       onClick={() => {
-        props.entityID && open({ entityID: props.entityID });
+        props.entityID &&
+          open({ entityID: props.entityID, parent: props.parent });
       }}
       className={`h-full w-full !bg-cover !bg-center !bg-no-repeat hover:cursor-pointer ${
         props.isMember ? "pb-1 pl-2 pr-1 pt-2" : "px-2 py-2"
@@ -161,7 +162,7 @@ export const BaseSmallCard = (
             } `}
             onClick={() => {
               if (!props.entityID) return;
-              open({ entityID: props.entityID });
+              open({ entityID: props.entityID, parent: props.parent });
               useUIState.getState().openDrawer(props.entityID, "chat");
               setTimeout(() => {
                 document.getElementById("messageInput")?.focus();

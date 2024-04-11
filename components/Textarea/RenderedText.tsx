@@ -26,6 +26,7 @@ export const RenderedText = forwardRef<
   let rep = useContext(ReplicacheContext);
   let openLink = useCallback(
     async (link: string) => {
+      if (!props.entityID) return;
       let entity = await rep?.rep.query((tx) =>
         scanIndex(tx).ave("card/title", link.slice(2, -2))
       );
@@ -45,10 +46,10 @@ export const RenderedText = forwardRef<
             positions: {},
           });
 
-        open({ entityID });
+        open({ entityID, parent: props.entityID });
         return;
       }
-      open({ entityID: entity.entity });
+      open({ entityID: entity.entity, parent: props.entityID });
     },
     [open, rep?.rep, authorized, memberEntity, mutate, props.entityID]
   );

@@ -236,7 +236,7 @@ export const CardContent = (props: {
         }}
       >
         <div className="cardSectionAdder pointer-events-none sticky top-0 z-10 flex w-full  justify-between">
-          <BackButton />
+          <BackButton entityID={props.entityID} />
           {authorized && (
             <SectionAdder
               entityID={props.entityID}
@@ -314,8 +314,7 @@ const CardLinkPreview = (props: { entityID: string }) => {
   return null;
 };
 
-const BackButton = () => {
-  let history = useRoomHistory();
+const BackButton = (props: { entityID: string }) => {
   let closeCard = useCloseCard();
   let { authorized } = useMutations();
   return (
@@ -324,15 +323,10 @@ const BackButton = () => {
         !authorized ? "" : "mt-3"
       }`}
       onClick={() => {
-        closeCard();
-        if (history.length < 2) {
-          document
-            .getElementById("appLayout")
-            ?.scrollTo({ behavior: "smooth", left: 0 });
-        }
+        closeCard(props.entityID);
       }}
     >
-      {history.length < 2 ? <CloseLinedTiny /> : <GoBackToPageLined />}
+      <CloseLinedTiny />
     </button>
   );
 };
