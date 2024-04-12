@@ -22,8 +22,13 @@ export const useCardViewer = () => {
       entityID: string;
       focus?: "title" | "content";
       parent: string | null;
+      append?: boolean;
     }) => {
-      openCard({ card: args.entityID, parent: args.parent });
+      openCard({
+        card: args.entityID,
+        parent: args.parent,
+        append: args.append,
+      });
       publishAppEvent("cardviewer.open-card", args);
       if (args.focus) {
         focusElement(() =>

@@ -165,16 +165,21 @@ export let useUIState = create(
           roomID,
           card,
           parent,
+          append,
         }: {
           spaceID: string;
           roomID: string;
           card: string;
           parent: string | null;
+          append?: boolean;
         }) => {
           set((state) => {
             let currentCards = state.spaces[spaceID]?.rooms?.[roomID] || [];
             let parentIndex = parent ? currentCards.indexOf(parent) : -1;
+            if (currentCards.includes(card)) return state;
             let newCards = [...currentCards.slice(0, parentIndex + 1), card];
+            if (append)
+              newCards = newCards.concat(currentCards.slice(parentIndex + 1));
 
             return {
               spaces: {
@@ -246,7 +251,7 @@ export const useOpenCard = () => {
   let closeCard = useUIState((state) => state.closeCard);
   let roomID = useRoom();
   return useCallback(
-    (args: { card: string; parent: null | string }) => {
+    (args: { card: string; parent: null | string; append?: boolean }) => {
       if (!sid || !roomID) return;
       let spaceID = sid;
       openCard({ ...args, spaceID, roomID });

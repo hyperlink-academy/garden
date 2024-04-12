@@ -58,7 +58,11 @@ export const BigCardBody = (
         console.log("yo?");
         if (editing) return;
         if (e.defaultPrevented) return;
-        open({ entityID: props.entityID, parent: props.parent });
+        open({
+          entityID: props.entityID,
+          parent: props.parent,
+          append: e.ctrlKey || e.metaKey,
+        });
       }}
     >
       {/* Big Card Preview Content Wrapper */}
