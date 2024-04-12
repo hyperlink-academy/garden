@@ -4,6 +4,7 @@ import { useCallback, useState } from "react";
 import * as Popover from "@radix-ui/react-popover";
 import { CardSmall } from "components/Icons";
 import { useCardViewer } from "components/CardViewerContext";
+import { useCloseCard } from "hooks/useUIState";
 
 export const Title = (props: { entityID: string }) => {
   let { authorized, mutate, action } = useMutations();
@@ -23,6 +24,7 @@ export const Title = (props: { entityID: string }) => {
   let [focused, setFocused] = useState(false);
   let [selectedAutocomplete, setSelectedAutocomplete] = useState(0);
   let { open } = useCardViewer();
+  let close = useCloseCard();
   let complete = useCallback(
     async (selectedCard?: string) => {
       if (selectedCard) {
@@ -34,6 +36,7 @@ export const Title = (props: { entityID: string }) => {
           newCard,
         });
         open({ entityID: newCard, parent: props.entityID });
+        close(props.entityID);
 
         action.end();
         setTimeout(() => {
