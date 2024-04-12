@@ -32,7 +32,7 @@ export const useCardViewer = () => {
         setTimeout(() => {
           document
             .getElementById(elementID.card(args.entityID).container)
-            ?.scrollIntoView({ behavior: "smooth" });
+            ?.scrollIntoView({ behavior: "smooth", inline: "center" });
         }, 50);
       if (args.focus) {
         focusElement(() =>
