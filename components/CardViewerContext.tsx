@@ -28,11 +28,12 @@ export const useCardViewer = () => {
         parent: args.parent,
         append: args.append,
       });
-      setTimeout(() => {
-        document
-          .getElementById(elementID.card(args.entityID).container)
-          ?.scrollIntoView({ behavior: "smooth" });
-      }, 50);
+      if (!args.append)
+        setTimeout(() => {
+          document
+            .getElementById(elementID.card(args.entityID).container)
+            ?.scrollIntoView({ behavior: "smooth" });
+        }, 50);
       if (args.focus) {
         focusElement(() =>
           document.getElementById(
