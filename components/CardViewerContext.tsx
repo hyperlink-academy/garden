@@ -7,7 +7,7 @@ import {
   useRoom,
   useUIState,
 } from "hooks/useUIState";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { CardView } from "./CardView";
 import { focusElement } from "src/utils";
 import { useIsMobile } from "hooks/utils";

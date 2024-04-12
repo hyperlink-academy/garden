@@ -9,7 +9,6 @@ import { useSidebarState } from "./SidebarState";
 import { Divider } from "components/Layout";
 import { useAuth } from "hooks/useAuth";
 import Link from "next/link";
-import { useViewportDifference } from "hooks/useViewportSize";
 
 export default function SidebarLayout(props: {
   breadcrumb: React.ReactNode;
@@ -70,17 +69,11 @@ export default function SidebarLayout(props: {
     },
   });
 
-  let sidebarSpring = useSpring({
-    width: isMobile || open ? 256 : 36,
-  });
   let disclosureSpring = useSpring({
     rotate: open ? 90 : -90,
   });
   let sidebarOverlaySpring = useSpring({
     opacity: open ? 0.2 : 0,
-  });
-  let mobileSidebarSpring = useSpring({
-    left: open ? 0 : -262,
   });
   useEffect(() => {
     let listener = (e: KeyboardEvent) => {
@@ -129,8 +122,10 @@ export default function SidebarLayout(props: {
             <div className="z-20 ml-auto h-full w-2/3" ref={droppableRef} />
           </animated.div>
         )}
-        <animated.div
-          style={mobileSidebarSpring}
+        <div
+          style={{
+            left: open ? 0 : -262,
+          }}
           className={`pwa-padding pwa-padding-bottom absolute top-0 z-30 flex h-full py-1 pl-1`}
         >
           <div
@@ -163,7 +158,7 @@ export default function SidebarLayout(props: {
               <div className="h-full w-64 pt-3">{props.openContent}</div>
             </div>
           </div>
-        </animated.div>
+        </div>
       </>
     );
 
@@ -177,8 +172,10 @@ export default function SidebarLayout(props: {
         } ${open ? "bg-white" : "bg-bg-blue"}`}
         onClick={() => setSidebar(true)}
       >
-        <animated.div
-          style={sidebarSpring}
+        <div
+          style={{
+            width: isMobile || open ? 256 : 36,
+          }}
           className="no-scrollbar h-full w-full overflow-x-hidden bg-inherit"
         >
           <div className="sidebar relative flex h-full w-full flex-col items-stretch justify-start justify-items-start gap-0 overflow-y-scroll bg-inherit">
@@ -220,7 +217,7 @@ export default function SidebarLayout(props: {
               </div>
             )}
           </div>
-        </animated.div>
+        </div>
       </div>
     </>
   );

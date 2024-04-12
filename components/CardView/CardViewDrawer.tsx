@@ -8,9 +8,8 @@ import {
 } from "./Discussion";
 import { useViewportSize } from "@react-aria/utils";
 import { useUIState } from "hooks/useUIState";
-import { springConfig } from "src/constants";
 import useMeasure from "react-use-measure";
-import { animated, useSpring } from "@react-spring/web";
+import { ChatEmptyTiny, RoomChat } from "components/Icons";
 
 export const CardViewDrawer = (props: {
   entityID: string;
@@ -20,10 +19,6 @@ export const CardViewDrawer = (props: {
   let viewportHeight = useViewportSize().height;
 
   let [measure, { height }] = useMeasure();
-  let drawerSpring = useSpring({
-    height: props.drawerOpen ? height : 0,
-    springConfig: springConfig,
-  });
   let cardBackgroundColor =
     db.useEntity(props.entityID, "card/background-color")?.value || "#FFFFFF";
   return (
@@ -34,7 +29,11 @@ export const CardViewDrawer = (props: {
           <BacklinkTab entityID={props.entityID} />
         </div>
       </div>
-      <animated.div style={drawerSpring}>
+      <div
+        style={{
+          height: props.drawerOpen ? height : 0,
+        }}
+      >
         <div ref={measure}>
           <MessageWindow
             onDragTop={() => useUIState.getState().closeDrawer(props.entityID)}
@@ -57,7 +56,7 @@ export const CardViewDrawer = (props: {
           }g-white" /> */}
           </MessageWindow>
         </div>
-      </animated.div>
+      </div>
       <div
         className={`sticky bottom-0  mt-2  pb-2`}
         style={{ backgroundColor: cardBackgroundColor }}
@@ -93,7 +92,11 @@ const ChatTab = (props: { entityID: string }) => {
   return (
     <Tab
       entityID={props.entityID}
-      text={`chat (${messages.length})`}
+      text={
+        <div className="py-0.5">
+          {messages.length > 0 ? <RoomChat /> : <ChatEmptyTiny />}
+        </div>
+      }
       id="chat"
     />
   );
@@ -124,7 +127,7 @@ const BacklinkTab = (props: { entityID: string }) => {
 
 const Tab = (props: {
   id: "backlinks" | "chat";
-  text: string;
+  text: React.ReactNode;
   entityID: string;
 }) => {
   let currentTab =

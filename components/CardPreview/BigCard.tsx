@@ -212,11 +212,11 @@ export const BigCardBody = (
                 <div className="cardPreviewCommentIcon flex shrink-0 items-center gap-1 py-0.5 pl-0.5 pr-1 text-xs">
                   {props.messagesCount && props.messagesCount > 0 ? (
                     <>
-                      <RoomChat /> {props.messagesCount}
+                      <RoomChat />
                     </>
                   ) : (
                     <>
-                      <ChatEmptyTiny /> 0
+                      <ChatEmptyTiny />
                     </>
                   )}
                 </div>
