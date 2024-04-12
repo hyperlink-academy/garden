@@ -1,5 +1,4 @@
 import { ref } from "data/Facts";
-import { useAppEventListener, publishAppEvent } from "hooks/useEvents";
 import { db, useMutations, useSpaceID } from "hooks/useReplicache";
 import {
   useOpenCard,
@@ -7,9 +6,9 @@ import {
   useRoom,
   useUIState,
 } from "hooks/useUIState";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { CardView } from "./CardView";
-import { focusElement } from "src/utils";
+import { elementID, focusElement } from "src/utils";
 import { useIsMobile } from "hooks/utils";
 import { useAuth } from "hooks/useAuth";
 import { useSidebarState } from "app/(app)/@sidebar/SidebarState";
@@ -29,11 +28,17 @@ export const useCardViewer = () => {
         parent: args.parent,
         append: args.append,
       });
-      publishAppEvent("cardviewer.open-card", args);
+      setTimeout(() => {
+        document
+          .getElementById(elementID.card(args.entityID).container)
+          ?.scrollIntoView({ behavior: "smooth" });
+      }, 50);
       if (args.focus) {
         focusElement(() =>
           document.getElementById(
-            args.focus === "content" ? "default-text-section" : "card-title"
+            args.focus === "content"
+              ? elementID.card(args.entityID)?.content
+              : elementID.card(args.entityID).title
           )
         );
       }
@@ -54,7 +59,6 @@ export function CardViewer(props: { space_id: string }) {
     if (!spaceID || !room) return [];
     return s.spaces[spaceID]?.rooms?.[room] || [];
   });
-  let cardViewerRef = useRef<HTMLDivElement | null>(null);
   let { mutate, memberEntity, client } = useMutations();
   let { session } = useAuth();
   let unreadBy = db.useEntity(
@@ -95,17 +99,6 @@ export function CardViewer(props: { space_id: string }) {
     });
   }, [room, history, client, mutate]);
 
-  useAppEventListener(
-    "cardviewer.open-card",
-    () => {
-      setTimeout(() => {
-        document
-          .getElementById("appLayout")
-          ?.scrollTo({ behavior: "smooth", left: 5000 });
-      }, 50);
-    },
-    []
-  );
   let [render, setRender] = useState(false);
   useEffect(() => {
     setRender(true);
@@ -123,8 +116,8 @@ export function CardViewer(props: { space_id: string }) {
           history.map((c) => {
             return (
               <div
+                id={elementID.card(c).container}
                 key={c}
-                id="cardViewerWrapper"
                 className={`cardViewerWrapper
                   flex  h-full w-[calc(100vw-16px)] max-w-xl
                   shrink-0 touch-pan-x

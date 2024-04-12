@@ -11,6 +11,7 @@ import { db, useMutations } from "hooks/useReplicache";
 import { Props } from "./index";
 import { useUIState } from "hooks/useUIState";
 import { LinkPreviewTiny } from "components/LinkPreview";
+import { elementID } from "src/utils";
 
 export const SmallCardBody = (
   props: {
@@ -169,7 +170,10 @@ export const BaseSmallCard = (
               open({ entityID: props.entityID, parent: props.parent });
               useUIState.getState().openDrawer(props.entityID, "chat");
               setTimeout(() => {
-                document.getElementById("messageInput")?.focus();
+                props.entityID &&
+                  document
+                    .getElementById(elementID.discussion(props.entityID).input)
+                    ?.focus();
               }, 50);
             }}
           >

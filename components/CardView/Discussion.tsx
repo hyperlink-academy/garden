@@ -16,6 +16,7 @@ import { useFilteredCards } from "../CardFilter";
 import { useAuth } from "hooks/useAuth";
 import { useGesture } from "@use-gesture/react";
 import { theme } from "tailwind.config";
+import { elementID } from "src/utils";
 let { colors } = theme;
 
 export const DiscussionRoom = (props: {
@@ -49,6 +50,7 @@ export const DiscussionRoom = (props: {
         />
       </div>
       <MessageWindow
+        entityID={props.entityID}
         className={`discussionWindow no-scrollbar relative flex h-full flex-col overflow-x-hidden overflow-y-scroll ${
           authorized ? "pb-[64px]" : "pb-[88px]"
         }`}
@@ -106,6 +108,7 @@ export const useMarkRead = (entityID: string, focused: boolean) => {
 };
 
 export const MessageWindow = (props: {
+  entityID: string;
   style?: HTMLAttributes<HTMLDivElement>["style"];
   onDragTop?: () => void;
   children: React.ReactNode;
@@ -145,7 +148,7 @@ export const MessageWindow = (props: {
       }}
       ref={elRef}
       className={props.className}
-      id="card-comments"
+      id={elementID.discussion(props.entityID).container}
     >
       {props.children}
     </div>
@@ -208,7 +211,9 @@ export const MessageInput = (props: {
       props.onSend();
     }
     setTimeout(() => {
-      let el = document.getElementById("card-comments");
+      let el = document.getElementById(
+        elementID.discussion(props.entityID).container
+      );
       if (!el) return;
       el.scrollTop = el.scrollHeight;
     }, 50);
@@ -305,7 +310,7 @@ export const MessageInput = (props: {
                   }
                   placeholder=""
                   className="w-full grow text-sm"
-                  id="messageInput"
+                  id={elementID.discussion(props.entityID).input}
                 />
 
                 <ButtonPrimary
@@ -590,7 +595,11 @@ const Message = (props: {
                 }`}
                 onClick={() => {
                   props.setReply(props.id);
-                  document.getElementById("messageInput")?.focus();
+                  document
+                    .getElementById(
+                      elementID.discussion(props.discussion).input
+                    )
+                    ?.focus();
                 }}
               >
                 <Reply />

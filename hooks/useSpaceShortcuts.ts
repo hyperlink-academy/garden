@@ -71,10 +71,10 @@ export function useCardShortcuts() {
       )
         return;
       if (e.key === "Enter") {
-        let el = document.getElementById("card-title");
-        console.log(el);
-        e.preventDefault();
-        if (el) el.focus();
+        //TODO we should look at this or fix this if we do selection state for cards
+        //let el = document.getElementById(document.getElementById);
+        // e.preventDefault();
+        //if (el) el.focus();
       }
       if (e.key === "ArrowUp" && e.shiftKey) {
         e.preventDefault();

@@ -41,6 +41,7 @@ import { LinkPreview } from "components/LinkPreview";
 import { useLinkPreviewManager } from "hooks/useLinkPreviewManager";
 import { useDrag } from "@use-gesture/react";
 import { useSmoker } from "components/Smoke";
+import { elementID } from "src/utils";
 
 const borderStyles = (args: { member: boolean }) => {
   switch (true) {
@@ -185,7 +186,6 @@ export const CardView = (props: {
           </div>
         )}
         <div
-          id="card-container"
           className={`
             no-scrollbar flex
             h-full  grow
@@ -536,10 +536,7 @@ const ScheduledDate = (props: {
   if (!props.dateEditing && !date) return null;
 
   return (
-    <div
-      id="card-date"
-      className="flex place-items-center gap-2 text-sm italic text-grey-55"
-    >
+    <div className="flex place-items-center gap-2 text-sm italic text-grey-55">
       {props.dateEditing ? (
         <>
           <input
@@ -608,7 +605,7 @@ const DefaultTextSection = (props: { entityID: string }) => {
   return (
     <SingleTextSection
       autocompleteCardNames
-      id="default-text-section"
+      id={elementID.card(props.entityID).content}
       style={{
         backgroundColor: cardBackgroundColor,
       }}

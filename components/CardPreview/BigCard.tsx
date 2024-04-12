@@ -11,7 +11,7 @@ import { Divider } from "components/Layout";
 import { db, useMutations } from "hooks/useReplicache";
 import { useUIState } from "hooks/useUIState";
 import { Props } from "./index";
-import { focusElement } from "src/utils";
+import { elementID, focusElement } from "src/utils";
 import { LinkPreviewCondensed } from "components/LinkPreview";
 
 export const BigCardBody = (
@@ -206,10 +206,13 @@ export const BigCardBody = (
                 } `}
                 onClick={() => {
                   if (!props.entityID) return;
+                  let entityID = props.entityID;
                   open({ entityID: props.entityID, parent: props.parent });
-                  useUIState.getState().openDrawer(props.entityID, "chat");
+                  useUIState.getState().openDrawer(entityID, "chat");
                   setTimeout(() => {
-                    document.getElementById("messageInput")?.focus();
+                    document
+                      .getElementById(elementID.discussion(entityID).input)
+                      ?.focus();
                   }, 50);
                 }}
               >

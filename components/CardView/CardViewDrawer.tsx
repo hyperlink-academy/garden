@@ -37,6 +37,7 @@ export const CardViewDrawer = (props: {
       <animated.div style={drawerSpring}>
         <div ref={measure}>
           <MessageWindow
+            entityID={props.entityID}
             onDragTop={() => useUIState.getState().closeDrawer(props.entityID)}
             style={{
               maxHeight: props.drawerOpen
