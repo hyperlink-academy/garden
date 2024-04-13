@@ -78,7 +78,7 @@ export const SpaceSearch = ({
             await mutate("addCardToSection", {
               factID: ulid(),
               cardEntity: entityID,
-              parent: currentOpenCard,
+              parent: currentOpenCard.card,
               section: "deck/contains",
               positions: {
                 eav: position,

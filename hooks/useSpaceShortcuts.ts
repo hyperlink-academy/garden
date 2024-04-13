@@ -89,7 +89,7 @@ export function useCardShortcuts() {
         if (!sortedCards) return;
 
         let currentIndex = sortedCards.findIndex(
-          (r) => r.value.value === currentCard
+          (r) => r.value.value === currentCard.card
         );
         if (!currentCard || currentIndex === -1) {
           open({
@@ -117,7 +117,7 @@ export function useCardShortcuts() {
 
         if (!sortedCards) return;
         let currentIndex = sortedCards.findIndex(
-          (r) => r.value.value === currentCard
+          (r) => r.value.value === currentCard.card
         );
         if (!currentCard || currentIndex === -1) {
           open({ entityID: sortedCards[0]?.value.value, parent: null });

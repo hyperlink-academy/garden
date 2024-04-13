@@ -63,7 +63,7 @@ export function CardViewer(props: { space_id: string }) {
   let { mutate, memberEntity, client } = useMutations();
   let { session } = useAuth();
   let unreadBy = db.useEntity(
-    room ? history[0] || null : null,
+    room ? history[0]?.card || null : null,
     "card/unread-by"
   );
   useEffect(() => {
@@ -74,7 +74,7 @@ export function CardViewer(props: { space_id: string }) {
           memberEntity,
           userID: session.user.id,
           space_id: props.space_id,
-          entityID: history[0],
+          entityID: history[0].card,
           attribute: "card/unread-by",
         });
     }
@@ -89,7 +89,7 @@ export function CardViewer(props: { space_id: string }) {
   ]);
   useEffect(() => {
     if (!client || !room) return;
-    let currentCard = history[0];
+    let currentCard = history[0]?.card;
     if (!currentCard) return;
     mutate("assertEmphemeralFact", {
       clientID: client.clientID,
@@ -117,8 +117,8 @@ export function CardViewer(props: { space_id: string }) {
           history.map((c) => {
             return (
               <div
-                id={elementID.card(c).container}
-                key={c}
+                id={elementID.card(c.card).container}
+                key={c.card}
                 className={`cardViewerWrapper
                   flex  h-full w-[calc(100vw-16px)] max-w-xl
                   shrink-0 touch-pan-x
@@ -132,9 +132,9 @@ export function CardViewer(props: { space_id: string }) {
                   } md:shrink`}
               >
                 <CardView
-                  entityID={c}
+                  entityID={c.card}
                   onDelete={() => {
-                    removeCardFromRoomHistory({ cardEntity: c, room });
+                    removeCardFromRoomHistory({ cardEntity: c.card, room });
                   }}
                 />
               </div>

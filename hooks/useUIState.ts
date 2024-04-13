@@ -14,7 +14,7 @@ export let useUIState = create(
           [spaceID: string]: {
             activeRoom?: string;
             rooms: {
-              [roomID: string]: string[];
+              [roomID: string]: { card: string; parent: string | null }[];
             };
           };
         },
@@ -153,7 +153,7 @@ export let useUIState = create(
                 rooms: {
                   [roomID]:
                     state.spaces?.[spaceID]?.rooms?.[roomID]?.filter(
-                      (c) => c !== card
+                      (c) => c.card !== card
                     ) || [],
                 },
               },
@@ -175,11 +175,31 @@ export let useUIState = create(
         }) => {
           set((state) => {
             let currentCards = state.spaces[spaceID]?.rooms?.[roomID] || [];
-            let parentIndex = parent ? currentCards.indexOf(parent) : -1;
-            if (currentCards.includes(card)) return state;
-            let newCards = [...currentCards.slice(0, parentIndex + 1), card];
-            if (append)
-              newCards = newCards.concat(currentCards.slice(parentIndex + 1));
+            let parentIndex = parent
+              ? currentCards.findIndex((c) => c.card === parent)
+              : -1;
+            if (currentCards.find((c) => c.card === card)) return state;
+            let newCards: { card: string; parent: string | null }[] = [];
+            if (!append)
+              newCards = [
+                ...currentCards.slice(0, parentIndex + 1),
+                { card, parent },
+              ];
+            if (append) {
+              let lastSibling = currentCards
+                .slice(parentIndex + 1)
+                .findIndex((c) => c.parent !== parent);
+              console.log(parent);
+              console.log(currentCards.slice(parentIndex + 1));
+              console.log(lastSibling);
+              if (lastSibling === -1)
+                lastSibling = currentCards.slice(parentIndex + 1).length;
+              newCards = [
+                ...currentCards.slice(0, parentIndex + 1 + lastSibling),
+                { card, parent },
+                ...currentCards.slice(parentIndex + 1 + lastSibling),
+              ];
+            }
 
             return {
               spaces: {
@@ -285,7 +305,7 @@ export const useRemoveCardFromRoomHistory = () => {
             ...state.spaces[sID],
             rooms: {
               ...state.spaces[sID].rooms,
-              [room]: history.filter((h) => h !== cardEntity),
+              [room]: history.filter((h) => h.card !== cardEntity),
             },
           },
         },
@@ -311,7 +331,7 @@ export const useRemoveCardFromRoomHistory = () => {
               [sID]: {
                 ...state.spaces[sID],
                 rooms: {
-                  [room]: history.filter((h) => h !== cardEntity),
+                  [room]: history.filter((h) => h.card !== cardEntity),
                 },
               },
             },
