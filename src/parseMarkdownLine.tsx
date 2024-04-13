@@ -1,6 +1,9 @@
 export const parseLine = (
   input: string,
-  config: { openLink: (name: string) => void; renderLinks?: boolean }
+  config: {
+    openLink: (args: { name: string; append: boolean }) => void;
+    renderLinks?: boolean;
+  }
 ) => {
   let output: Array<string | React.ReactNode> = [];
   let lastTokenPosition = 0;
@@ -66,7 +69,10 @@ export const parseLine = (
             className="inline text-accent-blue hover:cursor-pointer"
             onClick={(e) => {
               e.preventDefault();
-              config.openLink(content);
+              config.openLink({
+                append: e.ctrlKey || e.metaKey,
+                name: content,
+              });
             }}
           >
             {content}
