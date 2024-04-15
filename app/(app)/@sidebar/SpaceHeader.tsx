@@ -189,6 +189,7 @@ export const OpenSidebar = ({
   activeSpace: SpaceData;
 }) => {
   let { setSidebar } = useSidebarState();
+  let isMobile = useIsMobile();
   return (
     <div className="sidebarSpaceFromHome flex h-full flex-col items-stretch">
       <div className="sidebarContent grow">
@@ -212,7 +213,7 @@ export const OpenSidebar = ({
                   onClick={(e) => {
                     e.stopPropagation();
                     setSwitcher(false);
-                    setSidebar(false);
+                    if (isMobile) setSidebar(false);
                   }}
                   key={space.id}
                   href={
