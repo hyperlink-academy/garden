@@ -295,9 +295,11 @@ ol {
   }
 }
 
-input:focus {
-  animation: blink_input_opacity_to_prevent_scrolling_when_focus 0.01s;
-}
-textarea:focus {
-  animation: blink_input_opacity_to_prevent_scrolling_when_focus 0.01s;
+.iosSafari {
+  & input:focus {
+    animation: blink_input_opacity_to_prevent_scrolling_when_focus 0.01s;
+  }
+  & textarea:focus {
+    animation: blink_input_opacity_to_prevent_scrolling_when_focus 0.01s;
+  }
 }

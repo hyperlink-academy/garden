@@ -2,6 +2,7 @@
 import { useIsClient, useIsMobile } from "hooks/utils";
 import { LayoutWrapper, SideScrollSidebarHandler } from "./LayoutWrapper";
 import { useViewportDifference } from "hooks/useViewportSize";
+import { isIOS } from "@react-aria/utils";
 
 export const fetchCache = "force-no-store";
 
@@ -17,7 +18,9 @@ export default function AppLayout(props: {
     return (
       <LayoutWrapper
         id="heightWrapper"
-        className="no-scrollbar relative flex h-[calc(100%+env(safe-area-inset-top))] pt-10"
+        className={`no-scrollbar relative flex h-[calc(100%+env(safe-area-inset-top))] pt-10 ${
+          isIOS() ? "iosSafari" : ""
+        }`}
       >
         {props.sidebar}
         <SideScrollSidebarHandler
