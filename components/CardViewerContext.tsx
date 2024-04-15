@@ -33,7 +33,7 @@ export const useCardViewer = () => {
           document
             .getElementById(elementID.card(args.entityID).container)
             ?.scrollIntoView({ behavior: "smooth", inline: "center" });
-        }, 50);
+        }, 100);
       if (args.focus) {
         focusElement(() =>
           document.getElementById(
