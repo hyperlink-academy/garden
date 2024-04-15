@@ -363,7 +363,56 @@ const HelpShortcuts = () => {
         An evolving list of shortcuts you may find helpful in using Hyperlink!
       </p> */}
 
-      <h3>Text editing</h3>
+      <h3>Navigation</h3>
+      <ul>
+        <li>
+          <UnicodeKeyboardKey>{isAppleDevice() ? "⌘" : "⌃"}</UnicodeKeyboardKey>{" "}
+          + <KeyboardKey>/</KeyboardKey> to toggle expanded sidebar
+        </li>
+        <li>
+          <UnicodeKeyboardKey>⌥</UnicodeKeyboardKey> +{" "}
+          <UnicodeKeyboardKey>↑</UnicodeKeyboardKey> and{" "}
+          <UnicodeKeyboardKey>↓</UnicodeKeyboardKey> to switch rooms
+        </li>
+        <li>
+          <UnicodeKeyboardKey>⇧</UnicodeKeyboardKey> +{" "}
+          <UnicodeKeyboardKey>↑</UnicodeKeyboardKey> and{" "}
+          <UnicodeKeyboardKey>↓</UnicodeKeyboardKey> to switch cards in a room
+        </li>
+        {/* <li>
+          <i>canvas</i>:{" "}
+          <UnicodeKeyboardKey>{isAppleDevice() ? "⌘" : "⌃"}</UnicodeKeyboardKey>{" "}
+          + click for new card
+        </li> */}
+        {/* <li>
+          <i>collection</i>: drag to reorder cards
+        </li> */}
+        {/* <li>drag to reorder rooms in sidebar</li> */}
+        {/* <li>drag a card onto another to add it as a linked card</li> */}
+      </ul>
+
+      <h3>Search</h3>
+      <ul>
+        <li>
+          <UnicodeKeyboardKey>{isAppleDevice() ? "⌘" : "⌃"}</UnicodeKeyboardKey>{" "}
+          + <UnicodeKeyboardKey>k</UnicodeKeyboardKey> to open search
+        </li>
+        <li>
+          <UnicodeKeyboardKey>↑</UnicodeKeyboardKey> and{" "}
+          <UnicodeKeyboardKey>↓</UnicodeKeyboardKey> to select search results
+        </li>
+        <li>
+          <UnicodeKeyboardKey>{isAppleDevice() ? "⌘" : "⌃"}</UnicodeKeyboardKey>{" "}
+          + <UnicodeKeyboardKey>⏎</UnicodeKeyboardKey> to add to current room
+        </li>
+        <li>
+          <UnicodeKeyboardKey>{isAppleDevice() ? "⌘" : "⌃"}</UnicodeKeyboardKey>{" "}
+          + <UnicodeKeyboardKey>⇧</UnicodeKeyboardKey> +{" "}
+          <UnicodeKeyboardKey>⏎</UnicodeKeyboardKey> to add to current card
+        </li>
+      </ul>
+
+      <h3>Text Editing</h3>
       <ul>
         <li>
           start a line with <TextString>#</TextString> or{" "}
@@ -396,7 +445,7 @@ const HelpShortcuts = () => {
         </li>
       </ul>
 
-      <h3>Chat & comments</h3>
+      <h3>Chat</h3>
       <ul>
         <li>
           <UnicodeKeyboardKey>⏎</UnicodeKeyboardKey> to send a message
@@ -407,37 +456,8 @@ const HelpShortcuts = () => {
         </li>
       </ul>
 
-      <h3>Rooms & cards</h3>
-      <ul>
-        <li>
-          <UnicodeKeyboardKey>⌥</UnicodeKeyboardKey> +{" "}
-          <UnicodeKeyboardKey>↑</UnicodeKeyboardKey> and{" "}
-          <UnicodeKeyboardKey>↓</UnicodeKeyboardKey> to switch rooms
-        </li>
-        <li>
-          <UnicodeKeyboardKey>⇧</UnicodeKeyboardKey> +{" "}
-          <UnicodeKeyboardKey>↑</UnicodeKeyboardKey> and{" "}
-          <UnicodeKeyboardKey>↓</UnicodeKeyboardKey> to navigate between cards
-          in a room
-        </li>
-        <li>
-          <i>canvas</i>:{" "}
-          <UnicodeKeyboardKey>{isAppleDevice() ? "⌘" : "⌃"}</UnicodeKeyboardKey>{" "}
-          + click for new card
-        </li>
-        <li>
-          <i>collection</i>: drag to reorder cards
-        </li>
-        <li>drag to reorder rooms in sidebar</li>
-        <li>drag a card onto another to add it as a linked card</li>
-      </ul>
-
       <h3>General</h3>
       <ul>
-        <li>
-          <UnicodeKeyboardKey>{isAppleDevice() ? "⌘" : "⌃"}</UnicodeKeyboardKey>{" "}
-          + <KeyboardKey>/</KeyboardKey> to toggle expanded sidebar
-        </li>
         <li>
           <UnicodeKeyboardKey>{isAppleDevice() ? "⌘" : "⌃"}</UnicodeKeyboardKey>{" "}
           + <KeyboardKey>z</KeyboardKey> to undo

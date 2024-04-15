@@ -133,20 +133,28 @@ export const MemberCard = (props: {
 
   return (
     <div
-      className="relative flex h-full "
+      className="memberCardWrapper relative flex h-full hover:cursor-pointer"
       onClick={() => {
         if (!editing) setExpanded(!expanded);
         else return;
       }}
     >
       <div
-        className={`memberCard memberCardBorder relative flex  h-full grow flex-col items-stretch`}
+        className={`memberCard memberCardBorder relative flex h-full grow flex-col items-stretch`}
       >
-        <div className="memberCardHeader flex  items-end justify-between p-2 pb-0 text-white">
+        <div className="memberCardHeader flex items-end justify-between p-2 pb-0 text-white">
           <div className="flex h-fit flex-row gap-2 font-bold">
-            <Member /> {props.memberName}
+            <Member />{" "}
+            <Link
+              className="hover:underline"
+              href={`/s/${props.memberName}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {props.memberName}
+            </Link>
           </div>
-          <div className="text-sm ">member</div>
+          <div className="text-sm">member</div>
         </div>
         <div className="grow p-1 pt-1">
           <div
@@ -155,7 +163,11 @@ export const MemberCard = (props: {
             }`}
           >
             <button
-              className="flex h-full min-h-0 w-full grow items-start overflow-hidden text-left"
+              className={`flex h-full min-h-0 w-full grow items-start overflow-hidden text-left ${
+                session.session?.studio === props.memberStudio
+                  ? "hover:cursor-text"
+                  : ""
+              }`}
               onClick={() => {
                 if (session.session?.studio === props.memberStudio)
                   setEditing(true);
@@ -197,7 +209,7 @@ export const MemberCard = (props: {
               <>
                 <Divider />
                 <div
-                  className={`flex shrink-0  gap-1 text-grey-55 ${
+                  className={`flex shrink-0 gap-1 text-grey-55 ${
                     expanded ? "flex-col" : "justify-between"
                   }`}
                 >

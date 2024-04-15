@@ -11,6 +11,7 @@ import SidebarLayout from "../../SidebarLayout";
 import { SearchResults, SidebarSearchInput } from "../../SidebarSearch";
 import { useRouter } from "next/navigation";
 import { MobileHeaderTitle } from "../../MobileHeaderTitle";
+import { isAppleDevice } from "@react-aria/utils";
 
 export const StudioSidebarContent = (props: Props & { isAdmin: boolean }) => {
   return (
@@ -75,7 +76,7 @@ const StudioSidebarExpanded = (
           setSelectectedItemIndex={setSelectedItemIndex}
           value={spaceSearchInput}
           onChange={(e) => setSpaceSearchInput(e)}
-          placeholder="search studio (ctrl/⌘ K)"
+          placeholder={`search studio (${isAppleDevice() ? "⌘" : "⌃"}-K)`}
         />
       </div>
       {spaceSearchInput === "" ? (

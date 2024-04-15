@@ -13,6 +13,7 @@ import { SmallSpaceCard, SpaceData } from "components/SpacesList";
 import { uuidToBase62 } from "src/uuidHelpers";
 import { SearchResults, SidebarSearchInput } from "../../SidebarSearch";
 import { useRouter } from "next/navigation";
+import { isAppleDevice } from "@react-aria/utils";
 
 export function UserPageSidebar(props: {
   params: { studio: string };
@@ -83,7 +84,7 @@ const UserPageSidebarExpanded = (props: {
           resultsLength={results.length}
           value={search}
           onChange={(e) => setSearch(e)}
-          placeholder="search home (ctrl/⌘ K)"
+          placeholder={`search home (${isAppleDevice() ? "⌘" : "⌃"}-K)`}
         />
       </div>
       {search === "" ? (

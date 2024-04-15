@@ -115,14 +115,17 @@ export const AddReaction = (props: {
             </button>
           ))}
       </div>
-      <Divider />
+
       {fullMemberPermissions && (
-        <button
-          className="reactionPickerSettings place-self-end text-sm italic text-grey-55 hover:text-accent-blue disabled:hover:text-grey-55"
-          onClick={() => setReactionEditOpen(true)}
-        >
-          add / remove
-        </button>
+        <>
+          <Divider />
+          <button
+            className="reactionPickerSettings place-self-end text-sm italic text-grey-55 hover:text-accent-blue disabled:hover:text-grey-55"
+            onClick={() => setReactionEditOpen(true)}
+          >
+            add / remove
+          </button>
+        </>
       )}
       <EditReactions
         reactionEditOpen={reactionEditOpen}
