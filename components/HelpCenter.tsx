@@ -660,8 +660,6 @@ const HelpChangelog = () => {
       </p>
 
       <HelpDisclosureSection>
-        {/* LAST UPDATED: 3.25.24 */}
-
         {/* copy this section at the top to add a new items! */}
         {/* optional (boolean) props: important, deprecated, meta */}
         {/* 
@@ -672,6 +670,28 @@ const HelpChangelog = () => {
 
         {/* 2024 changes */}
 
+        <HelpDisclosure
+          name="Side scrolling card nav"
+          date="2024-04-16"
+          important
+        >
+          <p>
+            You can now open multiple cards side by side in columns, as many as
+            you like!
+          </p>
+          <p>
+            Clicking cards linked in other cards will automatically open to the
+            right so you can view a nested trail of linked cards. From anywhere
+            (including rooms & search), ctrl/cmd + click will always open cards
+            in new columns. And the “stack” of open cards will persist per-room.
+          </p>
+          <p>
+            This makes it a lot easier to compare notes or drafts, and to
+            navigate linked / nested cards. We’re finding it quite useful for
+            having more context visible at once, and more flexibility editing
+            cards.
+          </p>
+        </HelpDisclosure>
         <HelpDisclosure
           name="Global sidebar / nav refactor"
           date="2024-03-28"
@@ -695,7 +715,6 @@ const HelpChangelog = () => {
             we'll be working on more soon.
           </p>
         </HelpDisclosure>
-
         <HelpDisclosure
           name="New Handbook, Roadmap, Changelog"
           date="2024-03-27"
