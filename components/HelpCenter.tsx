@@ -476,23 +476,57 @@ const HelpRoadmap = () => {
   return (
     <div className="flex flex-col gap-4">
       <h2>Themes & Focus Areas</h2>
-      <p className="">
-        Use cases we&apos;re prioritizing; areas where we want Hyperlink to
-        shine:
+      <p>
+        Our vision is for Hyperlink to support a learning network — learners,
+        teachers, and schools, all working together in flexible, powerful,
+        creative environments.
       </p>
+      <p>
+        We think the most interesting results will come from the interplay
+        between different actors in a broader network: many people, many
+        projects, many groups, connecting in emergent and serendipitous ways.
+      </p>
+
       <HelpDisclosureSection>
-        <HelpDisclosure name="Hyperlink for Clubs">
+        <HelpDisclosure name="Hyperlink for Learners / Creators">
+          <p>
+            We've been using Hyperlink as a place to do creative projects — to
+            scratch our own itches, tease out collaborative ideas, and explore
+            things with friends. Spaces as flexible workbenches.
+          </p>
+          <p>
+            And we want a place to work across many different learning contexts,
+            from schools to communities of practice to casual collaborations
+            with friends, as our goals and interests evolve.
+          </p>
+          <p>Things we're excited about:</p>
+          <ul>
+            <li>
+              Customizing Spaces, so they can feel more personal and tailored to
+              your particular needs and vibes
+            </li>
+            <li>
+              Social features, to better follow what friends are doing, and join
+              in!
+            </li>
+            <li>
+              Realtime presence; making Spaces better for actually doing
+              creative work together
+            </li>
+            <li>
+              More ways of representing key info: rich text, multimedia cards,
+              etc.
+            </li>
+          </ul>
+        </HelpDisclosure>
+        <HelpDisclosure name="Hyperlink for Teachers / Facilitators">
           <p>
             Currently running experiments with internet clubs, and we want to
             make the app even better here — it should give us great ways to
             bring groups of people together for creative work and learning.
           </p>
-          <p>Some things this might include:</p>
+          <p>Things we're excited about:</p>
           <ul>
-            <li>
-              More ways of representing key info: rich text, multimedia cards,
-              etc.
-            </li>
             <li>
               Surfacing and sharing activity to keep momentum going; things
               should feel active and dynamic
@@ -505,20 +539,31 @@ const HelpRoadmap = () => {
               Built-in ways to send a group email / digest, perhaps as a card
             </li>
             <li>
-              Customization / theming so groups&apos; Spaces and Studios can
-              better reflect their identity
+              Theming and customization for Spaces and Studios to better reflect
+              a group's identity
             </li>
             <li>
-              Ways for people to discover and contribute to relevant clubs
+              Ways for people to discover and contribute to relevant courses,
+              clubs, or other groups / cohorts
             </li>
           </ul>
         </HelpDisclosure>
-        <HelpDisclosure name="Hyperlink for Schools">
+        <HelpDisclosure name="Hyperlink for Schools / Communities">
           <p>
             In the medium term, we want Hyperlink to be the best platform for
             independent internet-native schools to organize their activity.
           </p>
-          <p>This might include:</p>
+          <p>
+            For the record, this includes institutions that may not explicitly
+            self-identify as <em>schools</em> but share relevant values!
+          </p>
+          <p>
+            This includes maintaining more complex ecosystems of learning
+            activity — from explicitly structured courses, to more emergent and
+            dynamic cohorts, like extracurricular clubs, peer study groups, and
+            collaborative projects.
+          </p>
+          <p>Things we're excited about:</p>
           <ul>
             <li>
               Composable structure with Spaces and Studios reflecting more
@@ -564,15 +609,12 @@ const HelpRoadmap = () => {
         <p className="italic">currently in progress</p>
       </div>
       <HelpDisclosureSection>
-        <HelpDisclosure name="Global nav & notifications">
+        <HelpDisclosure name="Global notifications">
+          <p>Rethinking how notifications work throughout the app.</p>
           <p>
-            Refactoring navigation throughout the app to use a consistent
-            sidebar.
-          </p>
-          <p>
-            This is a big one, touching all parts of the app, but will make
-            everything feel more stable <em>and</em>
-            allow us to add a global notification center!
+            This includes, per-Space notifications (e.g. new cards and
+            messages), a place to consolidate your notifications globally across
+            the app, and options for email and push notifications.
           </p>
         </HelpDisclosure>
         <HelpDisclosure name="Card multiselect and actions">
@@ -595,18 +637,6 @@ const HelpRoadmap = () => {
           <p>
             This will enable interspersing text with images, linked cards, and
             (eventually) other media.
-          </p>
-        </HelpDisclosure>
-
-        <HelpDisclosure name="Multi-column side scrolling card viewer">
-          <p>
-            Rather than just one room and one card open next to it, you should
-            be able to click a card and have it open in a new column, with
-            arbitrary nesting.
-          </p>
-          <p>
-            This will make it easier to quickly browse collections, navigate
-            nested rooms and cards, and compare things side by side.
           </p>
         </HelpDisclosure>
         <HelpDisclosure name="Private Spaces & Studios">
