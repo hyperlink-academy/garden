@@ -25,7 +25,9 @@ export const RenderedText = forwardRef<
   let { mutate, authorized, memberEntity } = useMutations();
   let rep = useContext(ReplicacheContext);
   let openLink = useCallback(
-    async (link: string) => {
+    async (args: { name: string; append: boolean }) => {
+      if (!props.entityID) return;
+      let link = args.name;
       let entity = await rep?.rep.query((tx) =>
         scanIndex(tx).ave("card/title", link.slice(2, -2))
       );
@@ -45,10 +47,14 @@ export const RenderedText = forwardRef<
             positions: {},
           });
 
-        open({ entityID });
+        open({ entityID, parent: props.entityID });
         return;
       }
-      open({ entityID: entity.entity });
+      open({
+        entityID: entity.entity,
+        parent: props.entityID,
+        append: args.append,
+      });
     },
     [open, rep?.rep, authorized, memberEntity, mutate, props.entityID]
   );

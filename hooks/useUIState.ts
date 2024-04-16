@@ -14,7 +14,7 @@ export let useUIState = create(
           [spaceID: string]: {
             activeRoom?: string;
             rooms: {
-              [roomID: string]: string[];
+              [roomID: string]: { card: string; parent: string | null }[];
             };
           };
         },
@@ -136,11 +136,71 @@ export let useUIState = create(
             },
           }));
         },
-        closeCard: (spaceID: string, roomID: string) => {},
-        openCard: (spaceID: string, roomID: string, card: string) => {
+        closeCard: ({
+          spaceID,
+          roomID,
+          card,
+        }: {
+          spaceID: string;
+          roomID: string;
+          card: string;
+        }) => {
+          useUIState.setState((state) => ({
+            spaces: {
+              ...state.spaces,
+              [spaceID]: {
+                ...state.spaces[spaceID],
+                rooms: {
+                  [roomID]:
+                    state.spaces?.[spaceID]?.rooms?.[roomID]?.filter(
+                      (c) => c.card !== card
+                    ) || [],
+                },
+              },
+            },
+          }));
+        },
+        openCard: ({
+          spaceID,
+          roomID,
+          card,
+          parent,
+          append,
+        }: {
+          spaceID: string;
+          roomID: string;
+          card: string;
+          parent: string | null;
+          append?: boolean;
+        }) => {
           set((state) => {
-            let currentCard = state.spaces[spaceID]?.rooms?.[roomID]?.[0];
-            if (currentCard === card) return state;
+            let currentCards = state.spaces[spaceID]?.rooms?.[roomID] || [];
+            let parentIndex = parent
+              ? currentCards.findIndex((c) => c.card === parent)
+              : -1;
+            if (currentCards.find((c) => c.card === card)) return state;
+            let newCards: { card: string; parent: string | null }[] = [];
+            if (!append)
+              newCards = [
+                ...currentCards.slice(0, parentIndex + 1),
+                { card, parent },
+              ];
+            if (append) {
+              let lastSibling = currentCards
+                .slice(parentIndex + 1)
+                .findIndex((c) => c.parent !== parent);
+              console.log(parent);
+              console.log(currentCards.slice(parentIndex + 1));
+              console.log(lastSibling);
+              if (lastSibling === -1)
+                lastSibling = currentCards.slice(parentIndex + 1).length;
+              newCards = [
+                ...currentCards.slice(0, parentIndex + 1 + lastSibling),
+                { card, parent },
+                ...currentCards.slice(parentIndex + 1 + lastSibling),
+              ];
+            }
+
             return {
               spaces: {
                 ...state.spaces,
@@ -148,10 +208,7 @@ export let useUIState = create(
                   ...state.spaces[spaceID],
                   rooms: {
                     ...state.spaces[spaceID]?.rooms,
-                    [roomID]: [
-                      card,
-                      ...(state.spaces[spaceID]?.rooms?.[roomID] || []),
-                    ],
+                    [roomID]: newCards,
                   },
                 },
               },
@@ -208,27 +265,26 @@ export let useRoomHistory = () => {
 };
 
 export const useOpenCard = () => {
-  let spaceID = useSpaceID();
+  let sid = useSpaceID();
   let { action } = useMutations();
   let openCard = useUIState((state) => state.openCard);
   let closeCard = useUIState((state) => state.closeCard);
-  let room = useRoom();
+  let roomID = useRoom();
   return useCallback(
-    (entityID: string) => {
-      if (!spaceID) return;
-
-      if (!room) return;
-      openCard(spaceID, room, entityID);
+    (args: { card: string; parent: null | string; append?: boolean }) => {
+      if (!sid || !roomID) return;
+      let spaceID = sid;
+      openCard({ ...args, spaceID, roomID });
       action.add({
         undo: () => {
-          closeCard(spaceID as string, room as string);
+          closeCard({ ...args, spaceID, roomID });
         },
         redo: () => {
-          openCard(spaceID as string, room as string, entityID);
+          openCard({ ...args, spaceID, roomID });
         },
       });
     },
-    [spaceID, action, closeCard, openCard, room]
+    [sid, action, closeCard, openCard, roomID]
   );
 };
 
@@ -249,7 +305,7 @@ export const useRemoveCardFromRoomHistory = () => {
             ...state.spaces[sID],
             rooms: {
               ...state.spaces[sID].rooms,
-              [room]: history.filter((h) => h !== cardEntity),
+              [room]: history.filter((h) => h.card !== cardEntity),
             },
           },
         },
@@ -275,7 +331,7 @@ export const useRemoveCardFromRoomHistory = () => {
               [sID]: {
                 ...state.spaces[sID],
                 rooms: {
-                  [room]: history.filter((h) => h !== cardEntity),
+                  [room]: history.filter((h) => h.card !== cardEntity),
                 },
               },
             },
@@ -288,41 +344,41 @@ export const useRemoveCardFromRoomHistory = () => {
 };
 
 export const useCloseCard = () => {
-  let spaceID = useSpaceID();
+  let sid = useSpaceID();
   let { action } = useMutations();
-  let openCard = useUIState((state) => state.openCard);
+  let room = useRoom();
 
-  return useCallback(() => {
-    if (!spaceID) return;
-    let room = useUIState.getState().spaces[spaceID]?.activeRoom;
-    if (!room) return;
+  return useCallback(
+    (card: string) => {
+      if (!sid) return;
+      let spaceID = sid;
+      if (!room) return;
 
-    let closeCard = (spaceID: string, room: string) => {
-      useUIState.setState((state) => ({
-        spaces: {
-          ...state.spaces,
-          [spaceID]: {
-            ...state.spaces[spaceID],
-            rooms: {
-              [room]: state.spaces?.[spaceID]?.rooms?.[room]?.slice(1) || [],
+      let state = useUIState.getState();
+      let previousCards = state.spaces[spaceID]?.rooms?.[room];
+      let closeCard = useUIState.getState().closeCard;
+      closeCard({ spaceID, roomID: room, card });
+      action.add({
+        undo: () => {
+          useUIState.setState((state) => ({
+            spaces: {
+              ...state.spaces,
+              [spaceID]: {
+                ...state.spaces[spaceID],
+                rooms: {
+                  [room]: previousCards || [],
+                },
+              },
             },
-          },
+          }));
         },
-      }));
-    };
-
-    let currentCard = useUIState.getState().spaces[spaceID]?.rooms?.[room]?.[0];
-    if (!currentCard) return;
-    closeCard(spaceID as string, room as string);
-    action.add({
-      undo: () => {
-        openCard(spaceID as string, room as string, currentCard as string);
-      },
-      redo: () => {
-        closeCard(spaceID as string, room as string);
-      },
-    });
-  }, [spaceID, action, openCard]);
+        redo: () => {
+          closeCard({ spaceID, roomID: room, card });
+        },
+      });
+    },
+    [sid, action, room]
+  );
 };
 
 export const useCurrentOpenCard = () => {

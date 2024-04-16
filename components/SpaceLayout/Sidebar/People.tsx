@@ -19,7 +19,6 @@ import {
 import { db, useMutations, useSpaceID } from "hooks/useReplicache";
 import tailwind from "tailwind.config";
 import { useState } from "react";
-import { useOpenCard } from "hooks/useUIState";
 import { Fact } from "data/Facts";
 import { MediaDeviceSettings } from "components/Calls/CallManager";
 import { useJoinCall } from "components/Calls/CallProvider";
@@ -33,6 +32,7 @@ import { Modal } from "components/Modal";
 import { Truncate } from "components/Truncate";
 import { useSpaceData } from "hooks/useSpaceData";
 import { spacePath } from "hooks/utils";
+import { useCardViewer } from "components/CardViewerContext";
 
 export const People = (props: { space_id: string }) => {
   let spaceData = useSpaceData(props);
@@ -387,7 +387,7 @@ const Member = (props: { entityID: string; showInCall?: boolean }) => {
     activeSessions[0]?.entity || null,
     "presence/on-card"
   );
-  let open = useOpenCard();
+  let { open } = useCardViewer();
   let cardTitle = db.useEntity(onCard?.value.value || null, "card/title");
   if (participant && !props.showInCall) return null;
 
@@ -428,7 +428,8 @@ const Member = (props: { entityID: string; showInCall?: boolean }) => {
                 role="button"
                 className="over:cursor-pointer whitespace-nowrap underline"
                 onClick={() => {
-                  if (onCard) open(onCard.value.value);
+                  if (onCard)
+                    open({ entityID: onCard.value.value, parent: null });
                 }}
               >
                 {cardTitle?.value || "Untitled Card"}

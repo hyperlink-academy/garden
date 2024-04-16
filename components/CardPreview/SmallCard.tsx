@@ -11,6 +11,7 @@ import { db, useMutations } from "hooks/useReplicache";
 import { Props } from "./index";
 import { useUIState } from "hooks/useUIState";
 import { LinkPreviewTiny } from "components/LinkPreview";
+import { elementID } from "src/utils";
 
 export const SmallCardBody = (
   props: {
@@ -66,8 +67,13 @@ export const BaseSmallCard = (
   return (
     <div
       {...listenersAndAttributes}
-      onClick={() => {
-        props.entityID && open({ entityID: props.entityID });
+      onClick={(e) => {
+        props.entityID &&
+          open({
+            entityID: props.entityID,
+            parent: props.parent,
+            append: e.ctrlKey || e.metaKey,
+          });
       }}
       className={`h-full w-full !bg-cover !bg-center !bg-no-repeat hover:cursor-pointer ${
         props.isMember ? "pb-1 pl-2 pr-1 pt-2" : "px-2 py-2"
@@ -161,10 +167,13 @@ export const BaseSmallCard = (
             } `}
             onClick={() => {
               if (!props.entityID) return;
-              open({ entityID: props.entityID });
+              open({ entityID: props.entityID, parent: props.parent });
               useUIState.getState().openDrawer(props.entityID, "chat");
               setTimeout(() => {
-                document.getElementById("messageInput")?.focus();
+                props.entityID &&
+                  document
+                    .getElementById(elementID.discussion(props.entityID).input)
+                    ?.focus();
               }, 50);
             }}
           >

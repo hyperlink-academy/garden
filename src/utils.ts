@@ -51,3 +51,15 @@ export function focusElement(element: () => HTMLElement | null) {
     fakeInput?.remove();
   }, 500);
 }
+
+export const elementID = {
+  card: (entityID: string) => ({
+    title: `card/${entityID}/title`,
+    container: `card/${entityID}/container`,
+    content: `card/${entityID}/content`,
+  }),
+  discussion: (entityID: string) => ({
+    input: `discussion/${entityID}/input`,
+    container: `discussion/${entityID}/container`,
+  }),
+};

@@ -27,7 +27,7 @@ export const Reactions = (props: { entityID: string }) => {
             onOpenChange={() => setReactionPickerOpen(!reactionPickerOpen)}
           >
             <Popover.Trigger className="flex items-center px-1">
-              <button
+              <div
                 className={` ${
                   reactionPickerOpen
                     ? "text-accent-blue"
@@ -35,7 +35,7 @@ export const Reactions = (props: { entityID: string }) => {
                 }`}
               >
                 <ReactionAdd />
-              </button>
+              </div>
             </Popover.Trigger>
             <Popover.Portal>
               <Popover.Content

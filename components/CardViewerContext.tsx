@@ -1,5 +1,4 @@
 import { ref } from "data/Facts";
-import { useAppEventListener, publishAppEvent } from "hooks/useEvents";
 import { db, useMutations, useSpaceID } from "hooks/useReplicache";
 import {
   useOpenCard,
@@ -7,31 +6,45 @@ import {
   useRoom,
   useUIState,
 } from "hooks/useUIState";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { CardView } from "./CardView";
-import { focusElement } from "src/utils";
+import { elementID, focusElement } from "src/utils";
 import { useIsMobile } from "hooks/utils";
 import { useAuth } from "hooks/useAuth";
 import { useSidebarState } from "app/(app)/@sidebar/SidebarState";
 
 export const useCardViewer = () => {
-  let spaceID = useSpaceID();
   let openCard = useOpenCard();
 
   let open = useCallback(
-    (args: { entityID: string; focus?: "title" | "content" }) => {
-      if (!spaceID) return;
-      openCard(args.entityID);
-      publishAppEvent("cardviewer.open-card", args);
+    (args: {
+      entityID: string;
+      focus?: "title" | "content";
+      parent: string | null;
+      append?: boolean;
+    }) => {
+      openCard({
+        card: args.entityID,
+        parent: args.parent,
+        append: args.append,
+      });
+      if (!args.append)
+        setTimeout(() => {
+          document
+            .getElementById(elementID.card(args.entityID).container)
+            ?.scrollIntoView({ behavior: "smooth", inline: "center" });
+        }, 100);
       if (args.focus) {
         focusElement(() =>
           document.getElementById(
-            args.focus === "content" ? "default-text-section" : "card-title"
+            args.focus === "content"
+              ? elementID.card(args.entityID)?.content
+              : elementID.card(args.entityID).title
           )
         );
       }
     },
-    [spaceID, openCard]
+    [openCard]
   );
   return {
     open,
@@ -47,11 +60,10 @@ export function CardViewer(props: { space_id: string }) {
     if (!spaceID || !room) return [];
     return s.spaces[spaceID]?.rooms?.[room] || [];
   });
-  let cardViewerRef = useRef<HTMLDivElement | null>(null);
   let { mutate, memberEntity, client } = useMutations();
   let { session } = useAuth();
   let unreadBy = db.useEntity(
-    room ? history[0] || null : null,
+    room ? history[0]?.card || null : null,
     "card/unread-by"
   );
   useEffect(() => {
@@ -62,7 +74,7 @@ export function CardViewer(props: { space_id: string }) {
           memberEntity,
           userID: session.user.id,
           space_id: props.space_id,
-          entityID: history[0],
+          entityID: history[0].card,
           attribute: "card/unread-by",
         });
     }
@@ -77,7 +89,7 @@ export function CardViewer(props: { space_id: string }) {
   ]);
   useEffect(() => {
     if (!client || !room) return;
-    let currentCard = history[0];
+    let currentCard = history[0]?.card;
     if (!currentCard) return;
     mutate("assertEmphemeralFact", {
       clientID: client.clientID,
@@ -88,17 +100,6 @@ export function CardViewer(props: { space_id: string }) {
     });
   }, [room, history, client, mutate]);
 
-  useAppEventListener(
-    "cardviewer.open-card",
-    () => {
-      setTimeout(() => {
-        document
-          .getElementById("appLayout")
-          ?.scrollTo({ behavior: "smooth", left: 5000 });
-      }, 50);
-    },
-    []
-  );
   let [render, setRender] = useState(false);
   useEffect(() => {
     setRender(true);
@@ -111,29 +112,48 @@ export function CardViewer(props: { space_id: string }) {
 
   return (
     <>
-      <div
-        ref={cardViewerRef}
-        id="cardViewerWrapper"
-        className={`cardViewerWrapper
-          flex  h-full w-[calc(100vw-16px)] max-w-3xl
-          shrink-0 touch-pan-x
-          snap-center snap-always flex-col
-          items-stretch
-          focus:outline-none
-          sm:w-[calc(100vw-100px)] ${
-            !open ? "md:w-[calc(100vw-448px)]" : "md:w-[calc(100vw-670px)]"
-          } md:shrink`}
-      >
-        {room && history[0] ? (
-          <CardView
-            entityID={history[0]}
-            key={history[0]}
-            onDelete={() => {
-              removeCardFromRoomHistory({ cardEntity: history[0], room });
-            }}
-          />
+      <div className="h-full flex flex-row gap-3">
+        {history[0] ? (
+          history.map((c) => {
+            return (
+              <div
+                id={elementID.card(c.card).container}
+                key={c.card}
+                className={`cardViewerWrapper
+                  flex  h-full w-[calc(100vw-16px)] max-w-xl
+                  shrink-0 touch-pan-x
+                  snap-center snap-always flex-col
+                  items-stretch
+                  focus:outline-none
+                  sm:w-[calc(100vw-100px)] ${
+                    !open
+                      ? "md:w-[calc(100vw-448px)]"
+                      : "md:w-[calc(100vw-670px)]"
+                  } md:shrink`}
+              >
+                <CardView
+                  entityID={c.card}
+                  onDelete={() => {
+                    removeCardFromRoomHistory({ cardEntity: c.card, room });
+                  }}
+                />
+              </div>
+            );
+          })
         ) : (
-          <EmptyState roomType={roomType} />
+          <div
+            className={`cardViewerWrapper
+              flex  h-full w-[calc(100vw-16px)] max-w-3xl
+              shrink-0 touch-pan-x
+              snap-center snap-always flex-col
+              items-stretch
+              focus:outline-none
+              sm:w-[calc(100vw-100px)] ${
+                !open ? "md:w-[calc(100vw-448px)]" : "md:w-[calc(100vw-670px)]"
+              } md:shrink`}
+          >
+            <EmptyState roomType={roomType} />
+          </div>
         )}
       </div>
     </>

@@ -1,9 +1,11 @@
-import { db, scanIndex, useMutations } from "hooks/useReplicache";
+import { db, useMutations } from "hooks/useReplicache";
 import { SingleTextSection } from "./Sections";
 import { useCallback, useState } from "react";
-import { useOpenCard } from "hooks/useUIState";
 import * as Popover from "@radix-ui/react-popover";
 import { CardSmall } from "components/Icons";
+import { useCardViewer } from "components/CardViewerContext";
+import { useCloseCard } from "hooks/useUIState";
+import { elementID } from "src/utils";
 
 export const Title = (props: { entityID: string }) => {
   let { authorized, mutate, action } = useMutations();
@@ -22,7 +24,8 @@ export const Title = (props: { entityID: string }) => {
   );
   let [focused, setFocused] = useState(false);
   let [selectedAutocomplete, setSelectedAutocomplete] = useState(0);
-  let openCard = useOpenCard();
+  let { open } = useCardViewer();
+  let close = useCloseCard();
   let complete = useCallback(
     async (selectedCard?: string) => {
       if (selectedCard) {
@@ -33,18 +36,22 @@ export const Title = (props: { entityID: string }) => {
           currentCard: props.entityID,
           newCard,
         });
-        openCard(newCard);
+        open({ entityID: newCard, parent: props.entityID });
+        close(props.entityID);
 
         action.end();
         setTimeout(() => {
-          document.getElementById("default-text-section")?.focus;
+          document.getElementById(elementID.card(props.entityID).content)
+            ?.focus;
         }, 50);
         return;
       }
-      let element = document.getElementById("default-text-section");
+      let element = document.getElementById(
+        elementID.card(props.entityID).content
+      );
       element?.focus();
     },
-    [props.entityID, action, mutate, openCard]
+    [props.entityID, action, mutate, open, close]
   );
 
   return (
@@ -52,7 +59,7 @@ export const Title = (props: { entityID: string }) => {
       <SingleTextSection
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
-        id="card-title"
+        id={elementID.card(props.entityID).title}
         className="bg-inherit text-lg font-bold"
         onKeyDown={async (e) => {
           if (e.key === "Enter") {

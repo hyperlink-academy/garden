@@ -119,6 +119,7 @@ const CardDragPreview = ({ active }: { active: DraggableData }) => {
           }}
         >
           <CardPreview
+            parent={null}
             data={active.data}
             outerControls={active.outerControls}
             entityID={active.entityID}
@@ -131,6 +132,7 @@ const CardDragPreview = ({ active }: { active: DraggableData }) => {
       return (
         <div>
           <CardPreview
+            parent={null}
             data={active.data}
             outerControls={false}
             entityID={active.entityID}
@@ -146,6 +148,7 @@ const CardDragPreview = ({ active }: { active: DraggableData }) => {
         <div>
           <div className={`${active.size === "big" ? "w-[302px]" : ""}`}>
             <CardPreview
+              parent={null}
               outerControls={false}
               entityID={""}
               size={active.size}

@@ -1,5 +1,4 @@
 import React, { useContext, useState } from "react";
-import { ReferenceAttributes } from "data/Attributes";
 import {
   ReplicacheContext,
   ReplicacheMutators,
@@ -53,14 +52,12 @@ export const CardAdder = (
     return null;
   } else
     return (
-      <div
-
-          ref={droppableRef}
-      >
+      <div ref={droppableRef}>
         {over &&
           (over.type === "card" || over.type === "search-card" ? (
             <div className="pb-2 opacity-60">
               <CardPreview
+                parent={props.parentID}
                 data={over.data}
                 entityID={over.entityID}
                 hideContent={props.hideContent}
@@ -74,9 +71,7 @@ export const CardAdder = (
               <PlaceholderNewCard title={over.title} />
             </div>
           ) : null)}
-        <div
-          className="justify-left flex w-full shrink-0 items-center gap-2 rounded-lg border border-dashed border-grey-80 px-2 py-1 text-sm text-grey-55 group-hover:border-accent-blue"
-        >
+        <div className="justify-left flex w-full shrink-0 items-center gap-2 rounded-lg border border-dashed border-grey-80 px-2 py-1 text-sm text-grey-55 group-hover:border-accent-blue">
           <button
             className="group grow text-left font-bold hover:text-accent-blue"
             onClick={async () => {
@@ -89,7 +84,11 @@ export const CardAdder = (
                 memberEntity,
               });
               if (props.openOnAdd) {
-                open({ entityID: entity, focus: "title" });
+                open({
+                  entityID: entity,
+                  focus: "title",
+                  parent: props.parentID,
+                });
               } else null;
               if (rep === null) {
                 return;
@@ -109,6 +108,7 @@ export const CardAdder = (
               if (props.openOnAdd) {
                 open({
                   entityID: entity,
+                  parent: props.parentID,
                   focus:
                     d.type === "create"
                       ? d.name

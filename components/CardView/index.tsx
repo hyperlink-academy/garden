@@ -41,6 +41,7 @@ import { LinkPreview } from "components/LinkPreview";
 import { useLinkPreviewManager } from "hooks/useLinkPreviewManager";
 import { useDrag } from "@use-gesture/react";
 import { useSmoker } from "components/Smoke";
+import { elementID } from "src/utils";
 
 const borderStyles = (args: { member: boolean }) => {
   switch (true) {
@@ -185,7 +186,6 @@ export const CardView = (props: {
           </div>
         )}
         <div
-          id="card-container"
           className={`
             no-scrollbar flex
             h-full  grow
@@ -236,7 +236,7 @@ export const CardContent = (props: {
         }}
       >
         <div className="cardSectionAdder pointer-events-none sticky top-0 z-10 flex w-full  justify-between">
-          <BackButton />
+          <BackButton entityID={props.entityID} />
           {authorized && (
             <SectionAdder
               entityID={props.entityID}
@@ -314,8 +314,7 @@ const CardLinkPreview = (props: { entityID: string }) => {
   return null;
 };
 
-const BackButton = () => {
-  let history = useRoomHistory();
+const BackButton = (props: { entityID: string }) => {
   let closeCard = useCloseCard();
   let { authorized } = useMutations();
   return (
@@ -324,15 +323,10 @@ const BackButton = () => {
         !authorized ? "" : "mt-3"
       }`}
       onClick={() => {
-        closeCard();
-        if (history.length < 2) {
-          document
-            .getElementById("appLayout")
-            ?.scrollTo({ behavior: "smooth", left: 0 });
-        }
+        closeCard(props.entityID);
       }}
     >
-      {history.length < 2 ? <CloseLinedTiny /> : <GoBackToPageLined />}
+      <CloseLinedTiny />
     </button>
   );
 };
@@ -542,10 +536,7 @@ const ScheduledDate = (props: {
   if (!props.dateEditing && !date) return null;
 
   return (
-    <div
-      id="card-date"
-      className="flex place-items-center gap-2 text-sm italic text-grey-55"
-    >
+    <div className="flex place-items-center gap-2 text-sm italic text-grey-55">
       {props.dateEditing ? (
         <>
           <input
@@ -614,7 +605,7 @@ const DefaultTextSection = (props: { entityID: string }) => {
   return (
     <SingleTextSection
       autocompleteCardNames
-      id="default-text-section"
+      id={elementID.card(props.entityID).content}
       style={{
         backgroundColor: cardBackgroundColor,
       }}

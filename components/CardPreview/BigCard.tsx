@@ -11,7 +11,7 @@ import { Divider } from "components/Layout";
 import { db, useMutations } from "hooks/useReplicache";
 import { useUIState } from "hooks/useUIState";
 import { Props } from "./index";
-import { focusElement } from "src/utils";
+import { elementID, focusElement } from "src/utils";
 import { LinkPreviewCondensed } from "components/LinkPreview";
 
 export const BigCardBody = (
@@ -58,7 +58,11 @@ export const BigCardBody = (
         console.log("yo?");
         if (editing) return;
         if (e.defaultPrevented) return;
-        open({ entityID: props.entityID });
+        open({
+          entityID: props.entityID,
+          parent: props.parent,
+          append: e.ctrlKey || e.metaKey,
+        });
       }}
     >
       {/* Big Card Preview Content Wrapper */}
@@ -202,10 +206,13 @@ export const BigCardBody = (
                 } `}
                 onClick={() => {
                   if (!props.entityID) return;
-                  open({ entityID: props.entityID });
-                  useUIState.getState().openDrawer(props.entityID, "chat");
+                  let entityID = props.entityID;
+                  open({ entityID: props.entityID, parent: props.parent });
+                  useUIState.getState().openDrawer(entityID, "chat");
                   setTimeout(() => {
-                    document.getElementById("messageInput")?.focus();
+                    document
+                      .getElementById(elementID.discussion(entityID).input)
+                      ?.focus();
                   }, 50);
                 }}
               >
