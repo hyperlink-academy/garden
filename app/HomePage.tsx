@@ -90,7 +90,7 @@ export function HomePage() {
               >
                 <BackToHome />
                 <span>
-                  <strong>visit my homepage</strong>
+                  <strong>my homepage</strong>
                 </span>
               </Link>
             ) : (
@@ -126,11 +126,17 @@ export function HomePage() {
                   priority
                 />
               </div>
-              <div className="mx-4 -mt-[120px] flex flex-col gap-3 sm:mx-8">
-                <h1 className=" italic text-accent-blue">
-                  a place for <br /> collaborative creative projects
+              <div className="mx-4 -mt-[120px] flex flex-col gap-8 sm:mx-8">
+                <h1 className="text-xl sm:text-2xl italic text-accent-blue mt-16 sm:mt-0">
+                  <span>a place for</span>
+                  <br />
+                  <span className="ml-2 sm:ml-4">collaborative</span>
+                  <br />
+                  <span className="ml-4 sm:ml-16">creative</span>
+                  <br />
+                  <span className="ml-8 sm:ml-32">learning</span>
                 </h1>
-                <div className="flex w-full items-center gap-4">
+                <div className="flex w-full items-center gap-4 mx-auto place-content-center">
                   <ButtonPrimary
                     className="!px-2 !py-1 !text-lg sm:!px-4 sm:!py-1 sm:!text-xl"
                     content="Sign Up!"
@@ -186,7 +192,7 @@ export function HomePage() {
               </div>
 
               <p className="text-center font-bold italic sm:text-lg">
-                ✨ explore our current clubs! ✨
+                ✨ explore our recent clubs! ✨
               </p>
               <div className="mb-6 flex w-full flex-col-reverse  gap-9 pr-8 md:flex-row-reverse">
                 <StudioItem
@@ -416,7 +422,7 @@ export function HomePage() {
                         <p>You&apos;re already logged in ☀️</p>
                         <Link href={`/s/${session.session.username}`}>
                           <ButtonPrimary
-                            content="visit my homepage"
+                            content="my homepage"
                             icon={<BackToHome />}
                           />
                         </Link>
