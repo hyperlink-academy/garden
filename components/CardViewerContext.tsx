@@ -62,31 +62,6 @@ export function CardViewer(props: { space_id: string }) {
   });
   let { mutate, memberEntity, client } = useMutations();
   let { session } = useAuth();
-  let unreadBy = db.useEntity(
-    room ? history[0]?.card || null : null,
-    "card/unread-by"
-  );
-  useEffect(() => {
-    if (room && history[0] && memberEntity && session.user) {
-      let unread = unreadBy?.find((f) => f.value.value === memberEntity);
-      if (unread)
-        mutate("markRead", {
-          memberEntity,
-          userID: session.user.id,
-          space_id: props.space_id,
-          entityID: history[0].card,
-          attribute: "card/unread-by",
-        });
-    }
-  }, [
-    history,
-    room,
-    unreadBy,
-    memberEntity,
-    mutate,
-    session.user,
-    props.space_id,
-  ]);
   useEffect(() => {
     if (!client || !room) return;
     let currentCard = history[0]?.card;
@@ -132,6 +107,7 @@ export function CardViewer(props: { space_id: string }) {
                   } md:shrink`}
               >
                 <CardView
+                  space_id={props.space_id}
                   entityID={c.card}
                   onDelete={() => {
                     removeCardFromRoomHistory({ cardEntity: c.card, room });

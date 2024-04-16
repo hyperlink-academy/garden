@@ -64,6 +64,7 @@ const contentStyles = (args: { member: boolean }) => {
 
 export const CardView = (props: {
   entityID: string;
+  space_id: string;
   onDelete?: () => void;
   referenceFactID?: string;
 }) => {
@@ -71,7 +72,7 @@ export const CardView = (props: {
   let spaceID = useSpaceID();
   let memberName = db.useEntity(props.entityID, "member/name");
 
-  let { mutate, rep } = useMutations();
+  let { mutate, rep, memberEntity } = useMutations();
   let { setNodeRef } = useDroppableZone({
     id: props.entityID + "-cardview-dropzone",
     entityID: props.entityID,
@@ -132,6 +133,29 @@ export const CardView = (props: {
   });
   let cardBackgroundColor =
     db.useEntity(props.entityID, "card/background-color")?.value || "white";
+
+  let unreadBy = db.useEntity(props.entityID, "card/unread-by");
+  let { session } = useAuth();
+  useEffect(() => {
+    if (memberEntity && session.user) {
+      let unread = unreadBy?.find((f) => f.value.value === memberEntity);
+      if (unread)
+        mutate("markRead", {
+          memberEntity,
+          userID: session.user.id,
+          space_id: props.space_id,
+          entityID: props.entityID,
+          attribute: "card/unread-by",
+        });
+    }
+  }, [
+    props.entityID,
+    unreadBy,
+    memberEntity,
+    mutate,
+    session.user,
+    props.space_id,
+  ]);
 
   return (
     <div className="flex h-full flex-col items-stretch">
