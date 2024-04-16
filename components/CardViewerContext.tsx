@@ -112,18 +112,32 @@ export function CardViewer(props: { space_id: string }) {
 
   return (
     <>
-      <div className="h-full flex flex-row gap-3">
+      <div className="h-full flex flex-row gap-3 pr-4">
         {history[0] ? (
-          history.map((c) => {
+          history.map((c, index) => {
             return (
               <div
                 id={elementID.card(c.card).container}
                 key={c.card}
+                style={
+                  isMobile
+                    ? {
+                        zIndex: index,
+                        right: `calc(-1 * (100vw - ${48 - index * 4}px))`,
+                        left: 2 + index * 4,
+                      }
+                    : {
+                        zIndex: index,
+                        right: `calc(-34rem - ${index * 4}px )`,
+                        left: 48 + index * 4,
+                      }
+                }
                 className={`cardViewerWrapper
-                  flex  h-full w-[calc(100vw-16px)] max-w-xl
+                  flex  h-full w-[calc(100vw-32px)] max-w-xl
                   shrink-0 touch-pan-x
                   snap-center snap-always flex-col
                   items-stretch
+                  sticky
                   focus:outline-none
                   sm:w-[calc(100vw-100px)] ${
                     !open
