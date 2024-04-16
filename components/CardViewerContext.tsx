@@ -146,6 +146,7 @@ export function CardViewer(props: { space_id: string }) {
                   } md:shrink`}
               >
                 <CardView
+                  index={index}
                   entityID={c.card}
                   onDelete={() => {
                     removeCardFromRoomHistory({ cardEntity: c.card, room });

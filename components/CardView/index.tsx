@@ -17,7 +17,7 @@ import { scanIndex, db, useMutations, useSpaceID } from "hooks/useReplicache";
 import * as Popover from "@radix-ui/react-popover";
 
 import { AttachedCardSection, SingleTextSection } from "./Sections";
-import { usePreserveScroll } from "hooks/utils";
+import { useIsMobile, usePreserveScroll } from "hooks/utils";
 import Link from "next/link";
 import { useAuth } from "hooks/useAuth";
 import { MakeImage, ImageSection } from "./ImageSection";
@@ -42,6 +42,7 @@ import { useLinkPreviewManager } from "hooks/useLinkPreviewManager";
 import { useDrag } from "@use-gesture/react";
 import { useSmoker } from "components/Smoke";
 import { elementID } from "src/utils";
+import { getScrollParent, scrollIntoView } from "@react-aria/utils";
 
 const borderStyles = (args: { member: boolean }) => {
   switch (true) {
@@ -65,6 +66,7 @@ const contentStyles = (args: { member: boolean }) => {
 export const CardView = (props: {
   entityID: string;
   onDelete?: () => void;
+  index: number;
   referenceFactID?: string;
 }) => {
   let { authToken } = useAuth();
@@ -130,6 +132,7 @@ export const CardView = (props: {
       }, 100);
     },
   });
+  let isMobile = useIsMobile();
   let cardBackgroundColor =
     db.useEntity(props.entityID, "card/background-color")?.value || "white";
 
@@ -139,6 +142,16 @@ export const CardView = (props: {
         ref={setNodeRef}
         style={{
           backgroundColor: cardBackgroundColor,
+        }}
+        onFocus={(e) => {
+          if (!isMobile) return;
+          let scrollParent = getScrollParent(e.currentTarget) as HTMLElement;
+          let width = e.currentTarget.getBoundingClientRect().width;
+
+          scrollParent.scrollTo({
+            left: props.index * width + 340 + props.index * 8,
+            behavior: "smooth",
+          });
         }}
         className={`
           card
