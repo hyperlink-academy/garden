@@ -134,7 +134,7 @@ export default function SidebarLayout(props: {
             className={`sidebarWrapper lightBorder no-scrollbar relative z-50  flex shrink-0 cursor-default touch-none overflow-x-hidden overflow-y-scroll bg-white text-left`}
             onClick={() => setSidebar(true)}
           >
-            <div className="sidebar relative flex h-full w-full flex-col items-stretch justify-start justify-items-start gap-0 overflow-y-scroll bg-inherit">
+            <div className="sidebar relative flex h-full w-full flex-col items-stretch justify-start justify-items-start gap-0 overflow-y-scroll bg-inherit no-scrollbar">
               <div className={`sticky top-0 z-10 w-64 bg-inherit`}>
                 <div className="flex items-center justify-between px-3 pt-2">
                   <Breadcrumbs breadcrumb={props.breadcrumb} />
@@ -178,7 +178,7 @@ export default function SidebarLayout(props: {
           }}
           className="no-scrollbar h-full w-full overflow-x-hidden bg-inherit"
         >
-          <div className="sidebar relative flex h-full w-full flex-col items-stretch justify-start justify-items-start gap-0 overflow-y-scroll bg-inherit">
+          <div className="sidebar relative flex h-full w-full flex-col items-stretch justify-start justify-items-start gap-0 overflow-y-scroll bg-inherit no-scrollbar">
             <div
               className={`sticky top-0 z-10 bg-inherit ${open ? "w-64" : ""}`}
             >
