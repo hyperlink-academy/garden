@@ -5,10 +5,13 @@ import { ReplicacheContext } from "./useReplicache";
 
 export function useSubscribe<R extends ReadonlyJSONValue>(
   query: (tx: ReadTransaction) => Promise<R>,
-  def: R,
-  deps: Array<unknown> = [],
-  _key: string
+  defaultVal: R,
+  dependencies: Array<unknown> = [],
+  _key?: string
 ): R {
   let rep = useContext(ReplicacheContext)?.rep;
-  return useSubscribeRepl(rep, query, def, deps);
+  return useSubscribeRepl(rep, query, {
+    default: defaultVal,
+    dependencies,
+  });
 }

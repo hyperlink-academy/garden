@@ -8,13 +8,11 @@ import { get_share_code_route } from "./routes/get_share_code";
 import { join_route } from "./routes/join";
 import { pullRoute } from "./routes/pull";
 import { push_route } from "./routes/push";
-import { connect } from "./socket";
 import { handleFileUpload } from "./upload_file";
 import { migrations } from "./migrations";
 import { delete_self_route } from "./routes/delete_self";
 import { post_feed_route } from "./routes/post_feed";
 import { get_card_data_route } from "./routes/get_card_data";
-import type { WebSocket as DOWebSocket } from "@cloudflare/workers-types";
 import { createClient } from "backend/lib/supabase";
 
 export type Env = {
@@ -100,10 +98,15 @@ export class SpaceDurableObject implements DurableObject {
       this.pokeThrottle = true;
       this.state.waitUntil(
         new Promise<void>((resolve) => {
-          setTimeout(() => {
-            this.state.getWebSockets().forEach((socket) => {
-              socket.send(JSON.stringify({ type: "poke" }));
+          setTimeout(async () => {
+            let supabase = createClient(this.env);
+            let channel = supabase.channel(`space:${this.state.id.toString()}`);
+            await channel.send({
+              type: "broadcast",
+              event: "poke",
+              payload: { message: "poke" },
             });
+            supabase.removeChannel(channel);
             this.pokeThrottle = false;
             resolve();
           }, 50);
@@ -131,9 +134,6 @@ export class SpaceDurableObject implements DurableObject {
         case "upload_file": {
           return handleFileUpload(request, ctx);
         }
-        case "socket": {
-          return connect.bind(this)(request);
-        }
         case "api": {
           return router(path[2], request, ctx);
         }
@@ -145,36 +145,4 @@ export class SpaceDurableObject implements DurableObject {
       return new Response("An uncaught exception occured", { status: 500 });
     }
   }
-  async webSocketMessage(_ws: WebSocket, message: string) {
-    let ws = _ws as unknown as DOWebSocket;
-    try {
-      let msg = JSON.parse(message) as WebSocketMessage;
-      if (msg.type === "init") {
-        let clientID = msg.data.clientID;
-        ws.serializeAttachment({ clientID });
-      }
-      console.log(message);
-      this.poke();
-    } catch (e) {
-      console.log("ERROR", e);
-    }
-  }
-  async webSocketError(_ws: WebSocket, _e: Error) {
-    console.log("ERROR", _e);
-  }
-
-  async webSocketClose(_ws: WebSocket) {
-    let ws = _ws as unknown as DOWebSocket;
-    let data = await ws.deserializeAttachment();
-    console.log("disconnectin");
-    this.poke();
-    if (data) {
-      console.log(data);
-    }
-  }
 }
-
-export type WebSocketMessage = {
-  type: "init";
-  data: { clientID: string };
-};

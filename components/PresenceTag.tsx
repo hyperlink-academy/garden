@@ -1,35 +1,35 @@
 import { db, scanIndex } from "hooks/useReplicache";
 import { RoomMember } from "./Icons";
 import { Fact } from "data/Facts";
+import { filterFactsByPresences } from "src/utils";
+import { useConnectedClientIDs } from "./ReplicacheProvider";
 
 export const PresenceTag = (props: {
   entityID: string;
   size: string;
   outerControls: boolean;
 }) => {
+  let p = useConnectedClientIDs();
   let present = db.useQuery(
     async (tx) => {
-      return (
-        await Promise.all(
-          (
-            await scanIndex(tx).vae(props.entityID, "presence/on-card")
-          ).map(async (p) => {
-            let member = await scanIndex(tx).eav(
-              p.entity,
-              "presence/client-member"
-            );
-            return member?.value.value || null;
-          })
-        )
-      ).reduce((acc, curr) => {
-        if (curr && !acc.includes(curr)) {
-          acc.push(curr);
-        }
-        return acc;
-      }, [] as string[]);
+      let presencesOnCard = await filterFactsByPresences(
+        await scanIndex(tx).vae(props.entityID, "presence/on-card"),
+        p,
+        tx
+      );
+      let uniqueMembers: string[] = [];
+      for (let presence of presencesOnCard) {
+        let member = await scanIndex(tx).eav(
+          presence.entity,
+          "presence/client-member"
+        );
+        if (member && !uniqueMembers.includes(member.value.value))
+          uniqueMembers.push(member.value.value);
+      }
+      return uniqueMembers;
     },
     [],
-    [props.entityID]
+    [props.entityID, p]
   );
 
   return (

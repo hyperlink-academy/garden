@@ -261,6 +261,13 @@ const retractFact: Mutation<{ id: string; undoAction?: boolean }> = async (
   await ctx.retractFact(args.id, args.undoAction);
 };
 
+const retractEphemeralFact: Mutation<{ id: string; clientID: string }> = async (
+  args,
+  ctx
+) => {
+  await ctx.retractEphemeralFact(args.clientID, args.id);
+};
+
 const updateFact: Mutation<{
   id: string;
   undoAction?: boolean;
@@ -511,8 +518,6 @@ const initializeClient: Mutation<{
   memberEntity: string;
   clientEntity: string;
 }> = async (args, ctx) => {
-  let client = await ctx.scanIndex.ave("presence/client-id", args.clientID);
-  if (client) return;
   await ctx.assertEmphemeralFact(args.clientID, {
     entity: args.clientEntity,
     attribute: "presence/client-id",
@@ -597,6 +602,7 @@ export const Mutations = {
   assertFact,
   assertEmphemeralFact,
   retractFact,
+  retractEphemeralFact,
   updateFact,
   updatePositionInDesktop,
   removeCardFromDesktopOrCollection,

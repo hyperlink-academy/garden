@@ -54,12 +54,11 @@ export const PresenceHandler = (props: { space_do_id: string }) => {
   useEffect(() => {
     if (!authorized || !rep || !memberEntity || socketState !== "connected")
       return;
-    rep.clientID.then((clientID) => {
-      mutate("initializeClient", {
-        clientID,
-        clientEntity: ulid(),
-        memberEntity: memberEntity as string,
-      });
+    let clientID = rep.clientID;
+    mutate("initializeClient", {
+      clientID,
+      clientEntity: ulid(),
+      memberEntity: memberEntity as string,
     });
   }, [rep, authorized, memberEntity, socketState, mutate]);
 

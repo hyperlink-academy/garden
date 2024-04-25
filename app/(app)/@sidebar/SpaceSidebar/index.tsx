@@ -81,7 +81,7 @@ export const SpaceMobileHeader = (props: { space_id: string }) => {
       )
     );
   let activeSessions = db
-    .useAttribute("presence/client-member")
+    .useEphemeralAttribute("presence/client-member")
     .map((m) => m.value.value);
   let uniqueSessions = new Set(activeSessions);
 
@@ -89,7 +89,7 @@ export const SpaceMobileHeader = (props: { space_id: string }) => {
     (f) => uniqueSessions.has(f.entity) && f.entity !== memberEntity
   );
 
-  let membersInCall = db.useAttribute("presence/in-call");
+  let membersInCall = db.useEphemeralAttribute("presence/in-call");
 
   return (
     <div className={`flex h-full flex-row gap-1 text-grey-35`}>
@@ -158,7 +158,7 @@ export const CollapsedSpaceSidebar = (props: {
       )
     );
   let activeSessions = db
-    .useAttribute("presence/client-member")
+    .useEphemeralAttribute("presence/client-member")
     .map((m) => m.value.value);
   let uniqueSessions = new Set(activeSessions);
 
@@ -166,8 +166,7 @@ export const CollapsedSpaceSidebar = (props: {
     (f) => uniqueSessions.has(f.entity) && f.entity !== memberEntity
   );
 
-  let membersInCall = db.useAttribute("presence/in-call");
-  console.log(membersInCall);
+  let membersInCall = db.useEphemeralAttribute("presence/in-call");
 
   return (
     <div

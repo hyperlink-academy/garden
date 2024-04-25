@@ -14,7 +14,7 @@ import {
 } from "react";
 import { CardPreview } from "./CardPreview";
 import { ulid } from "src/ulid";
-import { useSubscribe } from "replicache-react";
+import { useSubscribe } from "hooks/useSubscribe";
 import { useCardViewer } from "./CardViewerContext";
 import { useDraggableCard, useDroppableZone } from "./DragContext";
 import { sortByPosition } from "src/position_helpers";
@@ -264,9 +264,7 @@ export const Desktop = (props: { entityID: string }) => {
 };
 
 let useHeight = (entity: string) => {
-  let rep = useContext(ReplicacheContext);
   return useSubscribe(
-    rep?.rep,
     async (tx) => {
       let cards = await scanIndex(tx).eav(entity, "desktop/contains");
       return await cards.reduce(async (acc, card) => {

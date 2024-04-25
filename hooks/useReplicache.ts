@@ -12,7 +12,7 @@ import {
   Mutations,
   FactInput,
 } from "data/mutations";
-import { createContext, useCallback, useContext, useMemo } from "react";
+import { createContext, useContext, useEffect, useMemo } from "react";
 import {
   Puller,
   Pusher,
@@ -27,6 +27,10 @@ import { useAuth } from "./useAuth";
 import { UndoManager } from "@rocicorp/undo";
 import { useSpaceData } from "./useSpaceData";
 import { useStudioDataByDOID } from "./useStudioData";
+import { RealtimeChannel } from "@supabase/supabase-js";
+import { create } from "zustand";
+import { useConnectedClientIDs } from "components/ReplicacheProvider";
+import { filterFactsByPresences } from "src/utils";
 
 export type ReplicacheMutators = {
   [k in keyof typeof Mutations]: (
@@ -37,6 +41,7 @@ export type ReplicacheMutators = {
 
 export let ReplicacheContext = createContext<{
   rep: Replicache<ReplicacheMutators>;
+  channel: RealtimeChannel;
   data:
     | { space_id: string; studio_id: undefined }
     | { studio_id: string; space_id: undefined };
@@ -437,6 +442,22 @@ export const db = {
       "ave" + attribute + value
     );
   },
+  useEphemeralAttribute<A extends keyof FilterAttributes<{ ephemeral: true }>>(
+    attribute: A | null,
+    entity?: string
+  ) {
+    let clients = useConnectedClientIDs();
+    return useSubscribe(
+      async (tx) => {
+        if (!attribute) return [];
+        let results = await scanIndex(tx).aev(attribute, entity);
+        return filterFactsByPresences(results, clients, tx);
+      },
+      [],
+      [attribute, entity, clients],
+      "aev" + attribute + entity
+    );
+  },
   useAttribute<A extends keyof Attribute>(
     attribute: A | null,
     entity?: string
@@ -568,30 +589,15 @@ export const useMutations = () => {
     }),
     [spaceData, session, memberEntity]
   );
-  let client = useSubscribe(
-    async (tx) => {
-      let client = await scanIndex(tx).ave("presence/client-id", tx.clientID);
-      if (!client) return null;
-      return {
-        clientID: client.value,
-        entity: client.entity,
-      };
-    },
-    null,
-    [],
-    "clientEntity"
-  );
 
-  let mutate = useCallback(
-    function mutate<T extends keyof typeof Mutations>(
+  let mutate = useMemo(() => {
+    return function mutate<T extends keyof typeof Mutations>(
       mutation: T,
       args: Parameters<(typeof Mutations)[T]>[0]
     ) {
-      if (!session) return;
       return rep?.rep.mutate[mutation](args);
-    },
-    [session, memberEntity, rep]
-  );
+    };
+  }, [rep]);
   let action = useMemo(
     () => ({
       start() {
@@ -610,13 +616,24 @@ export const useMutations = () => {
     [rep?.undoManager]
   );
 
+  let client = useSubscribe(
+    async (tx) => {
+      return (
+        (await scanIndex(tx).ave("presence/client-id", tx.clientID)) || null
+      );
+    },
+    null,
+    []
+  );
+
   // if (rep == null) throw "Cannot call useMutations() if not nested within a ReplicacheContext context"
 
   return {
+    client,
+    channel: rep?.channel,
     rep: rep?.rep,
     authorized: !!auth,
     memberEntity: memberEntity?.entity || null,
-    client,
     mutate,
     action,
     permissions,

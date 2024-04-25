@@ -1,12 +1,6 @@
 import { DraggableAttributes } from "@dnd-kit/core";
 import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
-import {
-  ReplicacheContext,
-  scanIndex,
-  db,
-  useMutations,
-  useSpaceID,
-} from "hooks/useReplicache";
+import { scanIndex, db, useMutations, useSpaceID } from "hooks/useReplicache";
 import {
   ChatEmptyTiny,
   CloseLinedTiny,
@@ -15,11 +9,11 @@ import {
   MakeSmallHandle,
 } from "components/Icons";
 import { useDrag, usePinch } from "@use-gesture/react";
-import { useContext, useRef } from "react";
+import { useRef } from "react";
 import { SmallCardBody } from "./SmallCard";
 import { BigCardBody } from "./BigCard";
 import { useLongPress } from "hooks/useLongPress";
-import { useSubscribe } from "replicache-react";
+import { useSubscribe } from "hooks/useSubscribe";
 import { useAuth } from "hooks/useAuth";
 import { ulid } from "src/ulid";
 import { getAndUploadFile } from "src/getAndUploadFile";
@@ -71,11 +65,9 @@ export const CardPreview = (
   let { memberEntity, mutate } = useMutations();
   let unreadBy = db.useEntity(props.entityID, "card/unread-by") || [];
   let isUnread = unreadBy.find((f) => f.value.value === memberEntity);
-  let rep = useContext(ReplicacheContext);
   let { authToken } = useAuth();
   let spaceID = useSpaceID();
   let unreadDiscussions = useSubscribe(
-    rep?.rep,
     async (tx) => {
       if (!memberEntity) return false;
       // NB - currently collections also use 'desktop/contains'

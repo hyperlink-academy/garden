@@ -6,6 +6,7 @@ import {
   RoomSearch,
 } from "components/Icons";
 import { Divider } from "components/Layout";
+import { useConnectedClientIDs } from "components/ReplicacheProvider";
 import { BaseSpaceCard, SpaceData } from "components/SpacesList";
 import { AddSpace } from "components/StudioPage/AddSpace";
 import { useAuth } from "hooks/useAuth";
@@ -15,6 +16,7 @@ import { useSubscribe } from "hooks/useSubscribe";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
+import { filterFactsByPresences } from "src/utils";
 import { mutate } from "swr";
 
 export type Props = {
@@ -73,22 +75,24 @@ export function SpaceList({ data }: Props) {
 
 const List = (props: { spaces: Array<SpaceData> }) => {
   let params = useParams<{ studio_id: string }>();
+  let presences = useConnectedClientIDs();
   let peopleInSpaces = useSubscribe(
     async (tx) => {
       let presenceInSpaces = await scanIndex(tx).aev("presence/in-space");
       return Promise.all(
-        presenceInSpaces.map(async (p) => {
-          let member = await scanIndex(tx).eav(
-            p.entity,
-            "presence/client-member"
-          );
-          return { ...p, member };
-        })
+        (await filterFactsByPresences(presenceInSpaces, presences, tx)).map(
+          async (p) => {
+            let member = await scanIndex(tx).eav(
+              p.entity,
+              "presence/client-member"
+            );
+            return { ...p, member };
+          }
+        )
       );
     },
     [],
-    [],
-    ""
+    [presences]
   );
 
   return (

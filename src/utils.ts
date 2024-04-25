@@ -1,4 +1,8 @@
 import { isIOS } from "@react-aria/utils";
+import { FilterAttributes } from "data/Attributes";
+import { Fact } from "data/Facts";
+import { scanIndex } from "hooks/useReplicache";
+import { ReadTransaction } from "replicache";
 
 export const getCurrentDate = () => {
   const date = new Date();
@@ -63,3 +67,15 @@ export const elementID = {
     container: `discussion/${entityID}/container`,
   }),
 };
+
+export async function filterFactsByPresences<
+  A extends keyof FilterAttributes<{ ephemeral: true }>
+>(facts: Fact<A>[], clients: string[], tx: ReadTransaction) {
+  let results: Fact<A>[] = [];
+  for (let f of facts) {
+    let client = await scanIndex(tx).eav(f.entity, "presence/client-id");
+    if (!client) continue;
+    if (clients.includes(client.value)) results.push(f);
+  }
+  return results;
+}

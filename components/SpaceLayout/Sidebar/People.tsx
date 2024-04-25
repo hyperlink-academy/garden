@@ -16,7 +16,7 @@ import {
   MoreOptionsSmall,
   RoomMember,
 } from "components/Icons";
-import { db, useMutations, useSpaceID } from "hooks/useReplicache";
+import { db, scanIndex, useMutations, useSpaceID } from "hooks/useReplicache";
 import tailwind from "tailwind.config";
 import { useState } from "react";
 import { Fact } from "data/Facts";
@@ -33,6 +33,9 @@ import { Truncate } from "components/Truncate";
 import { useSpaceData } from "hooks/useSpaceData";
 import { spacePath } from "hooks/utils";
 import { useCardViewer } from "components/CardViewerContext";
+import { useSubscribe } from "hooks/useSubscribe";
+import { filterFactsByPresences } from "src/utils";
+import { useConnectedClientIDs } from "components/ReplicacheProvider";
 
 export const People = (props: { space_id: string }) => {
   let spaceData = useSpaceData(props);
@@ -43,11 +46,11 @@ export const People = (props: { space_id: string }) => {
         (f) => f.identity_data?.username === m.value
       )
     );
-  let membersInCall = db.useAttribute("presence/in-call");
+  let membersInCall = db.useEphemeralAttribute("presence/in-call");
   let callOngoing = membersInCall.length > 0;
 
   let activeSessions = db
-    .useAttribute("presence/client-member")
+    .useEphemeralAttribute("presence/client-member")
     .map((m) => m.value.value);
   let uniqueSessions = new Set(activeSessions);
   let { authorized } = useMutations();
@@ -118,7 +121,7 @@ const JoinCall = (props: { space_id: string }) => {
   let [loading, setLoading] = useState(false);
   let joinCall = useJoinCall(props);
 
-  let membersInCall = db.useAttribute("presence/in-call");
+  let membersInCall = db.useEphemeralAttribute("presence/in-call");
   let callOngoing = membersInCall.length > 0;
 
   let meetingState = useMeetingState();
@@ -378,8 +381,17 @@ const MemberInCall = (props: { participantID: string }) => {
 
 const Member = (props: { entityID: string; showInCall?: boolean }) => {
   let { memberEntity } = useMutations();
-  let activeSessions =
-    db.useReference(props.entityID, "presence/client-member") || [];
+  let presences = useConnectedClientIDs();
+  let activeSessions = useSubscribe(
+    async (tx) =>
+      filterFactsByPresences(
+        await scanIndex(tx).vae(props.entityID, "presence/client-member"),
+        presences,
+        tx
+      ),
+    [],
+    [props.entityID, presences]
+  );
   let color = db.useEntity(props.entityID, "member/color");
   let name = db.useEntity(props.entityID, "member/name");
   let participant = useParticipantInCall(name?.value);

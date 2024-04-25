@@ -8,13 +8,18 @@ import { authTokenVerifier, verifyIdentity } from "backend/lib/auth";
 import { createClient } from "backend/lib/supabase";
 import { isUserMember } from "../lib/isMember";
 
+export type ClientGroup = {
+  [k: string]: { lastMutationID: number; lastUpdated: number };
+};
+
 export const push_route = makeRoute({
   route: "push",
   input: z.object({
     authToken: authTokenVerifier,
-    clientID: z.string(),
+    clientGroupID: z.string(),
     mutations: z.array(
       z.object({
+        clientID: z.string(),
         id: z.number(),
         name: z.string(),
         args: z.any(),
@@ -25,8 +30,6 @@ export const push_route = makeRoute({
     schemaVersion: z.string(),
   }),
   handler: async (msg, env: Env) => {
-    let lastMutationID =
-      (await env.storage.get<number>(`lastMutationID-${msg.clientID}`)) || 0;
     let supabase = createClient(env.env);
 
     let session = await verifyIdentity(env.env, msg.authToken);
@@ -38,6 +41,12 @@ export const push_route = makeRoute({
     let fact_store = store(cachedStore, { id: env.id });
 
     let isMember = await isUserMember(env, session.id);
+
+    let release = await env.pushLock.lock();
+    let clientGroup =
+      (await cachedStore.get<ClientGroup>(
+        `clientGroup-${msg.clientGroupID}`
+      )) || {};
 
     let isStudioMember = false;
     if (!isMember) {
@@ -51,22 +60,33 @@ export const push_route = makeRoute({
         .single();
       isStudioMember = !!data;
       if (!isStudioMember) {
-        env.storage.put<number>(
-          `lastMutationID-${msg.clientID}`,
-          msg.mutations[msg.mutations.length - 1].id
-        );
+        let lastMutationPerClient = msg.mutations.reduce((acc, mut) => {
+          acc[mut.clientID] = {
+            lastMutationID: mut.id,
+            lastUpdated: Date.now(),
+          };
+          return acc;
+        }, {} as ClientGroup);
+        cachedStore.put<ClientGroup>(`clientGroup-${msg.clientGroupID}`, {
+          ...clientGroup,
+          ...lastMutationPerClient,
+        });
+        cachedStore.flush();
+        release();
         return {
           data: { success: false, error: "user is not a member" },
         } as const;
       }
     }
 
-    let release = await env.pushLock.lock();
-
     for (let i = 0; i < msg.mutations.length; i++) {
       let mutation = msg.mutations[i];
+      let lastMutationID = clientGroup[mutation.clientID]?.lastMutationID || 0;
       if (mutation.id <= lastMutationID) continue;
-      lastMutationID = mutation.id;
+      clientGroup[mutation.clientID] = {
+        lastMutationID: mutation.id,
+        lastUpdated: Date.now(),
+      };
       let name = mutation.name as keyof typeof Mutations;
       if (!Mutations[name]) {
         continue;
@@ -91,7 +111,10 @@ export const push_route = makeRoute({
         );
       }
     }
-    cachedStore.put<number>(`lastMutationID-${msg.clientID}`, lastMutationID);
+    cachedStore.put<ClientGroup>(
+      `clientGroup-${msg.clientGroupID}`,
+      clientGroup
+    );
     await cachedStore.flush();
     release();
 

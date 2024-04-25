@@ -1,4 +1,3 @@
-import { app_event } from "backend/lib/analytics";
 import { makeRoute } from "backend/lib/api";
 import { Attribute } from "data/Attributes";
 import { Fact } from "data/Facts";
@@ -8,26 +7,32 @@ import type { WebSocket as DOWebSocket } from "@cloudflare/workers-types";
 import { Env } from "..";
 import { decodeTime } from "src/ulid";
 import { store } from "../fact_store";
+import { ClientGroup } from "./push";
+import { useMutations } from "hooks/useReplicache";
+import { useState } from "react";
 
 export const pullRoute = makeRoute({
   route: "pull",
   input: z.object({
-    clientID: z.string(),
+    clientGroupID: z.string(),
     cookie: z.union([
       z.object({
         ephemeralFacts: z.array(z.string()).optional(),
         lastUpdated: z.union([z.string(), z.number()]),
+        order: z.union([z.string(), z.number()]),
       }),
       z.undefined(),
       z.null(),
     ]),
-    lastMutationID: z.number(),
     pullVersion: z.number(),
     schemaVersion: z.string(),
   }),
   handler: async (msg, env: Env) => {
-    let lastMutationID =
-      (await env.storage.get<number>(`lastMutationID-${msg.clientID}`)) || 0;
+    let release = await env.pushLock.lock();
+    let clientGroup =
+      (await env.storage.get<ClientGroup>(
+        `clientGroup-${msg.clientGroupID}`
+      )) || {};
 
     let lastUpdated = msg.cookie?.lastUpdated || "";
     let facts = await env.storage.list<Fact<keyof Attribute>>({
@@ -53,13 +58,19 @@ export const pullRoute = makeRoute({
     let lastMessage =
       messages[messages.length - 1]?.server_ts ||
       messages[messages.length - 1]?.ts;
+    let lastEphemeralFact =
+      ephemeralFacts[ephemeralFacts.length - 1]?.lastUpdated;
     if (lastKey && lastKey > newLastUpdated) newLastUpdated = lastKey;
     if (lastMessage && lastMessage > newLastUpdated)
       newLastUpdated = lastMessage;
+    if (lastEphemeralFact && lastEphemeralFact > newLastUpdated)
+      newLastUpdated = lastEphemeralFact;
     let newCookie: typeof msg.cookie = {
       lastUpdated: newLastUpdated,
+      order: newLastUpdated,
       ephemeralFacts: ephemeralFacts.map((f) => f.id),
     };
+    release();
 
     return {
       data: {
@@ -69,7 +80,9 @@ export const pullRoute = makeRoute({
             (k) => !ephemeralFacts.find((f) => f.id === k)
           ) || [],
         cookie: newCookie,
-        lastMutationID,
+        lastMutationIDChanges: Object.fromEntries(
+          Object.entries(clientGroup).map(([k, v]) => [k, v.lastMutationID])
+        ),
         data: updates,
         messages,
       },
@@ -78,23 +91,27 @@ export const pullRoute = makeRoute({
 });
 
 async function getEphemeralFacts(state: DurableObjectState) {
-  let facts = await state.storage.list<Fact<keyof Attribute>>({
-    prefix: "ephemeral-",
-  });
-  let clients = state.getWebSockets().map(
-    (ws) =>
-      (ws as unknown as DOWebSocket).deserializeAttachment() as {
-        clientID: string;
-      }
-  );
+  let facts = [
+    ...(
+      await state.storage.list<Fact<keyof Attribute>>({
+        prefix: "ephemeral-",
+      })
+    ).entries(),
+  ];
   let existingFacts = [] as Fact<keyof Attribute>[];
   let fact_store = store(state.storage, { id: "" });
-  for (let [key, fact] of facts.entries()) {
-    if (Date.now() - decodeTime(fact.id) < 1000 * 5) existingFacts.push(fact);
-    if (!!clients.find((c) => key.includes(c?.clientID)))
+  for (let [key, fact] of facts) {
+    let clientID = key.slice(37);
+    let clientFact = facts.find(
+      ([, f]) => f.attribute === "presence/client-id" && f.value === clientID
+    );
+    if (
+      clientFact &&
+      Date.now() - parseInt(clientFact[1].lastUpdated) < 1000 * 60 * 2
+    ) {
       existingFacts.push(fact);
-    else {
-      fact_store.retractEphemeralFact(key.slice(-36), fact.id);
+    } else {
+      await fact_store.retractEphemeralFact(key.slice(-36), fact.id);
     }
   }
   return existingFacts;

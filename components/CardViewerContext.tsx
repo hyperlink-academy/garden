@@ -10,7 +10,6 @@ import { useCallback, useEffect, useState } from "react";
 import { CardView } from "./CardView";
 import { elementID, focusElement } from "src/utils";
 import { useIsMobile } from "hooks/utils";
-import { useAuth } from "hooks/useAuth";
 import { useSidebarState } from "app/(app)/@sidebar/SidebarState";
 
 export const useCardViewer = () => {
@@ -60,20 +59,19 @@ export function CardViewer(props: { space_id: string }) {
     if (!spaceID || !room) return [];
     return s.spaces[spaceID]?.rooms?.[room] || [];
   });
-  let { mutate, memberEntity, client } = useMutations();
-  let { session } = useAuth();
+  let { mutate, client } = useMutations();
   useEffect(() => {
-    if (!client || !room) return;
+    if (!client?.value || !room) return;
     let currentCard = history[0]?.card;
     if (!currentCard) return;
     mutate("assertEmphemeralFact", {
-      clientID: client.clientID,
+      clientID: client.value,
       entity: client.entity,
       attribute: "presence/on-card",
       value: ref(currentCard),
       positions: {},
     });
-  }, [room, history, client, mutate]);
+  }, [room, history, client?.value, client?.entity, mutate]);
 
   let [render, setRender] = useState(false);
   useEffect(() => {

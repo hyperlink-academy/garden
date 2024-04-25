@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { useSubscribe } from "replicache-react";
+import { useSubscribe } from "hooks/useSubscribe";
 import { ReplicacheContext, scanIndex, useMutations } from "./useReplicache";
 
 export const useReactions = (entityID?: string | null) => {
@@ -7,7 +7,6 @@ export const useReactions = (entityID?: string | null) => {
   let rep = useContext(ReplicacheContext);
 
   let reactions = useSubscribe(
-    rep?.rep,
     async (tx) => {
       if (!entityID) return [];
       let reactions = await scanIndex(tx).eav(entityID, "card/reaction");

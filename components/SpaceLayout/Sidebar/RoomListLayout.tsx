@@ -28,6 +28,8 @@ import { useIsActiveRoom, useRoom, useSetRoom } from "hooks/useUIState";
 import { Form, SubmitButton } from "components/Form";
 import { useIsMobile } from "hooks/utils";
 import { useSidebarState } from "app/(app)/@sidebar/SidebarState";
+import { filterFactsByPresences } from "src/utils";
+import { useConnectedClientIDs } from "components/ReplicacheProvider";
 
 export const EditRoomModal = (props: {
   open: boolean;
@@ -313,11 +315,13 @@ export const RoomListItem = (props: {
 };
 
 const PresenceDots = (props: { entityID: string }) => {
+  let presences = useConnectedClientIDs();
   let present = useSubscribe(
     async (tx) => {
-      let sessions = await scanIndex(tx).vae(
-        props.entityID,
-        "presence/in-room"
+      let sessions = await filterFactsByPresences(
+        await scanIndex(tx).vae(props.entityID, "presence/in-room"),
+        presences,
+        tx
       );
       let members = [] as Fact<"member/color">[];
       for (let presence of sessions) {
@@ -336,8 +340,7 @@ const PresenceDots = (props: { entityID: string }) => {
       return members;
     },
     [],
-    [props.entityID],
-    `${props.entityID}-present-in-room`
+    [props.entityID, presences]
   );
   return (
     <>
