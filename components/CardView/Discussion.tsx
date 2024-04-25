@@ -68,6 +68,20 @@ export const DiscussionRoom = (props: {
   );
 };
 
+function InputBuffer(props: { entityID: string }) {
+  return (
+    <div
+      className={`dummyMessageInput pointer-events-none opacity-0 -mt-8 whitespace-pre-wrap`}
+    >
+      <MessageInput
+        entityID={props.entityID}
+        allowReact={false}
+        isRoom={false}
+      />
+    </div>
+  );
+}
+
 export const useMarkRead = (entityID: string, focused: boolean) => {
   let rep = useContext(ReplicacheContext);
   let unreadBy = db.useEntity(entityID, "discussion/unread-by");
@@ -151,6 +165,7 @@ export const MessageWindow = (props: {
       id={elementID.discussion(props.entityID).container}
     >
       {props.children}
+      <InputBuffer entityID={props.entityID} />
     </div>
   );
 };
