@@ -518,6 +518,12 @@ const initializeClient: Mutation<{
   memberEntity: string;
   clientEntity: string;
 }> = async (args, ctx) => {
+  let existingFact = await ctx.scanIndex.ave(
+    "presence/client-id",
+    args.clientID
+  );
+  if (existingFact && existingFact.entity !== args.clientEntity)
+    ctx.retractEphemeralFact(args.clientID, existingFact.id);
   await ctx.assertEmphemeralFact(args.clientID, {
     entity: args.clientEntity,
     attribute: "presence/client-id",
