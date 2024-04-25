@@ -9,7 +9,7 @@ import { useSpaceID } from "hooks/useReplicache";
 import { useSpaceData } from "hooks/useSpaceData";
 import { useParams, useRouter } from "next/dist/client/components/navigation";
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { base62ToUuid, uuidToBase62 } from "src/uuidHelpers";
 import SidebarLayout from "./SidebarLayout";
 import { useSidebarState } from "./SidebarState";
@@ -79,13 +79,14 @@ export function SpaceHeader(props: {
         }
         return a.display_name.localeCompare(b.display_name);
       });
-  if (!spaces || !activeSpace) return null;
+  let data = useMemo(() => {
+    if (!activeSpace?.id) return null;
+    return { space_id: activeSpace.id, studio_id: undefined };
+  }, [activeSpace?.id]);
+  if (!spaces || !activeSpace || !data) return null;
 
   return (
-    <SpaceProvider
-      id={activeSpace.do_id}
-      data={{ space_id: activeSpace.id, studio_id: undefined }}
-    >
+    <SpaceProvider id={activeSpace.do_id} data={data}>
       <SidebarLayout
         openContent={
           <OpenSidebar
