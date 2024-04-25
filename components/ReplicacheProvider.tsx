@@ -244,7 +244,7 @@ export const useMakeSpaceReplicache = ({
       if (!rep) return;
       rep.count -= 1;
       if (rep.count === 0) {
-        usePresenceState.setState([]);
+        usePresenceState.setState({ clientIDs: [] });
         rep.channel.unsubscribe();
         rep.rep.close();
         reps.delete(key);

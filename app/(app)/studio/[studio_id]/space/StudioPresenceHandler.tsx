@@ -65,7 +65,7 @@ export const PresenceHandler = (props: { space_do_id: string }) => {
   useEffect(() => {
     if (!client?.entity || !authorized) return;
     mutate("assertEmphemeralFact", {
-      clientID: client.clientID,
+      clientID: client.value,
       entity: client.entity,
       attribute: "presence/in-space",
       value: props.space_do_id,
@@ -75,7 +75,7 @@ export const PresenceHandler = (props: { space_do_id: string }) => {
     client?.entity,
     room,
     authorized,
-    client?.clientID,
+    client?.value,
     mutate,
     props.space_do_id,
   ]);
