@@ -41,7 +41,6 @@ export type ReplicacheMutators = {
 
 export let ReplicacheContext = createContext<{
   rep: Replicache<ReplicacheMutators>;
-  channel: RealtimeChannel;
   data:
     | { space_id: string; studio_id: undefined }
     | { studio_id: string; space_id: undefined };

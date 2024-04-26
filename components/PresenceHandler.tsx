@@ -1,13 +1,58 @@
 import { useMeetingState } from "@daily-co/daily-react";
 import { ref } from "data/Facts";
-import { scanIndex, useMutations } from "hooks/useReplicache";
+import {
+  ReplicacheContext,
+  scanIndex,
+  useMutations,
+} from "hooks/useReplicache";
 import { useSubscribe } from "hooks/useSubscribe";
 import { useRoom } from "hooks/useUIState";
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { ulid } from "src/ulid";
+import { useConnectedClientIDs, usePresenceState } from "./ReplicacheProvider";
+import { supabaseBrowserClient } from "supabase/clients";
 
 export const PresenceHandler = () => {
   let { rep, mutate, authorized, memberEntity } = useMutations();
+  let replicacheContext = useContext(ReplicacheContext);
+  useEffect(() => {
+    if (!rep || !replicacheContext?.id) return;
+    let sup = supabaseBrowserClient();
+    let channel = sup.channel(`space:${replicacheContext.id}`);
+    let syncPresenceState = () => {
+      const newState = channel.presenceState<{ clientID: string }>();
+      let clientIDs = Object.values(newState)
+        .flat()
+        .map((f) => f.clientID);
+      usePresenceState.setState({ clientIDs });
+    };
+    channel
+      .on("broadcast", { event: "poke" }, () => {
+        rep.pull();
+      })
+      .on("presence", { event: "sync" }, () => {
+        syncPresenceState();
+      })
+      .on("presence", { event: "leave" }, () => {
+        syncPresenceState();
+      })
+      .on("presence", { event: "join" }, () => {
+        syncPresenceState();
+      });
+    channel.subscribe(async (status) => {
+      if (status !== "SUBSCRIBED") {
+        return;
+      }
+      await channel.track({ clientID: rep.clientID });
+      setTimeout(() => {
+        syncPresenceState();
+      }, 500);
+    });
+    return () => {
+      channel.untrack();
+      channel.unsubscribe();
+    };
+  }, [rep, replicacheContext?.id]);
   let room = useRoom();
   let meetingState = useMeetingState();
   let inCall = meetingState === "joined-meeting";
@@ -19,6 +64,17 @@ export const PresenceHandler = () => {
     },
     null,
     []
+  );
+  let clients = useConnectedClientIDs();
+  useSubscribe(
+    async (tx) => {
+      let clientIDs = await scanIndex(tx).aev("presence/client-id");
+      let clientMembers = await scanIndex(tx).aev("presence/client-member");
+      console.log({ clientIDs, clientMembers, clients, clientID: tx.clientID });
+      return null;
+    },
+    null,
+    [clients]
   );
   useEffect(() => {
     if (!client?.entity || !authorized) return;
