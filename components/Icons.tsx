@@ -545,11 +545,13 @@ export const Delete = (props: Props) => {
 };
 
 export const Edit = (props: { editing?: boolean } & Props) => {
+  let newProps = { ...props };
+  delete newProps.editing;
   return (
     <svg
       width="24"
       height="24"
-      {...props}
+      {...newProps}
       viewBox="0 0 24 24"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"

@@ -99,6 +99,9 @@ export const Textarea = (
       />
     );
   }
+  delete newProps.renderLinks;
+  delete newProps.textareaRef;
+  delete newProps.entityID;
   return (
     <AutosizeTextarea
       {...newProps}

@@ -79,7 +79,6 @@ const Toast = (props: {
   toast: Toast | null;
   setToast: (t: Toast | null) => void;
 }) => {
-  console.log(props.toast);
   let transitions = useTransition(props.toast ? [props.toast] : [], {
     from: { top: -32 },
     enter: { top: 20 },
