@@ -629,7 +629,6 @@ export const useMutations = () => {
 
   return {
     client,
-    channel: rep?.channel,
     rep: rep?.rep,
     authorized: !!auth,
     memberEntity: memberEntity?.entity || null,
