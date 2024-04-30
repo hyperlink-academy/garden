@@ -43,6 +43,7 @@ export function SideScrollSidebarHandler(props: {
   let bind = useGesture(
     {
       onDrag: (data) => {
+        if ((data.event as PointerEvent)?.pointerType === "mouse") return;
         if (
           (data.currentTarget as HTMLElement)?.scrollLeft === 0 &&
           data.direction[0] > 0 &&
