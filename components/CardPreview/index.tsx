@@ -39,7 +39,6 @@ export type Props = {
   onClick?: () => void;
   outerControls?: boolean;
   hideContent?: boolean;
-  editable?: boolean;
   factID?: string;
   dragHandleProps?: {
     attributes?: DraggableAttributes;
@@ -48,7 +47,6 @@ export type Props = {
   onResize?: (size: "big" | "small") => void;
   showRelated?: boolean;
   isOver?: boolean;
-  isSelected?: boolean;
   selectionMode?: boolean;
   isDragging?: boolean;
   onLongPress?: () => void;
@@ -80,7 +78,6 @@ export const CardPreview = (
     false,
     [memberEntity, props.entityID]
   );
-  let editing = useUIState((s) => s.focusedCard === props.entityID);
 
   let messagesCount = db.useMessages(props.entityID).length;
 
@@ -128,8 +125,8 @@ export const CardPreview = (
         className={`cardPreviewBorder select-none ${
           isUnread ? "unreadCardGlow" : ""
         } relative grow overflow-hidden ${borderStyles({ isMember })} ${
-          props.isSelected || (editing && !isMember) ? "selectedCardGlow" : ""
-        } ${props.isOver ? "rounded-[24px] shadow-[0_0_16px_0_#cccccc]" : ""}`}
+          props.isOver ? "rounded-[24px] shadow-[0_0_16px_0_#cccccc]" : ""
+        }`}
         style={{ WebkitTapHighlightColor: "transparent" }}
       >
         {props.size === "small" ? (

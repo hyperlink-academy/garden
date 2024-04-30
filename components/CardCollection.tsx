@@ -21,12 +21,11 @@ import {
   useDraggableCard,
   useDroppableZone,
 } from "./DragContext";
-import { useRemoveCardFromRoomHistory, useUIState } from "hooks/useUIState";
+import { useRemoveCardFromRoomHistory } from "hooks/useUIState";
 import { useCardViewer } from "./CardViewerContext";
 
 export const CardCollection = (props: {
   entityID: string;
-  editable?: boolean;
   attribute: "desktop/contains" | "deck/contains";
   cards: Fact<"desktop/contains" | "deck/contains">[];
   openOnAdd?: boolean;
@@ -34,7 +33,6 @@ export const CardCollection = (props: {
   let collectionType = db.useEntity(props.entityID, "collection/type");
   return (
     <CollectionList
-      editable={props.editable}
       openOnAdd={props.openOnAdd}
       attribute={props.attribute}
       entityID={props.entityID}
@@ -45,7 +43,6 @@ export const CardCollection = (props: {
 };
 
 const CollectionList = (props: {
-  editable?: boolean;
   openOnAdd?: boolean;
   collectionType?: Fact<"collection/type">["value"];
   entityID: string;
@@ -124,7 +121,6 @@ const CollectionList = (props: {
           attribute={props.attribute}
           hideContent={props.collectionType !== "cardpreview"}
           parent={props.entityID}
-          editable={props.editable}
           entityID={card.value.value}
           key={card.id}
           id={card.id}
@@ -144,7 +140,6 @@ const CollectionList = (props: {
 };
 
 const DraggableCard = (props: {
-  editable?: boolean;
   entityID: string;
   attribute: "desktop/contains" | "deck/contains";
   hideContent?: boolean;
@@ -189,7 +184,6 @@ const DraggableCard = (props: {
               <div className="pb-2 opacity-60">
                 <CardPreview
                   data={over.data}
-                  editable={props.editable}
                   entityID={over.entityID}
                   size={"big"}
                   parent={props.parent}
@@ -211,7 +205,6 @@ const DraggableCard = (props: {
               data={data}
               entityID={props.entityID}
               size="big"
-              editable={props.editable}
               dragHandleProps={{ listeners, attributes }}
               hideContent={props.hideContent}
               onDelete={() => {

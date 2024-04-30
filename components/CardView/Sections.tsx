@@ -315,7 +315,6 @@ export const AttachedCardSection = (props: { entityID: string }) => {
             )}
           </div>
           <CardCollection
-            editable
             entityID={props.entityID}
             attribute="deck/contains"
             cards={attachedCards.sort(sortByPosition("eav"))}

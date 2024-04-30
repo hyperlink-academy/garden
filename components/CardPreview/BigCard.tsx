@@ -24,18 +24,15 @@ export const BigCardBody = (
 ) => {
   let { authorized } = useMutations();
   let { open } = useCardViewer();
-  let editing = useUIState((s) => s.focusedCard === props.entityID);
-  let setFocusedCard = useUIState((s) => s.setFocusedCard);
   let linkPreview = db.useEntity(props.entityID, "card/link-preview");
   let cardBackgroundColor =
     db.useEntity(props.entityID, "card/background-color")?.value || "#FFFFFF";
-  let listenersAndAttributes =
-    authorized && !editing
-      ? {
-          ...props?.dragHandleProps?.attributes,
-          ...props?.dragHandleProps?.listeners,
-        }
-      : {};
+  let listenersAndAttributes = authorized
+    ? {
+        ...props?.dragHandleProps?.attributes,
+        ...props?.dragHandleProps?.listeners,
+      }
+    : {};
 
   return (
     <div
@@ -54,9 +51,6 @@ export const BigCardBody = (
             : cardBackgroundColor,
       }} //no tailwind equiv - need for long titles to wrap
       onClick={(e) => {
-        // if card is clicked (and its not in edit mode), open that card in cardView.
-        console.log("yo?");
-        if (editing) return;
         if (e.defaultPrevented) return;
         open({
           entityID: props.entityID,
@@ -67,9 +61,7 @@ export const BigCardBody = (
     >
       {/* Big Card Preview Content Wrapper */}
       <div
-        className={`cardPreviewContent flex w-full flex-col gap-2 ${
-          editing ? "" : "hover:cursor-pointer"
-        }`}
+        className={`cardPreviewContent flex w-full flex-col gap-2 hover:cursor-pointer`}
       >
         {/* TODO: remove this, seems to be unused??? */}
         {/* {props.showRelated && <Backlinks entityID={props.entityID} />} */}
@@ -118,7 +110,7 @@ export const BigCardBody = (
               fallback={props.data.title?.value}
               section={props.data.member ? "member/name" : "card/title"}
               placeholder="Untitled"
-              previewOnly={!editing || !!props.data.member}
+              previewOnly={!!props.data.member}
               className={`cardPreviewTitle text-md font-bold ${
                 props.data.isMember ? "w-fit text-white" : "text-grey-35"
               } ${
@@ -126,16 +118,6 @@ export const BigCardBody = (
                   ? "rounded-[3px] px-1"
                   : ""
               }`}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  let element = document.getElementById(
-                    `${props.entityID}-preview-default-text-section`
-                  );
-                  element?.focus();
-                }
-              }}
-              id={props.editable ? `${props.entityID}-preview-title` : ""}
             />
             {props.data.isMember ? (
               <div className="shrink-0 italic text-white">member</div>
@@ -148,7 +130,7 @@ export const BigCardBody = (
         {/* Big Card Preview Default Content*/}
         {/* (show if you're in preview mode OR there is content/image OR you're in edit mode) */}
         {!props.hideContent &&
-          (editing || !!props.data.content?.value || !!props.data.imageUrl) && (
+          (!!props.data.content?.value || !!props.data.imageUrl) && (
             <div
               className={`cardPreviewDefaultContent flex flex-col gap-2 ${
                 props.data.isMember &&
@@ -163,18 +145,12 @@ export const BigCardBody = (
                   fallback={props.data.content?.value}
                   autocompleteCardNames
                   focusText={props.focusText}
-                  placeholder={editing ? "write something…" : ""}
                   entityID={props.entityID}
-                  previewOnly={!editing}
+                  previewOnly
                   className={`cardPreviewDefaultTextContent truncate whitespace-pre-wrap leading-tight ${
                     !props.data.imageUrl ? "" : ""
                   } ${props.data.isMember ? "px-2 " : ""} `}
                   section={"card/content"}
-                  id={
-                    props.editable
-                      ? `${props.entityID}-preview-default-text-section`
-                      : ""
-                  }
                 />
               )}
               {props.data.imageUrl && !props.hideContent && (
@@ -259,34 +235,6 @@ export const BigCardBody = (
             </div>
             <div className="flex items-center gap-1">
               {/* edit toggle on cardPreview  */}
-              {props.editable && authorized && (
-                <button
-                  className={`jusitfy-self-end flex shrink-0 items-center gap-2 text-xs italic   ${
-                    editing ? "text-accent-blue" : "text-grey-55"
-                  }`}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    if (editing) setFocusedCard(undefined);
-                    else {
-                      setFocusedCard(props.entityID);
-                      requestAnimationFrame(() => {
-                        focusElement(() => {
-                          return document.getElementById(
-                            `${props.entityID}-preview-title`
-                          );
-                        });
-                      });
-                    }
-                  }}
-                >
-                  {!editing ? (
-                    <div className="hidden group-hover:block">edit</div>
-                  ) : (
-                    <div>done</div>
-                  )}
-                  <Edit editing={editing} width={20} height={20} />
-                </button>
-              )}
               {/* Card "X" to remove button */}
               {/* NB: this is for inner control in Collection only! */}
               {!props.outerControls && props.onDelete && authorized ? (

@@ -36,7 +36,6 @@ export let useUIState = create(
             reply?: string | null;
           };
         },
-        focusedCard: undefined as string | undefined,
       },
       (set) => ({
         setChatInput: (
@@ -215,8 +214,6 @@ export let useUIState = create(
             };
           });
         },
-        setFocusedCard: (entityID: string | undefined) =>
-          set({ focusedCard: entityID }),
       })
     ),
     {
