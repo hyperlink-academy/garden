@@ -303,7 +303,7 @@ export const DefaultAttributes = {
     type: "union",
     cardinality: "one",
     unique: false,
-    "union/value": ["canvas", "collection", "chat"],
+    "union/value": ["canvas", "collection", "chat", "card"],
   },
   "collection/type": {
     type: "union",

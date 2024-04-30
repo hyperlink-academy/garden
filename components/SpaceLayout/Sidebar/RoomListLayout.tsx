@@ -294,7 +294,7 @@ export const RoomListItem = (props: {
               );
             }}
             entityID={props.roomEntity}
-            section="room/name"
+            section={roomType?.value === "card" ? "card/title" : "room/name"}
             focused
             onBlur={() => props.setEditing(false)}
             className={`grow border-none bg-inherit p-0 font-normal italic text-inherit`}
@@ -374,6 +374,10 @@ export const DraggableRoomListItem = (props: {
 }) => {
   let rep = useContext(ReplicacheContext);
   let roomType = db.useEntity(props.entityID, "room/type");
+  let name = db.useEntity(
+    props.entityID,
+    roomType?.value === "card" ? "card/title" : "room/name"
+  );
 
   let [editing, setEditing] = useState(false);
   const { attributes, listeners, setNodeRef, isOverSomethingElse } =
@@ -509,7 +513,7 @@ export const DraggableRoomListItem = (props: {
           roomEntity={props.entityID}
           setRoomEditOpen={props.setRoomEditOpen}
         >
-          {props.children}
+          {name?.value || "Untitled Room"}
         </RoomListItem>
       )}
     </div>

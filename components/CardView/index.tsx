@@ -360,7 +360,7 @@ const CardMoreOptionsMenu = (props: {
   referenceFactID?: string;
   onDelete?: () => void;
 }) => {
-  let { authorized, permissions } = useMutations();
+  let { authorized, permissions, mutate } = useMutations();
   let memberName = db.useEntity(props.entityID, "member/name");
   let [areYouSureCardDeletionModalOpen, setAreYouSureCardDeletionModalOpen] =
     useState(false);
@@ -409,6 +409,17 @@ const CardMoreOptionsMenu = (props: {
         </MenuItem>
         <MenuItem>
           <CardBackgroundColorPicker entityID={props.entityID} />
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            mutate("createRoom", {
+              entity: props.entityID,
+              type: "card",
+              name: "",
+            });
+          }}
+        >
+          Pin Card
         </MenuItem>
         <Divider my={8} />
         <MenuItem
