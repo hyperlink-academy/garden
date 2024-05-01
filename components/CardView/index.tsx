@@ -755,12 +755,12 @@ export const SectionAdder = (props: {
         onClick={() => {
           if (date) {
             document
-              .getElementById("card-container")
+              .getElementById(elementID.card(props.entityID).container)
               ?.scrollTo({ top: 0, behavior: "smooth" });
           } else {
             props.setDateEditing();
             document
-              .getElementById("card-container")
+              .getElementById(elementID.card(props.entityID).container)
               ?.scrollTo({ top: 0, behavior: "smooth" });
           }
         }}
@@ -803,7 +803,7 @@ const ReactionPicker = (props: { entityID: string }) => {
             entityID={props.entityID}
             onSelect={() =>
               document
-                .getElementById("card-reactions")
+                .getElementById(elementID.card(props.entityID).reactions)
                 ?.scrollIntoView({ block: "center", behavior: "smooth" })
             }
           />

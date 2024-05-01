@@ -63,6 +63,7 @@ export const elementID = {
     content: `card/${entityID}/content`,
     image: `card/${entityID}/image`,
     attachedCards: `card/${entityID}/attachedCards`,
+    reactions: `card/${entityID}/attachedCards`,
   }),
   discussion: (entityID: string) => ({
     input: `discussion/${entityID}/input`,

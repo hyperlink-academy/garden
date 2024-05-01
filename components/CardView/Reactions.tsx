@@ -10,6 +10,7 @@ import { useReactions } from "hooks/useReactions";
 import { db, useMutations } from "hooks/useReplicache";
 import { useState } from "react";
 import { ulid } from "src/ulid";
+import { elementID } from "src/utils";
 
 export const Reactions = (props: { entityID: string }) => {
   let { permissions } = useMutations();
@@ -19,7 +20,10 @@ export const Reactions = (props: { entityID: string }) => {
   let reactions = useReactions(props.entityID);
   if (reactions.length === 0) return null;
   return (
-    <div className="flex flex-col gap-2" id="card-reactions">
+    <div
+      className="flex flex-col gap-2"
+      id={elementID.card(props.entityID).reactions}
+    >
       <div className="flex flex-wrap justify-start gap-2">
         <ReactionList entityID={props.entityID} />
         {authorized ? (
