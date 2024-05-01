@@ -38,9 +38,7 @@ export const SharedRoomList = (props: { setRoomEditOpen: () => void }) => {
                 key={room.id}
                 entityID={room.entity}
                 factID={room.id}
-              >
-                {room.value || <i>Untitled Room</i>}
-              </DraggableRoomListItem>
+              />
             );
           })}
         <CreateRoom />
@@ -87,7 +85,7 @@ const CreateRoom = () => {
     <>
       {over && over.type === "room" && (
         <div className="opacity-60">
-          <RoomListPreview entityID={over.entityID} />
+          <RoomListPreview entityID={over.entityID} type={over.roomType} />
         </div>
       )}
       <button

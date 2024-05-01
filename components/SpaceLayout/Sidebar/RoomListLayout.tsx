@@ -372,7 +372,6 @@ export const DraggableRoomListItem = (props: {
   draggable: boolean;
   entityID: string;
   factID: string;
-  children: React.ReactNode;
   setRoomEditOpen: () => void;
 }) => {
   let rep = useContext(ReplicacheContext);
@@ -386,6 +385,7 @@ export const DraggableRoomListItem = (props: {
   const { attributes, listeners, setNodeRef, isOverSomethingElse } =
     useDraggableCard({
       disabled: !props.draggable || editing,
+      roomType: roomType?.value || "canvas",
       type: "room",
       entityID: props.entityID,
       id: props.factID,
@@ -505,7 +505,7 @@ export const DraggableRoomListItem = (props: {
     <div {...obj} ref={refs} className={``}>
       {over && over.type === "room" && over.entityID !== props.entityID && (
         <div className="opacity-60">
-          <RoomListPreview entityID={over.entityID} />
+          <RoomListPreview entityID={over.entityID} type={over.roomType} />
         </div>
       )}
       {isOverSomethingElse ? null : (
@@ -523,8 +523,14 @@ export const DraggableRoomListItem = (props: {
   );
 };
 
-export const RoomListPreview = (props: { entityID: string }) => {
-  let name = db.useEntity(props.entityID, "room/name");
+export const RoomListPreview = (props: {
+  entityID: string;
+  type: Fact<"room/type">["value"];
+}) => {
+  let name = db.useEntity(
+    props.entityID,
+    props.type === "card" ? "card/title" : "room/name"
+  );
   return (
     <RoomListItem
       editing={false}
