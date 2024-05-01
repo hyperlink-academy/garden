@@ -7,6 +7,7 @@ import {
   RoomCanvas,
   RoomChat,
   RoomCollection,
+  RoomCard,
   RoomMember,
   RoomSearch,
   UnreadDot,
@@ -257,7 +258,7 @@ const CollapsedUnreadRoom = () => {
           unreadDiscussions?.filter(
             (unread) => !chatRooms.find((room) => room.entity === unread.entity)
           ).length > 0 ? (
-            <div className="absolute left-0 top-1">
+            <div className="absolute -left-1 -top-0">
               <UnreadDot />
             </div>
           ) : null}
@@ -287,9 +288,11 @@ const RoomButton = (props: { entityID: string }) => {
             <RoomCanvas />
           ) : roomType?.value === "chat" ? (
             <RoomChat />
-          ) : (
+          ) : roomType?.value === "collection" ? (
             <RoomCollection />
-          )
+          ) : roomType?.value === "card" ? (
+            <RoomCard />
+          ) : null
         }
       />
       {unreads && (

@@ -142,7 +142,9 @@ const CardDragPreview = ({ active }: { active: DraggableData }) => {
         </div>
       );
     case "room":
-      return <RoomListPreview entityID={active.entityID} />;
+      return (
+        <RoomListPreview entityID={active.entityID} type={active.roomType} />
+      );
     case "new-card":
       return (
         <div>
@@ -275,6 +277,7 @@ export type DraggableData = {
     }
   | {
       type: "room";
+      roomType: Fact<"room/type">["value"];
       entityID: string;
     }
   | { type: "new-card"; size: "big" | "small" }

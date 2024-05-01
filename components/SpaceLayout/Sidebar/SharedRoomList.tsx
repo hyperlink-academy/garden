@@ -13,11 +13,13 @@ import { useDroppableZone } from "components/DragContext";
 import {
   AddTiny,
   RoomCanvas,
+  RoomCard,
   RoomChat,
   RoomCollection,
 } from "components/Icons";
 import { useSetRoom } from "hooks/useUIState";
 import { ModalSubmitButton, Modal } from "components/Modal";
+import { Fact } from "data/Facts";
 
 export const SharedRoomList = (props: { setRoomEditOpen: () => void }) => {
   let { authorized } = useMutations();
@@ -36,9 +38,7 @@ export const SharedRoomList = (props: { setRoomEditOpen: () => void }) => {
                 key={room.id}
                 entityID={room.entity}
                 factID={room.id}
-              >
-                {room.value || <i>Untitled Room</i>}
-              </DraggableRoomListItem>
+              />
             );
           })}
         <CreateRoom />
@@ -52,8 +52,9 @@ const CreateRoom = () => {
   let [open, setOpen] = useState(false);
   let [roomState, setRoomState] = useState({
     name: "",
-    type: "canvas" as "canvas" | "collection" | "chat",
+    type: "canvas" as "canvas" | "collection" | "chat" | "card",
   });
+  let existingCard = db.useUniqueAttribute("card/title", roomState.name);
 
   let setRoom = useSetRoom();
   let rep = useContext(ReplicacheContext);
@@ -84,7 +85,7 @@ const CreateRoom = () => {
     <>
       {over && over.type === "room" && (
         <div className="opacity-60">
-          <RoomListPreview entityID={over.entityID} />
+          <RoomListPreview entityID={over.entityID} type={over.roomType} />
         </div>
       )}
       <button
@@ -103,8 +104,17 @@ const CreateRoom = () => {
         <form
           onSubmit={async (e) => {
             e.preventDefault();
-            let room = ulid();
+            let room =
+              roomState.type === "card" && existingCard
+                ? existingCard.entity
+                : ulid();
             await mutate("createRoom", { entity: room, ...roomState });
+            if (roomState.type === "card" && !existingCard)
+              await mutate("updateTitleFact", {
+                attribute: "card/title",
+                entity: room,
+                value: roomState.name,
+              });
             setRoom(room);
             setRoomState({ name: "", type: "canvas" });
             setOpen(false);
@@ -133,51 +143,30 @@ const CreateRoom = () => {
                 Room Type
               </RadioGroup.Label>
               <div className="my-2 flex flex-col gap-2">
-                <RadioGroup.Option value="canvas">
-                  {({ checked }) => (
-                    <div
-                      className={`${
-                        checked ? "bg-bg-blue" : ""
-                      } flex items-center justify-between gap-2 rounded-md border border-grey-15 p-2 hover:cursor-pointer`}
-                    >
-                      <div className="flex items-center gap-2">
-                        <RoomCanvas />
-                        <span className="font-bold">Canvas</span>
-                      </div>
-                      <span className="text-sm italic">spatial workspace</span>
-                    </div>
-                  )}
-                </RadioGroup.Option>
-                <RadioGroup.Option value="collection">
-                  {({ checked }) => (
-                    <div
-                      className={`${
-                        checked ? "bg-bg-blue" : ""
-                      } flex items-center justify-between gap-2 rounded-md border border-grey-15 p-2 hover:cursor-pointer`}
-                    >
-                      <div className="flex items-center gap-2">
-                        <RoomCollection />
-                        <span className="font-bold">Collection</span>
-                      </div>
-                      <span className="text-sm italic">ordered list</span>
-                    </div>
-                  )}
-                </RadioGroup.Option>
-                <RadioGroup.Option value="chat">
-                  {({ checked }) => (
-                    <div
-                      className={`${
-                        checked ? "bg-bg-blue" : ""
-                      } flex items-center justify-between gap-2 rounded-md border border-grey-15 p-2 hover:cursor-pointer`}
-                    >
-                      <div className="flex items-center gap-2">
-                        <RoomChat />
-                        <span className="font-bold">Chat</span>
-                      </div>
-                      <span className="text-sm italic">group conversation</span>
-                    </div>
-                  )}
-                </RadioGroup.Option>
+                <RoomTypeOption
+                  type="canvas"
+                  description="spatial workspace"
+                  icon={<RoomCanvas />}
+                  name="Canvas"
+                />
+                <RoomTypeOption
+                  type="collection"
+                  description="ordered list"
+                  icon={<RoomCollection />}
+                  name="Collection"
+                />
+                <RoomTypeOption
+                  type="chat"
+                  description="group conversation"
+                  icon={<RoomChat />}
+                  name="Chat"
+                />
+                <RoomTypeOption
+                  type="card"
+                  description="just one card"
+                  icon={<RoomCard />}
+                  name="Card"
+                />
               </div>
             </RadioGroup>
 
@@ -191,3 +180,28 @@ const CreateRoom = () => {
     </>
   );
 };
+
+function RoomTypeOption(props: {
+  type: Fact<"room/type">["value"];
+  name: string;
+  icon: React.ReactNode;
+  description: string;
+}) {
+  return (
+    <RadioGroup.Option value={props.type}>
+      {({ checked }) => (
+        <div
+          className={`${
+            checked ? "bg-bg-blue" : ""
+          } flex items-center justify-between gap-2 rounded-md border border-grey-15 p-2 hover:cursor-pointer`}
+        >
+          <div className="flex items-center gap-2">
+            {props.icon}
+            <span className="font-bold">{props.name}</span>
+          </div>
+          <span className="text-sm italic">{props.description}</span>
+        </div>
+      )}
+    </RadioGroup.Option>
+  );
+}

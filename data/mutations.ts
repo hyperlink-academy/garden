@@ -412,7 +412,7 @@ const replyToDiscussion: Mutation<{
 
 const createRoom: Mutation<{
   entity: string;
-  type: "canvas" | "collection" | "chat";
+  type: "canvas" | "collection" | "chat" | "card";
   name: string;
 }> = async (args, ctx) => {
   await ctx.assertFact({

@@ -19,7 +19,6 @@ import {
 import { Divider } from "./Layout";
 import { UnreadsRoom } from "./UnreadsRoom";
 import { EditRoomModal } from "./SpaceLayout/Sidebar/RoomListLayout";
-import { RenderedText } from "./Textarea/RenderedText";
 import { ulid } from "src/ulid";
 import { useAuth } from "hooks/useAuth";
 import { getAndUploadFile } from "src/getAndUploadFile";
@@ -31,9 +30,13 @@ import { useRoom } from "hooks/useUIState";
 import { SingleTextSection } from "./CardView/Sections";
 import { useCardViewer } from "./CardViewerContext";
 import { Textarea } from "./Textarea";
+import { CardView } from "./CardView";
+import { useSidebarState } from "app/(app)/@sidebar/SidebarState";
 
 export const Room = () => {
   let { open } = useCardViewer();
+
+  let { open: sideBarOpen } = useSidebarState();
   let room = useRoom();
   let roomType = db.useEntity(room, "room/type");
   let { ref } = usePreserveScroll<HTMLDivElement>(room);
@@ -48,147 +51,173 @@ export const Room = () => {
   if (room === "unreads") return <UnreadsRoom />;
   if (roomType?.value === "chat")
     return (
-      <div className="flex h-full w-fit">
-        <DiscussionRoom entityID={room} isRoom />
+      <div className="relative flex shrink-0  snap-center snap-always flex-row  rounded-md border border-grey-90">
+        <div className="flex h-full w-fit">
+          <DiscussionRoom entityID={room} isRoom />
+        </div>
+      </div>
+    );
+
+  if (roomType?.value === "card")
+    return (
+      <div
+        className={`cardViewerWrapper
+          flex  h-full w-[calc(100vw-16px)] max-w-xl
+          shrink-0 touch-pan-x
+          snap-center snap-always flex-col
+          items-stretch
+          focus:outline-none
+          sm:w-[calc(100vw-100px)] ${
+            !sideBarOpen
+              ? "md:w-[calc(100vw-448px)]"
+              : "md:w-[calc(100vw-670px)]"
+          } md:shrink`}
+      >
+        <CardView entityID={room} space_id={"FIX"} />
       </div>
     );
 
   return (
-    <div
-      id="room-wrapper"
-      onPaste={async (e) => {
-        //handles creating a new image card if you paste in an image
-        if (!authToken || !spaceID || !roomType || !rep || !memberEntity)
-          return;
-        if (roomType.value === "chat") return;
-        let data = await getAndUploadFile(
-          e.clipboardData.items,
-          authToken,
-          spaceID
-        );
-        if (data.length == 0) return;
-
-        //prevent image from opening in new tab
-        e.preventDefault();
-        for (let image of data) {
-          if (image.success === false) continue;
-
-          let newCard = ulid();
-          action.start();
-          let factID = ulid();
-          await create(
-            newCard,
-            {
-              addToEnd: true,
-              parentID: room,
-              positionKey: "eav",
-              attribute: "desktop/contains",
-            },
-            rep,
-            mutate,
-            factID
+    <div className="relative flex shrink-0  snap-center snap-always flex-row  rounded-md border border-grey-90">
+      <div
+        id="room-wrapper"
+        onPaste={async (e) => {
+          //handles creating a new image card if you paste in an image
+          if (!authToken || !spaceID || !roomType || !rep || !memberEntity)
+            return;
+          if (roomType.value === "chat") return;
+          let data = await getAndUploadFile(
+            e.clipboardData.items,
+            authToken,
+            spaceID
           );
-          await mutate("createCard", {
-            memberEntity,
-            entityID: newCard,
-            title: "",
-          });
-          await mutate("assertFact", {
-            entity: newCard,
-            attribute: "card/image",
-            value: { type: "file", id: image.data.id, filetype: "image" },
-            positions: {},
-          });
-          if (roomType.value === "canvas") {
-            let siblingPositions = await rep.query(async (tx) => {
-              let siblings = await scanIndex(tx).eav(room, "desktop/contains");
+          if (data.length == 0) return;
 
-              return Promise.all(
-                siblings.map(async (c) =>
-                  scanIndex(tx).eav(c.id, "card/position-in")
-                )
-              );
-            });
+          //prevent image from opening in new tab
+          e.preventDefault();
+          for (let image of data) {
+            if (image.success === false) continue;
 
-            let siblingsSortedByPosition = siblingPositions.sort(
-              (a, b) => (a?.value.y || 0) - (b?.value.y || 0)
-            );
-
-            let lastSiblingPosition =
-              siblingsSortedByPosition[siblingsSortedByPosition.length - 2]
-                ?.value.y;
-
-            await mutate("assertFact", {
-              entity: factID,
-              attribute: "card/position-in",
-              value: {
-                type: "position",
-                x: 64,
-                y: lastSiblingPosition ? lastSiblingPosition + 124 : 32,
-                rotation: 0,
-                size: "small",
+            let newCard = ulid();
+            action.start();
+            let factID = ulid();
+            await create(
+              newCard,
+              {
+                addToEnd: true,
+                parentID: room,
+                positionKey: "eav",
+                attribute: "desktop/contains",
               },
+              rep,
+              mutate,
+              factID
+            );
+            await mutate("createCard", {
+              memberEntity,
+              entityID: newCard,
+              title: "",
+            });
+            await mutate("assertFact", {
+              entity: newCard,
+              attribute: "card/image",
+              value: { type: "file", id: image.data.id, filetype: "image" },
               positions: {},
             });
+            if (roomType.value === "canvas") {
+              let siblingPositions = await rep.query(async (tx) => {
+                let siblings = await scanIndex(tx).eav(
+                  room,
+                  "desktop/contains"
+                );
 
-            let roomElement = document.getElementById("room-wrapper");
-            roomElement?.scrollTo({
-              top: lastSiblingPosition ? lastSiblingPosition : 0,
-              behavior: "smooth",
-            });
+                return Promise.all(
+                  siblings.map(async (c) =>
+                    scanIndex(tx).eav(c.id, "card/position-in")
+                  )
+                );
+              });
+
+              let siblingsSortedByPosition = siblingPositions.sort(
+                (a, b) => (a?.value.y || 0) - (b?.value.y || 0)
+              );
+
+              let lastSiblingPosition =
+                siblingsSortedByPosition[siblingsSortedByPosition.length - 2]
+                  ?.value.y;
+
+              await mutate("assertFact", {
+                entity: factID,
+                attribute: "card/position-in",
+                value: {
+                  type: "position",
+                  x: 64,
+                  y: lastSiblingPosition ? lastSiblingPosition + 124 : 32,
+                  rotation: 0,
+                  size: "small",
+                },
+                positions: {},
+              });
+
+              let roomElement = document.getElementById("room-wrapper");
+              roomElement?.scrollTo({
+                top: lastSiblingPosition ? lastSiblingPosition : 0,
+                behavior: "smooth",
+              });
+            }
+
+            if (roomType.value === "collection") {
+              let roomElement = document.getElementById("room-wrapper");
+              roomElement?.scrollTo({
+                top: roomElement.scrollHeight,
+                behavior: "smooth",
+              });
+            }
+            open({ entityID: newCard, focus: "title", parent: null });
           }
 
-          if (roomType.value === "collection") {
-            let roomElement = document.getElementById("room-wrapper");
-            roomElement?.scrollTo({
-              top: roomElement.scrollHeight,
-              behavior: "smooth",
-            });
+          action.end();
+        }}
+        ref={ref}
+        className="no-scrollbar mx-2 mb-2 mt-0 flex h-full w-[302px] flex-col items-stretch   overflow-x-hidden overflow-y-scroll text-sm sm:m-4 sm:mt-0"
+      >
+        <RoomHeader
+          totalCount={total}
+          filteredCount={cardsFiltered.length}
+          entityID={room}
+          reactions={reactions}
+          filters={filters}
+          setFilters={setFilters}
+        />
+
+        {/* per-room wrappers + components */}
+        {room ? (
+          roomType?.value === "collection" ? (
+            <div className="flex grow flex-col gap-2 pb-3 pt-2">
+              <CardCollection
+                cards={cardsFiltered}
+                entityID={room}
+                attribute="desktop/contains"
+                openOnAdd
+              />
+            </div>
+          ) : (
+            <div className="relative flex flex-col">
+              <Desktop entityID={room} />
+              <div className="desktopBackground absolute h-full w-full grow" />
+            </div>
+          )
+        ) : null}
+
+        <AddCardButton
+          total={total}
+          firstCard={cardsFiltered[0]?.value.value}
+          roomEntity={room}
+          getViewHeight={() =>
+            ref.current ? ref?.current.clientHeight + ref.current.scrollTop : 0
           }
-          open({ entityID: newCard, focus: "title", parent: null });
-        }
-
-        action.end();
-      }}
-      ref={ref}
-      className="no-scrollbar mx-2 mb-2 mt-0 flex h-full w-[302px] flex-col items-stretch   overflow-x-hidden overflow-y-scroll text-sm sm:m-4 sm:mt-0"
-    >
-      <RoomHeader
-        totalCount={total}
-        filteredCount={cardsFiltered.length}
-        entityID={room}
-        reactions={reactions}
-        filters={filters}
-        setFilters={setFilters}
-      />
-
-      {/* per-room wrappers + components */}
-      {room ? (
-        roomType?.value === "collection" ? (
-          <div className="flex grow flex-col gap-2 pb-3 pt-2">
-            <CardCollection
-              cards={cardsFiltered}
-              entityID={room}
-              attribute="desktop/contains"
-              openOnAdd
-            />
-          </div>
-        ) : (
-          <div className="relative flex flex-col">
-            <Desktop entityID={room} />
-            <div className="desktopBackground absolute h-full w-full grow" />
-          </div>
-        )
-      ) : null}
-
-      <AddCardButton
-        total={total}
-        firstCard={cardsFiltered[0]?.value.value}
-        roomEntity={room}
-        getViewHeight={() =>
-          ref.current ? ref?.current.clientHeight + ref.current.scrollTop : 0
-        }
-      />
+        />
+      </div>
     </div>
   );
 };

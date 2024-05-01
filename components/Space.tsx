@@ -39,9 +39,7 @@ export const Space = (props: Props) => {
   return (
     <>
       <PresenceHandler />
-      <div className="spaceRoomAndSidebar relative flex shrink-0  snap-center snap-always flex-row  rounded-md border border-grey-90">
-        <Room />
-      </div>
+      <Room />
       <CardViewer space_id={props.space_id} />
     </>
   );
