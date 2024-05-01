@@ -35,7 +35,12 @@ import { Fact } from "data/Facts";
 import { getAndUploadFile } from "src/getAndUploadFile";
 import { useReactions } from "hooks/useReactions";
 import { CardViewDrawer } from "./CardViewDrawer";
-import { useCloseCard, useRoomHistory, useUIState } from "hooks/useUIState";
+import {
+  useCloseCard,
+  useRoomHistory,
+  useSetRoom,
+  useUIState,
+} from "hooks/useUIState";
 import { Modal } from "components/Modal";
 import { Title } from "./Title";
 import { LinkPreview } from "components/LinkPreview";
@@ -409,17 +414,7 @@ const CardMoreOptionsMenu = (props: {
           <div>Copy Card Link</div>
           <LinkSmall />
         </MenuItem>
-        <MenuItem
-          onClick={() => {
-            mutate("createRoom", {
-              entity: props.entityID,
-              type: "card",
-              name: "",
-            });
-          }}
-        >
-          Pin Card to Sidebar <Pin />
-        </MenuItem>
+        <PinCardMenuItem entityID={props.entityID} />
         <MenuItem>
           <CardBackgroundColorPicker entityID={props.entityID} />
         </MenuItem>
@@ -443,6 +438,42 @@ const CardMoreOptionsMenu = (props: {
         entityID={props.entityID}
       />
     </Menu>
+  );
+};
+
+const PinCardMenuItem = (props: { entityID: string }) => {
+  let { mutate, rep } = useMutations();
+  let isRoom = db.useEntity(props.entityID, "room/name");
+  let roomType = db.useEntity(props.entityID, "room/type");
+  let setRoom = useSetRoom();
+  if (isRoom)
+    return (
+      <MenuItem
+        onClick={async () => {
+          let rooms = (
+            (await rep?.query((tx) => scanIndex(tx).aev("room/name"))) || []
+          ).sort(sortByPosition("roomList"));
+          let index = rooms.findIndex((r) => r.entity === props.entityID);
+          setRoom(rooms[index < 1 ? 1 : index - 1].entity);
+          if (isRoom) mutate("retractFact", { id: isRoom.id });
+          if (roomType) mutate("retractFact", { id: roomType.id });
+        }}
+      >
+        Unpin Card from Sidebar <Pin />
+      </MenuItem>
+    );
+  return (
+    <MenuItem
+      onClick={() => {
+        mutate("createRoom", {
+          entity: props.entityID,
+          type: "card",
+          name: "",
+        });
+      }}
+    >
+      Pin Card to Sidebar <Pin />
+    </MenuItem>
   );
 };
 
