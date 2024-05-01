@@ -5,6 +5,7 @@ import { Fact } from "data/Facts";
 import {
   Delete,
   RoomCanvas,
+  RoomCard,
   RoomChat,
   RoomCollection,
   UnreadDot,
@@ -277,6 +278,8 @@ export const RoomListItem = (props: {
             <RoomCanvas />
           ) : roomType?.value === "chat" ? (
             <RoomChat />
+          ) : roomType?.value === "card" ? (
+            <RoomCard />
           ) : null}
         </div>
         {authorized && props.editing ? (

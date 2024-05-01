@@ -11,6 +11,7 @@ import {
   CloseLinedTiny,
   GoBackToPageLined,
   LinkSmall,
+  Pin,
 } from "components/Icons";
 import { Divider, MenuContainer, MenuItem } from "components/Layout";
 import { scanIndex, db, useMutations, useSpaceID } from "hooks/useReplicache";
@@ -405,10 +406,8 @@ const CardMoreOptionsMenu = (props: {
             );
           }}
         >
-          <div className="font-bold">Copy link to card</div>
-        </MenuItem>
-        <MenuItem>
-          <CardBackgroundColorPicker entityID={props.entityID} />
+          <div>Copy Card Link</div>
+          <LinkSmall />
         </MenuItem>
         <MenuItem
           onClick={() => {
@@ -419,8 +418,12 @@ const CardMoreOptionsMenu = (props: {
             });
           }}
         >
-          Pin Card
+          Pin Card to Sidebar <Pin />
         </MenuItem>
+        <MenuItem>
+          <CardBackgroundColorPicker entityID={props.entityID} />
+        </MenuItem>
+
         <Divider my={8} />
         <MenuItem
           onClick={() => {
