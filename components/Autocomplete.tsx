@@ -28,8 +28,9 @@ export const Autocomplete = (props: {
           side="bottom"
           align="center"
           sideOffset={4}
+          collisionPadding={20}
           onOpenAutoFocus={(e) => e.preventDefault()}
-          className="z-10 max-h-32 w-64 overflow-y-scroll rounded-md border border-grey-80 bg-white py-0 text-grey-35"
+          className="!z-[60] max-h-32 w-64 overflow-y-scroll rounded-md border border-grey-80 bg-white py-0 text-grey-35"
         >
           <ul className="list-none p-0 text-sm">
             {props.suggestions.map((result, index) => {

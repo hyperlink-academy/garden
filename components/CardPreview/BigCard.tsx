@@ -167,7 +167,7 @@ export const BigCardBody = (
         {/* NB: show ONLY for non-member cards for now */}
         {!props.data.isMember && (
           <div className="cardPreviewActionsWrapper flex w-full items-center justify-between gap-2">
-            <div className="cardPreviewActions flex  gap-2">
+            <div className="cardPreviewActions flex items-center gap-2">
               {/* Discussions */}
               {/* three states: unread, existing, none */}
               {/* clicking = shortcut to focus input for a new message */}
@@ -194,9 +194,9 @@ export const BigCardBody = (
               >
                 <div className="cardPreviewCommentIcon flex shrink-0 items-center gap-1 py-0.5 pl-0.5 pr-1 text-xs">
                   {props.messagesCount && props.messagesCount > 0 ? (
-                    <>
-                      <RoomChat />
-                    </>
+                    <div className="flex font-normal items-center gap-1">
+                      <RoomChat /> {props.messagesCount}
+                    </div>
                   ) : (
                     <>
                       <ChatEmptyTiny />
@@ -208,7 +208,11 @@ export const BigCardBody = (
               {/* Reactions */}
               {props.data.reactions.length > 0 ? (
                 <>
-                  <Divider vertical my={2} />
+                  <div className="h-5">
+                    {" "}
+                    <Divider vertical />
+                  </div>
+
                   <div className="cardPreviewReactions flex flex-row items-center gap-1">
                     {props.data.reactions
                       .slice(0, 3)

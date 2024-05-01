@@ -95,7 +95,15 @@ const ChatTab = (props: { entityID: string }) => {
       entityID={props.entityID}
       text={
         <div className="py-0.5">
-          {messages.length > 0 ? <RoomChat /> : <ChatEmptyTiny />}
+          {messages.length > 0 ? (
+            <div className="flex gap-1 font-normal items-center">
+              {" "}
+              <RoomChat />
+              {messages.length}{" "}
+            </div>
+          ) : (
+            <ChatEmptyTiny />
+          )}
         </div>
       }
       id="chat"
