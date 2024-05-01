@@ -158,8 +158,7 @@ const EmptyState = (props: { roomType: string | undefined }) => {
               <em>Drag cards to reorder</em>
             </p>
           </>
-        ) : (
-          // if not 'canvas' or 'collection', it's chat
+        ) : props.roomType == "chat" ? (
           <>
             <p>
               <em>Attach cards to chat messages</em>
@@ -168,7 +167,7 @@ const EmptyState = (props: { roomType: string | undefined }) => {
               <em>Click to open them here</em>
             </p>
           </>
-        )}
+        ) : null}
       </div>
     </div>
   );
