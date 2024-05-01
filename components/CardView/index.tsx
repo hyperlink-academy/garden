@@ -37,6 +37,7 @@ import { useReactions } from "hooks/useReactions";
 import { CardViewDrawer } from "./CardViewDrawer";
 import {
   useCloseCard,
+  useRoom,
   useRoomHistory,
   useSetRoom,
   useUIState,
@@ -346,7 +347,9 @@ const CardLinkPreview = (props: { entityID: string }) => {
 
 const BackButton = (props: { entityID: string }) => {
   let closeCard = useCloseCard();
+  let room = useRoom();
   let { authorized } = useMutations();
+  if (props.entityID === room) return null;
   return (
     <button
       className={`pointer-events-auto  flex h-min w-fit items-center gap-1 rounded-full border border-grey-90 bg-white p-1 text-grey-55 shadow ${
@@ -483,7 +486,8 @@ const AreYouSureCardDeletionModal = (props: {
   onDelete?: () => void;
   entityID: string;
 }) => {
-  let { mutate, action } = useMutations();
+  let { mutate, action, rep } = useMutations();
+  let setRoom = useSetRoom();
   return (
     <Modal open={props.open} onClose={props.onClose}>
       <div className="flex flex-col gap-3 text-grey-35">
@@ -507,7 +511,13 @@ const AreYouSureCardDeletionModal = (props: {
               destructive={true}
               onClick={async () => {
                 action.start();
-
+                let rooms = (
+                  (await rep?.query((tx) => scanIndex(tx).aev("room/name"))) ||
+                  []
+                ).sort(sortByPosition("roomList"));
+                let index = rooms.findIndex((r) => r.entity === props.entityID);
+                if (index !== -1)
+                  setRoom(rooms[index < 1 ? 1 : index - 1].entity);
                 await mutate("deleteEntity", { entity: props.entityID });
                 props.onDelete?.();
 
