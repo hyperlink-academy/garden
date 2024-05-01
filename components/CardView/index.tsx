@@ -132,7 +132,7 @@ export const CardView = (props: {
       });
       setTimeout(() => {
         document
-          .getElementById("card-attached-card-section")
+          .getElementById(elementID.card(props.entityID).attachedCards)
           ?.scrollIntoView({ block: "end", behavior: "smooth" });
       }, 100);
     },
@@ -737,7 +737,7 @@ export const SectionAdder = (props: {
         onAdd={() => {
           setTimeout(() => {
             document
-              .getElementById("card-attached-card-section")
+              .getElementById(elementID.card(props.entityID).attachedCards)
               ?.scrollIntoView({ block: "end", behavior: "smooth" });
           }, 100);
         }}

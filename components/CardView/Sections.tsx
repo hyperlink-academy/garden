@@ -7,7 +7,7 @@ import { useAuth } from "hooks/useAuth";
 import { CardCollection } from "components/CardCollection";
 import { Autocomplete, useSuggestions } from "components/Autocomplete";
 import { getCoordinatesInTextarea } from "src/getCoordinatesInTextarea";
-import { getLinkAtCursor } from "src/utils";
+import { elementID, getLinkAtCursor } from "src/utils";
 import { modifyString, useKeyboardHandling } from "hooks/useKeyboardHandling";
 import { CollectionType } from "components/Room";
 import { sortByPosition } from "src/position_helpers";
@@ -302,7 +302,10 @@ export const AttachedCardSection = (props: { entityID: string }) => {
   return (
     <>
       {attachedCards && attachedCards.length > 0 && (
-        <div id="card-attached-card-section" className="flex flex-col gap-2">
+        <div
+          id={elementID.card(props.entityID).attachedCards}
+          className="flex flex-col gap-2"
+        >
           <div className="flex flex-row justify-between">
             <div className="text-grey-55 flex items-center gap-1 text-sm font-bold">
               <RoomCollection /> ({attachedCards.length})

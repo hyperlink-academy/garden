@@ -11,6 +11,7 @@ import { DotLoader } from "components/DotLoader";
 import { LightBoxModal } from "../Layout";
 import { Fact } from "data/Facts";
 import useMeasure from "react-use-measure";
+import { elementID } from "src/utils";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL as string;
 
@@ -40,7 +41,7 @@ export const MakeImage = (props: {
         setTimeout(
           () =>
             document
-              .getElementById("card-image")
+              .getElementById(elementID.card(props.entity).image)
               ?.scrollIntoView({ behavior: "smooth", block: "center" }),
           500
         );
@@ -208,7 +209,7 @@ export const CardImage = (props: {
     // FOCUS ON DIV AND PASTE AN IMAGE
     <div className="relative flex w-full flex-col rounded-md ">
       <div
-        id="card-image"
+        id={elementID.card(props.entityID).image}
         ref={imageRef}
         style={{
           width: "100%",

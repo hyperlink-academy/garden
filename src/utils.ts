@@ -61,6 +61,8 @@ export const elementID = {
     title: `card/${entityID}/title`,
     container: `card/${entityID}/container`,
     content: `card/${entityID}/content`,
+    image: `card/${entityID}/image`,
+    attachedCards: `card/${entityID}/attachedCards`,
   }),
   discussion: (entityID: string) => ({
     input: `discussion/${entityID}/input`,
