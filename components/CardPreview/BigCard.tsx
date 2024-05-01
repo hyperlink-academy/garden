@@ -110,7 +110,7 @@ export const BigCardBody = (
               fallback={props.data.title?.value}
               section={props.data.member ? "member/name" : "card/title"}
               placeholder="Untitled"
-              previewOnly={!!props.data.member}
+              previewOnly
               className={`cardPreviewTitle text-md font-bold ${
                 props.data.isMember ? "w-fit text-white" : "text-grey-35"
               } ${
