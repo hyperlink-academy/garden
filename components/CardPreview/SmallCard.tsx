@@ -51,31 +51,15 @@ export const BaseSmallCard = (
     messagesCount?: number;
   } & Omit<Props, "size" | "href" | "data">
 ) => {
-  let { authorized } = useMutations();
   let { open } = useCardViewer();
   let linkPreview = db.useEntity(props.entityID || null, "card/link-preview");
-  let listenersAndAttributes = authorized
-    ? {
-        ...props?.dragHandleProps?.attributes,
-        ...props?.dragHandleProps?.listeners,
-      }
-    : {};
   let cardBackgroundColor =
     (props.entityID &&
       db.useEntity(props.entityID, "card/background-color")?.value) ||
     "#FFFFFF";
   return (
     <div
-      {...listenersAndAttributes}
-      onClick={(e) => {
-        props.entityID &&
-          open({
-            entityID: props.entityID,
-            parent: props.parent,
-            append: e.ctrlKey || e.metaKey,
-          });
-      }}
-      className={`h-full w-full !bg-cover !bg-center !bg-no-repeat hover:cursor-pointer ${
+      className={`h-[6rem] w-[144px] !bg-cover !bg-center !bg-no-repeat hover:cursor-pointer ${
         props.isMember ? "pb-1 pl-2 pr-1 pt-2" : "px-2 py-2"
       }`}
       style={{

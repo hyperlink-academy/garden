@@ -27,16 +27,9 @@ export const BigCardBody = (
   let linkPreview = db.useEntity(props.entityID, "card/link-preview");
   let cardBackgroundColor =
     db.useEntity(props.entityID, "card/background-color")?.value || "#FFFFFF";
-  let listenersAndAttributes = authorized
-    ? {
-        ...props?.dragHandleProps?.attributes,
-        ...props?.dragHandleProps?.listeners,
-      }
-    : {};
 
   return (
     <div
-      {...listenersAndAttributes}
       className={`CardPreview flex h-full grow flex-row !bg-cover !bg-center !bg-no-repeat pl-2 text-sm ${
         props.data.isMember ? "py-2 pr-2" : "pb-1 pr-2 pt-2"
       }`}
@@ -49,14 +42,6 @@ export const BigCardBody = (
           !linkPreview
             ? `url(${props.data.imageUrl})`
             : cardBackgroundColor,
-      }} //no tailwind equiv - need for long titles to wrap
-      onClick={(e) => {
-        if (e.defaultPrevented) return;
-        open({
-          entityID: props.entityID,
-          parent: props.parent,
-          append: e.ctrlKey || e.metaKey,
-        });
       }}
     >
       {/* Big Card Preview Content Wrapper */}

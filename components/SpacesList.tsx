@@ -1,4 +1,3 @@
-import { useMutations } from "hooks/useReplicache";
 import Link from "next/link";
 import { DoorImage } from "./Doors";
 import { RoomMember } from "./Icons";
@@ -6,7 +5,8 @@ import { useAuth } from "hooks/useAuth";
 import { spacePath } from "hooks/utils";
 export type { SpaceData } from "backend/routes/get_space_data";
 import type { SpaceData } from "backend/routes/get_space_data";
-import { getCurrentDate } from "src/utils";
+import { useSpaceID } from "hooks/useReplicache";
+import { useSpaceData } from "hooks/useSpaceData";
 
 export const SpaceList = (props: {
   spaces: Array<SpaceData>;
@@ -32,6 +32,22 @@ export const SpaceList = (props: {
         })}
       </div>
     </div>
+  );
+};
+
+export const RemoteSpaceCard = (props: { space_id: string }) => {
+  let { data } = useSpaceData(props);
+  if (!data) return null;
+  return (
+    <Link
+      href={`${spacePath({
+        studio: data.owner.username,
+        id: data.id,
+        display_name: data.display_name || "",
+      })}`}
+    >
+      <SpaceCard {...data} />
+    </Link>
   );
 };
 

@@ -18,8 +18,9 @@ import { useAuth } from "hooks/useAuth";
 import { ulid } from "src/ulid";
 import { getAndUploadFile } from "src/getAndUploadFile";
 import { CardPreviewData, useCardPreviewData } from "hooks/CardPreviewData";
-import { useUIState } from "hooks/useUIState";
 import { PresenceTag } from "components/PresenceTag";
+import { useCardViewer } from "components/CardViewerContext";
+import { RemoteSpaceCard } from "components/SpacesList";
 
 const borderStyles = (args: { isMember: boolean }) => {
   switch (true) {
@@ -60,7 +61,7 @@ export const CardPreview = (
   } & Props
 ) => {
   let isMember = !!db.useEntity(props.entityID, "member/name");
-  let { memberEntity, mutate } = useMutations();
+  let { memberEntity, mutate, authorized } = useMutations();
   let unreadBy = db.useEntity(props.entityID, "card/unread-by") || [];
   let isUnread = unreadBy.find((f) => f.value.value === memberEntity);
   let { authToken } = useAuth();
@@ -85,6 +86,28 @@ export const CardPreview = (
     () => props.onLongPress?.(),
     props.isDragging
   );
+
+  let { open } = useCardViewer();
+  let listenersAndAttributes = authorized
+    ? {
+        ...props?.dragHandleProps?.attributes,
+        ...props?.dragHandleProps?.listeners,
+      }
+    : {};
+
+  if (props.data.content?.value === "SPACE CARD TEST") {
+    return (
+      <HoverControls {...props}>
+        <div
+          className="h-full w-fit"
+          {...listenersAndAttributes}
+          onClick={(e) => {}}
+        >
+          <RemoteSpaceCard space_id="a3a3a27f-0f5f-4668-a2e1-00748749089f" />
+        </div>
+      </HoverControls>
+    );
+  }
 
   return (
     <HoverControls {...props}>
@@ -129,19 +152,32 @@ export const CardPreview = (
         }`}
         style={{ WebkitTapHighlightColor: "transparent" }}
       >
-        {props.size === "small" ? (
-          <SmallCardBody
-            {...props}
-            unreadDiscussions={unreadDiscussions}
-            messagesCount={messagesCount}
-          />
-        ) : (
-          <BigCardBody
-            {...props}
-            unreadDiscussions={unreadDiscussions}
-            messagesCount={messagesCount}
-          />
-        )}
+        <div
+          className="h-full w-full"
+          {...listenersAndAttributes}
+          onClick={(e) => {
+            props.entityID &&
+              open({
+                entityID: props.entityID,
+                parent: props.parent,
+                append: e.ctrlKey || e.metaKey,
+              });
+          }}
+        >
+          {props.size === "small" ? (
+            <SmallCardBody
+              {...props}
+              unreadDiscussions={unreadDiscussions}
+              messagesCount={messagesCount}
+            />
+          ) : (
+            <BigCardBody
+              {...props}
+              unreadDiscussions={unreadDiscussions}
+              messagesCount={messagesCount}
+            />
+          )}
+        </div>
       </div>
     </HoverControls>
   );
@@ -191,11 +227,10 @@ export const HoverControls = (
     <div
       {...bindPinch()}
       ref={ref}
-      style={{}}
       className={`
       cardPreviewWrapper
       relative
-      ${props.size === "small" ? "h-[6rem] w-[160px]" : "h-full w-full"}
+      h-full w-full
       group grid
       grid-cols-[auto_min-content]
       ${props.outerControls ? "gap-1" : ""}
