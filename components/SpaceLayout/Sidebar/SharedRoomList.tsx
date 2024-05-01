@@ -48,7 +48,7 @@ export const SharedRoomList = (props: { setRoomEditOpen: () => void }) => {
 };
 
 const CreateRoom = () => {
-  let { mutate, authorized } = useMutations();
+  let { mutate, authorized, memberEntity } = useMutations();
   let [open, setOpen] = useState(false);
   let [roomState, setRoomState] = useState({
     name: "",
@@ -103,6 +103,7 @@ const CreateRoom = () => {
       <Modal header="Create Room" open={open} onClose={() => setOpen(false)}>
         <form
           onSubmit={async (e) => {
+            if (!memberEntity) return;
             e.preventDefault();
             let room =
               roomState.type === "card" && existingCard
@@ -110,10 +111,10 @@ const CreateRoom = () => {
                 : ulid();
             await mutate("createRoom", { entity: room, ...roomState });
             if (roomState.type === "card" && !existingCard)
-              await mutate("updateTitleFact", {
-                attribute: "card/title",
-                entity: room,
-                value: roomState.name,
+              await mutate("createCard", {
+                entityID: room,
+                title: roomState?.name || "",
+                memberEntity,
               });
             setRoom(room);
             setRoomState({ name: "", type: "canvas" });
