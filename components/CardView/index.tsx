@@ -557,27 +557,24 @@ const CardBackgroundColorPicker = (props: { entityID: string }) => {
   };
 
   return (
-    <div className="flex flex-col gap-1 font-bold">
-      Set Card Color
-      <div className="flex gap-1">
-        {CardBackgroundColors.map((color) => {
-          return (
-            <button
-              key={color}
-              className={`h-5 w-5 rounded-full border hover:cursor-pointer
+    <div className="flex gap-1">
+      {CardBackgroundColors.map((color) => {
+        return (
+          <button
+            key={color}
+            className={`h-5 w-5 rounded-full border hover:cursor-pointer
                ${
                  cardBackgroundColor === color
                    ? "border-2 border-grey-55"
                    : "border-1 border-grey-80 hover:border-2"
                }`}
-              style={{ backgroundColor: color }}
-              onClick={() => {
-                setCardBackgroudColor(color);
-              }}
-            />
-          );
-        })}
-      </div>
+            style={{ backgroundColor: color }}
+            onClick={() => {
+              setCardBackgroudColor(color);
+            }}
+          />
+        );
+      })}
     </div>
   );
 };
