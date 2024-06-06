@@ -414,7 +414,7 @@ const CardMoreOptionsMenu = (props: {
             );
           }}
         >
-          <div>Copy Card Link</div>
+          <div>Copy Link</div>
           <LinkSmall />
         </MenuItem>
         <PinCardMenuItem entityID={props.entityID} />
@@ -462,7 +462,7 @@ const PinCardMenuItem = (props: { entityID: string }) => {
           if (roomType) mutate("retractFact", { id: roomType.id });
         }}
       >
-        Unpin Card from Sidebar <Pin />
+        Unpin from Sidebar <Pin />
       </MenuItem>
     );
   return (
@@ -475,7 +475,7 @@ const PinCardMenuItem = (props: { entityID: string }) => {
         });
       }}
     >
-      Pin Card to Sidebar <Pin />
+      Pin to Sidebar <Pin />
     </MenuItem>
   );
 };
@@ -535,10 +535,12 @@ const AreYouSureCardDeletionModal = (props: {
 
 const CardBackgroundColors = [
   "#FFFFFF", //white
-  "#F4FFE7", //green
-  "#FFEEF2", //pink
-  "#ECF8FF", //blue
+  "#FFEEF2", //red
+  "#fff2e7", //orange
   "#FFFAE7", //yellow
+  "#F4FFE7", //green
+  "#ECF8FF", //blue
+  "#f4eeff", //purple
 ];
 
 const CardBackgroundColorPicker = (props: { entityID: string }) => {
@@ -557,7 +559,7 @@ const CardBackgroundColorPicker = (props: { entityID: string }) => {
   return (
     <div className="flex flex-col gap-1 font-bold">
       Set Card Color
-      <div className="flex gap-2">
+      <div className="flex gap-1">
         {CardBackgroundColors.map((color) => {
           return (
             <button
