@@ -164,77 +164,65 @@ export function HomePage() {
 
           {/* internet clubs */}
           <div className="mx-auto">
-            <div className="relative m-[8px] mx-4 -mt-12 flex max-w-3xl flex-col gap-8 border border-grey-80 bg-white p-4 pt-6 sm:mx-8 sm:p-8 sm:pt-8 sm:text-lg">
+            <div className="relative m-2 mx-4 -mt-12 flex max-w-3xl flex-col gap-8 border border-grey-80 bg-white p-4 pt-6 sm:mx-8 sm:p-8 sm:pt-8 sm:text-lg rounded-md">
               <div className="absolute -top-[16px] right-[8px] w-max rotate-3 rounded-md bg-accent-red p-1 text-sm font-bold text-white sm:-right-[32px] sm:p-2 sm:text-base">
                 in progress!
               </div>
-              <div
-                className={`flex max-w-2xl flex-col gap-3 text-center text-grey-35`}
-              >
-                <h2 className="text-grey-15">Internet Clubs</h2>
+              <div className="flex max-w-2xl flex-col gap-4 text-grey-35">
+                <h2 className="text-center">
+                  Hyperlink is prototyping a new app for making{" "}
+                  <div className="inline-block italic">
+                    <span className="text-[#cc0d96]">d</span>
+                    <span className="text-[#0093ce]">e</span>
+                    <span className="text-[#e24c00]">l</span>
+                    <span className="text-[#009c48]">i</span>
+                    <span className="text-[#e09f00]">g</span>
+                    <span className="text-[#e93d3d]">h</span>
+                    <span className="text-[#3d6fe0]">t</span>
+                    <span className="text-[#a93bd3]">f</span>
+                    <span className="text-[#0aa17c]">u</span>
+                    <span className="text-[#ff671a]">l</span>
+                  </div>{" "}
+                  <span className="underline decoration-wavy decoration-accent-gold decoration-2">
+                    documents
+                  </span>
+                  .
+                </h2>
 
                 <p>
-                  We&apos;re playing with{" "}
-                  <strong>a new kind of internet club</strong> — communities of
-                  practice where we make and explore things together.
+                  Imagine: quick tiny documents that can grow into rich
+                  environments for creative collaboration ✨🌱
                 </p>
-                <p>
-                  In each club we work async in Spaces, explore and chat about
-                  each other&apos;s work, and share updates with a group digest.
-                </p>
-                <a
-                  className="flex items-center justify-center gap-1 text-sm text-accent-blue hover:underline sm:text-base"
-                  href={"https://notes.hyperlink.academy/note/internet-clubs"}
-                >
-                  read more about internet clubs
-                  <GoToPageLined />
-                </a>
-              </div>
+                <ul>
+                  <li>Like Google Docs…but faster, nicer looking, more fun</li>
+                  <li>
+                    Like Notion…but cozier, more customizable, easy to share
+                  </li>
+                </ul>
 
-              <p className="text-center font-bold italic sm:text-lg">
-                ✨ explore our recent clubs! ✨
-              </p>
-              <div className="mb-6 flex w-full flex-col-reverse  gap-9 pr-8 md:flex-row-reverse">
-                <StudioItem
-                  name="Pedagogical Parents"
-                  description="reading books about learning"
-                  image="/img/landing/pedagogical.png"
-                  alt="diptych of book covers, on the front of an abstract blue building"
-                  url="https://hyperlink.academy/studio/4lO7UZsrSbMZUN7zEt7I4q"
-                />
-                <StudioItem
-                  name="Internet Homesteading"
-                  description="building personal websites"
-                  image="/img/landing/internet.png"
-                  alt="pixel art of tree, path, and home on a hilltop, on the front of an abstract red building"
-                  url="https://hyperlink.academy/studio/46boxeFl9XacS39o1hwpJ8"
-                />
-                <StudioItem
-                  name="Handmade March"
-                  description="making things by hand every day"
-                  image="/img/landing/handmade.png"
-                  alt="a handmade pufferfish stamp, on the front of an abstract golden building"
-                  url="https://hyperlink.academy/studio/2QUkzDt56DYB7B0RS10mTL"
-                />
-              </div>
+                <div className="flex flex-col sm:flex-row gap-4 items-start">
+                  <div className="flex flex-col gap-4">
+                    <p>
+                      Make lists, letters, project notebooks and wikis, syllabi,
+                      link-in-bio pages, collections & more.
+                    </p>
 
-              <div
-                style={{}}
-                className="my-4 flex flex-col items-center gap-4 bg-[url('../public/img/landing/funAccent.svg')] bg-contain bg-center bg-no-repeat p-16 text-center"
-              >
-                <div className="flex flex-col gap-0 rounded-md bg-white p-4 text-grey-35">
-                  <h4>Want to start a club of your own?</h4>
-                  <p className="text-base text-grey-55">
-                    We&apos;ll help with ideas, setup, and tech support!
-                  </p>
+                    <p>
+                      Drop your email to follow along as we ship version 0.1 +
+                      weekly updates for new mini-launches this summer!
+                    </p>
+                  </div>
+                  <Image
+                    src="/img/landing/minilink-example.jpg"
+                    alt="example doc: what should I eat for dinner?"
+                    width={256}
+                    height={166}
+                    priority
+                    className="self-center rotate-3 p-4 rounded-[20px]"
+                  />
                 </div>
-                <Link
-                  href="https://hyperlink.academy/forms/propose-club"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <ButtonSecondary content="Propose a Club" />
-                </Link>
+
+                <SubscribeForm />
               </div>
             </div>
           </div>
@@ -451,29 +439,7 @@ export function HomePage() {
                 We send updates 1–2x / month about new features & experiments;
                 we&apos;ll never spam or share your email
               </p>
-              <div className="mx-auto flex gap-2">
-                <form
-                  action="https://buttondown.email/api/emails/embed-subscribe/hyperlink"
-                  method="post"
-                  target="popupwindow"
-                  onSubmit={async () => {
-                    window.open(
-                      "https://buttondown.email/hyperlink",
-                      "popupwindow"
-                    );
-                  }}
-                  className="embeddable-buttondown-form  flex h-9 gap-1"
-                >
-                  <input
-                    type="email"
-                    name="email"
-                    id="bd-email"
-                    placeholder="email"
-                    required
-                  />
-                  <ButtonSecondary content="Subscribe!" type="submit" />
-                </form>
-              </div>
+              <SubscribeForm />
             </div>
           </div>
 
@@ -562,6 +528,31 @@ const FeatureListItem = (props: {
         </p>
         <p className="text-grey-55">{props.description}</p>
       </div>
+    </div>
+  );
+};
+
+const SubscribeForm = () => {
+  return (
+    <div className="mx-auto flex gap-2">
+      <form
+        action="https://buttondown.email/api/emails/embed-subscribe/hyperlink"
+        method="post"
+        target="popupwindow"
+        onSubmit={async () => {
+          window.open("https://buttondown.email/hyperlink", "popupwindow");
+        }}
+        className="embeddable-buttondown-form  flex h-9 gap-1"
+      >
+        <input
+          type="email"
+          name="email"
+          id="bd-email"
+          placeholder="email"
+          required
+        />
+        <ButtonSecondary content="Subscribe!" type="submit" />
+      </form>
     </div>
   );
 };
