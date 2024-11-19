@@ -166,11 +166,11 @@ export function HomePage() {
           <div className="mx-auto">
             <div className="relative m-2 mx-4 -mt-12 flex max-w-3xl flex-col gap-8 border border-grey-80 bg-white p-4 pt-6 sm:mx-8 sm:p-8 sm:pt-8 sm:text-lg rounded-md">
               <div className="absolute -top-[16px] right-[8px] w-max rotate-3 rounded-md bg-accent-red p-1 text-sm font-bold text-white sm:-right-[32px] sm:p-2 sm:text-base">
-                in progress!
+                current project!
               </div>
               <div className="flex max-w-2xl flex-col gap-4 text-grey-35">
                 <h2 className="text-center">
-                  Hyperlink is prototyping a new app for making{" "}
+                  Hyperlink is building a new app for making{" "}
                   <div className="inline-block italic">
                     <span className="text-[#cc0d96]">d</span>
                     <span className="text-[#0093ce]">e</span>
@@ -185,44 +185,61 @@ export function HomePage() {
                   </div>{" "}
                   <span className="underline decoration-wavy decoration-accent-gold decoration-2">
                     documents
-                  </span>
+                  </span>{" "}
+                  —{" "}
+                  <a
+                    target="_blank"
+                    href="https://leaflet.pub"
+                    className="text-accent-green hover:underline"
+                  >
+                    Leaflet
+                  </a>
                   .
                 </h2>
 
                 <p>
-                  Imagine: quick tiny documents that can grow into rich
-                  environments for creative collaboration ✨🌱
+                  It's a lightweight collaborative publishing tool for quick
+                  tiny docs that can grow into rich creative surfaces ✨🌱
                 </p>
                 <ul>
-                  <li>Like Google Docs…but faster, nicer looking, more fun</li>
-                  <li>
-                    Like Notion…but cozier, more customizable, easy to share
-                  </li>
+                  <li>Like Google Docs…but faster, prettier, more fun</li>
+                  <li>Like Notion…but cozy, customizable, easier to share</li>
                 </ul>
 
                 <div className="flex flex-col sm:flex-row gap-4 items-start">
                   <div className="flex flex-col gap-4">
                     <p>
-                      Make lists, letters, project notebooks and wikis, syllabi,
-                      link-in-bio pages, collections & more.
+                      With rich text, images, nested pages, lists, link
+                      previews, custom themes…
                     </p>
-
                     <p>
-                      Drop your email to follow along as we ship version 0.1 +
-                      weekly updates for new mini-launches this summer!
+                      From shared lists to love letters, poems to project notes,
+                      syllabi to scrapbooks, wikis & lists & collections & more.
                     </p>
+                    <p>
+                      Try at{" "}
+                      <a
+                        target="_blank"
+                        href="https://leaflet.pub"
+                        className="text-accent-green hover:underline"
+                      >
+                        leaflet.pub
+                      </a>{" "}
+                      — no account needed!
+                    </p>
+                    <p>Drop your email for Leaflet updates 🍃</p>
                   </div>
                   <Image
-                    src="/img/landing/minilink-example.jpg"
-                    alt="example doc: what should I eat for dinner?"
+                    src="/img/landing/home-gold-md-1.jpg"
+                    alt="grid of leaflet docs"
                     width={256}
-                    height={166}
+                    height={256}
                     priority
                     className="self-center rotate-3 p-4 rounded-[20px]"
                   />
                 </div>
 
-                <SubscribeForm />
+                <SubscribeFormLeaflet />
               </div>
             </div>
           </div>
@@ -439,7 +456,7 @@ export function HomePage() {
                 We send updates 1–2x / month about new features & experiments;
                 we&apos;ll never spam or share your email
               </p>
-              <SubscribeForm />
+              <SubscribeFormHyperlink />
             </div>
           </div>
 
@@ -532,15 +549,40 @@ const FeatureListItem = (props: {
   );
 };
 
-const SubscribeForm = () => {
+const SubscribeFormHyperlink = () => {
   return (
     <div className="mx-auto flex gap-2">
       <form
-        action="https://buttondown.email/api/emails/embed-subscribe/hyperlink"
+        action="https://buttondown.com/api/emails/embed-subscribe/hyperlink"
         method="post"
         target="popupwindow"
         onSubmit={async () => {
-          window.open("https://buttondown.email/hyperlink", "popupwindow");
+          window.open("https://buttondown.com/hyperlink", "popupwindow");
+        }}
+        className="embeddable-buttondown-form  flex h-9 gap-1"
+      >
+        <input
+          type="email"
+          name="email"
+          id="bd-email"
+          placeholder="email"
+          required
+        />
+        <ButtonSecondary content="Subscribe!" type="submit" />
+      </form>
+    </div>
+  );
+};
+
+const SubscribeFormLeaflet = () => {
+  return (
+    <div className="mx-auto flex gap-2">
+      <form
+        action="https://buttondown.com/api/emails/embed-subscribe/leaflet"
+        method="post"
+        target="popupwindow"
+        onSubmit={async () => {
+          window.open("https://buttondown.com/leaflet", "popupwindow");
         }}
         className="embeddable-buttondown-form  flex h-9 gap-1"
       >
@@ -573,11 +615,11 @@ const SubscribeModal = (props: { open: boolean; onClose: () => void }) => {
         we&apos;ll never spam or share your email
       </p>
       <form
-        action="https://buttondown.email/api/emails/embed-subscribe/hyperlink"
+        action="https://buttondown.com/api/emails/embed-subscribe/hyperlink"
         method="post"
         target="popupwindow"
         onSubmit={async () => {
-          window.open("https://buttondown.email/hyperlink", "popupwindow");
+          window.open("https://buttondown.com/hyperlink", "popupwindow");
         }}
         className="embeddable-buttondown-form  flex h-9 w-full gap-2"
       >
